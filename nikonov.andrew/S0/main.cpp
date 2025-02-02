@@ -1,5 +1,5 @@
-#include "credentials.hpp"
 #include <iostream>
+#include "credentials.hpp"
 int main()
 {
   nikonov::out_credentials(std::cout) << "\n";
