@@ -3,5 +3,5 @@
 
 std::ostream & kushekbaev::outCredentials(std::ostream & out)
 {
-  return out << "kushekbaev.daniil";
+  return out << "kushekbaev.danil";
 }
