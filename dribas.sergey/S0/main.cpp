@@ -3,7 +3,7 @@
 
 int main()
 {
-  dribas::outCredentials(std::cout) << "dribas.sergey";
+  dribas::outCredentials(std::cout);
   std::cout << '\n';
   return 0;
 }
