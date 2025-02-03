@@ -3,5 +3,5 @@
 
 std::ostream & dribas::outCredentials(std::ostream & out)
 {
-  return out << "dribas.serggay";
+  return out << "dribas.sergey";
 }
