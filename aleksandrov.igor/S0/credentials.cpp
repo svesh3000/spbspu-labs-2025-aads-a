@@ -5,3 +5,4 @@ std::ostream& aleksandrov::outputCredentials(std::ostream& out)
 {
   return out << "aleksandrov.igor";
 }
+
