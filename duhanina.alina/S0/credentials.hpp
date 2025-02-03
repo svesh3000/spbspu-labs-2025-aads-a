@@ -5,7 +5,7 @@
 
 namespace duhanina
 {
-  std::ostream& outCredentials(std::ostream & out);
+  std::ostream& outCredentials(std::ostream& out);
 }
 
 #endif
