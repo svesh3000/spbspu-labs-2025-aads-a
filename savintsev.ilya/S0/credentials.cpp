@@ -1,6 +1,7 @@
 #include "credentials.hpp"
+#include <iostream>
 
-std::ostream &savintsev::out_credentials(std::ostream &out)
+std::ostream & savintsev::out_credentials(std::ostream & out)
 {
-  // TODO: insert return statement here
+  return out << "savintsev.ilya";
 }

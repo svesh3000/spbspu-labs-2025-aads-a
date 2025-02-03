@@ -3,5 +3,5 @@
 
 int main()
 {
-  savintsev::out_credentials(std::cout) << "\n";
+  savintsev::out_credentials(std::cout) << std::endl;
 }
