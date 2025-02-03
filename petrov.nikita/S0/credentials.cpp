@@ -3,5 +3,5 @@
 
 std::ostream & petrov::out_credentials(std::ostream & out)
 {
-  return out << "petrov.nekich";
+  return out << "petrov.nikita";
 }
