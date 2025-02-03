@@ -1,8 +1,9 @@
 #include <iostream>
+#include "credentials.hpp"
 
 int main()
 {
-  std::cout << "dribas.sergey";
+  dribas::outCredentials(std::cout) << "dribas.sergey";
   std::cout << '\n';
   return 0;
 }
