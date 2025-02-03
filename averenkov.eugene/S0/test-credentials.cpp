@@ -5,6 +5,6 @@
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
   std::ostringstream out;
-  averenkov::out_credentials(out);
+  averenkov::outCredentials(out);
   BOOST_TEST(out.str() == "averenkov.eugene");
 }
