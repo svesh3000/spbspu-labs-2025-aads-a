@@ -11,4 +11,4 @@ BOOST_AUTO_TEST_CASE(credentials_test)
   BOOST_TEST(out.str() == "petrov.nikita");
 }
 
-BOOS_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END()
