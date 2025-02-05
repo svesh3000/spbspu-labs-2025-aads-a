@@ -2,6 +2,8 @@
 #include <sstream>
 #include "credentials.hpp"
 
+BOOST_AUTO_TEST_SUITE(credentials_suite)
+
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
   std::ostringstream out;
@@ -9,3 +11,4 @@ BOOST_AUTO_TEST_CASE(credentials_test)
   BOOST_TEST(out.str() == "petrov.nikita");
 }
 
+BOOS_AUTO_TEST_SUITE_END()
