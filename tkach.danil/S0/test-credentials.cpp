@@ -2,7 +2,7 @@
 #include <sstream>
 #include "credentials.hpp"
 
-BOOST_AUTO_TEST_CASE(credentialTest)
+BOOST_AUTO_TEST_CASE(credential_test)
 {
   std::ostringstream out;
   tkach::outCredentials(out);
