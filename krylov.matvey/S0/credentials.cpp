@@ -3,5 +3,5 @@
 
 std::ostream & krylov::out_credentials(std::ostream & out)
 {
-  return out << "krylov.matvay\n";
+  return out << "krylov.matvey";
 }
