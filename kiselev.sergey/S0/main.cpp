@@ -2,5 +2,5 @@
 #include "credentials.hpp"
 int main()
 {
-  kiselev::credentials(std::cout);
+  kiselev::credentials(std::cout) << "\n";
 }
