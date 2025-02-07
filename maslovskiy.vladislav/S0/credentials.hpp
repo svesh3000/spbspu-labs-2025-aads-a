@@ -4,7 +4,7 @@
 
 namespace maslovskiy
 {
-  std::ostream & out_credentials(std::ostream & out);
+  std::ostream& out_credentials(std::ostream&  out);
 }
 
 #endif
