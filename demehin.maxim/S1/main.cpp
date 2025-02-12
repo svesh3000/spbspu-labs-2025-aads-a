@@ -2,62 +2,104 @@
 #include <utility>
 #include <string>
 #include <list>
+#include <algorithm>
 
 namespace
 {
-  int* copyNums(const int* orig_nums, size_t nums_cnt)
+  size_t defineMaxSize(std::list< std::pair< std::string, std::list< int > > >& pairsList)
   {
-    int* nums = new int[nums_cnt];
-    for (size_t i = 0; i < nums_cnt; i++)
+    size_t max_size = 0;
+    for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
     {
-      nums[i] = orig_nums[i];
+      max_size = std::max(max_size, it->second.size());
     }
-    return nums;
+    return max_size;
   }
 
-  int* inputNums(std::istream& in, size_t capacity)
+  int* copyNums(const int* nums, size_t nums_cnt)
   {
-    int* nums = new int[capacity];
-    size_t size = 0;
-    int num = 0;
-    while (in >> num)
+    int* new_nums = new int[nums_cnt];
+    for (size_t i = 0; i < nums_cnt; i++)
     {
-      if (size >= capacity)
+      new_nums[i] = nums[i];
+    }
+    return new_nums;
+  }
+
+  void printSumValues(std::ostream& out, const int* vals, size_t size)
+  {
+    out << vals[0];
+    for (size_t i = 1; i < size; i++)
+    {
+      out << " " << vals[i];
+    }
+  }
+
+  void printValues(std::ostream& out, std::list< std::pair< std::string, std::list< int > > > pairsList)
+  {
+    size_t capacity = 128;
+    int* sum_values = new int[capacity];
+    size_t max_size = defineMaxSize(pairsList);
+    size_t sum_vals_cnt = 0;
+    for (size_t i = 0; i < max_size; i++)
+    {
+      int sum = 0;
+      for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
+      {
+        if (!it->second.empty())
+        {
+          out << it->second.front() << " ";
+          sum += it->second.front();
+          it->second.pop_front();
+        }
+      }
+      if (i >= capacity)
       {
         capacity *= 2;
-        int* new_nums = nullptr;
+        int* new_values = nullptr;
         try
         {
-          new_nums = copyNums(nums, capacity);
+          new_values = copyNums(sum_values, capacity);
         }
         catch (const std::bad_alloc&)
         {
-          delete[] nums;
+          delete[] sum_values;
           throw;
         }
-        delete[] nums;
-        nums = new_nums;
+        delete[] sum_values;
+        sum_values = new_values;
       }
 
-      nums[size++] = num;
+      sum_values[sum_vals_cnt++] = sum;
+      out << "\n";
     }
-    in.clear();
-    return nums;
+    printSumValues(out, sum_values, sum_vals_cnt);
   }
 }
 
 int main()
 {
-
-  using pairsList = std::list< std::pair< std::string, int* > >;
-  pairsList numsList;
-  size_t nodes_cnt = 0;
+  std::list< std::pair< std::string, std::list< int > > > pairsList;
   std::string nodeName;
   while (std::cin >> nodeName)
   {
-    int* nums = inputNums(std::cin, 128);
-    numsList.push_back(std::pair< std::string, int* >(nodeName, nums));
-    nodes_cnt++;
+    std::list< int > numsList;
+    int num = 0;
+    while (std::cin >> num)
+    {
+      numsList.push_back(num);
+    }
+    pairsList.push_back(std::make_pair(nodeName, numsList));
+    std::cin.clear();
   }
 
+  std::cout << pairsList.begin()->first;
+  for (auto it = ++pairsList.begin(); it != pairsList.end(); ++it)
+  {
+    std::cout << " " << it->first;
+  }
+  std::cout << "\n";
+
+  printValues(std::cout, pairsList);
+  std::cout << "\n";
 }
