@@ -6,7 +6,9 @@
 
 namespace
 {
-  size_t defineMaxSize(std::list< std::pair< std::string, std::list< int > > >& pairsList)
+  using ListOfPairs = std::list< std::pair< std::string, std::list< int > > >;
+
+  size_t defineMaxSize(ListOfPairs pairsList)
   {
     size_t max_size = 0;
     for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
@@ -35,7 +37,7 @@ namespace
     }
   }
 
-  void printValues(std::ostream& out, std::list< std::pair< std::string, std::list< int > > > pairsList)
+  void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t capacity = 128;
     int* sum_values = new int[capacity];
@@ -44,11 +46,20 @@ namespace
     for (size_t i = 0; i < max_size; i++)
     {
       int sum = 0;
-      for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
+      bool isFirst = true;
+      for (auto it = pairsList.begin(); it != pairsList.end(); it++)
       {
         if (!it->second.empty())
         {
-          out << it->second.front() << " ";
+          if (!isFirst)
+          {
+            out << "_";
+          }
+          else
+          {
+            isFirst = false;
+          }
+          out << it->second.front();
           sum += it->second.front();
           it->second.pop_front();
         }
