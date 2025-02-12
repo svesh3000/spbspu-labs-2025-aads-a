@@ -3,5 +3,5 @@
 
 std::ostream & brevnov::out_credentials(std::ostream & out)
 {
-  return out << "brevnov.nekita";
+  return out << "brevnov.nekita";   
 }
