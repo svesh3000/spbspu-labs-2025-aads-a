@@ -2,7 +2,7 @@
 #include <sstream>
 #include "credentials.hpp"
 
-BOOST_AUTO_TEST_CASE(credential_test)
+BOOST_AUTO_TEST_CASE(credentials_test)
 {
   std::ostringstream out;
   brevnov::out_credentials(out);
