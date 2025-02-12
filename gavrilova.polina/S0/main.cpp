@@ -3,5 +3,5 @@
 
 int main()
 {
-  dobsov::out_credentials(std::cout) << "\n";
+  gavrilova::out_credentials(std::cout) << "\n";
 }
