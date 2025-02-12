@@ -34,11 +34,11 @@ int main()
     }
   }
   std::cout << "\n";
-  //std::list<size_t> sums;
+  std::list<size_t> sums;
   for (size_t i = 0; i < max_size; ++i)
   {
     size_t printed = 0;
-    //sums.push_back(0);
+    size_t sum = 0;
     for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
     {
       auto temp_it = it->second.begin();
@@ -50,14 +50,25 @@ int main()
         }
         if (printed != 0)
         {
-          std::cout << "_";
+          std::cout << " ";
         }
         std::cout << *(temp_it);
+        sum += *(temp_it);
         printed++;
       }
     }
-  std::cout << "\n";
+    sums.push_back(sum);
+    std::cout << "\n";
   }
+  for (std::list<size_t>::iterator it = sums.begin(); it != sums.end(); ++it)
+  {
+    std::cout << *it;
+    if (std::next(it) != sums.end())
+    {
+      std::cout << " ";
+    }
+  }
+  std::cout << "\n";
 }
 
 /*
