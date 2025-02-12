@@ -3,6 +3,6 @@
 #include <iosfwd>
 namespace brevnov
 {
-  std::ostream
+  std::ostream & out_credentials(std::ostream & out);
 }
 #endif
