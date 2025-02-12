@@ -5,4 +5,3 @@ int main()
 {
   dobsov::out_credentials(std::cout) << "\n";
 }
-
