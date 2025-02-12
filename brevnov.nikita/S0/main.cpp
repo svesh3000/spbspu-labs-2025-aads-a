@@ -1,6 +1,7 @@
 #include <iostream>
+#include "credentials.hpp"
 
 int main() 
 {
-  std::cout << "brevnov.nikita\n";
+  brevnov::out_credentials(std::cout) << "\n";
 }
