@@ -1,8 +1,7 @@
 #include <list>
 #include <iostream>
 #include <string>
-#include <algorithm>
-#include <limits.h>
+#include "list.hpp"
 
 int main()
 {
