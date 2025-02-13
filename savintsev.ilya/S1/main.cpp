@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <limits.h>
 
 int main()
 {
@@ -9,6 +10,7 @@ int main()
   using storage_t = std::list<pair_t>;
   storage_t storage;
   std::string buffer = "";
+  bool was_input = false;
   size_t max_size = 0;
   std::cin >> buffer;
   while (!std::cin.eof())
@@ -25,6 +27,12 @@ int main()
     }
     max_size = std::max(max_size, temp_max_size);
     storage.push_back(temp_pair);
+    was_input = true;
+  }
+  if (!was_input)
+  {
+    std::cout << "0\n";
+    return 0;
   }
   for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
   {
@@ -36,6 +44,7 @@ int main()
   }
   std::cout << "\n";
   std::list<size_t> sums;
+  bool was_overflow = false;
   for (size_t i = 0; i < max_size; ++i)
   {
     size_t printed = 0;
@@ -54,12 +63,25 @@ int main()
           std::cout << " ";
         }
         std::cout << *(temp_it);
+        if (!((sum + *(temp_it) >= sum) && (sum + *(temp_it) >= *(temp_it))))
+        {
+          was_overflow = true;
+        }
         sum += *(temp_it);
         printed++;
       }
     }
     sums.push_back(sum);
     std::cout << "\n";
+  }
+  if (errno == ERANGE || was_overflow)
+  {
+    std::cerr << "WARNING: some numbers are too big, overflow\n";
+    return 1;
+  }
+  if (sums.empty())
+  {
+    sums.push_back(0);
   }
   for (std::list<size_t>::iterator it = sums.begin(); it != sums.end(); ++it)
   {
