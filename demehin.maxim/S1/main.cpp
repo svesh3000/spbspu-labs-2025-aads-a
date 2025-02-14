@@ -60,7 +60,7 @@ namespace
         {
           if (!isFirst)
           {
-            out << "_";
+            out << " ";
           }
           else
           {
@@ -110,6 +110,12 @@ int main()
     }
     pairsList.push_back(std::make_pair(nodeName, numsList));
     std::cin.clear();
+  }
+
+  if (pairsList.size() == 0)
+  {
+    std::cout << "0\n";
+    return 0;
   }
 
   std::cout << pairsList.begin()->first;
