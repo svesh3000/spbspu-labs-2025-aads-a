@@ -5,6 +5,6 @@
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
   std::ostringstream out;
-  asafov::outCredentials(out);
+  asafov::idents(out);
   BOOST_TEST(out.str() == "asafov.andrew");
 }
