@@ -1,11 +1,12 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <iterator>
+#include <cassert>
 
 namespace savintsev
 {
   template< typename T >
-  class ListNode
+  struct ListNode
   {
     T * data;
     ListNode< T > * next;
@@ -30,8 +31,9 @@ namespace savintsev
   class List
   {
   public:
+    //using iterator = Iterator;
     class Iterator:
-      public std::iterator<std::bidirectional_iterator_tag, T>
+      public std::iterator< std::bidirectional_iterator_tag, T >
     {
     public:
       Iterator(ListNode< T > * rhs):
@@ -39,7 +41,11 @@ namespace savintsev
       {}
       T & operator*()
       {
-        return node->data;
+        return *(node->data);
+      }
+      T * operator->()
+      {
+        return std::addressof(*(node->data));
       }
       Iterator & operator++()
       {
@@ -91,12 +97,12 @@ namespace savintsev
 
 template< typename T >
 savintsev::List< T >::List():
-  list_size(0),
-  dummy(new ListNode< T >())
+  dummy(new ListNode< T >()),
+  list_size(0)
 {}
 
-template< typename T >
-savintsev::List< T >::~List()
+template <typename T>
+savintsev::List<T>::~List()
 {
   clear();
   delete dummy;
@@ -141,7 +147,7 @@ size_t savintsev::List< T >::size() const
 template< typename T >
 void savintsev::List< T >::push_front(const T & value)
 {
-  ListNode< T > new_node = new ListNode< T >(value, dummy->next, dummy);
+  ListNode< T > * new_node = new ListNode< T >(value, dummy->next, dummy);
   dummy->next->prev = new_node;
   dummy->next = new_node;
   ++list_size;
@@ -150,7 +156,7 @@ void savintsev::List< T >::push_front(const T & value)
 template< typename T >
 void savintsev::List< T >::push_back(const T & value)
 {
-  ListNode< T > new_node = new ListNode< T >(value, dummy, dummy->next);
+  ListNode< T > * new_node = new ListNode< T >(value, dummy, dummy->next);
   dummy->prev->next = new_node;
   dummy->prev = new_node;
   ++list_size;
@@ -170,7 +176,7 @@ void savintsev::List< T >::pop_front()
 template< typename T >
 void savintsev::List< T >::clear()
 {
-  while (!empty)
+  while (!empty())
   {
     pop_front();
   }
