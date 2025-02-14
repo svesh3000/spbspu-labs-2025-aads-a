@@ -1,6 +1,7 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_COMPARISON_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_COMPARISON_HPP
 
+#include <algorithm>
 #include "forward-list-fwd-declaration.hpp"
 
 namespace kizhin {
@@ -8,8 +9,7 @@ namespace kizhin {
   template < typename T >
   bool operator==(const ForwardList< T >& lhs, const ForwardList< T >& rhs)
   {
-    // TODO: Implement operator==
-    return true; // stub for tests running
+    return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
   }
 
   template < typename T >
@@ -21,8 +21,20 @@ namespace kizhin {
   template < typename T >
   bool operator<(const ForwardList< T >& lhs, const ForwardList< T >& rhs)
   {
-    // TODO: Implement operator<
-    return true; // stub for tests running
+    using ConstIter = typename ForwardList< T >::const_iterator;
+    ConstIter first1 = lhs.begin();
+    ConstIter first2 = rhs.begin();
+    ConstIter last1 = lhs.end();
+    ConstIter last2 = rhs.end();
+    for (; (first1 != last1) && (first2 != last2); ++first1, ++first2) {
+      if (*first1 < *first2) {
+        return true;
+      }
+      if (*first2 < *first1) {
+        return false;
+      }
+    }
+    return (first1 == last1) && (first2 != last2);
   }
 
   template < typename T >
