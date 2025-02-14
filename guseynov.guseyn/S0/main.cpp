@@ -1,6 +1,7 @@
 #include <iostream>
+#include "credentials.hpp"
 
 int main()
 {
-  std::cout << "guseynov.guseyn\n"
+  guseynov::out_credentials(std::cout) << "\n";
 }
