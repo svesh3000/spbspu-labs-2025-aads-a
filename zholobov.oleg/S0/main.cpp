@@ -2,6 +2,7 @@
 
 #include "credentials.hpp"
 
-int main() {
+int main()
+{
   zholobov::out_credentials(std::cout) << "\n";
 }
