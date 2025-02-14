@@ -3,6 +3,6 @@
 
 int main()
 {
-  evstyunichev::out_credentials(std::cout) << '\n';
+  evstyunichev::out_credentials(std::cout) << "\n";
   return 0;
 }

@@ -18,4 +18,11 @@ BOOST_AUTO_TEST_CASE(credentials_test_second)
   BOOST_TEST(out.str() == "evstyunichev.konstantin");
 }
 
+BOOST_AUTO_TEST_CASE(credentials_test_third)
+{
+  std::ostringstream out;
+  evstyunichev::out_credentials(out);
+  BOOST_TEST(out.str() == "evstyunichev.konstantin");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
