@@ -30,17 +30,24 @@ namespace
 
   void printSumValues(std::ostream& out, const int* vals, size_t size)
   {
-    out << vals[0];
-    for (size_t i = 1; i < size; i++)
+    if (size > 0)
     {
-      out << " " << vals[i];
+      out << vals[0];
+      for (size_t i = 1; i < size; i++)
+      {
+        out << " " << vals[i];
+      }
+    }
+    else
+    {
+      out << 0;
     }
   }
 
   void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t capacity = 128;
-    int* sum_values = new int[capacity];
+    int* sum_values = new int[capacity]();
     size_t max_size = defineMaxSize(pairsList);
     size_t sum_vals_cnt = 0;
     for (size_t i = 0; i < max_size; i++)
@@ -85,6 +92,7 @@ namespace
       out << "\n";
     }
     printSumValues(out, sum_values, sum_vals_cnt);
+    delete[] sum_values;
   }
 }
 
