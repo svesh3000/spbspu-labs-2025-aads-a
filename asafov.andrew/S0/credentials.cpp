@@ -2,5 +2,5 @@
 
 void asafov::idents(std::ostream& out)
 {
-  out << "asafov.andrew" << '\n';
+  out << "asafov.andrew";
 }

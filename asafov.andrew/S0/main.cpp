@@ -4,4 +4,5 @@
 int main()
 {
   asafov::idents(std::cout);
+  std::cout << '\n';
 }
