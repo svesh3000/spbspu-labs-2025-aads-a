@@ -1,9 +1,11 @@
 #define BOOST_TEST_MODULE Test credentials
 #include <boost/test/included/unit_test.hpp>
+#include <sstream>
+#include "credentials.hpp"
 
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
-  int i = 0;
-  BOOST_TEST(i);
-  BOOST_TEST(i == 2);
+  std::ostringstream out;
+  evstyunichev::out_credentials(out);
+  BOOST_TEST(out.str() == "evstyunichev.konstantin");
 }
