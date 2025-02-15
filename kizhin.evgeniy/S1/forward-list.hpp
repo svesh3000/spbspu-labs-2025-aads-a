@@ -29,10 +29,10 @@ namespace kizhin {
     ForwardList();
     ForwardList(const ForwardList&);
     ForwardList(ForwardList&&) noexcept;
-    explicit ForwardList(size_type, const_reference = value_type{});
+    explicit ForwardList(size_type, const_reference = value_type());
     template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
     ForwardList(InputIt, InputIt);
-    ForwardList(std::initializer_list< value_type > l): ForwardList(l.begin(), l.end()) {}
+    ForwardList(std::initializer_list< value_type >);
     ~ForwardList();
 
     ForwardList& operator=(const ForwardList&);
@@ -51,66 +51,51 @@ namespace kizhin {
     bool empty() const noexcept;
     size_type size() const noexcept;
 
-    void push_back(const_reference);
-    void push_back(value_type&&);
-    void push_front(const_reference);
-    void push_front(value_type&&);
-    void pop_back() noexcept;
-    void pop_front() noexcept;
+    void pushBack(value_type);
+    void pushFront(value_type);
     template < typename... Args >
-    void emplace_back(Args&&...);
+    void emplaceBack(Args&&...);
     template < typename... Args >
-    void emplace_front(Args&&...);
+    void emplaceFront(Args&&...);
     template < typename... Args >
-    iterator emplace(const_iterator, Args&&...);
+    iterator emplaceAfter(const_iterator, Args&&...);
+
+    void popBack();
+    void popFront();
+    iterator eraseAfter(const_iterator);
+    iterator eraseAfter(const_iterator, const_iterator);
 
     void assign(size_type, const_reference);
     template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
     void assign(InputIt, InputIt);
     void assign(std::initializer_list< value_type >);
 
-    iterator insert(const_iterator, const_reference);
-    iterator insert(const_iterator, value_type&&);
-    iterator insert(const_iterator, size_type, const_reference);
+    iterator insertAfter(const_iterator, value_type);
+    iterator insertAfter(const_iterator, size_type, const_reference);
     template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
-    iterator insert(const_iterator, InputIt, InputIt);
-    iterator insert(const_iterator, std::initializer_list< value_type >);
+    iterator insertAfter(const_iterator, InputIt, InputIt);
+    iterator insertAfter(const_iterator, std::initializer_list< value_type >);
 
-    iterator erase(iterator);
-    iterator erase(const_iterator);
-    iterator erase(iterator, iterator);
-    iterator erase(const_iterator, const_iterator);
+    void clear() noexcept;
+    void swap(ForwardList&) noexcept;
+
+    void reverse();
+    void spliceAfter(const_iterator, ForwardList&);
+    void spliceAfter(const_iterator, ForwardList&, const_iterator);
+    void spliceAfter(const_iterator, ForwardList&, const_iterator, const_iterator);
 
     void remove(const_reference);
     template < typename UnaryPredicate >
-    void remove_if(UnaryPredicate);
-// TODO: Define splice
-#if 0
-    void splice(const_iterator, List&);
-    void splice(const_iterator, List&&);
-    void splice(const_iterator, List&, const_iterator);
-    void splice(const_iterator, List&&, const_iterator);
-    void splice(const_iterator, List&, const_iterator, const_iterator);
-    void splice(const_iterator, List&&, const_iterator, const_iterator);
-#endif
-
-    void reverse() noexcept;
+    void removeIf(UnaryPredicate);
     void unique();
     template < typename BinaryPredicate >
     void unique(BinaryPredicate);
     void sort();
     template < typename Comp >
     void sort(Comp);
-
     void merge(ForwardList&);
-    void merge(ForwardList&&);
     template < typename Comp >
     void merge(ForwardList&, Comp);
-    template < typename Comp >
-    void merge(ForwardList&&, Comp);
-
-    void clear() noexcept;
-    void swap(ForwardList&) noexcept;
 
   private:
     using Node = detail::Node< value_type >;
@@ -129,7 +114,7 @@ namespace kizhin {
   ForwardList< T >::ForwardList(const ForwardList& rhs): ForwardList()
   {
     for (const_iterator i = rhs.begin(), end = rhs.end(); i != end; ++i) {
-      push_back(*i);
+      pushBack(*i);
     }
   }
 
@@ -145,7 +130,7 @@ namespace kizhin {
   ForwardList< T >::ForwardList(size_type size, const_reference value): ForwardList()
   {
     for (size_type i = 0; i != size; ++i) {
-      push_back(value);
+      pushBack(value);
     }
   }
 
@@ -154,8 +139,14 @@ namespace kizhin {
   ForwardList< T >::ForwardList(InputIt first, InputIt last): ForwardList()
   {
     for (; first != last; ++first) {
-      push_back(*first);
+      pushBack(*first);
     }
+  }
+
+  template < typename T >
+  ForwardList< T >::ForwardList(std::initializer_list< value_type > init):
+    ForwardList(init.begin(), init.end())
+  {
   }
 
   template < typename T >
@@ -245,7 +236,7 @@ namespace kizhin {
   template < typename T >
   bool ForwardList< T >::empty() const noexcept
   {
-    return begin_ == nullptr;
+    return size_ == 0;
   }
 
   template < typename T >
@@ -255,64 +246,20 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::push_back(const_reference value)
+  void ForwardList< T >::pushBack(value_type value)
   {
-    emplace_back(value);
+    emplaceBack(std::move(value));
   }
 
   template < typename T >
-  void ForwardList< T >::push_back(value_type&& value)
+  void ForwardList< T >::pushFront(value_type value)
   {
-    emplace_back(std::move(value));
-  }
-
-  template < typename T >
-  void ForwardList< T >::push_front(const_reference value)
-  {
-    emplace_front(value);
-  }
-
-  template < typename T >
-  void ForwardList< T >::push_front(value_type&& value)
-  {
-    emplace_front(std::move(value));
-  }
-
-  template < typename T >
-  void ForwardList< T >::pop_back() noexcept
-  {
-    assert(!empty());
-    if (begin_ == end_) {
-      delete begin_;
-      begin_ = nullptr;
-      end_ = nullptr;
-    } else {
-      Node* tmp = begin_;
-      while (tmp->next != end_) {
-        tmp = tmp->next;
-      }
-      delete tmp->next;
-      tmp->next = nullptr;
-    }
-    --size_;
-  }
-
-  template < typename T >
-  void ForwardList< T >::pop_front() noexcept
-  {
-    assert(!empty());
-    Node* tmp = begin_;
-    begin_ = begin_->next;
-    if (begin_ == nullptr) {
-      end_ = nullptr;
-    }
-    --size_;
-    delete tmp;
+    emplaceFront(std::move(value));
   }
 
   template < typename T >
   template < typename... Args >
-  void ForwardList< T >::emplace_back(Args&&... args)
+  void ForwardList< T >::emplaceBack(Args&&... args)
   {
     std::unique_ptr< Node > newNode = std::make_unique< Node >(
         Node{ value_type(std::forward< Args >(args)...), nullptr });
@@ -327,7 +274,7 @@ namespace kizhin {
 
   template < typename T >
   template < typename... Args >
-  void ForwardList< T >::emplace_front(Args&&... args)
+  void ForwardList< T >::emplaceFront(Args&&... args)
   {
     begin_ = new Node{ value_type(std::forward< Args >(args)...), begin_ };
     if (end_ == nullptr) {
@@ -338,21 +285,14 @@ namespace kizhin {
 
   template < typename T >
   template < typename... Args >
-  typename ForwardList< T >::iterator ForwardList< T >::emplace(const_iterator position,
-      Args&&... args)
+  typename ForwardList< T >::iterator ForwardList< T >::emplaceAfter(
+      const_iterator position, Args&&... args)
   {
-    if (position == begin()) {
-      emplace_front(std::forward< Args >(args)...);
-      return begin();
-    }
     if (position == end()) {
-      emplace_back(std::forward< Args >(args)...);
+      emplaceBack(std::forward< Args >(args)...);
       return iterator(end_);
     }
-    Node* prev = begin_;
-    while (prev->next != position.node_) {
-      prev = prev->next;
-    }
+    Node* prev = position.node_;
     Node* newNode = new Node{ value_type(std::forward< Args >(args)...), prev->next };
     prev->next = newNode;
     ++size_;
@@ -360,124 +300,206 @@ namespace kizhin {
   }
 
   template < typename T >
+  void ForwardList< T >::popBack()
+  {
+    assert(!empty());
+    if (begin_ == end_) {
+      popFront();
+    } else {
+      Node* tmp = begin_;
+      while (tmp->next != end_) {
+        tmp = tmp->next;
+      }
+      delete tmp->next;
+      tmp->next = nullptr;
+      end_ = tmp;
+      --size_;
+    }
+  }
+
+  template < typename T >
+  void ForwardList< T >::popFront()
+  {
+    assert(!empty());
+    Node* tmp = begin_;
+    begin_ = begin_->next;
+    if (begin_ == nullptr) {
+      end_ = nullptr;
+    }
+    --size_;
+    delete tmp;
+  }
+
+  template < typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::eraseAfter(
+      const_iterator position)
+  {
+    assert(!empty());
+    return eraseAfter(position, std::next(position, 2));
+  }
+
+  template < typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::eraseAfter(const_iterator first,
+      const_iterator last)
+  {
+    // TODO: Refactor
+    assert(!empty());
+    Node* firstPtr = first.node_->next;
+    Node* lastPtr = last.node_;
+    while (firstPtr != lastPtr) {
+      Node* tmp = firstPtr->next;
+      delete firstPtr;
+      firstPtr = tmp;
+      --size_;
+    }
+    first.node_->next = firstPtr;
+    return iterator(first.node_);
+  }
+
+  template < typename T >
   void ForwardList< T >::assign(size_type size, const_reference value)
   {
-    clear();
-    for (size_type i = 0; i != size; ++i) {
-      push_back(value);
-    }
+    ForwardList tmp(size, value);
+    swap(tmp);
   }
 
   template < typename T >
   template < typename InputIt, detail::enable_if_input_iterator< InputIt > >
   void ForwardList< T >::assign(InputIt first, InputIt last)
   {
-    clear();
-    for (; first != last; ++first) {
-      push_back(*first);
+    ForwardList tmp(first, last);
+    swap(tmp);
+  }
+
+  template < typename T >
+  void ForwardList< T >::assign(std::initializer_list< value_type > init)
+  {
+    ForwardList tmp(init);
+    swap(tmp);
+  }
+
+  template < typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
+      const_iterator position, value_type value)
+  {
+    return emplaceAfter(position, std::move(value));
+  }
+
+  template < typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
+      const_iterator position, size_type size, const_reference value)
+  {
+    if (size == 0) {
+      return iterator(position.node_);
     }
-  }
-
-  template < typename T >
-  void ForwardList< T >::assign(std::initializer_list< value_type > l)
-  {
-    assign(l.begin(), l.end());
-  }
-
-  template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::insert(const_iterator position,
-      const_reference value)
-  {
-    return emplace(position, value);
-  }
-
-  template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::insert(const_iterator position,
-      value_type&& value)
-  {
-    return emplace(position, std::move(value));
-  }
-
-  template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::insert(const_iterator position,
-      size_type size, const_reference value)
-  {
-    assert(size != 0);
-    iterator result = emplace(position, value);
+    iterator result = emplaceAfter(position, value);
     position = result;
     for (size_type i = 1; i != size; ++i) {
-      ++position;
-      position = emplace(position, value);
+      position = emplaceAfter(position, value);
     }
     return result;
   }
 
   template < typename T >
   template < typename InputIt, detail::enable_if_input_iterator< InputIt > >
-  typename ForwardList< T >::iterator ForwardList< T >::insert(const_iterator position,
-      InputIt first, InputIt last)
+  typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
+      const_iterator position, InputIt first, InputIt last)
   {
-    iterator result = emplace(position, *first);
-    position = result;
+    if (first == last) {
+      return iterator(position.node_);
+    }
+    iterator result = emplaceAfter(position, *first);
+    iterator pos = result;
     ++first;
     for (; first != last; ++first) {
-      ++position;
-      position = emplace(position, *first);
+      pos = emplaceAfter(pos, *first);
     }
     return result;
   }
 
   template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::insert(const_iterator position,
-      std::initializer_list< value_type > init)
+  typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
+      const_iterator position, std::initializer_list< value_type > init)
   {
-    return insert(position, init.begin(), init.end());
+    return insertAfter(position, init.begin(), init.end());
   }
 
   template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::erase(iterator)
+  void ForwardList< T >::clear() noexcept
   {
-    // TODO: Implement erase
-    return iterator(); // stub for tests running
+    while (!empty()) {
+      popFront();
+    }
   }
 
   template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::erase(const_iterator)
+  void ForwardList< T >::swap(ForwardList& rhs) noexcept
   {
-    // TODO: Implement erase
-    return iterator(); // stub for tests running
-  }
-
-  template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::erase(iterator, iterator)
-  {
-    // TODO: Implement erase
-    return iterator(); // stub for tests running
-  }
-
-  template < typename T >
-  typename ForwardList< T >::iterator ForwardList< T >::erase(const_iterator,
-      const_iterator)
-  {
-    // TODO: Implement erase
-    return iterator(); // stub for tests running
+    using std::swap;
+    swap(begin_, rhs.begin_);
+    swap(end_, rhs.end_);
+    swap(size_, rhs.size_);
   }
 
   template < typename T >
   void ForwardList< T >::remove(const_reference value)
   {
-    remove_if([&value](const_reference rhs) -> bool { return value == rhs; });
+    removeIf([&value](const_reference rhs) -> bool {
+      return value == rhs;
+    });
   }
 
   template < typename T >
   template < typename UnaryPredicate >
-  void ForwardList< T >::remove_if(UnaryPredicate)
+  void ForwardList< T >::removeIf(UnaryPredicate p)
   {
-    // TODO: Implement remove
+    for (; begin_ != nullptr && p(begin_->data); --size_) {
+      Node* tmp = begin_;
+      begin_ = begin_->next;
+      delete tmp;
+    }
+    if (begin_ == nullptr) {
+      end_ = nullptr;
+      return;
+    }
+    Node* prev = begin_;
+    Node* curr = begin_->next;
+    while (curr != nullptr) {
+      if (p(curr->data)) {
+        prev->next = curr->next;
+        if (curr == end_) {
+          end_ = prev;
+        }
+        delete curr;
+        --size_;
+      } else {
+        prev = curr;
+      }
+      curr = prev->next;
+    }
   }
 
   template < typename T >
-  void ForwardList< T >::reverse() noexcept
+  void ForwardList< T >::spliceAfter(const_iterator, ForwardList&)
+  {
+    // TODO: Implement splice
+  }
+
+  template < typename T >
+  void ForwardList< T >::spliceAfter(const_iterator, ForwardList&, const_iterator)
+  {
+    // TODO: Implement splice
+  }
+
+  template < typename T >
+  void ForwardList< T >::spliceAfter(const_iterator, ForwardList&, const_iterator,
+      const_iterator)
+  {
+    // TODO: Implement splice
+  }
+
+  template < typename T >
+  void ForwardList< T >::reverse()
   {
     // TODO: Implement reverse
   }
@@ -515,40 +537,10 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::merge(ForwardList&&)
-  {
-    // TODO: Implement merge
-  }
-
-  template < typename T >
   template < typename Comp >
   void ForwardList< T >::merge(ForwardList&, Comp)
   {
     // TODO: Implement merge
-  }
-
-  template < typename T >
-  template < typename Comp >
-  void ForwardList< T >::merge(ForwardList&&, Comp)
-  {
-    // TODO: Implement merge
-  }
-
-  template < typename T >
-  void ForwardList< T >::clear() noexcept
-  {
-    while (!empty()) {
-      pop_front();
-    }
-  }
-
-  template < typename T >
-  void ForwardList< T >::swap(ForwardList& rhs) noexcept
-  {
-    using std::swap;
-    swap(begin_, rhs.begin_);
-    swap(end_, rhs.end_);
-    swap(size_, rhs.size_);
   }
 }
 
