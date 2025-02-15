@@ -1,3 +1,5 @@
+#include <cctype>
+#include <cerrno>
 #include <exception>
 #include <iostream>
 #include <limits>
@@ -5,13 +7,15 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <asm-generic/errno-base.h>
 
 using numberList = std::list< int >;
 using pair = std::pair< std::string, numberList >;
 using pairList = std::list< pair >;
+
 std::istream& listOfNumbers(std::istream& input, numberList& listNumber)
 {
-  int number = 0;
+  int number;
   while (input >> number)
   {
     listNumber.push_back(number);
@@ -33,7 +37,7 @@ std::ostream& outputName(std::ostream& output, pairList& list)
   return output;
 }
 
-std::list< int > outputNumbers(std::ostream& output, pairList& list)
+std::list< int > outputNumbers(std::ostream& output, pairList& list, bool& overflow)
 {
   pairList::const_iterator end = list.cend();
   pairList::const_iterator begin = list.cbegin();
@@ -43,6 +47,7 @@ std::list< int > outputNumbers(std::ostream& output, pairList& list)
     maxCount = maxCount < begin->second.size() ? begin->second.size() : maxCount;
   }
   std::list< int > sum;
+  const int max = std::numeric_limits< int >::max();
   for (size_t i = 0; i < maxCount; ++i)
   {
     int summa = 0;
@@ -60,6 +65,7 @@ std::list< int > outputNumbers(std::ostream& output, pairList& list)
       {
         output << " ";
       }
+      overflow = max - *nbegin >= summa ? true : false;
       summa += *nbegin;
     }
     output << "\n";
@@ -85,16 +91,13 @@ int main()
 {
   pairList list;
   std::string nameNode;
+  bool wasOverflow = false;
   try
   {
     while (std::cin >> nameNode)
     {
       numberList numbers;
-      if (!(listOfNumbers(std::cin, numbers)))
-      {
-        std::cerr << "Was overflow\n";
-        return 1;
-      }
+      listOfNumbers(std::cin, numbers);
       list.push_back(pair(nameNode, numbers));
     }
     outputName(std::cout, list) << "\n";
@@ -103,7 +106,12 @@ int main()
       std::cout << "0\n";
       return 0;
     }
-    std::list< int > sum = outputNumbers(std::cout, list);
+    std::list< int > sum = outputNumbers(std::cout, list, wasOverflow);
+    if (wasOverflow)
+    {
+      std::cerr << "WAS OVERFLOW\n";
+      return 1;
+    }
     outputSum(std::cout, sum) << "\n";
   }
   catch (const std::exception& e)
