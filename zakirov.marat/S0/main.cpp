@@ -1,6 +1,7 @@
 #include <iostream>
+#include "personal_data.hpp"
 
 int main()
 {
-  std::cout << "zakirov.marat" << '\n';
+  zakirov::out_personal_data(std::cout) << '\n';
 }
