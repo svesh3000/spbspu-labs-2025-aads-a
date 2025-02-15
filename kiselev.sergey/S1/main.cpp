@@ -1,7 +1,9 @@
-#include <cstddef>
+#include <exception>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 
 using numberList = std::list< int >;
@@ -10,7 +12,16 @@ using pairList = std::list< pair >;
 void listOfNumbers(std::istream& input, numberList& listNumber)
 {
   int number = 0;
+  int maxInt = std::numeric_limits< int >::max();
   while (input >> number)
+  {
+    if (number > maxInt)
+    {
+      throw std::overflow_error("Overflow");
+    }
+    listNumber.push_back(number);
+  }
+  if (listNumber.empty())
   {
     listNumber.push_back(number);
   }
@@ -27,7 +38,6 @@ std::ostream& outputName(std::ostream& output, pairList& list)
       output << " ";
     }
   }
-  output << "\n";
   return output;
 }
 
@@ -83,13 +93,25 @@ int main()
 {
   pairList list;
   std::string nameNode;
-  while (std::cin >> nameNode)
+  try
   {
-    numberList numbers;
-    listOfNumbers(std::cin, numbers);
-    list.push_back(pair(nameNode, numbers));
+    while (std::cin >> nameNode)
+    {
+      numberList numbers;
+      listOfNumbers(std::cin, numbers);
+      list.push_back(pair(nameNode, numbers));
+    }
+    if (list.empty())
+    {
+      throw std::logic_error("There was no input");
+    }
+    outputName(std::cout, list) << "\n";
+    std::list< int > sum = outputNumbers(std::cout, list);
+    outputSum(std::cout, sum) << "\n";
   }
-  outputName(std::cout, list) << "\n";
-  std::list< int > sum = outputNumbers(std::cout, list);
-  outputSum(std::cout, sum) << "\n";
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 }
