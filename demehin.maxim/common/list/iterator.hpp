@@ -43,15 +43,15 @@ namespace demehin
   {}
 
   template< typename T >
-  ListIterator< T >::this_t& ListIterator< T >::operator++()
+  typename ListIterator< T >::this_t& ListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    node = node_->next_;
+    node_ = node_->next_;
     return *this;
   }
 
   template< typename T >
-  ListIterator< T >::this_t& ListIterator< T >::operator++(int)
+  typename ListIterator< T >::this_t& ListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -60,7 +60,7 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T >::this_t& ListIterator< T >::operator--()
+  typename ListIterator< T >::this_t& ListIterator< T >::operator--()
   {
     assert(node_ != nullptr);
     node_ = node_->prev_;
@@ -68,7 +68,7 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T >::this_t& ListIterator< T >::operator--(int)
+  typename ListIterator< T >::this_t& ListIterator< T >::operator--(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -87,7 +87,7 @@ namespace demehin
   T* ListIterator< T >::operator->()
   {
     assert(node_ != nullptr);
-    return std::adressof(node_->data);
+    return std::addressof(node_->data);
   }
 
 }

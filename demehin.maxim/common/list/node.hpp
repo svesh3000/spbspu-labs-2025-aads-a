@@ -3,7 +3,7 @@
 
 namespace demehin
 {
-  template< typepename T >
+  template< typename T >
   struct Node
   {
     T data_;
@@ -11,7 +11,7 @@ namespace demehin
     Node<T>* next_;
 
     Node(const T& data):
-      data(data),
+      data_(data),
       prev_(nullptr),
       next_(nullptr)
     {}

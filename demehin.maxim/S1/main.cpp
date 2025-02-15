@@ -50,6 +50,7 @@ namespace
     int* sum_values = new int[capacity]();
     size_t max_size = defineMaxSize(pairsList);
     size_t sum_vals_cnt = 0;
+    int max_int = std::numeric_limits< int >::max();
     for (size_t i = 0; i < max_size; i++)
     {
       int sum = 0;
@@ -67,6 +68,10 @@ namespace
             isFirst = false;
           }
           out << it->second.front();
+          if (sum > max_int - it->second.front())
+          {
+            throw std::overflow_error("error: owerflow");
+          }
           sum += it->second.front();
           it->second.pop_front();
         }
@@ -124,7 +129,14 @@ int main()
     std::cout << " " << it->first;
   }
   std::cout << "\n";
-
-  printValues(std::cout, pairsList);
+  try
+  {
+    printValues(std::cout, pairsList);
+  }
+  catch (const std::overflow_error& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   std::cout << "\n";
 }
