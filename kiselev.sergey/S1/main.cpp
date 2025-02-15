@@ -9,23 +9,14 @@
 using numberList = std::list< int >;
 using pair = std::pair< std::string, numberList >;
 using pairList = std::list< pair >;
-void listOfNumbers(std::istream& input, numberList& listNumber)
+std::istream& listOfNumbers(std::istream& input, numberList& listNumber)
 {
   int number = 0;
-  int maxInt = std::numeric_limits< int >::max();
   while (input >> number)
   {
-    if (number > maxInt)
-    {
-      throw std::overflow_error("Overflow");
-    }
     listNumber.push_back(number);
   }
-  if (listNumber.empty())
-  {
-    listNumber.push_back(number);
-  }
-  input.clear();
+  return input;
 }
 std::ostream& outputName(std::ostream& output, pairList& list)
 {
@@ -98,14 +89,19 @@ int main()
     while (std::cin >> nameNode)
     {
       numberList numbers;
-      listOfNumbers(std::cin, numbers);
+      if (!(listOfNumbers(std::cin, numbers)))
+      {
+        std::cerr << "Was overflow\n";
+        return 1;
+      }
       list.push_back(pair(nameNode, numbers));
     }
-    if (list.empty())
-    {
-      throw std::logic_error("There was no input");
-    }
     outputName(std::cout, list) << "\n";
+    if (list.empty() || list.front().second.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
     std::list< int > sum = outputNumbers(std::cout, list);
     outputSum(std::cout, sum) << "\n";
   }
