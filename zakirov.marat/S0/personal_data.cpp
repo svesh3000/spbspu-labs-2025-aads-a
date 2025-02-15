@@ -3,5 +3,5 @@
 
 std::ostream & zakirov::out_personal_data(std::ostream & out)
 {
-  out << "zakirov.marat";
+  return out << "zakirov.marat";
 }
