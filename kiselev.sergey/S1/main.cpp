@@ -16,6 +16,7 @@ std::istream& listOfNumbers(std::istream& input, numberList& listNumber)
   {
     listNumber.push_back(number);
   }
+  input.clear();
   return input;
 }
 std::ostream& outputName(std::ostream& output, pairList& list)
@@ -97,7 +98,7 @@ int main()
       list.push_back(pair(nameNode, numbers));
     }
     outputName(std::cout, list) << "\n";
-    if (list.empty() || list.front().second.empty())
+    if (list.front().second.empty())
     {
       std::cout << "0\n";
       return 0;
