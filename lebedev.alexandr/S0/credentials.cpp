@@ -3,5 +3,5 @@
 
 std::ostream& lebedev::outCredentials(std::ostream& out)
 {
-  return out << "lebedev.alexandr";  
+  return out << "lebedev.alexandr";
 }
