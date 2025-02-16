@@ -1,5 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <stdexcept>
 
 namespace kiselev
 {
@@ -21,6 +22,26 @@ namespace kiselev
       prev_(nullptr),
       next_(nullptr)
     {}
+
+    ~Node()
+    {
+      delete data_;
+    }
+  };
+  template< typename T>
+  class List
+  {
+  public:
+
+    List();
+    List(const List& list);
+    List(const List&& list);
+    ~List();
+  private:
+
+    Node< T >* node;
+    size_t size;
+
   };
 }
 #endif

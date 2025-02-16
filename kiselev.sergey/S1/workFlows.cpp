@@ -43,39 +43,6 @@ namespace
     return output << *nums;
   }
 
-  std::ostream& outputName(std::ostream& output, const list& list_)
-  {
-    list::const_iterator end = list_.cend();
-    bool first = true;
-    for (list::const_iterator it = list_.begin(); it != end; ++it)
-    {
-      outputElement(output, it, first);
-    }
-    return output;
-  }
-
-  std::ostream& outputNumbers(std::ostream& output, const list& list_)
-  {
-    list::const_iterator end = list_.end();
-    list::const_iterator begin = list_.begin();
-    for (size_t i = 0; i < searchMax(list_); ++i)
-    {
-      begin = list_.begin();
-      bool first = true;
-      for (; begin != end; ++begin)
-      {
-        numberList::const_iterator nbegin = begin->second.begin();
-        if (i >= begin->second.size())
-        {
-          continue;
-        }
-        std::advance(nbegin, i); //Сделать у итератора метод +=
-        outputElement(output, nbegin, first);
-      }
-      output << "\n";
-    }
-    return output;
-  }
   void calcucationSum(list& list_, numberList& sum)
   {
     list::const_iterator end = list_.end();
@@ -113,8 +80,41 @@ namespace
     }
     return output;
   }
-}
 
+  std::ostream& outputName(std::ostream& output, const list& list_)
+  {
+    list::const_iterator end = list_.cend();
+    bool first = true;
+    for (list::const_iterator it = list_.begin(); it != end; ++it)
+    {
+      outputElement(output, it, first);
+    }
+    return output;
+  }
+
+  std::ostream& outputNumbers(std::ostream& output, const list& list_)
+  {
+    list::const_iterator end = list_.end();
+    list::const_iterator begin = list_.begin();
+    for (size_t i = 0; i < searchMax(list_); ++i)
+    {
+      begin = list_.begin();
+      bool first = true;
+      for (; begin != end; ++begin)
+      {
+        numberList::const_iterator nbegin = begin->second.begin();
+        if (i >= begin->second.size())
+        {
+          continue;
+        }
+        std::advance(nbegin, i); //Сделать у итератора метод +=
+        outputElement(output, nbegin, first);
+      }
+      output << "\n";
+    }
+    return output;
+  }
+}
 std::istream& kiselev::createList(std::istream& input, list& list_)
 {
   std::string name;
@@ -138,27 +138,19 @@ std::istream& kiselev::createList(std::istream& input, list& list_)
 
 std::ostream& kiselev::output(std::ostream& output, list& list_)
 {
-  try
+  if (list_.empty())
   {
-    if (list_.empty())
-    {
-      return output << "0\n";
-    }
-    outputName(output, list_) << "\n";
-    if (list_.front().second.empty())
-    {
-      return output << "0\n";
-    }
-    outputNumbers(output, list_);
-    numberList summ;
-    calcucationSum(list_, summ);
-    outputSum(output, summ) << "\n";
-    return output;
+    return output << "0\n";
   }
-  catch (const std::overflow_error&)
+  outputName(output, list_) << "\n";
+  if (list_.front().second.empty())
   {
-    return output;
-    throw;
+    return output << "0\n";
   }
+  outputNumbers(output, list_);
+  numberList summ;
+  calcucationSum(list_, summ);
+  outputSum(output, summ) << "\n";
+  return output;
 }
 
