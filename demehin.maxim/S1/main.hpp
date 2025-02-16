@@ -5,9 +5,10 @@
 #include <algorithm>
 #include <list/list.hpp>
 
+
 namespace
 {
-  using ListOfPairs = demehin::List<std::pair<std::string, demehin::List<unsigned long long>>>;
+  using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< unsigned long long > > >;
 
   size_t defineMaxSize(ListOfPairs pairsList)
   {
@@ -19,7 +20,7 @@ namespace
     return max_size;
   }
 
-  unsigned long long calculateSum(demehin::List<unsigned long long> nums)
+  unsigned long long calculateSum(demehin::List< unsigned long long > nums)
   {
     unsigned long long sum = 0;
     if (nums.empty())
@@ -27,7 +28,7 @@ namespace
       return 0;
     }
 
-    unsigned long long max = std::numeric_limits<unsigned long long>::max();
+    unsigned long long max = std::numeric_limits< unsigned long long >::max();
     for (auto it = nums.begin(); it != nums.end(); it++)
     {
       if (sum > max - *it)
@@ -43,10 +44,10 @@ namespace
   void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t max_size = defineMaxSize(pairsList);
-    demehin::List<unsigned long long> sumList;
-    for (size_t i = 0; i < max_size; i++)
+    demehin::List< unsigned long long > sumList;
+    for (size_t	i = 0; i < max_size; i++)
     {
-      demehin::List<unsigned long long> numsList;
+      demehin::List< unsigned long long > numsList;
       for (auto it = pairsList.begin(); it != pairsList.end(); it++)
       {
         if (!it->second.empty())
@@ -78,11 +79,11 @@ namespace
 
 int main()
 {
-  demehin::List<std::pair<std::string, demehin::List<unsigned long long>>> pairsList;
+  demehin::List< std::pair< std::string, demehin::List< unsigned long long > > > pairsList;
   std::string nodeName;
   while (std::cin >> nodeName)
   {
-    demehin::List<unsigned long long> numsList;
+    demehin::List< unsigned long long > numsList;
     unsigned long long num = 0;
     while (std::cin >> num)
     {
