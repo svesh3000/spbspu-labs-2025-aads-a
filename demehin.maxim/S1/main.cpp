@@ -43,6 +43,11 @@ namespace
   void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t max_size = defineMaxSize(pairsList);
+    if (max_size == 0)
+    {
+      out << "0";
+      return;
+    }
     demehin::List<unsigned long long> sumList;
     for (size_t i = 0; i < max_size; i++)
     {
