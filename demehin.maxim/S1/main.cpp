@@ -73,6 +73,7 @@ namespace
           out << it->second.front();
           if (sum > max_int - it->second.front())
           {
+            delete[] sum_values;
             throw std::overflow_error("error: owerflow");
           }
           sum += it->second.front();
