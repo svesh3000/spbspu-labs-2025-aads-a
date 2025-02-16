@@ -12,7 +12,7 @@ namespace
     size_t max = 0;
     for (list::const_iterator begin = list_.begin(); begin != list_.end(); ++begin)
     {
-      max = max < begin->second.size() ? begin->second.size() : max;
+      max = std::max(max, begin->second.size());
     }
     return max;
   }
@@ -33,8 +33,8 @@ namespace
 
   std::ostream& outputNumbers(std::ostream& output, const list& list_)
   {
-    list::const_iterator end = list_.cend();
-    list::const_iterator begin = list_.cbegin();
+    list::const_iterator end = list_.end();
+    list::const_iterator begin = list_.begin();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
       begin = list_.cbegin();
@@ -56,14 +56,15 @@ namespace
     }
     return output;
   }
-  void calcucationSum(const list& list_, numberList& sum)
+  void calcucationSum(list& list_, numberList& sum)
   {
-    list::const_iterator end = list_.cend();
+    list::const_iterator end = list_.end();
+    list::const_iterator begin = list_.begin();
     const int max = std::numeric_limits< int >::max();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
       int summa = 0;
-      list::const_iterator begin = list_.begin();
+      begin = list_.begin();
       for (; begin != end; ++begin)
       {
         numberList::const_iterator nbegin = begin->second.begin();
@@ -84,7 +85,7 @@ namespace
 
   std::ostream& outputSum(std::ostream& output, const numberList& list)
   {
-    std::list< int >::const_iterator begin = list.cbegin();
+    std::list< int >::const_iterator begin = list.begin();
     for (; begin != list.cend(); ++begin)
     {
       if (begin != list.cbegin())
@@ -120,12 +121,11 @@ std::istream& kiselev::createList(std::istream& input, list& list_)
 
 std::ostream& kiselev::output(std::ostream& output, list& list_)
 {
-  list::const_iterator begin = list_.cbegin();
   numberList summ;
   calcucationSum(list_, summ);
   outputName(output, list_) << "\n";
   outputNumbers(output, list_);
-  outputSum(output, begin->second) << "\n";
+  outputSum(output, summ) << "\n";
   return output;
 }
 
