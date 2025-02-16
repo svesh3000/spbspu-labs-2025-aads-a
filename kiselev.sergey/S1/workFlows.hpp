@@ -3,7 +3,7 @@
 #include <iostream>
 #include <list>
 
-using numberList = std::list< int >;
+using numberList = std::list< unsigned long long >;
 using pair = std::pair< std::string, numberList >;
 using list = std::list< pair >;
 
