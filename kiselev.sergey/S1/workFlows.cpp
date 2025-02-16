@@ -138,19 +138,27 @@ std::istream& kiselev::createList(std::istream& input, list& list_)
 
 std::ostream& kiselev::output(std::ostream& output, list& list_)
 {
-  if (list_.empty())
+  try
   {
-    return output << "0\n";
+    if (list_.empty())
+    {
+      return output << "0\n";
+    }
+    outputName(output, list_) << "\n";
+    if (list_.front().second.empty())
+    {
+      return output << "0\n";
+    }
+    outputNumbers(output, list_);
+    numberList summ;
+    calcucationSum(list_, summ);
+    outputSum(output, summ) << "\n";
+    return output;
   }
-  numberList summ;
-  calcucationSum(list_, summ);
-  outputName(output, list_) << "\n";
-  if (list_.front().second.empty())
+  catch (const std::overflow_error)
   {
-    return output << "0\n";
+    return output;
+    throw;
   }
-  outputNumbers(output, list_);
-  outputSum(output, summ) << "\n";
-  return output;
 }
 

@@ -13,7 +13,6 @@ int main()
   }
   catch (const std::exception& e)
   {
-    std::cout << "the list are formed\n";
     std::cerr << e.what() << "\n";
     return 1;
   }
