@@ -80,10 +80,10 @@ namespace
   {
     list::const_iterator end = list_.end();
     list::const_iterator begin = list_.begin();
-    const int max = std::numeric_limits< int >::max();
+    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
-      int summa = 0;
+      unsigned long long summa = 0;
       begin = list_.begin();
       for (; begin != end; ++begin)
       {
