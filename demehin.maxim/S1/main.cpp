@@ -3,10 +3,13 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <list/list.hpp>
+
 
 namespace
 {
-  using ListOfPairs = std::list< std::pair< std::string, std::list< int > > >;
+  //using ListOfPairs = std::list< std::pair< std::string, std::list< int > > >;
+  using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< int > > >;
 
   size_t defineMaxSize(ListOfPairs pairsList)
   {
@@ -103,11 +106,12 @@ namespace
 
 int main()
 {
-  std::list< std::pair< std::string, std::list< int > > > pairsList;
+  //std::list< std::pair< std::string, std::list< int > > > pairsList;
+  demehin::List< std::pair< std::string, demehin::List< int > > > pairsList;
   std::string nodeName;
   while (std::cin >> nodeName)
   {
-    std::list< int > numsList;
+    demehin::List< int > numsList;
     int num = 0;
     while (std::cin >> num)
     {

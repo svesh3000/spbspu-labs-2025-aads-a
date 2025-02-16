@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include "node.hpp"
+#include <cassert>
 
 namespace demehin
 {
@@ -17,7 +18,7 @@ namespace demehin
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++();
-    this_t& operator++(int);
+    this_t operator++(int);
 
     this_t& operator--();
     this_t& operator--(int);
@@ -51,7 +52,7 @@ namespace demehin
   }
 
   template< typename T >
-  typename ListIterator< T >::this_t& ListIterator< T >::operator++(int)
+  typename ListIterator< T >::this_t ListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -80,14 +81,26 @@ namespace demehin
   T& ListIterator< T >::operator*()
   {
     assert(node_ != nullptr);
-    return node_->data;
+    return node_->data_;
   }
 
   template< typename T >
   T* ListIterator< T >::operator->()
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data);
+    return std::addressof(node_->data_);
+  }
+
+  template< typename T >
+  bool ListIterator< T >::operator==(const this_t& rhs) const
+  {
+    return node_ == rhs.node_;
+  }
+
+  template< typename T >
+  bool ListIterator< T >::operator!=(const this_t& rhs) const
+  {
+    return !(rhs == *this);
   }
 
 }

@@ -15,6 +15,12 @@ namespace demehin
       prev_(nullptr),
       next_(nullptr)
     {}
+
+    Node():
+      data_(T()),
+      prev_(nullptr),
+      next_(nullptr)
+    {}
   };
 }
 
