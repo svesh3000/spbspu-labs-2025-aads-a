@@ -155,7 +155,7 @@ std::ostream& kiselev::output(std::ostream& output, list& list_)
     outputSum(output, summ) << "\n";
     return output;
   }
-  catch (const std::overflow_error)
+  catch (const std::overflow_error&)
   {
     return output;
     throw;
