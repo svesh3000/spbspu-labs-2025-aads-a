@@ -1,7 +1,6 @@
 #include <exception>
 #include <iostream>
 #include <list>
-#include <stdexcept>
 #include "workFlows.hpp"
 int main()
 {
@@ -14,7 +13,8 @@ int main()
   }
   catch (const std::exception& e)
   {
-    std::cout << e.what() << "\n";
+    std::cout << "the list are formed\n";
+    std::cerr << e.what() << "\n";
     return 1;
   }
 }

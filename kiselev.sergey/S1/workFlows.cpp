@@ -95,7 +95,7 @@ namespace
         std::advance(nbegin, i);
         if (max - *nbegin < summa)
         {
-          throw std::overflow_error("Overflow for int");
+          throw std::overflow_error("Overflow for unsigned long long");
         }
         summa += *nbegin;
       }
