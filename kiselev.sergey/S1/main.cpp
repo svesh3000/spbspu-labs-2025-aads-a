@@ -9,17 +9,12 @@ int main()
   try
   {
     kiselev::createList(std::cin, list);
-    if (list.front().second.empty())
-    {
-      std::cout << "0\n";
-      return 0;
-    }
     kiselev::output(std::cout, list);
     return 0;
   }
   catch (const std::exception& e)
   {
-    std::cerr << e.what() << "\n";
+    std::cout << e.what() << "\n";
     return 1;
   }
 }

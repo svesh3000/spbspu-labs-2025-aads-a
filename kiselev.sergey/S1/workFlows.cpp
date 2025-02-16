@@ -145,6 +145,10 @@ std::ostream& kiselev::output(std::ostream& output, list& list_)
   numberList summ;
   calcucationSum(list_, summ);
   outputName(output, list_) << "\n";
+  if (list_.front().second.empty())
+  {
+    return output << "0\n";
+  }
   outputNumbers(output, list_);
   outputSum(output, summ) << "\n";
   return output;
