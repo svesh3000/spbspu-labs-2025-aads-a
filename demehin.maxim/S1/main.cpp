@@ -21,33 +21,124 @@ namespace
     return max_size;
   }
 
-  unsigned long long* copyNums(const unsigned long long* nums, size_t nums_cnt)
+  //unsigned long long* copyNums(const unsigned long long* nums, size_t nums_cnt)
+  //{
+    //unsigned long long* new_nums = new unsigned long long[nums_cnt];
+    //for (size_t i = 0; i < nums_cnt; i++)
+    //{
+      //new_nums[i] = nums[i];
+    //}
+    //return new_nums;
+  //}
+
+  //void printSumValues(std::ostream& out, const unsigned long long* vals, size_t size)
+ // {
+    //if (size > 0)
+    //{
+      //out << vals[0];
+      //for (size_t i = 1; i < size; i++)
+      //{
+       //out << " " << vals[i];
+      //}
+    //}
+    //else
+    //{
+      //out << 0;
+    //}
+  //}
+
+
+  //demehin::List< unsigned long long > getValues(ListOfPairs pairsList)
+  //{
+    //demehin::List< unsigned long long > numList;
+    //for (auto it = pairsList.begin(); it != pairsList.end(); it++)
+    //{
+      //if (!it->second.empty())
+      //{
+        //numList.push_back(it->second.front());
+      //}
+    //}
+    //return numList;
+  //}
+
+  unsigned long long calculateSum(demehin::List< unsigned long long > nums)
   {
-    unsigned long long* new_nums = new unsigned long long[nums_cnt];
-    for (size_t i = 0; i < nums_cnt; i++)
+    unsigned long long sum = 0;
+    if (nums.empty())
     {
-      new_nums[i] = nums[i];
+      return 0;
     }
-    return new_nums;
+
+    unsigned long long max = std::numeric_limits< unsigned long long >::max();
+    for (auto it = nums.begin(); it != nums.end(); it++)
+    {
+      if (sum > max - *it)
+      {
+        throw std::overflow_error("error: overflow");
+      }
+      sum += *it;
+    }
+    return sum;
   }
 
-  void printSumValues(std::ostream& out, const unsigned long long* vals, size_t size)
-  {
-    if (size > 0)
-    {
-      out << vals[0];
-      for (size_t i = 1; i < size; i++)
-      {
-        out << " " << vals[i];
-      }
-    }
-    else
-    {
-      out << 0;
-    }
-  }
 
   void printValues(std::ostream& out, ListOfPairs pairsList)
+  {
+    size_t max_size = defineMaxSize(pairsList);
+    demehin::List< unsigned long long > sumList;
+    for (size_t	i = 0; i < max_size; i++)
+    {
+      demehin::List< unsigned long long > numsList;
+      for (auto it = pairsList.begin(); it != pairsList.end(); it++)
+      {
+        if (!it->second.empty())
+        {
+          numsList.push_back(it->second.front());
+          it->second.pop_front();
+        }
+      }
+      if (!numsList.empty())
+      {
+        out << numsList.front();
+        for (auto it = ++numsList.begin(); it != numsList.end(); it++)
+        {
+          out << " " << *it;
+        }
+        out << "\n";
+        sumList.push_back(calculateSum(numsList));
+      }
+    }
+    out << sumList.front();
+    for (auto it = ++sumList.begin(); it != sumList.end(); it++)
+    {
+      out << " " << *it;
+    }
+  }
+  //void printValues(std::ostream& out, ListOfPairs pairsList)
+  //{
+    //demehin::List< unsigned long long > sumList;
+    //size_t max_size = defineMaxSize(pairsList);
+    //for (size_t i = 0; i < max_size; i++)
+    //{
+      //demehin::List< unsigned long long > numsList = getValues(pairsList);
+      //out << *numsList.begin();
+      //for (auto it = ++numsList.begin(); it != numsList.end(); it++)
+      //{
+        //out << " " << *it;
+      //}
+      //out << "\n";
+      //sumList.push_back(calculateSum(numsList));
+      //pairsList.pop_front();
+    //}
+
+    //out << *sumList.begin();
+    //for (auto it = ++sumList.begin(); it != sumList.end(); it++)
+    //{
+      //out << " " << *it;
+    //}
+  //}
+
+  /*void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t capacity = 128;
     unsigned long long* sum_values = new unsigned long long[capacity]();
@@ -74,7 +165,7 @@ namespace
           if (sum > max_int - it->second.front())
           {
             delete[] sum_values;
-            throw std::overflow_error("error: owerflow");
+            throw std::overflow_error("error: overflow");
           }
           sum += it->second.front();
           it->second.pop_front();
@@ -102,7 +193,7 @@ namespace
     }
     printSumValues(out, sum_values, sum_vals_cnt);
     delete[] sum_values;
-  }
+  }*/
 }
 
 int main()
