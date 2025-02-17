@@ -43,6 +43,13 @@ namespace demehin
 
     void swap(List&);
 
+    void splice(cIter pos, List< T >&);
+    void splice(cIter pos, List< T >&&);
+    void splice(cIter pos, List< T >&, cIter it);
+    void splice(cIter pos, List< T >&&, cIter it);
+    void splice(cIter pos, List< T >&, cIter first, cIter last);
+    void splice(cIter pos, List< T >&&, cIter first, cIter last);
+
   private:
     using Node = demehin::Node< T >;
 
