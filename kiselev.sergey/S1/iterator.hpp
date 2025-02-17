@@ -1,7 +1,8 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <cstddef>
-#include "list.hpp"
+#include <memory>
+#include "node.hpp"
 namespace kiselev
 {
   template< typename T>
@@ -9,23 +10,20 @@ namespace kiselev
   {
   public:
 
-    using iter = Iterator< T >;
-
     Iterator(): node_(nullptr) {}
-    Iterator(const iter&) = default;
+    Iterator(const Iterator< T >&) = default;
     Iterator(Node< T >* node): node_(node) {}
     ~Iterator() = default;
-    iter& operator=(const iter&) = default;
+    Iterator< T >& operator=(const Iterator< T >&) = default;
 
-    iter& operator++();
-    iter& operator++(int);
-    iter& operator+=(size_t);
+    Iterator< T >& operator++();
+    Iterator< T >& operator++(int);
 
     T& operator*();
     T* operator->();
 
-    bool operator==(const iter&) const;
-    bool operator!=(const iter&) const;
+    bool operator==(const Iterator< T >&) const;
+    bool operator!=(const Iterator< T >&) const;
 
   private:
 
@@ -34,30 +32,20 @@ namespace kiselev
   };
 
   template< typename T >
-  typename Iterator< T >::iter& Iterator< T >::operator++()
+  Iterator< T >& Iterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    node_ = node_->next;
+    node_ = node_->next_;
     return *this;
   }
 
   template< typename T >
-  typename Iterator< T >::iter& Iterator< T >::operator++(int)
+  Iterator< T >& Iterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
-    iter result(*this);
+    Iterator< T > result(*this);
     ++(*this);
     return result;
-  }
-
-  template< typename T >
-  typename Iterator< T >::iter& Iterator< T >::operator+=(size_t i)
-  {
-    for (size_t j = 0; j < i; ++j)
-    {
-      ++(*this);
-    }
-    return *this;
   }
 
   template< typename T >
@@ -75,13 +63,13 @@ namespace kiselev
   }
 
   template< typename T >
-  bool Iterator< T >::operator==(const iter& it) const
+  bool Iterator< T >::operator==(const Iterator< T >& it) const
   {
     return node_ == it.node_;
   }
 
   template< typename T >
-  bool Iterator< T >::operator!=(const iter& it) const
+  bool Iterator< T >::operator!=(const Iterator< T >& it) const
   {
     return !(it == *this);
   }
