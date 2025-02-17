@@ -24,10 +24,13 @@ namespace demehin
     size_t size() const;
 
     void pop_front();
+    void pop_back();
 
+    void push_front(const T&);
     void push_back(const T&);
 
     T& front();
+    T& back();
 
     bool empty();
 
@@ -46,11 +49,9 @@ namespace demehin
   template< typename T >
   List< T >::List():
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
-    //fake_(new Node()),
     tail_(nullptr),
     size_(0)
   {
-    //new (fake_) Node(T());
     fake_->next_ = nullptr;
     fake_->prev_ = nullptr;
   }
@@ -66,7 +67,6 @@ namespace demehin
       current = next;
     }
     delete[] reinterpret_cast< char* >(fake_);
-    //delete fake_;
   }
 
   template< typename T >
@@ -87,7 +87,6 @@ namespace demehin
     tail_(rhs.tail_),
     size_(rhs.size_)
   {
-    //rhs.fake_ = new Node();
     rhs.fake_ = nullptr;
     rhs.tail_ = nullptr;
     rhs.size_ = 0;
@@ -102,7 +101,7 @@ namespace demehin
   template< typename T >
   ListIterator< T > List< T >::end() const
   {
-    return ListIterator< T >(nullptr);
+    return ListIterator< T >(tail_->next_);
   }
 
   template< typename T >
@@ -145,6 +144,12 @@ namespace demehin
   T& List< T >::front()
   {
     return fake_->next_->data_;
+  }
+
+  template< typename T >
+  T& List< T >::back()
+  {
+    return tail_->data_;
   }
 
   template< typename T >
