@@ -33,7 +33,7 @@ int main()
     std::cout << "0\n";
     return 0;
   }
-  for (storage_t::Iterator it = storage.begin(); it != storage.end(); ++it)
+  for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
   {
     std::cout << it->first;
     if (std::next(it) != storage.end())
@@ -48,7 +48,7 @@ int main()
   {
     size_t printed = 0;
     size_t sum = 0;
-    for (storage_t::Iterator it = storage.begin(); it != storage.end(); ++it)
+    for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
     {
       auto temp_it = it->second.begin();
       if (it->second.size() > i)

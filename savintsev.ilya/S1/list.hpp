@@ -27,11 +27,14 @@ namespace savintsev
     }
   };
 
+  template< typename T > 
+  class List;
+
   template< typename T >
   class Iterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
-    friend class List< T >;
+    template< typename U > friend class List;
   public:
     Iterator(ListNode< T > * rhs):
       node(rhs)
@@ -69,6 +72,10 @@ namespace savintsev
     bool operator!=(const Iterator & rhs) const
     {
       return node != rhs.node;
+    }
+    bool operator==(const Iterator & rhs) const
+    {
+      return node == rhs.node;
     }
   private:
     ListNode< T > * node;
@@ -120,13 +127,13 @@ savintsev::List<T>::~List()
 template< typename T >
 typename savintsev::List< T >::iterator savintsev::List< T >::begin()
 {
-  return Iterator(dummy->next);
+  return iterator(dummy->next);
 }
 
 template< typename T >
 typename savintsev::List< T >::iterator savintsev::List< T >::end()
 {
-  return Iterator(dummy);
+  return iterator(dummy);
 }
 
 template< typename T >
