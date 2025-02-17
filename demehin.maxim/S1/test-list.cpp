@@ -24,6 +24,5 @@ BOOST_AUTO_TEST_CASE(list_test)
   demehin::List< int > list2(list);
   BOOST_TEST(list2.size() == 2);
   BOOST_TEST(list2.front() == 2);
-  //demehin::List< int > list3(std::move(list2));
-  //BOOST_TEST(list3.front() == 2);
+  list.swap(list2);
 }
