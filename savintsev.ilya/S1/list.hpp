@@ -27,7 +27,7 @@ namespace savintsev
     }
   };
 
-  template< typename T > 
+  template< typename T >
   class List;
 
   template< typename T >
