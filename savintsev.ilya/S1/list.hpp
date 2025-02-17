@@ -28,54 +28,63 @@ namespace savintsev
   };
 
   template< typename T >
+  class Iterator:
+    public std::iterator< std::bidirectional_iterator_tag, T >
+  {
+    friend class List< T >;
+  public:
+    Iterator(ListNode< T > * rhs):
+      node(rhs)
+    {}
+    T & operator*()
+    {
+      return *(node->data);
+    }
+    T * operator->()
+    {
+      return std::addressof(*(node->data));
+    }
+    Iterator & operator++()
+    {
+      node = node->next;
+      return *this;
+    }
+    Iterator operator++(int)
+    {
+      Iterator result(*this);
+      ++(*this);
+      return result;
+    }
+    Iterator & operator--()
+    {
+      node = node->prev;
+      return *this;
+    }
+    Iterator & operator--(int)
+    {
+      Iterator result(*this);
+      --(*this);
+      return result;
+    }
+    bool operator!=(const Iterator & rhs) const
+    {
+      return node != rhs.node;
+    }
+  private:
+    ListNode< T > * node;
+  };
+
+  template< typename T >
   class List
   {
   public:
-    //using iterator = Iterator;
-    class Iterator:
-      public std::iterator< std::bidirectional_iterator_tag, T >
-    {
-    public:
-      Iterator(ListNode< T > * rhs):
-        node(rhs)
-      {}
-      T & operator*()
-      {
-        return *(node->data);
-      }
-      T * operator->()
-      {
-        return std::addressof(*(node->data));
-      }
-      Iterator & operator++()
-      {
-        node = node->next;
-        return *this;
-      }
-      Iterator operator++(int)
-      {
-        Iterator result(*this);
-        ++(*this);
-        return result;
-      }
-      Iterator & operator--()
-      {
-        node = node->prev;
-        return *this;
-      }
-      bool operator!=(const Iterator & rhs) const
-      {
-        return node != rhs.node;
-      }
-    private:
-      ListNode< T > * node;
-    };
+    using iterator = Iterator< T >;
 
     List();
     ~List();
 
-    Iterator begin();
-    Iterator end();
+    iterator begin();
+    iterator end();
 
     T & front();
     T & back();
@@ -101,7 +110,7 @@ savintsev::List< T >::List():
   list_size(0)
 {}
 
-template <typename T>
+template< typename T >
 savintsev::List<T>::~List()
 {
   clear();
@@ -109,13 +118,13 @@ savintsev::List<T>::~List()
 }
 
 template< typename T >
-typename savintsev::List< T >::Iterator savintsev::List< T >::begin()
+typename savintsev::List< T >::iterator savintsev::List< T >::begin()
 {
   return Iterator(dummy->next);
 }
 
 template< typename T >
-typename savintsev::List< T >::Iterator savintsev::List< T >::end()
+typename savintsev::List< T >::iterator savintsev::List< T >::end()
 {
   return Iterator(dummy);
 }
