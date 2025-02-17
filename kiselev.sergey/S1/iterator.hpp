@@ -1,6 +1,5 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
-#include <cstddef>
 #include <memory>
 #include "node.hpp"
 namespace kiselev
@@ -17,7 +16,10 @@ namespace kiselev
     Iterator< T >& operator=(const Iterator< T >&) = default;
 
     Iterator< T >& operator++();
-    Iterator< T >& operator++(int);
+    Iterator< T > operator++(int);
+
+    Iterator< T >& operator--();
+    Iterator< T > operator--(int);
 
     T& operator*();
     T* operator->();
@@ -40,11 +42,28 @@ namespace kiselev
   }
 
   template< typename T >
-  Iterator< T >& Iterator< T >::operator++(int)
+  Iterator< T > Iterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
     Iterator< T > result(*this);
     ++(*this);
+    return result;
+  }
+
+  template< typename T >
+  Iterator< T >& Iterator< T >::operator--()
+  {
+    assert(node_ != nullptr);
+    node_ = node_->prev_;
+    return *this;
+  }
+
+  template< typename T >
+  Iterator< T > Iterator< T >::operator--(int)
+  {
+    assert(node_ != nullptr);
+    Iterator< T > result(*this);
+    --(this);
     return result;
   }
 
