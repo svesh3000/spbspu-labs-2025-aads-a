@@ -26,7 +26,6 @@ namespace
     {
       return 0;
     }
-
     unsigned long long max = std::numeric_limits<unsigned long long>::max();
     for (auto it = nums.begin(); it != nums.end(); it++)
     {
@@ -83,11 +82,11 @@ namespace
 
 int main()
 {
-  demehin::List<std::pair<std::string, demehin::List<unsigned long long>>> pairsList;
+  demehin::List< std::pair< std::string, demehin::List< unsigned long long > > > pairsList;
   std::string nodeName;
   while (std::cin >> nodeName)
   {
-    demehin::List<unsigned long long> numsList;
+    demehin::List< unsigned long long > numsList;
     unsigned long long num = 0;
     while (std::cin >> num)
     {

@@ -29,6 +29,8 @@ namespace demehin
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
 
+    Node< T >* getNode() const;
+
   private:
     Node< T >* node_;
   };
@@ -101,6 +103,12 @@ namespace demehin
   bool ListIterator< T >::operator!=(const this_t& rhs) const
   {
     return !(rhs == *this);
+  }
+
+  template< typename T >
+  Node< T >* ListIterator< T >::getNode() const
+  {
+    return node_;
   }
 
 }

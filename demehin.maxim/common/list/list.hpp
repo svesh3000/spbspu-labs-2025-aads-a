@@ -50,6 +50,15 @@ namespace demehin
     void splice(cIter pos, List< T >&, cIter first, cIter last);
     void splice(cIter pos, List< T >&&, cIter first, cIter last);
 
+    void fill(Iter first, Iter last, const T&);
+
+    void remove(const T&);
+    template< typename UnaryPredicate >
+    void removeIf(UnaryPredicate p);
+
+    void assign(size_t, const T&);
+    void assign(Iter, Iter);
+
   private:
     using Node = demehin::Node< T >;
 
@@ -82,12 +91,9 @@ namespace demehin
   template< typename T >
   void List< T >::clear()
   {
-    Node* current = fake_->next_;
-    while (current != nullptr)
+    while (!empty())
     {
-      Node* next = current->next_;
-      delete current;
-      current = next;
+      pop_back();
     }
   }
 
@@ -245,6 +251,101 @@ namespace demehin
     std::swap(size_, other.size_);
   }
 
+  template< typename T >
+  void List< T >::fill(ListIterator< T > first, ListIterator< T > last, const T& value)
+  {
+    for (; first != last; ++first)
+    {
+      *first = value;
+    }
+  }
+
+  template< typename T >
+  void List< T >::splice(cListIterator< T > pos, List< T >& other)
+  {
+    if (other.empty() || pos == end())
+    {
+      return;
+    }
+
+    Node* first = other.fake_->next_;
+    Node* last = other.tail_;
+    Node* posNode = pos.getNode();
+    posNode->prev_->next_ = first;
+    first->prev_ = posNode->prev_;
+    last->next_ = posNode;
+    posNode->prev_ = last;
+
+    other.clear();
+  }
+
+  template< typename T >
+  void List< T >::splice(cListIterator< T > pos, List< T >&& other)
+  {
+    List< T > tempList(std::move(other));
+    splice(tempList);
+  }
+
+  template< typename T >
+  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > it)
+  {
+    if (other.empty() || pos == end() || it == other.begin())
+    {
+      return;
+    }
+
+    Node* itNode = it.getNode();
+    Node* posNode = pos.getNode();
+    Node* itPrevNode = itNode->prev_;
+
+    itPrevNode->next_ = itNode->next_;
+    itNode->prev_ = posNode->prev_;
+    itNode->next_ = posNode;
+    posNode->prev_->next_ = itNode;
+    posNode->prev_ = itNode;
+  }
+
+  template< typename T >
+  void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > it)
+  {
+    List< T > tempList(std::move(other));
+    splice(tempList);
+  }
+
+  template< typename T >
+  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > first,
+    cListIterator< T > last)
+  {
+    if (other.empty() || pos == end())
+    {
+      return;
+    }
+
+    Node* posNode = pos.getNode();
+    Node* firstNode = first.getNode();
+    Node* lastNode = last.getNode();
+  }
+
+  template< typename T >
+  void List< T >::remove(const T& value)
+  {
+  }
+
+  template< typename T >
+  template< typename UnaryPredicate >
+  void List< T >::removeIf(UnaryPredicate p)
+  {
+  }
+
+  template< typename T >
+  void List< T >::assign(size_t count, const T& value)
+  {
+    clear();
+    for (size_t i = 0; i < count; i++)
+    {
+      push_back(value);
+    }
+  }
 }
 
 #endif

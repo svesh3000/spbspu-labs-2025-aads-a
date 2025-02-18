@@ -25,4 +25,15 @@ BOOST_AUTO_TEST_CASE(list_test)
   BOOST_TEST(list2.size() == 2);
   BOOST_TEST(list2.front() == 2);
   list.swap(list2);
+  demehin::List< int > list3;
+  for (size_t i = 0; i < 5; i++)
+  {
+    list3.push_back(0);
+  }
+  list3.fill(list3.begin(), list3.end(), 1);
+  BOOST_TEST(list3.front() == 1);
+  BOOST_TEST(list3.back() == 1);
+  demehin::List< int > list4(std::move(list3));
+  BOOST_TEST(list4.size() == 5);
+  BOOST_TEST(list4.front() == 1);
 }
