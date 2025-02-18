@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include "list.hpp"
+#include "list-algorithms.hpp"
 
 BOOST_AUTO_TEST_CASE(list_test)
 {
@@ -76,4 +77,20 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
   BOOST_TEST(*it == "banana");
   ++it;
   BOOST_TEST(*it == "orange");
+}
+
+BOOST_AUTO_TEST_CASE(test_fill)
+{
+  savintsev::List<int> list1;
+  for (size_t i = 0; i < 8; ++i)
+  {
+    list1.push_back(0);
+  }
+  savintsev::fill(list1.begin(), --list1.end(), 5);
+  auto it = list1.begin();
+  for (size_t i = 0; i < 7; ++i)
+  {
+    BOOST_TEST(*it == 5);
+  }
+  BOOST_TEST(list1.back() == 0);
 }
