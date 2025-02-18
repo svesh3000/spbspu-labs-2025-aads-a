@@ -3,29 +3,59 @@
 #include "list.hpp"
 #include "list-algorithms.hpp"
 
-BOOST_AUTO_TEST_CASE(list_test)
+BOOST_AUTO_TEST_CASE(test_swap)
 {
   std::string out;
-  savintsev::List<std::string> list;
-  list.push_back("test1234");
-  BOOST_TEST(!list.empty());
-  BOOST_TEST(list.size() == 1);
-  list.pop_front();
-  BOOST_TEST(list.size() == 0);
-  list.push_back("test1234");
-  list.push_front("test8765");
-  list.clear();
-  BOOST_TEST(list.empty());
-  list.push_front("test");
-  BOOST_TEST(list.front() == "test");
-  list.push_back("hello");
-  BOOST_TEST(list.back() == "hello");
+  savintsev::List<std::string> meats;
+  meats.push_back("hotdog");
+  meats.push_back("pierogi");
+  meats.push_back("beef");
+  savintsev::List<std::string> vegetables;
+  vegetables.push_back("latuce");
+  vegetables.push_back("tomato");
+  meats.swap(vegetables);
+  BOOST_TEST(meats.front() == "latuce");
+  BOOST_TEST(vegetables.front() == "hotdog");
+  BOOST_TEST(meats.back() == "tomato");
+  BOOST_TEST(vegetables.back() == "beef");
+}
+
+BOOST_AUTO_TEST_CASE(test_std_interface)
+{
   savintsev::List<std::string> list1;
-  list1.push_back("hotdog");
-  list.swap(list1);
-  BOOST_TEST(list.back() == "hotdog");
-  BOOST_TEST(list1.back() == "hello");
-  list1.push_back("lemonade");
+  BOOST_TEST(list1.empty());
+  BOOST_TEST(list1.size() == 0);
+  list1.push_back("test");
+  BOOST_TEST(!list1.empty());
+  list1.push_front("another_test");
+  BOOST_TEST(list1.size() == 2);
+  list1.pop_front();
+  BOOST_TEST(list1.size() == 1);
+  BOOST_TEST(list1.front() == "test");
+  list1.push_back("onemore_test");
+  list1.pop_back();
+  BOOST_TEST(list1.back() == "test");
+  list1.clear();
+  BOOST_TEST(list1.empty());
+  BOOST_TEST(list1.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_push_and_pop)
+{
+  savintsev::List<std::string> list1;
+  list1.push_back("1");
+  list1.push_back("2");
+  list1.push_front("0");
+  auto it = list1.begin();
+  BOOST_TEST(*it == "0");
+  ++it;
+  BOOST_TEST(*it == "1");
+  ++it;
+  BOOST_TEST(*it == "2");
+  list1.pop_front();
+  auto jt = list1.begin();
+  BOOST_TEST(*jt++ == "1");
+  BOOST_TEST(*jt == "2");
 }
 
 BOOST_AUTO_TEST_CASE(test_begin_and_end)
@@ -36,8 +66,7 @@ BOOST_AUTO_TEST_CASE(test_begin_and_end)
   auto it = list1.begin();
   BOOST_TEST(*it == "front");
   auto jt = list1.end();
-  --jt;
-  BOOST_TEST(*jt == "back");
+  BOOST_TEST(*--jt == "back");
 }
 
 BOOST_AUTO_TEST_CASE(test_front_and_back)
