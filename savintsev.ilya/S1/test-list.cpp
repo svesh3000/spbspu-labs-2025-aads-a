@@ -123,3 +123,18 @@ BOOST_AUTO_TEST_CASE(test_fill)
   }
   BOOST_TEST(list1.back() == 0);
 }
+
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  savintsev::List<int> list1;
+  list1.push_back(0);
+  list1.push_back(0);
+  list1.push_back(4);
+  list1.push_back(0);
+  list1.push_back(4);
+  list1.remove(4);
+  for (auto it = list1.begin(); it != list1.end(); ++it)
+  {
+    BOOST_TEST(*it == 0);
+  }
+}

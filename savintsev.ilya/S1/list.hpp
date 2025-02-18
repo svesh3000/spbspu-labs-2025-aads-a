@@ -107,6 +107,9 @@ namespace savintsev
     void pop_back();
     void swap(List & rhs);
     void clear();
+
+    void remove(const T & value);
+    //void splice(iterator pos, List & rhs);
   private:
     ListNode< T > * dummy;
     size_t list_size;
@@ -240,6 +243,22 @@ void savintsev::List< T >::clear()
   while (!empty())
   {
     pop_front();
+  }
+}
+
+template< typename T >
+void savintsev::List< T >::remove(const T & value)
+{
+  for (auto it = begin(); it != end(); ++it)
+  {
+    if (*it == value)
+    {
+      it.node->prev->next = it.node->next;
+      it.node->next->prev = it.node->prev;
+      delete it.node;
+      --list_size;
+      --it;
+    }
   }
 }
 
