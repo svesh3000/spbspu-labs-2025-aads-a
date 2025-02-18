@@ -89,12 +89,14 @@ namespace savintsev
 
     List();
     ~List();
+    List(const List & rhs);
+    List(List && rhs);
 
-    iterator begin();
-    iterator end();
+    iterator begin() const;
+    iterator end() const;
 
-    T & front();
-    T & back();
+    T & front() const;
+    T & back() const;
 
     bool empty() const;
     size_t size() const;
@@ -102,8 +104,8 @@ namespace savintsev
     void push_front(const T & value);
     void push_back(const T & value);
     void pop_front();
-    //void pop_back();
-    //void swap(List & rhs);
+    void pop_back();
+    void swap(List & rhs);
     void clear();
   private:
     ListNode< T > * dummy;
@@ -118,32 +120,52 @@ savintsev::List< T >::List():
 {}
 
 template< typename T >
-savintsev::List<T>::~List()
+savintsev::List< T >::~List()
 {
   clear();
   delete dummy;
 }
 
 template< typename T >
-typename savintsev::List< T >::iterator savintsev::List< T >::begin()
+savintsev::List< T >::List(const List & rhs):
+  dummy(new ListNode< T >()),
+  list_size(0)
+{
+  for (auto it = rhs.begin(); it != rhs.end(); ++it)
+  {
+    push_back(*it);
+  }
+}
+
+template< typename T >
+savintsev::List< T >::List(List && rhs):
+  dummy(rhs.dummy),
+  list_size(rhs.list_size)
+{
+  rhs.dummy = nullptr;
+  rhs.list_size = 0;
+}
+
+template< typename T >
+typename savintsev::List< T >::iterator savintsev::List< T >::begin() const
 {
   return iterator(dummy->next);
 }
 
 template< typename T >
-typename savintsev::List< T >::iterator savintsev::List< T >::end()
+typename savintsev::List< T >::iterator savintsev::List< T >::end() const
 {
   return iterator(dummy);
 }
 
 template< typename T >
-T & savintsev::List< T >::front()
+T & savintsev::List< T >::front() const
 {
   return *(dummy->next->data);
 }
 
 template< typename T >
-T & savintsev::List< T >::back()
+T & savintsev::List< T >::back() const
 {
   return *(dummy->prev->data);
 }
@@ -172,7 +194,7 @@ void savintsev::List< T >::push_front(const T & value)
 template< typename T >
 void savintsev::List< T >::push_back(const T & value)
 {
-  ListNode< T > * new_node = new ListNode< T >(value, dummy, dummy->next);
+  ListNode< T > * new_node = new ListNode< T >(value, dummy, dummy->prev);
   dummy->prev->next = new_node;
   dummy->prev = new_node;
   ++list_size;
@@ -187,6 +209,29 @@ void savintsev::List< T >::pop_front()
   dummy->next->prev = dummy;
   delete temp_front;
   --list_size;
+}
+
+template< typename T >
+void savintsev::List< T >::pop_back()
+{
+  assert(!empty());
+  ListNode< T > * temp_back = dummy->prev;
+  dummy->prev = temp_back->prev;
+  dummy->prev->next = dummy;
+  delete temp_back;
+  --list_size;
+}
+
+template< typename T >
+void savintsev::List< T >::swap(List & rhs)
+{
+  ListNode< T > * temp_next = dummy->next;
+  ListNode< T > * temp_prev = dummy->prev;
+  dummy->next = rhs.dummy->next;
+  dummy->prev = rhs.dummy->prev;
+  rhs.dummy->next = temp_next;
+  rhs.dummy->prev = temp_prev;
+  std::swap(list_size, rhs.list_size);
 }
 
 template< typename T >
