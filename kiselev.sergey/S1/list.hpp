@@ -1,8 +1,5 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include <cstddef>
-#include <stdexcept>
-#include <type_traits>
 #include "iterator.hpp"
 #include "node.hpp"
 
@@ -15,8 +12,12 @@ namespace kiselev
 
     List(): head_(nullptr), size_(0) {};
     List(const List< T >&);
-    List(const List< T >&&);
+    List(List< T >&&);
+    List(size_t, const T&);
     ~List();
+
+    List< T >& operator=(const List< T >&);
+    List< T >& operator=(const List< T >&&);
 
     Iterator< T > begin() const noexcept;
     Iterator< T > end() const noexcept;
@@ -35,6 +36,8 @@ namespace kiselev
 
     void clear();
     void swap(List< T >&) noexcept;
+
+    void assign(size_t, const T&);
 
 
   private:
@@ -64,7 +67,7 @@ namespace kiselev
   }
 
   template< typename T >
-  List< T >::List(const List< T >&& list):
+  List< T >::List(List< T >&& list):
     head_(list.head_),
     size_(list.size_)
   {
@@ -73,10 +76,37 @@ namespace kiselev
   }
 
   template< typename T >
+  List< T >::List(size_t count, const T& data):
+    head_(nullptr),
+    size_(0)
+  {
+    for (size_t i = 0; i < count; ++i)
+    {
+      push_back(data);
+    }
+  }
+
+  template< typename T >
   List< T >::~List()
   {
     clear();
     delete head_;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(const List< T >& list)
+  {
+    List< T > cpy(list);
+    swap(cpy);
+    return *this;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(const List< T >&& list)
+  {
+    List< T > temp(std::move(list));
+    swap(temp);
+    return *this;
   }
 
   template< typename T >
@@ -209,6 +239,15 @@ namespace kiselev
     std::swap(head_, list.head_);
     std::swap(size_, list.size_);
   }
+
+  template< typename T >
+  void List< T >::assign(size_t count, const T& data)
+  {
+    List< T > temp(count, data);
+    swap(temp);
+  }
+
+
 
 }
 #endif
