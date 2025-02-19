@@ -109,6 +109,8 @@ namespace savintsev
     void clear();
 
     void remove(const T & value);
+    template< class predicate >
+    void remove_if(predicate pred);
     void splice(iterator pos, List & rhs);
     void splice(iterator pos, List & rhs, iterator i);
     void splice(iterator pos, List & rhs, iterator first, iterator last);
@@ -257,11 +259,19 @@ void savintsev::List< T >::remove(const T & value)
     {
       it.node->prev->next = it.node->next;
       it.node->next->prev = it.node->prev;
-      delete it.node;
-      --list_size;
+      auto temp = it;
       --it;
+      delete temp.node;
+      --list_size;
     }
   }
+}
+
+template< typename T >
+template< class predicate >
+void savintsev::List< T >::remove_if(predicate pred)
+{
+  
 }
 
 template< typename T >
