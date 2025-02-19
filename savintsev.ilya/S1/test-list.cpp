@@ -138,3 +138,29 @@ BOOST_AUTO_TEST_CASE(test_remove)
     BOOST_TEST(*it == 0);
   }
 }
+
+BOOST_AUTO_TEST_CASE(test_splice)
+{
+  savintsev::List<int> list1, list2;
+  for (int i = 1; i <= 4; ++i)
+  {
+    list1.push_back(i);
+    list2.push_back(i*10);
+  }
+  auto it = list1.begin();
+  it++;
+  list1.splice(it, list2);
+  it = list1.begin();
+  BOOST_TEST(*it++ == 1);
+  BOOST_TEST(*it++ == 10);
+  BOOST_TEST(*it++ == 20);
+  BOOST_TEST(*it++ == 30);
+  BOOST_TEST(*it++ == 40);
+  BOOST_TEST(*it++ == 2);
+  BOOST_TEST(*it++ == 3);
+  BOOST_TEST(*it == 4);
+  BOOST_TEST(list1.size() == 8);
+  BOOST_TEST(list2.empty());
+  list2.push_back(1);
+  BOOST_TEST(list2.front() == 1);
+}
