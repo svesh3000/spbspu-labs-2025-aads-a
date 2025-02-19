@@ -114,6 +114,9 @@ namespace savintsev
     void splice(iterator pos, List & rhs);
     void splice(iterator pos, List & rhs, iterator i);
     void splice(iterator pos, List & rhs, iterator first, iterator last);
+    void assign(iterator first, iterator last);
+    void assign(size_t n, const T & value);
+    
   private:
     ListNode< T > * dummy;
     size_t list_size;
@@ -323,6 +326,26 @@ void savintsev::List< T >::splice(iterator pos, List & rhs, iterator first, iter
   first.node->prev = pos.node->prev;
   pos.node->prev = last.node->prev;
   last.node->prev = temp_first_prev;
+}
+
+template< typename T >
+void savintsev::List< T >::assign(iterator first, iterator last)
+{
+  clear();
+  for (auto it = first; it != last; ++it)
+  {
+    push_back(*it);
+  }
+}
+
+template< typename T >
+void savintsev::List< T >::assign(size_t n, const T & value)
+{
+  clear();
+  for (size_t i = 0; i < n; ++i)
+  {
+    push_back(value);
+  }
 }
 
 #endif

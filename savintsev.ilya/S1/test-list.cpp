@@ -229,3 +229,21 @@ BOOST_AUTO_TEST_CASE(test_splice)
   BOOST_TEST(list1.size() == 4);
   BOOST_TEST(list2.size() == 5);
 }
+
+BOOST_AUTO_TEST_CASE(test_assign)
+{
+  savintsev::List< int > list1;
+  savintsev::List< int > list2;
+  list1.assign(7, 100);
+  auto it = list1.begin();
+  for (size_t i = 0; i < 7; ++i)
+  {
+    BOOST_TEST(*it++ == 100);
+  }
+  list2.assign(list1.begin(), list1.end());
+  auto jt = list2.begin();
+  for (size_t i = 0; i < 7; ++i)
+  {
+    BOOST_TEST(*jt++ == 100);
+  }
+}
