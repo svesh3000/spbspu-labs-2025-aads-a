@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test_swap)
   BOOST_TEST(vegetables.back() == "beef");
 }
 
-BOOST_AUTO_TEST_CASE(test_std_interface)
+BOOST_AUTO_TEST_CASE(test_basic_interface)
 {
   savintsev::List< std::string > list1;
   BOOST_TEST(list1.empty());
@@ -154,7 +154,6 @@ struct is_even
 
 BOOST_AUTO_TEST_CASE(test_remove_if)
 {
-  
   savintsev::List< int > list1;
   for (size_t i = 1; i <= 10; ++i)
   {

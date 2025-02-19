@@ -116,7 +116,6 @@ namespace savintsev
     void splice(iterator pos, List & rhs, iterator first, iterator last);
     void assign(iterator first, iterator last);
     void assign(size_t n, const T & value);
-    
   private:
     ListNode< T > * dummy;
     size_t list_size;
