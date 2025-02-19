@@ -1,5 +1,8 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <iterator>
+#include <stdexcept>
+#include "constIterator.hpp"
 #include "iterator.hpp"
 #include "node.hpp"
 
@@ -36,8 +39,19 @@ namespace kiselev
 
     void clear();
     void swap(List< T >&) noexcept;
-
     void assign(size_t, const T&);
+    Iterator< T > erase(ConstIterator< T >);
+    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
+
+    void remove(const T&);
+    template< typename Predicate >
+    void remove_if(Predicate);
+    void splice(ConstIterator< T >, List< T >&);
+    void splice(ConstIterator< T >, List< T >&&);
+    void splice(ConstIterator< T > position, List< T >&, ConstIterator< T > i);
+    void splice(ConstIterator< T > position, List< T >&&, ConstIterator< T > i);
+    void splice(ConstIterator< T > pos, List< T >&, ConstIterator< T > first, ConstIterator< T > last);
+    void splice(ConstIterator< T > pos, List< T >&&, ConstIterator< T > first, ConstIterator< T > last);
 
 
   private:
@@ -247,6 +261,162 @@ namespace kiselev
     swap(temp);
   }
 
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > position)
+  {
+    if (position == head_)
+    {
+      pop_front();
+      position = end();
+    }
+    else if (position == end())
+    {
+      pop_back();
+      position = end();
+    }
+    else
+    {
+      Node< T >* node = position.getNode();
+      node->prev_->next_ = node->next_;
+      node->next_->prev_ = node->next_;
+    }
+    size_--;
+    return ++position;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
+  {
+    if (std::distance(first, last) > size())
+    {
+      throw std::out_of_range("The range is too large");
+    }
+    for (; first < last;)
+    {
+      erase(first);
+    }
+    erase(last);
+    return last;
+  }
+
+  template< typename T >
+  void List< T >::remove(const T& data)
+  {
+    if (begin() == end())
+    {
+      if (head_ == data)
+      {
+        pop_front();
+      }
+    }
+    for (Iterator< T > it = ++begin(); it != end();)
+    {
+      if (it.getNode() == data)
+      {
+        erase(it);
+      }
+      else
+      {
+        it++;
+      }
+    }
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::remove_if(Predicate pred)
+  {
+    if (begin() == end())
+    {
+      if (pred(head_))
+      {
+        pop_front();
+      }
+      for (Iterator< T > it = ++begin(); it != end();)
+      {
+        if (pred(it.getNode()))
+        {
+          erase(it);
+        }
+        else
+        {
+          ++it;
+        }
+      }
+    }
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > position, List< T >& list)
+  {
+    if (list.empty())
+    {
+      return;
+    }
+    Node< T >* node = position.getNode();
+    Node< T >* listHead = list.front();
+    Node< T >* listTail = list.back();
+    listTail->next_ = node;
+    listTail->prev_ = node->prev_;
+    node->prev_->next_ = listHead;
+    node->prev_ = listTail;
+    size_ += list.size_;
+    listHead = nullptr;
+    list.size_ = 0;
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > position, List< T >&& list)
+  {
+    splice(position, list);
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
+  {
+    Node< T >* iNode = i.getNode();
+    iNode->prev_->next_ = iNode->next;
+    iNode->next_->prev_ = iNode->prev_;
+    if (list.head_ == iNode)
+    {
+      list.head_ = list.size_ == 1 ? nullptr : iNode->next_;
+    }
+    --list.size_;
+    Node< T >* node = position.getNode();
+    iNode->prev_ = node->prev_;
+    iNode->next_ = node;
+    node->prev_ = iNode;
+    node->prev_->next_ = iNode;
+    ++size_;
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > position, List< T >&& list, ConstIterator< T > i)
+  {
+    splice(position, list, i);
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last)
+  {
+    list.size_ -= std::distance(first, last);
+    Node< T >* fNode = first.getNode();
+    Node< T >* lNode = last.getNode();
+    fNode->prev_->next_ = lNode;
+    lNode->prev_ = fNode->prev_;
+    Node< T >* node = pos.getNode();
+    fNode->prev_ = node->prev_;
+    lNode->prev_->next_ = node;
+    node->prev_->next_ = fNode;
+    node->prev_ = lNode->prev_;
+    size_ += std::distance(first, last);
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator< T > pos, List< T >&& list, ConstIterator< T > first, ConstIterator< T > last)
+  {
+    splice(pos, list, first, last);
+  }
 
 
 }

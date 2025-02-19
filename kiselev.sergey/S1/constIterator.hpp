@@ -25,6 +25,8 @@ namespace kiselev
     bool operator==(const ConstIterator< T >&) const;
     bool operator!=(const ConstIterator< T >&) const;
 
+    Node< T >* getNode() const;
+
   private:
 
     const Node< T >* node_;

@@ -27,6 +27,8 @@ namespace kiselev
     bool operator==(const Iterator< T >&) const;
     bool operator!=(const Iterator< T >&) const;
 
+    Node< T >* getNode() const;
+
   private:
 
     Node< T >* node_;
@@ -91,6 +93,12 @@ namespace kiselev
   bool Iterator< T >::operator!=(const Iterator< T >& it) const
   {
     return !(it == *this);
+  }
+
+  template< typename T >
+  Node< T >* Iterator< T >::getNode() const
+  {
+    return node_;
   }
 
 }
