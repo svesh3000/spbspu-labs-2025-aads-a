@@ -14,15 +14,15 @@ namespace demehin
 
     cListIterator();
     cListIterator(const this_t&) = default;
-    cListIterator(const Node< T >* node);
+    cListIterator(Node< T >* node);
     ~cListIterator() = default;
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++();
-    this_t& operator++(int);
+    this_t operator++(int);
 
     this_t& operator--();
-    this_t& operator--(int);
+    this_t operator--(int);
 
     const T& operator*() const;
     const T* operator->() const;
@@ -30,8 +30,10 @@ namespace demehin
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
 
+    Node< T >* getNode() const;
+
   private:
-    const Node< T >* node_;
+    Node< T >* node_;
   };
 
   template< typename T >
@@ -40,7 +42,7 @@ namespace demehin
   {}
 
   template< typename T >
-  cListIterator< T >::cListIterator(const Node< T >* node):
+  cListIterator< T >::cListIterator(Node< T >* node):
     node_(node)
   {}
 
@@ -53,7 +55,7 @@ namespace demehin
   }
 
   template< typename T >
-  typename cListIterator< T >::this_t& cListIterator< T >::operator++(int)
+  typename cListIterator< T >::this_t cListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -70,7 +72,7 @@ namespace demehin
   }
 
   template< typename T >
-  typename cListIterator< T >::this_t& cListIterator< T >::operator--(int)
+  typename cListIterator< T >::this_t cListIterator< T >::operator--(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -102,6 +104,12 @@ namespace demehin
   bool cListIterator< T >::operator!=(const this_t& rhs) const
   {
     return !(rhs == *this);
+  }
+
+  template< typename T >
+  Node< T >* cListIterator< T >::getNode() const
+  {
+    return node_;
   }
 
 }
