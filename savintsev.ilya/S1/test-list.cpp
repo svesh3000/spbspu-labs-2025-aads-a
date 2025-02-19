@@ -163,4 +163,38 @@ BOOST_AUTO_TEST_CASE(test_splice)
   BOOST_TEST(list2.empty());
   list2.push_back(1);
   BOOST_TEST(list2.front() == 1);
+  it = list1.begin();
+  it++;
+  it++;
+  list2.splice(list2.begin(), list1, it);
+  auto jt = list2.begin();
+  BOOST_TEST(*jt++ == 20);
+  BOOST_TEST(*jt == 1);
+  BOOST_TEST(list1.size() == 7);
+  BOOST_TEST(list2.size() == 2);
+  list1.clear();
+  list2.clear();
+  for (int i = 1; i <= 7; ++i)
+  {
+    list1.push_back(i);
+  }
+  list2.push_back(2);
+  list2.push_back(6);
+  auto first = list1.begin();
+  ++first;
+  ++first;
+  auto last = list1.end();
+  --last;
+  --last;
+  jt = list2.begin();
+  ++jt;
+  list2.splice(jt, list1, first, last);
+  jt = list2.begin();
+  for (size_t i = 2; i <= 6; ++i)
+  {
+    BOOST_TEST(*jt == i);
+    ++jt;
+  }
+  BOOST_TEST(list1.size() == 4);
+  BOOST_TEST(list2.size() == 5);
 }

@@ -110,6 +110,8 @@ namespace savintsev
 
     void remove(const T & value);
     void splice(iterator pos, List & rhs);
+    void splice(iterator pos, List & rhs, iterator i);
+    void splice(iterator pos, List & rhs, iterator first, iterator last);
   private:
     ListNode< T > * dummy;
     size_t list_size;
@@ -270,9 +272,38 @@ void savintsev::List< T >::splice(iterator pos, List & rhs)
   rhs.dummy->next->prev = pos.node->prev;
   rhs.dummy->prev->next = pos.node;
   pos.node->prev = rhs.dummy->prev;
+  ListNode< T > * temp = new ListNode< T >();
   delete rhs.dummy;
-  rhs.dummy = new ListNode< T >();
+  rhs.dummy = temp;
+  temp = nullptr;
   rhs.list_size = 0;
+}
+
+template< typename T >
+void savintsev::List< T >::splice(iterator pos, List & rhs, iterator i)
+{
+  pos.node->prev->next = i.node;
+  pos.node->prev = i.node;
+  list_size++;
+  i.node->prev->next = i.node->next;
+  i.node->next->prev = i.node->prev;
+  i.node->next = pos.node;
+  i.node->prev = pos.node->prev->prev;
+  rhs.list_size--;
+}
+
+template< typename T >
+void savintsev::List< T >::splice(iterator pos, List & rhs, iterator first, iterator last)
+{
+  list_size += std::distance(first, last);
+  rhs.list_size -= std::distance(first, last);
+  last.node->prev->next = pos.node;
+  pos.node->prev->next = first.node;
+  first.node->prev->next = last.node;
+  ListNode< T > * temp_first_prev = first.node->prev;
+  first.node->prev = pos.node->prev;
+  pos.node->prev = last.node->prev;
+  last.node->prev = temp_first_prev;
 }
 
 #endif
