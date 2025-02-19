@@ -6,11 +6,11 @@
 BOOST_AUTO_TEST_CASE(test_swap)
 {
   std::string out;
-  savintsev::List<std::string> meats;
+  savintsev::List< std::string > meats;
   meats.push_back("hotdog");
   meats.push_back("pierogi");
   meats.push_back("beef");
-  savintsev::List<std::string> vegetables;
+  savintsev::List< std::string > vegetables;
   vegetables.push_back("latuce");
   vegetables.push_back("tomato");
   meats.swap(vegetables);
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_swap)
 
 BOOST_AUTO_TEST_CASE(test_std_interface)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   BOOST_TEST(list1.empty());
   BOOST_TEST(list1.size() == 0);
   list1.push_back("test");
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(test_std_interface)
 
 BOOST_AUTO_TEST_CASE(test_push_and_pop)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   list1.push_back("1");
   list1.push_back("2");
   list1.push_front("0");
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_push_and_pop)
 
 BOOST_AUTO_TEST_CASE(test_begin_and_end)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   list1.push_back("front");
   list1.push_back("back");
   auto it = list1.begin();
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_begin_and_end)
 
 BOOST_AUTO_TEST_CASE(test_front_and_back)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   list1.push_back("front");
   list1.push_back("back");
   BOOST_TEST(list1.front() == "front");
@@ -80,11 +80,11 @@ BOOST_AUTO_TEST_CASE(test_front_and_back)
 
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   list1.push_back("banana");
   list1.push_back("orange");
   list1.push_front("apple");
-  savintsev::List<std::string> list2(list1);
+  savintsev::List< std::string > list2(list1);
   auto it = list2.begin();
   BOOST_TEST(*it == "apple");
   ++it;
@@ -95,11 +95,11 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
 
 BOOST_AUTO_TEST_CASE(test_move_constructor)
 {
-  savintsev::List<std::string> list1;
+  savintsev::List< std::string > list1;
   list1.push_back("banana");
   list1.push_back("orange");
   list1.push_front("apple");
-  savintsev::List<std::string> list2(std::move(list1));
+  savintsev::List< std::string > list2(std::move(list1));
   auto it = list2.begin();
   BOOST_TEST(*it == "apple");
   ++it;
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
 
 BOOST_AUTO_TEST_CASE(test_fill)
 {
-  savintsev::List<int> list1;
+  savintsev::List< int > list1;
   for (size_t i = 0; i < 8; ++i)
   {
     list1.push_back(0);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_fill)
 
 BOOST_AUTO_TEST_CASE(test_remove)
 {
-  savintsev::List<int> list1;
+  savintsev::List< int > list1;
   list1.push_back(0);
   list1.push_back(0);
   list1.push_back(4);
@@ -139,9 +139,40 @@ BOOST_AUTO_TEST_CASE(test_remove)
   }
 }
 
+bool divisible_by_five(const int & value)
+{
+  return (value % 2);
+}
+
+struct is_even
+{
+  bool operator()(const int & value)
+  {
+    return (value % 2) == 0;
+  }
+};
+
+BOOST_AUTO_TEST_CASE(test_remove_if)
+{
+  
+  savintsev::List< int > list1;
+  for (size_t i = 1; i <= 10; ++i)
+  {
+    list1.push_back(i);
+  }
+  list1.remove_if(divisible_by_five);
+  list1.remove_if(is_even());
+  size_t i = 1;
+  for (auto it = list1.begin(); it != list1.end(); ++it)
+  {
+    BOOST_TEST(*it == i);
+    i += (i == 3) ? 4 : 2;
+  }
+}
+
 BOOST_AUTO_TEST_CASE(test_splice)
 {
-  savintsev::List<int> list1, list2;
+  savintsev::List< int > list1, list2;
   for (int i = 1; i <= 4; ++i)
   {
     list1.push_back(i);

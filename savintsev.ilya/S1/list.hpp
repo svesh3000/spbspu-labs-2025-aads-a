@@ -63,7 +63,7 @@ namespace savintsev
       node = node->prev;
       return *this;
     }
-    Iterator & operator--(int)
+    Iterator operator--(int)
     {
       Iterator result(*this);
       --(*this);
@@ -259,8 +259,7 @@ void savintsev::List< T >::remove(const T & value)
     {
       it.node->prev->next = it.node->next;
       it.node->next->prev = it.node->prev;
-      auto temp = it;
-      --it;
+      auto temp = it--;
       delete temp.node;
       --list_size;
     }
@@ -271,7 +270,17 @@ template< typename T >
 template< class predicate >
 void savintsev::List< T >::remove_if(predicate pred)
 {
-  
+  for (auto it = begin(); it != end(); ++it)
+  {
+    if (pred(*it))
+    {
+      it.node->prev->next = it.node->next;
+      it.node->next->prev = it.node->prev;
+      auto temp = it--;
+      delete temp.node;
+      --list_size;
+    }
+  }
 }
 
 template< typename T >
