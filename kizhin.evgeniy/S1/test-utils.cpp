@@ -13,3 +13,12 @@ void kizhin::testInvariants(const ListT& list)
   BOOST_TEST(std::addressof(list.back()) == std::addressof(*beforeEnd));
 }
 
+void kizhin::testComparisonInvariants(const ListT& lhs, const ListT& rhs)
+{
+  BOOST_TEST((lhs == rhs) == !(lhs != rhs));
+  BOOST_TEST((lhs < rhs) == (rhs > lhs));
+  BOOST_TEST((lhs < rhs) == !(lhs >= rhs));
+  BOOST_TEST((lhs > rhs) == !(lhs <= rhs));
+  BOOST_TEST((lhs == rhs) == (lhs <= rhs && lhs >= rhs));
+}
+

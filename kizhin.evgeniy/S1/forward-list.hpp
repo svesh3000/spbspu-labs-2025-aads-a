@@ -335,6 +335,7 @@ namespace kizhin {
       const_iterator position)
   {
     assert(!empty());
+    assert(position.node_ != nullptr);
     return eraseAfter(position, std::next(position, 2));
   }
 
@@ -342,7 +343,6 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::eraseAfter(const_iterator first,
       const_iterator last)
   {
-    // TODO: Refactor
     assert(!empty());
     Node* firstPtr = first.node_->next;
     Node* lastPtr = last.node_;
@@ -353,6 +353,9 @@ namespace kizhin {
       --size_;
     }
     first.node_->next = firstPtr;
+    if (firstPtr == nullptr) { // TODO: add test
+      end_ = first.node_;
+    }
     return iterator(first.node_);
   }
 
@@ -492,16 +495,57 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::spliceAfter(const_iterator, ForwardList&, const_iterator,
-      const_iterator)
+  void ForwardList< T >::spliceAfter(const_iterator position, ForwardList& source,
+      const_iterator first, const_iterator last)
   {
-    // TODO: Implement splice
+    // TODO: Test it
+    if (first == last || std::addressof(source) == this) {
+      return;
+    }
+    Node* otherFirst = first.node_;
+    Node* otherLast = last.node_;
+    Node* prevOther = otherFirst;
+    Node* rangeEnd = otherFirst ? otherFirst->next : nullptr;
+    size_type count = 0;
+    while (rangeEnd != otherLast) {
+      prevOther = rangeEnd;
+      rangeEnd = rangeEnd->next;
+      ++count;
+    }
+    if (!prevOther) {
+      return;
+    }
+    Node* spliceBegin = otherFirst->next;
+    otherFirst->next = otherLast;
+    if (source.end_ == prevOther) {
+      source.end_ = otherFirst;
+    }
+    source.size_ -= count;
+
+    Node* posNode = position.node_;
+    Node* nextNode = posNode->next;
+    posNode->next = spliceBegin;
+    prevOther->next = nextNode;
+    if (!nextNode) {
+      end_ = prevOther;
+    }
+    size_ += count;
   }
 
   template < typename T >
   void ForwardList< T >::reverse()
   {
-    // TODO: Implement reverse
+    Node* prev = nullptr;
+    Node* curr = begin_;
+    Node* next = nullptr;
+    end_ = begin_;
+    while (curr) {
+      next = curr->next;
+      curr->next = prev;
+      prev = curr;
+      curr = next;
+    }
+    begin_ = prev;
   }
 
   template < typename T >
@@ -512,9 +556,26 @@ namespace kizhin {
 
   template < typename T >
   template < typename BinaryPredicate >
-  void ForwardList< T >::unique(BinaryPredicate)
+  void ForwardList< T >::unique(BinaryPredicate p)
   {
-    // TODO: Implement unique
+    // TODO: test
+    if (empty()) {
+      return;
+    }
+    Node* curr = begin_;
+    while (curr->next) {
+      if (p(curr->data, curr->next->data)) {
+        Node* tmp = curr->next;
+        curr->next = tmp->next;
+        delete tmp;
+        --size_;
+        if (!curr->next) {
+          end_ = curr;
+        }
+      } else {
+        curr = curr->next;
+      }
+    }
   }
 
   template < typename T >
@@ -531,15 +592,23 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::merge(ForwardList&)
+  void ForwardList< T >::merge(ForwardList& source)
   {
-    // TODO: Implement merge
+    merge(source, std::less< value_type >{});
   }
 
   template < typename T >
   template < typename Comp >
-  void ForwardList< T >::merge(ForwardList&, Comp)
+  void ForwardList< T >::merge(ForwardList& source, Comp)
   {
+    if (this == std::addressof(source) || source.empty()) {
+      return;
+    }
+    if (empty()) {
+      swap(source);
+      return;
+    }
+
     // TODO: Implement merge
   }
 }
