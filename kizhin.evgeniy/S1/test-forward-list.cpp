@@ -1,3 +1,4 @@
+#include <boost/test/unit_test_suite.hpp>
 #include "test-utils.hpp"
 
 using kizhin::ListT;
@@ -419,24 +420,74 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_SUITE_END();
 BOOST_AUTO_TEST_SUITE(operations);
 
-BOOST_AUTO_TEST_CASE(remove_value)
+BOOST_AUTO_TEST_CASE(remove_value_from_empty)
 {
-  // TODO: Implement remove tests
+  ListT list;
+  list.remove(1);
+  testInvariants(list);
+  BOOST_TEST(list.empty());
 }
 
-BOOST_AUTO_TEST_CASE(remove_predicate)
+BOOST_AUTO_TEST_CASE(remove_value_from_filled)
 {
-  // TODO: Implement remove tests
+  ListT list(100, 1);
+  list.remove(1);
+  testInvariants(list);
+  BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(remove_value)
+{
+  ListT list{ 1, 1, 3, 4, 1, 1 };
+  const ListT expected{ 3, 4 };
+  list.remove(1);
+  testInvariants(list);
+  BOOST_TEST(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(remove_if)
+{
+  ListT list{ 1, 1, 3, 4, 1, 1 };
+  const ListT expected{ 3, 4 };
+  list.removeIf([](ListT::const_reference v) -> bool {
+    return v == 1;
+  });
+  testInvariants(list);
+  BOOST_TEST(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(reverse_empty)
+{
+  ListT list;
+  list.reverse();
+  testInvariants(list);
+  BOOST_TEST(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(reverse)
 {
-  // TODO: Implement reverse tests
+  const ListT expected{ 5, 4, 3, 2, 1 };
+  ListT list{ 1, 2, 3, 4, 5 };
+  list.reverse();
+  testInvariants(list);
+  BOOST_TEST(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(unique_empty)
+{
+  ListT list;
+  list.unique();
+  testInvariants(list);
+  BOOST_TEST(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(unique)
 {
-  // TODO: Implement unique tests
+  ListT list{ 1, 1, 1, 3, 4, 1, 1 };
+  const ListT expected{ 1, 3, 4, 1 };
+  list.unique();
+  testInvariants(list);
+  BOOST_TEST(list == expected);
 }
 
 BOOST_AUTO_TEST_CASE(unique_predicate)
@@ -454,9 +505,74 @@ BOOST_AUTO_TEST_CASE(sort_comparator)
   // TODO: Implement sort tests
 }
 
-// TODO: Add tests: merge, splice
+BOOST_AUTO_TEST_CASE(splice_after)
+{
+
+  const ListT expectedFirst{ 1 };
+  const ListT expectedSecond{ 10, 2, 3, 4, 5, 11, 12 };
+  ListT first = { 1, 2, 3, 4, 5 };
+  ListT second = { 10, 11, 12 };
+  second.spliceAfter(second.begin(), first, first.begin(), first.end());
+  testInvariants(first);
+  testInvariants(second);
+  BOOST_TEST(first == expectedFirst);
+  BOOST_TEST(second == expectedSecond);
+}
+
+// TODO: Add tests: merge
 
 BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE(comparison_operators);
 
-// TODO: Test free comparison operators
+BOOST_AUTO_TEST_CASE(comparison_empty_lists)
+{
+  const ListT list1;
+  const ListT list2;
+  BOOST_TEST(!(list1 < list2));
+  BOOST_TEST(!(list1 > list2));
+  BOOST_TEST(list1 == list2);
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_CASE(equality_operator_different_sizes)
+{
+  const ListT list1(10);
+  const ListT list2(11);
+  BOOST_TEST(!(list1 == list2));
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_CASE(equality_operator_different_values)
+{
+  const ListT list1{ 1, 2, 3, 4 };
+  const ListT list2{ 1, 2, 3, 5 };
+  BOOST_TEST(!(list1 == list2));
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_CASE(equality_operator_same)
+{
+  const ListT list1{ 1, 2, 3, 4 };
+  const ListT list2{ 1, 2, 3, 4 };
+  BOOST_TEST(list1 == list2);
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_CASE(less_operator_different_sizes)
+{
+  const ListT list1{ 1, 2 };
+  const ListT list2{ 1, 2, 3 };
+  BOOST_TEST(list1 < list2);
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_CASE(less_operator_different_values)
+{
+  const ListT list1{ 1, 2, 3 };
+  const ListT list2{ 1, 4, 2 };
+  BOOST_TEST(list1 < list2);
+  testComparisonInvariants(list1, list2);
+}
+
+BOOST_AUTO_TEST_SUITE_END();
 
