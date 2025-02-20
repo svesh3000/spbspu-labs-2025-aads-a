@@ -14,13 +14,16 @@ namespace demehin
     using cIter = cListIterator< T >;
 
     List();
+    List(const List< T >&);
+    List(List< T >&&);
+
     List(size_t, const T&);
     List(std::initializer_list< T >);
+    List(Iter, Iter);
 
     ~List();
 
-    List(const List< T >&);
-    List(List< T >&&);
+    List< T >& operator=(const List< T >&);
 
     Iter begin() const;
     Iter end() const;
@@ -68,8 +71,9 @@ namespace demehin
     Iter insert(cIter, const T&);
     Iter insert(cIter, T&&);
     Iter insert(cIter, size_t, const T&);
+    //template< typename InputIt >
     Iter insert(cIter, Iter, Iter);
-    Iter insert(cIter, std::initializer_list< T >);
+    //Iter insert(cIter, std::initializer_list< T >);
 
   private:
     using Node = demehin::Node< T >;
@@ -108,10 +112,24 @@ namespace demehin
   }
 
   template< typename T >
+  List< T >::List(ListIterator< T > first, ListIterator< T > last):
+    List()
+  {
+    assign(first, last);
+  }
+
+  template< typename T >
   List< T >::~List()
   {
     clear();
     delete[] reinterpret_cast< char* >(fake_);
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(const List< T >& other)
+  {
+    assign(other.begin(), other.end());
+    return *this;
   }
 
   template< typename T >
@@ -219,6 +237,7 @@ namespace demehin
     else
     {
       fake_->next_ = new_node;
+      new_node->prev_ = fake_;
     }
 
     tail_ = new_node;
@@ -401,19 +420,6 @@ namespace demehin
         erase(it);
       }
     }
-
-    //auto it = cbegin();
-    //while (it != cend())
-    //{
-      //if (*it == value)
-      //{
-        //it = erase(it);
-      //}
-      //else
-      //{
-        //++it;
-      //}
-    //}
   }
 
   template< typename T >
@@ -464,9 +470,6 @@ namespace demehin
   {
     const Node* todelete = pos.getNode();
     ListIterator< T > toreturn(todelete->next_);
-    //todelete->prev_->next_ = todelete->next_;
-    //todelete->next_->prev_ = todelete->prev_->next_;
-    //delete todelete;
     if (todelete == fake_->next_)
     {
       fake_->next_ = todelete->next_;
@@ -486,6 +489,17 @@ namespace demehin
     }
     size_--;
     delete todelete;
+    return toreturn;
+  }
+
+  template< typename T >
+  ListIterator< T > List< T >::erase(cListIterator< T > first, cListIterator< T > last)
+  {
+    ListIterator< T > toreturn;
+    for (auto it = first; it != last; it++)
+    {
+      toreturn = erase(it);
+    }
     return toreturn;
   }
 
@@ -514,6 +528,50 @@ namespace demehin
     T temp_val = std::move(value);
     return insert(pos, temp_val);
   }
+
+  template< typename T >
+  ListIterator< T > List< T >::insert(cListIterator< T > pos, size_t count, const T& value)
+  {
+    if (count == 0)
+    {
+      return ListIterator< T >(pos.getNode());
+    }
+
+    ListIterator< T > toreturn = insert(pos, value);
+    for (size_t i = 1; i < count; i++)
+    {
+      insert(pos, value);
+    }
+    return toreturn;
+  }
+
+  template< typename T >
+  //template< typename InputIt >
+  ListIterator< T > List< T >::insert(cListIterator< T > pos, ListIterator< T > first,
+    ListIterator< T > last)
+  {
+    if (first == last)
+    {
+      return ListIterator< T >(pos.getNode());
+    }
+
+    for (auto it = first; it != last; it++)
+    {
+      insert(pos, *it);
+    }
+    return first;
+  }
+
+  /*template< typename T >
+  ListIterator< T > List< T >::insert(cListIterator< T > pos, std::initializer_list< T > ilist)
+  {
+    if (ilist.size() == 0)
+    {
+      return ListIterator< T >(pos.getNode());
+    }
+
+    return insert(pos, ilist.begin(), ilist.end());
+  }*/
 
 }
 
