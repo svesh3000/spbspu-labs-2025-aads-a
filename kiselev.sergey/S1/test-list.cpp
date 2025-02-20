@@ -2,6 +2,8 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include <endian.h>
+#include "constIterator.hpp"
+#include "iterator.hpp"
 #include "list.hpp"
 
 using namespace kiselev;
@@ -85,6 +87,28 @@ BOOST_AUTO_TEST_CASE(swap)
   list2.push_front(++i);
   list2.swap(list);
   BOOST_TEST(list2.size() == copyList.size());
+}
+
+BOOST_AUTO_TEST_CASE(erase_pos)
+{
+  List< int > list;
+  for (size_t i = 0; i < 20; ++i)
+  {
+    list.push_back(i);
+  }
+  ConstIterator< int > begin = list.cbegin();
+  Iterator< int > it = list.erase(begin);
+  BOOST_CHECK(it == list.begin());
+  ConstIterator< int > end = list.cend();
+  it = list.erase(end);
+  BOOST_CHECK(it == list.begin());
+  ConstIterator< int > iter = ++list.cbegin();
+  it = list.erase(iter);
+  BOOST_CHECK(*it == 3);
+  begin = ++list.cbegin();
+  end = list.cend();
+  it = list.erase(begin, end);
+  BOOST_CHECK(it == list.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

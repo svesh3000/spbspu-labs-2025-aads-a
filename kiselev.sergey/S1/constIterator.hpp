@@ -1,6 +1,8 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
+#include <cstddef>
 #include <memory>
+#include <type_traits>
 #include "node.hpp"
 
 namespace kiselev
@@ -29,9 +31,20 @@ namespace kiselev
 
   private:
 
-    const Node< T >* node_;
+    Node< T >* node_;
 
   };
+
+  template< typename T >
+  size_t distance(ConstIterator< T > first, ConstIterator< T > last)
+  {
+    size_t count = 0;
+    for (; first != last; ++first)
+    {
+      ++count;
+    }
+    return count;
+  }
 
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator++()
@@ -91,6 +104,12 @@ namespace kiselev
   bool ConstIterator< T >::operator!=(const ConstIterator< T >& it) const
   {
     return !(it == *this);
+  }
+
+  template< typename T >
+  Node< T >* ConstIterator< T >::getNode() const
+  {
+    return node_;
   }
 
 }

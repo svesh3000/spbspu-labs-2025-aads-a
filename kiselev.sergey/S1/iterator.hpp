@@ -1,5 +1,6 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
+#include <cstddef>
 #include <memory>
 #include "node.hpp"
 namespace kiselev
@@ -34,6 +35,17 @@ namespace kiselev
     Node< T >* node_;
 
   };
+
+  template< typename T >
+  size_t distance(Iterator< T > first, Iterator< T > last)
+  {
+    size_t count = 0;
+    for (;first != last; ++first)
+    {
+      ++count;
+    }
+    return count;
+  }
 
   template< typename T >
   Iterator< T >& Iterator< T >::operator++()

@@ -23,7 +23,9 @@ namespace kiselev
     List< T >& operator=(const List< T >&&);
 
     Iterator< T > begin() const noexcept;
+    ConstIterator< T > cbegin() const noexcept;
     Iterator< T > end() const noexcept;
+    ConstIterator< T > cend() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -130,6 +132,18 @@ namespace kiselev
   }
 
   template< typename T >
+  ConstIterator< T > List< T >::cbegin() const noexcept
+  {
+    return ConstIterator< T >(head_);
+  }
+
+  template< typename T >
+  ConstIterator< T > List< T >::cend() const noexcept
+  {
+    return ConstIterator< T >(head_->prev_);
+  }
+
+  template< typename T >
   Iterator< T > List< T >::end() const noexcept
   {
     return Iterator< T >(head_->prev_);
@@ -231,8 +245,9 @@ namespace kiselev
     else
     {
       Node< T >* oldHead = head_;
+      head_->prev_->next_ = head_->next_;
+      head_->next_->prev_ = head_->prev_;
       head_ = head_->next_;
-      head_->prev_->next_ = head_;
       delete oldHead;
     }
     --size_;
@@ -264,39 +279,42 @@ namespace kiselev
   template< typename T >
   Iterator< T > List< T >::erase(ConstIterator< T > position)
   {
-    if (position == head_)
+    Iterator< T > it;
+    if (position == cbegin())
     {
       pop_front();
-      position = end();
+      it = begin();
     }
-    else if (position == end())
+    else if (position == cend())
     {
       pop_back();
-      position = end();
+      it = begin();
     }
     else
     {
-      Node< T >* node = position.getNode();
+      const Node< T >* node = position.getNode();
       node->prev_->next_ = node->next_;
       node->next_->prev_ = node->next_;
+      it = node->next_;
+      delete node;
     }
     size_--;
-    return ++position;
+    return it;
   }
 
   template< typename T >
   Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
   {
-    if (std::distance(first, last) > size())
+    if (distance(first, last) > size())
     {
       throw std::out_of_range("The range is too large");
     }
-    for (; first < last;)
+    for (; first != last;)
     {
-      erase(first);
+      Iterator< T > it = erase(first);
+      first = it.getNode();
     }
-    erase(last);
-    return last;
+    return Iterator< T >(first.getNode());
   }
 
   template< typename T >
