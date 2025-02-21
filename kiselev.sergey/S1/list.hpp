@@ -15,17 +15,19 @@ namespace kiselev
 
     List(): head_(nullptr), size_(0) {};
     List(const List< T >&);
-    List(List< T >&&);
+    List(List< T >&&) noexcept;
     List(size_t, const T&);
     ~List();
 
     List< T >& operator=(const List< T >&);
-    List< T >& operator=(const List< T >&&);
+    List< T >& operator=(List< T >&&) noexcept;
 
     Iterator< T > begin() const noexcept;
     ConstIterator< T > cbegin() const noexcept;
     Iterator< T > end() const noexcept;
     ConstIterator< T > cend() const noexcept;
+    Iterator< T > last() noexcept;
+    ConstIterator< T > clast() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -67,23 +69,16 @@ namespace kiselev
   List< T >::List(const List< T >& list):
     List()
   {
-    try
+    Iterator< T > it = list.begin();
+    while(size() != list.size())
     {
-      Iterator< T > it = list.begin();
-      while(size() != list.size())
-      {
-        push_back(*it);
-        ++it;
-      }
-    }
-    catch(...)
-    {
-      clear();
+      push_back(*it);
+      ++it;
     }
   }
 
   template< typename T >
-  List< T >::List(List< T >&& list):
+  List< T >::List(List< T >&& list) noexcept:
     head_(list.head_),
     size_(list.size_)
   {
@@ -106,7 +101,6 @@ namespace kiselev
   List< T >::~List()
   {
     clear();
-    delete head_;
   }
 
   template< typename T >
@@ -118,7 +112,7 @@ namespace kiselev
   }
 
   template< typename T >
-  List< T >& List< T >::operator=(const List< T >&& list)
+  List< T >& List< T >::operator=(List< T >&& list) noexcept
   {
     List< T > temp(std::move(list));
     swap(temp);
@@ -128,25 +122,37 @@ namespace kiselev
   template< typename T >
   Iterator< T > List< T >::begin() const noexcept
   {
-    return Iterator< T >(head_);
+    return Iterator< T >(head_, head_->next_);
   }
 
   template< typename T >
   ConstIterator< T > List< T >::cbegin() const noexcept
   {
-    return ConstIterator< T >(head_);
+    return ConstIterator< T >(head_, head_->next_);
   }
 
   template< typename T >
   ConstIterator< T > List< T >::cend() const noexcept
   {
-    return ConstIterator< T >(head_->prev_);
+    return ConstIterator< T >(nullptr, head_->prev_);
   }
 
   template< typename T >
   Iterator< T > List< T >::end() const noexcept
   {
+    return Iterator< T >(nullptr, head_->prev_);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::last() noexcept
+  {
     return Iterator< T >(head_->prev_);
+  }
+
+  template< typename T >
+  ConstIterator< T > List< T >::clast() const noexcept
+  {
+    return ConstIterator< T >(head_->prev_);
   }
 
   template< typename T >
@@ -218,39 +224,14 @@ namespace kiselev
   void List< T >::pop_back()
   {
     assert(!empty());
-    if (size_ == 1)
-    {
-      delete head_;
-      head_ = nullptr;
-    }
-    else
-    {
-      Node< T >* oldTail = head_->prev_;
-      head_->prev_ = oldTail->prev_;
-      head_->prev_->next_ = head_;
-      delete oldTail;
-    }
-    --size_;
+    erase(ConstIterator< T >(head_->prev_));
   }
 
   template< typename T >
   void List< T >::pop_front()
   {
     assert(!empty());
-    if (size_ == 1)
-    {
-      delete head_;
-      head_ = nullptr;
-    }
-    else
-    {
-      Node< T >* oldHead = head_;
-      head_->prev_->next_ = head_->next_;
-      head_->next_->prev_ = head_->prev_;
-      head_ = head_->next_;
-      delete oldHead;
-    }
-    --size_;
+    erase(cbegin());
   }
 
   template< typename T >
@@ -279,25 +260,22 @@ namespace kiselev
   template< typename T >
   Iterator< T > List< T >::erase(ConstIterator< T > position)
   {
-    Iterator< T > it;
+    Iterator< T > it(position.node_->next_);
+    position.node_->next_->prev_ = position.node_->prev_;
     if (position == cbegin())
     {
-      pop_front();
-      it = begin();
+      head_ = head_->next_;
     }
-    else if (position == cend())
+    else if (position.node_ == head_->prev_)
     {
-      pop_back();
-      it = begin();
+      head_->prev_ = head_->prev_->prev_;
+      position.node_->prev_->next_ = position.node_->next_;
     }
     else
     {
-      const Node< T >* node = position.getNode();
-      node->prev_->next_ = node->next_;
-      node->next_->prev_ = node->next_;
-      it = node->next_;
-      delete node;
+      position.node_->prev_->next_ = position.node_->next_;
     }
+    delete position.node_;
     size_--;
     return it;
   }
@@ -305,16 +283,12 @@ namespace kiselev
   template< typename T >
   Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
   {
-    if (distance(first, last) > size())
-    {
-      throw std::out_of_range("The range is too large");
-    }
     for (; first != last;)
     {
-      Iterator< T > it = erase(first);
-      first = it.getNode();
+      erase(first);
+      ++first;
     }
-    return Iterator< T >(first.getNode());
+    return Iterator< T >(first.node_);
   }
 
   template< typename T >
@@ -329,7 +303,7 @@ namespace kiselev
     }
     for (Iterator< T > it = ++begin(); it != end();)
     {
-      if (it.getNode() == data)
+      if (it.node_ == data)
       {
         erase(it);
       }
@@ -352,7 +326,7 @@ namespace kiselev
       }
       for (Iterator< T > it = ++begin(); it != end();)
       {
-        if (pred(it.getNode()))
+        if (pred(it.node_))
         {
           erase(it);
         }
@@ -371,7 +345,7 @@ namespace kiselev
     {
       return;
     }
-    Node< T >* node = position.getNode();
+    Node< T >* node = position.node_;
     Node< T >* listHead = list.front();
     Node< T >* listTail = list.back();
     listTail->next_ = node;
@@ -392,7 +366,7 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
   {
-    Node< T >* iNode = i.getNode();
+    Node< T >* iNode = i.node_;
     iNode->prev_->next_ = iNode->next;
     iNode->next_->prev_ = iNode->prev_;
     if (list.head_ == iNode)
@@ -400,7 +374,7 @@ namespace kiselev
       list.head_ = list.size_ == 1 ? nullptr : iNode->next_;
     }
     --list.size_;
-    Node< T >* node = position.getNode();
+    Node< T >* node = position.node_;
     iNode->prev_ = node->prev_;
     iNode->next_ = node;
     node->prev_ = iNode;
@@ -418,11 +392,11 @@ namespace kiselev
   void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last)
   {
     list.size_ -= std::distance(first, last);
-    Node< T >* fNode = first.getNode();
-    Node< T >* lNode = last.getNode();
+    Node< T >* fNode = first.node_;
+    Node< T >* lNode = last.node_;
     fNode->prev_->next_ = lNode;
     lNode->prev_ = fNode->prev_;
-    Node< T >* node = pos.getNode();
+    Node< T >* node = pos.node_;
     fNode->prev_ = node->prev_;
     lNode->prev_->next_ = node;
     node->prev_->next_ = fNode;

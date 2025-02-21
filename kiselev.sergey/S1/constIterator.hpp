@@ -1,19 +1,23 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
 #include <cstddef>
-#include <memory>
+#include <iterator>
 #include <type_traits>
 #include "node.hpp"
 
 namespace kiselev
 {
   template< typename T >
-  class ConstIterator
+  class List;
+  template< typename T >
+  class ConstIterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
+    friend class List< T >;
   public:
 
-    ConstIterator(): node_(nullptr) {}
-    ConstIterator(Node< T >* node): node_(node) {}
+    ConstIterator(): node_(nullptr), end_(nullptr) {}
+    ConstIterator(Node< T >* node): node_(node), end_(nullptr)  {}
+    ConstIterator(Node< T >* node, Node< T >* end_): node_(node), end_(end_) {}
 
     ConstIterator< T >& operator++();
     ConstIterator< T > operator++(int);
@@ -27,15 +31,15 @@ namespace kiselev
     bool operator==(const ConstIterator< T >&) const;
     bool operator!=(const ConstIterator< T >&) const;
 
-    Node< T >* getNode() const;
 
   private:
 
     Node< T >* node_;
+    Node< T >* end_;
 
   };
 
-  template< typename T >
+  /*template< typename T >
   size_t distance(ConstIterator< T > first, ConstIterator< T > last)
   {
     size_t count = 0;
@@ -45,12 +49,19 @@ namespace kiselev
     }
     return count;
   }
-
+  */
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    node_ = node_->next_;
+    if (node_ == end_)
+    {
+      node_ = nullptr;
+    }
+    else
+    {
+      node_ = node_->next_;
+    }
     return *this;
   }
 
@@ -66,8 +77,14 @@ namespace kiselev
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator--()
   {
-    assert(node_ != nullptr);
-    node_ = node_->prev_;
+    if (node_ == nullptr)
+    {
+      end_ = end_->prev_;
+    }
+    else
+    {
+      node_ = node_->prev_;
+    }
     return *this;
   }
 
@@ -104,12 +121,6 @@ namespace kiselev
   bool ConstIterator< T >::operator!=(const ConstIterator< T >& it) const
   {
     return !(it == *this);
-  }
-
-  template< typename T >
-  Node< T >* ConstIterator< T >::getNode() const
-  {
-    return node_;
   }
 
 }

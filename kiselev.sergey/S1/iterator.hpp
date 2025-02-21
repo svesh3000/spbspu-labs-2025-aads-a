@@ -1,20 +1,22 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include "node.hpp"
 namespace kiselev
 {
   template< typename T>
-  class Iterator
+  class List;
+  template< typename T >
+  class Iterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
+    friend class List< T >;
   public:
 
-    Iterator(): node_(nullptr) {}
-    Iterator(const Iterator< T >&) = default;
-    Iterator(Node< T >* node): node_(node) {}
-    ~Iterator() = default;
-    Iterator< T >& operator=(const Iterator< T >&) = default;
+    Iterator(): node_(nullptr), end_(nullptr) {};
+    Iterator(Node< T >* node): node_(node), end_(nullptr) {}
+    Iterator(Node< T >* node, Node< T >* end): node_(node), end_(end) {}
 
     Iterator< T >& operator++();
     Iterator< T > operator++(int);
@@ -28,15 +30,15 @@ namespace kiselev
     bool operator==(const Iterator< T >&) const;
     bool operator!=(const Iterator< T >&) const;
 
-    Node< T >* getNode() const;
 
   private:
 
     Node< T >* node_;
+    Node< T >* end_;
 
   };
 
-  template< typename T >
+  /*template< typename T >
   size_t distance(Iterator< T > first, Iterator< T > last)
   {
     size_t count = 0;
@@ -46,7 +48,7 @@ namespace kiselev
     }
     return count;
   }
-
+  */
   template< typename T >
   Iterator< T >& Iterator< T >::operator++()
   {
@@ -105,12 +107,6 @@ namespace kiselev
   bool Iterator< T >::operator!=(const Iterator< T >& it) const
   {
     return !(it == *this);
-  }
-
-  template< typename T >
-  Node< T >* Iterator< T >::getNode() const
-  {
-    return node_;
   }
 
 }
