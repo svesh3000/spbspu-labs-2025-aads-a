@@ -71,9 +71,9 @@ namespace demehin
     Iter insert(cIter, const T&);
     Iter insert(cIter, T&&);
     Iter insert(cIter, size_t, const T&);
-    //template< typename InputIt >
-    Iter insert(cIter, Iter, Iter);
-    //Iter insert(cIter, std::initializer_list< T >);
+    template< typename InputIt >
+    Iter insert(cIter, InputIt, InputIt);
+    Iter insert(cIter, std::initializer_list< T >);
 
   private:
     using Node = demehin::Node< T >;
@@ -308,19 +308,12 @@ namespace demehin
   template< typename T >
   void List< T >::splice(cListIterator< T > pos, List< T >& other)
   {
-    if (other.empty() || pos == end())
+    if (other.empty())
     {
       return;
     }
 
-    Node* first = other.fake_->next_;
-    Node* last = other.tail_;
-    Node* posNode = pos.getNode();
-    posNode->prev_->next_ = first;
-    first->prev_ = posNode->prev_;
-    last->next_ = posNode;
-    posNode->prev_ = last;
-    size_ += other.size_;
+    insert(pos, other.begin(), other.end());
     other.clear();
   }
 
@@ -334,7 +327,7 @@ namespace demehin
   template< typename T >
   void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > it)
   {
-    if (other.empty() || pos == end() || it == other.begin())
+    if (other.empty() || pos == cend() || it == other.cbegin())
     {
       return;
     }
@@ -363,7 +356,7 @@ namespace demehin
   void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > first,
     cListIterator< T > last)
   {
-    if (other.empty() || pos == end())
+    if (other.empty() || pos == cend())
     {
       return;
     }
@@ -546,23 +539,23 @@ namespace demehin
   }
 
   template< typename T >
-  //template< typename InputIt >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, ListIterator< T > first,
-    ListIterator< T > last)
+  template< typename InputIt >
+  ListIterator< T > List< T >::insert(cListIterator< T > pos, InputIt first, InputIt last)
   {
     if (first == last)
     {
       return ListIterator< T >(pos.getNode());
     }
 
+    ListIterator< T > toreturn;
     for (auto it = first; it != last; it++)
     {
-      insert(pos, *it);
+      toreturn = insert(pos, *it);
     }
-    return first;
+    return toreturn;
   }
 
-  /*template< typename T >
+  template< typename T >
   ListIterator< T > List< T >::insert(cListIterator< T > pos, std::initializer_list< T > ilist)
   {
     if (ilist.size() == 0)
@@ -571,7 +564,7 @@ namespace demehin
     }
 
     return insert(pos, ilist.begin(), ilist.end());
-  }*/
+  }
 
 }
 

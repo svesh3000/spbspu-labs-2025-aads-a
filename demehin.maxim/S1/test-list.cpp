@@ -111,10 +111,36 @@ BOOST_AUTO_TEST_CASE(list_mods_test)
   printList(out6, list2);
   BOOST_TEST(out6.str() == "4445555");
 
-  //list2.insert(list2.cbegin(), ilist);
-  //std::ostringstream out7;
-  //printList(out7, list2);
-  //BOOST_TEST(out7.str() == "4445555");
+  list2.insert(list2.cbegin(), ilist);
+  std::ostringstream out7;
+  printList(out7, list2);
+  BOOST_TEST(out7.str() == "4445555");
+}
+
+BOOST_AUTO_TEST_CASE(list_splice_test)
+{
+  demehin::List< int > lst1(3, 5);
+  demehin::List< int > lst2(3, 4);
+  lst2.splice(++lst2.cbegin(), lst1);
+  std::ostringstream out;
+  printList(out, lst2);
+  BOOST_TEST(out.str() == "455544");
+  BOOST_TEST(lst1.empty());
+
+  demehin::List< int > lst3(1, 3);
+  lst3.push_back(2);
+  lst2.splice(lst2.cbegin(), lst3, ++lst3.cbegin());
+  std::ostringstream out1;
+  printList(out1, lst2);
+  BOOST_TEST(out1.str() == "2455544");
+
+  demehin::List< int > lst4(3, 1);
+  lst4.push_front(2);
+  lst2.splice(++lst2.cbegin(), lst4, ++lst4.cbegin(), ++(++lst4.cbegin()));
+  std::ostringstream out2;
+  printList(out2, lst2);
+  BOOST_TEST(out2.str() == "211455544");
+
 }
 
 BOOST_AUTO_TEST_CASE(list_operators_test)
