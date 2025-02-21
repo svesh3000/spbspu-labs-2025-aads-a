@@ -4,6 +4,7 @@
 #include <iterator>
 #include <type_traits>
 #include "node.hpp"
+#include "iterator.hpp"
 
 namespace kiselev
 {
@@ -15,9 +16,8 @@ namespace kiselev
     friend class List< T >;
   public:
 
-    ConstIterator(): node_(nullptr), end_(nullptr) {}
-    ConstIterator(Node< T >* node): node_(node), end_(nullptr)  {}
-    ConstIterator(Node< T >* node, Node< T >* end_): node_(node), end_(end_) {}
+    ConstIterator(): node_(nullptr) {}
+    ConstIterator(Node< T >* node): node_(node) {}
 
     ConstIterator< T >& operator++();
     ConstIterator< T > operator++(int);
@@ -35,7 +35,6 @@ namespace kiselev
   private:
 
     Node< T >* node_;
-    Node< T >* end_;
 
   };
 
@@ -54,14 +53,7 @@ namespace kiselev
   ConstIterator< T >& ConstIterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    if (node_ == end_)
-    {
-      node_ = nullptr;
-    }
-    else
-    {
-      node_ = node_->next_;
-    }
+    node_ = node_->next_;
     return *this;
   }
 
@@ -77,14 +69,8 @@ namespace kiselev
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator--()
   {
-    if (node_ == nullptr)
-    {
-      end_ = end_->prev_;
-    }
-    else
-    {
-      node_ = node_->prev_;
-    }
+    assert(node_ != nullptr);
+    node_ = node_->prev_;
     return *this;
   }
 

@@ -14,9 +14,8 @@ namespace kiselev
     friend class List< T >;
   public:
 
-    Iterator(): node_(nullptr), end_(nullptr) {};
-    Iterator(Node< T >* node): node_(node), end_(nullptr) {}
-    Iterator(Node< T >* node, Node< T >* end): node_(node), end_(end) {}
+    Iterator(): node_(nullptr) {};
+    Iterator(Node< T >* node): node_(node) {}
 
     Iterator< T >& operator++();
     Iterator< T > operator++(int);
@@ -34,7 +33,6 @@ namespace kiselev
   private:
 
     Node< T >* node_;
-    Node< T >* end_;
 
   };
 

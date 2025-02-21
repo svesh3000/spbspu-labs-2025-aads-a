@@ -99,16 +99,32 @@ BOOST_AUTO_TEST_CASE(erase_pos)
   ConstIterator< int > begin = list.cbegin();
   Iterator< int > it = list.erase(begin);
   BOOST_CHECK(it == list.begin());
-  ConstIterator< int > end = list.clast();
+  ConstIterator< int > end = --list.cend();
   it = list.erase(end);
-  BOOST_CHECK(it == ++list.last());
+  BOOST_CHECK(it == list.end());
   ConstIterator< int > iter = ++list.cbegin();
   it = list.erase(iter);
   BOOST_CHECK(*it == 3);
   begin = ++list.cbegin();
-  end = list.cend();
+  end = --list.cend();
   it = list.erase(begin, end);
-  BOOST_CHECK(it == list.end());
+  BOOST_CHECK(it == --list.end());
+}
+
+BOOST_AUTO_TEST_CASE(remove)
+{
+  List< int > list;
+  int i = 0;
+  list.push_back(i);
+  list.remove(i);
+  BOOST_TEST(list.empty());
+  for (;i < 10; ++i)
+  {
+    list.push_back(i);
+  }
+  list.push_back(1);
+  list.remove(1);
+  BOOST_TEST(list.size() == 9);
 }
 
 
