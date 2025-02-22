@@ -83,21 +83,19 @@ int main()
   }
 
   if (!pairs_list.empty()) {
+    std::cout << 0;
+  } else {
     std::cout << pairs_list.begin()->first;
     for (auto i = ++pairs_list.begin(); i != pairs_list.end(); ++i) {
       std::cout << ' ' << i->first;
     }
     std::cout << '\n';
-    if (get_max_pairs_list_size(pairs_list) == 0) {
-      std::cout << 0;
-    } else {
-      try {
-        print_lists_info(std::cout, pairs_list);
-      } catch (const std::overflow_error&) {
-        std::cerr << "Overflow error\n";
-        return 1;
-      }
+    try {
+      print_lists_info(std::cout, pairs_list);
+    } catch (const std::overflow_error&) {
+      std::cerr << "Overflow error\n";
+      return 1;
     }
-    std::cout << '\n';
   }
+  std::cout << '\n';
 }
