@@ -33,6 +33,10 @@ namespace kiselev
     List< T >& operator=(std::initializer_list< T >);
     bool operator==(const List< T >&) const;
     bool operator!=(const List< T >&) const;
+    bool operator<(const List< T >&) const;
+    bool operator>(const List< T >&) const;
+    bool operator<=(const List< T >&) const;
+    bool operator>=(const List< T >&) const;
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > cbegin() const noexcept;
@@ -200,6 +204,40 @@ namespace kiselev
   bool List< T >::operator!=(const List<T>& list) const
   {
     return !(*this == list);
+  }
+
+  template< typename T >
+  bool List< T >::operator<(const List< T >& list) const
+  {
+    size_t min = std::min(size_, list.size_);
+    ConstIterator< T > thisIt = cbegin();
+    ConstIterator< T > otherIt = list.cbegin();
+    for (size_t i = 0; i < min; ++i, ++thisIt, ++otherIt)
+    {
+      if (*thisIt != *otherIt)
+      {
+        return *thisIt < * otherIt;
+      }
+    }
+    return false;
+  }
+
+  template< typename T >
+  bool List< T >::operator>(const List< T >& list) const
+  {
+    return list < *this;
+  }
+
+  template< typename T >
+  bool List< T >::operator<=(const List< T >& list) const
+  {
+    return !(*this > list);
+  }
+
+  template< typename T >
+  bool List< T >::operator>=(const List<T>& list) const
+  {
+    return !(*this < list);
   }
 
   template< typename T >

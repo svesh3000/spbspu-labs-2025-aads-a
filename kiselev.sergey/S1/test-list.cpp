@@ -238,29 +238,93 @@ BOOST_AUTO_TEST_CASE(assign_range_initializer)
   BOOST_TEST(list.size() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(equal_sign)
+BOOST_AUTO_TEST_CASE(operator_equal)
 {
   List< int > list;
   createList(&list, 5);
   List< int > list2;
   createList(&list2, 5);
-  bool i = list == list2;
-  BOOST_TEST(i);
+  bool isEqual = list == list2;
+  BOOST_TEST(isEqual);
   list2.push_back(1);
-  i = list == list2;
-  BOOST_TEST(!i);
+  isEqual = list == list2;
+  BOOST_TEST(!isEqual);
   list.push_back(4);
-  i = list == list2;
-  BOOST_TEST(!i);
+  isEqual = list == list2;
+  BOOST_TEST(!isEqual);
 }
 
-BOOST_AUTO_TEST_CASE(unequal_sign)
+BOOST_AUTO_TEST_CASE(operator_unequal)
 {
   List< int > list;
   createList(&list, 3);
   List< int > list2;
-  bool i = list != list2;
-  BOOST_TEST(i);
+  bool isUnequal = list != list2;
+  BOOST_TEST(isUnequal);
+  createList(&list2, 3);
+  isUnequal = list != list2;
+  BOOST_TEST(!isUnequal);
 }
+
+BOOST_AUTO_TEST_CASE(operator_less)
+{
+  List< int > list = { 0, 1, 2, 3 };
+  List< int > list2 = { 0, 1, 2, 3 };
+  bool isLess = list < list2;
+  BOOST_TEST(!isLess);
+  list.push_back(1);
+  list2.push_back(3);
+  isLess = list < list2;
+  BOOST_TEST(isLess);
+}
+
+BOOST_AUTO_TEST_CASE(operator_more)
+{
+  List< int > list = { 1, 2, 3 };
+  List< int > list2 = { 1, 2, 3 };
+  bool isMore = list > list2;
+  BOOST_TEST(!isMore);
+  list.push_back(6);
+  list2.push_back(4);
+  isMore = list > list2;
+  BOOST_TEST(isMore);
+}
+
+BOOST_AUTO_TEST_CASE(operator_less_or_equal)
+{
+  List< int > list = { 1, 2, 3 };
+  List< int > list2 = { 1, 2, 3 };
+  bool isLessOrEqual = list <= list2;
+  BOOST_TEST(isLessOrEqual);
+  list.push_back(4);
+  list2.push_back(6);
+  isLessOrEqual = list <= list2;
+  BOOST_TEST(isLessOrEqual);
+  list.pop_back();
+  list2.pop_back();
+  list.push_back(7);
+  list2.push_back(2);
+  isLessOrEqual = list <= list2;
+  BOOST_TEST(!isLessOrEqual);
+}
+
+BOOST_AUTO_TEST_CASE(operator_more_or_equal)
+{
+  List< int > list = { 3, 4, 5 };
+  List< int > list2 = { 3, 4, 5 };
+  bool isMoreOrEqual = list >= list2;
+  BOOST_TEST(isMoreOrEqual);
+  list.push_front(5);
+  list2.push_front(3);
+  isMoreOrEqual = list >= list2;
+  BOOST_TEST(isMoreOrEqual);
+  list.pop_front();
+  list2.pop_front();
+  list.push_front(3);
+  list2.push_front(6);
+  isMoreOrEqual = list >= list2;
+  BOOST_TEST(!isMoreOrEqual);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
