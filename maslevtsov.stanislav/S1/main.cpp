@@ -82,7 +82,7 @@ int main()
     std::cin.clear();
   }
 
-  if (!pairs_list.empty()) {
+  if (pairs_list.empty()) {
     std::cout << 0;
   } else {
     std::cout << pairs_list.begin()->first;
