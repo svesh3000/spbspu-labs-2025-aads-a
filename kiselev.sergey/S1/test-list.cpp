@@ -1,12 +1,31 @@
+#include <cstddef>
+#include <sstream>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include <endian.h>
 #include "constIterator.hpp"
 #include "iterator.hpp"
 #include "list.hpp"
 
 using namespace kiselev;
+namespace
+{
+  void createList(List< int >* list, int count)
+  {
+    for (int i = 0; i < count; ++i)
+    {
+      list->push_back(i);
+    }
+  }
+  std::ostream& outputList(std::ostream& out, List< int >* list)
+  {
+    for (ConstIterator< int > it = list->cbegin(); it != list->cend(); ++it)
+    {
+      out << *it;
+    }
+    return out;
+  }
+}
 BOOST_AUTO_TEST_SUITE(list)
 
 BOOST_AUTO_TEST_CASE(empty)
@@ -92,10 +111,7 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_CASE(erase_pos)
 {
   List< int > list;
-  for (size_t i = 0; i < 20; ++i)
-  {
-    list.push_back(i);
-  }
+  createList(&list, 20);
   ConstIterator< int > begin = list.cbegin();
   Iterator< int > it = list.erase(begin);
   BOOST_CHECK(it == list.begin());
@@ -118,13 +134,50 @@ BOOST_AUTO_TEST_CASE(remove)
   list.push_back(i);
   list.remove(i);
   BOOST_TEST(list.empty());
-  for (;i < 10; ++i)
-  {
-    list.push_back(i);
-  }
+  createList(&list, 10);
   list.push_back(1);
   list.remove(1);
   BOOST_TEST(list.size() == 9);
+}
+
+BOOST_AUTO_TEST_CASE(splice)
+{
+  List< int > list1;
+  createList(&list1, 5);
+  List< int > list2;
+  createList(&list2, 3);
+  ConstIterator< int > it = ++list1.cbegin();
+  list1.splice(it, list2);
+  std::ostringstream out;
+  outputList(out, &list1);
+  BOOST_TEST(out.str() == "00121234");
+  std::ostringstream out1;
+  it = list1.cbegin();
+  List< int > list3;
+  createList(&list3, 3);
+  ConstIterator< int > it2 = --list3.cend();
+  list1.splice(it, list3, it2);
+  outputList(out1, &list1);
+  BOOST_TEST(out1.str() == "200121234");
+  List< int > list4;
+  createList(&list4, 4);
+  it2 = --list4.cend();
+  ConstIterator< int > it3 = ++list4.cbegin();
+  list1.splice(it, list4, it3, it2);
+  std::ostringstream out2;
+  outputList(out2, &list1);
+  BOOST_TEST(out2.str() == "21200121234");
+}
+
+BOOST_AUTO_TEST_CASE(insert)
+{
+  List< int > list;
+  list.insert(list.cbegin(), 1);
+  BOOST_TEST(list.front() == 1);
+  list.insert(list.cbegin(), 3);
+  BOOST_TEST(list.front() == 3);
+  list.insert(++list.cbegin(), 5);
+  BOOST_TEST(*(++list.cbegin()) == 5);
 }
 
 
