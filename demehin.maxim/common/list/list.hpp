@@ -24,6 +24,12 @@ namespace demehin
     ~List();
 
     List< T >& operator=(const List< T >&);
+    bool operator==(const List< T >&) const;
+    bool operator!=(const List< T >&) const;
+    bool operator<(const List< T >&) const;
+    bool operator<=(const List< T >&) const;
+    bool operator>(const List< T >&) const;
+    bool operator>=(const List< T >&) const;
 
     Iter begin() const;
     Iter end() const;
@@ -130,6 +136,74 @@ namespace demehin
   {
     assign(other.begin(), other.end());
     return *this;
+  }
+
+  template< typename T >
+  bool List< T >::operator==(const List< T >& rhs) const
+  {
+    if (size() != rhs.size())
+    {
+      return false;
+    }
+
+    auto it1 = begin();
+    auto it2 = rhs.begin();
+    while (it1 != end())
+    {
+      if (*it1 != *it2)
+      {
+        return false;
+      }
+      ++it1;
+      ++it2;
+    }
+    return true;
+  }
+
+  template< typename T >
+  bool List< T >::operator!=(const List< T >& rhs) const
+  {
+    return !(*this == rhs);
+  }
+
+  template< typename T >
+  bool List< T >::operator<(const List< T >& rhs) const
+  {
+    auto it1 = begin();
+    auto it2 = rhs.begin();
+    while (it1 != end() && it2 != rhs.end())
+    {
+      if (*it1 < *it2)
+      {
+        return true;
+      }
+      if (*it1 > *it2)
+      {
+        return false;
+      }
+      it1++;
+      it2++;
+    }
+
+    return size() < rhs.size();
+  }
+
+  template< typename T >
+  bool List< T >::operator<=(const List< T >& rhs) const
+  {
+    return *this < rhs || *this == rhs;
+  }
+
+  template< typename T >
+  bool List< T >::operator>(const List< T >& rhs) const
+  {
+    return !(*this <= rhs);
+  }
+
+  template< typename T >
+  bool List< T >::operator>=(const List< T >& rhs) const
+  {
+    return *this > rhs || *this == rhs;
   }
 
   template< typename T >

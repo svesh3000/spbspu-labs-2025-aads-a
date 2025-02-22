@@ -6,7 +6,8 @@
 namespace demehin
 {
   template< typename T >
-  struct ListIterator
+  struct ListIterator: public std::iterator<
+    std::bidirectional_iterator_tag, T >
   {
   public:
     using this_t = ListIterator< T >;

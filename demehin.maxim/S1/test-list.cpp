@@ -145,6 +145,25 @@ BOOST_AUTO_TEST_CASE(list_splice_test)
 
 BOOST_AUTO_TEST_CASE(list_operators_test)
 {
+  demehin::List< int > lst1(3, 5);
+  demehin::List< int > lst2(3, 5);
+  BOOST_TEST(lst1 == lst2);
+
+  lst1.push_front(1);
+  BOOST_TEST(lst1 != lst2);
+  BOOST_TEST(lst1 < lst2);
+
+  lst1.pop_front();
+  lst2.push_back(6);
+  BOOST_TEST(lst1 <= lst2);
+  demehin::List< int > lst3(lst2);
+  BOOST_TEST(lst3 <= lst2);
+
+  lst1.push_front(10);
+  BOOST_TEST(lst1 > lst2);
+
+  BOOST_TEST(lst3 >= lst2);
+  BOOST_TEST(lst1 >= lst3);
 }
 
 BOOST_AUTO_TEST_CASE(list_test)
