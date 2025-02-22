@@ -24,30 +24,49 @@ int main()
     }
     listOfPairs.push_back(pair);
   }
-
-  std::list< int > listOfLineSums;
-  for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
+  if (listOfPairs.empty())
   {
-    int sumOfLine = 0;
-    for (auto iter = it->second.begin(); iter != it->second.end(); ++iter)
-    {
-      sumOfLine += *iter;
-    }
-    listOfLineSums.push_back(sumOfLine);
+    std::cout << "0\n";
+    return 0;
   }
+
   for (auto it = listOfPairs.begin(); it != --listOfPairs.end(); ++it)
   {
     std::cout << it->first << " ";
   }
   std::cout << (--listOfPairs.end())->first << "\n";
 
+  std::list< int > listOfLineSums;
+  for (size_t i = 0; i < maxSizeOfNumList; ++i)
+  {
+    int sumOfLine = 0;
+    for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
+    {
+      if (it->second.size() <= i)
+      {
+        continue;
+      }
+      auto currentValue = std::next(it->second.begin(), i);
+      sumOfLine += *currentValue;
+    }
+    listOfLineSums.push_back(sumOfLine);
+  }
 
-  for (size_t i = 0; i < maxSizeOfNumList; i++)
+  for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
     for (auto it = listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
+      if (it->second.size() <= i)
+      {
+        continue;
+      }
       auto current = std::next(it->second.begin(), i);
       std::cout << *current << " ";
+    }
+    if ((--listOfPairs.end())->second.size() <= i)
+    {
+      std::cout << "\n";
+      continue;
     }
     std::cout << *(std::next((--(listOfPairs.end()))->second.begin(), i)) << "\n";
   }
