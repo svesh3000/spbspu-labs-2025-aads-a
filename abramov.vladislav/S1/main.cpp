@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <limits>
 
 int main()
 {
@@ -8,6 +9,7 @@ int main()
   std::string s;
   std::cin >> s;
   size_t count = 0;
+  size_t lists_count = 0;
   while (std::cin)
   {
     std::pair< std::string, std::list< long int > > bidir;
@@ -20,6 +22,12 @@ int main()
     }
     lists.push_back(bidir);
     count = std::max(count, bidir.second.size());
+    ++lists_count;
+  }
+  if (!lists_count)
+  {
+    std::cout << "0\n";
+    return 0;
   }
   for (auto iter = lists.begin(); iter != --lists.end(); ++iter)
   {
@@ -46,6 +54,7 @@ int main()
     }
   }
   long int *sums = new long int[count];
+  constexpr long int max = std::numeric_limits< long int >::max();
   for (size_t i = 0; i < count; ++i)
   {
     long int sum = 0;
@@ -54,6 +63,12 @@ int main()
       if (iter->second.size() > i)
       {
         auto iter2 = std::next(iter->second.begin(), i);
+        if (*iter2 > max - sum)
+        {
+          std::cerr << "overflow\n";
+          delete[] sums;
+          return 1;
+        }
         sum += *iter2;
       }
     }
