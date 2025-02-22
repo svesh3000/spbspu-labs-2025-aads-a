@@ -29,6 +29,7 @@ namespace kiselev
 
     List< T >& operator=(const List< T >&);
     List< T >& operator=(List< T >&&) noexcept;
+    List< T >& operator=(std::initializer_list< T >);
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > cbegin() const noexcept;
@@ -52,6 +53,9 @@ namespace kiselev
     void clear();
     void swap(List< T >&) noexcept;
     void assign(size_t, const T&);
+    template< typename InputIterator >
+    void assign(InputIterator first, InputIterator last);
+    void assign(std::initializer_list< T >);
     Iterator< T > erase(ConstIterator< T >);
     Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
     Iterator< T > insert(ConstIterator< T >, const T&);
@@ -163,6 +167,14 @@ namespace kiselev
   }
 
   template< typename T >
+  List< T >& List< T >::operator=(std::initializer_list< T > il)
+  {
+    List< T > temp(il);
+    swap(temp);
+    return *this;
+  }
+
+  template< typename T >
   Iterator< T > List< T >::begin() noexcept
   {
     return Iterator< T >(head_);
@@ -269,6 +281,21 @@ namespace kiselev
   void List< T >::assign(size_t count, const T& data)
   {
     List< T > temp(count, data);
+    swap(temp);
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  void List< T >::assign(InputIterator first, InputIterator last)
+  {
+    List< T > temp(first, last);
+    swap(temp);
+  }
+
+  template< typename T >
+  void List< T >::assign(std::initializer_list< T > il)
+  {
+    List< T > temp(il);
     swap(temp);
   }
 

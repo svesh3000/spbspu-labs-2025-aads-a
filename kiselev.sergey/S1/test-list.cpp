@@ -208,13 +208,34 @@ BOOST_AUTO_TEST_CASE(insert_range)
   BOOST_TEST((res == list.begin()));
 }
 
-BOOST_AUTO_TEST_CASE(inser_initializer)
+BOOST_AUTO_TEST_CASE(insert_initializer)
 {
   List< int > list;
   createList(&list, 5);
   std::initializer_list< int > il = { 1, 2, 3 };
   Iterator< int > it = list.insert(list.cbegin(), il.begin(), il.end());
   BOOST_TEST((it == list.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(assign_fill)
+{
+  List< int > list;
+  size_t size = 20;
+  list.assign(size, 10);
+  BOOST_TEST(list.size() == size);
+  BOOST_TEST(list.front() == 10);
+}
+
+BOOST_AUTO_TEST_CASE(assign_range_initializer)
+{
+  List< int > list;
+  List< int > list2;
+  createList(&list2, 5);
+  list.assign(list2.begin(), list2.end());
+  BOOST_TEST(list.size() == 5);
+  std::initializer_list< int > il = { 1, 2, 3 };
+  list.assign(il);
+  BOOST_TEST(list.size() == 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
