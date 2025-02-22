@@ -187,18 +187,19 @@ BOOST_AUTO_TEST_CASE(emplace_after_empty)
 {
   constexpr ListT::value_type value = 7;
   ListT list;
-  list.emplaceAfter(list.begin(), value);
+  list.emplaceAfter(list.beforeBegin(), value);
   testInvariants(list);
   BOOST_TEST(list.size() == 1);
   BOOST_TEST(list.front() == value);
 }
 
-BOOST_AUTO_TEST_CASE(emplace_after_end)
+BOOST_AUTO_TEST_CASE(emplace_after_end_prev)
 {
   constexpr ListT::value_type value = 7;
   constexpr ListT::size_type initSize = 77;
   ListT list(initSize);
-  ListT::iterator result = list.emplaceAfter(list.end(), value);
+  ListT::iterator result =
+      list.emplaceAfter(std::next(list.begin(), list.size() - 1), value);
   testInvariants(list);
   BOOST_TEST(list.size() == initSize + 1);
   BOOST_TEST(list.back() == value);
@@ -481,6 +482,15 @@ BOOST_AUTO_TEST_CASE(unique_empty)
   BOOST_TEST(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(unique_filled)
+{
+  ListT list(100, 1);
+  const ListT expected{ 1 };
+  list.unique();
+  testInvariants(list);
+  BOOST_TEST(list == expected);
+}
+
 BOOST_AUTO_TEST_CASE(unique)
 {
   ListT list{ 1, 1, 1, 3, 4, 1, 1 };
@@ -492,7 +502,13 @@ BOOST_AUTO_TEST_CASE(unique)
 
 BOOST_AUTO_TEST_CASE(unique_predicate)
 {
-  // TODO: Implement unique tests
+  ListT list{ 1, 1, 1, 3, 4, 1, 1 };
+  const ListT expected{ 1, 3, 4, 1 };
+  list.unique([](ListT::const_reference lhs, ListT::const_reference rhs) -> bool {
+    return lhs == rhs;
+  });
+  testInvariants(list);
+  BOOST_TEST(list == expected);
 }
 
 BOOST_AUTO_TEST_CASE(sort)
@@ -505,9 +521,27 @@ BOOST_AUTO_TEST_CASE(sort_comparator)
   // TODO: Implement sort tests
 }
 
+BOOST_AUTO_TEST_CASE(splice_after_this)
+{
+  ListT list{ 1, 2, 3, 4, 5 };
+  const ListT copied(list);
+  list.spliceAfter(list.begin(), list, list.begin(), list.end());
+  testInvariants(list);
+  BOOST_TEST(list == copied);
+}
+
+BOOST_AUTO_TEST_CASE(splice_after_empty_range)
+{
+  ListT list{ 1, 2, 3, 4, 5 };
+  ListT other{ 1, 2, 3 };
+  const ListT copied(list);
+  list.spliceAfter(list.begin(), list, other.begin(), other.begin());
+  testInvariants(list);
+  BOOST_TEST(list == copied);
+}
+
 BOOST_AUTO_TEST_CASE(splice_after)
 {
-
   const ListT expectedFirst{ 1 };
   const ListT expectedSecond{ 10, 2, 3, 4, 5, 11, 12 };
   ListT first = { 1, 2, 3, 4, 5 };
