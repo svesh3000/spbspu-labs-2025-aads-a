@@ -1,5 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <algorithm>
 #include <cstddef>
 #include <exception>
 #include <initializer_list>
@@ -30,6 +31,8 @@ namespace kiselev
     List< T >& operator=(const List< T >&);
     List< T >& operator=(List< T >&&) noexcept;
     List< T >& operator=(std::initializer_list< T >);
+    bool operator==(const List< T >&) const;
+    bool operator!=(const List< T >&) const;
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > cbegin() const noexcept;
@@ -172,6 +175,31 @@ namespace kiselev
     List< T > temp(il);
     swap(temp);
     return *this;
+  }
+
+  template< typename T >
+  bool List< T >::operator==(const List<T>& list) const
+  {
+    if (size_ == list.size_)
+    {
+      ConstIterator< T > thisIt = cbegin();
+      ConstIterator< T > otherIt = list.cbegin();
+      for (; thisIt != cend(); ++thisIt, ++otherIt)
+      {
+        if (*thisIt != *otherIt)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  template< typename T >
+  bool List< T >::operator!=(const List<T>& list) const
+  {
+    return !(*this == list);
   }
 
   template< typename T >

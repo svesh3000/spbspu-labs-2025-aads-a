@@ -238,4 +238,29 @@ BOOST_AUTO_TEST_CASE(assign_range_initializer)
   BOOST_TEST(list.size() == 3);
 }
 
+BOOST_AUTO_TEST_CASE(equal_sign)
+{
+  List< int > list;
+  createList(&list, 5);
+  List< int > list2;
+  createList(&list2, 5);
+  bool i = list == list2;
+  BOOST_TEST(i);
+  list2.push_back(1);
+  i = list == list2;
+  BOOST_TEST(!i);
+  list.push_back(4);
+  i = list == list2;
+  BOOST_TEST(!i);
+}
+
+BOOST_AUTO_TEST_CASE(unequal_sign)
+{
+  List< int > list;
+  createList(&list, 3);
+  List< int > list2;
+  bool i = list != list2;
+  BOOST_TEST(i);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
