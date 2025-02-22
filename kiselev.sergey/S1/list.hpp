@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <exception>
+#include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
@@ -19,6 +20,9 @@ namespace kiselev
     List(const List< T >&);
     List(List< T >&&) noexcept;
     List(size_t, const T&);
+    template< typename InputIterator >
+    List< T >(InputIterator first, InputIterator last);
+    List< T >(std::initializer_list< T >);
     ~List();
 
     List< T >& operator=(const List< T >&);
@@ -47,6 +51,11 @@ namespace kiselev
     Iterator< T > erase(ConstIterator< T >);
     Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
     Iterator< T > insert(ConstIterator< T >, const T&);
+    Iterator< T > insert(ConstIterator< T >, T&&);
+    Iterator< T > insert(ConstIterator< T >, size_t, const T&);
+    template< typename InputIterator >
+    Iterator< T > insert(ConstIterator< T > pos, InputIterator first, InputIterator last);
+    Iterator< T > insert(ConstIterator< T >, std::initializer_list< T >);
 
     void remove(const T&);
     template< typename Predicate >
@@ -109,6 +118,22 @@ namespace kiselev
       push_back(data);
     }
   }
+
+  template< typename T >
+  template< typename InputIterator >
+  List< T >::List(InputIterator first, InputIterator last):
+    List()
+  {
+    for (; first != last; ++first)
+    {
+      push_front(*first);
+    }
+  }
+
+  template< typename T >
+  List< T >::List(std::initializer_list< T > il):
+    List(il.begin(), il.end())
+  {}
 
   template< typename T >
   List< T >::~List()
