@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <initializer_list>
 #include <sstream>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
@@ -169,7 +170,7 @@ BOOST_AUTO_TEST_CASE(splice)
   BOOST_TEST(out2.str() == "21200121234");
 }
 
-BOOST_AUTO_TEST_CASE(insert)
+BOOST_AUTO_TEST_CASE(insert_element)
 {
   List< int > list;
   list.insert(list.cbegin(), 1);
@@ -178,7 +179,42 @@ BOOST_AUTO_TEST_CASE(insert)
   BOOST_TEST(list.front() == 3);
   list.insert(++list.cbegin(), 5);
   BOOST_TEST(*(++list.cbegin()) == 5);
+  int i = 7;
+  list.insert(list.cbegin(), i);
+  BOOST_TEST(list.front() == 7);
 }
 
+BOOST_AUTO_TEST_CASE(insert_fill)
+{
+  List< int > list;
+  createList(&list, 5);
+  size_t i = 0;
+  Iterator< int > res = list.insert(list.cbegin(), i, 3);
+  BOOST_TEST((res == list.begin()));
+  i = 2;
+  res = list.insert(list.cbegin(), i, 7);
+  BOOST_TEST(list.front() == 7);
+}
+
+BOOST_AUTO_TEST_CASE(insert_range)
+{
+  List< int > list;
+  createList(&list, 5);
+  List< int > list2;
+  Iterator< int > res = list.insert(list.cbegin(), list2.cbegin(), list2.cend());
+  BOOST_TEST((res == list.begin()));
+  createList(&list2, 4);
+  res = list.insert(list.cbegin(), ++list2.cbegin(), list2.cend());
+  BOOST_TEST((res == list.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(inser_initializer)
+{
+  List< int > list;
+  createList(&list, 5);
+  std::initializer_list< int > il = { 1, 2, 3 };
+  Iterator< int > it = list.insert(list.cbegin(), il.begin(), il.end());
+  BOOST_TEST((it == list.begin()));
+}
 
 BOOST_AUTO_TEST_SUITE_END()

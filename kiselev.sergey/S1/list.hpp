@@ -1,8 +1,10 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <cstddef>
 #include <exception>
 #include <initializer_list>
 #include <iterator>
+#include <new>
 #include <stdexcept>
 #include <type_traits>
 #include "constIterator.hpp"
@@ -28,16 +30,18 @@ namespace kiselev
     List< T >& operator=(const List< T >&);
     List< T >& operator=(List< T >&&) noexcept;
 
-    Iterator< T > begin() const noexcept;
+    Iterator< T > begin() noexcept;
     ConstIterator< T > cbegin() const noexcept;
-    Iterator< T > end() const noexcept;
+    Iterator< T > end() noexcept;
     ConstIterator< T > cend() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    T& front() const noexcept;
-    T& back() const noexcept;
+    T& front() noexcept;
+    const T& front() const noexcept;
+    T& back() noexcept;
+    const T& back() const noexcept;
 
     void push_back(const T&);
     void push_front(const T&);
@@ -159,7 +163,7 @@ namespace kiselev
   }
 
   template< typename T >
-  Iterator< T > List< T >::begin() const noexcept
+  Iterator< T > List< T >::begin() noexcept
   {
     return Iterator< T >(head_);
   }
@@ -173,13 +177,13 @@ namespace kiselev
   template< typename T >
   ConstIterator< T > List< T >::cend() const noexcept
   {
-    return ConstIterator< T >(end_);
+    return ConstIterator< T >(empty() ? head_ : end_);
   }
 
   template< typename T >
-  Iterator< T > List< T >::end() const noexcept
+  Iterator< T > List< T >::end() noexcept
   {
-    return Iterator< T >(end_);
+    return Iterator< T >(empty() ? head_ : end_);
   }
 
   template< typename T >
@@ -195,13 +199,25 @@ namespace kiselev
   }
 
   template< typename T >
-  T& List< T >::front() const noexcept
+  T& List< T >::front() noexcept
   {
     return head_->data_;
   }
 
   template< typename T >
-  T& List< T >::back() const noexcept
+  const T& List< T >::front() const noexcept
+  {
+    return head_->data_;
+  }
+
+  template< typename T >
+  T& List< T >::back() noexcept
+  {
+    return end_->prev_->data_;
+  }
+
+  template< typename T >
+  const T& List< T >::back() const noexcept
   {
     return end_->prev_->data_;
   }
@@ -372,12 +388,26 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last)
   {
+    if (first == last)
+    {
+      return;
+    }
     for (; first != last;)
     {
       insert(pos, *first);
       Iterator< T > it = list.erase(first);
       first = it.node_;
     }
+    /*
+    Iterator< T > temp = pos.node_->prev_;
+    last.node_->prev_->next_ = pos.node_;
+    pos.node_->prev_ = last.node_->prev_;
+    first.node_->prev_->next_ = last.node_;
+    pos.node_->prev_ = last.node_->prev_;
+    last.node_->prev_ = first.node_->prev_;
+    first.node_->prev_ = temp.node_;
+    size_ += std::distance(first, last);
+    list.size_ -= std::distance(first, last);*/
   }
 
   template< typename T >
@@ -416,6 +446,79 @@ namespace kiselev
     ++size_;
     return Iterator< T >(node);
   }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > position, T&& data)
+  {
+    return insert(position, data);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > position, size_t n, const T& data)
+  {
+    if (n == 0)
+    {
+      return Iterator< T >(position.node_);
+    }
+    Iterator< T > res = insert(position, data);
+    size_t i = 1;
+    try
+    {
+      for (; i < n; ++i)
+      {
+        insert(position, data);
+      }
+      return Iterator< T >(res.node_);
+    }
+    catch (const std::bad_alloc&)
+    {
+      for (size_t j = 0; j < i; ++j)
+      {
+        Iterator< T > it = erase(--position);
+        position = it.node_;
+      }
+      throw;
+    }
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, InputIterator first, InputIterator last)
+  {
+    if (first == last)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    Iterator< T > res = insert(pos, *first);
+    ++first;
+    size_t i = 1;
+    try
+    {
+      for (; first != last; ++first)
+      {
+        insert(pos, *first);
+        ++i;
+      }
+      return res;
+    }
+    catch (const std::bad_alloc&)
+    {
+      for (size_t j = 0; j < i; ++j)
+      {
+        Iterator< T > it = erase(--pos);
+        pos = it.node_;
+      }
+      throw;
+    }
+
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > position, std::initializer_list< T > il)
+  {
+    return insert(position, il.begin(), il.end());
+  }
+
 
 
 }
