@@ -1,40 +1,70 @@
 #include <iostream>
 #include <list>
-#include <utility>
 #include <string>
-#include <cctype>
+#include <utility>
+
+using list_t = std::list< unsigned int >;
+using pairs_list_t = std::list< std::pair< std::string, list_t > >;
+
+// namespace {
+//   std::size_t get_max_pair_list_size(const pairs_list_t& list)
+//   {
+//     std::size_t maximum = *(*list.begin()).second.begin();
+//     for (auto i = list.begin(); i != list.end(); ++i) {
+//       maximum = maximum < (*i).second.size() ? (*i).second.size() : maximum;
+//     }
+//     return maximum;
+//   }
+// }
 
 int main()
 {
-  using pair_t = std::pair< std::string, std::list< unsigned int > >;
-  using pair_list_t = std::list< pair_t >;
+  pairs_list_t pairs_list{};
+  bool is_empty_input = true;
 
-  pair_list_t list = {};
-  std::string input_data = "";
-  pair_t pair = {"", {}};
-  bool is_first_pair = true, is_empty_input = true;
   while (!std::cin.eof()) {
-    std::cin >> input_data;
-    if (!std::isdigit(input_data[0]) || std::cin.eof()) {
-      if (!is_first_pair) {
-        list.push_back(pair);
+    list_t list{};
+    std::string list_name = "";
+    unsigned int num = 0;
+    std::cin >> list_name;
+    while (!std::cin.fail()) {
+      std::cin >> num;
+      if (std::cin.fail()) {
+        break;
       }
-      pair = {input_data, {}};
-      is_first_pair = false;
-      continue;
-    } else {
-      pair.second.push_front(std::stoi(input_data));
+      list.push_back(num);
       is_empty_input = false;
     }
+    if (!std::cin.eof()) {
+      std::cin.clear();
+    }
+    pairs_list.push_back(std::make_pair(list_name, list));
   }
 
-  if (is_empty_input) {
-    std::cout << 0;
-  } else {
-    std::cout << (*list.begin()).first;
-    for (auto i = ++list.cbegin(); i != list.cend(); ++i) {
-      std::cout << ' ' << (*i).first;
-    }
-  }
-  std::cout << '\n';
+  // std::cout << (*pairs_list.begin()).first;
+  // for (auto i = ++pairs_list.begin(); i != pairs_list.end(); ++i) {
+  //   std::cout << ' ' << (*i).first;
+  // }
+  // std::cout << '\n';
+  // if (is_empty_input) {
+  //   std::cout << 0 << '\n';
+  // } else {
+  //   list_t sum_list{};
+  //   for (auto i = pairs_list.begin(); i != pairs_list.end(); ++i) {
+  //     unsigned int sum = 0;
+  //     std::cout << *(*i).second.begin();
+  //     sum += *(*i).second.begin();
+  //     for (auto j = ++(*i).second.begin(); j != (*i).second.end(); ++j) {
+  //       std::cout << ' ' << *j;
+  //       sum += *j;
+  //     }
+  //     std::cout << '\n';
+  //     sum_list.push_back(sum);
+  //   }
+  //   std::cout << *sum_list.begin();
+  //   for (auto i = ++sum_list.begin(); i != sum_list.end(); ++i) {
+  //     std::cout << ' ' << *i;
+  //   }
+  // }
+  // std::cout << '\n';
 }
