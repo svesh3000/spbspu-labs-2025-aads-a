@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(remove)
   BOOST_TEST(list.size() == 9);
 }
 
-BOOST_AUTO_TEST_CASE(splice)
+BOOST_AUTO_TEST_CASE(splice_list)
 {
   List< int > list1;
   createList(&list1, 5);
@@ -211,22 +211,60 @@ BOOST_AUTO_TEST_CASE(splice)
   std::ostringstream out;
   outputList(out, &list1);
   BOOST_TEST(out.str() == "00121234");
+  List< int > list3;
+  createList(&list3, 5);
+  List< int > list4;
+  createList(&list4, 3);
+  it = ++list3.cbegin();
+  list3.splice(it, std::move(list4));
+  std::ostringstream out2;
+  outputList(out2, &list3);
+  BOOST_TEST(out2.str() == "00121234");
+
+}
+BOOST_AUTO_TEST_CASE(splice_element)
+{
+  List< int > list;
+  createList(&list, 4);
+  List< int > list2;
+  createList(&list2, 3);
   std::ostringstream out1;
-  it = list1.cbegin();
+  ConstIterator< int > it = list.cbegin();
+  ConstIterator< int > element = ++list2.cbegin();
+  list.splice(it, list2, element);
+  std::ostringstream out;
+  outputList(out, &list);
+  BOOST_TEST(out.str() == "10123");
+  it = list.cbegin();
+  element = list2.cbegin();
+  list.splice(it, std::move(list2), element);
+  std::ostringstream out2;
+  outputList(out2, &list);\
+  BOOST_TEST(out2.str() == "010123");
+}
+
+BOOST_AUTO_TEST_CASE(splice_range)
+{
+  List< int > list;
+  createList(&list, 4);
+  List< int > list2;
+  createList(&list2, 3);
+  ConstIterator< int > pos = list.cbegin();
+  ConstIterator< int > first = ++list2.cbegin();
+  ConstIterator< int > last = list2.cend();
+  list.splice(pos, list2, first, last);
+  std::ostringstream out;
+  outputList(out, &list);
+  BOOST_TEST(out.str() == "120123");
   List< int > list3;
   createList(&list3, 3);
-  ConstIterator< int > it2 = --list3.cend();
-  list1.splice(it, list3, it2);
-  outputList(out1, &list1);
-  BOOST_TEST(out1.str() == "200121234");
-  List< int > list4;
-  createList(&list4, 4);
-  it2 = --list4.cend();
-  ConstIterator< int > it3 = ++list4.cbegin();
-  list1.splice(it, list4, it3, it2);
+  pos = list.cbegin();
+  first = list3.cbegin();
+  last = --list3.cend();
+  list.splice(pos, std::move(list3), first, last);
   std::ostringstream out2;
-  outputList(out2, &list1);
-  BOOST_TEST(out2.str() == "21200121234");
+  outputList(out2, &list);
+  BOOST_TEST(out2.str() == "01120123");
 }
 
 BOOST_AUTO_TEST_CASE(insert_element)
