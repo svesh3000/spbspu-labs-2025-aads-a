@@ -1,5 +1,6 @@
-#include "input.hpp"
 #include <iostream>
+#include "output.hpp"
+#include "input.hpp"
 
 int main()
 {
@@ -10,9 +11,9 @@ int main()
     lists.push_front(karnauhova::input_line(std::cin, name));
   }
   lists.reverse();
+  karnauhova::output_names_lists(lists, std::cout);
   for (const auto& it : lists)
   {
-    std::cout << it.first << " ";
     for (const int& num : it.second) 
     {
       std::cout << num << " ";
