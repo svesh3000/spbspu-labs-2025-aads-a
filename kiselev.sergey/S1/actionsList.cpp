@@ -1,6 +1,7 @@
 #include "actionsList.hpp"
 #include <cstddef>
 #include <limits>
+#include <new>
 #include <ostream>
 #include <stdexcept>
 
@@ -20,25 +21,33 @@ namespace
   {
     auto it = list_.cbegin();
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    for (size_t i = 0; i < searchMax(list_); ++i)
+    try
     {
-      unsigned long long summa = 0;
-      it = list_.begin();
-      for (; it != list_.cend(); ++it)
+      for (size_t i = 0; i < searchMax(list_); ++i)
       {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
+        unsigned long long summa = 0;
+        it = list_.begin();
+        for (; it != list_.cend(); ++it)
         {
-          continue;
-        }
-        std::advance(nit, i);
-        if (max - *nit < summa)
-        {
-          throw std::overflow_error("Overflow for unsigned long long");
-        }
-        summa += *nit;
+          auto nit = it->second.cbegin();
+          if (i >= it->second.size())
+          {
+            continue;
+          }
+          std::advance(nit, i);
+          if (max - *nit < summa)
+          {
+            throw std::overflow_error("Overflow for unsigned long long");
+          }
+          summa += *nit;
+       }
+       sum.pushBack(summa);
       }
-      sum.pushBack(summa);
+    }
+    catch (const std::bad_alloc&)
+    {
+      sum.clear();
+      throw;
     }
   }
 
@@ -99,20 +108,28 @@ namespace
 std::istream& kiselev::createList(std::istream& input, list& list_)
 {
   std::string name;
-  while (input >> name)
+  try
   {
-    numberList numbers;
-    unsigned long long number = 0;
-    while (input >> number)
+    while (input >> name)
     {
-      if (!input)
+      numberList numbers;
+      unsigned long long number = 0;
+      while (input >> number)
       {
-        throw std::logic_error("Incorrect number");
+        if (!input)
+        {
+          throw std::logic_error("Incorrect number");
+        }
+        numbers.pushBack(number);
       }
-      numbers.pushBack(number);
+      input.clear();
+      list_.pushBack(pair(name, numbers));
     }
-    input.clear();
-    list_.pushBack(pair(name, numbers));
+  }
+  catch (const std::bad_alloc&)
+  {
+    list_.clear();
+    throw;
   }
   return input;
 }

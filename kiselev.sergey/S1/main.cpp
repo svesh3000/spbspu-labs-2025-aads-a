@@ -1,3 +1,4 @@
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include "actionsList.hpp"
@@ -10,7 +11,7 @@ int main()
     kiselev::output(std::cout, list);
     return 0;
   }
-  catch (const std::overflow_error& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
