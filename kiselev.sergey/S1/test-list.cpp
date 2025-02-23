@@ -29,6 +29,43 @@ namespace
 }
 BOOST_AUTO_TEST_SUITE(list)
 
+BOOST_AUTO_TEST_CASE(default_and_copy_and_move_constructor)
+{
+  List< int > list;
+  BOOST_TEST(list.empty());
+  createList(&list, 4);
+  List< int > copyList(list);
+  BOOST_TEST((copyList == list));
+  List< int > list2(std::move(list));
+  BOOST_TEST((list2 == copyList));
+}
+
+BOOST_AUTO_TEST_CASE(fill_constructor)
+{
+  size_t size = 0;
+  List< int > list(size, 2);
+  BOOST_TEST(list.empty());
+  size = 10;
+  List< int > list2(size, 5);
+  BOOST_TEST((list2.size() == size));
+}
+
+BOOST_AUTO_TEST_CASE(range_constructor)
+{
+  List< int > list;
+  List< int > list2(list.cbegin(), list.cend());
+  BOOST_TEST(list2.empty());
+  createList(&list, 5);
+  List< int > list3(list.cbegin(), list.cend());
+  BOOST_TEST(list3.size() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list_constructor)
+{
+  std::initializer_list< int > il = {1, 2, 3, 4 };
+  List< int > list(il);
+  BOOST_TEST(list.size() == il.size());
+}
 BOOST_AUTO_TEST_CASE(empty)
 {
   List< int > list;

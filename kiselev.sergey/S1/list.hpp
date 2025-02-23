@@ -488,7 +488,6 @@ namespace kiselev
       insert(pos, *first);
       first = list.erase(first);
     }
-
   }
 
   template< typename T >
