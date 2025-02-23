@@ -4,11 +4,10 @@
 #include "actionsList.hpp"
 int main()
 {
-  list list;
   try
   {
-    kiselev::createList(std::cin, list);
-    kiselev::output(std::cout, list);
+    list listPairs = kiselev::createList(std::cin);
+    kiselev::output(std::cout, listPairs);
     return 0;
   }
   catch (const std::exception& e)

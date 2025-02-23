@@ -17,11 +17,11 @@ namespace
     return max;
   }
 
-  void calcucationSum(list& list_, numberList& sum)
+  numberList calcucationSum(list& list_)
   {
     auto it = list_.cbegin();
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    numberList copySum(sum);
+    numberList sum;
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
       unsigned long long summa = 0;
@@ -40,9 +40,9 @@ namespace
         }
         summa += *nit;
       }
-      copySum.pushBack(summa);
+      sum.pushBack(summa);
     }
-    sum.swap(copySum);
+    return sum;
   }
 
   std::ostream& outputSum(std::ostream& output, const numberList& list)
@@ -99,10 +99,10 @@ namespace
     return output;
   }
 }
-std::istream& kiselev::createList(std::istream& input, list& list_)
+list kiselev::createList(std::istream& input)
 {
   std::string name;
-  list copyList(list_);
+  list list_;
   while (input >> name)
   {
     numberList numbers;
@@ -116,10 +116,9 @@ std::istream& kiselev::createList(std::istream& input, list& list_)
       numbers.pushBack(number);
     }
     input.clear();
-    copyList.pushBack(pair(name, numbers));
+    list_.pushBack(pair(name, numbers));
   }
-  list_.swap(copyList);
-  return input;
+  return list_;
 }
 
 std::ostream& kiselev::output(std::ostream& output, list& list_)
@@ -134,8 +133,7 @@ std::ostream& kiselev::output(std::ostream& output, list& list_)
     return output << "0\n";
   }
   outputNumbers(output, list_);
-  numberList summ;
-  calcucationSum(list_, summ);
+  numberList summ = calcucationSum(list_);
   outputSum(output, summ) << "\n";
   return output;
 }

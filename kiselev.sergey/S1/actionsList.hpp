@@ -10,7 +10,7 @@ using list = kiselev::List< pair >;
 
 namespace kiselev
 {
-  std::istream& createList(std::istream& input, list& list_);
+  list createList(std::istream& input);
   std::ostream& output(std::ostream& output, list& list_);
 }
 #endif
