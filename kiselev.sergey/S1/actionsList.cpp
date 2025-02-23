@@ -1,10 +1,8 @@
-#include "workFlows.hpp"
+#include "actionsList.hpp"
 #include <cstddef>
-#include <iterator>
 #include <limits>
 #include <ostream>
 #include <stdexcept>
-#include "constIterator.hpp"
 
 namespace
 {
@@ -20,26 +18,25 @@ namespace
 
   void calcucationSum(list& list_, numberList& sum)
   {
-    list::const_iterator end = list_.end();
-    list::const_iterator begin = list_.begin();
+    auto it = list_.cbegin();
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
       unsigned long long summa = 0;
-      begin = list_.begin();
-      for (; begin != end; ++begin)
+      it = list_.begin();
+      for (; it != list_.cend(); ++it)
       {
-        numberList::const_iterator nbegin = begin->second.begin();
-        if (i >= begin->second.size())
+        auto nit = it->second.cbegin();
+        if (i >= it->second.size())
         {
           continue;
         }
-        std::next(nbegin, i);
-        if (max - *nbegin < summa)
+        std::advance(nit, i);
+        if (max - *nit < summa)
         {
           throw std::overflow_error("Overflow for unsigned long long");
         }
-        summa += *nbegin;
+        summa += *nit;
       }
       sum.push_back(summa);
     }
@@ -77,7 +74,7 @@ namespace
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
       it = list_.cbegin();
-      for (; it != list_.end(); ++it)
+      for (; it != list_.cend(); ++it)
       {
         auto nit = it->second.cbegin();
         if (i >= it->second.size())

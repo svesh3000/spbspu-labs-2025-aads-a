@@ -1,15 +1,8 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include <algorithm>
-#include <cstddef>
-#include <exception>
 #include <initializer_list>
-#include <iterator>
-#include <new>
 #include <stdexcept>
-#include <type_traits>
 #include "constIterator.hpp"
-#include "iterator.hpp"
 #include "node.hpp"
 
 namespace kiselev

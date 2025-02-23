@@ -1,12 +1,12 @@
 #ifndef WORKFLOWS_HPP
 #define WORKFLOWS_HPP
 #include <iostream>
-#include <list>
+#include "list.hpp"
 #include <ostream>
 
-using numberList = std::list< unsigned long long >;
+using numberList = kiselev::List< unsigned long long >;
 using pair = std::pair< std::string, numberList >;
-using list = std::list< pair >;
+using list = kiselev::List< pair >;
 
 namespace kiselev
 {
