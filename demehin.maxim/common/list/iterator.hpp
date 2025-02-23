@@ -111,7 +111,6 @@ namespace demehin
   {
     return node_;
   }
-
 }
 
 #endif

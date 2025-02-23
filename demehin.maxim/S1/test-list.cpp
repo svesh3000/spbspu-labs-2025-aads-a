@@ -115,6 +115,17 @@ BOOST_AUTO_TEST_CASE(list_mods_test)
   std::ostringstream out7;
   printList(out7, list2);
   BOOST_TEST(out7.str() == "4445555");
+
+  demehin::List< int > list3;
+  for (int i = 0; i < 4; i++)
+  {
+    list3.push_back(i);
+  }
+  list3.reverse();
+  std::ostringstream out8;
+  printList(out8, list3);
+  BOOST_TEST(out8.str() == "3210");
+
 }
 
 BOOST_AUTO_TEST_CASE(list_splice_test)

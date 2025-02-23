@@ -81,6 +81,8 @@ namespace demehin
     Iter insert(cIter, InputIt, InputIt);
     Iter insert(cIter, std::initializer_list< T >);
 
+    void reverse();
+
   private:
     using Node = demehin::Node< T >;
 
@@ -640,6 +642,16 @@ namespace demehin
     return insert(pos, ilist.begin(), ilist.end());
   }
 
+  template< typename T >
+  void List< T >::reverse()
+  {
+    List < T > temp;
+    for (auto it = begin(); it != end(); it++)
+    {
+      temp.push_front(*it);
+    }
+    *this = temp;
+  }
 }
 
 #endif
