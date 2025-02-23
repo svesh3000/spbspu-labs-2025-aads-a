@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <initializer_list>
+#include <iterator>
 #include <stdexcept>
 #include "constIterator.hpp"
 #include "node.hpp"
@@ -44,11 +45,11 @@ namespace kiselev
     T& back() noexcept;
     const T& back() const noexcept;
 
-    void push_back(const T&);
-    void push_front(const T&);
+    void pushBack(const T&);
+    void pushFront(const T&);
 
-    void pop_back();
-    void pop_front();
+    void popBack();
+    void popFront();
 
     void clear();
     void swap(List< T >&) noexcept;
@@ -101,7 +102,7 @@ namespace kiselev
   {
     for (ConstIterator< T > it = list.cbegin(); it != list.cend(); ++it)
     {
-      push_back(*it);
+      pushBack(*it);
     }
   }
 
@@ -124,7 +125,7 @@ namespace kiselev
   {
     for (size_t i = 0; i < count; ++i)
     {
-      push_back(data);
+      pushBack(data);
     }
   }
 
@@ -135,7 +136,7 @@ namespace kiselev
   {
     for (; first != last; ++first)
     {
-      push_front(*first);
+      pushFront(*first);
     }
   }
 
@@ -295,26 +296,26 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::push_back(const T& data)
+  void List< T >::pushBack(const T& data)
   {
     insert(cend(), data);
   }
 
   template< typename T >
-  void List< T >::push_front(const T& data)
+  void List< T >::pushFront(const T& data)
   {
     insert(cbegin(), data);
   }
 
   template< typename T >
-  void List< T >::pop_back()
+  void List< T >::popBack()
   {
     assert(!empty());
     erase(ConstIterator< T >(end_->prev_));
   }
 
   template< typename T >
-  void List< T >::pop_front()
+  void List< T >::popFront()
   {
     assert(!empty());
     erase(cbegin());
@@ -325,7 +326,7 @@ namespace kiselev
   {
     while (!empty())
     {
-      pop_front();
+      popFront();
     }
   }
 
@@ -395,7 +396,7 @@ namespace kiselev
     {
       if (head_->data_ == data)
       {
-        pop_front();
+        popFront();
       }
     }
     else
@@ -434,20 +435,7 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& list)
   {
-    if (list.empty())
-    {
-      return;
-    }
-    Node< T >* node = position.node_;
-    list.head_->prev_ = node->prev_;
-    node->prev_->next_ = list.head_;
-    list.end_->prev_->next_ = node;
-    node->prev_ = list.end_->prev_;
-    size_ += list.size_;
-    list.head_ = list.end_;
-    list.end_->next_ = list.end_;
-    list.end_->prev_ = list.end_;
-    list.size_ = 0;
+    splice(position, list, list.cbegin(), list.cend());
   }
 
   template< typename T >
@@ -459,8 +447,7 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
   {
-    insert(position, *i);
-    list.erase(i);
+    splice(position, list, i, std::next(i));
   }
 
   template< typename T >
@@ -472,15 +459,41 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last)
   {
-    if (first == last)
+    Node< T >* firstNode = first.node_;
+    Node< T >* lastNode = last.node_->prev_;
+    size_t distance = std::distance(first, last);
+    list.size_ -= distance;
+    size_ += distance;
+    firstNode->prev_->next_ = lastNode->next_;
+    lastNode->next_->prev_ = firstNode->prev_;
+    if (firstNode == list.head_)
     {
-      return;
+      list.head_ = last.node_;
+      list.head_->prev_ = end_;
+      list.end_->next_ = list.head_;
     }
-    for (; first != last;)
+    if (lastNode == list.end_->prev_)
     {
-      insert(pos, *first);
-      first = list.erase(first);
+      list.end_->prev_ = first.node_->prev_;
+      first.node_->prev_->next_ = list.end_;
     }
+    if (pos == cbegin())
+    {
+      lastNode->next_ = head_;
+      head_->prev_ = lastNode;
+      head_ = firstNode;
+      head_->prev_ = end_;
+      end_->next_ = head_;
+    }
+    else
+    {
+      pos.node_->prev_->next_ = firstNode;
+      firstNode->prev_ = pos.node_->prev_;
+      pos.node_->prev_ = lastNode;
+      lastNode->next_ = pos.node_;
+    }
+
+
   }
 
   template< typename T >

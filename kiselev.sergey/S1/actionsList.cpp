@@ -38,7 +38,7 @@ namespace
         }
         summa += *nit;
       }
-      sum.push_back(summa);
+      sum.pushBack(summa);
     }
   }
 
@@ -73,6 +73,7 @@ namespace
     auto it = list_.cbegin();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
+      bool first = true;
       it = list_.cbegin();
       for (; it != list_.cend(); ++it)
       {
@@ -82,10 +83,11 @@ namespace
           continue;
         }
         std::advance(nit, i);
-        if (it != list_.cbegin())
+        if (!first)
         {
           output << " ";
         }
+        first = false;
         output << *nit;
       }
       output << "\n";
@@ -107,10 +109,10 @@ std::istream& kiselev::createList(std::istream& input, list& list_)
       {
         throw std::logic_error("Incorrect number");
       }
-      numbers.push_back(number);
+      numbers.pushBack(number);
     }
     input.clear();
-    list_.push_back(pair(name, numbers));
+    list_.pushBack(pair(name, numbers));
   }
   return input;
 }

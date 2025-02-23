@@ -15,7 +15,7 @@ namespace
   {
     for (int i = 0; i < count; ++i)
     {
-      list->push_back(i);
+      list->pushBack(i);
     }
   }
   std::ostream& outputList(std::ostream& out, List< int >* list)
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(size)
 {
   List< int > list;
   const int i = 1;
-  list.push_back(i);
+  list.pushBack(i);
   BOOST_TEST(list.size() == 1);
 }
 
@@ -106,8 +106,8 @@ BOOST_AUTO_TEST_CASE(front_and_push_front)
 {
   List< int > list;
   int i = 1;
-  list.push_front(i);
-  list.push_front(++i);
+  list.pushFront(i);
+  list.pushFront(++i);
   BOOST_TEST(list.front() == i);
 }
 
@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE(back_and_push_back)
 {
   List< int > list;
   int i = 1;
-  list.push_back(i);
-  list.push_back(++i);
+  list.pushBack(i);
+  list.pushBack(++i);
   BOOST_TEST(list.back() == i);
 }
 
@@ -124,11 +124,11 @@ BOOST_AUTO_TEST_CASE(pop_back)
 {
   List< int > list;
   int i = 1;
-  list.push_back(i);
-  list.push_back(++i);
-  list.pop_back();
+  list.pushBack(i);
+  list.pushBack(++i);
+  list.popBack();
   BOOST_TEST(list.back() == --i);
-  list.pop_back();
+  list.popBack();
   BOOST_TEST(list.size() == 0);
 }
 
@@ -136,21 +136,18 @@ BOOST_AUTO_TEST_CASE(pop_front)
 {
   List< int > list;
   int i = 1;
-  list.push_front(i);
-  list.push_back(++i);
-  list.pop_front();
+  list.pushFront(i);
+  list.pushBack(++i);
+  list.popFront();
   BOOST_TEST(list.front() == i);
-  list.pop_front();
+  list.popFront();
   BOOST_TEST(list.size() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(clear)
 {
   List< int > list;
-  int i = 1;
-  list.push_back(i);
-  list.push_back(++i);
-  list.push_front(i);
+  createList(&list, 4);
   list.clear();
   BOOST_TEST(list.empty());
 }
@@ -159,11 +156,11 @@ BOOST_AUTO_TEST_CASE(swap)
 {
   List< int > list;
   int i = 0;
-  list.push_back(i);
+  list.pushBack(i);
   List< int > copyList(list);
   List< int > list2;
-  list2.push_back(++i);
-  list2.push_front(++i);
+  list2.pushBack(++i);
+  list2.pushFront(++i);
   list2.swap(list);
   BOOST_TEST(list2.size() == copyList.size());
 }
@@ -191,11 +188,11 @@ BOOST_AUTO_TEST_CASE(remove)
 {
   List< int > list;
   int i = 0;
-  list.push_back(i);
+  list.pushBack(i);
   list.remove(i);
   BOOST_TEST(list.empty());
   createList(&list, 10);
-  list.push_back(1);
+  list.pushBack(1);
   list.remove(1);
   BOOST_TEST(list.size() == 9);
 }
@@ -249,13 +246,13 @@ BOOST_AUTO_TEST_CASE(splice_range)
   createList(&list, 4);
   List< int > list2;
   createList(&list2, 3);
-  ConstIterator< int > pos = list.cbegin();
+  ConstIterator< int > pos = list.cend();
   ConstIterator< int > first = ++list2.cbegin();
   ConstIterator< int > last = list2.cend();
   list.splice(pos, list2, first, last);
   std::ostringstream out;
   outputList(out, &list);
-  BOOST_TEST(out.str() == "120123");
+  BOOST_TEST(out.str() == "012312");
   List< int > list3;
   createList(&list3, 3);
   pos = list.cbegin();
@@ -264,7 +261,7 @@ BOOST_AUTO_TEST_CASE(splice_range)
   list.splice(pos, std::move(list3), first, last);
   std::ostringstream out2;
   outputList(out2, &list);
-  BOOST_TEST(out2.str() == "01120123");
+  BOOST_TEST(out2.str() == "01012312");
 }
 
 BOOST_AUTO_TEST_CASE(insert_element)
@@ -343,10 +340,10 @@ BOOST_AUTO_TEST_CASE(operator_equal)
   createList(&list2, 5);
   bool isEqual = list == list2;
   BOOST_TEST(isEqual);
-  list2.push_back(1);
+  list2.pushBack(1);
   isEqual = list == list2;
   BOOST_TEST(!isEqual);
-  list.push_back(4);
+  list.pushBack(4);
   isEqual = list == list2;
   BOOST_TEST(!isEqual);
 }
@@ -369,8 +366,8 @@ BOOST_AUTO_TEST_CASE(operator_less)
   List< int > list2 = { 0, 1, 2, 3 };
   bool isLess = list < list2;
   BOOST_TEST(!isLess);
-  list.push_back(1);
-  list2.push_back(3);
+  list.pushBack(1);
+  list2.pushBack(3);
   isLess = list < list2;
   BOOST_TEST(isLess);
 }
@@ -381,8 +378,8 @@ BOOST_AUTO_TEST_CASE(operator_more)
   List< int > list2 = { 1, 2, 3 };
   bool isMore = list > list2;
   BOOST_TEST(!isMore);
-  list.push_back(6);
-  list2.push_back(4);
+  list.pushBack(6);
+  list2.pushBack(4);
   isMore = list > list2;
   BOOST_TEST(isMore);
 }
@@ -393,14 +390,14 @@ BOOST_AUTO_TEST_CASE(operator_less_or_equal)
   List< int > list2 = { 1, 2, 3 };
   bool isLessOrEqual = list <= list2;
   BOOST_TEST(isLessOrEqual);
-  list.push_back(4);
-  list2.push_back(6);
+  list.pushBack(4);
+  list2.pushBack(6);
   isLessOrEqual = list <= list2;
   BOOST_TEST(isLessOrEqual);
-  list.pop_back();
-  list2.pop_back();
-  list.push_back(7);
-  list2.push_back(2);
+  list.popBack();
+  list2.popBack();
+  list.pushBack(7);
+  list2.pushBack(2);
   isLessOrEqual = list <= list2;
   BOOST_TEST(!isLessOrEqual);
 }
@@ -411,14 +408,14 @@ BOOST_AUTO_TEST_CASE(operator_more_or_equal)
   List< int > list2 = { 3, 4, 5 };
   bool isMoreOrEqual = list >= list2;
   BOOST_TEST(isMoreOrEqual);
-  list.push_front(5);
-  list2.push_front(3);
+  list.pushFront(5);
+  list2.pushFront(3);
   isMoreOrEqual = list >= list2;
   BOOST_TEST(isMoreOrEqual);
-  list.pop_front();
-  list2.pop_front();
-  list.push_front(3);
-  list2.push_front(6);
+  list.popFront();
+  list2.popFront();
+  list.pushFront(3);
+  list2.pushFront(6);
   isMoreOrEqual = list >= list2;
   BOOST_TEST(!isMoreOrEqual);
 }
@@ -428,7 +425,7 @@ BOOST_AUTO_TEST_CASE(reverse)
   List< int > list;
   list.reverse();
   BOOST_TEST(list.empty());
-  list.push_back(1);
+  list.pushBack(1);
   createList(&list, 4);
   list.reverse();
   std::ostringstream out;
