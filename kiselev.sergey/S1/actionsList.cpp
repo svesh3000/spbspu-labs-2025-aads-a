@@ -21,34 +21,28 @@ namespace
   {
     auto it = list_.cbegin();
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    try
+    numberList copySum(sum);
+    for (size_t i = 0; i < searchMax(list_); ++i)
     {
-      for (size_t i = 0; i < searchMax(list_); ++i)
+      unsigned long long summa = 0;
+      it = list_.begin();
+      for (; it != list_.cend(); ++it)
       {
-        unsigned long long summa = 0;
-        it = list_.begin();
-        for (; it != list_.cend(); ++it)
+        auto nit = it->second.cbegin();
+        if (i >= it->second.size())
         {
-          auto nit = it->second.cbegin();
-          if (i >= it->second.size())
-          {
-            continue;
-          }
-          std::advance(nit, i);
-          if (max - *nit < summa)
-          {
-            throw std::overflow_error("Overflow for unsigned long long");
-          }
-          summa += *nit;
-       }
-       sum.pushBack(summa);
+          continue;
+        }
+        std::advance(nit, i);
+        if (max - *nit < summa)
+        {
+          throw std::overflow_error("Overflow for unsigned long long");
+        }
+        summa += *nit;
       }
+      copySum.pushBack(summa);
     }
-    catch (const std::bad_alloc&)
-    {
-      sum.clear();
-      throw;
-    }
+    sum.swap(copySum);
   }
 
   std::ostream& outputSum(std::ostream& output, const numberList& list)
@@ -108,29 +102,23 @@ namespace
 std::istream& kiselev::createList(std::istream& input, list& list_)
 {
   std::string name;
-  try
+  list copyList(list_);
+  while (input >> name)
   {
-    while (input >> name)
+    numberList numbers;
+    unsigned long long number = 0;
+    while (input >> number)
     {
-      numberList numbers;
-      unsigned long long number = 0;
-      while (input >> number)
+      if (!input)
       {
-        if (!input)
-        {
-          throw std::logic_error("Incorrect number");
-        }
-        numbers.pushBack(number);
+        throw std::logic_error("Incorrect number");
       }
-      input.clear();
-      list_.pushBack(pair(name, numbers));
+      numbers.pushBack(number);
     }
+    input.clear();
+    copyList.pushBack(pair(name, numbers));
   }
-  catch (const std::bad_alloc&)
-  {
-    list_.clear();
-    throw;
-  }
+  list_.swap(copyList);
   return input;
 }
 
