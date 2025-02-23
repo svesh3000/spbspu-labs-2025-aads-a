@@ -1,6 +1,4 @@
 #include <exception>
-#include <iostream>
-#include <stdexcept>
 #include "actionsList.hpp"
 int main()
 {

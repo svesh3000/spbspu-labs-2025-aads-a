@@ -1,10 +1,6 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
-#include <cstddef>
-#include <iterator>
-#include <type_traits>
 #include "iterator.hpp"
-#include "node.hpp"
 
 namespace kiselev
 {

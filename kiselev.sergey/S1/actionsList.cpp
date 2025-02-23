@@ -1,8 +1,5 @@
 #include "actionsList.hpp"
-#include <cstddef>
 #include <limits>
-#include <new>
-#include <ostream>
 #include <stdexcept>
 
 namespace

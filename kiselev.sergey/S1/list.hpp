@@ -1,10 +1,8 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <initializer_list>
-#include <iterator>
 #include <stdexcept>
 #include "constIterator.hpp"
-#include "node.hpp"
 
 namespace kiselev
 {
@@ -25,6 +23,7 @@ namespace kiselev
     List< T >& operator=(const List< T >&);
     List< T >& operator=(List< T >&&) noexcept;
     List< T >& operator=(std::initializer_list< T >);
+
     bool operator==(const List< T >&) const;
     bool operator!=(const List< T >&) const;
     bool operator<(const List< T >&) const;
@@ -53,12 +52,15 @@ namespace kiselev
 
     void clear();
     void swap(List< T >&) noexcept;
+
     void assign(size_t, const T&);
     template< typename InputIterator >
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T >);
+
     Iterator< T > erase(ConstIterator< T >);
     Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
+
     Iterator< T > insert(ConstIterator< T >, const T&);
     Iterator< T > insert(ConstIterator< T >, T&&);
     Iterator< T > insert(ConstIterator< T >, size_t, const T&);
@@ -69,6 +71,7 @@ namespace kiselev
     void remove(const T&);
     template< typename Predicate >
     void remove_if(Predicate);
+
     void splice(ConstIterator< T >, List< T >&);
     void splice(ConstIterator< T >, List< T >&&);
     void splice(ConstIterator< T > position, List< T >&, ConstIterator< T > i);
@@ -447,7 +450,7 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
   {
-    splice(position, list, i, std::next(i));
+    splice(position, list, i, ++i);
   }
 
   template< typename T >

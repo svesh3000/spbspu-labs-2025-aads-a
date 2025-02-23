@@ -1,8 +1,8 @@
 #ifndef WORKFLOWS_HPP
 #define WORKFLOWS_HPP
 #include <iostream>
-#include "list.hpp"
 #include <ostream>
+#include "list.hpp"
 
 using numberList = kiselev::List< unsigned long long >;
 using pair = std::pair< std::string, numberList >;

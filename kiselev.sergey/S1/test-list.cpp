@@ -1,11 +1,7 @@
-#include <cstddef>
-#include <initializer_list>
 #include <sstream>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include "constIterator.hpp"
-#include "iterator.hpp"
 #include "list.hpp"
 
 using namespace kiselev;
