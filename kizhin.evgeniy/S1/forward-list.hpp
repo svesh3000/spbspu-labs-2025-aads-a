@@ -85,15 +85,18 @@ namespace kizhin {
     void remove(const_reference);
     template < typename UnaryPredicate >
     void removeIf(UnaryPredicate);
+
     void unique();
     template < typename BinaryPredicate >
     void unique(BinaryPredicate);
-    void sort();
-    template < typename Comparator >
-    void sort(Comparator);
+
     void merge(ForwardList&);
     template < typename Comparator >
     void merge(ForwardList&, Comparator);
+
+    void sort();
+    template < typename Comparator >
+    void sort(Comparator);
 
   private:
     using Node = detail::Node< value_type >;
@@ -170,6 +173,7 @@ namespace kizhin {
   ForwardList< T >& ForwardList< T >::operator=(ForwardList&& rhs) noexcept
   {
     clear();
+    operator delete(beforeBegin_);
     beforeBegin_ = std::exchange(rhs.beforeBegin_, nullptr);
     end_ = std::exchange(rhs.end_, nullptr);
     size_ = std::exchange(rhs.size_, 0);
@@ -300,12 +304,12 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::emplaceAfter(
       const_iterator position, Args&&... args)
   {
-    assert(position != end()); /* TODO: clarify */
+    assert(position != end());
     if (position == beforeBegin()) {
       emplaceFront(std::forward< Args >(args)...);
       return iterator(beforeBegin_->next);
     }
-    if (position.node_ == end_) { /* TODO: WTF */
+    if (position.node_ == end_) {
       emplaceBack(std::forward< Args >(args)...);
       return iterator(end_);
     }
@@ -367,7 +371,7 @@ namespace kizhin {
       --size_;
     }
     first.node_->next = lastPtr;
-    if (lastPtr == nullptr) { // TODO: add test
+    if (lastPtr == nullptr) {
       end_ = first.node_;
     }
     return iterator(first.node_);
@@ -463,27 +467,18 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::remove(const_reference value)
+  void ForwardList< T >::reverse()
   {
-    removeIf([&value](const_reference rhs) -> bool {
-      return value == rhs;
-    });
-  }
-
-  template < typename T >
-  template < typename UnaryPredicate >
-  void ForwardList< T >::removeIf(UnaryPredicate p)
-  {
-    const_iterator curr = begin();
-    const_iterator prev = beforeBegin();
-    while (curr != end()) {
-      if (p(*curr)) {
-        curr = eraseAfter(prev);
-      } else {
-        prev = curr;
-        ++curr;
-      }
+    Node* prev = nullptr;
+    Node* curr = beforeBegin_->next;
+    end_ = beforeBegin_->next;
+    while (curr) {
+      Node* next = curr->next;
+      curr->next = prev;
+      prev = curr;
+      curr = next;
     }
+    beforeBegin_->next = prev;
   }
 
   template < typename T >
@@ -508,26 +503,46 @@ namespace kizhin {
     if (first == last || std::addressof(source) == this) {
       return;
     }
-    const_iterator current = first;
-    while (std::next(current) != last) {
-      position = emplaceAfter(position, std::move(current.node_->next->data));
-      current = source.eraseAfter(current);
+    Node* next = position.node_->next;
+    position.node_->next = first.node_->next;
+    size_type distance = std::distance(first, last) - 1;
+    Node* lastInserted = std::next(first, distance).node_;
+    lastInserted->next = next;
+    if (lastInserted->next == nullptr) {
+      end_ = lastInserted;
     }
+    first.node_->next = last.node_;
+    if (last == source.end()) {
+      source.end_ = first.node_;
+    }
+    size_ += distance;
+    source.size_ -= distance;
   }
 
   template < typename T >
-  void ForwardList< T >::reverse()
+  void ForwardList< T >::remove(const_reference value)
   {
-    Node* prev = nullptr;
-    Node* curr = beforeBegin_->next;
-    end_ = beforeBegin_->next;
-    while (curr) {
-      Node* next = curr->next;
-      curr->next = prev;
-      prev = curr;
-      curr = next;
+    const auto pred = [&value](const_reference rhs) -> bool
+    {
+      return value == rhs;
+    };
+    removeIf(pred);
+  }
+
+  template < typename T >
+  template < typename UnaryPredicate >
+  void ForwardList< T >::removeIf(UnaryPredicate p)
+  {
+    const_iterator curr = begin();
+    const_iterator prev = beforeBegin();
+    while (curr != end()) {
+      if (p(*curr)) {
+        curr = eraseAfter(prev);
+      } else {
+        prev = curr;
+        ++curr;
+      }
     }
-    beforeBegin_->next = prev;
   }
 
   template < typename T >
@@ -544,32 +559,17 @@ namespace kizhin {
       return;
     }
     Node* curr = beforeBegin_->next;
-    while (curr->next) {
+    while (curr->next != nullptr) {
       if (p(curr->data, curr->next->data)) {
         Node* tmp = curr->next;
         curr->next = tmp->next;
         delete tmp;
         --size_;
-        if (!curr->next) {
-          end_ = curr;
-        }
       } else {
         curr = curr->next;
       }
     }
-  }
-
-  template < typename T >
-  void ForwardList< T >::sort()
-  {
-    return sort(std::less< value_type >{});
-  }
-
-  template < typename T >
-  template < typename Comp >
-  void ForwardList< T >::sort(Comp)
-  {
-    // TODO: Implement sort
+    end_ = curr;
   }
 
   template < typename T >
@@ -579,8 +579,8 @@ namespace kizhin {
   }
 
   template < typename T >
-  template < typename Comp >
-  void ForwardList< T >::merge(ForwardList& source, Comp)
+  template < typename Comparator >
+  void ForwardList< T >::merge(ForwardList& source, Comparator comp)
   {
     if (this == std::addressof(source) || source.empty()) {
       return;
@@ -589,10 +589,48 @@ namespace kizhin {
       swap(source);
       return;
     }
+    iterator thisCurr = begin();
+    iterator sourceCurr = source.begin();
+    ForwardList result;
+    while (thisCurr != end() && sourceCurr != source.end()) {
+      if (comp(*thisCurr, *sourceCurr)) {
+        result.emplaceBack(*thisCurr);
+        ++thisCurr;
+      } else {
+        result.emplaceBack(*sourceCurr);
+        ++sourceCurr;
+      }
+    }
+    result.insertAfter(const_iterator(result.end_), thisCurr, end());
+    result.insertAfter(const_iterator(result.end_), sourceCurr, source.end());
+    source.clear();
+    swap(result);
+  }
 
-    // TODO: Implement merge
+  template < typename T >
+  void ForwardList< T >::sort()
+  {
+    return sort(std::less< value_type >{});
+  }
+
+  template < typename T >
+  template < typename Comparator >
+  void ForwardList< T >::sort(Comparator comp)
+  {
+    if (size_ <= 1) {
+      return;
+    }
+    const iterator mid = std::next(begin(), size_ / 2);
+    ForwardList< T > left;
+    ForwardList< T > right;
+    left.spliceAfter(left.beforeBegin(), *this, beforeBegin(), mid);
+    right.spliceAfter(right.beforeBegin(), *this, beforeBegin(), end());
+
+    left.sort(comp);
+    right.sort(comp);
+    merge(left, comp);
+    merge(right, comp);
   }
 }
 
 #endif
-
