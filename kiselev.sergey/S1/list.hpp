@@ -450,7 +450,7 @@ namespace kiselev
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
   {
-    splice(position, list, i, ++i);
+    splice(position, list, i, std::next(i));
   }
 
   template< typename T >
