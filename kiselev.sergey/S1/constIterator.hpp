@@ -3,8 +3,8 @@
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
-#include "node.hpp"
 #include "iterator.hpp"
+#include "node.hpp"
 
 namespace kiselev
 {
@@ -18,6 +18,7 @@ namespace kiselev
 
     ConstIterator(): node_(nullptr) {}
     ConstIterator(Node< T >* node): node_(node) {}
+    ConstIterator(Iterator< T > it): node_(it.node_) {}
 
     ConstIterator< T >& operator++();
     ConstIterator< T > operator++(int);
@@ -38,17 +39,6 @@ namespace kiselev
 
   };
 
-  /*template< typename T >
-  size_t distance(ConstIterator< T > first, ConstIterator< T > last)
-  {
-    size_t count = 0;
-    for (; first != last; ++first)
-    {
-      ++count;
-    }
-    return count;
-  }
-  */
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator++()
   {

@@ -326,5 +326,18 @@ BOOST_AUTO_TEST_CASE(operator_more_or_equal)
   BOOST_TEST(!isMoreOrEqual);
 }
 
+BOOST_AUTO_TEST_CASE(reverse)
+{
+  List< int > list;
+  list.reverse();
+  BOOST_TEST(list.empty());
+  list.push_back(1);
+  createList(&list, 4);
+  list.reverse();
+  std::ostringstream out;
+  outputList(out, &list);
+  BOOST_TEST(out.str() == "32101");
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

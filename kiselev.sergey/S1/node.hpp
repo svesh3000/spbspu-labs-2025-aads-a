@@ -16,12 +16,6 @@ namespace kiselev
       prev_(nullptr)
     {}
 
-    Node(const T& data, Node< T >* next, Node< T >* prev):
-      data_(data),
-      next_(next),
-      prev_(prev)
-    {}
-
     Node():
       data_(T()),
       next_(nullptr),

@@ -81,6 +81,7 @@ namespace kiselev
     void splice(ConstIterator< T > position, List< T >&&, ConstIterator< T > i);
     void splice(ConstIterator< T > pos, List< T >&, ConstIterator< T > first, ConstIterator< T > last);
     void splice(ConstIterator< T > pos, List< T >&&, ConstIterator< T > first, ConstIterator< T > last);
+    void reverse();
 
 
   private:
@@ -389,8 +390,7 @@ namespace kiselev
   {
     for (; first != last;)
     {
-      Iterator< T > it = erase(first);
-      first = it.node_;
+      first = erase(first);
     }
     return Iterator< T >(last.node_);
   }
@@ -411,8 +411,7 @@ namespace kiselev
       {
         if (it.node_->data_ == data)
         {
-          Iterator< T > iter = erase(it);
-          it = iter.node_;
+          it = erase(it);
         }
         else
         {
@@ -430,12 +429,11 @@ namespace kiselev
     {
       if (pred(*it))
       {
-        Iterator< T > iter = erase(it);
-        it = iter.node_;
+        it = erase(it);
       }
       else
       {
-          ++it;
+        ++it;
       }
     }
   }
@@ -488,19 +486,9 @@ namespace kiselev
     for (; first != last;)
     {
       insert(pos, *first);
-      Iterator< T > it = list.erase(first);
-      first = it.node_;
+      first = list.erase(first);
     }
-    /*
-    Iterator< T > temp = pos.node_->prev_;
-    last.node_->prev_->next_ = pos.node_;
-    pos.node_->prev_ = last.node_->prev_;
-    first.node_->prev_->next_ = last.node_;
-    pos.node_->prev_ = last.node_->prev_;
-    last.node_->prev_ = first.node_->prev_;
-    first.node_->prev_ = temp.node_;
-    size_ += std::distance(first, last);
-    list.size_ -= std::distance(first, last);*/
+
   }
 
   template< typename T >
@@ -567,8 +555,7 @@ namespace kiselev
     {
       for (size_t j = 0; j < i; ++j)
       {
-        Iterator< T > it = erase(--position);
-        position = it.node_;
+        position = erase(--position);
       }
       throw;
     }
@@ -598,8 +585,7 @@ namespace kiselev
     {
       for (size_t j = 0; j < i; ++j)
       {
-        Iterator< T > it = erase(--pos);
-        pos = it.node_;
+        pos = erase(--pos);
       }
       throw;
     }
@@ -610,6 +596,25 @@ namespace kiselev
   Iterator< T > List< T >::insert(ConstIterator< T > position, std::initializer_list< T > il)
   {
     return insert(position, il.begin(), il.end());
+  }
+
+  template< typename T >
+  void List< T >::reverse()
+  {
+    if (empty() || size_ == 1)
+    {
+      return;
+    }
+    Node< T >* node = head_;
+    head_ = end_->prev_;
+    end_->prev_ = node;
+    ConstIterator< T > it = head_;
+    for (; it != cend(); ++it)
+    {
+      node = it.node_->next_;
+      it.node_->next_ = it.node_->prev_;
+      it.node_->prev_ = node;
+    }
   }
 
 

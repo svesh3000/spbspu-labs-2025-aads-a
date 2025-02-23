@@ -9,9 +9,12 @@ namespace kiselev
   template< typename T>
   class List;
   template< typename T >
+  class ConstIterator;
+  template< typename T >
   class Iterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
     friend class List< T >;
+    friend class ConstIterator< T >;
   public:
 
     Iterator(): node_(nullptr) {};
@@ -36,17 +39,6 @@ namespace kiselev
 
   };
 
-  /*template< typename T >
-  size_t distance(Iterator< T > first, Iterator< T > last)
-  {
-    size_t count = 0;
-    for (;first != last; ++first)
-    {
-      ++count;
-    }
-    return count;
-  }
-  */
   template< typename T >
   Iterator< T >& Iterator< T >::operator++()
   {
