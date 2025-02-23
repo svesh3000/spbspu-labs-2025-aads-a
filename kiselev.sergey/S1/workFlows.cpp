@@ -4,43 +4,18 @@
 #include <limits>
 #include <ostream>
 #include <stdexcept>
+#include "constIterator.hpp"
 
 namespace
 {
   size_t searchMax(const list& list_)
   {
     size_t max = 0;
-    for (list::const_iterator begin = list_.begin(); begin != list_.end(); ++begin)
+    for (auto begin = list_.cbegin(); begin != list_.cend(); ++begin)
     {
       max = std::max(max, begin->second.size());
     }
     return max;
-  }
-
-  std::ostream& outputElement(std::ostream& output, const list::const_iterator& list, bool& first)
-  {
-    if (!first)
-    {
-      output << " ";
-    }
-    else
-    {
-      first = false;
-    }
-    return output << list->first;
-  }
-
-  std::ostream& outputElement(std::ostream& output, const numberList::const_iterator& nums, bool& first)
-  {
-    if (!first)
-    {
-      output << " ";
-    }
-    else
-    {
-      first = false;
-    }
-    return output << *nums;
   }
 
   void calcucationSum(list& list_, numberList& sum)
@@ -59,7 +34,7 @@ namespace
         {
           continue;
         }
-        std::advance(nbegin, i);
+        std::next(nbegin, i);
         if (max - *nbegin < summa)
         {
           throw std::overflow_error("Overflow for unsigned long long");
@@ -72,45 +47,52 @@ namespace
 
   std::ostream& outputSum(std::ostream& output, const numberList& list)
   {
-    bool first = true;
-    numberList::const_iterator begin = list.begin();
-    for (; begin != list.cend(); ++begin)
+    for (auto it = list.cbegin(); it != list.cend(); ++it)
     {
-      outputElement(output, begin, first);
+      if (it != list.cbegin())
+      {
+        output << " ";
+      }
+      output << *it;
     }
     return output;
   }
 
   std::ostream& outputName(std::ostream& output, const list& list_)
   {
-    list::const_iterator end = list_.cend();
-    bool first = true;
-    for (list::const_iterator it = list_.begin(); it != end; ++it)
+    for (auto it = list_.cbegin(); it != list_.cend(); ++it)
     {
-      outputElement(output, it, first);
+      if (it != list_.cbegin())
+      {
+        output << " ";
+      }
+      output << it->first;
     }
     return output;
   }
 
   std::ostream& outputNumbers(std::ostream& output, const list& list_)
   {
-    list::const_iterator end = list_.end();
-    list::const_iterator begin = list_.begin();
+    auto it = list_.cbegin();
     for (size_t i = 0; i < searchMax(list_); ++i)
     {
-      begin = list_.begin();
-      bool first = true;
-      for (; begin != end; ++begin)
+      it = list_.cbegin();
+      for (; it != list_.end(); ++it)
       {
-        numberList::const_iterator nbegin = begin->second.begin();
-        if (i >= begin->second.size())
+        auto nit = it->second.cbegin();
+        if (i >= it->second.size())
         {
           continue;
         }
-        std::advance(nbegin, i); //Сделать у итератора метод +=
-        outputElement(output, nbegin, first);
+        std::advance(nit, i);
+        if (it != list_.cbegin())
+        {
+          output << " ";
+        }
+        output << *nit;
       }
       output << "\n";
+      it = list_.cbegin();
     }
     return output;
   }
