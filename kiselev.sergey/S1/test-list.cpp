@@ -66,6 +66,28 @@ BOOST_AUTO_TEST_CASE(initializer_list_constructor)
   List< int > list(il);
   BOOST_TEST(list.size() == il.size());
 }
+
+BOOST_AUTO_TEST_CASE(copy_assignment_operator)
+{
+  List< int > list;
+  createList(&list, 5);
+  List< int > copyList;
+  copyList = list;
+  BOOST_TEST((list == copyList));
+  List< int > list2;
+  list2 = std::move(list);
+  BOOST_TEST((list2 == copyList));
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list_assignment_operator)
+{
+  std::initializer_list< int > il = { 1, 2, 3 ,4 };
+  List< int > listIl(il);
+  List< int > list;
+  list = il;
+  BOOST_TEST((list == listIl));
+}
+
 BOOST_AUTO_TEST_CASE(empty)
 {
   List< int > list;
