@@ -11,7 +11,6 @@ int main()
   std::list< std::string > nodeList;
   std::list< int > valueList;
   std::list< int > sumList;
-
   while (!std::cin.eof())
   {
     while (std::cin >> nodeName)
