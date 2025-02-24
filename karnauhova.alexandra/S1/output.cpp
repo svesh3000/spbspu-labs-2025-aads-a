@@ -10,3 +10,41 @@ void karnauhova::output_names_lists(std::forward_list<std::pair<std::string, std
   }
   out << "\n";
 }
+
+void karnauhova::output_element_lists(std::forward_list<int> lists, size_t index, std::ostream& out)
+{
+  size_t count = 1;
+  auto it = lists.begin();
+  while (it != lists.end() && count < index)
+  {
+    it++;
+    count++;
+  }
+  if (it == lists.end())
+  {
+    return;
+  }
+  out << *it;
+}
+
+void karnauhova::output_elements_lists(std::forward_list<std::pair<std::string, std::forward_list<int>>> lists, std::ostream& out)
+{
+  int max_length = 0;
+  for (const auto& it : lists)
+  {
+    if (std::distance((it.second).begin(), (it.second).end()) > max_length)
+    {
+      max_length = std::distance((it.second).begin(), (it.second).end());
+    }
+  }
+  for (int i = 0; i < max_length; ++i)
+  {
+    for (const auto& it : lists) 
+    {
+      output_element_lists(it.second, (i + 1), out);
+      out << " ";
+    }
+    out << "\n";
+  }
+  out << "\n";
+}

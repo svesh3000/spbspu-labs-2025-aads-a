@@ -12,13 +12,5 @@ int main()
   }
   lists.reverse();
   karnauhova::output_names_lists(lists, std::cout);
-  for (const auto& it : lists)
-  {
-    for (const int& num : it.second) 
-    {
-      std::cout << num << " ";
-    }
-    std::cout << std::endl;
-  }
-
+  karnauhova::output_elements_lists(lists, std::cout);
 }
