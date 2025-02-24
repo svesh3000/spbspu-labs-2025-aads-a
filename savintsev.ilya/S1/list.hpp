@@ -2,86 +2,18 @@
 #define LIST_HPP
 #include <iterator>
 #include <cassert>
+#include "list-node.hpp"
+#include "list-iterators.hpp"
 
 namespace savintsev
 {
-  template< typename T >
-  struct ListNode
-  {
-    T * data;
-    ListNode< T > * next;
-    ListNode< T > * prev;
-    ListNode(const T & value, ListNode * nextNode = nullptr, ListNode * prevNode = nullptr):
-      data(new T(value)),
-      next(nextNode),
-      prev(prevNode)
-    {}
-    ListNode():
-      data(nullptr),
-      next(this),
-      prev(this)
-    {}
-    ~ListNode()
-    {
-      delete data;
-    }
-  };
-
-  template< typename T >
-  class List;
-
-  template< typename T >
-  class ConstIterator;
-
-  template< typename T >
-  class Iterator:
-    public std::iterator< std::bidirectional_iterator_tag, T >
-  {
-    friend class List< T >;
-    friend class ConstIterator< T >;
-  public:
-    Iterator();
-    Iterator(ListNode< T > * rhs);
-    T & operator*();
-    T * operator->();
-    Iterator & operator++();
-    Iterator operator++(int);
-    Iterator & operator--();
-    Iterator operator--(int);
-    bool operator!=(const Iterator & rhs) const;
-    bool operator==(const Iterator & rhs) const;
-  private:
-    ListNode< T > * node;
-  };
-
-  template< typename T >
-  class ConstIterator:
-    public std:: iterator< std::bidirectional_iterator_tag, T >
-  {
-    template< typename U >
-    friend class List;
-  public:
-    ConstIterator();
-    ConstIterator(ListNode< T > * rhs);
-    ConstIterator(Iterator< T > rhs);
-    const T & operator*();
-    const T * operator->();
-    ConstIterator & operator++();
-    ConstIterator operator++(int);
-    ConstIterator & operator--();
-    ConstIterator operator--(int);
-    bool operator!=(const ConstIterator & rhs) const;
-    bool operator==(const ConstIterator & rhs) const;
-  private:
-    ListNode< T > * node;
-  };
-
   template< typename T >
   class List
   {
   public:
     using iterator = Iterator< T >;
     using const_iterator = ConstIterator< T >;
+    using const_it = ConstIterator< T >;
 
     List();
     ~List();
@@ -90,168 +22,46 @@ namespace savintsev
     List(size_t n, const T & value);
 
     iterator begin() noexcept;
-    iterator end() const;
-    const_iterator cbegin() const noexcept;
+    const_iterator begin() const noexcept;
+    iterator end() noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const;
     const_iterator cend() const;
 
-    T & front() const;
-    T & back() const;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void push_front(const T & value);
+    void push_front(T && value);
     void push_back(const T & value);
+    void push_back(T && value);
     void pop_front();
     void pop_back();
     void swap(List & rhs);
-    void clear();
+    void clear() noexcept;
 
     void remove(const T & value);
     template< class predicate >
     void remove_if(predicate pred);
-    void splice(iterator pos, List & rhs);
-    void splice(iterator pos, List & rhs, iterator i);
-    void splice(iterator pos, List & rhs, iterator first, iterator last);
-    void assign(iterator first, iterator last);
+
+    void splice(const_iterator pos, List & rhs);
+    void splice(const_iterator pos, List && rhs);
+    void splice(const_iterator pos, List & rhs, const_iterator i);
+    void splice(const_iterator pos, List && rhs, const_iterator i);
+    void splice(const_iterator pos, List & rhs, const_iterator first, const_iterator last);
+    void splice(const_iterator pos, List && rhs, const_iterator first, const_iterator last);
+
+    void assign(const_iterator first, const_iterator last);
     void assign(size_t n, const T & value);
   private:
     ListNode< T > * dummy;
     size_t list_size;
   };
-}
-
-template< typename T >
-savintsev::Iterator< T >::Iterator():
-  node(nullptr)
-{}
-
-template< typename T >
-savintsev::Iterator< T >::Iterator(ListNode< T > * rhs):
-  node(rhs)
-{}
-
-template< typename T >
-T & savintsev::Iterator< T >::operator*()
-{
-  return *(node->data);
-}
-
-template< typename T >
-T * savintsev::Iterator< T >::operator->()
-{
-  return std::addressof(*(node->data));
-}
-
-template< typename T >
-savintsev::Iterator< T > & savintsev::Iterator< T >::operator++()
-{
-  node = node->next;
-  return *this;
-}
-
-template< typename T >
-savintsev::Iterator< T > savintsev::Iterator< T >::operator++(int)
-{
-  Iterator result(*this);
-  ++(*this);
-  return result;
-}
-
-template< typename T >
-savintsev::Iterator< T > & savintsev::Iterator< T >::operator--()
-{
-  node = node->prev;
-  return *this;
-}
-
-template< typename T >
-savintsev::Iterator< T > savintsev::Iterator< T >::operator--(int)
-{
-  Iterator result(*this);
-  --(*this);
-  return result;
-}
-
-template< typename T >
-bool savintsev::Iterator< T >::operator!=(const Iterator & rhs) const
-{
-  return node != rhs.node;
-}
-
-template< typename T >
-bool savintsev::Iterator< T >::operator==(const Iterator & rhs) const
-{
-  return node == rhs.node;
-}
-
-template< typename T >
-savintsev::ConstIterator< T >::ConstIterator():
-  node(nullptr)
-{}
-
-template< typename T >
-savintsev::ConstIterator< T >::ConstIterator(ListNode< T > * rhs):
-  node(rhs)
-{}
-
-template< typename T >
-savintsev::ConstIterator< T >::ConstIterator(Iterator< T > rhs):
-  node(rhs.node)
-{}
-
-template< typename T >
-const T & savintsev::ConstIterator< T >::operator*()
-{
-  return *(node->data);
-}
-
-template< typename T >
-const T * savintsev::ConstIterator< T >::operator->()
-{
-  return std::addressof(*(node->data));
-}
-
-template< typename T >
-savintsev::ConstIterator< T > & savintsev::ConstIterator< T >::operator++()
-{
-  node = node->next;
-  return *this;
-}
-
-template< typename T >
-savintsev::ConstIterator< T > savintsev::ConstIterator< T >::operator++(int)
-{
-  ConstIterator result(*this);
-  ++(*this);
-  return result;
-}
-
-template< typename T >
-savintsev::ConstIterator< T > & savintsev::ConstIterator< T >::operator--()
-{
-  node = node->prev;
-  return *this;
-}
-
-template< typename T >
-savintsev::ConstIterator< T > savintsev::ConstIterator< T >::operator--(int)
-{
-  ConstIterator result(*this);
-  --(*this);
-  return result;
-}
-
-template< typename T >
-bool savintsev::ConstIterator< T >::operator!=(const ConstIterator & rhs) const
-{
-  return node != rhs.node;
-}
-
-template< typename T >
-bool savintsev::ConstIterator< T >::operator==(const ConstIterator & rhs) const
-{
-  return node == rhs.node;
 }
 
 template< typename T >
@@ -305,13 +115,25 @@ typename savintsev::List< T >::iterator savintsev::List< T >::begin() noexcept
 }
 
 template< typename T >
-typename savintsev::List< T >::iterator savintsev::List< T >::end() const
+typename savintsev::List< T >::const_iterator savintsev::List< T >::begin() const noexcept
+{
+  return const_iterator(dummy->next);
+}
+
+template< typename T >
+typename savintsev::List< T >::iterator savintsev::List< T >::end() noexcept
 {
   return iterator(dummy);
 }
 
 template< typename T >
-typename savintsev::List< T >::const_iterator savintsev::List< T >::cbegin() const noexcept
+typename savintsev::List< T >::const_iterator savintsev::List< T >::end() const noexcept
+{
+  return const_iterator(dummy);
+}
+
+template< typename T >
+typename savintsev::List< T >::const_iterator savintsev::List< T >::cbegin() const
 {
   return const_iterator(dummy->next);
 }
@@ -323,25 +145,37 @@ typename savintsev::List< T >::const_iterator savintsev::List< T >::cend() const
 }
 
 template< typename T >
-T & savintsev::List< T >::front() const
+T & savintsev::List< T >::front()
 {
   return *(dummy->next->data);
 }
 
 template< typename T >
-T & savintsev::List< T >::back() const
+const T & savintsev::List< T >::front() const
+{
+  return *(dummy->next->data);
+}
+
+template< typename T >
+T & savintsev::List< T >::back()
 {
   return *(dummy->prev->data);
 }
 
 template< typename T >
-bool savintsev::List< T >::empty() const
+const T & savintsev::List< T >::back() const
+{
+  return *(dummy->prev->data);
+}
+
+template< typename T >
+bool savintsev::List< T >::empty() const noexcept
 {
   return list_size == 0;
 }
 
 template< typename T >
-size_t savintsev::List< T >::size() const
+size_t savintsev::List< T >::size() const noexcept
 {
   return list_size;
 }
@@ -356,9 +190,27 @@ void savintsev::List< T >::push_front(const T & value)
 }
 
 template< typename T >
+void savintsev::List< T >::push_front(T && value)
+{
+  ListNode< T > * new_node = new ListNode< T >(std::move(value), dummy->next, dummy);
+  dummy->next->prev = new_node;
+  dummy->next = new_node;
+  ++list_size;
+}
+
+template< typename T >
 void savintsev::List< T >::push_back(const T & value)
 {
   ListNode< T > * new_node = new ListNode< T >(value, dummy, dummy->prev);
+  dummy->prev->next = new_node;
+  dummy->prev = new_node;
+  ++list_size;
+}
+
+template< typename T >
+void savintsev::List< T >::push_back(T && value)
+{
+  ListNode< T > * new_node = new ListNode< T >(std::move(value), dummy, dummy->prev);
   dummy->prev->next = new_node;
   dummy->prev = new_node;
   ++list_size;
@@ -399,7 +251,7 @@ void savintsev::List< T >::swap(List & rhs)
 }
 
 template< typename T >
-void savintsev::List< T >::clear()
+void savintsev::List< T >::clear() noexcept
 {
   while (!empty())
   {
@@ -441,49 +293,72 @@ void savintsev::List< T >::remove_if(predicate pred)
 }
 
 template< typename T >
-void savintsev::List< T >::splice(iterator pos, List & rhs)
+void savintsev::List< T >::splice(const_iterator pos, List & rhs)
 {
   list_size += rhs.list_size;
+  rhs.list_size = 0;
+
   pos.node->prev->next = rhs.dummy->next;
   rhs.dummy->next->prev = pos.node->prev;
   rhs.dummy->prev->next = pos.node;
   pos.node->prev = rhs.dummy->prev;
-  ListNode< T > * temp = new ListNode< T >();
-  delete rhs.dummy;
-  rhs.dummy = temp;
-  temp = nullptr;
-  rhs.list_size = 0;
+
+  rhs.dummy->next = rhs.dummy;
+  rhs.dummy->prev = rhs.dummy;
 }
 
 template< typename T >
-void savintsev::List< T >::splice(iterator pos, List & rhs, iterator i)
+void savintsev::List< T >::splice(const_iterator pos, List && rhs)
+{
+  splice(pos, rhs);
+}
+
+template< typename T >
+void savintsev::List< T >::splice(const_iterator pos, List & rhs, const_iterator i)
 {
   pos.node->prev->next = i.node;
   pos.node->prev = i.node;
-  list_size++;
   i.node->prev->next = i.node->next;
   i.node->next->prev = i.node->prev;
   i.node->next = pos.node;
   i.node->prev = pos.node->prev->prev;
+  list_size++;
   rhs.list_size--;
 }
 
 template< typename T >
-void savintsev::List< T >::splice(iterator pos, List & rhs, iterator first, iterator last)
+void savintsev::List< T >::splice(const_iterator pos, List && rhs, const_iterator i)
 {
-  list_size += std::distance(first, last);
-  rhs.list_size -= std::distance(first, last);
-  last.node->prev->next = pos.node;
-  pos.node->prev->next = first.node;
-  first.node->prev->next = last.node;
-  ListNode< T > * temp_first_prev = first.node->prev;
-  first.node->prev = pos.node->prev;
-  pos.node->prev = last.node->prev;
-  last.node->prev = temp_first_prev;
+  splice(pos, rhs, i);
 }
 
 template< typename T >
-void savintsev::List< T >::assign(iterator first, iterator last)
+void savintsev::List< T >::splice(const_it pos, List & rhs, const_it first, const_it last)
+{
+  size_t dist = std::distance(first, last);
+  list_size += dist;
+  rhs.list_size -= dist;
+
+  ListNode< T > * temp_first_prev = first.node->prev;
+
+  last.node->prev->next = pos.node;
+  pos.node->prev->next = first.node;
+  first.node->prev->next = last.node;
+  first.node->prev = pos.node->prev;
+  pos.node->prev = last.node->prev;
+  last.node->prev = temp_first_prev;
+
+  temp_first_prev = nullptr;
+}
+
+template< typename T >
+void savintsev::List< T >::splice(const_it pos, List && rhs, const_it first, const_it last)
+{
+  splice(pos, rhs, first, last);
+}
+
+template< typename T >
+void savintsev::List< T >::assign(const_iterator first, const_iterator last)
 {
   clear();
   for (auto it = first; it != last; ++it)
