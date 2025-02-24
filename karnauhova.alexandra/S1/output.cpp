@@ -11,7 +11,7 @@ void karnauhova::output_names_lists(std::forward_list<std::pair<std::string, std
   out << "\n";
 }
 
-void karnauhova::output_element_lists(std::forward_list<int> lists, size_t index, std::ostream& out)
+void karnauhova::output_element_lists(std::forward_list<int> lists, size_t index, std::ostream& out, bool& first)
 {
   size_t count = 1;
   auto it = lists.begin();
@@ -24,6 +24,11 @@ void karnauhova::output_element_lists(std::forward_list<int> lists, size_t index
   {
     return;
   }
+  if (!first)
+  {
+    out << " ";
+  }
+  first = false;
   out << *it;
 }
 
@@ -39,10 +44,10 @@ void karnauhova::output_elements_lists(std::forward_list<std::pair<std::string, 
   }
   for (int i = 0; i < max_length; ++i)
   {
+    bool first = true;
     for (const auto& it : lists) 
     {
-      output_element_lists(it.second, (i + 1), out);
-      out << " ";
+      output_element_lists(it.second, (i + 1), out, first);
     }
     out << "\n";
   }
