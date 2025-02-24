@@ -6,10 +6,10 @@
 #include <string>
 #include "list.hpp"
 
-using list = std::forward_list< std::pair< std::string, std::forward_list< int > > >;
+using list = std::forward_list< std::pair< std::string, std::forward_list< size_t > > >;
 
 namespace maslov
 {
-  void print(std::ostream & out, const list & listOfPairs, size_t maxSize);
+  void printData(std::ostream & out, const list & listOfPairs, size_t maxSize);
 }
 #endif
