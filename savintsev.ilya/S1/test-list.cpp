@@ -2,21 +2,21 @@
 #include <string>
 #include "list.hpp"
 
+template< typename T >
+using lt = savintsev::List< T >;
+
 BOOST_AUTO_TEST_CASE(test_swap)
 {
-  std::string out;
-  savintsev::List< std::string > meats;
-  meats.push_back("hotdog");
-  meats.push_back("pierogi");
-  meats.push_back("beef");
-  savintsev::List< std::string > vegetables;
-  vegetables.push_back("latuce");
-  vegetables.push_back("tomato");
-  meats.swap(vegetables);
-  BOOST_TEST(meats.front() == "latuce");
-  BOOST_TEST(vegetables.front() == "hotdog");
-  BOOST_TEST(meats.back() == "tomato");
-  BOOST_TEST(vegetables.back() == "beef");
+  lt< int > first(3,100);
+  lt< int > second(5,200);
+
+  first.swap(second);
+
+  lt< int > first1({200, 200, 200, 200, 200});
+  lt< int > second1({100, 100, 100});
+
+  BOOST_TEST(first == first1);
+  BOOST_TEST(second == second1);
 }
 
 BOOST_AUTO_TEST_CASE(test_basic_interface)

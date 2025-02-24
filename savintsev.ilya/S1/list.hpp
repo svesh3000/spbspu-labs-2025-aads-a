@@ -74,6 +74,30 @@ namespace savintsev
     iterator insert(const_iterator pos, std::initializer_list< T > il);
 
     void reverse() noexcept;
+
+    template< class... Args >
+    iterator emplace(const_iterator pos, Args &&... args);
+
+    template< class... Args >
+    iterator emplace_back(Args &&... args);
+
+    template< class... Args >
+    iterator emplace_front(Args &&... args);
+
+    void sort();
+    template< class Compare >
+    void sort(Compare comp);
+
+    void merge(List & x);
+    void merge(List && x);
+    template< class Compare >
+    void merge(List & x, Compare comp);
+    template< class Compare >
+    void merge(List && x, Compare comp);
+
+    void unique();
+    template< class BinaryPredicate >
+    void unique(BinaryPredicate binary_pred);
   private:
     ListNode< T > * dummy;
     size_t list_size;
@@ -99,7 +123,7 @@ namespace savintsev
 template< typename T >
 bool savintsev::operator==(const List< T > & lhs, const List< T > & rhs)
 {
-  if (lhs.list_size != rhs.list_size)
+  if (lhs.size() != rhs.size())
   {
     return false;
   }
@@ -403,12 +427,10 @@ void savintsev::List< T >::pop_back()
 template< typename T >
 void savintsev::List< T >::swap(List & rhs)
 {
-  ListNode< T > * temp_next = dummy->next;
-  ListNode< T > * temp_prev = dummy->prev;
-  dummy->next = rhs.dummy->next;
-  dummy->prev = rhs.dummy->prev;
-  rhs.dummy->next = temp_next;
-  rhs.dummy->prev = temp_prev;
+  std::swap(dummy->next->prev, rhs.dummy->next->prev);
+  std::swap(dummy->prev->next, rhs.dummy->prev->next);
+  std::swap(dummy->next, rhs.dummy->next);
+  std::swap(dummy->prev, rhs.dummy->prev);
   std::swap(list_size, rhs.list_size);
 }
 
@@ -452,6 +474,27 @@ void savintsev::List< T >::remove_if(Predicate pred)
       --list_size;
     }
   }
+}
+
+template< typename T >
+template< class... Args >
+typename savintsev::List< T >::iterator savintsev::List< T >::emplace(const_iterator pos, Args &&... args)
+{
+  return insert(pos, T(args...));
+}
+
+template< typename T >
+template< class... Args >
+typename savintsev::List< T >::iterator savintsev::List< T >::emplace_back(Args &&... args)
+{
+  return insert(const_iterator(end()), T(args...));
+}
+
+template< typename T >
+template< class... Args >
+typename savintsev::List< T >::iterator savintsev::List< T >::emplace_front(Args &&... args)
+{
+  return insert(const_iterator(begin()), T(args...));
 }
 
 template< typename T >
