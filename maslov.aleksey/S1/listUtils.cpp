@@ -1,7 +1,8 @@
 #include "listUtils.hpp"
 #include <iostream>
+#include <limits>
 
-void maslov::print(std::ostream & out, const list & listOfPairs, size_t maxSize)
+void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxSize)
 {
   out << listOfPairs.begin()->first;
   for (auto it = ++listOfPairs.begin(); it != listOfPairs.end(); ++it)
@@ -9,11 +10,17 @@ void maslov::print(std::ostream & out, const list & listOfPairs, size_t maxSize)
     out << " " << it->first;
   }
   out << "\n";
-  std::forward_list< int > sums;
+  if (maxSize == 0)
+  {
+    out << "0";
+    return;
+  }
+  const size_t max = std::numeric_limits< size_t >::max();
+  std::forward_list< size_t > sums;
   auto itSum = sums.before_begin();
   for (size_t i = 0; i < maxSize; ++i)
   {
-    int sum = 0;
+    size_t sum = 0;
     bool flagPrint = false;
     for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
     {
@@ -35,6 +42,10 @@ void maslov::print(std::ostream & out, const list & listOfPairs, size_t maxSize)
           if (flagPrint)
           {
             out << " ";
+          }
+          if (sum > max - *itNum)
+          {
+            throw std::overflow_error("overflow");
           }
           sum += *itNum;
           out << *itNum;
