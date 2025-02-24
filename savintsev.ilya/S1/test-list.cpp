@@ -40,6 +40,23 @@ BOOST_AUTO_TEST_CASE(test_basic_interface)
   BOOST_TEST(list1.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_iterator_replace)
+{
+  savintsev::List< size_t > list;
+  for (size_t i = 0; i < 5; ++i)
+  {
+    list.push_back(10);
+  }
+  for (auto it = list.begin(); it != list.end(); ++it)
+  {
+    *it = 20;
+  }
+  for (auto it = list.cbegin(); it != list.cend(); ++it)
+  {
+    BOOST_TEST(*it == 20);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(test_push_and_pop)
 {
   savintsev::List< std::string > list1;

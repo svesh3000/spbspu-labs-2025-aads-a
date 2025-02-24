@@ -1,12 +1,11 @@
-#include <list>
 #include <iostream>
 #include <string>
 #include "list.hpp"
 
 int main()
 {
-  using pair_t = std::pair<std::string, std::list<size_t>>;
-  using storage_t = savintsev::List<pair_t>;
+  using pair_t = std::pair< std::string, savintsev::List< size_t > >;
+  using storage_t = savintsev::List< pair_t >;
   storage_t storage;
   std::string buffer = "";
   bool was_input = false;
@@ -42,7 +41,7 @@ int main()
     }
   }
   std::cout << "\n";
-  std::list<size_t> sums;
+  savintsev::List< size_t > sums;
   bool was_overflow = false;
   for (size_t i = 0; i < max_size; ++i)
   {
@@ -82,10 +81,10 @@ int main()
   {
     sums.push_back(0);
   }
-  for (std::list<size_t>::iterator it = sums.begin(); it != sums.end(); ++it)
+  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
   {
     std::cout << *it;
-    if (std::next(it) != sums.end())
+    if (std::next(it) != sums.cend())
     {
       std::cout << " ";
     }

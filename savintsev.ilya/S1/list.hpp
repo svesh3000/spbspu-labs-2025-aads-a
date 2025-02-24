@@ -34,49 +34,38 @@ namespace savintsev
   class Iterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
-    template< typename U > friend class List;
+    template< typename U >
+    friend class List;
   public:
-    Iterator(ListNode< T > * rhs):
-      node(rhs)
-    {}
-    T & operator*()
-    {
-      return *(node->data);
-    }
-    T * operator->()
-    {
-      return std::addressof(*(node->data));
-    }
-    Iterator & operator++()
-    {
-      node = node->next;
-      return *this;
-    }
-    Iterator operator++(int)
-    {
-      Iterator result(*this);
-      ++(*this);
-      return result;
-    }
-    Iterator & operator--()
-    {
-      node = node->prev;
-      return *this;
-    }
-    Iterator operator--(int)
-    {
-      Iterator result(*this);
-      --(*this);
-      return result;
-    }
-    bool operator!=(const Iterator & rhs) const
-    {
-      return node != rhs.node;
-    }
-    bool operator==(const Iterator & rhs) const
-    {
-      return node == rhs.node;
-    }
+    Iterator(ListNode< T > * rhs);
+    T & operator*();
+    T * operator->();
+    Iterator & operator++();
+    Iterator operator++(int);
+    Iterator & operator--();
+    Iterator operator--(int);
+    bool operator!=(const Iterator & rhs) const;
+    bool operator==(const Iterator & rhs) const;
+  private:
+    ListNode< T > * node;
+  };
+
+  template< typename T >
+  class ConstIterator:
+    public std:: iterator< std::bidirectional_iterator_tag, T >
+  {
+    template< typename U >
+    friend class List;
+  public:
+    ConstIterator(ListNode< T > * rhs);
+    const T & operator*();
+    const T * operator->();
+    ConstIterator & operator++();
+    ConstIterator operator++(int);
+    ConstIterator & operator--();
+    ConstIterator operator--(int);
+    bool operator!=(const ConstIterator & rhs) const;
+    bool operator==(const ConstIterator & rhs) const;
   private:
     ListNode< T > * node;
   };
@@ -86,6 +75,7 @@ namespace savintsev
   {
   public:
     using iterator = Iterator< T >;
+    using const_iterator = ConstIterator< T >;
 
     List();
     ~List();
@@ -94,6 +84,8 @@ namespace savintsev
 
     iterator begin() const;
     iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
 
     T & front() const;
     T & back() const;
@@ -120,6 +112,124 @@ namespace savintsev
     ListNode< T > * dummy;
     size_t list_size;
   };
+}
+
+template< typename T >
+savintsev::Iterator< T >::Iterator(ListNode< T > * rhs):
+  node(rhs)
+{}
+
+template< typename T >
+T & savintsev::Iterator< T >::operator*()
+{
+  return *(node->data);
+}
+
+template< typename T >
+T * savintsev::Iterator< T >::operator->()
+{
+  return std::addressof(*(node->data));
+}
+
+template< typename T >
+savintsev::Iterator< T > & savintsev::Iterator< T >::operator++()
+{
+  node = node->next;
+  return *this;
+}
+
+template< typename T >
+savintsev::Iterator< T > savintsev::Iterator< T >::operator++(int)
+{
+  Iterator result(*this);
+  ++(*this);
+  return result;
+}
+
+template< typename T >
+savintsev::Iterator< T > & savintsev::Iterator< T >::operator--()
+{
+  node = node->prev;
+  return *this;
+}
+
+template< typename T >
+savintsev::Iterator< T > savintsev::Iterator< T >::operator--(int)
+{
+  Iterator result(*this);
+  --(*this);
+  return result;
+}
+
+template< typename T >
+bool savintsev::Iterator< T >::operator!=(const Iterator & rhs) const
+{
+  return node != rhs.node;
+}
+
+template< typename T >
+bool savintsev::Iterator< T >::operator==(const Iterator & rhs) const
+{
+  return node == rhs.node;
+}
+
+template< typename T >
+savintsev::ConstIterator< T >::ConstIterator(ListNode< T > * rhs):
+  node(rhs)
+{}
+
+template< typename T >
+const T & savintsev::ConstIterator< T >::operator*()
+{
+  return *(node->data);
+}
+
+template< typename T >
+const T * savintsev::ConstIterator< T >::operator->()
+{
+  return std::addressof(*(node->data));
+}
+
+template< typename T >
+savintsev::ConstIterator< T > & savintsev::ConstIterator< T >::operator++()
+{
+  node = node->next;
+  return *this;
+}
+
+template< typename T >
+savintsev::ConstIterator< T > savintsev::ConstIterator< T >::operator++(int)
+{
+  ConstIterator result(*this);
+  ++(*this);
+  return result;
+}
+
+template< typename T >
+savintsev::ConstIterator< T > & savintsev::ConstIterator< T >::operator--()
+{
+  node = node->prev;
+  return *this;
+}
+
+template< typename T >
+savintsev::ConstIterator< T > savintsev::ConstIterator< T >::operator--(int)
+{
+  ConstIterator result(*this);
+  --(*this);
+  return result;
+}
+
+template< typename T >
+bool savintsev::ConstIterator< T >::operator!=(const ConstIterator & rhs) const
+{
+  return node != rhs.node;
+}
+
+template< typename T >
+bool savintsev::ConstIterator< T >::operator==(const ConstIterator & rhs) const
+{
+  return node == rhs.node;
 }
 
 template< typename T >
@@ -165,6 +275,18 @@ template< typename T >
 typename savintsev::List< T >::iterator savintsev::List< T >::end() const
 {
   return iterator(dummy);
+}
+
+template< typename T >
+typename savintsev::List< T >::const_iterator savintsev::List< T >::cbegin() const
+{
+  return const_iterator(dummy->next);
+}
+
+template< typename T >
+typename savintsev::List< T >::const_iterator savintsev::List< T >::cend() const
+{
+  return const_iterator(dummy);
 }
 
 template< typename T >
@@ -255,7 +377,7 @@ void savintsev::List< T >::clear()
 template< typename T >
 void savintsev::List< T >::remove(const T & value)
 {
-  for (auto it = begin(); it != end(); ++it)
+  for (auto it = cbegin(); it != cend(); ++it)
   {
     if (*it == value)
     {
@@ -272,7 +394,7 @@ template< typename T >
 template< class predicate >
 void savintsev::List< T >::remove_if(predicate pred)
 {
-  for (auto it = begin(); it != end(); ++it)
+  for (auto it = cbegin(); it != cend(); ++it)
   {
     if (pred(*it))
     {
