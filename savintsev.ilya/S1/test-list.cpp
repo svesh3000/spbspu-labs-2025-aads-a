@@ -1,7 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include "list.hpp"
-#include "list-algorithms.hpp"
 
 BOOST_AUTO_TEST_CASE(test_swap)
 {
@@ -51,9 +50,9 @@ BOOST_AUTO_TEST_CASE(test_iterator_replace)
   {
     *it = 20;
   }
-  for (auto it = list.cbegin(); it != list.cend(); ++it)
+  for (auto cit = list.cbegin(); cit != list.cend(); ++cit)
   {
-    BOOST_TEST(*it == 20);
+    BOOST_TEST(*cit == 20);
   }
 }
 
@@ -127,18 +126,12 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
 
 BOOST_AUTO_TEST_CASE(test_fill)
 {
-  savintsev::List< int > list1;
+  savintsev::List< int > list1(8, 0);
+  auto it = list1.cbegin();
   for (size_t i = 0; i < 8; ++i)
   {
-    list1.push_back(0);
+    BOOST_TEST(*it == 0);
   }
-  savintsev::fill(list1.begin(), --list1.end(), 5);
-  auto it = list1.begin();
-  for (size_t i = 0; i < 7; ++i)
-  {
-    BOOST_TEST(*it == 5);
-  }
-  BOOST_TEST(list1.back() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_remove)

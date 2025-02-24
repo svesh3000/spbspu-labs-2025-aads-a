@@ -31,12 +31,16 @@ namespace savintsev
   class List;
 
   template< typename T >
+  class ConstIterator;
+
+  template< typename T >
   class Iterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
-    template< typename U >
-    friend class List;
+    friend class List< T >;
+    friend class ConstIterator< T >;
   public:
+    Iterator();
     Iterator(ListNode< T > * rhs);
     T & operator*();
     T * operator->();
@@ -57,7 +61,9 @@ namespace savintsev
     template< typename U >
     friend class List;
   public:
+    ConstIterator();
     ConstIterator(ListNode< T > * rhs);
+    ConstIterator(Iterator< T > rhs);
     const T & operator*();
     const T * operator->();
     ConstIterator & operator++();
@@ -81,10 +87,11 @@ namespace savintsev
     ~List();
     List(const List & rhs);
     List(List && rhs);
+    List(size_t n, const T & value);
 
-    iterator begin() const;
+    iterator begin() noexcept;
     iterator end() const;
-    const_iterator cbegin() const;
+    const_iterator cbegin() const noexcept;
     const_iterator cend() const;
 
     T & front() const;
@@ -113,6 +120,11 @@ namespace savintsev
     size_t list_size;
   };
 }
+
+template< typename T >
+savintsev::Iterator< T >::Iterator():
+  node(nullptr)
+{}
 
 template< typename T >
 savintsev::Iterator< T >::Iterator(ListNode< T > * rhs):
@@ -174,8 +186,18 @@ bool savintsev::Iterator< T >::operator==(const Iterator & rhs) const
 }
 
 template< typename T >
+savintsev::ConstIterator< T >::ConstIterator():
+  node(nullptr)
+{}
+
+template< typename T >
 savintsev::ConstIterator< T >::ConstIterator(ListNode< T > * rhs):
   node(rhs)
+{}
+
+template< typename T >
+savintsev::ConstIterator< T >::ConstIterator(Iterator< T > rhs):
+  node(rhs.node)
 {}
 
 template< typename T >
@@ -266,7 +288,18 @@ savintsev::List< T >::List(List && rhs):
 }
 
 template< typename T >
-typename savintsev::List< T >::iterator savintsev::List< T >::begin() const
+savintsev::List< T >::List(size_t n, const T & value):
+  dummy(new ListNode< T >()),
+  list_size(0)
+{
+  for (size_t i = 0; i < n; ++i)
+  {
+    push_back(value);
+  }
+}
+
+template< typename T >
+typename savintsev::List< T >::iterator savintsev::List< T >::begin() noexcept
 {
   return iterator(dummy->next);
 }
@@ -278,7 +311,7 @@ typename savintsev::List< T >::iterator savintsev::List< T >::end() const
 }
 
 template< typename T >
-typename savintsev::List< T >::const_iterator savintsev::List< T >::cbegin() const
+typename savintsev::List< T >::const_iterator savintsev::List< T >::cbegin() const noexcept
 {
   return const_iterator(dummy->next);
 }
