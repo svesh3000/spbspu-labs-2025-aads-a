@@ -50,11 +50,15 @@ typename maslevtsov::FwdIterator< T >::this_t& maslevtsov::FwdIterator< T >::ope
 
 template< typename T >
 T& maslevtsov::FwdIterator< T >::operator*()
-{}
+{
+  return node_->data_;
+}
 
 template< typename T >
 T* maslevtsov::FwdIterator< T >::operator->()
-{}
+{
+  return std::addressof(node_->data_);
+}
 
 template< typename T >
 bool maslevtsov::FwdIterator< T >::operator==(const this_t& rhs) const

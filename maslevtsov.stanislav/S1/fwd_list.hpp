@@ -11,7 +11,10 @@ namespace maslevtsov {
     T data_;
     FwdListNode< T >* next_;
 
-    FwdListNode();
+    FwdListNode():
+      data_(T()),
+      next_(nullptr)
+    {}
   };
 
   template< typename T >
@@ -22,18 +25,18 @@ namespace maslevtsov {
 
     ~FwdList();
 
-    T& front() const noexcept;
-    T& back() const noexcept;
+    T& front() const;
+    T& back() const;
 
-    std::size_t size() const noexcept;
-    bool empty() const noexcept;
+    std::size_t size() const;
+    bool empty() const;
 
     void push_front(const T& value);
     void push_front(T&& value);
     void push_back(const T& value);
     void push_back(T&& value);
     void swap(FwdList& other);
-    void clear() noexcept;
+    void clear();
 
   private:
     FwdListNode< T >* head_;
