@@ -12,22 +12,32 @@ namespace rychkov
   struct node_t
   {
     T data;
-    node_t* next;
-    node_t* prev;
+    node_t* prev = nullptr;
+    node_t* next = nullptr;
   };
 
   template< class T, bool isConst, bool isReversed >
   class BidirectionalIterator
   {
   public:
+    using difference_type = ptrdiff_t;
     using value_type = T;
-    using pointer = T*;
-    using reference = T&;
+    using pointer = value_type*;
+    using reference = value_type&;
     using iterator_category = std::bidirectional_iterator_tag;
 
     BidirectionalIterator() noexcept:
       node_(nullptr)
     {}
+
+    bool operator==(BidirectionalIterator rhs) const noexcept
+    {
+      return node_ == rhs.node_;
+    }
+    bool operator!=(BidirectionalIterator rhs) const noexcept
+    {
+      return !(*this == rhs);
+    }
 
     BidirectionalIterator& operator++() noexcept
     {
@@ -39,6 +49,7 @@ namespace rychkov
       {
         node_ = node_->next;
       }
+      return *this;
     }
     BidirectionalIterator operator++(int) noexcept
     {
@@ -56,6 +67,7 @@ namespace rychkov
       {
         node_ = node_->prev;
       }
+      return *this;
     }
     BidirectionalIterator operator--(int) noexcept
     {
@@ -64,7 +76,8 @@ namespace rychkov
       return temp;
     }
 
-    typename std::enable_if< isConst, reference >::type operator*() noexcept
+    template< bool isConst1 = isConst >
+    typename std::enable_if_t< isConst && isConst1, reference > operator*() noexcept
     {
       return node_->data;
     }
@@ -72,18 +85,19 @@ namespace rychkov
     {
       return node_->data;
     }
-    typename std::enable_if< isConst, pointer >::type operator->() noexcept
+    template< bool isConst1 = isConst >
+    typename std::enable_if_t< isConst && isConst1, pointer > operator->() noexcept
     {
-      return std::adressof(node_->data);
+      return std::addressof(node_->data);
     }
     const pointer operator->() const noexcept
     {
-      return std::adressof(node_->data);
+      return std::addressof(node_->data);
     }
   private:
     friend class rychkov::List< T >;
-    node_t* node_;
-    BidirectionalIterator(node_t* node) noexcept:
+    node_t< T >* node_;
+    BidirectionalIterator(node_t< T >* node) noexcept:
       node_(node)
     {}
   };
