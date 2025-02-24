@@ -27,7 +27,7 @@ namespace
       {
         std::advance(currIt, i);
         out << *currIt;
-        if (*currIt < max - sum)
+        if (*currIt > max - sum)
         {
           throw std::overflow_error("overflow");
         }
@@ -42,7 +42,7 @@ namespace
         currIt = it->second.begin();
         std::advance(currIt, i);
         out << *currIt;
-        if (*currIt < max - sum)
+        if (*currIt > max - sum)
         {
           throw std::overflow_error("overflow");
         }
@@ -56,7 +56,7 @@ namespace
         {
           std::advance(currIt, i);
           out << " " << *currIt;
-          if (*currIt < max - sum)
+          if (*currIt > max - sum)
           {
             throw std::overflow_error("overflow");
           }
