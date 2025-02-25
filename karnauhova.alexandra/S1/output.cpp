@@ -1,5 +1,5 @@
 #include "output.hpp"
-void karnauhova::output_names_lists(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
+void karnauhova::output_names(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
 {
   auto it = l.begin();
   out << it->first;
@@ -32,7 +32,7 @@ void karnauhova::output_element_lists(std::forward_list<int> lists, size_t index
   out << *it;
 }
 
-void karnauhova::output_elements_lists(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
+void karnauhova::output_lists(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
 {
   int max_length = 0;
   for (const auto& it : l)
