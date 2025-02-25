@@ -11,6 +11,6 @@ int main()
     lists.push_front(karnauhova::input_line(std::cin, name));
   }
   lists.reverse();
-  karnauhova::output_names_lists(lists, std::cout);
-  karnauhova::output_elements_lists(lists, std::cout);
+  karnauhova::output_names(lists, std::cout);
+  karnauhova::output_lists(lists, std::cout);
 }
