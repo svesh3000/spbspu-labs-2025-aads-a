@@ -6,32 +6,25 @@
 namespace
 {
   using lop = std::list< std::pair< std::string, std::list< unsigned long long > > >;
-  void printNums(std::ostream & out, const lop & listOfPairs)
+  size_t getMax(const lop & listOfPairs)
   {
-    size_t maxNums = listOfPairs.begin()->second.size();
+    size_t maxNums = 0;
     for (auto it = ++listOfPairs.begin(); it != listOfPairs.end(); ++it)
     {
-      if (maxNums < it->second.size())
-      {
-        maxNums = it->second.size();
-      }
+      maxNums = std::max(maxNums, it->second.size());
     }
-    std::list< unsigned long long > sumList;
-    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    for (size_t i = 0; i < maxNums; i++)
+    return maxNums;
+  }
+  void printNums(std::ostream & out, const lop & listOfPairs)
+  {
+    for (size_t i = 0; i < getMax(listOfPairs); i++)
     {
-      unsigned long long sum = 0;
       auto it = listOfPairs.begin();
       auto currIt = it->second.begin();
       if (it->second.size() > i)
       {
         std::advance(currIt, i);
         out << *currIt;
-        if (*currIt > max - sum)
-        {
-          throw std::overflow_error("overflow");
-        }
-        sum += *currIt;
       }
       else
       {
@@ -42,31 +35,47 @@ namespace
         currIt = it->second.begin();
         std::advance(currIt, i);
         out << *currIt;
-        if (*currIt > max - sum)
-        {
-          throw std::overflow_error("overflow");
-        }
-        sum += *currIt;
       }
       ++it;
+      for (; it != listOfPairs.end(); ++it)
+      {
+        currIt = it->second.begin();
+        if (it->second.size() > i)
+        {
+          std::advance(currIt, i);
+          out << " " << *currIt;
+        }
+      }
+      out << "\n";
+    }
+  }
+  std::list< unsigned long long > calculateSum(const lop & listOfPairs)
+  {
+    std::list< unsigned long long > sumList;
+    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
+    for (size_t i = 0; i < getMax(listOfPairs); i++)
+    {
+      unsigned long long sum = 0;
+      auto it = listOfPairs.begin();
       for (; it != listOfPairs.end(); ++it)
       {
         auto currIt = it->second.begin();
         if (it->second.size() > i)
         {
           std::advance(currIt, i);
-          out << " " << *currIt;
-          if (*currIt > max - sum)
+          if (max - *currIt < sum)
           {
-            throw std::overflow_error("overflow");
+            throw std::overflow_error("Overflow");
           }
           sum += *currIt;
         }
       }
       sumList.push_back(sum);
-      out << "\n";
     }
-
+    return sumList;
+  }
+  void printSums(std::ostream & out, const std::list< unsigned long long > sumList)
+  {
     out << *sumList.begin();
     for (auto it = ++sumList.begin(); it != sumList.end(); ++it)
     {
@@ -105,13 +114,16 @@ int main()
   }
   std::cout << "\n";
 
+  printNums(std::cout, listOfPairs);
+  std::list< unsigned long long > sumList;
   try
   {
-    printNums(std::cout, listOfPairs);
+    sumList = calculateSum(listOfPairs);
   }
-  catch (const std::exception & e)
+  catch (const std::overflow_error & e)
   {
-    std::cerr << e.what() << '\n';
+    std::cerr << e.what() << "\n";
     return 1;
   }
+  printSums(std::cout, sumList);
 }
