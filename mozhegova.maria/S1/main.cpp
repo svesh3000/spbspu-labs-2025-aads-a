@@ -9,7 +9,7 @@ namespace
   size_t getMax(const lop & listOfPairs)
   {
     size_t maxNums = 0;
-    for (auto it = ++listOfPairs.begin(); it != listOfPairs.end(); ++it)
+    for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
     {
       maxNums = std::max(maxNums, it->second.size());
     }
