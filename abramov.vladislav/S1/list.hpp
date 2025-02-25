@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cstddef>
+#include <algorithm>
 #include "node.hpp"
 
 namespace abramov
@@ -14,6 +15,12 @@ namespace abramov
     const T &front() const;
     T &back();
     const T &back() const;
+    void pushBack(const T &data);
+    void pushFront(const T &data);
+    void popBack();
+    void popFront();
+    void swap(List &rhs) noexcept;
+    void clear();
     bool empty() const;
     size_t size() const;
   private:
@@ -32,12 +39,7 @@ namespace abramov
   template< class T >
   List< T >::~List()
   {
-    while (head_)
-    {
-      Node< T > *temp = head_;
-      head_ = head_->next_;
-      delete temp;
-    }
+    clear();
   }
 
   template< class T >
@@ -62,6 +64,105 @@ namespace abramov
   const T &List< T >::back() const
   {
     return tail_->data_;
+  }
+
+  template< class T >
+  void List< T >::pushBack(const T &data)
+  {
+    Node< T > *node = new Node< T >{ data };
+    ++size_;
+    if (empty())
+    {
+      head_ = node;
+      tail_ = node;
+    }
+    else
+    {
+      tail_->next_ = node;
+      node->prev_ = tail_;
+      tail_ = node;
+    }
+  }
+
+  template< class T >
+  void List< T >::pushFront(const T &data)
+  {
+    Node< T > *node = new Node< T >{ data };
+    ++size_;
+    if (empty())
+    {
+      head_ = node;
+      tail_ = node;
+    }
+    else
+    {
+      head_->prev_ = node;
+      node->next_ = head_;
+      head_ = node;
+    }
+  }
+
+  template< class T >
+  void List< T >::popBack()
+  {
+    if (!empty())
+    {
+      --size_;
+      if (head_ == tail_)
+      {
+        delete tail_;
+        head_ = nullptr;
+        tail_ = nullptr;
+      }
+      else
+      {
+        Node< T > *node = tail_->prev_;
+        delete tail_;
+        tail_ = node;
+        tail_->next_ = nullptr;
+      }
+    }
+  }
+
+  template< class T >
+  void List< T >::popFront()
+  {
+    if (!empty())
+    {
+      --size_;
+      if (head_ == tail_)
+      {
+        delete head_;
+        head_ = nullptr;
+        tail_ = nullptr;
+      }
+      else
+      {
+        Node< T > *node = head_->next_;
+        delete head_;
+        head_ = node;
+        head_->prev_ = nullptr;
+      }
+    }
+  }
+
+  template< class T >
+  void List< T >::swap(List &rhs) noexcept
+  {
+    std::swap(head_, rhs.head_);
+    std::swap(tail_, rhs.tail_);
+    std::swap(size_, rhs.size_);
+  }
+
+  template< class T >
+  void List< T >::clear()
+  {
+    while (head_)
+    {
+      Node< T > *temp = head_;
+      head_ = head_->next_;
+      delete temp;
+    }
   }
 
   template< class T >
