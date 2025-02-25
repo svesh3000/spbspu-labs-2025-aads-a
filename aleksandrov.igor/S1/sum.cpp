@@ -5,49 +5,21 @@
 
 namespace aleksandrov
 {
-  int sign(int num)
+  unsigned long long calcSum(const std::forward_list< unsigned long long >& list)
   {
-    return (num > 0) ? 1 : ((num < 0) ? -1 : 0);
-  }
+    const unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
+    unsigned long long sum = 0;
 
-  bool sameSign(int a, int b)
-  {
-    return sign(a) * sign(b) > 0;
-  }
-
-  int calcIntSum(const std::forward_list< int >& intList)
-  {
-    const int maxInt = std::numeric_limits< int >::max();
-    const int minInt = std::numeric_limits< int >::min();
-    int sum = 0;
-    for (auto it = intList.begin(); it != intList.end(); ++it)
+    for (auto it = list.begin(); it != list.end(); ++it)
     {
-      int el = *it;
-      if (sameSign(sum, el) && (sum > 0))
+      unsigned long long value = *it;
+      if (maxValue - sum > value)
       {
-        if (maxInt - sum > el)
-        {
-          sum += el;
-        }
-        else
-        {
-          throw std::overflow_error("Overflow error!");
-        }
+        sum += value;
       }
-      else if (sameSign(sum, el) && (sum < 0))
+      else
       {
-        if (minInt - sum < el)
-        {
-          sum += el;
-        }
-        else
-        {
-          throw std::overflow_error("Overflow error!");
-        }
-      }
-      else if (!sameSign(sum, el))
-      {
-        sum += el;
+        throw std::overflow_error("There was an overflow error!");
       }
     }
     return sum;
