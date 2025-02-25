@@ -2,7 +2,7 @@
 #define FWD_ITERATOR
 
 #include <iterator>
-#include "fwd_list.hpp"
+#include "fwd_list_node.hpp"
 
 namespace maslevtsov {
   template< typename T >
@@ -13,6 +13,7 @@ namespace maslevtsov {
 
     FwdIterator();
     FwdIterator(const this_t& rhs) = default;
+    explicit FwdIterator(const FwdListNode< T >& node);
     ~FwdIterator() = default;
 
     this_t& operator=(const FwdIterator& rhs) = default;
@@ -30,7 +31,12 @@ namespace maslevtsov {
 
 template< typename T >
 maslevtsov::FwdIterator< T >::FwdIterator():
-  node_(nullptr, nullptr)
+  node_(nullptr)
+{}
+
+template< typename T >
+maslevtsov::FwdIterator< T >::FwdIterator(const FwdListNode< T >& node):
+  node_(node)
 {}
 
 template< typename T >
