@@ -51,7 +51,7 @@ namespace rychkov
     void assign(std::initializer_list< value_type > rhs);
 
     template< class... Args >
-    reference emplace(const_iterator pos, Args... args);
+    reference emplace(const_iterator pos, Args&&... args);
 
     size_type remove(const value_type& value);
     template< class C >
@@ -95,14 +95,14 @@ namespace rychkov
     void pop_back();
     value_type back() const;
     template< class... Args >
-    reference emplace_back(Args... args);
+    reference emplace_back(Args&&... args);
 
     void push_front(const value_type& value);
     void push_front(value_type&& value);
     void pop_front();
     value_type front() const;
     template< class... Args >
-    reference emplace_front(Args... args);
+    reference emplace_front(Args&&... args);
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;

@@ -91,17 +91,16 @@ template< class T >
 rychkov::List< T >& rychkov::List< T >::operator=(List&& rhs) noexcept
 {
   List< T > temp(std::move(rhs));
-  std::swap(head_, temp.head_);
-  std::swap(tail_, temp.tail_);
-  std::swap(size_, temp.size_);
+  swap(temp);
   return *this;
 }
 template< class T >
 rychkov::List< T >& rychkov::List< T >::operator=(std::initializer_list< value_type > rhs)
 {
   List< T > temp(std::move(rhs));
-  std::swap(*this, temp);
+  swap(temp);
   return *this;
 }
+
 
 #endif
