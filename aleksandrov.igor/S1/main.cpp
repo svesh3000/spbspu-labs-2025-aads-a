@@ -6,31 +6,28 @@
 
 namespace aleksandrov
 {
-  void outputIntList(const std::forward_list< int >& intList, std::ostream& output)
+  void outputList(const std::forward_list< unsigned long long >& list, std::ostream& output)
   {
-    for (auto it = intList.begin(); it != intList.end(); ++it)
+    output << list.front();
+    for (auto it = ++list.begin(); it != list.end(); ++it)
     {
-      std::cout << *it;
-      if (it != intList.end())
-      {
-        output << " ";
-      }
+      std::cout << " " << *it;
     }
   }
 }
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list < int > > > list;
+  std::forward_list< std::pair< std::string, std::forward_list < unsigned long long > > > list;
   std::string listName;
   size_t maxSubListSize = 0;
 
   auto listIter = list.before_begin();
   while (std::cin >> listName)
   {
-    std::forward_list< int > numList;
+    std::forward_list< unsigned long long > numList;
     auto numListIter = numList.before_begin();
-    int num = 0;
+    unsigned long long num = 0;
     size_t numCount = 0;
     while (std::cin >> num)
     {
@@ -55,22 +52,24 @@ int main()
     ++nameListIter;
   }
 
-  if (!nameList.empty())
+  if (nameList.empty())
   {
-    std::cout << nameList.front();
+    std::cout << "0" << "\n";
+    return 0;
   }
+  std::cout << nameList.front();
   for (auto it = ++nameList.begin(); it != nameList.end(); ++it)
   {
     std::cout << " " << *it;
   }
   std::cout << "\n";
 
-  std::forward_list< std::forward_list < int > > yaNumList;
+  std::forward_list< std::forward_list < unsigned long long > > yaNumList;
   auto yaNumListIter = yaNumList.before_begin();
   size_t shift = 0;
   while (shift != maxSubListSize)
   {
-    std::forward_list< int > numList;
+    std::forward_list< unsigned long long > numList;
     auto numListIter = numList.before_begin();
     for (auto it = list.begin(); it != list.end(); ++it)
     {
@@ -90,29 +89,34 @@ int main()
     ++yaNumListIter;
   }
 
+  if (yaNumList.empty())
+  {
+    std::cout << "0" << "\n";
+    return 0;
+  }
   for (auto it = yaNumList.begin(); it != yaNumList.end(); ++it)
   {
-    aleksandrov::outputIntList(*it, std::cout);
+    aleksandrov::outputList(*it, std::cout);
     std::cout << "\n";
   }
 
-  std::forward_list< int > sumList;
+  std::forward_list< unsigned long long > sumList;
   auto sumListIter = sumList.before_begin();
   for (auto it = yaNumList.begin(); it != yaNumList.end(); ++it)
   {
     try
     {
-      int sum = aleksandrov::calcIntSum(*it);
+      unsigned long long sum = aleksandrov::calcSum(*it);
       sumList.insert_after(sumListIter, sum);
       ++sumListIter;
     }
     catch (const std::overflow_error& e)
     {
-      std::cerr << e.what();
-      break;
+      std::cerr << e.what() << "\n";
+      return 1;
     }
   }
-  aleksandrov::outputIntList(sumList, std::cout);
+  aleksandrov::outputList(sumList, std::cout);
   std::cout << "\n";
 }
 

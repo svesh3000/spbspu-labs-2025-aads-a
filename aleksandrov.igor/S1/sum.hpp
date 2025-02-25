@@ -5,9 +5,7 @@
 
 namespace aleksandrov
 {
-  int sign(int num);
-  bool sameSign(int a, int b);
-  int calcIntSum(const std::forward_list< int >& intList);
+  unsigned long long calcSum(const std::forward_list< unsigned long long >& list);
 }
 
 #endif
