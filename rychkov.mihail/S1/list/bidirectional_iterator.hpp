@@ -29,6 +29,11 @@ namespace rychkov
     BidirectionalIterator() noexcept:
       node_(nullptr)
     {}
+    template< bool isConst1 = isConst >
+    BidirectionalIterator(typename std::enable_if_t< isConst && isConst1,
+            BidirectionalIterator< value_type, false, isReversed > > rhs) noexcept:
+      node_(rhs.node_)
+    {}
 
     bool operator==(BidirectionalIterator rhs) const noexcept
     {
@@ -96,6 +101,7 @@ namespace rychkov
     }
   private:
     friend class rychkov::List< T >;
+    friend class BidirectionalIterator< value_type, true, isReversed >;
     node_t< T >* node_;
     BidirectionalIterator(node_t< T >* node) noexcept:
       node_(node)
