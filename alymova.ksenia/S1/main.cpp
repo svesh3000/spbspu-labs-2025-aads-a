@@ -8,7 +8,7 @@
 
 int main()
 {
-	list_pair_t list;
-	alymova::inputProcess(std::cin, list);
+  list_pair_t list;
+  alymova::inputProcess(std::cin, list);
   alymova::outputProcess(std::cout, list);
 }

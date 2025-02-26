@@ -44,7 +44,7 @@ namespace alymova
     friend class List< T >;
     const ListNode< T >* node_;
   };
-  
+
   template< typename T >
   Iterator< T >::Iterator():
     node_(nullptr)
