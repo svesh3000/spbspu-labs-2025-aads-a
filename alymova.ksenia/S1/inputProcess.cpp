@@ -8,22 +8,22 @@
 void alymova::inputProcess(std::istream& in, list_pair_t& list)
 {
   std::string name;
-	while ((in >> name) && (!in.eof()))
-	{
-		list_int_t list_int;
-		char next = '\0';
+  while ((in >> name) && (!in.eof()))
+  {
+    list_int_t list_int;
+    char next = '\0';
     in >> std::noskipws;
-		while ((in >> next) && (next != '\n') && (!in.eof()))
-		{
+    while ((in >> next) && (next != '\n') && (!in.eof()))
+    {
       if (isdigit(next))
       {
         list_int.push_back(std::atoi(std::addressof(next)));
       }
-		}
+    }
     in >> std::skipws;
-		pair_t p(name, list_int);
-		list.push_back(p);
-	}
+    pair_t p(name, list_int);
+    list.push_back(p);
+  }
 }
 void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
 {
@@ -87,14 +87,14 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
 size_t alymova::findMaxListSize(const list_pair_t& list)
 {
   size_t max_size = 0;
-	for (list_pair_citer_t it = list.cbegin(); it != list.cend(); it++)
-	{
+  for (list_pair_citer_t it = list.cbegin(); it != list.cend(); it++)
+  {
     size_t size_now = (*it).second.size();
     if (size_now > max_size)
     {
       max_size = size_now;
     }
-	}
+  }
   return max_size;
 }
 bool alymova::isOverflowSumInt(int a, int b)
