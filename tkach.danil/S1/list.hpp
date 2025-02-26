@@ -146,7 +146,6 @@ namespace tkach
       pop_front();
     }
   }
-  
 }
 
 #endif
