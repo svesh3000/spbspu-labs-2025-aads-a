@@ -66,7 +66,7 @@ namespace alymova
   template< typename T >
   List< T >::List(List< T >&& other):
     fake_(other.fake_),
-    head_(head_)
+    head_(other.head_)
   {
     other.fake_ = nullptr;
     other.head_ = nullptr;
