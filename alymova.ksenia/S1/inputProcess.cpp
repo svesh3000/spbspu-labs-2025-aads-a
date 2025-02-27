@@ -25,7 +25,7 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
     in.clear();
   }
 }
-void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
+void alymova::outputProcess(std::ostream& out, const list_pair_t& list, bool& overflow)
 {
   if (list.empty())
   {
@@ -67,7 +67,8 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
         printed = true;
         if (isOverflowSumInt(sum_now, *list_now_it))
         {
-          throw std::logic_error("Summation is impossible");
+          overflow = true;
+          //throw std::logic_error("Summation is impossible");
         }
         sum_now += (*list_now_it);
       }

@@ -9,6 +9,7 @@
 int main()
 {
   list_pair_t list;
+  bool overflow = false;
   try
   {
     alymova::inputProcess(std::cin, list);
@@ -18,9 +19,13 @@ int main()
   {
     std::cerr << "Allocate error\n";
   }
+  if (overflow)
+  {
+    std::cerr << "Summation is incorrect\n";
+  }
   catch (const std::logic_error& e)
   {
-    std::cerr << "\n" << e.what() << "\n";
+    std::cerr << e.what() << "\n";
     return 1;
   }
 }
