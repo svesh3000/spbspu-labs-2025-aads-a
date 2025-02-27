@@ -5,6 +5,10 @@
 
 void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> temporary)
 {
+  if (temporary.empty())
+  {
+    return;
+  }
   auto it = temporary.begin();
   std::cout << (*it).first;
   for (++it; it != temporary.end(); it++)
@@ -16,6 +20,10 @@ void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> 
 
 void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize)
 {
+  if (maxSize == 0)
+  {
+    return;
+  }
   std::list<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)
   {
