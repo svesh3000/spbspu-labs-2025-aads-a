@@ -11,18 +11,19 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
   while ((in >> name) && (!in.eof()))
   {
     list_int_t list_int;
-    char next = '\0';
-    in >> std::noskipws;
-    while ((in >> next) && (next != '\n') && (!in.eof()))
+    int num = 0;
+    while ((in >> num))
     {
-      if (isdigit(next))
-      {
-        list_int.push_back(std::atoi(std::addressof(next)));
-      }
+      list_int.push_back(num);
     }
-    in >> std::skipws;
     pair_t p(name, list_int);
     list.push_back(p);
+    if (in.eof())
+    {
+      break;
+      std::cout << "eof\n";
+    }
+    in.clear();
   }
 }
 void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
@@ -37,7 +38,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   {
     if (it != list.cbegin())
     {
-      out << "_";
+      out << " ";
     }
     out << (*it).first;
   }
@@ -61,7 +62,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
         }
         if (printed)
         {
-          out << "_";
+          out << " ";
         }
         out << *list_now_it;
         printed = true;
@@ -83,7 +84,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   {
     if (it != sums.begin())
     {
-      out << "_";
+      out << " ";
     }
     out << (*it);
   }
