@@ -13,6 +13,7 @@ namespace abramov
     friend struct List< T >;
 
     ConstIterator();
+    ConstIterator(Node< T > *node);
     ConstIterator(const ConstIterator &c_iter) = default;
     ~ConstIterator() = default;
     ConstIterator &operator=(const ConstIterator &c_iter) = default;
@@ -31,6 +32,11 @@ namespace abramov
   template< class T >
   ConstIterator< T >::ConstIterator():
     node_(nullptr)
+  {}
+
+  template< class T >
+  ConstIterator< T >::ConstIterator(Node< T > *node):
+    node_(node)
   {}
 
   template< class T >
@@ -59,7 +65,7 @@ namespace abramov
   ConstIterator< T > ConstIterator< T >::operator--(int)
   {
     ConstIterator< T > c_iter(*this);
-    ++(*this);
+    --(*this);
     return c_iter;
   }
 
