@@ -353,7 +353,7 @@ namespace mozhegova
     {
       tempNode->prev_->next_ = tempNode->next_;
     }
-    if (pos == --cend())
+    if (tempNode == tail_)
     {
       tail_ = tempNode->prev_;
     }
@@ -463,7 +463,7 @@ namespace mozhegova
   void List< T >::assign(std::initializer_list< T > il)
   {
     clear();
-    for (auto it = il.begin; it != il.end; ++it)
+    for (auto it = il.begin(); it != il.end(); ++it)
     {
       push_back(*it);
     }
