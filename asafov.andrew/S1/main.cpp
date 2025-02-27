@@ -19,13 +19,13 @@ int main(int argc, char* argv[])
   data3.push_back(6);
   sequences.push_back(std::make_pair("jkl", data3));
   asafov::outputSequences(sequences);
-  
+
   /*for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
     std::cout << it->first << ':';
     for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) std::cout << ' ' << *it2;
     std::cout << '\n';
   }*/
-  
+
   return 0;   
 } 
