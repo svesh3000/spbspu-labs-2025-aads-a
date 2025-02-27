@@ -20,8 +20,8 @@ namespace alymova
     List< T >& operator=(const List< T >& other);
     List< T >& operator=(List< T >&& other);
 
-    Iterator< T > begin() noexcept;
-    Iterator< T > end() noexcept;
+    Iterator< T > begin() const noexcept;
+    Iterator< T > end() const noexcept;
     ConstIterator< T > cbegin() const noexcept;
     ConstIterator< T > cend() const noexcept;
 
@@ -130,12 +130,12 @@ namespace alymova
     clear();
   }
   template< typename T >
-  Iterator< T > List< T >::begin() noexcept
+  Iterator< T > List< T >::begin() const noexcept
   {
     return Iterator< T >(head_);
   }
   template< typename T >
-  Iterator< T > List< T >::end() noexcept
+  Iterator< T > List< T >::end() const noexcept
   {
     return Iterator< T >(fake_);
   }
