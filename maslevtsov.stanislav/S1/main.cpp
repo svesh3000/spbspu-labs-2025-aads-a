@@ -46,7 +46,7 @@ namespace {
       list_t column_elements;
       for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j) {
         if (!j->second.empty()) {
-          column_elements.push_front(j->second.front());
+          column_elements.push_back(j->second.front());
           j->second.pop_front();
         }
       }
@@ -56,7 +56,7 @@ namespace {
           out << ' ' << *j;
         }
         std::cout << '\n';
-        sums.push_front(get_sum_of_list_elements(column_elements));
+        sums.push_back(get_sum_of_list_elements(column_elements));
       }
     }
     out << *sums.begin();
@@ -75,9 +75,9 @@ int main()
     list_t list;
     unsigned long long num = 0;
     while (std::cin >> num) {
-      list.push_front(num);
+      list.push_back(num);
     }
-    pairs_list.push_front(std::make_pair(list_name, list));
+    pairs_list.push_back(std::make_pair(list_name, list));
     std::cin.clear();
   }
 
