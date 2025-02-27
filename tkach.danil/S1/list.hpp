@@ -12,6 +12,9 @@ namespace tkach
   {
   public:
     List();
+    List(const List< T >& other);
+    List(List< T >&& other);
+    ~List();
     Iterator< T > begin() noexcept;
     Citerator< T > cbegin() const noexcept;
     Iterator< T > end() noexcept;
@@ -21,6 +24,8 @@ namespace tkach
     size_t size();
     void push_front(const T& data);
     void push_back(const T& data);
+    void push_front(T&& data);
+    void push_back(T&& data);
     void pop_front();
     void clear();
   private:
@@ -98,9 +103,58 @@ namespace tkach
   }
 
   template< typename T >
+  List< T >::List(const List< T >& other):
+    List()
+  {
+    push_back(*(other.cbegin()));
+    for (auto it = ++other.cbegin(); it != other.cend(); ++it)
+    {
+      push_back(*it);
+    }
+  }
+
+  template< typename T >
   void List< T >::push_back(const T& data)
   {
     Node< T >* new_node = new Node< T >(data);
+    if (!head_)
+    {
+      head_ = new_node;
+      head_->next_ = head_;
+      tail_ = head_;
+    }
+    else
+    {
+      new_node->next_ = head_;
+      tail_->next_ = new_node;
+      tail_ = new_node;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  void List< T >::push_front(T&& data)
+  {
+    Node< T >* new_node = new Node< T >(std::move(data), head_);
+    if (!head_)
+    {
+      head_ = new_node;
+      head_->next_ = head_;
+      tail_ = head_;
+    }
+    else
+    {
+      tail_->next_ = new_node;
+      new_node->next_ = head_;
+      head_ = new_node;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  void List< T >::push_back(T&& data)
+  {
+    Node< T >* new_node = new Node< T >(std::move(data), head_);
     if (!head_)
     {
       head_ = new_node;
@@ -145,6 +199,23 @@ namespace tkach
     {
       pop_front();
     }
+  }
+
+  template< typename T >
+  List< T >::~List()
+  {
+    clear();
+  }
+
+  template< typename T >
+  List< T >::List(List< T >&& other):
+    head_(other.head_),
+    tail_(other.tail_),
+    size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
   }
 }
 

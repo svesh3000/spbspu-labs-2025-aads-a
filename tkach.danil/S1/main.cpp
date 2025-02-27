@@ -1,7 +1,13 @@
 #include <iostream>
 #include <forward_list>
 #include <string>
+#include <utility>
 #include "list.hpp"
+
+namespace
+{
+
+}
 
 int main()
 {
@@ -46,6 +52,7 @@ int main()
     {
       if (it->second.empty())
       {
+        it++;
         continue;
       }
       size_t pair_second_front = it->second.front();

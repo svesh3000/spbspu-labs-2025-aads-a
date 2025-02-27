@@ -25,7 +25,8 @@ namespace tkach
 
   template< typename T >
   Node< T >::Node(const T & data):
-    data_(data)
+    data_(data),
+    next_(nullptr)
   {}
 
   template< typename T >
