@@ -12,15 +12,33 @@ int main()
   try
   {
     alymova::inputProcess(std::cin, list);
-    alymova::outputProcess(std::cout, list);
   }
   catch (const std::bad_alloc& e)
   {
     std::cerr << "Allocate error\n";
   }
-  catch (const std::logic_error& e)
+
+  if (list.empty())
   {
-    std::cerr << e.what() << "\n";
+    std::cout << "0\n";
+    return 0;
+  }
+  alymova::outputListString(std::cout, list);
+  std::cout << "\n";
+
+  bool overflow = false;
+  list_int_t sums;
+  alymova::outputProcess(std::cout, list, sums, overflow);
+  if (overflow)
+  {
+    std::cerr << "Summation is incorrect\n";
     return 1;
   }
+  if (sums.empty())
+  {
+    std::cout << "0\n";
+    return 0;
+  }
+  alymova::outputListInt(std::cout, sums);
+  std::cout << "\n";
 }

@@ -25,25 +25,8 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
     in.clear();
   }
 }
-void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
+void alymova::outputProcess(std::ostream& out, const list_pair_t& list, list_int_t& sums, bool& overflow)
 {
-  if (list.empty())
-  {
-    out << "0\n";
-    return;
-  }
-
-  for (list_pair_citer_t it = list.cbegin(); it != list.cend(); it++)
-  {
-    if (it != list.cbegin())
-    {
-      out << " ";
-    }
-    out << (*it).first;
-  }
-  out << "\n";
-
-  list_int_t sums;
   size_t max_size = findMaxListSize(list);
   for (size_t i = 0; i < max_size; i++)
   {
@@ -67,28 +50,39 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
         printed = true;
         if (isOverflowSumInt(sum_now, *list_now_it))
         {
-          throw std::logic_error("Summation is impossible");
+          overflow = true;
         }
-        sum_now += (*list_now_it);
+        else
+        {
+          sum_now += (*list_now_it);
+        }
       }
     }
     sums.push_back(sum_now);
     out << "\n";
   }
-  if (sums.empty())
+}
+void alymova::outputListInt(std::ostream& out, const list_int_t& list)
+{
+  for (list_int_citer_t it = list.cbegin(); it != list.cend(); it++)
   {
-    out << "0\n";
-    return;
-  }
-  for (list_int_iter_t it = sums.begin(); it != sums.end(); it++)
-  {
-    if (it != sums.begin())
+    if (it != list.cbegin())
     {
       out << " ";
     }
     out << (*it);
   }
-  out << "\n";
+}
+void alymova::outputListString(std::ostream& out, const list_pair_t& list)
+{
+  for (list_pair_citer_t it = list.cbegin(); it != list.cend(); it++)
+  {
+    if (it != list.cbegin())
+    {
+      out << " ";
+    }
+    out << (*it).first;
+  }
 }
 size_t alymova::findMaxListSize(const list_pair_t& list)
 {

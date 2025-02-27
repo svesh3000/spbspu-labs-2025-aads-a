@@ -17,7 +17,9 @@ using list_int_citer_t = alymova::ConstIterator< size_t >;
 namespace alymova
 {
   void inputProcess(std::istream& in, list_pair_t& list);
-  void outputProcess(std::ostream& out, const list_pair_t& list);
+  void outputProcess(std::ostream& out, const list_pair_t& list, list_int_t& sums, bool& overflow);
+  void outputListInt(std::ostream& out, const list_int_t& list);
+  void outputListString(std::ostream& out, const list_pair_t& list);
   size_t findMaxListSize(const list_pair_t& list);
   bool isOverflowSumInt(size_t a, size_t b);
 }
