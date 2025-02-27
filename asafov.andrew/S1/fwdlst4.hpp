@@ -6,16 +6,17 @@
 namespace asafov
 {
   template<typename T>
-class Forward_list
-{
-    struct Node {
+  class Forward_list
+  {
+    struct Node
+    {
       T data_;
       Node* next_;
       Node(const T& data) : data_(data), next_(nullptr)
       {}
     };
+
   public:
-    class const_iterator;
     Forward_list() : head_(nullptr), last_(nullptr)
     {}
 
@@ -33,50 +34,52 @@ class Forward_list
         last_ = new_node;
       }
     }
-  
+
   size_t size() const
+  {
+    size_t i = 0;
+    for (const_iterator it = begin(); it != end(); ++it, ++i);
+    return i;
+  }
+  const_iterator begin() const {
+    return const_iterator(head_, last_);
+  }
+  const_iterator end() const {
+    return const_iterator(nullptr, last_);
+  }
+    class const_iterator
     {
-      size_t i = 0;
-      for (const_iterator it = begin(); it != end(); ++it)
-      {
-        ++i;
-      }
-      return i;
-    }
-    const_iterator begin() const {
-      return const_iterator(head_, last_);
-    }
-    const_iterator end() const {
-      return const_iterator(nullptr, last_);
-    }
-    class const_iterator {
-      public:
+      friend class Forward_list<T>;
+    public:
       const_iterator() = default;
-        const_iterator(Node* node, Node* last) : current_(node), last_(last) {}
-        const T& operator*() const
+      const_iterator(Node* node, Node* last) : current_(node), last_(last) {}
+      const T& operator*() const
+      {
+        return current_->data_;
+      }
+      T* operator->() const {
+        return std::addressof(current_->data_);
+      }
+      const_iterator& operator++()
+      {
+        if (current_ && current_ != last_)
         {
-          return current_->data_;
+          current_ = current_->next_;
         }
-        T* operator->() const {
-          return std::addressof(current_->data_);
-        }
-        const_iterator& operator++()
+        else
         {
-          if (current_ && current_ != last_) {
-            current_ = current_->next_;
-          } else {
-            current_ = nullptr;
-          }
-          return *this;
+          current_ = nullptr;
         }
-        bool operator!=(const const_iterator& other) const
-        {
-          return current_ != other.current_;
-        }
-        bool operator==(const const_iterator& other) const
-        {
-          return current_ == other.current_;
-        }
+        return *this;
+      }
+      bool operator!=(const const_iterator& other) const
+      {
+        return current_ != other.current_;
+      }
+      bool operator==(const const_iterator& other) const
+      {
+        return current_ == other.current_;
+      }
       private:
         Node* current_;
         Node* last_;

@@ -52,7 +52,7 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
     std::cout << iter->first << ' ' << std::flush;
     begins[size] = iter->second.begin();
     ends[size] = iter->second.end();
-    ++size;	
+    ++size;
   }
   std::cout << '\n';
   seqiter = sequences.begin();
