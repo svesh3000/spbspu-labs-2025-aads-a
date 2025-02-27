@@ -199,7 +199,7 @@ namespace abramov
   template< class T >
   Iterator< T > List< T >::end() const
   {
-    return Iterator< T >();
+    return Iterator< T >(tail_);
   }
 
   template< class T >
@@ -211,7 +211,7 @@ namespace abramov
   template< class T >
   ConstIterator< T > List< T >::cend() const
   {
-    return ConstIterator< T >();
+    return ConstIterator< T >(tail_);
   }
 }
 #endif
