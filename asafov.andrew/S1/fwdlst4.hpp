@@ -17,23 +17,67 @@ namespace asafov
     };
 
   public:
-    Forward_list() : head_(nullptr), last_(nullptr)
-    {}
 
-    ~Forward_list() = default;
-    void push_back(const T& value)
+
+  class const_iterator
+  {
+    friend class Forward_list<T>;
+  public:
+    const_iterator() = default;
+    const_iterator(Node* node, Node* last) : current_(node), last_(last) {}
+    const T& operator*() const
     {
-      Node* new_node = new Node(value);
-      if (!head_) {
-        head_ = new_node;
-        last_ = new_node;
-        new_node->next_ = head_;
-      } else {
-        last_->next_ = new_node;
-        new_node->next_ = head_;
-        last_ = new_node;
-      }
+      return current_->data_;
     }
+    T* operator->() const {
+      return std::addressof(current_->data_);
+    }
+    const_iterator& operator++()
+    {
+      if (current_ && current_ != last_)
+      {
+        current_ = current_->next_;
+      }
+      else
+      {
+        current_ = nullptr;
+      }
+      return *this;
+    }
+    bool operator!=(const const_iterator& other) const
+    {
+      return current_ != other.current_;
+    }
+    bool operator==(const const_iterator& other) const
+    {
+      return current_ == other.current_;
+    }
+    private:
+      Node* current_;
+      Node* last_;
+  };
+
+
+  Forward_list() : head_(nullptr), last_(nullptr)
+  {}
+
+  ~Forward_list() = default;
+  void push_back(const T& value)
+  {
+    Node* new_node = new Node(value);
+    if (!head_)
+    {
+      head_ = new_node;
+      last_ = new_node;
+      new_node->next_ = head_;
+    }
+    else
+    {
+      last_->next_ = new_node;
+      new_node->next_ = head_;
+      last_ = new_node;
+    }
+  }
 
   size_t size() const
   {
@@ -47,43 +91,6 @@ namespace asafov
   const_iterator end() const {
     return const_iterator(nullptr, last_);
   }
-    class const_iterator
-    {
-      friend class Forward_list<T>;
-    public:
-      const_iterator() = default;
-      const_iterator(Node* node, Node* last) : current_(node), last_(last) {}
-      const T& operator*() const
-      {
-        return current_->data_;
-      }
-      T* operator->() const {
-        return std::addressof(current_->data_);
-      }
-      const_iterator& operator++()
-      {
-        if (current_ && current_ != last_)
-        {
-          current_ = current_->next_;
-        }
-        else
-        {
-          current_ = nullptr;
-        }
-        return *this;
-      }
-      bool operator!=(const const_iterator& other) const
-      {
-        return current_ != other.current_;
-      }
-      bool operator==(const const_iterator& other) const
-      {
-        return current_ == other.current_;
-      }
-      private:
-        Node* current_;
-        Node* last_;
-    };
   private:
     Node* head_;
     Node* last_;
