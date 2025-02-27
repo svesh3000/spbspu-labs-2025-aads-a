@@ -3,6 +3,10 @@
 void karnauhova::output_names(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
 {
   auto it = l.begin();
+  if (it == l.end())
+  {
+    return;
+  }
   out << it->first;
   it++;
   for (; it != l.end(); it++)
