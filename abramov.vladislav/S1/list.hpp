@@ -70,7 +70,6 @@ namespace abramov
   void List< T >::pushBack(const T &data)
   {
     Node< T > *node = new Node< T >{ data };
-    ++size_;
     if (empty())
     {
       head_ = node;
@@ -82,13 +81,13 @@ namespace abramov
       node->prev_ = tail_;
       tail_ = node;
     }
+    ++size_;
   }
 
   template< class T >
   void List< T >::pushFront(const T &data)
   {
     Node< T > *node = new Node< T >{ data };
-    ++size_;
     if (empty())
     {
       head_ = node;
@@ -100,6 +99,7 @@ namespace abramov
       node->next_ = head_;
       head_ = node;
     }
+    ++size_;
   }
 
   template< class T >
@@ -163,6 +163,7 @@ namespace abramov
       head_ = head_->next_;
       delete temp;
     }
+    size_ = 0;
   }
 
   template< class T >
