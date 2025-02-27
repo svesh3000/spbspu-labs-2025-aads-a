@@ -1,8 +1,9 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <cctype>
 
-void printList(std::list<int> list)
+void printList(std::list<unsigned int> list)
 {
   std::cout << *list.begin();
   for (auto i = ++list.begin(); i != list.end(); ++i)
@@ -24,7 +25,7 @@ void printList(std::list<std::string> list)
 
 int main()
 {
-  std::list< std::pair<std::string, std::list<int>>> List;
+  std::list< std::pair<std::string, std::list<unsigned int>>> List;
   bool isOverflow = 0;
   std::string str = "";
   std::cin >> str;
@@ -37,19 +38,19 @@ int main()
   while (true)
   {
     str = temp;
-    std::list< int > list;
+    std::list< unsigned int > list;
     std::string in = "";
     while (std::cin >> in)
     {
       try
       {
-        int num = std::stoi(in, nullptr, 10);
+        unsigned int num = std::stoul(in, nullptr, 10);
+        std::string s = std::to_string(num);
+        if (s != in)
+        {
+          isOverflow = true;
+        }
         list.push_back(num);
-      }
-      catch (const std::out_of_range&)
-      {
-        isOverflow = 1;
-        break;
       }
       catch (const std::invalid_argument&)
       {
@@ -57,12 +58,8 @@ int main()
         break;
       }
     }
-    std::pair<std::string, std::list<int>> pair(str, list);
+    std::pair<std::string, std::list<unsigned int>> pair(str, list);
     List.push_back(pair);
-    if (isOverflow)
-    {
-      break;
-    }
     if (std::cin.eof())
     {
       break;
@@ -74,7 +71,7 @@ int main()
     return 0;
   }
   std::list<std::string> listOfHeads;
-  std::list<std::list<int>> listOfLists;
+  std::list<std::list<unsigned int>> listOfLists;
   size_t max_size = 0;
   for (auto i = List.begin(); i != List.end(); ++i)
   {
@@ -85,7 +82,7 @@ int main()
   }
   for (size_t i = 0; i < max_size; ++i)
   {
-    std::list<int> list;
+    std::list<unsigned int> list;
     listOfLists.push_back(list);
   }
   for (auto i = List.begin(); i != List.end(); ++i)
@@ -101,7 +98,7 @@ int main()
       }
     }
   }
-  std::list<int> listOfSum;
+  std::list<unsigned int> listOfSum;
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
   {
     int res = 0;
