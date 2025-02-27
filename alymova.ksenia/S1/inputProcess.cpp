@@ -78,6 +78,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   if (sums.empty())
   {
     out << "0\n";
+    return;
   }
   for (list_int_iter_t it = sums.begin(); it != sums.end(); it++)
   {
