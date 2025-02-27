@@ -1,6 +1,6 @@
 #include "sequencefunctions.h"
 
-int main(int argc, char* argv[])
+int main()
 {
   //sequence_list_t sequences = asafov::getSequences();
   int* a = new int;
