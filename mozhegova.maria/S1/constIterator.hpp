@@ -11,10 +11,10 @@ namespace mozhegova
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    Iterator(): node_(nullptr) {};
-    Iterator(const ConstIterator< T > &) = default;
-    Iterator(Node< T > * node): node_(node) {}
-    ~Iterator() = default;
+    ConstIterator(): node_(nullptr) {};
+    ConstIterator(const ConstIterator< T > &) = default;
+    ConstIterator(Node< T > * node): node_(node) {}
+    ~ConstIterator() = default;
     ConstIterator< T > & operator=(const ConstIterator< T > &) = default;
 
     ConstIterator< T > & operator++();
