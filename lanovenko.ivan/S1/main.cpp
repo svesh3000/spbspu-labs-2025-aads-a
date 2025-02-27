@@ -14,8 +14,9 @@ void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> 
   std::cout << '\n';
 }
 
-void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, int* array, size_t maxSize)
+void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize)
 {
+  std::list<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)
   {
     size_t res = 0;
@@ -35,17 +36,14 @@ void printSequences(const std::list < std::pair < std::string, std::list<int>>> 
         isFirstElement = false;
       }
     }
-    array[i] = res;
+    sumList.push_back(res);
     std::cout << '\n';
   }
-}
-
-void printSequencesSum(const int* sumArray, size_t maxSize)
-{
-  std::cout << sumArray[0];
-  for (size_t i = 1; i < maxSize; i++)
+  auto it = sumList.begin();
+  std::cout << (*it);
+  for (++it; it != sumList.end(); it++)
   {
-    std::cout << " " << sumArray[i];
+    std::cout << " " << (*it);
   }
   std::cout << '\n';
 }
@@ -72,24 +70,12 @@ int main()
   }
   printSequencesName(myList);
   size_t maxSize = 0;
-  int* sumArray = nullptr;
-  for (const auto& i : myList)
+  for (auto it :myList)
   {
-    if (maxSize < i.second.size())
+    if (maxSize < it.second.size())
     {
-      maxSize = i.second.size();
+      maxSize = it.second.size();
     }
   }
-  try
-  {
-    sumArray = new int[maxSize] {};
-  }
-  catch (const std::bad_alloc& e)
-  {
-    std::cerr << "Out of memmory\n";
-    return 1;
-  }
-  printSequences(myList, sumArray, maxSize);
-  printSequencesSum(sumArray, maxSize);
-  delete[] sumArray;
+  printSequences(myList, maxSize);
 }
