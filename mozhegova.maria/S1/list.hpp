@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <initializer_list>
 #include "cstddef"
 #include "iterator.hpp"
 #include "constIterator.hpp"
@@ -15,7 +16,12 @@ namespace mozhegova
     List(const List< T > &);
     List(List< T > &&);
     List(size_t, const T &);
+    List(std::initializer_list< T >);
+    template< typename InputIterator >
+    List(InputIterator first, InputIterator last);
     ~List();
+
+    List< T > & operator=(std::initializer_list< T >);
 
     Iterator< T > begin() const;
     Iterator< T > end() const;
@@ -49,7 +55,20 @@ namespace mozhegova
     void splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > first, ConstIterator< T > last);
     void splice(ConstIterator< T > pos, List< T > && x, ConstIterator< T > first, ConstIterator< T > last);
 
+    Iterator< T > insert(ConstIterator< T > pos, const T & val);
+    Iterator< T > insert(ConstIterator< T > pos, size_t n, const T & val);
+    template< typename InputIterator >
+    Iterator< T > insert(ConstIterator< T > pos, InputIterator first, InputIterator last);
+    Iterator< T > insert(ConstIterator< T > pos, T && val);
+    Iterator< T > insert(ConstIterator< T > pos, std::initializer_list< T >);
+
+    Iterator< T > erase(ConstIterator< T > pos);
+    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
+
     void assign(size_t, const T &);
+    template< typename InputIterator >
+    void assign(InputIterator first, InputIterator last);
+    void assign(std::initializer_list< T >);
   private:
     Node< T > * fake_;
     Node< T > * tail_;
@@ -92,10 +111,31 @@ namespace mozhegova
   }
 
   template< typename T >
+  List< T >::List(std::initializer_list< T > il):
+    List()
+  {
+    assign(il);
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  List< T >::List(InputIterator first, InputIterator last):
+    List()
+  {
+    assign(first, last);
+  }
+
+  template< typename T >
   List< T >::~List()
   {
     clear();
     delete fake_;
+  }
+
+  template< typename T >
+  List< T > & List< T >::operator=(std::initializer_list< T > il)
+  {
+    assign(il);
   }
 
   template< typename T >
@@ -197,33 +237,13 @@ namespace mozhegova
   template< typename T >
   void List< T >::pop_front()
   {
-    assert(!empty());
-    Node< T > * tempNode = fake_->next_;
-    fake_->next_ = tempNode->next_;
-    if (fake_->next_ != nullptr)
-    {
-      tempNode->next_->prev_ = fake_;
-    }
-    delete tempNode;
-    size_--;
+    erase(cbegin());
   }
 
   template< typename T >
   void List< T >::pop_back()
   {
-    assert(!empty());
-    Node< T > * tempNode = tail_;
-    if (size_ == 1)
-    {
-      fake_->next_ = nullptr;
-    }
-    else
-    {
-      tail_ = tail_->prev_;
-      tail_->next_ = nullptr;
-    }
-    delete tempNode;
-    size_--;
+    erase(ConstIterator< T >(end_));
   }
 
   template< typename T >
@@ -271,28 +291,143 @@ namespace mozhegova
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x)
   {
-    
+    insert(pos, x.begin(), x.end());
+    x.clear();
   }
 
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > && x)
-  {}
+  {
+    splice(pos, x);
+  }
 
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > i)
-  {}
+  {
+    insert(pos, *i);
+    x.erase(i);
+  }
 
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > && x, ConstIterator< T > i)
-  {}
+  {
+    splice(pos, i);
+  }
 
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > first, ConstIterator< T > last)
-  {}
+  {
+    insert(pos, first, last);
+    for (auto it = first; it != last; ++it)
+    {
+      x.erase(it);
+    }
+  }
 
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > && x, ConstIterator< T > first, ConstIterator< T > last)
-  {}
+  {
+    splice(pos, x, first, last);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > pos)
+  {
+    assert(!empty());
+    Node< T > * tempNode = pos.node_;
+    Iterator< T > it(tempNode->next_);
+    if (pos == cbegin())
+    {
+      fake_->next_ = tempNode->next_;
+    }
+    else
+    {
+      tempNode->prev_->next_ = tempNode->next_;
+    }
+    if (pos == --cend())
+    {
+      tail_ = tempNode->prev_;
+    }
+    else
+    {
+      tempNode->next_->prev_ = tempNode->prev_;
+    }
+    delete tempNode;
+    size_--;
+    return it;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
+  {
+    Iterator< T > temp;
+    for (auto it = first; it != last; ++it)
+    {
+      temp = erase(it);
+    }
+    return temp;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, const T & val)
+  {
+    if (empty())
+    {
+      push_back(val);
+      return begin();
+    }
+    Node< T > * tempNode = pos.node_;
+    Node< T > * newNode(val);
+    tempNode->prev_->next_ = newNode;
+    newNode->prev_ = tempNode->prev_;
+    newNode->next_ = tempNode;
+    tempNode->prev_ = newNode;
+    size_++;
+    return Iterator< T >(newNode);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, size_t n, const T & val)
+  {
+    if (n == 0)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    Iterator< T > temp = insert(pos, val);
+    for (size_t i = 1; i < n; i++)
+    {
+      insert(pos, val);
+    }
+    return temp;
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, InputIterator first, InputIterator last)
+  {
+    if (first == last)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    Iterator< T > temp = insert(pos, *first);
+    for (auto it = ++first; it != last; ++it)
+    {
+      insert(pos, *it);
+    }
+    return temp;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, T && val)
+  {
+    return insert(pos, val);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(ConstIterator< T > pos, std::initializer_list< T > il)
+  {
+    return insert(pos, il.begin(), il.end());
+  }
 
   template< typename T >
   void List< T >::assign(size_t n, const T & val)
@@ -301,6 +436,27 @@ namespace mozhegova
     for (size_t i = 0; i < n; i++)
     {
       push_back(val);
+    }
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  void List< T >::assign(InputIterator first, InputIterator last)
+  {
+    clear();
+    for (auto it = first; it != last; ++it)
+    {
+      push_back(*it);
+    }
+  }
+
+  template< typename T >
+  void List< T >::assign(std::initializer_list< T > il)
+  {
+    clear();
+    for (auto it = il.begin; it != il.end; ++it)
+    {
+      push_back(*it);
     }
   }
 }
