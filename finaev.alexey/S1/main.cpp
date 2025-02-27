@@ -26,17 +26,31 @@ int main()
 {
   std::list< std::pair<std::string, std::list<int>>> List;
   std::string str = "";
-  while (std::cin >> str)
+  std::cin >> str;
+  std::string temp = str;
+  while (true)
   {
+    str = temp;
     std::list< int > list;
-    int num = 0;
-    while (std::cin >> num)
+    std::string in = "";
+    while (std::cin >> in)
     {
+      int num = 0;
+      try
+      {
+        num = std::stoi(in, nullptr, 10);
+      }
+      catch (const std::out_of_range&)
+      {
+        std::cerr << "is overflow!\n";
+        return 1;
+      }
+      catch (const std::invalid_argument&)
+      {
+        temp = in;
+        break;
+      }
       list.push_back(num);
-    }
-    if (std::cin.fail() && !std::cin.eof())
-    {
-      std::cin.clear();
     }
     std::pair<std::string, std::list<int>> pair(str, list);
     List.push_back(pair);
