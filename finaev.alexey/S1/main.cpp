@@ -111,10 +111,13 @@ int main()
   {
     printList(*i);
   }
-  printList(listOfSum);
-  if (isOverflow == 1)
+  if (isOverflow)
   {
     std::cerr << "is overflow!\n";
     return 1;
+  }
+  else
+  {
+    printList(listOfSum);
   }
 }
