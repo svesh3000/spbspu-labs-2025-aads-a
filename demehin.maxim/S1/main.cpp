@@ -1,13 +1,12 @@
 #include <iostream>
 #include <utility>
 #include <string>
-#include <list>
 #include <algorithm>
 #include <list/list.hpp>
 
 namespace
 {
-  using ListOfPairs = demehin::List< std::pair<std::string, demehin::List< unsigned long long > > >;
+  using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< unsigned long long > > >;
 
   size_t defineMaxSize(ListOfPairs pairsList)
   {

@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
-#include <list/list.hpp>
 #include <sstream>
+#include <list/list.hpp>
 
 namespace
 {

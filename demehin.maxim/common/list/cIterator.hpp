@@ -1,8 +1,7 @@
 #ifndef CITERATOR_HPP
 #define CITERATOR_HPP
-#include "node.hpp"
-#include "iterator.hpp"
 #include <cassert>
+#include "node.hpp"
 
 namespace demehin
 {

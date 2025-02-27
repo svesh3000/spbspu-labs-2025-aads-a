@@ -1,7 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
-#include "node.hpp"
 #include <cassert>
+#include "node.hpp"
 
 namespace demehin
 {
