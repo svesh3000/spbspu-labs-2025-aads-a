@@ -114,6 +114,11 @@ int main()
   }
   std::cout << "\n";
 
+  if (listOfPairs.front().second.empty())
+  {
+    std::cout << "0\n";
+    return 0;
+  }
   printNums(std::cout, listOfPairs);
   mozhegova::List< unsigned long long > sumList;
   try
