@@ -33,7 +33,7 @@ namespace mozhegova
   private:
     Node< T > * node_;
   };
-  
+
   template< typename T >
   ConstIterator< T > & ConstIterator< T >::operator++()
   {
