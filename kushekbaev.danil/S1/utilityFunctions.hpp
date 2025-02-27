@@ -7,6 +7,8 @@
 #include <limits>
 #include <stdexcept>
 
+using pairedList = std::list< std::pair< std::string, std::list< unsigned long long > > >;
+
 namespace kushekbaev
 {
   size_t calcOfSize(pairedList pairsList);
