@@ -20,10 +20,10 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
 {
   int max_length = 0;
   int sum = 0;
-  if (l.begin() == l.end())
-  {
-    return;
-  }
+  //if (l.begin() == l.end())
+  //{
+    //return;
+  //}
   for (const auto& it : l)
   {
     if (std::distance((it.second).begin(), (it.second).end()) > max_length)
@@ -34,6 +34,7 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
   if (max_length == 0)
   {
     out << 0 << "\n";
+    return;
   }
   for (int i = 0; i < max_length; ++i)
   {
