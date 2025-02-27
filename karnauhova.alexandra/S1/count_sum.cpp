@@ -50,7 +50,7 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
     sum = 0;
   }
   out << sums[0];
-  for (int i = 0; i < max_length; i++)
+  for (int i = 1; i < max_length; i++)
   {
     out << " ";
     out << sums[i];
