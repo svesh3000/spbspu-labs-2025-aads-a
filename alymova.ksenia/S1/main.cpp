@@ -20,7 +20,7 @@ int main()
   }
   catch (const std::logic_error& e)
   {
-    std::cerr << "Incorrect sum\n";
+    std::cerr << << "\n" << e.what() << "\n";
     return 1;
   }
 }

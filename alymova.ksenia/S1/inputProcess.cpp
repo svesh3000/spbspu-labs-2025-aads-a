@@ -16,7 +16,6 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
     {
       list_int.push_back(num);
     }
-    //std::cout << "error\n";
     pair_t p(name, list_int);
     list.push_back(p);
     if (in.eof())
@@ -105,6 +104,5 @@ size_t alymova::findMaxListSize(const list_pair_t& list)
 }
 bool alymova::isOverflowSumInt(size_t a, size_t b)
 {
-  return (((a >= 0) && (b > std::numeric_limits< int >::max() - a))
-    || ((a < 0) && (b < std::numeric_limits< int >::min() - a)));
+  return (b > std::numeric_limits< size_t >::max() - a);
 }
