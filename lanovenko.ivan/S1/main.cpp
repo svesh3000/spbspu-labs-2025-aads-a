@@ -2,7 +2,7 @@
 #include <utility>
 #include <list>
 #include <iomanip>
-#include <limits>
+#include<limits>
 
 void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> temporary)
 {
@@ -64,6 +64,7 @@ int main()
 {
   std::list < std::pair<std::string, std::list<int>>> myList;
   std::string sequenceName = "";
+  bool intLimit = false;
   while (std::cin >> sequenceName)
   {
     unsigned long long int element = 0;
@@ -72,13 +73,9 @@ int main()
     {
       if (element > std::numeric_limits<int>::max())
       {
-        std::cerr << "lalalala\n";
-        return 1;
+        intLimit = true;
       }
-      else
-      {
-        temporaryList.push_back(element);
-      }
+      temporaryList.push_back(element);
     }
     std::pair<std::string, std::list<int>> temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
@@ -87,6 +84,11 @@ int main()
       break;
     }
     std::cin.clear();
+  }
+  if (intLimit == true)
+  {
+    std::cerr << "Over!\n";
+    return 1;
   }
   printSequencesName(myList);
   size_t maxSize = 0;
