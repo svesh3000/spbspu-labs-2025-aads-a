@@ -37,7 +37,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   {
     if (it != list.cbegin())
     {
-      out << " ";
+      out << "_";
     }
     out << (*it).first;
   }
@@ -61,7 +61,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
         }
         if (printed)
         {
-          out << " ";
+          out << "_";
         }
         out << *list_now_it;
         printed = true;
@@ -75,11 +75,15 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
     sums.push_back(sum_now);
     out << "\n";
   }
+  if (sums.empty())
+  {
+    out << "0\n";
+  }
   for (list_int_iter_t it = sums.begin(); it != sums.end(); it++)
   {
     if (it != sums.begin())
     {
-      out << " ";
+      out << "_";
     }
     out << (*it);
   }
