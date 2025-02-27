@@ -27,15 +27,22 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
       max_length = std::distance((it.second).begin(), (it.second).end());
     }
   }
+  if (max_length = 0)
+  {
+    out << 0 << "\n";
+  }
   for (int i = 0; i < max_length; ++i)
   {
     for (const auto& it : l)
     {
       sum += element_lists(it.second, (i + 1));
     }
+    if (i != 0)
+    {
+      out << " ";
+    }
     out << sum;
     sum = 0;
-    out << " ";
   }
   out << "\n";
 }
