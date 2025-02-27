@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <list>
-#include <limits>
 
 void printList(std::list<int> list)
 {
@@ -49,8 +48,8 @@ int main()
       }
       catch (const std::out_of_range&)
       {
-        list.push_back(std::numeric_limits< int >::max());
         isOverflow = 1;
+        break;
       }
       catch (const std::invalid_argument&)
       {
@@ -60,6 +59,10 @@ int main()
     }
     std::pair<std::string, std::list<int>> pair(str, list);
     List.push_back(pair);
+    if (isOverflow)
+    {
+      break;
+    }
     if (std::cin.eof())
     {
       break;
@@ -113,13 +116,10 @@ int main()
   {
     printList(*i);
   }
+  printList(listOfSum);
   if (isOverflow)
   {
     std::cerr << "is overflow!\n";
     return 1;
-  }
-  else
-  {
-    printList(listOfSum);
   }
 }
