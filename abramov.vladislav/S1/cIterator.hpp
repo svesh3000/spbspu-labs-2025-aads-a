@@ -4,6 +4,9 @@
 
 namespace abramov
 {
+  template< class T >
+  struct List;
+
   template < class T >
   struct ConstIterator: std::iterator< std::bidirectional_iterator_tag, T >
   {

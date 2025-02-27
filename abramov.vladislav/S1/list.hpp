@@ -3,9 +3,17 @@
 #include <cstddef>
 #include <algorithm>
 #include "node.hpp"
+#include "iterator.hpp"
+#include "cIterator.hpp"
 
 namespace abramov
 {
+  template< class T >
+  struct ConstIterator;
+
+  template< class T >
+  struct Iterator;
+
   template< class T >
   struct List
   {
@@ -23,6 +31,10 @@ namespace abramov
     void clear();
     bool empty() const;
     size_t size() const;
+    Iterator< T > begin() const;
+    Iterator< T > end() const;
+    ConstIterator< T > cbegin() const;
+    ConstIterator< T > cend() const;
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -176,6 +188,30 @@ namespace abramov
   size_t List< T >::size() const
   {
     return size_;
+  }
+
+  template< class T >
+  Iterator< T > List< T >::begin() const
+  {
+    return Iterator< T >(head_);
+  }
+
+  template< class T >
+  Iterator< T > List< T >::end() const
+  {
+    return Iterator< T >();
+  }
+
+  template< class T >
+  ConstIterator< T > List< T >::cbegin() const
+  {
+    return ConstIterator< T >(head_);
+  }
+
+  template< class T >
+  ConstIterator< T > List< T >::cend() const
+  {
+    return ConstIterator< T >();
   }
 }
 #endif

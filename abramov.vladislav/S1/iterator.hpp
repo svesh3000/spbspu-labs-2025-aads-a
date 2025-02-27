@@ -5,11 +5,15 @@
 namespace abramov
 {
   template< class T >
+  struct List;
+
+  template< class T >
   struct Iterator: std::iterator< std::bidirectional_iterator_tag, T >
   {
     friend struct List< T >;
 
     Iterator();
+    Iterator(Node< T > *node);
     Iterator(const Iterator &iter) = default;
     ~Iterator() = default;
     Iterator &operator=(const Iterator &iter) = default;
@@ -28,6 +32,11 @@ namespace abramov
   template< class T >
   Iterator< T >::Iterator():
     node_(nullptr)
+  {}
+
+  template< class T >
+  Iterator< T >::Iterator(Node< T > *node):
+    node_(node)
   {}
 
   template< class T >

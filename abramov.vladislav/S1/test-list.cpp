@@ -70,3 +70,11 @@ BOOST_AUTO_TEST_CASE(clear)
   list.clear();
   BOOST_TEST(list.empty());
 }
+
+BOOST_AUTO_TEST_CASE(begin)
+{
+  abramov::List< int > list;
+  list.pushFront(0);
+  auto iter = list.begin();
+  BOOST_TEST(*iter == 0);
+}
