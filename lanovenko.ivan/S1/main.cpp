@@ -5,9 +5,11 @@
 
 void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> temporary)
 {
-  for (const auto& it: temporary)
+  auto it = temporary.begin();
+  std::cout << (*it).first;
+  for (++it; it != temporary.end(); it++)
   {
-    std::cout << it.first << ' ';
+    std::cout << " " << (*it).first;
   }
   std::cout << '\n';
 }
@@ -17,20 +19,23 @@ void printSequences(const std::list < std::pair < std::string, std::list<int>>> 
   for (size_t i = 0; i < maxSize; i++)
   {
     size_t res = 0;
+    bool isFirstElement = true;
     for (const auto& pair : temporary)
     {
-      if (pair.second.size() != 0 )
+      if (!pair.second.empty() && i < pair.second.size())
       {
         auto it = pair.second.begin();
-        if (i < pair.second.size())
+        std::advance(it, i);
+        if (!isFirstElement)
         {
-          std::advance(it, i);
-          std::cout << *(it) << ' ';
-          res += *(it);
+          std::cout << " ";
         }
+        std::cout << (*it);
+        res += *(it);
+        isFirstElement = false;
       }
-      array[i] = res;
     }
+    array[i] = res;
     std::cout << '\n';
   }
 }
@@ -40,7 +45,7 @@ void printSequencesSum(const int* sumArray, size_t maxSize)
   std::cout << sumArray[0];
   for (size_t i = 1; i < maxSize; i++)
   {
-    std::cout << ' ' << sumArray[i];
+    std::cout << " " << sumArray[i];
   }
   std::cout << '\n';
 }
