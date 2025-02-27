@@ -27,7 +27,7 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
       max_length = std::distance((it.second).begin(), (it.second).end());
     }
   }
-  if (max_length = 0)
+  if (max_length == 0)
   {
     out << 0 << "\n";
   }
