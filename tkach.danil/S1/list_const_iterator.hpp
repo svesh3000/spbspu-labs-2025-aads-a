@@ -12,7 +12,6 @@ namespace tkach
   template< typename T >
   class Citerator: public std::iterator< std::forward_iterator_tag, T>
   {
-    friend class List< T >;
   public:
     using this_t = Citerator< T >;
     Citerator();

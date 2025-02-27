@@ -86,20 +86,7 @@ namespace tkach
   template< typename T >
   void List< T >::push_front(const T& data)
   {
-    Node< T >* new_node = new Node< T >(data);
-    if (!head_)
-    {
-      head_ = new_node;
-      head_->next_ = head_;
-      tail_ = head_;
-    }
-    else
-    {
-      tail_->next_ = new_node;
-      new_node->next_ = head_;
-      head_ = new_node;
-    }
-    size_++;
+    push_front(T(data));
   }
 
   template< typename T >
@@ -120,20 +107,7 @@ namespace tkach
   template< typename T >
   void List< T >::push_back(const T& data)
   {
-    Node< T >* new_node = new Node< T >(data);
-    if (!head_)
-    {
-      head_ = new_node;
-      head_->next_ = head_;
-      tail_ = head_;
-    }
-    else
-    {
-      new_node->next_ = head_;
-      tail_->next_ = new_node;
-      tail_ = new_node;
-    }
-    size_++;
+    push_back(T(data));
   }
 
   template< typename T >
