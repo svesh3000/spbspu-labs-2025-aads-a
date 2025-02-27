@@ -128,25 +128,14 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
     return;
   }
   size_type erasedSize = 0;
-  for (const_iterator i = from; i != to; i++, erasedSize++)
+  for (const_iterator i = from; i != to; ++i, ++erasedSize)
   {}
 
-  if (to == rhs.end())
-  {
-    tail_ = from.node_->prev;
-  }
-  else
-  {
-    to.node_->prev = from.node_->prev;
-  }
-  if (from == rhs.begin())
-  {
-    head_ = to.node_;
-  }
-  else
-  {
-    from.node_->prev->next = to.node_;
-  }
+  node_t< value_type >** insertedTail = (to == rhs.end() ? &tail_ : &(to.node_->prev));
+  *(pos == end() ? &tail_ : &(pos.node_->prev)) = *insertedTail;
+  *(pos == begin() ? &head_ : &(pos.node_->prev->next)) = from.node_;
+  *insertedTail = from.node_->prev;
+  *(from == rhs.begin() ? &rhs.head_ : &(from.node_->prev->next)) = to.node_;
   rhs.size_ -= erasedSize;
   size_ += erasedSize;
 }
