@@ -28,6 +28,11 @@ int main()
   bool isOverflow = 0;
   std::string str = "";
   std::cin >> str;
+  if (!std::cin.good())
+  {
+    std::cout << 0 << "\n";
+    return 0;
+  }
   std::string temp = str;
   while (true)
   {
@@ -43,7 +48,6 @@ int main()
       }
       catch (const std::out_of_range&)
       {
-        std::cerr << "is overflow!\n";
         isOverflow = 1;
       }
       catch (const std::invalid_argument&)
@@ -62,7 +66,7 @@ int main()
   }
   if (List.size() == 0)
   {
-    std::cout << '0' << "\n";
+    std::cout << 0 << "\n";
     return 0;
   }
   std::list<std::string> listOfHeads;
@@ -105,6 +109,7 @@ int main()
   }
   if (isOverflow == 1)
   {
+    std::cerr << "is overflow!\n";
     return 1;
   }
   printList(listOfHeads);
