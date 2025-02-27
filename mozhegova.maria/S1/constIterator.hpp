@@ -28,6 +28,8 @@ namespace mozhegova
 
     bool operator==(const ConstIterator< T > &) const;
     bool operator!=(const ConstIterator< T > &) const;
+
+    Node< T > * getNode() const;
   private:
     Node< T > * node_;
   };
@@ -90,6 +92,12 @@ namespace mozhegova
   bool ConstIterator< T >::operator!=(const ConstIterator< T > & rhs) const
   {
     return !(rhs == *this);
+  }
+
+  template< typename T >
+  Node< T > * ConstIterator< T >::getNode() const
+  {
+    return node_;
   }
 }
 

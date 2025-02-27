@@ -21,6 +21,7 @@ namespace mozhegova
     List(InputIterator first, InputIterator last);
     ~List();
 
+    List< T > & operator=(const List< T > &);
     List< T > & operator=(std::initializer_list< T >);
 
     Iterator< T > begin() const;
@@ -133,9 +134,17 @@ namespace mozhegova
   }
 
   template< typename T >
+  List< T > & List< T >::operator=(const List< T > & other)
+  {
+    assign(other.begin(), other.end());
+    return *this;
+  }
+
+  template< typename T >
   List< T > & List< T >::operator=(std::initializer_list< T > il)
   {
     assign(il);
+    return *this;
   }
 
   template< typename T >
@@ -153,13 +162,13 @@ namespace mozhegova
   template< typename T >
   ConstIterator< T > List< T >::cbegin() const
   {
-    return Iterator< T >(fake_->next_);
+    return ConstIterator< T >(fake_->next_);
   }
 
   template< typename T >
   ConstIterator< T > List< T >::cend() const
   {
-    return Iterator< T >(tail_->next_);
+    return ConstIterator< T >(tail_->next_);
   }
 
   template< typename T >
@@ -243,7 +252,7 @@ namespace mozhegova
   template< typename T >
   void List< T >::pop_back()
   {
-    erase(ConstIterator< T >(end_));
+    erase(ConstIterator< T >(tail_));
   }
 
   template< typename T >
@@ -264,11 +273,11 @@ namespace mozhegova
   }
 
   template< typename T >
-  void List< T >::remove(const T &)
+  void List< T >::remove(const T & val)
   {
     for (auto it = this.begin(); it != this.end(); ++it)
     {
-      if (*it == T)
+      if (*it == val)
       {
         erase(it);
       }
@@ -334,7 +343,7 @@ namespace mozhegova
   Iterator< T > List< T >::erase(ConstIterator< T > pos)
   {
     assert(!empty());
-    Node< T > * tempNode = pos.node_;
+    Node< T > * tempNode = pos.getNode();
     Iterator< T > it(tempNode->next_);
     if (pos == cbegin())
     {
