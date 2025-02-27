@@ -41,10 +41,10 @@ int main()
     std::string in = "";
     while (std::cin >> in)
     {
-      int num = 0;
       try
       {
-        num = std::stoi(in, nullptr, 10);
+        int num = std::stoi(in, nullptr, 10);
+        list.push_back(num);
       }
       catch (const std::out_of_range&)
       {
@@ -55,7 +55,6 @@ int main()
         temp = in;
         break;
       }
-      list.push_back(num);
     }
     std::pair<std::string, std::list<int>> pair(str, list);
     List.push_back(pair);
