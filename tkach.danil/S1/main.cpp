@@ -82,8 +82,6 @@ int main()
       }
     }
   }
-  
-
   if (sums.empty())
   {
     std:: cout << 0 << "\n";
