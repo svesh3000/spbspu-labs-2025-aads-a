@@ -17,15 +17,12 @@ namespace maslevtsov {
     FwdIterator< T > end();
 
     T& front() const;
-    T& back() const;
 
     std::size_t size() const;
     bool empty() const;
 
     void push_front(const T& value);
     void push_front(T&& value);
-    void push_back(const T& value);
-    void push_back(T&& value);
     void pop_front();
     void swap(FwdList& other);
     void clear();
@@ -40,14 +37,17 @@ namespace maslevtsov {
 template< typename T >
 maslevtsov::FwdList< T >::FwdList():
   head_(nullptr),
-  tail_(head_),
+  tail_(new FwdListNode< T >(T())),
   size_(0)
-{}
+{
+  tail_->next_ = tail_;
+}
 
 template< typename T >
 maslevtsov::FwdList< T >::~FwdList()
 {
   clear();
+  delete tail_;
 }
 
 template< typename T >
@@ -59,19 +59,13 @@ maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::begin()
 template< typename T >
 maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::end()
 {
-  return FwdIterator< T >(tail_->next_);
+  return FwdIterator< T >(tail_);
 }
 
 template< typename T >
 T& maslevtsov::FwdList< T >::front() const
 {
   return head_->data_;
-}
-
-template< typename T >
-T& maslevtsov::FwdList< T >::back() const
-{
-  return tail_->data_;
 }
 
 template< typename T >
@@ -89,44 +83,30 @@ bool maslevtsov::FwdList< T >::empty() const
 template< typename T >
 void maslevtsov::FwdList< T >::push_front(const T& value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >(value, head_);
+  FwdListNode< T >* new_node = new FwdListNode< T >(value);
+  new_node->next_ = empty() ? tail_ : head_;
+  tail_->next_ = new_node;
   head_ = new_node;
-  tail_->next_ = head_;
   ++size_;
 }
 
 template< typename T >
 void maslevtsov::FwdList< T >::push_front(T&& value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >(std::move(value), head_);
+  FwdListNode< T >* new_node = new FwdListNode< T >(std::move(value));
+  new_node->next_ = empty() ? tail_ : head_;
+  tail_->next_ = new_node;
   head_ = new_node;
-  tail_->next_ = head_;
-  ++size_;
-}
-
-template< typename T >
-void maslevtsov::FwdList< T >::push_back(const T& value)
-{
-  FwdListNode< T >* new_node = new FwdListNode< T >(value, head_);
-  tail_ = new_node;
-  ++size_;
-}
-
-template< typename T >
-void maslevtsov::FwdList< T >::push_back(T&& value)
-{
-  FwdListNode< T >* new_node = new FwdListNode< T >(std::move(value), head_);
-  tail_ = new_node;
   ++size_;
 }
 
 template< typename T >
 void maslevtsov::FwdList< T >::pop_front()
 {
-  FwdListNode< T >* to_delete = head_;
-  head_ = to_delete->next_;
-  tail_->next_ = head_;
-  delete to_delete;
+  FwdListNode< T >* new_head = head_->next_;
+  delete head_;
+  tail_->next_ = new_head;
+  head_ = new_head;
   --size_;
 }
 

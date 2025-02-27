@@ -1,14 +1,14 @@
 #include <iostream>
-#include <list>
 #include <string>
 #include <utility>
 #include <limits>
+#include <list>
 
 namespace {
   using list_t = std::list< unsigned long long >;
   using pairs_list_t = std::list< std::pair< std::string, list_t > >;
 
-  std::size_t get_max_pairs_list_size(const pairs_list_t& list) noexcept
+  std::size_t get_max_pairs_list_size(pairs_list_t& list) noexcept
   {
     std::size_t maximum = 0, size = 0;
     for (auto i = list.begin(); i != list.end(); ++i) {
@@ -29,7 +29,7 @@ namespace {
     throw std::overflow_error("overflow");
   }
 
-  std::size_t get_sum_of_list_elements(const list_t& list)
+  std::size_t get_sum_of_list_elements(list_t& list)
   {
     std::size_t result = 0;
     for (auto i = list.begin(); i != list.end(); ++i) {
@@ -38,16 +38,15 @@ namespace {
     return result;
   }
 
-  void print_lists_info(std::ostream& out, const pairs_list_t& pairs_list)
+  void print_lists_info(std::ostream& out, pairs_list_t pairs_list)
   {
-    pairs_list_t copy = pairs_list;
     std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
     list_t sums;
     for (std::size_t i = 0; i != max_pairs_list_size; ++i) {
       list_t column_elements;
-      for (auto j = copy.begin(); j != copy.end(); ++j) {
+      for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j) {
         if (!j->second.empty()) {
-          column_elements.push_back(j->second.front());
+          column_elements.push_front(j->second.front());
           j->second.pop_front();
         }
       }
@@ -57,7 +56,7 @@ namespace {
           out << ' ' << *j;
         }
         std::cout << '\n';
-        sums.push_back(get_sum_of_list_elements(column_elements));
+        sums.push_front(get_sum_of_list_elements(column_elements));
       }
     }
     out << *sums.begin();
@@ -76,9 +75,9 @@ int main()
     list_t list;
     unsigned long long num = 0;
     while (std::cin >> num) {
-      list.push_back(num);
+      list.push_front(num);
     }
-    pairs_list.push_back(std::make_pair(list_name, list));
+    pairs_list.push_front(std::make_pair(list_name, list));
     std::cin.clear();
   }
 

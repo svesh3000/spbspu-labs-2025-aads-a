@@ -11,15 +11,16 @@ namespace maslevtsov {
   template< typename T >
   class FwdListNode
   {
+  public:
     friend class FwdList< T >;
     friend class FwdIterator< T >;
 
+    FwdListNode();
+    FwdListNode(const T& data);
+
+  private:
     T data_;
     FwdListNode< T >* next_;
-
-    FwdListNode();
-    FwdListNode(const T& data, FwdListNode< T >* next);
-    ~FwdListNode();
   };
 }
 
@@ -30,15 +31,9 @@ maslevtsov::FwdListNode< T >::FwdListNode():
 {}
 
 template< typename T >
-maslevtsov::FwdListNode< T >::FwdListNode(const T& data, FwdListNode< T >* next):
+maslevtsov::FwdListNode< T >::FwdListNode(const T& data):
   data_(data),
-  next_(next)
+  next_(nullptr)
 {}
-
-template< typename T >
-maslevtsov::FwdListNode< T >::~FwdListNode()
-{
-  delete next_;
-}
 
 #endif

@@ -13,7 +13,7 @@ namespace maslevtsov {
 
     FwdIterator();
     FwdIterator(const this_t& rhs) = default;
-    explicit FwdIterator(const FwdListNode< T >& node);
+    explicit FwdIterator(FwdListNode< T >* node);
     ~FwdIterator() = default;
 
     this_t& operator=(const FwdIterator& rhs) = default;
@@ -35,7 +35,7 @@ maslevtsov::FwdIterator< T >::FwdIterator():
 {}
 
 template< typename T >
-maslevtsov::FwdIterator< T >::FwdIterator(const FwdListNode< T >& node):
+maslevtsov::FwdIterator< T >::FwdIterator(FwdListNode< T >* node):
   node_(node)
 {}
 
