@@ -20,7 +20,7 @@ int karnauhova::element_lists(std::forward_list<unsigned long long> lists, size_
 void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forward_list<unsigned long long>>> l, std::ostream& out)
 {
   int max_length = 0;
-  int sum = 0;
+  unsigned long long sum = 0;
   for (const auto& it : l)
   {
     if (std::distance((it.second).begin(), (it.second).end()) > max_length)
@@ -38,7 +38,7 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
     for (const auto& it : l)
     {
       unsigned long long element = element_lists(it.second, (i + 1));
-      if (std::numeric_limits<unsigned long long>::max() - sum < element)
+      if (std::numeric_limits<unsigned long long>::max() - element < sum)
       {
         throw std::logic_error("Incorrect sum");
       }
