@@ -9,19 +9,35 @@ template< class T >
 template< class... Args >
 typename rychkov::List< T >::reference rychkov::List< T >::emplace(const_iterator pos, Args&&... args)
 {
-  if ((head_ == nullptr) && (tail_ == nullptr))
+  node_t< value_type >* inserted = new node_t< value_type >{{std::forward<Args>(args)...}};
+  if (begin() == end())
   {
-    tail_ = new node_t< value_type >{{std::forward<Args>(args)...}};
-    head_ = tail_;
-    return head_->data;
+    tail_ = head_ = inserted;
   }
-  if (pos == end())
-  {
-    tail_->next = new node_t< value_type >{{std::forward<Args>(args)...}, tail_};
-    return tail_->data;
+  else{
+    if (pos == end())
+    {
+      inserted->prev = tail_;
+      tail_->next = inserted;
+      tail_ = inserted;
+    }
+    else
+    {
+      inserted->next = pos.node_;
+    }
+    if (pos == begin())
+    {
+      inserted->next = head_;
+      head_->prev = inserted;
+      head_ = inserted;
+    }
+    else
+    {
+      inserted->next = pos.node_;
+    }
   }
-  pos.node_->prev = new node_t< value_type >{{std::forward<Args>(args)...}, pos.node_->prev, pos.node_};
-  return pos.node_->prev->data;
+  size_++;
+  return inserted->data;
 }
 template< class T >
 template< class... Args >
@@ -93,7 +109,7 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs)
     {
       tail_->next = rhs.head_;
     }
-    rhs.head_->prev_ = tail_;
+    rhs.head_->prev = tail_;
     tail_ = std::exchange(rhs.tail_, nullptr);
     size_ += std::exchange(rhs.size_, 0);
     rhs.head_ = nullptr;
@@ -107,14 +123,32 @@ void rychkov::List< T >::splice(const_iterator pos, List&& rhs)
 template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator from, const_iterator to)
 {
-  if (from != to)
+  if (from == to)
   {
-    if (to != nullptr)
-    {
-      to->prev == from->next;
-    }
-    to.node_->next->prev = from->prev_->next;
+    return;
   }
+  size_type erasedSize = 0;
+  for (const_iterator i = from; i != to; i++, erasedSize++)
+  {}
+
+  if (to == rhs.end())
+  {
+    tail_ = from.node_->prev;
+  }
+  else
+  {
+    to.node_->prev = from.node_->prev;
+  }
+  if (from == rhs.begin())
+  {
+    head_ = to.node_;
+  }
+  else
+  {
+    from.node_->prev->next = to.node_;
+  }
+  rhs.size_ -= erasedSize;
+  size_ += erasedSize;
 }
 
 #endif
