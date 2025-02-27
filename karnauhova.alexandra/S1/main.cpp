@@ -1,6 +1,7 @@
 #include <iostream>
 #include "output.hpp"
 #include "input.hpp"
+#include "count_sum.hpp"
 
 int main()
 {
@@ -13,4 +14,5 @@ int main()
   lists.reverse();
   karnauhova::output_names(lists, std::cout);
   karnauhova::output_lists(lists, std::cout);
+  karnauhova::count_lists(lists, std::cout);
 }

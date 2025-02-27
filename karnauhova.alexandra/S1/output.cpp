@@ -1,4 +1,5 @@
 #include "output.hpp"
+
 void karnauhova::output_names(std::forward_list<std::pair<std::string, std::forward_list<int>>> l, std::ostream& out)
 {
   auto it = l.begin();
@@ -51,5 +52,4 @@ void karnauhova::output_lists(std::forward_list<std::pair<std::string, std::forw
     }
     out << "\n";
   }
-  out << "\n";
 }
