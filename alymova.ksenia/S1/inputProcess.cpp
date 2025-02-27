@@ -11,17 +11,17 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
   while ((in >> name) && (!in.eof()))
   {
     list_int_t list_int;
-    int num = 0;
+    size_t num = 0;
     while ((in >> num))
     {
       list_int.push_back(num);
     }
+    //std::cout << "error\n";
     pair_t p(name, list_int);
     list.push_back(p);
     if (in.eof())
     {
       break;
-      std::cout << "eof\n";
     }
     in.clear();
   }
@@ -48,7 +48,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   size_t max_size = findMaxListSize(list);
   for (size_t i = 0; i < max_size; i++)
   {
-    int sum_now = 0;
+    size_t sum_now = 0;
     bool printed = false;
     for (list_pair_citer_t it = list.cbegin(); it != list.cend(); it++)
     {
@@ -88,6 +88,7 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
     }
     out << (*it);
   }
+  out << "\n";
 }
 size_t alymova::findMaxListSize(const list_pair_t& list)
 {
@@ -102,7 +103,7 @@ size_t alymova::findMaxListSize(const list_pair_t& list)
   }
   return max_size;
 }
-bool alymova::isOverflowSumInt(int a, int b)
+bool alymova::isOverflowSumInt(size_t a, size_t b)
 {
   return (((a >= 0) && (b > std::numeric_limits< int >::max() - a))
     || ((a < 0) && (b < std::numeric_limits< int >::min() - a)));
