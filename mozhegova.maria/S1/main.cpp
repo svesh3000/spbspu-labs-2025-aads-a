@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <limits>
-#include <list>
+#include "list.hpp"
 
 namespace
 {
-  using lop = std::list< std::pair< std::string, std::list< unsigned long long > > >;
+  using lop = mozhegova::List< std::pair< std::string, mozhegova::List< unsigned long long > > >;
   size_t getMax(const lop & listOfPairs)
   {
     size_t maxNums = 0;
@@ -49,9 +49,9 @@ namespace
       out << "\n";
     }
   }
-  std::list< unsigned long long > calculateSum(const lop & listOfPairs)
+  mozhegova::List< unsigned long long > calculateSum(const lop & listOfPairs)
   {
-    std::list< unsigned long long > sumList;
+    mozhegova::List< unsigned long long > sumList;
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
     for (size_t i = 0; i < getMax(listOfPairs); i++)
     {
@@ -74,7 +74,7 @@ namespace
     }
     return sumList;
   }
-  void printSums(std::ostream & out, const std::list< unsigned long long > sumList)
+  void printSums(std::ostream & out, const mozhegova::List< unsigned long long > sumList)
   {
     out << *sumList.begin();
     for (auto it = ++sumList.begin(); it != sumList.end(); ++it)
@@ -87,11 +87,11 @@ namespace
 
 int main()
 {
-  std::list< std::pair< std::string, std::list< unsigned long long > > > listOfPairs;
+  mozhegova::List< std::pair< std::string, mozhegova::List< unsigned long long > > > listOfPairs;
   std::string nameList;
   while (std::cin >> nameList)
   {
-    std::list< unsigned long long > numList;
+    mozhegova::List< unsigned long long > numList;
     unsigned long long num = 0;
     while (std::cin >> num)
     {
@@ -115,7 +115,7 @@ int main()
   std::cout << "\n";
 
   printNums(std::cout, listOfPairs);
-  std::list< unsigned long long > sumList;
+  mozhegova::List< unsigned long long > sumList;
   try
   {
     sumList = calculateSum(listOfPairs);
