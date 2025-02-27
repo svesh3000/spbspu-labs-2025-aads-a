@@ -14,7 +14,11 @@ namespace alymova
     List();
     List(const List< T >& other);
     List(List< T >&& other);
+    List(size_t n, const T& value = T());
     ~List();
+
+    List< T >& operator=(const List< T >& other);
+    List< T >& operator=(List< T >&& other);
 
     Iterator< T > begin() noexcept;
     Iterator< T > end() noexcept;
@@ -38,7 +42,30 @@ namespace alymova
   private:
     ListNode< T >* fake_;
     ListNode< T >* head_;
+
+    void do_default() noexcept;
   };
+  template< typename T >
+  bool operator==(const List< T >& lhs, const List< T >& rhs)
+  {
+    if (lhs.size() != rhs.size())
+    {
+      return false;
+    }
+    for (ConstIterator< T > it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
+    {
+      if ((*it_lhs) != (*it_rhs))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  template< typename T >
+  bool operator!=(const List< T >& lhs, const List< T >& rhs)
+  {
+    return (!(lhs == rhs));
+  }
 
   template< typename T >
   List< T >::List():
@@ -47,8 +74,7 @@ namespace alymova
   {}
   template< typename T >
   List< T >::List(const List< T >& other):
-    fake_(new ListNode< T >(T(), nullptr, nullptr)),
-    head_(fake_)
+    List()
   {
     try
     {
@@ -68,8 +94,35 @@ namespace alymova
     fake_(other.fake_),
     head_(other.head_)
   {
-    other.fake_ = nullptr;
-    other.head_ = nullptr;
+    other.do_default();
+  }
+  template< typename T >
+  List< T >::List(size_t n, const T& value):
+    List()
+  {
+    for (size_t i = 0; i < n; i++)
+    {
+      push_back(value);
+    }
+  }
+  template< typename T >
+  List< T >& List< T >::operator=(const List< T >& other)
+  {
+    if (this != std::addressof(other))
+    {
+      List< T > copy(other);
+      swap(copy);
+    }
+    return *this;
+  }
+  template< typename T >
+  List< T >& List< T >::operator=(List< T >&& other)
+  {
+    clear();
+    fake_ = other.fake_;
+    head_ = other.head_;
+    other.do_default();
+    return *this;
   }
   template< typename T >
   List< T >::~List()
@@ -214,6 +267,12 @@ namespace alymova
       pop_front();
     }
     delete fake_;
+  }
+  template< typename T >
+  void List< T >::do_default() noexcept
+  {
+    fake_ = nullptr;
+    head_ = nullptr;
   }
 }
 #endif
