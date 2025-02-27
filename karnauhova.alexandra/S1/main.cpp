@@ -20,7 +20,8 @@ int main()
   }
   catch (const std::logic_error& e)
   {
-    std::cerr <<"\n" << "Overflow\n";
+    std::cout << "\n";
+    std::cerr << "Overflow\n";
     return 1;
   }
 }
