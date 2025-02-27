@@ -36,7 +36,7 @@ int main()
   std::cout << pairsList.begin()->first;
   for (auto it = ++pairsList.begin(); it != pairsList.end(); ++it)
   {
-    std::cout << "_" << it->first;
+    std::cout << " " << it->first;
   }
   std::cout << "\n";
 
@@ -44,8 +44,6 @@ int main()
 
   for (size_t i = 0; i < maxSize; ++i)
   {
-    valueList = kushekbaev::deletingSpaces(pairsList, valueList);
-
     std::list< unsigned long long > outputList = valueList;
     while (!outputList.empty())
     {
@@ -57,8 +55,15 @@ int main()
       outputList.pop_front();
     }
     std::cout << "\n";
-
-    sum = kushekbaev::calcOfSum(valueList);
+    try
+    {
+      sum = kushekbaev::calcOfSum(valueList);
+    }
+    catch (std::logic_error&)
+    {
+      std::cerr << "Overflow!";
+      return 1;
+    }
   }
 
   std::cout << sumList.front();
