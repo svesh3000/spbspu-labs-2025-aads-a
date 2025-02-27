@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <limits>
 
 void printList(std::list<int> list)
 {
@@ -48,6 +49,7 @@ int main()
       }
       catch (const std::out_of_range&)
       {
+        list.push_back(std::numeric_limits< int >::max());
         isOverflow = 1;
       }
       catch (const std::invalid_argument&)
