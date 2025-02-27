@@ -1,17 +1,22 @@
 #include "input.hpp"
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
-std::pair<std::string, std::forward_list<int>> karnauhova::input_line(std::istream& in, std::string name)
+std::pair<std::string, std::forward_list<unsigned long long>> karnauhova::input_line(std::istream& in, std::string name)
 {
-  int x = 0;
-  std::forward_list<int> numbers{};
+  unsigned long long x = 0;
+  std::forward_list<unsigned long long> numbers{};
   while (in >> x && !in.eof())
   {
-        numbers.push_front(x);
+    if (!x)
+    {
+      throw std::logic_error("Incorrect number");
+    }
+    numbers.push_front(x);
   }
   in.clear();
   numbers.reverse();
-  std::pair<std::string, std::forward_list<int>> p (name, numbers);
+  std::pair<std::string, std::forward_list<unsigned long long>> p (name, numbers);
   return p;
 }
