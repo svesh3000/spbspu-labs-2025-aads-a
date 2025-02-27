@@ -33,6 +33,7 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
     out << 0 << "\n";
     return;
   }
+  int* sums = new int[max_length];
   for (int i = 0; i < max_length; ++i)
   {
     for (const auto& it : l)
@@ -40,16 +41,20 @@ void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forwa
       unsigned long long element = element_lists(it.second, (i + 1));
       if (std::numeric_limits<unsigned long long>::max() - element < sum)
       {
+        delete[] sums;
         throw std::logic_error("Incorrect sum");
       }
       sum += element;
     }
-    if (i != 0)
-    {
-      out << " ";
-    }
-    out << sum;
+    sums[i] = sum;
     sum = 0;
   }
+  out << sums[0];
+  for (int i = 0; i < max_length; i++)
+  {
+    out << " ";
+    out << sums[i];
+  }
+  delete[] sums;
   out << "\n";
 }
