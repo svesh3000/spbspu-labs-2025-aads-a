@@ -2,6 +2,7 @@
 #include <forward_list>
 #include <string>
 #include <utility>
+#include <limits>
 #include "list.hpp"
 
 namespace
@@ -13,6 +14,8 @@ int main()
 {
   using namespace tkach;
   List< std::pair< std::string, List < size_t > > > fd_pair_list;
+  auto max = std::numeric_limits< size_t >::max();
+  bool overflow = false;
   std::string list_name = "";
   while(std::cin >> list_name)
   {
@@ -56,10 +59,9 @@ int main()
         continue;
       }
       size_t pair_second_front = it->second.front();
-      if (!(sum <= sum + pair_second_front && pair_second_front <= sum + pair_second_front))
+      if (sum > max - pair_second_front)
       {
-        std::cerr << "overflaw\n";
-        return 1;
+        overflow = true;
       }
       sum += pair_second_front;
       new_list.push_back(pair_second_front);
@@ -80,9 +82,16 @@ int main()
       }
     }
   }
+  
+
   if (sums.empty())
   {
     std:: cout << 0 << "\n";
+    return 0;
+  }
+  if (overflow == true)
+  {
+    std:: cerr << "Error: overflow\n";
     return 1;
   }
   std::cout << sums.front();
