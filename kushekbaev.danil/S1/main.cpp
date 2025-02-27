@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <utility>
+#include <limits>
 
 using pairedList = std::list< std::pair<std::string, std::list< int > > >;
 
@@ -11,6 +12,7 @@ int main()
   std::list< std::string > nodeList;
   std::list< int > valueList;
   std::list< int > sumList;
+
   while (!std::cin.eof())
   {
     while (std::cin >> nodeName)
@@ -68,6 +70,11 @@ int main()
         int sum = 0;
         for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
         {
+          if (sum > std::numeric_limits< int >::max() - *it)
+          {
+            std::cerr << "Overflow!\n";
+            return 1;
+          }
           sum += *it;
         }
         valueList.push_back(sum);
