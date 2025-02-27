@@ -17,7 +17,6 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
   }
   const size_t max = std::numeric_limits< size_t >::max();
   std::forward_list< size_t > sums;
-  auto itSum = sums.before_begin();
   bool flagOverflow = false;
   for (size_t i = 0; i < maxSize; ++i)
   {
@@ -54,9 +53,10 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
         }
       }
     }
-    itSum = sums.insert_after(itSum, sum);
+    sums.push_front(sum);
     out << "\n";
   }
+  sums.reverse();
   if (flagOverflow)
   {
     throw std::overflow_error("overflow");
