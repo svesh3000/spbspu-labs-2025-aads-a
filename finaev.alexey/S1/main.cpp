@@ -107,15 +107,15 @@ int main()
     }
     listOfSum.push_back(res);
   }
-  if (isOverflow == 1)
-  {
-    std::cerr << "is overflow!\n";
-    return 1;
-  }
   printList(listOfHeads);
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
   {
     printList(*i);
   }
   printList(listOfSum);
+  if (isOverflow == 1)
+  {
+    std::cerr << "is overflow!\n";
+    return 1;
+  }
 }
