@@ -156,7 +156,7 @@ namespace mozhegova
   template< typename T >
   Iterator< T > List< T >::end() const
   {
-    return Iterator< T >(tail_->next_);
+    return Iterator< T >(empty() ? fake_->next_ : tail_->next_);
   }
 
   template< typename T >
@@ -168,7 +168,7 @@ namespace mozhegova
   template< typename T >
   ConstIterator< T > List< T >::cend() const
   {
-    return ConstIterator< T >(tail_->next_);
+    return ConstIterator< T >(empty() ? fake_->next_ : tail_->next_);
   }
 
   template< typename T >
@@ -212,7 +212,7 @@ namespace mozhegova
   {
     Node< T > * newNode = new Node< T > (data);
     newNode->next_ = fake_->next_;
-    if (size_ > 0)
+    if (!empty())
     {
       fake_->next_->prev_ = newNode;
     }
@@ -229,7 +229,7 @@ namespace mozhegova
   void List< T >::push_back(const T & data)
   {
     Node< T > * newNode = new Node< T > (data);
-    if (size_ > 0)
+    if (!empty())
     {
       newNode->prev_ = tail_;
       tail_->next_ = newNode;
