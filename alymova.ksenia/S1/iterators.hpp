@@ -7,8 +7,8 @@
 namespace alymova
 {
   template< typename T >
-  struct Iterator
-    //public std::iterator< std::bidirectional_iterator_tag, T >
+  struct Iterator:
+    public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
     Iterator();
@@ -26,8 +26,8 @@ namespace alymova
     ListNode< T >* node_;
   };
   template< typename T >
-  struct ConstIterator
-    //public std::iterator<std::bidirectional_iterator_tag, T >
+  struct ConstIterator:
+    public std::iterator<std::bidirectional_iterator_tag, T >
   {
   public:
     ConstIterator();
