@@ -25,6 +25,7 @@ void printList(std::list<std::string> list)
 int main()
 {
   std::list< std::pair<std::string, std::list<int>>> List;
+  bool isOverflow = 0;
   std::string str = "";
   std::cin >> str;
   std::string temp = str;
@@ -43,7 +44,7 @@ int main()
       catch (const std::out_of_range&)
       {
         std::cerr << "is overflow!\n";
-        return 1;
+        isOverflow = 1;
       }
       catch (const std::invalid_argument&)
       {
@@ -61,7 +62,7 @@ int main()
   }
   if (List.size() == 0)
   {
-    std::cout << 0 << "\n";
+    std::cout << '0' << "\n";
     return 0;
   }
   std::list<std::string> listOfHeads;
@@ -101,6 +102,10 @@ int main()
       res += *j;
     }
     listOfSum.push_back(res);
+  }
+  if (isOverflow == 1)
+  {
+    return 1;
   }
   printList(listOfHeads);
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
