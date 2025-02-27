@@ -29,7 +29,7 @@ namespace kushekbaev
     return valueList;
   }
 
-  unsigned long long calcOfSum(std::list< unsigned long long > valueList, std::ostream& out)
+  unsigned long long calcOfSum(std::list< unsigned long long > valueList)
   {
     unsigned long long sum = 0;
 

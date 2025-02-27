@@ -11,6 +11,7 @@ int main()
   std::list< std::string > nodeList;
   std::list< unsigned long long > valueList;
   std::list< unsigned long long > sumList;
+  unsigned long long sum = 0;
 
   while (!std::cin.eof())
   {
@@ -57,7 +58,7 @@ int main()
     }
     std::cout << "\n";
 
-    unsigned long long sum = kushekbaev::calcOfSum(valueList, std::cout);
+    sum = kushekbaev::calcOfSum(valueList);
   }
 
   std::cout << sumList.front();
@@ -65,4 +66,5 @@ int main()
   {
     std::cout << "_" << *it;
   }
+  std::cout << "\n" << sum << "\n";
 }
