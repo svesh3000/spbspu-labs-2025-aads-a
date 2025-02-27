@@ -7,7 +7,7 @@ BOOST_AUTO_TEST_CASE(begin_test)
   list.push_front(0);
   list.push_front(1);
   maslevtsov::FwdIterator< int > iterator = list.begin();
-  BOOST_TEST(*iterator == 0);
+  BOOST_TEST(*iterator == 1);
 }
 
 BOOST_AUTO_TEST_CASE(end_test)
@@ -16,5 +16,5 @@ BOOST_AUTO_TEST_CASE(end_test)
   list.push_front(0);
   list.push_front(1);
   maslevtsov::FwdIterator< int > iterator = list.end();
-  BOOST_TEST(*iterator == 1);
+  BOOST_TEST(*iterator == 0);
 }
