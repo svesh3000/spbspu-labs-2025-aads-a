@@ -58,7 +58,8 @@ int main()
       size_t pair_second_front = it->second.front();
       if (!(sum <= sum + pair_second_front && pair_second_front <= sum + pair_second_front))
       {
-        throw std::overflow_error("Overflaw");
+        std::cerr << "overflaw\n";
+        return 1;
       }
       sum += pair_second_front;
       new_list.push_back(pair_second_front);

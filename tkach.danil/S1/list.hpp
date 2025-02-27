@@ -106,6 +106,10 @@ namespace tkach
   List< T >::List(const List< T >& other):
     List()
   {
+    if (other.empty())
+    {
+      return;
+    }
     push_back(*(other.cbegin()));
     for (auto it = ++other.cbegin(); it != other.cend(); ++it)
     {
