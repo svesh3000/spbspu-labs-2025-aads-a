@@ -11,8 +11,8 @@ namespace abramov
 
     ConstIterator();
     ConstIterator(const ConstIterator &c_iter) = default;
-    ConstIterator &operator=(const ConstIterator &c_iter) = default;
     ~ConstIterator() = default;
+    ConstIterator &operator=(const ConstIterator &c_iter) = default;
     ConstIterator &operator++();
     ConstIterator operator++(int);
     ConstIterator &operator--();
