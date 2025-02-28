@@ -19,19 +19,22 @@ namespace tkach
     Citerator< T > cbegin() const noexcept;
     Iterator< T > end() noexcept;
     Citerator< T > cend() const noexcept;
-    bool empty() const;
+    bool empty() const noexcept;
     T& front();
-    size_t size();
-    void push_front(const T& data);
-    void push_back(const T& data);
-    void push_front(T&& data);
-    void push_back(T&& data);
-    void pop_front();
+    const T& front() const;
+    size_t size() const;
+    void pushFront(const T& data);
+    void pushBack(const T& data);
+    void pushFront(T&& data);
+    void pushBack(T&& data);
+    void popFront();
     void clear();
+    void swap(List< T >& other) noexcept;
   private:
     Node< T >* head_;
     Node< T >* tail_;
     size_t size_;
+    List< T > getList(const List< T >& other);
   };
 
   template< typename T >
@@ -42,9 +45,33 @@ namespace tkach
   {}
 
   template< typename T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
+  }
+
+  template< typename T >
+  List< T > List< T >::getList(const List< T >& other)
+  {
+    List< T > temp;
+    if (other.empty())
+    {
+      return temp;
+    }
+    try
+    {
+      temp.pushBack(*(other.cbegin()));
+      for (auto it = ++other.cbegin(); it != other.cend(); ++it)
+      {
+        temp.pushBack(*it);
+      }
+    }
+    catch (const std::bad_alloc&)
+    {
+      temp.clear();
+      throw;
+    }
+    return temp;
   }
 
   template< typename T >
@@ -74,44 +101,48 @@ namespace tkach
   template< typename T >
   T& List< T >::front()
   {
+    return const_cast< T& >(static_cast< const List< T >* >(this)->front());
+  }
+  
+  template< typename T >
+  const T& List< T >::front() const
+  {
     return head_->data_;
   }
 
   template< typename T >
-  size_t List< T >::size()
+  size_t List< T >::size() const
   {
     return size_;
   }
 
   template< typename T >
-  void List< T >::push_front(const T& data)
+  void List< T >::swap(List< T >& other) noexcept
   {
-    push_front(T(data));
+    std::swap(head_, other.head_);
+    std::swap(tail_, other.tail_);
+    std::swap(size_, other.size_);
+  }
+
+  template< typename T >
+  void List< T >::pushFront(const T& data)
+  {
+    pushFront(T(data));
   }
 
   template< typename T >
   List< T >::List(const List< T >& other):
-    List()
+    List(getList(other))
+  {}
+
+  template< typename T >
+  void List< T >::pushBack(const T& data)
   {
-    if (other.empty())
-    {
-      return;
-    }
-    push_back(*(other.cbegin()));
-    for (auto it = ++other.cbegin(); it != other.cend(); ++it)
-    {
-      push_back(*it);
-    }
+    pushBack(T(data));
   }
 
   template< typename T >
-  void List< T >::push_back(const T& data)
-  {
-    push_back(T(data));
-  }
-
-  template< typename T >
-  void List< T >::push_front(T&& data)
+  void List< T >::pushFront(T&& data)
   {
     Node< T >* new_node = new Node< T >(std::move(data), head_);
     if (!head_)
@@ -130,7 +161,7 @@ namespace tkach
   }
 
   template< typename T >
-  void List< T >::push_back(T&& data)
+  void List< T >::pushBack(T&& data)
   {
     Node< T >* new_node = new Node< T >(std::move(data), head_);
     if (!head_)
@@ -149,7 +180,7 @@ namespace tkach
   }
 
   template< typename T >
-  void List< T >::pop_front()
+  void List< T >::popFront()
   {
     if (empty())
     {
@@ -175,7 +206,7 @@ namespace tkach
   {
     while (head_)
     {
-      pop_front();
+      popFront();
     }
   }
 
