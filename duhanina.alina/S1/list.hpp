@@ -2,7 +2,7 @@
 #define LIST_HPP
 
 #include "node.hpp"
-#include "iterator.h"
+#include "iterator.hpp"
 #include "citerator.hpp"
 
 namespace duhanina
@@ -15,12 +15,13 @@ namespace duhanina
     List(size_t count, const T& value);
     ~List();
 
+    List(const List< T >& list);
     List(List&& other) noexcept;
 
     Iterator< T > begin() const;
     Iterator< T > end() const;
-    Iterator< T > cbegin() const;
-    Iterator< T > cend() const;
+    constIterator< T > cbegin() const;
+    constIterator< T > cend() const;
 
     T& front();
     T& back();
@@ -69,6 +70,16 @@ namespace duhanina
     delete fake_;
   }
 
+  template< typename T >
+  List< T >::List(const List< T >& list):
+    List()
+  {
+    for (constIterator< T > it = list.cbegin(); it != list.cend(); ++it)
+    {
+      push_back(*it);
+    }
+  }
+
   template < typename T >
   List< T >::List(List&& other) noexcept : fake_(other.fake_), listSize_(other.listSize_)
   {
@@ -86,35 +97,19 @@ namespace duhanina
   template < typename T >
   Iterator< T > List< T >::end() const
   {
-    if (empty()) {
-      return Iterator< T >(fake_);
-    }
-    Node< T >* current = fake_->next_;
-    while (current->next_ != fake_) {
-      current = current->next_;
-    }
-    return Iterator< T >(current);
+    return Iterator< T >(fake_);
   }
 
   template < typename T >
-  Iterator< T > List< T >::cbegin() const
+  constIterator< T > List< T >::cbegin() const
   {
-    return Iterator< T >(fake_->next_);
+    return constIterator< T >(fake_->next_);
   }
 
   template < typename T >
-  Iterator< T > List< T >::cend() const
+  constIterator< T > List< T >::cend() const
   {
-    if (empty())
-    {
-      return Iterator< T >(fake_);
-    }
-    const Node< T >* current = fake_->next_;
-    while (current->next_ != fake_)
-    {
-      current = current->next_;
-    }
-    return Iterator< T >(current);
+    return constIterator< T >(fake_);
   }
 
   template < typename T >
@@ -260,6 +255,7 @@ namespace duhanina
     {
       push_back(value);
     }
+  }
 }
 
 #endif

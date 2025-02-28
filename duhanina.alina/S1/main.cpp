@@ -2,8 +2,8 @@
 #include <utility>
 #include <string>
 #include <algorithm>
+#include <limits>
 #include "list.hpp"
-
 
 namespace
 {
@@ -18,28 +18,35 @@ namespace
     std::cout << "\n";
   }
 
-  duhanina::List< duhanina::List< unsigned long long > > generateListPair(pair& ListPair)
+  duhanina::List< duhanina::List< unsigned long long > > generateSequences(const pair sequences)
   {
-    duhanina::List< duhanina::List< unsigned long long > > resultListPair;
-    bool allListsEmpty = false;
-    while (!allListsEmpty)
+    duhanina::List< duhanina::List< unsigned long long > > result;
+    size_t maxLen = 0;
+    for (auto it = sequences.begin(); it != sequences.end(); ++it)
     {
-      allListsEmpty = true;
-      duhanina::List< unsigned long long > currentSequence;
-      for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
+      if (it->second.size() > maxLen)
       {
-        if (!it->second.empty()) {
-          currentSequence.push_back(it->second.front());
-          it->second.pop_front();
-          allListsEmpty = false;
-        }
-      }
-      if (!currentSequence.empty())
-      {
-        resultListPair.push_back(currentSequence);
+        maxLen = it->second.size();
       }
     }
-    return resultListPair;
+    for (size_t i = 0; i < maxLen; ++i)
+    {
+      duhanina::List< unsigned long long > newSeq;
+      for (auto it = sequences.begin(); it != sequences.end(); ++it)
+      {
+        if (i < it->second.size())
+        {
+          auto numIt = it->second.begin();
+          for (size_t j = 0; j < i; ++j)
+          {
+            ++numIt;
+          }
+          newSeq.push_back(*numIt);
+        }
+      }
+      result.push_back(newSeq);
+    }
+    return result;
   }
 
   void printListPair(const duhanina::List< duhanina::List< unsigned long long > >& ListPair)
@@ -48,7 +55,7 @@ namespace
     {
       for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
       {
-        std::cout << *numIt;
+        std::cout << *numIt << " ";
       }
       std::cout << "\n";
     }
@@ -99,7 +106,7 @@ int main()
     return 0;
   }
   printNames(ListPair);
-  auto resultListPair = generateListPair(ListPair);
+  auto resultListPair = generateSequences(ListPair);
   printListPair(resultListPair);
   try
   {

@@ -12,7 +12,7 @@ namespace duhanina
   {
   public:
     constIterator();
-    constIterator(Node< T >* node);
+    constIterator(const Node< T >* node);
     ~constIterator() = default;
 
     constIterator< T >& operator++();
@@ -25,7 +25,7 @@ namespace duhanina
     bool operator!=(const constIterator< T >&) const;
 
   private:
-    Node<T>* node_;
+    const Node<T>* node_;
   };
 
   template< typename T >
@@ -34,7 +34,7 @@ namespace duhanina
   {}
 
   template< typename T >
-  constIterator< T >::constIterator(Node< T >* node):
+  constIterator< T >::constIterator(const Node< T >* node):
     node_(node)
   {}
 
