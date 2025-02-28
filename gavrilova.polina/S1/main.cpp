@@ -29,9 +29,9 @@ int main() {
   } catch(const std::overflow_error& e) {
     std::cout << e.what();
   }
-  
+
   if (maxLen == 0) {
-    std::cout << "0\n"; 
+    std::cout << "0\n";
   } else {
     outFwdListInt(std::cout, sums);
   }
