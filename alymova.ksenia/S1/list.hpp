@@ -20,7 +20,8 @@ namespace alymova
     List< T >& operator=(const List< T >& other);
     List< T >& operator=(List< T >&& other);
 
-    Iterator< T > begin() const noexcept;
+    Iterator< T > begin() noexcept;
+    ConstIterator< T > begin() const noexcept;
     Iterator< T > end() const noexcept;
     ConstIterator< T > cbegin() const noexcept;
     ConstIterator< T > cend() const noexcept;
@@ -69,6 +70,7 @@ namespace alymova
 
   template< typename T >
   List< T >::List():
+    //fake_(reinterpret_cast< ListNode< T >* >(new char)),
     fake_(new ListNode< T >(T(), nullptr, nullptr)),
     head_(fake_)
   {}
@@ -130,9 +132,14 @@ namespace alymova
     clear();
   }
   template< typename T >
-  Iterator< T > List< T >::begin() const noexcept
+  Iterator< T > List< T >::begin() noexcept
   {
     return Iterator< T >(head_);
+  }
+  template< typename T >
+  ConstIterator< T > List< T >::begin() const noexcept
+  {
+    return ConstIterator< T >(head_);
   }
   template< typename T >
   Iterator< T > List< T >::end() const noexcept
@@ -159,6 +166,13 @@ namespace alymova
   T& List< T >::back() noexcept
   {
     assert(!empty());
+    /*ConstIterator< T > it = begin();
+    while (it != cend())
+    {
+      ++it;
+    }
+    return (*it);
+    */
     return fake_->prev_->data_;
   }
   template< typename T >
@@ -171,6 +185,13 @@ namespace alymova
   const T& List< T >::back() const noexcept
   {
     assert(!empty());
+    ConstIterator< T > it = cbegin();
+    while (it != cend())
+    {
+      ++it;
+    }
+    return (*it);
+    //
     return fake_->prev_->data_;
   }
   template< typename T >
@@ -198,6 +219,7 @@ namespace alymova
     {
       head_ = node;
       head_->next_ = fake_;
+      //
       fake_->prev_ = head_;
     }
     else
@@ -225,6 +247,7 @@ namespace alymova
     {
       head_ = node;
       head_->next_ = fake_;
+      //
       fake_->prev_ = head_;
     }
     else
@@ -237,6 +260,7 @@ namespace alymova
       subhead->next_ = node;
       node->prev_ = subhead;
       node->next_ = fake_;
+      //
       fake_->prev_ = node;
     }
   }
@@ -250,6 +274,7 @@ namespace alymova
       subhead = subhead->next_;
     }
     subhead->prev_->next_ = fake_;
+    //
     fake_->prev_ = subhead->prev_;
     delete subhead;
   }
