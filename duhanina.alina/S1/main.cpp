@@ -11,9 +11,10 @@ namespace
 
   void printNames(const pair& ListPair)
   {
-    for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
+    std::cout << ListPair.begin();
+    for (auto it = ++ListPair.begin(); it != ListPair.end(); ++it)
     {
-      std::cout << it->first << " ";
+      std::cout << " " << it->first;
     }
     std::cout << "\n";
   }
@@ -53,9 +54,10 @@ namespace
   {
     for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
     {
-      for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+      std::cout << it->begin();
+      for (auto numIt = ++it->begin(); numIt != it->end(); ++numIt)
       {
-        std::cout << *numIt << " ";
+        std::cout << " " << *numIt;
       }
       std::cout << "\n";
     }
@@ -77,9 +79,10 @@ namespace
       }
       sums.push_back(sum);
     }
-    for (auto it = sums.begin(); it != sums.end(); ++it)
+    std::cout << sums.begin();
+    for (auto it = ++sums.begin(); it != sums.end(); ++it)
     {
-      std::cout << *it << " ";
+      std::cout << " " << *it;
     }
     std::cout << "\n";
   }
