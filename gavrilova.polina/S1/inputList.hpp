@@ -6,7 +6,7 @@
 
 namespace gavrilova
 {
-  std::forward_list< int > inputNumbers (std::istream& in, size_t& maxLen);
+  std::forward_list< int > inputNumbers(std::istream& in, size_t& curLen);
 }
 
 #endif
