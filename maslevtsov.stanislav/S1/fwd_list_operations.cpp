@@ -11,6 +11,14 @@ namespace {
     }
     throw std::overflow_error("overflow");
   }
+
+  void print_list_elements(std::ostream& out, maslevtsov::list_t& list)
+  {
+    out << *list.begin();
+    for (auto j = ++list.begin(); j != list.end(); ++j) {
+      out << ' ' << *j;
+    }
+  }
 }
 
 std::size_t maslevtsov::get_max_pairs_list_size(pairs_list_t& list) noexcept
@@ -47,16 +55,10 @@ void maslevtsov::print_lists_info(std::ostream& out, pairs_list_t pairs_list)
       }
     }
     if (!column_elements.empty()) {
-      out << *column_elements.begin();
-      for (auto j = ++column_elements.begin(); j != column_elements.end(); ++j) {
-        out << ' ' << *j;
-      }
-      out << '\n';
       sums.push_back(get_sum_of_list_elements(column_elements));
+      print_list_elements(out, column_elements);
+      out << '\n';
     }
   }
-  out << *sums.begin();
-  for (auto j = ++sums.begin(); j != sums.end(); ++j) {
-    out << ' ' << *j;
-  }
+  print_list_elements(out, sums);
 }
