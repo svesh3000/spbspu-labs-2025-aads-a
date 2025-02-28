@@ -2,7 +2,7 @@
 #include <limits>
 
 namespace {
-  unsigned long long addition (size_t first, size_t second) {
+  unsigned long long addition (unsigned long long first, unsigned long long second) {
     unsigned long long MAX_OF_SIZET = std::numeric_limits<unsigned long long>::max();
     if (first > MAX_OF_SIZET - second) {
       throw std::overflow_error("Overflow.\n");
@@ -41,10 +41,13 @@ std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out,
     ++ptr;
   }
   for (size_t i = 0; i < maxLen; ++i) {
-    size_t curSum = 0;
+    ULL curSum = 0;
     size_t ind = 0;
-    while (ptr_arr[ind] == ptr_end_arr[ind]) {
+    while (ind < n && ptr_arr[ind] == ptr_end_arr[ind]) {
       ++ind;
+    }
+    if (ind == n) {
+      break;
     }
     out << *ptr_arr[ind];
     curSum = addition(curSum, *ptr_arr[ind]);

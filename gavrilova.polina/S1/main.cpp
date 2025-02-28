@@ -18,6 +18,9 @@ int main() {
     maxLen = (maxLen < curLen) ? curLen : maxLen;
     listOfPairs.push_front({name, numbers});
     ++numOfPairs;
+    if (numOfPairs == 2) {
+      break;
+    }
   }
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
@@ -25,6 +28,7 @@ int main() {
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
   } catch(const std::overflow_error& e) {
+    std::cout << "\n";
     std::cerr << e.what();
     return 1;
   }
