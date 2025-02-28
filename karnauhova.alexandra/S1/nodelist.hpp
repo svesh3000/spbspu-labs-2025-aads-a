@@ -2,9 +2,10 @@
 #define NODELIST_HPP
 
 template< typename T >
-class NodeList
+struct NodeList
 {
   T data;
   NodeList< T >* next;
+  //NodeList(const T& value) : data(value), next(nullptr) {}
 };
 #endif

@@ -4,9 +4,11 @@
 #include <algorithm>
 #include "iterator.hpp"
 #include "nodelist.hpp"
+
 template< typename T >
 class List
 {
+public:
   using Node = NodeList< T >;
   using Iterator = ListIterator< T >;
   List();
@@ -28,7 +30,7 @@ private:
 
 template< typename T >
 List< T >::List():
-  fake_(static_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
+  fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
   size_(0)
 {
   fake_->next = fake_;
@@ -77,7 +79,7 @@ template< typename T >
 List< T >::~List()
 {
   clear();
-  delete[] static_cast<char*>(fake_);
+  delete[] reinterpret_cast<char*>(fake_);
 }
 
 template< typename T >
@@ -89,7 +91,12 @@ T& List< T >::front()
 template< typename T >
 T& List< T >::back()
 {
-  return end()->node_->data_;
+  NodeList< T >* now = fake_; 
+  while (now->next != fake_)
+  {
+    now = now->next;
+  }
+  return now->data;
 }
 
 template< typename T >
