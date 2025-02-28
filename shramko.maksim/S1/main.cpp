@@ -1,46 +1,44 @@
 #include <iostream>
-#include <list>
+#include <forward_list>
 #include <string>
+#include <utility>
 
+namespace
+{
+    using list_t = std::forward_list< unsigned long long >;
+    using pairs_list_t = std::forward_list< std::pair< std::string, list_t > >;
+}
 int main()
 {
-  using pair_t = std::pair< std::string, std::list< unsigned long > >;
-  using pair_list_t = std::list< pair_t >;
+  pairs_list_t pairs_list{};
+  pairs_list_t pairs_list;
+  std::string list_name = "";
+  bool isEmpty = true;
 
-  pair_list_t list = {};
-  std::string input = "";
-  pair_t pair = {"", {}};
-  bool isFirst = true, isEmpty = true;
-
-  while (!std::cin.eof())
+  while (std::cin >> list_name)
   {
-    std::cin >> input;
-    if (!std::isdigit(input[0]) || std::cin.eof())
-    {
-        if (!isFirst)
-        {
-            list.push_back(pair);
-        }
+    list_t list;
+    unsigned long long num = 0;
 
-        pair = {input, {}};
-        isFirst = false;
-        continue;
-    }
-    else
+    while (std::cin >> num)
     {
-        pair.second.push_front(std::stoi(input));
-        isEmpty = false;
+      list.push_front(num);
+      isEmpty = false;
     }
+
+    pairs_list.push_front(std::make_pair(list_name, list));
+    std::cin.clear();
   }
 
+  std::cout << pairs_list.begin()->first;
+  for (auto i = ++pairs_list.begin(); i != pairs_list.end(); ++i)
+  {
+    std::cout << ' ' << i->first;
+  }
+  std::cout << '\n';
   if (isEmpty)
   {
-    std::cout << (*list.begin()).first;
-    for (auto i = ++list.cbegin(); i != list.cend(); ++i)
-    {
-        std::cout << " " << (*i).first;
-    }
+    std::cout << 0 << '\n';
   }
-  std::cout << "\n";
-  
+  std::cout << '\n';
 }
