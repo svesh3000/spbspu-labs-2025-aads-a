@@ -1,21 +1,96 @@
 #include <iostream>
-#include <forward_list>
+#include <list>
 #include <string>
 #include <utility>
+#include <limits>
 
 namespace
 {
-    using list_t = std::forward_list< unsigned long long >;
-    using pairs_list_t = std::forward_list< std::pair< std::string, list_t > >;
+    using list_t = std::list< unsigned long long >;
+    using pairs_list_t = std::list< std::pair< std::string, list_t > >;
 }
+
+std::size_t maxPairSize(const pairs_list_t& list) noexcept
+{
+  std::size_t max = 0, size = 0;
+  for (auto i = list.begin(); i != list.end(); ++i)
+  {
+    for (auto j = i->second.begin(); j != i->second.end(); ++j)
+    {
+      ++size;
+    }
+    max = max > size ? max : size;
+  }
+  return max;
+}
+
+int getSum(unsigned long long one, unsigned long long two)
+{
+  const unsigned long long max_ull = std::numeric_limits< unsigned long long >::max();
+  if (max_ull - one > two)
+  {
+    return one + two;
+  }
+  throw std::overflow_error("Overflow!");
+}
+
+std::size_t getListElemenSum(const list_t& list)
+{
+  std::size_t res = 0;
+  for (auto i = list.begin(); i != list.end(); ++i)
+  {
+    res = getSum(res, *i);
+  }
+  return res;
+}
+
+void printInfo(std::ostream& out, const pairs_list_t& pairs_list)
+{
+  pairs_list_t copy = pairs_list;
+  std::size_t max_pairs_list_size = maxPairSize(pairs_list);
+  list_t sums;
+
+  for (std::size_t i = 0; i != max_pairs_list_size; ++i)
+  {
+    list_t col;
+    for (auto j = copy.begin(); j != copy.end(); ++j)
+    {
+      if (!j->second.empty())
+      {
+        col.push_back(j->second.front());
+        j->second.pop_front();
+      }
+    }
+    
+    if (!col.empty())
+    {
+      out << *col.begin();
+
+      for (auto j = ++col.begin(); j != col.end(); ++j)
+      {
+        out << ' ' << *j;
+      }
+
+      std::cout << '\n';
+      sums.push_back(getListElemenSum(col));
+    }
+  }
+
+  out << *sums.begin();
+  
+  for (auto j = ++sums.begin(); j != sums.end(); ++j)
+  {
+    out << ' ' << *j;
+  }
+}
+
 int main()
 {
-  pairs_list_t pairs_list{};
-  pairs_list_t pairs_list;
-  std::string list_name = "";
+  pairs_list_t pairsList;
+  std::string listName = "";
   bool isEmpty = true;
 
-  while (std::cin >> list_name)
+  while (std::cin >> listName)
   {
     list_t list;
     unsigned long long num = 0;
@@ -26,19 +101,33 @@ int main()
       isEmpty = false;
     }
 
-    pairs_list.push_front(std::make_pair(list_name, list));
+    pairsList.push_front(std::make_pair(listName, list));
     std::cin.clear();
   }
 
-  std::cout << pairs_list.begin()->first;
-  for (auto i = ++pairs_list.begin(); i != pairs_list.end(); ++i)
+  if (!pairsList.empty())
   {
-    std::cout << ' ' << i->first;
+    std::cout << 0;
   }
-  std::cout << '\n';
-  if (isEmpty)
+  else
   {
-    std::cout << 0 << '\n';
+    std::cout << pairsList.begin()->first;
+
+    for (auto i = ++pairsList.begin(); i != pairsList.end(); ++i)
+    {
+      std::cout << ' ' << i->first;
+    }
+    std::cout << '\n';
+
+    try
+    {
+      printInfo(std::cout, pairsList);
+    }
+    catch (const std::overflow_error &)
+    {
+      std::cerr << "Overflow error!\n";
+      return 1;
+    }
   }
   std::cout << '\n';
 }
