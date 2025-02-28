@@ -56,7 +56,7 @@ int main()
     }
     else
     {
-      std::cout << *(std::next((--(lists.end()))->second.begin(), i)) << "\n";
+      std::cout << " " << *(std::next((--(lists.end()))->second.begin(), i)) << "\n";
     }
   }
   unsigned long long int *sums = new unsigned long long int[count];
