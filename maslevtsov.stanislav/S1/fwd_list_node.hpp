@@ -1,5 +1,5 @@
-#ifndef FWD_LIST_NODE
-#define FWD_LIST_NODE
+#ifndef FWD_LIST_NODE_HPP
+#define FWD_LIST_NODE_HPP
 
 namespace maslevtsov {
   template< typename T >

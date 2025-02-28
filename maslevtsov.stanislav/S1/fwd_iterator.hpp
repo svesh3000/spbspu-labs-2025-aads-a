@@ -1,5 +1,5 @@
-#ifndef FWD_ITERATOR
-#define FWD_ITERATOR
+#ifndef FWD_ITERATOR_HPP
+#define FWD_ITERATOR_HPP
 
 #include <iterator>
 #include "fwd_list_node.hpp"
@@ -19,8 +19,8 @@ namespace maslevtsov {
     this_t& operator=(const FwdIterator& rhs) = default;
     this_t& operator++();
     this_t& operator++(int);
-    T& operator*();
-    T* operator->();
+    T& operator*() const;
+    T* operator->() const;
     bool operator==(const this_t& rhs) const;
     bool operator!=(const this_t& rhs) const;
 
@@ -55,13 +55,13 @@ typename maslevtsov::FwdIterator< T >::this_t& maslevtsov::FwdIterator< T >::ope
 }
 
 template< typename T >
-T& maslevtsov::FwdIterator< T >::operator*()
+T& maslevtsov::FwdIterator< T >::operator*() const
 {
   return node_->data_;
 }
 
 template< typename T >
-T* maslevtsov::FwdIterator< T >::operator->()
+T* maslevtsov::FwdIterator< T >::operator->() const
 {
   return std::addressof(node_->data_);
 }

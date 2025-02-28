@@ -1,5 +1,5 @@
-#ifndef FWD_LIST
-#define FWD_LIST
+#ifndef FWD_LIST_HPP
+#define FWD_LIST_HPP
 
 #include <cstddef>
 #include "fwd_list_node.hpp"
@@ -13,10 +13,11 @@ namespace maslevtsov {
     FwdList();
     ~FwdList();
 
-    FwdIterator< T > begin();
-    FwdIterator< T > end();
+    FwdIterator< T > begin() const;
+    FwdIterator< T > end() const;
 
     T& front() const;
+    T& back() const;
 
     std::size_t size() const;
     bool empty() const;
@@ -51,13 +52,13 @@ maslevtsov::FwdList< T >::~FwdList()
 }
 
 template< typename T >
-maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::begin()
+maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::begin() const
 {
   return FwdIterator< T >(head_);
 }
 
 template< typename T >
-maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::end()
+maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::end() const
 {
   return FwdIterator< T >(tail_);
 }
@@ -66,6 +67,14 @@ template< typename T >
 T& maslevtsov::FwdList< T >::front() const
 {
   return head_->data_;
+}
+
+template< typename T >
+T& maslevtsov::FwdList< T >::back() const
+{
+  FwdIterator< T > it = begin();
+  for (; it != end(); ++it);
+  return *it;
 }
 
 template< typename T >
