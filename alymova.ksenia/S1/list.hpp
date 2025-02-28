@@ -345,8 +345,6 @@ namespace alymova
       subhead = subhead->next_;
     }
   }
-
-  
   template< typename T >
   void List< T >::do_null() noexcept
   {
