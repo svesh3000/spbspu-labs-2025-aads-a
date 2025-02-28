@@ -91,7 +91,7 @@ T& List< T >::front()
 template< typename T >
 T& List< T >::back()
 {
-  NodeList< T >* now = fake_; 
+  NodeList< T >* now = fake_;
   while (now->next != fake_)
   {
     now = now->next;
@@ -108,7 +108,7 @@ ListIterator< T > List< T >::begin() const
 template< typename T >
 ListIterator< T > List< T >::end() const
 {
-  NodeList< T >* now = fake_; 
+  NodeList< T >* now = fake_;
   while (now->next != fake_)
   {
     now = now->next;

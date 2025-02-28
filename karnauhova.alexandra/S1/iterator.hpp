@@ -28,7 +28,7 @@ template< typename T >
 ListIterator< T >& ListIterator< T >::operator++()
 {
   node = node->next;
-  return *this; 
+  return *this;
 }
 
 template< typename T >
