@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <stdexcept>
 #include "node.hpp"
 #include "iterator.hpp"
 
@@ -11,7 +12,12 @@ namespace maslov
   struct FwdList
   {
     FwdList();
+    FwdList(const FwdList< T > & rhs);
+    FwdList(FwdList< T > && rhs) noexcept;
     ~FwdList();
+
+    FwdList< T > & operator=(const FwdList< T > & rhs);
+    FwdList< T > & operator=(FwdList< T > && rhs) noexcept;
 
     FwdListIterator< T > begin();
     FwdListIterator< T > end();
@@ -22,10 +28,11 @@ namespace maslov
     bool empty() const noexcept;
     size_t max_size() const noexcept;
 
-    void push_front(const T &);
+    void push_front(const T & value);
     void pop_front();
-    void swap(FwdList< T > &) noexcept;
+    void swap(FwdList< T > & rhs) noexcept;
     void clear();
+    void reverse() noexcept;
    private:
     FwdListNode< T > * fake_;
     size_t size_;
@@ -44,6 +51,58 @@ namespace maslov
   {
     clear();
     delete fake_;
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(const FwdList< T > & rhs):
+    fake_(new FwdListNode< T >{T(), nullptr}),
+    size_(0)
+  {
+    fake_->next = fake_;
+    if (!rhs.empty())
+    {
+      FwdListNode< T > * current = rhs.fake_->next;
+      while (current != rhs.fake_)
+      {
+        push_front(current->data);
+        current = current->next;
+      }
+    }
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(FwdList< T > && rhs) noexcept:
+    fake_(rhs.fake_),
+    size_(rhs.size_)
+  {
+    rhs.fake_ = nullptr;
+    rhs.size_ = 0;
+  }
+
+  template< typename T >
+  FwdList< T > & FwdList< T >::operator=(const FwdList< T > & rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      FwdList temp(rhs);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename T >
+  FwdList< T > & FwdList< T >::operator=(FwdList< T > && rhs) noexcept
+  {
+    if (this != std::addressof(rhs))
+    {
+      clear();
+      delete fake_;
+      fake_ = rhs.fake_;
+      size_ = rhs.size_;
+      rhs.fake_ = nullptr;
+      rhs.size_ = 0;
+    }
+    return *this;
   }
 
   template< typename T >
@@ -84,7 +143,7 @@ namespace maslov
   template< typename T >
   void FwdList< T >::push_front(const T & value)
   {
-    FwdListNode< T > * newNode = new FwdListNode< T >(value, nullptr);
+    FwdListNode< T > * newNode = new FwdListNode< T >{value, nullptr};
     if (empty())
     {
         newNode->next = fake_;
@@ -123,13 +182,33 @@ namespace maslov
   template< typename T >
   FwdListIterator< T > FwdList< T >::begin()
   {
-    return iterator(fake_->next);
+    return FwdListIterator< T >(fake_->next);
   }
 
   template< typename T >
   FwdListIterator< T > FwdList< T >::end()
   {
-    return iterator(fake_);
+    return FwdListIterator< T >(fake_);
+  }
+
+  template< typename T >
+  void FwdList< T >::reverse() noexcept
+  {
+    if (empty() || max_size() == 1)
+    {
+      return;
+    }
+    FwdListNode< T > * current = fake_->next;
+    FwdListNode< T > * prev = fake_;
+    FwdListNode< T > * next = nullptr;
+    while (current != fake_)
+    {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    fake_->next = prev;
   }
 }
 #endif
