@@ -27,27 +27,38 @@ void zakirov::get_list_llint(std::istream & in, list_llint & forward_list)
 void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
   size_t size = 0;
-  list_iter iterators_llint;
   list_pair list_temp = forward_list;
+  list_pair::iterator pre_iterator;
   list_pair::iterator big_iterator = list_temp.begin();
-  list_iter::iterator position = iterators_llint.before_begin();
   out << (* big_iterator).first;
   while (big_iterator != list_temp.end())
   {
     out << ' ' << (* big_iterator).first;
-    iterators_llint.insert_after(position++, (* big_iterator).second.begin());
+    ++big_iterator;
     ++size;
   }
 
   out << '\n';
-  while (iterators_llint.begin() != iterators_llint.end())
+  while (size > 0)
   {
-    position = iterators_llint.begin();
+    pre_iterator = list_temp.before_begin();
+    big_iterator = list_temp.begin();
+    size_t deleted = 0;
     for (size_t i = 0; i < size; ++i)
     {
-      out << *(* position);
-      ++(* position);
-      ++position;
+      if ((* big_iterator).second.empty())
+      {
+        ++big_iterator;
+        ++deleted;
+        list_temp.erase_after(pre_iterator);
+        continue;
+      }
+
+      out << *((* big_iterator).second.begin());
+      (* big_iterator).second.pop_front();
+      ++big_iterator;
     }
+
+    size -= deleted;
   }
 }
