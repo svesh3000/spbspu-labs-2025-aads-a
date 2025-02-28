@@ -2,32 +2,11 @@
 #include <string>
 #include <list>
 #include <cctype>
-#include <sstream>
-
-void printList(std::list<size_t> list)
-{
-  std::cout << *list.begin();
-  for (auto i = ++list.begin(); i != list.end(); ++i)
-  {
-    std::cout << " " <<  * i;
-  }
-  std::cout << "\n";
-}
-
-void printList(std::list<std::string> list)
-{
-  std::cout << *list.begin();
-  for (auto i = ++list.begin(); i != list.end(); ++i)
-  {
-    std::cout << " " << *i;
-  }
-  std::cout << "\n";
-}
+#include "actionsWithList.hpp"
 
 int main()
 {
   std::list< std::pair<std::string, std::list<size_t>>> List;
-  bool isOverflow = 0;
   std::string str = "";
   std::cin >> str;
   if (!std::cin.good())
@@ -54,8 +33,7 @@ int main()
         break;
       }
     }
-    std::pair<std::string, std::list<size_t>> pair(str, list);
-    List.push_back(pair);
+    List.push_back({ str, list });
     if (std::cin.eof())
     {
       break;
@@ -67,56 +45,21 @@ int main()
     return 0;
   }
   std::list<std::string> listOfHeads;
-  std::list<std::list<size_t>> listOfLists;
-  size_t max_size = 0;
-  for (auto i = List.begin(); i != List.end(); ++i)
-  {
-    if ((*i).second.size() > max_size)
-    {
-      max_size = (*i).second.size();
-    }
-  }
-  for (size_t i = 0; i < max_size; ++i)
-  {
-    std::list<size_t> list;
-    listOfLists.push_back(list);
-  }
   for (auto i = List.begin(); i != List.end(); ++i)
   {
     listOfHeads.push_back((*i).first);
-    auto counter = listOfLists.begin();
-    for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
-    {
-      (*counter).push_back(*j);
-      if (counter != listOfLists.end())
-      {
-        ++counter;
-      }
-    }
   }
-  std::list<size_t> listOfSum;
+  std::list<std::list<size_t>> listOfLists = finaev::createRightList(List);
+  finaev::printList(listOfHeads, std::cout);
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
   {
-    size_t res = 0;
-    for (auto j = (*i).begin(); j != (*i).end(); ++j)
-    {
-      if ((res + *j) < res)
-      {
-        isOverflow = true;
-      }
-      res += *j;
-    }
-    listOfSum.push_back(res);
+    finaev::printList(*i, std::cout);
   }
-  printList(listOfHeads);
-  for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
-  {
-    printList(*i);
-  }
-  if (isOverflow)
+  if (finaev::isOverflow(listOfLists))
   {
     std::cerr << "is overflow!\n";
     return 1;
   }
-  printList(listOfSum);
+  std::list<size_t> listOfSum = finaev::createListOfSum(listOfLists);
+  finaev::printList(listOfSum, std::cout);
 }
