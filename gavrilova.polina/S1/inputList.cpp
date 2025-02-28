@@ -6,6 +6,9 @@ std::forward_list< int > gavrilova::inputNumbers (std::istream& in, size_t& curL
   int num = 0;
   curLen = 0;
   while (in >> num && !in.eof()) {
+    if (!in) {
+      throw std::overflow_error("Invalid nummber.\n");
+    }
     numbers.push_front(num);
     ++curLen;
   }

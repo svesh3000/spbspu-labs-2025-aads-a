@@ -66,10 +66,6 @@ std::forward_list< size_t > gavrilova::outNumbers(std::ostream& out, gavrilova::
 std::ostream& gavrilova::outFwdListInt(std::ostream& out, std::forward_list< size_t > list) {
   auto ptr = list.begin();
   auto end = list.end();
-  if (ptr == end) {
-    out << 0;
-    return out;
-  }
   out << *ptr;
   ++ptr;
   while (ptr != end) {
