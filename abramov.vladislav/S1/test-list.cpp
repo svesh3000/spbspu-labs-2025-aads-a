@@ -75,6 +75,34 @@ BOOST_AUTO_TEST_CASE(begin)
 {
   abramov::List< int > list;
   list.pushFront(0);
+  list.pushFront(1);
   auto iter = list.begin();
-  BOOST_TEST(*iter == 0);
+  BOOST_TEST(*iter == 1);
+}
+
+BOOST_AUTO_TEST_CASE(end)
+{
+  abramov::List< int > list;
+  list.pushBack(1);
+  list.pushBack(2);
+  auto iter1 = list.begin();
+  auto iter2 = list.end();
+  ++iter1;
+  ++iter1;
+  bool b = (iter1 == iter2);
+  BOOST_TEST(b);
+}
+
+BOOST_AUTO_TEST_CASE(fill)
+{
+  abramov::List< int > list;
+  list.pushBack(0);
+  list.pushBack(1);
+  list.pushBack(2);
+  auto iter1 = list.begin();
+  auto iter2 = list.end();
+  list.fill(iter1, iter2, 3);
+  BOOST_TEST(list.front() == 3);
+  BOOST_TEST(*(++iter1) == 3);
+  BOOST_TEST(list.back() == 3);
 }

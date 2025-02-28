@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(pre_decrement)
   abramov::List< int > list;
   list.pushBack(0);
   list.pushBack(1);
-  auto iter = list.end();
+  auto iter = ++list.begin();
   BOOST_TEST(*iter == 1);
   --iter;
   BOOST_TEST(*iter == 0);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(post_decrement)
   abramov::List< int > list;
   list.pushBack(0);
   list.pushBack(1);
-  auto iter = list.end();
+  auto iter = ++list.begin();
   BOOST_TEST(*(iter--) == 1);
   BOOST_TEST(*iter == 0);
 }
@@ -49,10 +49,8 @@ BOOST_AUTO_TEST_CASE(equality)
   list.pushBack(0);
   list.pushBack(1);
   list.pushBack(2);
-  auto iter1 = list.end();
-  auto iter2 = list.begin();
-  --iter1;
-  ++iter2;
+  auto iter1 = list.begin();
+  auto iter2 = ++iter1;
   bool b = (iter1 == iter2);
   BOOST_TEST(b);
 }

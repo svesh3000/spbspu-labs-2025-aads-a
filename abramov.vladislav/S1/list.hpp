@@ -35,6 +35,7 @@ namespace abramov
     Iterator< T > end() const;
     ConstIterator< T > cbegin() const;
     ConstIterator< T > cend() const;
+    void fill(Iterator< T > begin, Iterator< T > end, const T &val);
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -199,7 +200,7 @@ namespace abramov
   template< class T >
   Iterator< T > List< T >::end() const
   {
-    return Iterator< T >(tail_);
+    return Iterator< T >(nullptr);
   }
 
   template< class T >
@@ -211,7 +212,17 @@ namespace abramov
   template< class T >
   ConstIterator< T > List< T >::cend() const
   {
-    return ConstIterator< T >(tail_);
+    return ConstIterator< T >(nullptr);
+  }
+
+  template< class T >
+  void List< T >::fill(Iterator< T > begin, Iterator< T > end, const T &val)
+  {
+    while (begin != end)
+    {
+      *begin = val;
+      ++begin;
+    }
   }
 }
 #endif
