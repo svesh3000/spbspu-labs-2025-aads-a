@@ -11,7 +11,7 @@ namespace averenkov
 
     Node(const T& data):
       data_(data),
-      next_(nullptr),
+      next_(nullptr)
     {}
 
       Node():

@@ -1,6 +1,7 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
 #include <iterator>
+#include <cassert>
 #include "node.hpp"
 
 namespace averenkov
