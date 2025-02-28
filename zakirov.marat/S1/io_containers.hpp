@@ -13,7 +13,6 @@ using list_iter = std::forward_list< list_llint::iterator >;
 namespace zakirov
 {
   void get_list_pair(std::istream & in, list_pair & forward_list);
-  void get_pair_strlist(std::istream & in, pair_strlist & forward_list);
   void get_list_llint(std::istream & in, list_llint & forward_list);
   void output_result(std::ostream & out, list_pair & forward_list);
 }

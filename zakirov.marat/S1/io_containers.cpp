@@ -1,7 +1,7 @@
 #include "io_containers.hpp"
 #include <cstring>
 
-void get_list_pair(std::istream & in, list_pair & forward_list)
+void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 {
   std::string sequence_name;
   list_llint sequence_num = {};
