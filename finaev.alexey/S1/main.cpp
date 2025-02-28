@@ -8,36 +8,20 @@ int main()
 {
   std::list< std::pair<std::string, std::list<size_t>>> List;
   std::string str = "";
-  std::cin >> str;
-  if (!std::cin.good())
+  while (std::cin >> str)
   {
-    std::cout << 0 << "\n";
-    return 0;
-  }
-  std::string temp = str;
-  while (true)
-  {
-    str = temp;
     std::list< size_t > list;
-    std::string in = "";
-    while (std::cin >> in)
+    size_t num = 0;
+    while (std::cin >> num)
     {
-      if (std::isdigit(in[0]))
-      {
-        size_t num = strtoull(in.c_str(), nullptr, 10);
-        list.push_back(num);
-      }
-      else
-      {
-        temp = in;
-        break;
-      }
+      list.push_back(num);
     }
     List.push_back({ str, list });
     if (std::cin.eof())
     {
       break;
     }
+    std::cin.clear();
   }
   if (List.size() == 0)
   {
