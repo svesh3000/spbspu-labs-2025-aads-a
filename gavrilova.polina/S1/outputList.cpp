@@ -28,11 +28,11 @@ std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
 }
 std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out, gavrilova::FLPairs list, size_t maxLen, size_t n)
 {
-  using fwdlistOfPairs = std::forward_list< std::pair< std::string, std::forward_list< int > > >;
+  using fwdlistOfPairs = std::forward_list< std::pair< std::string, std::forward_list< ULL > > >;
   fwdlistOfPairs::iterator beginList = list.begin();
-  std::forward_list< int >::iterator ptr_arr[1000] = {};
-  std::forward_list< int >::iterator ptr_end_arr[1000] = {};
-  std::forward_list< unsigned long long > sums = {};
+  std::forward_list< ULL >::iterator ptr_arr[1000] = {};
+  std::forward_list< ULL >::iterator ptr_end_arr[1000] = {};
+  std::forward_list< ULL > sums = {};
 
   fwdlistOfPairs::iterator ptr = beginList;
   for (size_t i = 0; i < n; ++i) {
@@ -63,7 +63,7 @@ std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out,
   sums.reverse();
   return sums;
 }
-std::ostream& gavrilova::outFwdListULL(std::ostream& out, std::forward_list< unsigned long long > list) {
+std::ostream& gavrilova::outFwdListULL(std::ostream& out, std::forward_list< ULL > list) {
   auto ptr = list.begin();
   auto end = list.end();
   out << *ptr;

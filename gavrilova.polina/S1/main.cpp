@@ -7,24 +7,25 @@
 
 int main() {
   using namespace gavrilova;
-  std::forward_list< std::pair< std::string, std::forward_list< int > > > listOfPairs{};
+  using ULL = unsigned long long;
+  std::forward_list< std::pair< std::string, std::forward_list< ULL > > > listOfPairs{};
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
   size_t curLen = 0;
   while (std::cin >> name && !std::cin.eof()) {
-    std::forward_list< int > numbers = inputNumbers(std::cin, curLen);
+    std::forward_list< ULL > numbers = inputNumbers(std::cin, curLen);
     maxLen = (maxLen < curLen) ? curLen : maxLen;
     listOfPairs.push_front({name, numbers});
     ++numOfPairs;
   }
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
-  std::forward_list< unsigned long long > sums {};
+  std::forward_list< ULL > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
   } catch(const std::overflow_error& e) {
-    std::cout << e.what();
+    std::cerr << e.what();
     return 1;
   }
 
