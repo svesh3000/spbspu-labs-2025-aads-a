@@ -55,9 +55,9 @@ void maslevtsov::print_lists_info(std::ostream& out, pairs_list_t pairs_list)
       }
     }
     if (!column_elements.empty()) {
-      sums.push_back(get_sum_of_list_elements(column_elements));
       print_list_elements(out, column_elements);
       out << '\n';
+      sums.push_back(get_sum_of_list_elements(column_elements));
     }
   }
   print_list_elements(out, sums);
