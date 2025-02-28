@@ -21,7 +21,9 @@ namespace maslov
     FwdList< T > & operator=(FwdList< T > && rhs) noexcept;
 
     FwdListIterator< T > begin();
+    FwdListConstIterator< T > cbegin() const;
     FwdListIterator< T > end();
+    FwdListConstIterator< T > cend() const;
 
     T & front() noexcept;
     const T & front() const noexcept;
@@ -34,6 +36,9 @@ namespace maslov
     void swap(FwdList< T > & rhs) noexcept;
     void clear();
     void reverse() noexcept;
+    void remove(const T & value);
+    template < typename Predicate >
+    void remove_if(Predicate pred);
    private:
     FwdListNode< T > * fake_;
     size_t size_;
@@ -199,10 +204,31 @@ namespace maslov
   }
 
   template< typename T >
+  FwdListConstIterator< T > FwdList< T >::cbegin() const
+  {
+    return FwdListConstIterator< T >(fake_->next);
+  }
+
+  template< typename T >
   FwdListIterator< T > FwdList< T >::end()
   {
     return FwdListIterator< T >(fake_);
   }
+
+  template< typename T >
+  FwdListConstIterator< T > FwdList< T >::cend() const
+  {
+    return FwdListConstIterator< T >(fake_);
+  }
+
+  template < typename T >
+  void FwdList< T >::remove(const T & value)
+  {}
+
+  template< typename T >
+  template < typename Predicate >
+  void FwdList< T >::remove_if(Predicate pred)
+  {}
 
   template< typename T >
   void FwdList< T >::reverse() noexcept
