@@ -57,7 +57,7 @@ void printInfo(std::ostream& out, pairs_list_t pairs_list)
     {
       if (!j->second.empty())
       {
-        col.push_front(j->second.front());
+        col.push_back(j->second.front());
         j->second.pop_front();
       }
     }
@@ -72,7 +72,7 @@ void printInfo(std::ostream& out, pairs_list_t pairs_list)
       }
 
       std::cout << '\n';
-      sums.push_front(getListElemenSum(col));
+      sums.push_back(getListElemenSum(col));
     }
   }
 
@@ -97,11 +97,11 @@ int main()
 
     while (std::cin >> num)
     {
-      list.push_front(num);
+      list.push_back(num);
       isEmpty = false;
     }
 
-    pairsList.push_front(std::make_pair(listName, list));
+    pairsList.push_back(std::make_pair(listName, list));
     std::cin.clear();
   }
 

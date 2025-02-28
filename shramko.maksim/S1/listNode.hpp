@@ -1,5 +1,5 @@
-#ifndef LIST_NODE
-#define LIST_NODE
+#ifndef LISTNODE_HPP
+#define LISTNODE_HPP
 
 namespace shramko
 {

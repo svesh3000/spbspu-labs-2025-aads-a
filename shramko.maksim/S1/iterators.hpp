@@ -1,5 +1,5 @@
-#ifndef ITERATOR
-#define ITERATOR
+#ifndef ITERATORS_HPP
+#define ITERATORS_HPP
 
 #include <iterator>
 #include "list.hpp"
