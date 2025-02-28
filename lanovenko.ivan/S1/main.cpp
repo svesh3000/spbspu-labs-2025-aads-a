@@ -4,7 +4,7 @@
 #include <limits>
 #include <iomanip>
 
-void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> temporary)
+void printSequencesName(const std::list<std::pair<std::string, std::list<unsigned long long>>> temporary)
 {
   if (temporary.empty())
   {
@@ -24,8 +24,29 @@ bool isSumLimit(size_t a, size_t b)
   return (b > std::numeric_limits<int>::max() - a);
 }
 
+void printSumList(const std::list<int>& sumList, bool sumLimit)
+{
+  if (sumLimit)
+  {
+    return;
+  }
+  if (!sumList.empty())
+  {
+    auto it = sumList.begin();
+    std::cout << (*it);
+    for (++it; it != sumList.end(); it++)
+    {
+      std::cout << " " << (*it);
+    }
+  }
+  else
+  {
+    std::cout << 0;
+  }
+  std::cout << '\n';
+}
 
-void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize, bool& sumLimit)
+void printSequences(const std::list < std::pair < std::string, std::list<unsigned long long>>> temporary, size_t maxSize, bool& sumLimit)
 {
   std::list<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)
@@ -54,35 +75,22 @@ void printSequences(const std::list < std::pair < std::string, std::list<int>>> 
     std::cout << '\n';
     sumList.push_back(res);
   }
-  if (!sumList.empty())
-  {
-    auto it = sumList.begin();
-    std::cout << (*it);
-    for (++it; it != sumList.end(); it++)
-    {
-      std::cout << " " << (*it);
-    }
-  }
-  else
-  {
-    std::cout << 0;
-  }
-  std::cout << '\n';
+  printSumList(sumList, sumLimit);
 }
 
 int main()
 {
-  std::list < std::pair<std::string, std::list<int>>> myList;
+  std::list < std::pair<std::string, std::list<unsigned long long>>> myList;
   std::string sequenceName = "";
   while (std::cin >> sequenceName)
   {
-    size_t element = 0;
-    std::list<int> temporaryList{};
+    unsigned long long element = 0;
+    std::list<unsigned long long> temporaryList{};
     while (std::cin >> element)
     {
       temporaryList.push_back(element);
     }
-    std::pair<std::string, std::list<int>> temporaryPair{ sequenceName, temporaryList };
+    std::pair<std::string, std::list<unsigned long long>> temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
     if (std::cin.eof())
     {
@@ -103,7 +111,7 @@ int main()
   printSequences(myList, maxSize, sumLimit);
   if (sumLimit)
   {
-    std::cerr << "Sum Limit!\n";
+    std::cerr << "Sum limit!\n";
     return 1;
   }
 }
