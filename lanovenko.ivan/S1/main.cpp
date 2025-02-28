@@ -24,6 +24,7 @@ bool isSumLimit(size_t a, size_t b)
   return (b > std::numeric_limits<int>::max() - a);
 }
 
+
 void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize, bool& sumLimit)
 {
   std::list<int> sumList{};
@@ -50,8 +51,8 @@ void printSequences(const std::list < std::pair < std::string, std::list<int>>> 
         isFirstElement = false;
       }
     }
-    sumList.push_back(res);
     std::cout << '\n';
+    sumList.push_back(res);
   }
   if (!sumList.empty())
   {
@@ -77,7 +78,10 @@ int main()
   {
     size_t element = 0;
     std::list<int> temporaryList{};
-    temporaryList.push_back(element);
+    while (std::cin >> element)
+    {
+      temporaryList.push_back(element);
+    }
     std::pair<std::string, std::list<int>> temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
     if (std::cin.eof())
