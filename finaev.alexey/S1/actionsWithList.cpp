@@ -34,21 +34,21 @@ std::list < std::list < size_t > > finaev::createRightList(std::list< std::pair<
     {
       max_size = (*i).second.size();
     }
-    for (size_t i = 0; i < max_size; ++i)
+  }
+  for (size_t i = 0; i < max_size; ++i)
+  {
+    std::list<size_t> list;
+    listOfLists.push_back(list);
+  }
+  for (auto i = List.begin(); i != List.end(); ++i)
+  {
+    auto counter = listOfLists.begin();
+    for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
     {
-      std::list<size_t> list;
-      listOfLists.push_back(list);
-    }
-    for (auto i = List.begin(); i != List.end(); ++i)
-    {
-      auto counter = listOfLists.begin();
-      for (auto j = (*i).second.begin(); j != (*i).second.end(); ++j)
+      (*counter).push_back(*j);
+      if (counter != listOfLists.end())
       {
-        (*counter).push_back(*j);
-        if (counter != listOfLists.end())
-        {
-          ++counter;
-        }
+        ++counter;
       }
     }
   }
