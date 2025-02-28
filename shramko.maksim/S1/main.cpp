@@ -10,7 +10,7 @@ namespace
     using pairs_list_t = std::list< std::pair< std::string, list_t > >;
 }
 
-std::size_t maxPairSize(const pairs_list_t& list) noexcept
+std::size_t maxPairSize(pairs_list_t& list) noexcept
 {
   std::size_t max = 0, size = 0;
   for (auto i = list.begin(); i != list.end(); ++i)
@@ -34,7 +34,7 @@ int getSum(unsigned long long one, unsigned long long two)
   throw std::overflow_error("Overflow!");
 }
 
-std::size_t getListElemenSum(const list_t& list)
+std::size_t getListElemenSum(list_t& list)
 {
   std::size_t res = 0;
   for (auto i = list.begin(); i != list.end(); ++i)
@@ -44,7 +44,7 @@ std::size_t getListElemenSum(const list_t& list)
   return res;
 }
 
-void printInfo(std::ostream& out, const pairs_list_t& pairs_list)
+void printInfo(std::ostream& out, pairs_list_t pairs_list)
 {
   pairs_list_t copy = pairs_list;
   std::size_t max_pairs_list_size = maxPairSize(pairs_list);
@@ -53,11 +53,11 @@ void printInfo(std::ostream& out, const pairs_list_t& pairs_list)
   for (std::size_t i = 0; i != max_pairs_list_size; ++i)
   {
     list_t col;
-    for (auto j = copy.begin(); j != copy.end(); ++j)
+    for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j)
     {
       if (!j->second.empty())
       {
-        col.push_back(j->second.front());
+        col.push_front(j->second.front());
         j->second.pop_front();
       }
     }
@@ -72,7 +72,7 @@ void printInfo(std::ostream& out, const pairs_list_t& pairs_list)
       }
 
       std::cout << '\n';
-      sums.push_back(getListElemenSum(col));
+      sums.push_front(getListElemenSum(col));
     }
   }
 
