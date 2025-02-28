@@ -8,8 +8,8 @@ namespace gavrilova
 {
   using FLPairs = std::forward_list< std::pair< std::string, std::forward_list< int > > >;
   std::ostream& outNames(std::ostream& out, FLPairs list);
-  std::forward_list< size_t > outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n);
-  std::ostream& outFwdListInt(std::ostream& out, std::forward_list< size_t > list);
+  std::forward_list< unsigned long long > outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n);
+  std::ostream& outFwdListULL(std::ostream& out, std::forward_list< unsigned long long > list);
 }
 
 #endif

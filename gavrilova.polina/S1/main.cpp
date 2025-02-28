@@ -20,17 +20,18 @@ int main() {
   }
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
-  std::forward_list< size_t > sums {};
+  std::forward_list< unsigned long long > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
   } catch(const std::overflow_error& e) {
     std::cout << e.what();
+    return 1;
   }
 
   if (maxLen == 0) {
     std::cout << "0\n";
   } else {
-    outFwdListInt(std::cout, sums);
+    outFwdListULL(std::cout, sums);
   }
 }
 

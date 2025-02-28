@@ -2,8 +2,8 @@
 #include <limits>
 
 namespace {
-  size_t addition (size_t first, size_t second) {
-    size_t MAX_OF_SIZET = std::numeric_limits<size_t>::max();
+  unsigned long long addition (size_t first, size_t second) {
+    unsigned long long MAX_OF_SIZET = std::numeric_limits<unsigned long long>::max();
     if (first > MAX_OF_SIZET - second) {
       throw std::overflow_error("Overflow.\n");
     }
@@ -26,13 +26,13 @@ std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
   out << "\n";
   return out;
 }
-std::forward_list< size_t > gavrilova::outNumbers(std::ostream& out, gavrilova::FLPairs list, size_t maxLen, size_t n)
+std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out, gavrilova::FLPairs list, size_t maxLen, size_t n)
 {
   using fwdlistOfPairs = std::forward_list< std::pair< std::string, std::forward_list< int > > >;
   fwdlistOfPairs::iterator beginList = list.begin();
   std::forward_list< int >::iterator ptr_arr[1000] = {};
   std::forward_list< int >::iterator ptr_end_arr[1000] = {};
-  std::forward_list< size_t > sums = {};
+  std::forward_list< unsigned long long > sums = {};
 
   fwdlistOfPairs::iterator ptr = beginList;
   for (size_t i = 0; i < n; ++i) {
@@ -63,7 +63,7 @@ std::forward_list< size_t > gavrilova::outNumbers(std::ostream& out, gavrilova::
   sums.reverse();
   return sums;
 }
-std::ostream& gavrilova::outFwdListInt(std::ostream& out, std::forward_list< size_t > list) {
+std::ostream& gavrilova::outFwdListULL(std::ostream& out, std::forward_list< unsigned long long > list) {
   auto ptr = list.begin();
   auto end = list.end();
   out << *ptr;
