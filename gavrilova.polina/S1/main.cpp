@@ -18,9 +18,6 @@ int main() {
     maxLen = (maxLen < curLen) ? curLen : maxLen;
     listOfPairs.push_front({name, numbers});
     ++numOfPairs;
-    if (numOfPairs == 2) {
-      break;
-    }
   }
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
