@@ -14,14 +14,12 @@ namespace maslov
 
     FwdListIterator();
     FwdListIterator(FwdListNode< T > *);
-    ~FwdListIterator() = default;
     FwdListIterator(const this_t &) = default;
+    ~FwdListIterator() = default;
     this_t & operator=(const this_t &) = default;
 
     T & operator*();
-    const T & operator*() const;
     T * operator->();
-    const T * operator->() const;
 
     this_t & operator++();
     this_t operator++(int);
@@ -43,29 +41,17 @@ namespace maslov
   {}
 
   template< typename T >
-  const T & FwdListIterator< T >::operator*() const
+  T & FwdListIterator< T >::operator*()
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename T >
-  T & FwdListIterator< T >::operator*()
-  {
-    return const_cast< T & >(static_cast< const FwdListIterator & >(*this).operator*());
-  }
-
-  template< typename T >
-  const T * FwdListIterator< T >::operator->() const
+  T * FwdListIterator< T >::operator->()
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
-  }
-
-  template< typename T >
-  T * FwdListIterator< T >::operator->()
-  {
-    return const_cast< T * >(static_cast< const FwdListIterator & >(*this).operator->());
   }
 
   template< typename T >
@@ -93,6 +79,82 @@ namespace maslov
 
   template< typename T >
   bool FwdListIterator< T >::operator!=(const this_t & rhs) const
+  {
+    return node_ != rhs.node_;
+  }
+
+  template < typename T >
+  struct FwdListConstIterator
+  {
+    using this_t = FwdListConstIterator< T >;
+
+    FwdListConstIterator();
+    FwdListConstIterator(const this_t &) = default;
+    FwdListConstIterator(FwdListNode< T > * node);
+    ~FwdListConstIterator() = default;
+    this_t & operator=(const this_t &) = default;
+
+    this_t & operator++();
+    this_t operator++(int);
+
+    const T & operator*() const;
+    const T * operator->() const;
+
+    bool operator==(const this_t &) const;
+    bool operator!=(const this_t &) const;
+   private:
+    FwdListNode< T > * node_;
+  };
+
+  template< typename T >
+  FwdListConstIterator< T >::FwdListConstIterator():
+    node_(nullptr)
+  {}
+
+  template< typename T >
+  FwdListConstIterator< T >::FwdListConstIterator(FwdListNode< T > * node):
+    node_(node)
+  {}
+
+  template< typename T >
+  const T & FwdListConstIterator< T >::operator*() const
+  {
+    assert(node_ != nullptr);
+    return node_->data;
+  }
+
+  template< typename T >
+  const T * FwdListConstIterator< T >::operator->() const
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->data);
+  }
+
+  template< typename T >
+  typename FwdListConstIterator< T >::this_t & FwdListConstIterator< T >::operator++()
+  {
+    assert(node_ != nullptr);
+    node_ = node_->next;
+    return *this;
+  }
+
+  template< typename T >
+  typename FwdListConstIterator< T >::this_t FwdListConstIterator< T >::operator++(int)
+  {
+    assert(node_ != nullptr);
+    this_t temp = *this;
+    ++(*this);
+    return temp;
+  }
+
+  template< typename T >
+  bool FwdListConstIterator< T >::operator==(const this_t & rhs) const
+  {
+    return node_ == rhs.node_;
+  }
+
+  template< typename T >
+  bool FwdListConstIterator< T >::operator!=(const this_t & rhs) const
   {
     return node_ != rhs.node_;
   }
