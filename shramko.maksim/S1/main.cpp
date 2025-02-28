@@ -105,7 +105,7 @@ int main()
     std::cin.clear();
   }
 
-  if (!pairsList.empty())
+  if (pairsList.empty())
   {
     std::cout << 0;
   }
