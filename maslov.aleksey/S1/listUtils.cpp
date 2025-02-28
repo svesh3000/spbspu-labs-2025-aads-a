@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 
-void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxSize)
+void maslov::printData(std::ostream & out, list & listOfPairs, size_t maxSize)
 {
   out << listOfPairs.begin()->first;
   for (auto it = ++listOfPairs.begin(); it != listOfPairs.end(); ++it)
@@ -16,7 +16,7 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
     return;
   }
   const size_t max = std::numeric_limits< size_t >::max();
-  std::forward_list< size_t > sums;
+  maslov::FwdList< size_t > sums;
   bool flagOverflow = false;
   for (size_t i = 0; i < maxSize; ++i)
   {
