@@ -1,4 +1,15 @@
 #include "outputList.hpp"
+#include <limits>
+
+namespace {
+  int addition (int first, int second) {
+      int MAX_OF_INT = std::numeric_limits<int>::max();
+    if (MAX_OF_INT - first > second) {
+      throw std::overflow_error("Overflow.\n");
+    }
+    return first + second;
+  }
+}
 std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
 {
   auto ptr = list.begin();
@@ -33,14 +44,14 @@ std::forward_list< int > gavrilova::outNumbers(std::ostream& out, gavrilova::FLP
       ++ind;
     }
     out << *ptr_arr[ind];
-    curSum += *ptr_arr[ind];
+    curSum = addition(curSum, *ptr_arr[ind]);
     ++ptr_arr[ind];
     for (size_t j = ind + 1; j < n; ++j) {
       if (ptr_arr[j] == ptr_end_arr[j]) {
         continue;
       }
       out << " " << *ptr_arr[j];
-      curSum += *ptr_arr[j];
+      curSum = addition(curSum, *ptr_arr[j]);
       ++ptr_arr[j];
     }
     sums.push_front(curSum);

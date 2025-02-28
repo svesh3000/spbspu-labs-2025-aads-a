@@ -9,27 +9,17 @@ int main() {
   using namespace gavrilova;
   std::forward_list< std::pair< std::string, std::forward_list< int > > > listOfPairs{};
   size_t numOfPairs = 0;
-  std::string name;
   size_t maxLen = 0;
-  size_t curLen = 0;
-  while (std::cin >> name && !std::cin.eof()) {
-    std::forward_list< int > numbers = inputNumbers(std::cin, curLen);
-    maxLen = (maxLen < curLen) ? curLen : maxLen;
-    if (curLen) {
-      listOfPairs.push_front({name, numbers});
-      ++numOfPairs;
-    }
-    if (numOfPairs == 4) {
-      break;
-    }
-  }
-  if (!numOfPairs) {
-    std::cout << 0;
-    return 0;
-  }
+  listOfPairs = inputList(std::cin, listOfPairs, maxLen, numOfPairs);
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
-  std::forward_list< int > sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
+  std::forward_list< int > sums {};
+  try {
+    sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
+  } catch(const std::overflow_error& e) {
+    std::cerr << e.what();
+    return 1;
+  }
   outFwdListInt(std::cout, sums);
 }
 
