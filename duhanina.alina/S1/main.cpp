@@ -11,7 +11,7 @@ namespace
 
   void printNames(const pair& ListPair)
   {
-    std::cout << ListPair.begin();
+    std::cout << ListPair.begin()->first;
     for (auto it = ++ListPair.begin(); it != ListPair.end(); ++it)
     {
       std::cout << " " << it->first;
@@ -54,7 +54,7 @@ namespace
   {
     for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
     {
-      std::cout << it->begin();
+      std::cout << *it->begin();
       for (auto numIt = ++it->begin(); numIt != it->end(); ++numIt)
       {
         std::cout << " " << *numIt;
@@ -73,13 +73,13 @@ namespace
       {
         if (sum > std::numeric_limits< unsigned long long >::max() - *numIt)
         {
-          throw;
+          throw std::overflow_error("Overflow");
         }
         sum += *numIt;
       }
       sums.push_back(sum);
     }
-    std::cout << sums.begin();
+    std::cout << *sums.begin();
     for (auto it = ++sums.begin(); it != sums.end(); ++it)
     {
       std::cout << " " << *it;
