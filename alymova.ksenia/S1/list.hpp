@@ -14,7 +14,7 @@ namespace alymova
     List();
     List(const List< T >& other);
     List(List< T >&& other);
-    List(size_t n, const T& value = T());
+    List(size_t n, const T& value);
     ~List();
 
     List< T >& operator=(const List< T >& other);
@@ -22,8 +22,9 @@ namespace alymova
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > begin() const noexcept;
-    Iterator< T > end() const noexcept;
     ConstIterator< T > cbegin() const noexcept;
+    Iterator< T > end() noexcept;
+    ConstIterator< T > end() const noexcept;
     ConstIterator< T > cend() const noexcept;
 
     T& front() noexcept;
@@ -44,7 +45,7 @@ namespace alymova
     ListNode< T >* fake_;
     ListNode< T >* head_;
 
-    void do_default() noexcept;
+    void do_null() noexcept;
   };
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs)
@@ -70,7 +71,6 @@ namespace alymova
 
   template< typename T >
   List< T >::List():
-    //fake_(reinterpret_cast< ListNode< T >* >(new char)),
     fake_(new ListNode< T >(T(), nullptr, nullptr)),
     head_(fake_)
   {}
@@ -96,7 +96,7 @@ namespace alymova
     fake_(other.fake_),
     head_(other.head_)
   {
-    other.do_default();
+    other.do_null();
   }
   template< typename T >
   List< T >::List(size_t n, const T& value):
@@ -123,7 +123,7 @@ namespace alymova
     clear();
     fake_ = other.fake_;
     head_ = other.head_;
-    other.do_default();
+    other.do_null();
     return *this;
   }
   template< typename T >
@@ -142,19 +142,24 @@ namespace alymova
     return ConstIterator< T >(head_);
   }
   template< typename T >
-  Iterator< T > List< T >::end() const noexcept
+  ConstIterator< T > List< T >::cbegin() const noexcept
+  {
+    return begin();
+  }
+  template< typename T >
+  Iterator< T > List< T >::end() noexcept
   {
     return Iterator< T >(fake_);
   }
   template< typename T >
-  ConstIterator< T > List< T >::cbegin() const noexcept
+  ConstIterator< T > List< T >::end() const noexcept
   {
-    return ConstIterator< T >(head_);
+    return ConstIterator< T >(fake_);
   }
   template< typename T >
   ConstIterator< T > List< T >::cend() const noexcept
   {
-    return ConstIterator< T >(fake_);
+    return end();
   }
   template< typename T >
   T& List< T >::front() noexcept
@@ -166,13 +171,6 @@ namespace alymova
   T& List< T >::back() noexcept
   {
     assert(!empty());
-    /*ConstIterator< T > it = begin();
-    while (it != cend())
-    {
-      ++it;
-    }
-    return (*it);
-    */
     return fake_->prev_->data_;
   }
   template< typename T >
@@ -185,13 +183,6 @@ namespace alymova
   const T& List< T >::back() const noexcept
   {
     assert(!empty());
-    ConstIterator< T > it = cbegin();
-    while (it != cend())
-    {
-      ++it;
-    }
-    return (*it);
-    //
     return fake_->prev_->data_;
   }
   template< typename T >
@@ -203,8 +194,8 @@ namespace alymova
   size_t List< T >::size() const noexcept
   {
     size_t size = 0;
-    ConstIterator< T > it = cbegin();
-    while (it != cend())
+    ConstIterator< T > it = begin();
+    while (it != end())
     {
       ++it;
       ++size;
@@ -219,7 +210,6 @@ namespace alymova
     {
       head_ = node;
       head_->next_ = fake_;
-      //
       fake_->prev_ = head_;
     }
     else
@@ -247,20 +237,18 @@ namespace alymova
     {
       head_ = node;
       head_->next_ = fake_;
-      //
       fake_->prev_ = head_;
     }
     else
     {
       ListNode< T >* subhead = head_;
-      for (Iterator< T > it = ++(begin()); it != end(); ++it)
+      for (Iterator< T > it = ++begin(); it != end(); ++it)
       {
         subhead = subhead->next_;
       }
       subhead->next_ = node;
       node->prev_ = subhead;
       node->next_ = fake_;
-      //
       fake_->prev_ = node;
     }
   }
@@ -269,14 +257,22 @@ namespace alymova
   {
     assert(!empty());
     ListNode< T >* subhead = head_;
-    for (Iterator< T > it = ++(begin()); it != end(); ++it)
+    for (Iterator< T > it = ++begin(); it != end(); ++it)
     {
       subhead = subhead->next_;
     }
-    subhead->prev_->next_ = fake_;
-    //
-    fake_->prev_ = subhead->prev_;
-    delete subhead;
+    if (size() == 1)
+    {
+      head_ = fake_;
+      fake_->prev_ = nullptr;
+      delete subhead;
+    }
+    else
+    {
+      subhead->prev_->next_ = fake_;
+      fake_->prev_ = subhead->prev_;
+      delete subhead;
+    }
   }
   template< typename T >
   void List< T >::swap(List< T >& other) noexcept
@@ -294,7 +290,7 @@ namespace alymova
     delete fake_;
   }
   template< typename T >
-  void List< T >::do_default() noexcept
+  void List< T >::do_null() noexcept
   {
     fake_ = nullptr;
     head_ = nullptr;
