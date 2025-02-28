@@ -103,7 +103,7 @@ namespace tkach
   {
     return const_cast< T& >(static_cast< const List< T >* >(this)->front());
   }
-  
+
   template< typename T >
   const T& List< T >::front() const
   {
