@@ -5,19 +5,19 @@
 
 int main()
 {
-  std::list< std::pair< std::string, std::list < long int > > > lists;
+  std::list< std::pair< std::string, std::list < unsigned long long int > > > lists;
   std::string s;
   std::cin >> s;
   size_t count = 0;
   size_t lists_count = 0;
   while (std::cin)
   {
-    std::pair< std::string, std::list< long int > > bidir;
+    std::pair< std::string, std::list< unsigned long long int > > bidir;
     bidir.first = s;
     std::cin >> s;
     while(std::cin && std::isdigit(s[0]))
     {
-      bidir.second.push_back(std::strtol(s.c_str(), nullptr, 10));
+      bidir.second.push_back(std::strtoull(s.c_str(), nullptr, 10));
       std::cin >> s;
     }
     lists.push_back(bidir);
@@ -36,12 +36,18 @@ int main()
   std::cout << (--lists.end())->first << "\n";
   for (size_t i = 0; i < count; ++i)
   {
+    bool flag = false;
     for (auto iter = lists.begin(); iter != --(lists.end()); ++iter)
     {
       if (iter->second.size() > i)
       {
         auto iter2 = std::next(iter->second.begin(), i);
-        std::cout << *iter2 << " ";
+        if (flag)
+        {
+          std::cout << " ";
+        }
+        std::cout << *iter2;
+        flag = true;
       }
     }
     if ((--lists.end())->second.size() <= i)
@@ -53,11 +59,11 @@ int main()
       std::cout << *(std::next((--(lists.end()))->second.begin(), i)) << "\n";
     }
   }
-  long int *sums = new long int[count];
-  constexpr long int max = std::numeric_limits< long int >::max();
+  unsigned long long int *sums = new unsigned long long int[count];
+  constexpr unsigned long long int max = std::numeric_limits< unsigned long long int >::max();
   for (size_t i = 0; i < count; ++i)
   {
-    long int sum = 0;
+    unsigned long long int sum = 0;
     for (auto iter = lists.begin(); iter != lists.end(); ++iter)
     {
       if (iter->second.size() > i)
