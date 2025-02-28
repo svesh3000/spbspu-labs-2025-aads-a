@@ -4,16 +4,8 @@
 namespace alymova
 {
   template< typename T >
-  class List;
-  template< typename T >
-  struct Iterator;
-  template< typename T >
-  struct ConstIterator;
-
-  template< typename T >
-  class ListNode
+  struct ListNode
   {
-  public:
     T data_;
     ListNode< T >* next_;
     ListNode< T >* prev_;

@@ -6,6 +6,7 @@
 using list_t = alymova::List< int >;
 using iter_t = alymova::Iterator< int >;
 using citer_t = alymova::ConstIterator< int >;
+using list_str_t = alymova::List< std::string >;
 BOOST_AUTO_TEST_CASE(test_constructors_operators)
 {
   list_t list1 = {3, 1};
@@ -95,4 +96,21 @@ BOOST_AUTO_TEST_CASE(test_swap)
   list_t list3 = list2;
   list1.swap(list2);
   BOOST_TEST(list1 == list3);
+}
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  list_str_t list = {1, "cat"};
+  list.remove("cat");
+  BOOST_TEST(list.size() == 0);
+
+  list.push_back("dog");
+  list.push_back("student");
+  list.remove("student");
+  BOOST_TEST(list.back() == "dog");
+
+  list_str_t list1 = {10, "cat"};
+  list1.push_back("fox");
+  list1.push_front("dolphin");
+  list1.remove("cat");
+  BOOST_TEST(list1.size() == 2);
 }

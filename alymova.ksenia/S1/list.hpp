@@ -1,7 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cassert>
-#include <iostream>
 #include "iterators.hpp"
 #include "listNode.hpp"
 
@@ -14,7 +13,7 @@ namespace alymova
     List();
     List(const List< T >& other);
     List(List< T >&& other);
-    List(size_t n, const T& value);
+    List(size_t n, const T& value = T());
     ~List();
 
     List< T >& operator=(const List< T >& other);
@@ -41,6 +40,9 @@ namespace alymova
     void pop_back() noexcept;
     void swap(List< T >& other) noexcept;
     void clear() noexcept;
+
+    void remove(const T& value) noexcept;
+    void remove_if(bool (*pred)(const T& value));
   private:
     ListNode< T >* fake_;
     ListNode< T >* head_;
@@ -289,6 +291,62 @@ namespace alymova
     }
     delete fake_;
   }
+  template< typename T >
+  void List < T >::remove(const T& value) noexcept
+  {
+    assert(!empty());
+    ListNode< T >* subhead = head_;
+    for (Iterator< T > it = begin(); it != end(); ++it)
+    {
+      if (*it == value)
+      {
+        if (it == begin())
+        {
+          pop_front();
+        }
+        else if (it == --end())
+        {
+          pop_back();
+        }
+        else
+        {
+          subhead->prev_->next_ = subhead->next_;
+          subhead->next_->prev_ = subhead->prev_;
+          delete subhead;
+        }
+      }
+      subhead = subhead->next_;
+    }
+  }
+  template< typename T >
+  void List< T >::remove_if(bool (*pred)(const T& value))
+  {
+    assert(!empty());
+    ListNode< T >* subhead = head_;
+    for (Iterator< T > it = begin(); it != end(); ++it)
+    {
+      if (*pred(*it))
+      {
+        if (it == begin())
+        {
+          pop_front();
+        }
+        else if (it == --end())
+        {
+          pop_back();
+        }
+        else
+        {
+          subhead->prev_->next_ = subhead->next_;
+          subhead->next_->prev_ = subhead->prev_;
+          delete subhead;
+        }
+      }
+      subhead = subhead->next_;
+    }
+  }
+
+  
   template< typename T >
   void List< T >::do_null() noexcept
   {
