@@ -1,8 +1,8 @@
 #include <iostream>
 #include <utility>
 #include <list>
+#include <limits>
 #include <iomanip>
-#include<limits>
 
 void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> temporary)
 {
@@ -19,7 +19,12 @@ void printSequencesName(const std::list<std::pair<std::string, std::list<int>>> 
   std::cout << '\n';
 }
 
-void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize)
+bool isSumLimit(size_t a, size_t b)
+{
+  return (b > std::numeric_limits<int>::max() - a);
+}
+
+void printSequences(const std::list < std::pair < std::string, std::list<int>>> temporary, size_t maxSize, bool& sumLimit)
 {
   std::list<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)
@@ -37,6 +42,10 @@ void printSequences(const std::list < std::pair < std::string, std::list<int>>> 
           std::cout << " ";
         }
         std::cout << (*it);
+        if (isSumLimit(res, *it))
+        {
+          sumLimit = true;
+        }
         res += *(it);
         isFirstElement = false;
       }
@@ -64,19 +73,11 @@ int main()
 {
   std::list < std::pair<std::string, std::list<int>>> myList;
   std::string sequenceName = "";
-  bool intLimit = false;
   while (std::cin >> sequenceName)
   {
-    unsigned long long int element = 0;
+    size_t element = 0;
     std::list<int> temporaryList{};
-    while (std::cin >> element)
-    {
-      if (element > std::numeric_limits<int>::max())
-      {
-        intLimit = true;
-      }
-      temporaryList.push_back(element);
-    }
+    temporaryList.push_back(element);
     std::pair<std::string, std::list<int>> temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
     if (std::cin.eof())
@@ -84,11 +85,6 @@ int main()
       break;
     }
     std::cin.clear();
-  }
-  if (intLimit == true)
-  {
-    std::cerr << "Over!\n";
-    return 1;
   }
   printSequencesName(myList);
   size_t maxSize = 0;
@@ -99,5 +95,11 @@ int main()
       maxSize = it.second.size();
     }
   }
-  printSequences(myList, maxSize);
+  bool sumLimit = false;
+  printSequences(myList, maxSize, sumLimit);
+  if (sumLimit)
+  {
+    std::cerr << "Sum Limit!\n";
+    return 1;
+  }
 }
