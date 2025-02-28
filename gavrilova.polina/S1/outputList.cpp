@@ -1,6 +1,5 @@
 #include "outputList.hpp"
-std::ostream& gavrilova::outNames(std::ostream& out, std::forward_list< std::pair< std::string, \
-std::forward_list< int > > > list)
+std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
 {
   auto ptr = list.begin();
   auto end = list.end();
@@ -13,8 +12,7 @@ std::forward_list< int > > > list)
   out << "\n";
   return out;
 }
-std::forward_list< int > gavrilova::outNumbers(std::ostream& out, std::forward_list< std::pair\
-< std::string, std::forward_list< int > > > list, size_t maxLen, size_t n)
+std::forward_list< int > gavrilova::outNumbers(std::ostream& out, gavrilova::FLPairs list, size_t maxLen, size_t n)
 {
   using fwdlistOfPairs = std::forward_list< std::pair< std::string, std::forward_list< int > > >;
   fwdlistOfPairs::iterator beginList = list.begin();
