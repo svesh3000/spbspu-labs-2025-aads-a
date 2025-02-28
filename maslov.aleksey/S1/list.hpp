@@ -12,6 +12,7 @@ namespace maslov
   struct FwdList
   {
     FwdList();
+    FwdList(size_t k, const T & value);
     FwdList(const FwdList< T > & rhs);
     FwdList(FwdList< T > && rhs) noexcept;
     ~FwdList();
@@ -44,6 +45,18 @@ namespace maslov
     size_(0)
   {
     fake_->next = fake_;
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(size_t k, const T & value):
+    fake_(new FwdListNode< T >{T(), nullptr}),
+    size_(0)
+  {
+    fake_->next = fake_;
+    for (size_t i = 0; i < k; ++i)
+    {
+      push_front(value);
+    }
   }
 
   template< typename T >
