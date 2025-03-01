@@ -11,12 +11,12 @@ namespace
   {
     size_t maxSize = 0;
 
-    for (auto it = ++pairsList.begin(); it != pairsList.end(); ++it)
+    for (const auto& pair : pairsList)
     {
-      maxSize = std::max(maxSize, it->second.size());
+      maxSize = std::max(maxSize, pair.second.size());
     }
 
-    return maxSize + 1;
+    return maxSize;
   }
 }
 
