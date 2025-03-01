@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
 
@@ -46,12 +47,18 @@ namespace maslov
     void remove(const T & value);
     template < typename Predicate >
     void removeIf(Predicate pred);
-    void spliceAfter(iterator position, FwdList< T > & fwdlst);
-    void spliceAfter(iterator position, FwdList< T > && fwdlst);
-    void spliceAfter(iterator position, FwdList< T > & fwdlst, iterator i);
-    void spliceAfter(iterator position, FwdList< T > && fwdlst, iterator i);
-    void spliceAfter(iterator position, FwdList< T > & fwdlst, iterator first, iterator last);
-    void spliceAfter(iterator position, FwdList< T > && fwdlst, iterator first, iterator last);
+
+    void spliceAfter(cIterator position, FwdList< T > & fwdlst);
+    void spliceAfter(cIterator position, FwdList< T > && fwdlst);
+    void spliceAfter(cIterator position, FwdList< T > & fwdlst, cIterator i);
+    void spliceAfter(cIterator position, FwdList< T > && fwdlst, cIterator i);
+    void spliceAfter(cIterator position, FwdList< T > & fwdlst, cIterator first, cIterator last);
+    void spliceAfter(cIterator position, FwdList< T > && fwdlst, cIterator first, cIterator last);
+
+    template < typename InputIterator >
+    void assign(InputIterator first, InputIterator last);
+    void assign(size_t n, const T & val);
+    void assign(std::initializer_list< T > il);
    private:
     FwdListNode< T > * fake_;
     size_t size_;
@@ -317,7 +324,7 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(FwdListIterator< T > position, FwdList< T > & fwdlst)
+  void FwdList< T >::spliceAfter(cIterator position, FwdList< T > & fwdlst)
   {
     if (fwdlst.empty())
     {
@@ -343,13 +350,13 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(FwdListIterator< T > position, FwdList< T > && fwdlst)
+  void FwdList< T >::spliceAfter(cIterator position, FwdList< T > && fwdlst)
   {
     spliceAfter(position, fwdlst);
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(iterator position, FwdList< T > & fwdlst, iterator i)
+  void FwdList< T >::spliceAfter(cIterator position, FwdList< T > & fwdlst, cIterator i)
   {
     if (fwdlst.empty())
     {
@@ -388,14 +395,14 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(iterator position, FwdList< T > && fwdlst, iterator i)
+  void FwdList< T >::spliceAfter(cIterator position, FwdList< T > && fwdlst, cIterator i)
   {
     spliceAfter(position, fwdlst, i);
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(iterator position,
-      FwdList< T > & fwdlst, iterator first, iterator last)
+  void FwdList< T >::spliceAfter(cIterator position,
+      FwdList< T > & fwdlst, cIterator first, cIterator last)
   {
     if (first == last)
     {
@@ -449,8 +456,8 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::spliceAfter(iterator position,
-      FwdList< T > && fwdlst, iterator first, iterator last)
+  void FwdList< T >::spliceAfter(cIterator position,
+      FwdList< T > && fwdlst, cIterator first, cIterator last)
   {
     spliceAfter(position, fwdlst, first, last);
   }
@@ -470,6 +477,39 @@ namespace maslov
       }
     }
     return false;
+  }
+  template< typename T >
+  template < typename InputIterator >
+  void FwdList< T >::assign(InputIterator first, InputIterator last)
+  {
+    clear();
+    for (auto it = first; it != last; ++it)
+    {
+      pushFront(*it);
+    }
+    reverse();
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(size_t n, const T & val)
+  { 
+    clear();
+    for (size_t i = 0; i < n; i++)
+    {
+      pushFront(val);
+    }
+    reverse();
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(std::initializer_list< T > il)
+  {
+    clear();
+    for (auto it = il.begin(); it != il.end(); ++it)
+    {
+      push_back(*it);
+    }
+    reverse();
   }
 }
 #endif
