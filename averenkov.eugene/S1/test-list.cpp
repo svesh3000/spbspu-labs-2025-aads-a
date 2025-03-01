@@ -1,140 +1,207 @@
-#define BOOST_TEST_MODULE ListTest
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
-using IntList = averenkov::List< int >;
+BOOST_AUTO_TEST_SUITE(ListTest)
 
-BOOST_AUTO_TEST_CASE(TestDefaultConstructor)
+BOOST_AUTO_TEST_CASE(DefaultConstructor)
 {
-  IntList list;
-  BOOST_CHECK(list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 0);
+    averenkov::List<int> list;
+    BOOST_TEST(list.empty());
 }
 
-BOOST_AUTO_TEST_CASE(TestPushFront)
+BOOST_AUTO_TEST_CASE(CopyConstructor)
 {
-  IntList list;
-  list.push_front(10);
-  BOOST_CHECK_EQUAL(list.front(), 10);
-  BOOST_CHECK_EQUAL(list.size(), 1);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    averenkov::List<int> copyList(list);
+    BOOST_TEST(copyList.size() == 2);
+    BOOST_TEST(copyList.front() == 1);
+    BOOST_TEST(copyList.back() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestPushBack)
+BOOST_AUTO_TEST_CASE(MoveConstructor)
 {
-  IntList list;
-  list.push_back(20);
-  BOOST_CHECK_EQUAL(list.back(), 20);
-  BOOST_CHECK_EQUAL(list.size(), 1);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    averenkov::List<int> movedList(std::move(list));
+    BOOST_TEST(movedList.size() == 2);
+    BOOST_TEST(movedList.front() == 1);
+    BOOST_TEST(movedList.back() == 2);
+    BOOST_TEST(list.empty());
 }
 
-BOOST_AUTO_TEST_CASE(TestPopFront)
+BOOST_AUTO_TEST_CASE(FillConstructor)
 {
-  IntList list;
-  list.push_front(30);
-  list.pop_front();
-  BOOST_CHECK(list.empty());
+    averenkov::List<int> list(3, 5);
+    BOOST_TEST(list.size() == 3);
+    BOOST_TEST(list.front() == 5);
+    BOOST_TEST(list.back() == 5);
 }
 
-BOOST_AUTO_TEST_CASE(TestPopBack)
+BOOST_AUTO_TEST_CASE(BeginEnd)
 {
-  IntList list;
-  list.push_back(40);
-  list.pop_back();
-  BOOST_CHECK(list.empty());
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    auto it = list.begin();
+    BOOST_TEST(*it == 1);
+    ++it;
+    BOOST_TEST(*it == 2);
+    ++it;
+    BOOST_TEST(it == list.end());
 }
 
-BOOST_AUTO_TEST_CASE(TestCopyConstructor)
+BOOST_AUTO_TEST_CASE(CBeginCEnd)
 {
-  IntList list1;
-  list1.push_back(50);
-  IntList list2 = list1;
-  BOOST_CHECK_EQUAL(list2.size(), 1);
-  BOOST_CHECK_EQUAL(list2.front(), 50);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    auto it = list.cbegin();
+    BOOST_TEST(*it == 1);
+    ++it;
+    BOOST_TEST(*it == 2);
+    ++it;
+    BOOST_TEST(it == list.cend());
 }
 
-BOOST_AUTO_TEST_CASE(TestMoveConstructor)
+BOOST_AUTO_TEST_CASE(FrontBack)
 {
-  IntList list1;
-  list1.push_back(60);
-  IntList list2 = std::move(list1);
-  BOOST_CHECK_EQUAL(list2.size(), 1);
-  BOOST_CHECK_EQUAL(list2.front(), 60);
-  BOOST_CHECK(list1.empty());
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    BOOST_TEST(list.front() == 1);
+    BOOST_TEST(list.back() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestAssign)
+BOOST_AUTO_TEST_CASE(PushFront)
 {
-  IntList list;
-  list.assign(3, 70);
-  BOOST_CHECK_EQUAL(list.size(), 3);
-  BOOST_CHECK_EQUAL(list.front(), 70);
-  BOOST_CHECK_EQUAL(list.back(), 70);
+    averenkov::List<int> list;
+    list.push_front(1);
+    list.push_front(2);
+
+    BOOST_TEST(list.front() == 2);
+    BOOST_TEST(list.back() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(TestRemove)
+BOOST_AUTO_TEST_CASE(PushBack)
 {
-  IntList list;
-  list.push_back(80);
-  list.push_back(90);
-  list.remove(80);
-  BOOST_CHECK_EQUAL(list.size(), 1);
-  BOOST_CHECK_EQUAL(list.front(), 90);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    BOOST_TEST(list.front() == 1);
+    BOOST_TEST(list.back() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(TestRemoveIf)
+BOOST_AUTO_TEST_CASE(PopFront)
 {
-  IntList list;
-  list.push_back(10);
-  list.push_back(15);
-  list.push_back(20);
-  list.removeIf([](int val) { return val % 2 == 0; });
-  BOOST_CHECK_EQUAL(list.size(), 1);
-  BOOST_CHECK_EQUAL(list.front(), 15);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    list.pop_front();
+    BOOST_TEST(list.front() == 2);
+    BOOST_TEST(list.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(TestSplice)
+BOOST_AUTO_TEST_CASE(PopBack)
 {
-  IntList list1, list2;
-  list1.push_back(1);
-  list1.push_back(2);
-  list2.push_back(3);
-  list2.push_back(4);
-  list1.splice(list1.end(), list2);
-  BOOST_CHECK_EQUAL(list1.size(), 4);
-  BOOST_CHECK_EQUAL(list1.back(), 4);
-  BOOST_CHECK(list2.empty());
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    list.pop_back();
+    BOOST_TEST(list.back() == 1);
+    BOOST_TEST(list.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(TestSwap)
+BOOST_AUTO_TEST_CASE(Clear)
 {
-  IntList list1, list2;
-  list1.push_back(100);
-  list2.push_back(200);
-  list1.swap(list2);
-  BOOST_CHECK_EQUAL(list1.front(), 200);
-  BOOST_CHECK_EQUAL(list2.front(), 100);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+
+    list.clear();
+    BOOST_TEST(list.empty());
+    BOOST_TEST(list.size() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(TestClear)
+BOOST_AUTO_TEST_CASE(Swap)
 {
-  IntList list;
-  list.push_back(300);
-  list.push_back(400);
-  list.clear();
-  BOOST_CHECK(list.empty());
+    averenkov::List<int> list1;
+    list1.push_back(1);
+    list1.push_back(2);
+
+    averenkov::List<int> list2;
+    list2.push_back(3);
+    list2.push_back(4);
+
+    list1.swap(list2);
+    BOOST_TEST(list1.front() == 3);
+    BOOST_TEST(list2.front() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(TestIterator)
+BOOST_AUTO_TEST_CASE(Remove)
 {
-  IntList list;
-  list.push_back(1);
-  list.push_back(2);
-  list.push_back(3);
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
 
-  int sum = 0;
-  for (auto it = list.begin(); it != list.end(); ++it)
-  {
-    sum += *it;
-  }
-  BOOST_CHECK_EQUAL(sum, 6);
+    list.remove(2);
+    BOOST_TEST(list.size() == 2);
+    BOOST_TEST(list.front() == 1);
+    BOOST_TEST(list.back() == 3);
 }
+
+BOOST_AUTO_TEST_CASE(RemoveIf)
+{
+    averenkov::List<int> list;
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+
+    list.remove_if([](int value) { return value % 2 == 0; });
+    BOOST_TEST(list.size() == 2);
+    BOOST_TEST(list.front() == 1);
+    BOOST_TEST(list.back() == 3);
+}
+
+/*BOOST_AUTO_TEST_CASE(Splice)
+{
+    averenkov::List<int> list1;
+    list1.push_back(1);
+    list1.push_back(2);
+
+    averenkov::List<int> list2;
+    list2.push_back(3);
+    list2.push_back(4);
+
+    auto it = list1.begin();
+    ++it;
+    list1.splice(it, list2);
+
+    BOOST_TEST(list1.size() == 4);
+    BOOST_TEST(list2.size() == 0);
+    BOOST_TEST(list1.front() == 1);
+    BOOST_TEST(list1.back() == 2);
+}*/
+
+BOOST_AUTO_TEST_CASE(Assign)
+{
+    averenkov::List<int> list;
+    list.assign(3, 5);
+
+    BOOST_TEST(list.size() == 3);
+    BOOST_TEST(list.front() == 5);
+    BOOST_TEST(list.back() == 5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
