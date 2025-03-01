@@ -29,8 +29,8 @@ namespace maslov
     FwdListIterator< T > end();
     FwdListConstIterator< T > end() const;
 
-    T & front() noexcept;
-    const T & front() const noexcept;
+    T & front();
+    const T & front() const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -129,17 +129,17 @@ namespace maslov
   }
 
   template< typename T >
-  T & FwdList< T >::front() noexcept
+  T & FwdList< T >::front()
   {
     return const_cast< T & >(static_cast< const FwdList & >(*this).front());
   }
 
   template< typename T >
-  const T & FwdList< T >::front() const noexcept
+  const T & FwdList< T >::front() const
   {
     if (empty())
     {
-        throw std::runtime_error("ERROR:: empty list");
+      throw std::runtime_error("ERROR:: empty list");
     }
     return fake_->next->data;
   }
