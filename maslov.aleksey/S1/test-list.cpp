@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <iostream>
 #include "list.hpp"
 
 using FwdList = maslov::FwdList< int >;
@@ -25,19 +24,19 @@ BOOST_AUTO_TEST_CASE(fillConstructor)
 BOOST_AUTO_TEST_CASE(copyConstructor)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list2 = list1;
   BOOST_TEST(list1 == list2);
-  list2.push_front(3);
+  list2.pushFront(3);
   BOOST_TEST(list1 != list2);
 }
 
 BOOST_AUTO_TEST_CASE(moveConstructor)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list3 = list1;
   FwdList list2 = std::move(list1);
   BOOST_TEST(list1.empty());
@@ -51,8 +50,8 @@ BOOST_AUTO_TEST_SUITE(operators)
 BOOST_AUTO_TEST_CASE(copyOperator)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list2;
   list2 = list1;
   BOOST_TEST(list2 == list1);
@@ -61,8 +60,8 @@ BOOST_AUTO_TEST_CASE(copyOperator)
 BOOST_AUTO_TEST_CASE(moveOperator)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list3 = list1;
   FwdList list2;
   list2 = std::move(list1);
@@ -73,13 +72,13 @@ BOOST_AUTO_TEST_CASE(moveOperator)
 BOOST_AUTO_TEST_CASE(equalOperator)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list2;
-  list2.push_front(1);
-  list2.push_front(2);
+  list2.pushFront(1);
+  list2.pushFront(2);
   BOOST_TEST(list1 == list2);
-  list1.push_front(3);
+  list1.pushFront(3);
   BOOST_TEST(list1 != list2);
 }
 
@@ -90,10 +89,10 @@ BOOST_AUTO_TEST_SUITE(modifiers)
 BOOST_AUTO_TEST_CASE(pushFront)
 {
   FwdList list;
-  list.push_front(1);
+  list.pushFront(1);
   BOOST_TEST(list.size() == 1);
   BOOST_TEST(list.front() == 1);
-  list.push_front(2);
+  list.pushFront(2);
   BOOST_TEST(list.size() == 2);
   BOOST_TEST(list.front() == 2);
 }
@@ -101,24 +100,24 @@ BOOST_AUTO_TEST_CASE(pushFront)
 BOOST_AUTO_TEST_CASE(popFront)
 {
   FwdList list;
-  list.push_front(1);
-  list.push_front(2);
-  list.pop_front();
+  list.pushFront(1);
+  list.pushFront(2);
+  list.popFront();
   BOOST_TEST(list.size() == 1);
   BOOST_TEST(list.front() == 1);
-  list.pop_front();
+  list.popFront();
   BOOST_TEST(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(swap)
 {
   FwdList list1;
-  list1.push_front(1);
-  list1.push_front(2);
+  list1.pushFront(1);
+  list1.pushFront(2);
   FwdList list2;
-  list2.push_front(3);
-  list2.push_front(4);
-  list2.push_front(5);
+  list2.pushFront(3);
+  list2.pushFront(4);
+  list2.pushFront(5);
   FwdList tempList1 = list1;
   FwdList tempList2 = list2;
   list1.swap(list2);
@@ -129,8 +128,8 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_CASE(clear)
 {
   FwdList list;
-  list.push_front(1);
-  list.push_front(2);
+  list.pushFront(1);
+  list.pushFront(2);
   list.clear();
   BOOST_TEST(list.empty());
 }
@@ -145,14 +144,14 @@ BOOST_AUTO_TEST_CASE(reverse)
   emptyList.reverse();
   BOOST_TEST(emptyList.empty());
   FwdList listOneElement;
-  listOneElement.push_front(1);
+  listOneElement.pushFront(1);
   listOneElement.reverse();
   BOOST_TEST(listOneElement.size() == 1);
   BOOST_TEST(listOneElement.front() == 1);
   FwdList list;
-  list.push_front(1);
-  list.push_front(2);
-  list.push_front(3);
+  list.pushFront(1);
+  list.pushFront(2);
+  list.pushFront(3);
   list.reverse();
   BOOST_TEST(list.size() == 3);
   auto it = list.begin();
@@ -162,9 +161,40 @@ BOOST_AUTO_TEST_CASE(reverse)
 }
 
 BOOST_AUTO_TEST_CASE(remove)
-{}
+{
+  FwdList list;
+  list.pushFront(1);
+  list.pushFront(2);
+  list.pushFront(5);
+  list.pushFront(3);
+  list.pushFront(5);
+  list.pushFront(4);
+  list.remove(5);
+  BOOST_TEST(list.size() == 4);
+  size_t value = 4;
+  for (auto it = list.begin(); it != list.end(); ++it)
+  {
+    BOOST_TEST(*it == value);
+    value--;
+  }
+}
 
+bool lessThanThree(const size_t & value)
+{
+  return (value < 3);
+}
 BOOST_AUTO_TEST_CASE(removeIf)
-{}
+{
+  FwdList list;
+  list.pushFront(1);
+  list.pushFront(3);
+  list.pushFront(5);
+  list.pushFront(2);
+  list.removeIf(lessThanThree);
+  BOOST_TEST(list.size() == 2);
+  auto it = list.begin();
+  BOOST_TEST(*it++ == 5);
+  BOOST_TEST(*it++ == 3);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

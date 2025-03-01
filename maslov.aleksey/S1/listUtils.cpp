@@ -53,13 +53,13 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
         }
       }
     }
-    sums.push_front(sum);
+    sums.pushFront(sum);
     out << "\n";
   }
   sums.reverse();
   if (flagOverflow)
   {
-    throw std::overflow_error("overflow");
+    throw std::overflow_error("ERROR: overflow");
   }
   auto it = sums.begin();
   out << *it;

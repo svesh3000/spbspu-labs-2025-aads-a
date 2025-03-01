@@ -2,7 +2,6 @@
 #define LIST_UTILS_HPP
 
 #include <iosfwd>
-#include <forward_list>
 #include <string>
 #include "list.hpp"
 

@@ -14,11 +14,11 @@ int main()
     maslov::FwdList< size_t > numbers;
     while (std::cin >> number && !std::cin.eof())
     {
-      numbers.push_front(number);
+      numbers.pushFront(number);
     }
     numbers.reverse();
     maxSize = std::max(maxSize, numbers.size());
-    listOfPairs.push_front(std::make_pair(name, numbers));
+    listOfPairs.pushFront(std::make_pair(name, numbers));
     std::cin.clear();
   }
   listOfPairs.reverse();
