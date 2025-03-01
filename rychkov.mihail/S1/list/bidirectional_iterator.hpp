@@ -95,7 +95,7 @@ namespace rychkov
     {
       return std::addressof(node_->data);
     }
-    const pointer operator->() const noexcept
+    const value_type* operator->() const noexcept
     {
       return std::addressof(node_->data);
     }
