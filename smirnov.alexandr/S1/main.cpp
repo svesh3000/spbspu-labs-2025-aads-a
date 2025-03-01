@@ -85,4 +85,25 @@ int main()
     }
     std::cout << "\n";
   }
+
+  List< int > sums;
+  for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
+  {
+    const List< size_t > & sequence = *it;
+    int sum = 0;
+    for (auto numIt = sequence.begin(); numIt != sequence.end(); ++numIt)
+    {
+      sum += *numIt;
+    }
+    sums.pushBack(sum);
+  }
+  for (auto it = sums.begin(); it != sums.end(); ++it)
+  {
+    if (it != sums.begin())
+    {
+      std::cout << " ";
+    }
+    std::cout << *it;
+  }
+  std::cout << "\n";
 }
