@@ -58,7 +58,7 @@ int main()
     {
       sum = kushekbaev::calcOfSum(valueList);
     }
-    catch (std::logic_error&)
+    catch (std::overflow_error&)
     {
       std::cerr << "Overflow!";
       return 1;
