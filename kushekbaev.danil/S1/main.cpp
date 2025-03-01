@@ -69,5 +69,5 @@ int main()
   {
     std::cout << "_" << *it;
   }
-  std::cout << "\n" << sum << "\n";
+  std::cout << sum << "\n";
 }
