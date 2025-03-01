@@ -4,8 +4,6 @@
 #include <memory>
 namespace asafov
 {
-
-
   template<typename T>
   class Forward_list
   {
@@ -36,7 +34,6 @@ namespace asafov
 
     ~Forward_list()
     {
-      
     }
 
     class const_iterator
@@ -122,7 +119,7 @@ namespace asafov
     }
     void pop_back();
     void swap();
-    
+
     size_t size() const
     {
       size_t i = 0;
@@ -143,12 +140,9 @@ namespace asafov
         return false;
       }
     }
-    
+
     T& front();
     T& back();
-
-
-    
 
     void clear();
   private:
