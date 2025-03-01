@@ -35,39 +35,26 @@ int main()
   std::cout << "\n";
 
   size_t maxSize = kushekbaev::calcOfSize(pairsList);
+  std::list< unsigned long long > sumList;
 
-  for (size_t i = 0; i < maxSize; ++i)
+  for (size_t i = 0; i != maxSize; ++i)
   {
-    std::list< unsigned long long > outputList = pairsList.begin()->second;
-    while (!outputList.empty())
+    std::list< unsigned long long > rowList;
+    for (auto j = pairsList.begin(); j != pairsList.end(); ++j)
     {
-      std::cout << outputList.front();
-      if (!(outputList.size() == 1))
+      if (!j->second.empty())
       {
-        std::cout << "_";
+        rowList.push_back(j->second.front());
+        j->second.pop_front();
       }
-      outputList.pop_front();
     }
-    std::cout << "\n";
+    if (!rowList.empty())
+    {
+      std::cout << *sumList.begin();
+      for (auto j = ++sumList.begin(); j != sumList.end(); ++j)
+      {
+        std::cout << "_" << *j;
+      }
+    }
   }
-
-  unsigned long long sum = 0;
-
-  try
-  {
-    sum = kushekbaev::calcOfSum(pairsList);
-  }
-  catch (const std::overflow_error&)
-  {
-    std::cerr << "Overflow!\n";
-    return 1;
-  }
-
-  auto valueList = pairsList.begin()->second;
-
-  for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
-  {
-    std::cout << "_" << *it;
-  }
-  std::cout << sum << "\n";
 }
