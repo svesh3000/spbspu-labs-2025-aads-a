@@ -259,7 +259,7 @@ namespace averenkov
     Node< T >* current = fake_;
     while (current->next_ != fake_)
     {
-      if (pred(current->next_->data))
+      if (pred(current->next_->data_))
       {
         Node< T >* toDelete = current->next_;
         current->next_ = current->next_->next_;
@@ -280,10 +280,10 @@ namespace averenkov
     {
       return;
     }
-    Node<T>* posNode = pos.node_;
-    Node<T>* firstNode = first.node_;
-    Node<T>* lastNode = firstNode;
-    Node<T>* prevNode = rhs.fake_;
+    Node< T >* posNode = pos.node_;
+    Node< T >* firstNode = first.node_;
+    Node< T >* lastNode = firstNode;
+    Node< T >* prevNode = rhs.fake_;
     while (prevNode->next_ != firstNode)
     {
       prevNode = prevNode->next_;
