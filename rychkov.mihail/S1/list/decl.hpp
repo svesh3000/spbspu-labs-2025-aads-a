@@ -78,9 +78,9 @@ namespace rychkov
     template< class C >
     void merge(List&& rhs, C compare);
 
-    void unique();
+    size_type unique();
     template< class P >
-    void unique(P predicate);
+    size_type unique(P predicate);
     void sort();
     template< class C >
     void sort(C compare);
@@ -117,6 +117,12 @@ namespace rychkov
     node_t< value_type >* head_;
     node_t< value_type >* tail_;
     size_t size_;
+
+    template< class C >
+    const_iterator merge_sort(C& compare, const_iterator from, size_t size_);
+    template< class C >
+    void unsafeMerge(C& compare, const_iterator& from, const_iterator& to,
+        const_iterator insfrom, const_iterator insto);
   };
 }
 
