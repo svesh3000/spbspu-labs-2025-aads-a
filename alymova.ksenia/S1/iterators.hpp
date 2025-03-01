@@ -6,9 +6,6 @@
 
 namespace alymova
 {
-  //template< typename T >
-  //class List;
-
   template< typename T >
   struct Iterator:
     public std::iterator< std::bidirectional_iterator_tag, T >

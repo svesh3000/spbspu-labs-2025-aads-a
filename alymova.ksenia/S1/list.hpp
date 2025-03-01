@@ -55,6 +55,8 @@ namespace alymova
     ListNode< T >* head_;
 
     void do_null() noexcept;
+    void push_single(ListNode< T >* node);
+    ListNode< T >* get_last_node();
   };
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs)
@@ -217,9 +219,7 @@ namespace alymova
     ListNode< T >* node = new ListNode< T >(value, nullptr, nullptr);
     if (empty())
     {
-      head_ = node;
-      head_->next_ = fake_;
-      fake_->prev_ = head_;
+      push_single(node);
     }
     else
     {
@@ -244,17 +244,11 @@ namespace alymova
     ListNode< T >* node = new ListNode< T >(value, nullptr, nullptr);
     if (empty())
     {
-      head_ = node;
-      head_->next_ = fake_;
-      fake_->prev_ = head_;
+      push_single(node);
     }
     else
     {
-      ListNode< T >* subhead = head_;
-      for (Iterator< T > it = ++begin(); it != end(); ++it)
-      {
-        subhead = subhead->next_;
-      }
+      ListNode< T >* subhead = get_last_node();
       subhead->next_ = node;
       node->prev_ = subhead;
       node->next_ = fake_;
@@ -265,11 +259,7 @@ namespace alymova
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    ListNode< T >* subhead = head_;
-    for (Iterator< T > it = ++begin(); it != end(); ++it)
-    {
-      subhead = subhead->next_;
-    }
+    ListNode< T >* subhead = get_last_node();
     if (size() == 1)
     {
       head_ = fake_;
@@ -357,6 +347,23 @@ namespace alymova
   {
     fake_ = nullptr;
     head_ = nullptr;
+  }
+  template< typename T >
+  void List< T >::push_single(ListNode< T >* node)
+  {
+    head_ = node;
+    head_->next_ = fake_;
+    fake_->prev_ = head_;
+  }
+  template< typename T >
+  ListNode< T >* List< T >::get_last_node()
+  {
+    ListNode< T >* subhead = head_;
+    for (Iterator< T > it = ++begin(); it != end(); ++it)
+    {
+      subhead = subhead->next_;
+    }
+    return subhead;
   }
 }
 #endif
