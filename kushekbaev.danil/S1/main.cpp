@@ -8,15 +8,19 @@ int main()
 {
   pairedList pairsList;
   std::string listNumber = "";
+  std::list< unsigned long long > sumList;
 
   while (std::cin >> listNumber)
   {
     std::list< unsigned long long > valueList;
     unsigned long long value = 0;
+    unsigned long long sum = 0;
     while (std::cin >> value)
     {
       valueList.push_back(value);
+      sum += value;
     }
+    sumList.push_back(sum);
     pairsList.push_back(std::make_pair(listNumber, valueList));
     std::cin.clear();
   }
@@ -35,11 +39,10 @@ int main()
   std::cout << "\n";
 
   size_t maxSize = kushekbaev::calcOfSize(pairsList);
-  std::list< unsigned long long > sumList;
 
   try
   {
-  for (size_t i = 0; i != maxSize; ++i)
+    for (size_t i = 0; i != maxSize; ++i)
     {
       std::list< unsigned long long > rowList;
       for (auto tmp_it = pairsList.begin(); tmp_it != pairsList.end(); ++tmp_it)
@@ -49,16 +52,6 @@ int main()
           rowList.push_back(tmp_it->second.front());
           tmp_it->second.pop_front();
         }
-      }
-      if (!rowList.empty())
-      {
-        std::cout << *sumList.begin();
-        for (auto tmp_it = ++sumList.begin(); tmp_it != sumList.end(); ++tmp_it)
-        {
-          std::cout << " " << *tmp_it;
-        }
-        std::cout << "\n";
-        sumList.push_back(kushekbaev::calcSumOfList(rowList));
       }
     }
   }
@@ -71,6 +64,6 @@ int main()
   std::cout << *sumList.begin();
   for (auto it = ++sumList.begin(); it != sumList.end(); ++it)
   {
-    std::cout << " " << *it;
+    std::cout << "_" << *it;
   }
 }
