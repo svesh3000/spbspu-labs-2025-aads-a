@@ -14,6 +14,11 @@ int main()
     std::cerr << e.what() << '\n';
     return 1;
   }
+  if (list.empty())
+  {
+    std::cerr << "ERROR: Input is empty!\n";
+    return 1;
+  }
   outputNamesLists(std::cout, list) << '\n';
   outputNewLists(std::cout, list) << '\n';
   outputSumsNewLists(std::cout, list) << '\n';
