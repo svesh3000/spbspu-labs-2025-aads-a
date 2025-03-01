@@ -18,7 +18,7 @@ void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 
 void zakirov::get_list_llint(std::istream & in, list_llint & forward_list)
 {
-  long long int sequence_element = 0;
+  unsigned long long int sequence_element = 0;
   list_llint::iterator fillable_iterator = forward_list.before_begin();
   while (in >> sequence_element)
   {
@@ -29,40 +29,42 @@ void zakirov::get_list_llint(std::istream & in, list_llint & forward_list)
 
 void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
-  size_t size = 0;
-  list_pair list_temp = forward_list;
-  list_pair::iterator pre_iterator;
-  list_pair::iterator big_iterator = list_temp.begin();
-  out << (* big_iterator).first;
-  while (big_iterator != list_temp.end())
+  // size_t size = 0;
+
+  list_pair::iterator big_iter = forward_list.begin();
+  list_iter list_iterators;
+  list_iter::iterator r_iter_list = list_iterators.before_begin();
+  list_iter::iterator pre_iter_list;
+
+  while (big_iter != forward_list.end())
   {
-    out << ' ' << (* big_iterator).first;
-    ++big_iterator;
-    ++size;
+    list_iterators.insert_after(r_iter_list, (* big_iter).second.begin());
+    ++r_iter_list;
+    ++big_iter;
   }
 
-  out << '\n';
-  while (size > 0)
+  while (!list_iterators.empty())
   {
-    pre_iterator = list_temp.before_begin();
-    big_iterator = list_temp.begin();
-    size_t deleted = 0;
-    for (size_t i = 0; i < size; ++i)
+    r_iter_list = list_iterators.begin();
+    pre_iter_list = list_iterators.before_begin();
+    big_iter = forward_list.begin();
+
+    while (r_iter_list != list_iterators.end())
     {
-      if ((* big_iterator).second.empty())
+      if ((* r_iter_list) == (* big_iter).second.end())
       {
-        ++big_iterator;
-        ++deleted;
-        list_temp.erase_after(pre_iterator);
+        ++r_iter_list;
+        list_iterators.erase_after(pre_iter_list);
         continue;
       }
 
-      out << *((* big_iterator).second.begin()) << " ";
-      (* big_iterator).second.pop_front();
-      ++big_iterator;
+      out << ** r_iter_list << ' ';
+      ++(* r_iter_list);
+      ++r_iter_list;
+      ++pre_iter_list;
+      ++big_iter;
     }
 
     out << '\n';
-    size -= deleted;
   }
 }

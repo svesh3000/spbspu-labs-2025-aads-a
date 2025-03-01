@@ -5,9 +5,9 @@
 #include <utility>
 #include <iostream>
 
-using pair_strlist = std::pair< std::string, std::forward_list< long long int > >;
-using list_llint = std::forward_list< long long int >;
-using list_pair = std::forward_list< std::pair< std::string, std::forward_list< long long int > > >;
+using pair_strlist = std::pair< std::string, std::forward_list< unsigned long long > >;
+using list_llint = std::forward_list< unsigned long long >;
+using list_pair = std::forward_list< std::pair< std::string, std::forward_list< unsigned long long> > >;
 using list_iter = std::forward_list< list_llint::iterator >;
 
 namespace zakirov

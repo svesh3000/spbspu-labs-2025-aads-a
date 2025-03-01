@@ -5,8 +5,7 @@
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list< long long int > > > forward_list;
-  auto filling_iterator = forward_list.begin();
+  std::forward_list< std::pair< std::string, std::forward_list< unsigned long long int > > > forward_list;
   zakirov::get_list_pair(std::cin, forward_list);
   zakirov::output_result(std::cout, forward_list);
 }
