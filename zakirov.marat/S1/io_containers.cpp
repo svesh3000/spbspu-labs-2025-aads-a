@@ -54,7 +54,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     {
       break;
     }
-    
+
     while (r_iter_list != list_iterators.end())
     {
       if ((* r_iter_list) == (* big_iter).second.end())
