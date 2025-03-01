@@ -8,7 +8,6 @@
 namespace maslov
 {
   template< typename T >
-  
   struct FwdListIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
     using thisT = FwdListIterator< T >;
