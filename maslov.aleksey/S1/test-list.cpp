@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <iostream>
 #include "list.hpp"
 
 using FwdList = maslov::FwdList< int >;
@@ -14,15 +15,23 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 BOOST_AUTO_TEST_CASE(fillConstructor)
 {
   FwdList list(4, 4);
-  BOOST_TEST(list.max_size() == 4);
-  for (auto it = list.cbegin(); it != list.cend(); ++it)
+  BOOST_TEST(list.size() == 4);
+  for (auto it = list.begin(); it != list.end(); ++it)
   {
     BOOST_TEST(*it == 4);
   }
 }
 
 BOOST_AUTO_TEST_CASE(copyConstructor)
-{}
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list2 = list1;
+  BOOST_TEST(list1 == list2);
+  list2.push_front(3);
+  BOOST_TEST(list1 != list2);
+}
 
 BOOST_AUTO_TEST_CASE(moveConstructor)
 {}

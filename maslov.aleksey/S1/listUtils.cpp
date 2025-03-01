@@ -4,8 +4,8 @@
 
 void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxSize)
 {
-  out << listOfPairs.cbegin()->first;
-  for (auto it = ++listOfPairs.cbegin(); it != listOfPairs.cend(); ++it)
+  out << listOfPairs.begin()->first;
+  for (auto it = ++listOfPairs.begin(); it != listOfPairs.end(); ++it)
   {
     out << " " << it->first;
   }
@@ -22,16 +22,16 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
   {
     size_t sum = 0;
     bool flagPrint = false;
-    for (auto it = listOfPairs.cbegin(); it != listOfPairs.cend(); ++it)
+    for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
     {
       if (!it->second.empty())
       {
         bool flagEnd = true;
-        auto itNum = it->second.cbegin();
+        auto itNum = it->second.begin();
         for (size_t j = 0; j < i; ++j)
         {
           itNum++;
-          if (itNum == it->second.cend())
+          if (itNum == it->second.end())
           {
             flagEnd = false;
             break;
