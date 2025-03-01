@@ -142,17 +142,21 @@ BOOST_AUTO_TEST_CASE(insert)
   printList(out1, list);
   BOOST_TEST(out1.str() == "52");
 
-  list.insert(list.cend(), 0, 5);
+  size_t n = 0;
+  auto it = list.cbegin();
+  ++it;
+  list.insert(it, n, 5);
   std::ostringstream out2;
   printList(out2, list);
   BOOST_TEST(out2.str() == "52");
-  list.insert(list.cend(), 3, 9);
+  n = 3;
+  list.insert(it, n, 9);
   std::ostringstream out3;
   printList(out3, list);
   BOOST_TEST(out3.str() == "59992");
 
   mozhegova::List< int > list2({1, 2, 3, 4, 5, 6});
-  auto it = list.cbegin();
+  it = list.cbegin();
   std::advance(it, 3);
   auto it2 = list2.begin();
   list.insert(it, it2, list2.begin());
