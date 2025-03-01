@@ -108,7 +108,7 @@ size_t FwdList::size() const
 
 void FwdList::push_front(const T &value)
 {
-  ListNode<T> *newNode = new ListNode<T>{value, fake->next};
+  NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake->next};
   fake->next = newNode;
   ++nodeCount;
 }
@@ -119,7 +119,7 @@ void FwdList::pop_front()
   {
     throw std::out_of_range("List is empty");
   }
-  ListNode<T> *temp = fake->next;
+  NodeFwdList<T> *temp = fake->next;
   fake->next = fake->next->next;
   delete temp;
   --nodeCount;
@@ -135,12 +135,12 @@ void FwdList::clear()
 
 void FwdList::remove(const T &value)
 {
-  ListNode<T> *current = fake;
+  NodeFwdList<T> *current = fake;
   while (current->next != fake)
   {
     if (current->next->data == value)
     {
-      ListNode<T> *temp = current->next;
+      NodeFwdList<T> *temp = current->next;
       current->next = current->next->next;
       delete temp;
       --nodeCount;
@@ -159,7 +159,7 @@ void FwdList::splice(const FwdList<T> &other)
     return;
   }
 
-  ListNode<T> *lastNode = fake->next;
+  NodeFwdList<T> *lastNode = fake->next;
   while (lastNode->next != fake)
   {
     lastNode = lastNode->next;
@@ -174,9 +174,9 @@ void FwdList::reverse()
   if (empty())
     return;
 
-  ListNode<T> *prev = nullptr;
-  ListNode<T> *current = fake->next;
-  ListNode<T> *next = nullptr;
+  NodeFwdList<T> *prev = nullptr;
+  NodeFwdList<T> *current = fake->next;
+  NodeFwdList<T> *next = nullptr;
 
   while (current != fake)
   {
