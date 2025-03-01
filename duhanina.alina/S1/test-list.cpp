@@ -6,7 +6,7 @@ using list_t = List<int>;
 namespace duhanina {
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const Iterator<T>& it) {
+friend std::ostream& operator<<(std::ostream& os, const Iterator<T>& it) {
   if (it.ptr_ != nullptr) {
     os << "Iterator(" << *it << ")"; // Используем оператор * для вывода значения
   } else {
