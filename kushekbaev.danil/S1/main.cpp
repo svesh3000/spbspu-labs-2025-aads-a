@@ -27,12 +27,6 @@ int main()
     }
   }
 
-  if (pairsList.size() == 0)
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-
   std::cout << pairsList.begin()->first;
   for (auto it = ++pairsList.begin(); it != pairsList.end(); ++it)
   {
