@@ -81,11 +81,10 @@ int main()
     sums.push_back(sum);
   }
   std::cout << *(sums.begin());
-  for (auto it = (sums.begin())++; it != sums.end(); it++)
+  for (auto it = ++(sums.begin()); it != sums.end(); it++)
   {
     std::cout << " " << *it;
   }
-
   std::cout << "\n";
   return 0;
 }

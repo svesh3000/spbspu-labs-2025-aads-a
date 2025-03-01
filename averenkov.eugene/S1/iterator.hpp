@@ -11,7 +11,7 @@ namespace averenkov
   {
   public:
     ListIterator() = default;
-    ListIterator(Node<T>* node) : node_(node) {};
+    ListIterator(Node< T >* node) : node_(node) {};
     ~ListIterator() = default;
 
     ListIterator< T >& operator++();
@@ -24,7 +24,7 @@ namespace averenkov
     bool operator!=(const ListIterator< T >&) const;
 
   private:
-    Node<T>* node_;
+    Node< T >* node_;
 
   };
 
