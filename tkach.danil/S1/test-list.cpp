@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <sstream>
 #include "list.hpp"
 
 using namespace tkach;
@@ -127,11 +126,13 @@ BOOST_AUTO_TEST_CASE(list_swap_test)
 
 BOOST_AUTO_TEST_CASE(list_fill_test)
 {
-  List< int > list(5, 54);
+  size_t count = 5;
+  List< int > list(count, 54);
+  BOOST_TEST(list.size() == 5);
   auto it = list.begin();
-  for(size_t i = 0; i < list.size(); ++i)
+  for (size_t i = 0; i < count; ++i)
   {
-    *(it++) = 54;
+    BOOST_TEST(*it == 54);
   }
 }
 
