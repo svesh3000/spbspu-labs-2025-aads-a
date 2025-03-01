@@ -5,7 +5,7 @@
 
 int main()
 {
-  rychkov::List< std::pair< std::string, rychkov::List< size_t > > > entered;
+  rychkov::List< std::pair< std::string, rychkov::List< unsigned > > > entered;
   std::string name;
   while (std::cin >> name)
   {
@@ -13,6 +13,10 @@ int main()
     {
       size_t processed = 0;
       size_t number = std::stoull(name, &processed);
+      if (static_cast< unsigned >(number) != number)
+      {
+        throw std::out_of_range("ul was overflowed");
+      }
       if (processed != name.size())
       {
         std::cerr << "int suffix is not supplied\n";
@@ -36,14 +40,14 @@ int main()
     }
   }
 
-  rychkov::List< rychkov::List< size_t > > result;
+  rychkov::List< rychkov::List< unsigned > > result;
   char space[2] = "\0";
   for (const decltype(entered)::value_type& i : entered)
   {
     std::cout << space << i.first;
     space[0] = ' ';
     decltype(result)::iterator wPoint = result.begin();
-    for (size_t j : i.second)
+    for (unsigned j : i.second)
     {
       if (wPoint != result.end())
       {
@@ -56,14 +60,17 @@ int main()
       }
     }
   }
-  std::cout << '\n';
+  if (!entered.empty())
+  {
+    std::cout << '\n';
+  }
 
   rychkov::List< size_t > sums(0, result.size());
   decltype(sums)::iterator wPoint = sums.begin();
-  for (rychkov::List< size_t > i : result)
+  for (const decltype(result)::value_type& i : result)
   {
     space[0] = '\0';
-    for (int j : i)
+    for (unsigned j : i)
     {
       *wPoint += j;
       std::cout << space << j;
