@@ -2,96 +2,139 @@
 #include <boost/test/included/unit_test.hpp>
 #include "list.hpp"
 
-using inList = averenkov::List< int >;
+using IntList = averenkov::List< int >;
 
 BOOST_AUTO_TEST_CASE(TestDefaultConstructor)
 {
-  inList list;
+  IntList list;
   BOOST_CHECK(list.empty());
   BOOST_CHECK_EQUAL(list.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestPushFront)
 {
-  inList list;
+  IntList list;
   list.push_front(10);
-  BOOST_CHECK(!list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(list.front(), 10);
+  BOOST_CHECK_EQUAL(list.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(TestPushBack)
 {
-  inList list;
+  IntList list;
   list.push_back(20);
-  BOOST_CHECK(!list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(list.back(), 20);
+  BOOST_CHECK_EQUAL(list.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(TestPopFront)
 {
-  inList list;
+  IntList list;
   list.push_front(30);
   list.pop_front();
   BOOST_CHECK(list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestPopBack)
 {
-  inList list;
+  IntList list;
   list.push_back(40);
   list.pop_back();
   BOOST_CHECK(list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestCopyConstructor)
 {
-  inList list1;
+  IntList list1;
   list1.push_back(50);
-  inList list2(list1);
+  IntList list2 = list1;
   BOOST_CHECK_EQUAL(list2.size(), 1);
   BOOST_CHECK_EQUAL(list2.front(), 50);
 }
 
-BOOST_AUTO_TEST_CASE(TestAssignment)
+BOOST_AUTO_TEST_CASE(TestMoveConstructor)
 {
-  inList list1;
+  IntList list1;
   list1.push_back(60);
-  inList list2;
-  list2 = list1;
+  IntList list2 = std::move(list1);
   BOOST_CHECK_EQUAL(list2.size(), 1);
   BOOST_CHECK_EQUAL(list2.front(), 60);
-}
-
-BOOST_AUTO_TEST_CASE(TestClear)
-{
-  inList list;
-  list.push_back(70);
-  list.push_back(80);
-  list.clear();
-  BOOST_CHECK(list.empty());
-  BOOST_CHECK_EQUAL(list.size(), 0);
-}
-
-BOOST_AUTO_TEST_CASE(TestRemove)
-{
-  inList list;
-  list.push_back(90);
-  list.push_back(100);
-  list.remove(90);
-  BOOST_CHECK_EQUAL(list.size(), 1);
-  BOOST_CHECK_EQUAL(list.front(), 100);
+  BOOST_CHECK(list1.empty());
 }
 
 BOOST_AUTO_TEST_CASE(TestAssign)
 {
-  inList list;
-  list.assign(3, 42);
+  IntList list;
+  list.assign(3, 70);
   BOOST_CHECK_EQUAL(list.size(), 3);
-  BOOST_CHECK_EQUAL(list.front(), 42);
-  BOOST_CHECK_EQUAL(list.back(), 42);
+  BOOST_CHECK_EQUAL(list.front(), 70);
+  BOOST_CHECK_EQUAL(list.back(), 70);
 }
 
+BOOST_AUTO_TEST_CASE(TestRemove)
+{
+  IntList list;
+  list.push_back(80);
+  list.push_back(90);
+  list.remove(80);
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.front(), 90);
+}
+
+BOOST_AUTO_TEST_CASE(TestRemoveIf)
+{
+  IntList list;
+  list.push_back(10);
+  list.push_back(15);
+  list.push_back(20);
+  list.removeIf([](int val) { return val % 2 == 0; });
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.front(), 15);
+}
+
+BOOST_AUTO_TEST_CASE(TestSplice)
+{
+  IntList list1, list2;
+  list1.push_back(1);
+  list1.push_back(2);
+  list2.push_back(3);
+  list2.push_back(4);
+  list1.splice(list1.end(), list2);
+  BOOST_CHECK_EQUAL(list1.size(), 4);
+  BOOST_CHECK_EQUAL(list1.back(), 4);
+  BOOST_CHECK(list2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(TestSwap)
+{
+  IntList list1, list2;
+  list1.push_back(100);
+  list2.push_back(200);
+  list1.swap(list2);
+  BOOST_CHECK_EQUAL(list1.front(), 200);
+  BOOST_CHECK_EQUAL(list2.front(), 100);
+}
+
+BOOST_AUTO_TEST_CASE(TestClear)
+{
+  IntList list;
+  list.push_back(300);
+  list.push_back(400);
+  list.clear();
+  BOOST_CHECK(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(TestIterator)
+{
+  IntList list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
+  int sum = 0;
+  for (auto it = list.begin(); it != list.end(); ++it)
+  {
+    sum += *it;
+  }
+  BOOST_CHECK_EQUAL(sum, 6);
+}

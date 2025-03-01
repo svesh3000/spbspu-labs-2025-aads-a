@@ -145,7 +145,7 @@ namespace averenkov
   T& List< T >::front()
   {
     assert(!empty());
-    return fake_->next_->data;
+    return fake_->next_->data_;
   }
 
   template < class T >
@@ -157,13 +157,14 @@ namespace averenkov
     {
       current = current->next_;
     }
-    return current->data;
+    return current->data_;
   }
 
   template < class T >
   void List< T >::push_front(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value, fake_->next_);
+    Node< T >* newNode = new Node< T >(value);
+    newNode->next_ = fake_->next_;
     fake_->next_ = newNode;
     size_++;
   }
@@ -237,7 +238,7 @@ namespace averenkov
     Node< T >* current = fake_;
     while (current->next_ != fake_)
     {
-      if (current->next_->data == value)
+      if (current->next_->data_ == value)
       {
         Node< T >* toDelete = current->next_;
         current->next_ = current->next_->next_;
