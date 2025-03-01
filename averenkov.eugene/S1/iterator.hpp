@@ -28,7 +28,6 @@ namespace averenkov
 
   };
 
-
   template< typename T >
   ListIterator< T >& ListIterator< T >::operator++()
   {
