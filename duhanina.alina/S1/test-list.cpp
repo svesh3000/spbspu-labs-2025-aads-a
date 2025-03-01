@@ -3,6 +3,17 @@
 
 using namespace duhanina;
 using list_t = List<int>;
+namespace
+{
+  std::ostream& outputList(std::ostream& out, List< int >* list)
+  {
+    for (constIterator< int > it = list->cbegin(); it != list->cend(); ++it)
+    {
+      out << *it;
+    }
+    return out;
+  }
+}
 
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
