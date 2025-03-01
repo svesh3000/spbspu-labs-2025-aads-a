@@ -82,7 +82,7 @@ int main()
   }
 
   std::list< unsigned long long > sumList;
-  
+
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
   {
     unsigned long long sum = 0;
