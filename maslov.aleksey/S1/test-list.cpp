@@ -140,7 +140,26 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(operations)
 
 BOOST_AUTO_TEST_CASE(reverse)
-{}
+{
+  FwdList emptyList;
+  emptyList.reverse();
+  BOOST_TEST(emptyList.empty());
+  FwdList listOneElement;
+  listOneElement.push_front(1);
+  listOneElement.reverse();
+  BOOST_TEST(listOneElement.size() == 1);
+  BOOST_TEST(listOneElement.front() == 1);
+  FwdList list;
+  list.push_front(1);
+  list.push_front(2);
+  list.push_front(3);
+  list.reverse();
+  BOOST_TEST(list.size() == 3);
+  auto it = list.begin();
+  BOOST_TEST(*it++ == 1);
+  BOOST_TEST(*it++ == 2);
+  BOOST_TEST(*it++ == 3);
+}
 
 BOOST_AUTO_TEST_CASE(remove)
 {}
