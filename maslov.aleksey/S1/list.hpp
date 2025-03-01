@@ -11,6 +11,9 @@ namespace maslov
   template< typename T >
   struct FwdList
   {
+    using cIterator = FwdListConstIterator< T >;
+    using iterator = FwdListIterator< T >;
+
     FwdList();
     FwdList(size_t k, const T & value);
     FwdList(const FwdList< T > & rhs);
@@ -23,10 +26,10 @@ namespace maslov
     bool operator==(const FwdList< T > & rhs) const;
     bool operator!=(const FwdList< T >& rhs) const;
 
-    FwdListIterator< T > begin();
-    FwdListConstIterator< T > begin() const;
-    FwdListIterator< T > end();
-    FwdListConstIterator< T > end() const;
+    iterator begin();
+    cIterator begin() const;
+    iterator end();
+    cIterator end() const;
 
     T & front();
     const T & front() const;
@@ -43,9 +46,16 @@ namespace maslov
     void remove(const T & value);
     template < typename Predicate >
     void removeIf(Predicate pred);
+    void spliceAfter(iterator position, FwdList< T > & fwdlst);
+    void spliceAfter(iterator position, FwdList< T > && fwdlst);
+    void spliceAfter(iterator position, FwdList< T > & fwdlst, iterator i);
+    void spliceAfter(iterator position, FwdList< T > && fwdlst, iterator i);
+    void spliceAfter(iterator position, FwdList< T > & fwdlst, iterator first, iterator last);
+    void spliceAfter(iterator position, FwdList< T > && fwdlst, iterator first, iterator last);
    private:
     FwdListNode< T > * fake_;
     size_t size_;
+    bool isValidIterator(const cIterator & it) const;
   };
 
   template< typename T >
@@ -304,6 +314,162 @@ namespace maslov
   bool FwdList< T >::operator!=(const FwdList< T > & rhs) const
   {
     return !(*this == rhs);
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(FwdListIterator< T > position, FwdList< T > & fwdlst)
+  {
+    if (fwdlst.empty())
+    {
+      return;
+    }
+    FwdListNode< T > * insert = fake_;
+    for (auto it = begin(); it != position; ++it)
+    {
+      insert = insert->next;
+    }
+    insert = insert->next;
+    FwdListNode< T > * last = fwdlst.fake_;
+    while(last->next != fwdlst.fake_)
+    {
+      last = last->next;
+    }
+    FwdListNode< T > * after = insert->next;
+    insert->next = fwdlst.fake_->next;
+    last->next = after;
+    size_ += fwdlst.size_;
+    fwdlst.size_ = 0;
+    fwdlst.fake_->next = fwdlst.fake_;
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(FwdListIterator< T > position, FwdList< T > && fwdlst)
+  {
+    spliceAfter(position, fwdlst);
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(iterator position, FwdList< T > & fwdlst, iterator i)
+  {
+    if (fwdlst.empty())
+    {
+      return;
+    }
+    /*if (!isValidIterator(position))
+    {
+      throw std::invalid_argument("ERROR: Invalid iterator"); 
+    }*/
+    FwdListNode< T > * insert = fake_;
+    for (auto it = begin(); it != position; ++it)
+    {
+      insert = insert->next;
+    }
+    insert = insert->next;
+    FwdListNode< T > * current = fwdlst.fake_;
+    FwdListNode< T > * spliceNode = nullptr;
+    for (auto it = fwdlst.begin(); it != fwdlst.end(); ++it)
+    {
+      if (it == i)
+      {
+        spliceNode = current->next;
+        break;
+      }
+      current = current->next;
+    }
+    if (!spliceNode)
+    {
+      throw std::invalid_argument("ERROR: Invalid iterator");
+    }
+    current->next = spliceNode->next;
+    spliceNode->next = insert->next;
+    insert->next = spliceNode;
+    fwdlst.size_--;
+    size_++;
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(iterator position, FwdList< T > && fwdlst, iterator i)
+  {
+    spliceAfter(position, fwdlst, i);
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(iterator position,
+      FwdList< T > & fwdlst, iterator first, iterator last)
+  {
+    if (first == last)
+    {
+      return;
+    }
+    /*if (!isValidIterator(position))
+    {
+      throw std::invalid_argument("ERROR: Invalid iterator"); 
+    }*/
+    FwdListNode< T > * insert = fake_;
+    for (auto it = begin(); it != position; ++it)
+    {
+      insert = insert->next;
+    }
+    insert = insert->next;
+    FwdListNode< T > * beforeBeginNode = fwdlst.fake_;
+    FwdListNode< T > * beginNode = nullptr;
+    FwdListNode< T > * lastNode = nullptr;
+    FwdListNode< T > * temp = fwdlst.fake_;
+    FwdListNode< T > * afterLastNode = nullptr;
+    size_t count = 0;
+    for (auto it = fwdlst.begin(); it != fwdlst.end(); it++)
+    {
+      if (it == first)
+      {
+        beforeBeginNode = temp;
+        beginNode = temp->next;
+        count = 0;
+      }
+      auto tempIt = it;
+      if (++tempIt == last)
+      {
+        lastNode = temp->next;
+        afterLastNode = temp->next->next;
+        count++;
+        break;
+      }
+      temp = temp->next;
+      count++;
+    }
+    if (!beginNode || !lastNode)
+    {
+      throw std::invalid_argument("ERROR: Invalid iterator");
+    }
+    FwdListNode< T > * after = insert->next;
+    insert->next = beginNode;
+    beforeBeginNode->next = afterLastNode;
+    lastNode->next = after;
+    size_ += count;
+    fwdlst.size_ -= count;
+  }
+
+  template< typename T >
+  void FwdList< T >::spliceAfter(iterator position,
+      FwdList< T > && fwdlst, iterator first, iterator last)
+  {
+    spliceAfter(position, fwdlst, first, last);
+  }
+
+  template< typename T >
+  bool FwdList< T >::isValidIterator(const cIterator & it) const
+  {
+    if (it == end())
+    {
+      return true;
+    }
+    for (auto currentIt = begin(); currentIt != end(); ++currentIt)
+    {
+      if (currentIt == it)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 }
 #endif

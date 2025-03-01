@@ -203,4 +203,73 @@ BOOST_AUTO_TEST_CASE(removeIf)
   BOOST_TEST(out.str() == "53");
 }
 
+BOOST_AUTO_TEST_CASE(SpliceAfter1)
+{
+  FwdList list1;
+  list1.pushFront(1);
+  list1.pushFront(2);
+  list1.pushFront(3);
+  FwdList list2;
+  list2.pushFront(4);
+  list2.pushFront(5);
+  list2.pushFront(6);
+  list1.spliceAfter(list1.begin(), list2);
+  std::ostringstream out1;
+  printList(out1, list1);
+  std::ostringstream out2;
+  printList(out2, list2);
+  BOOST_TEST(out1.str() == "365421");
+  BOOST_TEST(out2.str() == "");
+}
+
+BOOST_AUTO_TEST_CASE(SpliceAfter2)
+{
+  FwdList list1;
+  list1.pushFront(1);
+  list1.pushFront(2);
+  list1.pushFront(3);
+  FwdList list2;
+  list2.pushFront(4);
+  list2.pushFront(5);
+  list2.pushFront(6);
+  auto it = ++list2.begin();
+  list1.spliceAfter(list1.begin(), list2, it);
+  std::ostringstream out1;
+  printList(out1, list1);
+  std::ostringstream out2;
+  printList(out2, list2);
+  BOOST_TEST(out1.str() == "3521");
+  BOOST_TEST(out2.str() == "64");
+  BOOST_TEST(list2.size() == 2);
+  BOOST_TEST(list1.size() == 4);
+}
+BOOST_AUTO_TEST_CASE(SpliceAfterRange)
+{
+  FwdList list1;
+  list1.pushFront(1);
+  list1.pushFront(2);
+  list1.pushFront(3);
+  FwdList list2;
+  list2.pushFront(4);
+  list2.pushFront(5);
+  list2.pushFront(6);
+  list2.pushFront(7);
+  list2.pushFront(8);
+  auto begin = ++list2.begin();
+  auto last = list2.begin();
+  for (size_t i = 0; i < 4; i++)
+  {
+    ++last;
+  }
+  list1.spliceAfter(list1.begin(), list2, begin, last);
+  std::ostringstream out1;
+  printList(out1, list1);
+  std::ostringstream out2;
+  printList(out2, list2);
+  BOOST_TEST(out1.str() == "376521");
+  BOOST_TEST(out2.str() == "84");
+  BOOST_TEST(list2.size() == 2);
+  BOOST_TEST(list1.size() == 6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
