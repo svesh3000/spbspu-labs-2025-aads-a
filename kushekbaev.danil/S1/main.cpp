@@ -10,7 +10,6 @@ int main()
   std::string nodeName = "";
   std::list< std::string > nodeList;
   std::list< unsigned long long > valueList;
-  std::list< unsigned long long > sumList;
   unsigned long long sum = 0;
 
   while (!std::cin.eof())
@@ -25,6 +24,12 @@ int main()
       pairsList.push_back(std::make_pair(nodeName, valueList));
       std::cin.clear();
     }
+  }
+
+  if (pairsList.size() == 0)
+  {
+    std::cout << "0\n";
+    return 0;
   }
 
   std::cout << pairsList.begin()->first;
@@ -60,7 +65,6 @@ int main()
     }
   }
 
-  std::cout << sumList.front();
   for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
   {
     std::cout << "_" << *it;
