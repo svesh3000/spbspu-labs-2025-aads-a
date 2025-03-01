@@ -25,7 +25,7 @@ int main()
     std::cout << "0\n";
     return 0;
   }
-  std::cout << list.begin()
+  std::cout << list.begin()->first;
   for (auto it = ++(list.begin()); it != list.end(); it++)
   {
     std::cout << " " << it->first;
