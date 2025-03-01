@@ -67,8 +67,12 @@ namespace zholobov {
 
   private:
     struct Node_t {
-      T value;
+      value_type value;
       Node_t* next;
+      Node_t(const value_type& val, Node_t* nextNode):
+        value(val), next(nextNode) {}
+      Node_t(value_type&& val, Node_t* nextNode):
+        value(std::move(val)), next(nextNode) {}
     };
 
     Node_t* head_;
@@ -156,20 +160,26 @@ typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdLis
 template < typename T >
 void zholobov::CircularFwdList< T >::push_front(const value_type& val)
 {
-  Node_t* new_node = new Node_t;
-  new_node->value = val;
-  new_node->next = head_;
+  Node_t* new_node = new Node_t(val, head_);
   head_ = new_node;
+  if (size_ == 0) {
+    tail_ = head_;
+  }
+  tail_->next = head_;
   ++size_;
 }
 
 template < typename T >
 void zholobov::CircularFwdList< T >::push_front(value_type&& val)
 {
-  Node_t* new_node = new Node_t;
+  Node_t* new_node = new Node_t(std::move(val), head_);
   new_node->value = val;
   new_node->next = head_;
   head_ = new_node;
+  if (size_ == 0) {
+    tail_ = head_;
+  }
+  tail_->next = head_;
   ++size_;
 }
 

@@ -1,7 +1,6 @@
 #ifndef CIRCULARFWDLISTITERATORS_HPP
 #define CIRCULARFWDLISTITERATORS_HPP
 
-#include <forward_list>
 #include <memory>
 #include "CircularFwdList.hpp"
 
