@@ -59,6 +59,23 @@ int main()
   }
   std::cout << "\n";
 
+  bool hasNum = false;
+  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  {
+    const std::pair< std::string, List< unsigned long long > > & seq = *it;
+    if (!seq.second.isEmpty())
+    {
+      hasNum = true;
+      break;
+    }
+  }
+
+  if (!hasNum)
+  {
+    std::cout << 0 << std::endl;
+    return 0;
+  }
+
   std::list< List< unsigned long long > > resultSequences;
   bool hasNumbers = true;
   while (hasNumbers)
