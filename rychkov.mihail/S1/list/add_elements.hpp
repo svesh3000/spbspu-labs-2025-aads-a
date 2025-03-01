@@ -103,17 +103,7 @@ void rychkov::List< T >::insert(const_iterator pos, std::initializer_list< value
 template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List& rhs)
 {
-  if (rhs.size_ != 0)
-  {
-    if (tail_ != nullptr)
-    {
-      tail_->next = rhs.head_;
-    }
-    rhs.head_->prev = tail_;
-    tail_ = std::exchange(rhs.tail_, nullptr);
-    size_ += std::exchange(rhs.size_, 0);
-    rhs.head_ = nullptr;
-  }
+  splice(pos, rhs, rhs.begin(), rhs.end());
 }
 template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List&& rhs)
@@ -131,11 +121,47 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
   for (const_iterator i = from; i != to; ++i, ++erasedSize)
   {}
 
-  node_t< value_type >** insertedTail = (to == rhs.end() ? &tail_ : &(to.node_->prev));
-  *(pos == end() ? &tail_ : &(pos.node_->prev)) = *insertedTail;
-  *(pos == begin() ? &head_ : &(pos.node_->prev->next)) = from.node_;
-  *insertedTail = from.node_->prev;
-  *(from == rhs.begin() ? &rhs.head_ : &(from.node_->prev->next)) = to.node_;
+  if (from == rhs.begin())
+  {
+    rhs.head_ = to.node_;
+  }
+  else
+  {
+    from.node_->prev->next = to.node_;
+  }
+  const_iterator insertedTail;
+  if (to == rhs.end())
+  {
+    insertedTail = rhs.tail_;
+    rhs.tail_ = from.node_->prev;
+  }
+  else
+  {
+    insertedTail = to.node_->prev;
+    to.node_->prev = from.node_->prev;
+  }
+
+  if (pos == begin())
+  {
+    head_ = from.node_;
+    from.node_->prev = nullptr;
+  }
+  else
+  {
+    pos.node_->prev->next = from.node_;
+    from.node_->prev = pos.node_->prev;
+  }
+  if (pos == end())
+  {
+    tail_ = insertedTail.node_;
+    insertedTail.node_->next = nullptr;
+  }
+  else
+  {
+    pos.node_->prev = insertedTail.node_;
+    insertedTail.node_->next = pos.node_;
+  }
+
   rhs.size_ -= erasedSize;
   size_ += erasedSize;
 }

@@ -69,7 +69,8 @@ rychkov::List< T >::List(InputIt from, InputIt to):
   tail_ = new node_t< value_type >{*from};
   head_ = tail_;
   size_++;
-  for (++from; from != to; ++from)
+  ++from;
+  for (; from != to; ++from)
   {
     tail_->next = new node_t< value_type >{*from, tail_};
     tail_ = tail_->next;

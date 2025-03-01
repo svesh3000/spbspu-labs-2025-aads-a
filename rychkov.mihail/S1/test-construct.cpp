@@ -1,7 +1,15 @@
-#include <array>
 #include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
+
+namespace rychkov
+{
+  template< class T, size_t N >
+  static size_t size( const T (&array)[N] ) noexcept
+  {
+    return N;
+  }
+}
 
 BOOST_AUTO_TEST_SUITE(S1_constructors_test)
 
@@ -16,23 +24,23 @@ BOOST_AUTO_TEST_CASE(initializer_list_test)
 {
   int expected[] = {2, 5, 3, 9};
   rychkov::List< int > list = {2, 5, 3, 9};
-  BOOST_TEST(list.size() == std::size(expected));
+  BOOST_TEST(list.size() == rychkov::size(expected));
   BOOST_TEST(!list.empty());
   BOOST_TEST(list.front() == *expected);
-  BOOST_TEST(list.back() == expected[std::size(expected) - 1]);
+  BOOST_TEST(list.back() == expected[rychkov::size(expected) - 1]);
 
-  BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + std::size(expected)));
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + rychkov::size(expected)));
 }
 BOOST_AUTO_TEST_CASE(S1_array_ptrs_test)
 {
   int expected[] = {2, 5, 3, 9};
-  rychkov::List< int > list(expected, expected + std::size(expected));
+  rychkov::List< int > list(expected, expected + rychkov::size(expected));
   BOOST_TEST(list.size() == 4);
   BOOST_TEST(!list.empty());
   BOOST_TEST(list.front() == *expected);
-  BOOST_TEST(list.back() == expected[std::size(expected) - 1]);
+  BOOST_TEST(list.back() == expected[rychkov::size(expected) - 1]);
 
-  BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + std::size(expected)));
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + rychkov::size(expected)));
 }
 BOOST_AUTO_TEST_CASE(fill_test)
 {
@@ -61,9 +69,9 @@ BOOST_AUTO_TEST_CASE(copy_test)
 BOOST_AUTO_TEST_CASE(move_test)
 {
   int expected[] = {2, 5, 3, 9};
-  rychkov::List< int > list(expected, expected + std::size(expected));
+  rychkov::List< int > list(expected, expected + rychkov::size(expected));
   rychkov::List< int > list2 = std::move(list);
-  BOOST_TEST(std::equal(list2.begin(), list2.end(), expected, expected + std::size(expected)));
+  BOOST_TEST(std::equal(list2.begin(), list2.end(), expected, expected + rychkov::size(expected)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
