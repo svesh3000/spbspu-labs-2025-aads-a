@@ -1,12 +1,13 @@
 #include "FwdList.hpp"
 #include "IteratorFwd.hpp"
 
+template< class T >
 FwdList::FwdList() :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
-{
-}
+{}
 
+template< class T >
 FwdList::FwdList(const FwdList &other) :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
@@ -17,6 +18,7 @@ FwdList::FwdList(const FwdList &other) :
   }
 }
 
+template< class T >
 FwdList::FwdList(FwdList &&other) noexcept :
   fake(other.fake),
   nodeCount(other.nodeCount)
@@ -25,6 +27,7 @@ FwdList::FwdList(FwdList &&other) noexcept :
   other.nodeCount = 0;
 }
 
+template< class T >
 FwdList &FwdList::operator=(const FwdList &other)
 {
   if (this == &other)
@@ -39,6 +42,7 @@ FwdList &FwdList::operator=(const FwdList &other)
   return *this;
 }
 
+template< class T >
 FwdList &FwdList::operator=(FwdList &&other) noexcept
 {
   if (this == &other)
@@ -56,22 +60,26 @@ FwdList &FwdList::operator=(FwdList &&other) noexcept
   return *this;
 }
 
+template< class T >
 FwdList::~FwdList()
 {
   clear();
   delete fake;
 }
 
+template< class T >
 IteratorFwd FwdList::begin() const
 {
   return IteratorFwd(fake->next);
 }
 
+template< class T >
 IteratorFwd FwdList::end() const
 {
   return IteratorFwd(fake);
 }
 
+template< class T >
 T & FwdList::front()
 {
   if (empty())
@@ -81,6 +89,7 @@ T & FwdList::front()
   return fake->next->data;
 }
 
+template< class T >
 T & FwdList::back()
 {
   if (empty())
@@ -96,16 +105,19 @@ T & FwdList::back()
   return current->data
 }
 
+template< class T >
 bool FwdList::empty() const
 {
   return nodeCount == 0;
 }
 
+template< class T >
 size_t FwdList::size() const
 {
   return nodeCount;
 }
 
+template< class T >
 void FwdList::push_front(const T &value)
 {
   NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake->next};
@@ -113,6 +125,7 @@ void FwdList::push_front(const T &value)
   ++nodeCount;
 }
 
+template< class T >
 void FwdList::pop_front()
 {
   if (empty())
@@ -125,6 +138,7 @@ void FwdList::pop_front()
   --nodeCount;
 }
 
+template< class T >
 void FwdList::clear()
 {
   while (!empty())
@@ -133,6 +147,7 @@ void FwdList::clear()
   }
 }
 
+template< class T >
 void FwdList::remove(const T &value)
 {
   NodeFwdList<T> *current = fake;
@@ -152,6 +167,7 @@ void FwdList::remove(const T &value)
   }
 }
 
+template< class T >
 void FwdList::splice(const FwdList<T> &other)
 {
   if (other.empty())
@@ -169,6 +185,7 @@ void FwdList::splice(const FwdList<T> &other)
   nodeCount += other.nodeCount;
 }
 
+template< class T >
 void FwdList::reverse()
 {
   if (empty())
@@ -188,6 +205,7 @@ void FwdList::reverse()
   fake->next = prev;
 }
 
+template< class T >
 bool FwdList::operator==(const FwdList<T> &other) const
 {
   if (nodeCount != other.nodeCount)
@@ -207,11 +225,13 @@ bool FwdList::operator==(const FwdList<T> &other) const
   return true;
 }
 
+template< class T >
 bool FwdList::operator!=(const FwdList<T> &other) const
 {
   return !(*this == other);
 }
 
+template< class T >
 bool FwdList::operator<(const FwdList<T> &other) const
 {
   IteratorFwd it1 = begin();
@@ -232,6 +252,7 @@ bool FwdList::operator<(const FwdList<T> &other) const
   return nodeCount < other.nodeCount;
 }
 
+template< class T >
 bool FwdList::operator>(const FwdList<T> &other) const
 {
   return other < *this;
