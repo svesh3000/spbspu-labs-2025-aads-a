@@ -1,21 +1,23 @@
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
+using IntList = averenkov::List< int >;
+
 BOOST_AUTO_TEST_SUITE(ListTest)
 
 BOOST_AUTO_TEST_CASE(DefaultConstructor)
 {
-    averenkov::List<int> list;
+    IntList list;
     BOOST_TEST(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(CopyConstructor)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
-    averenkov::List<int> copyList(list);
+    IntList copyList(list);
     BOOST_TEST(copyList.size() == 2);
     BOOST_TEST(copyList.front() == 1);
     BOOST_TEST(copyList.back() == 2);
@@ -23,11 +25,11 @@ BOOST_AUTO_TEST_CASE(CopyConstructor)
 
 BOOST_AUTO_TEST_CASE(MoveConstructor)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
-    averenkov::List<int> movedList(std::move(list));
+    IntList movedList(std::move(list));
     BOOST_TEST(movedList.size() == 2);
     BOOST_TEST(movedList.front() == 1);
     BOOST_TEST(movedList.back() == 2);
@@ -36,7 +38,7 @@ BOOST_AUTO_TEST_CASE(MoveConstructor)
 
 BOOST_AUTO_TEST_CASE(FillConstructor)
 {
-    averenkov::List<int> list(3, 5);
+    IntList list(3, 5);
     BOOST_TEST(list.size() == 3);
     BOOST_TEST(list.front() == 5);
     BOOST_TEST(list.back() == 5);
@@ -44,7 +46,7 @@ BOOST_AUTO_TEST_CASE(FillConstructor)
 
 BOOST_AUTO_TEST_CASE(BeginEnd)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -58,7 +60,7 @@ BOOST_AUTO_TEST_CASE(BeginEnd)
 
 BOOST_AUTO_TEST_CASE(CBeginCEnd)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -72,7 +74,7 @@ BOOST_AUTO_TEST_CASE(CBeginCEnd)
 
 BOOST_AUTO_TEST_CASE(FrontBack)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -82,7 +84,7 @@ BOOST_AUTO_TEST_CASE(FrontBack)
 
 BOOST_AUTO_TEST_CASE(PushFront)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_front(1);
     list.push_front(2);
 
@@ -92,7 +94,7 @@ BOOST_AUTO_TEST_CASE(PushFront)
 
 BOOST_AUTO_TEST_CASE(PushBack)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -102,7 +104,7 @@ BOOST_AUTO_TEST_CASE(PushBack)
 
 BOOST_AUTO_TEST_CASE(PopFront)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -113,7 +115,7 @@ BOOST_AUTO_TEST_CASE(PopFront)
 
 BOOST_AUTO_TEST_CASE(PopBack)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -124,7 +126,7 @@ BOOST_AUTO_TEST_CASE(PopBack)
 
 BOOST_AUTO_TEST_CASE(Clear)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
 
@@ -135,11 +137,11 @@ BOOST_AUTO_TEST_CASE(Clear)
 
 BOOST_AUTO_TEST_CASE(Swap)
 {
-    averenkov::List<int> list1;
+    IntList list1;
     list1.push_back(1);
     list1.push_back(2);
 
-    averenkov::List<int> list2;
+    IntList list2;
     list2.push_back(3);
     list2.push_back(4);
 
@@ -150,7 +152,7 @@ BOOST_AUTO_TEST_CASE(Swap)
 
 BOOST_AUTO_TEST_CASE(Remove)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
     list.push_back(3);
@@ -163,12 +165,12 @@ BOOST_AUTO_TEST_CASE(Remove)
 
 BOOST_AUTO_TEST_CASE(RemoveIf)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.push_back(1);
     list.push_back(2);
     list.push_back(3);
 
-    list.remove_if([](int value) { return value % 2 == 0; });
+    list.removeIf([](int value) { return value % 2 == 0; });
     BOOST_TEST(list.size() == 2);
     BOOST_TEST(list.front() == 1);
     BOOST_TEST(list.back() == 3);
@@ -176,11 +178,11 @@ BOOST_AUTO_TEST_CASE(RemoveIf)
 
 /*BOOST_AUTO_TEST_CASE(Splice)
 {
-    averenkov::List<int> list1;
+    IntList list1;
     list1.push_back(1);
     list1.push_back(2);
 
-    averenkov::List<int> list2;
+    IntList list2;
     list2.push_back(3);
     list2.push_back(4);
 
@@ -196,7 +198,7 @@ BOOST_AUTO_TEST_CASE(RemoveIf)
 
 BOOST_AUTO_TEST_CASE(Assign)
 {
-    averenkov::List<int> list;
+    IntList list;
     list.assign(3, 5);
 
     BOOST_TEST(list.size() == 3);
