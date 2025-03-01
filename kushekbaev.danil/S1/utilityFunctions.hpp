@@ -13,7 +13,7 @@ namespace kushekbaev
 {
   size_t calcOfSize(pairedList pairsList);
   std::list< unsigned long long > deletingSpaces(pairedList pairsList, std::list< unsigned long long > valueList);
-  unsigned long long calcOfSum(std::list< unsigned long long > valueList);
+  unsigned long long calcOfSum(pairedList pairsList);
 }
 
 #endif

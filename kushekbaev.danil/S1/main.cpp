@@ -7,23 +7,18 @@ using pairedList = std::list< std::pair<std::string, std::list< unsigned long lo
 int main()
 {
   pairedList pairsList;
-  std::string nodeName = "";
-  std::list< std::string > nodeList;
-  std::list< unsigned long long > valueList;
-  unsigned long long sum = 0;
+  std::string listNumber = "";
 
-  while (!std::cin.eof())
+  while (std::cin >> listNumber)
   {
-    while (std::cin >> nodeName)
+    std::list< unsigned long long > valueList;
+    unsigned long long value = 0;
+    while (std::cin >> value)
     {
-      unsigned long long value = 0;
-      while (std::cin >> value)
-      {
-        valueList.push_back(value);
-      }
-      pairsList.push_back(std::make_pair(nodeName, valueList));
-      std::cin.clear();
+      valueList.push_back(value);
     }
+    pairsList.push_back(std::make_pair(listNumber, valueList));
+    std::cin.clear();
   }
 
   if (pairsList.size() == 0)
@@ -43,17 +38,7 @@ int main()
 
   for (size_t i = 0; i < maxSize; ++i)
   {
-    try
-    {
-      sum = kushekbaev::calcOfSum(valueList);
-    }
-    catch (const std::overflow_error&)
-    {
-      std::cerr << "Overflow!";
-      return 1;
-    }
-
-    std::list< unsigned long long > outputList = valueList;
+    std::list< unsigned long long > outputList = pairsList.begin()->second;
     while (!outputList.empty())
     {
       std::cout << outputList.front();
@@ -65,6 +50,20 @@ int main()
     }
     std::cout << "\n";
   }
+
+  unsigned long long sum = 0;
+
+  try
+  {
+    sum = kushekbaev::calcOfSum(pairsList);
+  }
+  catch (const std::overflow_error&)
+  {
+    std::cerr << "Overflow!\n";
+    return 1;
+  }
+
+  auto valueList = pairsList.begin()->second;
 
   for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
   {

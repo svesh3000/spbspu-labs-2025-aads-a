@@ -28,9 +28,10 @@ namespace kushekbaev
     return valueList;
   }
 
-  unsigned long long calcOfSum(std::list< unsigned long long > valueList)
+  unsigned long long calcOfSum(pairedList pairsList)
   {
     unsigned long long sum = 0;
+    auto valueList = pairsList.begin()->second;
 
     for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
     {
