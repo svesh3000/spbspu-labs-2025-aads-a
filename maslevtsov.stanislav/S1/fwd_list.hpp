@@ -38,11 +38,9 @@ namespace maslevtsov {
 template< typename T >
 maslevtsov::FwdList< T >::FwdList():
   head_(nullptr),
-  tail_(new FwdListNode< T >(T())),
+  tail_(new FwdListNode< T >{T(), tail_}),
   size_(0)
-{
-  tail_->next_ = tail_;
-}
+{}
 
 template< typename T >
 maslevtsov::FwdList< T >::~FwdList()
@@ -73,7 +71,8 @@ template< typename T >
 T& maslevtsov::FwdList< T >::back() const
 {
   FwdIterator< T > it = begin();
-  for (; it != end(); ++it);
+  for (; it != end(); ++it)
+    ;
   return *it;
 }
 
@@ -92,7 +91,7 @@ bool maslevtsov::FwdList< T >::empty() const noexcept
 template< typename T >
 void maslevtsov::FwdList< T >::push_front(const T& value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >(value);
+  FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
   new_node->next_ = empty() ? tail_ : head_;
   tail_->next_ = new_node;
   head_ = new_node;
@@ -102,7 +101,7 @@ void maslevtsov::FwdList< T >::push_front(const T& value)
 template< typename T >
 void maslevtsov::FwdList< T >::push_front(T&& value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >(std::move(value));
+  FwdListNode< T >* new_node = new FwdListNode< T >{std::move(value), nullptr};
   new_node->next_ = empty() ? tail_ : head_;
   tail_->next_ = new_node;
   head_ = new_node;
