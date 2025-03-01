@@ -25,9 +25,10 @@ int main()
     std::cout << "0\n";
     return 0;
   }
-  for (auto it = list.begin(); it != list.end(); it++)
+  std::cout << list.begin()
+  for (auto it = ++(list.begin()); it != list.end(); it++)
   {
-    std::cout << it->first << " ";
+    std::cout << " " << it->first;
   }
   std::cout << "\n";
   averenkov::List< averenkov::List< unsigned long long > > result;
