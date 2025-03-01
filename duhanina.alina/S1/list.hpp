@@ -40,6 +40,8 @@ namespace duhanina
     void remove_if(Predicate pred);
     void assign(size_t count, const T& value);
 
+    bool operator==(const List< T >&) const;
+    bool operator!=(const List< T >&) const;
   private:
     Node< T >* fake_;
     size_t listSize_;
