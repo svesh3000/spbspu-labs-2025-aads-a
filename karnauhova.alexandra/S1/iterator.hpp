@@ -5,7 +5,7 @@
 #include "nodelist.hpp"
 
 template< typename T >
-struct ListIterator
+struct ListIterator: public std::iterator< std::forward_iterator_tag, T >
 {
   NodeList< T >* node;
   using this_t = ListIterator< T >;
@@ -18,8 +18,10 @@ struct ListIterator
   this_t& operator++();
   this_t operator++(int);
 
-  T& operator*(); //+const
-  T* operator->();//+const
+  T& operator*();
+  const T& operator*() const;
+  T* operator->();
+  const T* operator->() const;
   bool operator!=(const this_t&) const;
   bool operator==(const this_t&) const;
 };
@@ -32,7 +34,7 @@ ListIterator< T >& ListIterator< T >::operator++()
 }
 
 template< typename T >
-ListIterator<T> ListIterator<T>::operator++(int)
+ListIterator< T > ListIterator<T>::operator++(int)
 {
   ListIterator< T > result(*this);
   ++(*this);
@@ -40,27 +42,38 @@ ListIterator<T> ListIterator<T>::operator++(int)
 }
 
 template< typename T >
-bool ListIterator<T>::operator==(const this_t& rhs) const
+bool ListIterator< T >::operator==(const this_t& rhs) const
 {
-    return node == rhs.node;
+  return node == rhs.node;
 }
 
 template< typename T >
-bool ListIterator<T>::operator!=(const this_t& rhs) const
+bool ListIterator< T >::operator!=(const this_t& rhs) const
 {
-    return !(rhs == *this);
+  return !(rhs == *this);
 }
 
 template< typename T >
-T& ListIterator<T>::operator*()
+const T& ListIterator< T >::operator*() const
 {
-    return node->data;
+  return node->data;
 }
 
 template< typename T >
-T* ListIterator<T>::operator->()
+const T* ListIterator< T >::operator->() const
 {
-    return std::addressof(node->data);
+  return std::addressof(node->data);
 }
 
+template< typename T >
+T& ListIterator< T >::operator*()
+{
+  return const_cast< T& >(static_cast< const ListIterator< T >& >(this)->operator*());
+}
+
+template< typename T >
+T* ListIterator< T >::operator->()
+{
+  return const_cast< T* >(static_cast< const ListIterator< T >* >(this)->operator->());
+}
 #endif

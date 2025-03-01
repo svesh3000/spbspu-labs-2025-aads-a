@@ -6,6 +6,5 @@ struct NodeList
 {
   T data;
   NodeList< T >* next;
-  //NodeList(const T& value) : data(value), next(nullptr) {}
 };
 #endif

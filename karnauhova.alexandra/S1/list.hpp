@@ -67,11 +67,12 @@ template< typename T >
 void List< T >::clear()
 {
   NodeList< T >* last = fake_->next;
-  while (!size_)
+  while (size_)
   {
     NodeList< T >* now = last->next;
     delete last;
     last = now;
+    size_--;
   }
 }
 
@@ -109,7 +110,7 @@ template< typename T >
 ListIterator< T > List< T >::end() const
 {
   NodeList< T >* now = fake_;
-  while (now->next != fake_)
+  while (now != fake_)
   {
     now = now->next;
   }
