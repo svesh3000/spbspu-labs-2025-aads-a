@@ -13,6 +13,7 @@ namespace smirnov
     void pushBack(const T & value);
     bool isEmpty() const;
     size_t getSize() const;
+    void popFront();
     using ConstIterator = typename std::list< T >::const_iterator;
     ConstIterator begin() const;
     ConstIterator end() const;
@@ -37,6 +38,15 @@ template< typename T >
 size_t smirnov::List< T >::getSize() const
 {
   return data.size();
+}
+
+template< typename T >
+void smirnov::List< T >::popFront()
+{
+  if (!data.empty())
+  {
+    data.pop_front();
+  }
 }
 
 template< typename T >

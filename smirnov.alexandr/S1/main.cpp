@@ -48,8 +48,27 @@ int main()
     }
     std::cout << sequence.first;
   }
-  if (!sequences.empty())
+  std::cout << "\n";
+
+  std::list< List< size_t > > resultSequences;
+  bool hasNumbers = true;
+  while (hasNumbers)
   {
-    std::cout << "\n";
+    List< size_t > currentSequence;
+    hasNumbers = false;
+    for (auto it = sequences.begin(); it != sequences.end(); ++it)
+    {
+      std::pair< std::string, List< size_t > > & seq = *it;
+      if (!seq.second.isEmpty())
+      {
+        currentSequence.pushBack(*seq.second.begin());
+        seq.second.popFront();
+        hasNumbers = true;
+      }
+    }
+    if (!currentSequence.isEmpty())
+    {
+      resultSequences.push_back(currentSequence);
+    }
   }
 }
