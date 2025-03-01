@@ -43,6 +43,16 @@ int main()
 
   for (size_t i = 0; i < maxSize; ++i)
   {
+    try
+    {
+      sum = kushekbaev::calcOfSum(valueList);
+    }
+    catch (std::overflow_error&)
+    {
+      std::cerr << "Overflow!";
+      return 1;
+    }
+    
     std::list< unsigned long long > outputList = valueList;
     while (!outputList.empty())
     {
@@ -54,15 +64,6 @@ int main()
       outputList.pop_front();
     }
     std::cout << "\n";
-    try
-    {
-      sum = kushekbaev::calcOfSum(valueList);
-    }
-    catch (std::overflow_error&)
-    {
-      std::cerr << "Overflow!";
-      return 1;
-    }
   }
 
   for (auto it = ++valueList.begin(); it != valueList.end(); ++it)
