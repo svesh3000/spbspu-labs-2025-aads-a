@@ -11,7 +11,11 @@ namespace maslevtsov {
   {
   public:
     FwdList();
+    FwdList(const FwdList& rhs);
+    FwdList(FwdList&& rhs);
     ~FwdList();
+    FwdList& operator=(const FwdList& rhs);
+    FwdList& operator=(FwdList&& rhs);
 
     FwdIterator< T > begin() const noexcept;
     FwdIterator< T > end() const noexcept;
@@ -38,9 +42,11 @@ namespace maslevtsov {
 template< typename T >
 maslevtsov::FwdList< T >::FwdList():
   head_(nullptr),
-  tail_(new FwdListNode< T >{T(), tail_}),
+  tail_(new FwdListNode< T >{T(), nullptr}),
   size_(0)
-{}
+{
+  tail_->next_ = tail_;
+}
 
 template< typename T >
 maslevtsov::FwdList< T >::~FwdList()
