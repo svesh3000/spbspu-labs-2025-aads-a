@@ -2,6 +2,7 @@
 #define CIRCULARFWDLIST_HPP
 
 #include <cstddef>
+#include <utility>
 
 namespace zholobov {
 
@@ -32,7 +33,7 @@ namespace zholobov {
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
     iterator end() noexcept;
-    iterator end() const noexcept;
+    const_iterator end() const noexcept;
 
     reference front();
     const_reference front() const;
@@ -40,7 +41,7 @@ namespace zholobov {
     const_reference back() const;
 
     bool empty() const noexcept;
-    size_t size() const;
+    size_t size() const { return size_; }
 
     void assign(size_t n, const value_type& val);
     void push_front(const value_type& val);
@@ -77,6 +78,99 @@ namespace zholobov {
     friend class CircularFwdListIterator< T >;
     friend class CircularFwdListConstIterator< T >;
   };
+}
+
+template < typename T >
+zholobov::CircularFwdList< T >::CircularFwdList():
+  head_(nullptr), tail_(nullptr), size_(0)
+{}
+
+template < typename T >
+zholobov::CircularFwdList< T >::CircularFwdList(const CircularFwdList& other):
+  head_(nullptr), tail_(nullptr), size_(0)
+{
+  Node_t* other_p = other.head_;
+  if (other_p != nullptr) {
+    head_ = new Node_t;
+    head_->value = other_p->value;
+    head_->next = head_;
+    ++size_;
+    other_p = other_p->next;
+    Node_t* prev = head_;
+    while (other_p != other.head_) {
+      Node_t* curr = new Node_t;
+      ++size_;
+      curr->value = other_p->value;
+      curr->next = head_;
+      prev->next = curr;
+    };
+    tail_ = prev;
+  }
+}
+
+template < typename T >
+zholobov::CircularFwdList< T >::CircularFwdList(CircularFwdList&& other) noexcept:
+  head_(nullptr), tail_(nullptr), size_(0)
+{
+  std::swap(head_, other.head_);
+  std::swap(tail_, other.tail_);
+  std::swap(size_, other.size_);
+}
+
+template < typename T >
+zholobov::CircularFwdList< T >::~CircularFwdList()
+{
+  Node_t* curr = head_->next;
+  while (curr != head_) {
+    Node_t* temp = curr;
+    curr = curr->next;
+    delete temp;
+  }
+  delete head_;
+}
+
+template < typename T >
+typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::begin() noexcept
+{
+  return iterator(std::addressof(head_));
+}
+
+template < typename T >
+typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::begin() const noexcept
+{
+  return const_iterator(std::addressof(head_));
+}
+
+template < typename T >
+typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::end() noexcept
+{
+  return iterator(std::addressof(tail_->next));
+}
+
+template < typename T >
+typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::end() const noexcept
+{
+  return const_iterator(std::addressof(tail_->next));
+}
+
+template < typename T >
+void zholobov::CircularFwdList< T >::push_front(const value_type& val)
+{
+  Node_t* new_node = new Node_t;
+  new_node->value = val;
+  new_node->next = head_;
+  head_ = new_node;
+  ++size_;
+}
+
+template < typename T >
+void zholobov::CircularFwdList< T >::push_front(value_type&& val)
+{
+  Node_t* new_node = new Node_t;
+  new_node->value = val;
+  new_node->next = head_;
+  head_ = new_node;
+  ++size_;
 }
 
 #endif
