@@ -11,16 +11,16 @@ namespace maslevtsov {
   public:
     using this_t = FwdIterator< T >;
 
-    FwdIterator();
-    FwdIterator(const this_t& rhs) = default;
+    FwdIterator() = default;
+    FwdIterator(const this_t& rhs);
     explicit FwdIterator(FwdListNode< T >* node);
     ~FwdIterator() = default;
 
-    this_t& operator=(const FwdIterator& rhs) = default;
+    this_t& operator=(const FwdIterator& rhs);
     this_t& operator++();
     this_t& operator++(int);
-    T& operator*() const;
-    T* operator->() const;
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
     bool operator==(const this_t& rhs) const;
     bool operator!=(const this_t& rhs) const;
 
@@ -30,14 +30,21 @@ namespace maslevtsov {
 }
 
 template< typename T >
-maslevtsov::FwdIterator< T >::FwdIterator():
-  node_(nullptr)
+maslevtsov::FwdIterator< T >::FwdIterator(const this_t& rhs):
+  node_(rhs.node_)
 {}
 
 template< typename T >
 maslevtsov::FwdIterator< T >::FwdIterator(FwdListNode< T >* node):
   node_(node)
 {}
+
+template< typename T >
+typename maslevtsov::FwdIterator< T >::this_t& maslevtsov::FwdIterator< T >::operator=(const FwdIterator& rhs)
+{
+  node_ = rhs.node_;
+  return *this;
+}
 
 template< typename T >
 typename maslevtsov::FwdIterator< T >::this_t& maslevtsov::FwdIterator< T >::operator++()
@@ -55,13 +62,13 @@ typename maslevtsov::FwdIterator< T >::this_t& maslevtsov::FwdIterator< T >::ope
 }
 
 template< typename T >
-T& maslevtsov::FwdIterator< T >::operator*() const
+T& maslevtsov::FwdIterator< T >::operator*() const noexcept
 {
   return node_->data_;
 }
 
 template< typename T >
-T* maslevtsov::FwdIterator< T >::operator->() const
+T* maslevtsov::FwdIterator< T >::operator->() const noexcept
 {
   return std::addressof(node_->data_);
 }

@@ -13,20 +13,20 @@ namespace maslevtsov {
     FwdList();
     ~FwdList();
 
-    FwdIterator< T > begin() const;
-    FwdIterator< T > end() const;
+    FwdIterator< T > begin() const noexcept;
+    FwdIterator< T > end() const noexcept;
 
     T& front() const;
     T& back() const;
 
-    std::size_t size() const;
-    bool empty() const;
+    std::size_t size() const noexcept;
+    bool empty() const noexcept;
 
     void push_front(const T& value);
     void push_front(T&& value);
-    void pop_front();
-    void swap(FwdList& other);
-    void clear();
+    void pop_front() noexcept;
+    void swap(FwdList& other) noexcept;
+    void clear() noexcept;
 
   private:
     FwdListNode< T >* head_;
@@ -52,13 +52,13 @@ maslevtsov::FwdList< T >::~FwdList()
 }
 
 template< typename T >
-maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::begin() const
+maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::begin() const noexcept
 {
   return FwdIterator< T >(head_);
 }
 
 template< typename T >
-maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::end() const
+maslevtsov::FwdIterator< T > maslevtsov::FwdList< T >::end() const noexcept
 {
   return FwdIterator< T >(tail_);
 }
@@ -78,13 +78,13 @@ T& maslevtsov::FwdList< T >::back() const
 }
 
 template< typename T >
-std::size_t maslevtsov::FwdList< T >::size() const
+std::size_t maslevtsov::FwdList< T >::size() const noexcept
 {
   return size_;
 }
 
 template< typename T >
-bool maslevtsov::FwdList< T >::empty() const
+bool maslevtsov::FwdList< T >::empty() const noexcept
 {
   return size_ == 0;
 }
@@ -110,7 +110,7 @@ void maslevtsov::FwdList< T >::push_front(T&& value)
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::pop_front()
+void maslevtsov::FwdList< T >::pop_front() noexcept
 {
   FwdListNode< T >* new_head = head_->next_;
   delete head_;
@@ -120,7 +120,7 @@ void maslevtsov::FwdList< T >::pop_front()
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::swap(FwdList& other)
+void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
 {
   std::swap(head_, other.head_);
   std::swap(tail_, other.tail_);
@@ -128,7 +128,7 @@ void maslevtsov::FwdList< T >::swap(FwdList& other)
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::clear()
+void maslevtsov::FwdList< T >::clear() noexcept
 {
   while (!empty()) {
     pop_front();

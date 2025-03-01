@@ -12,7 +12,7 @@ namespace {
     throw std::overflow_error("overflow");
   }
 
-  void print_list_elements(std::ostream& out, maslevtsov::list_t& list)
+  void print_list_elements(std::ostream& out, maslevtsov::list_t& list) noexcept
   {
     out << *list.begin();
     for (auto j = ++list.begin(); j != list.end(); ++j) {
