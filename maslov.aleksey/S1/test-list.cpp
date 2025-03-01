@@ -1,7 +1,24 @@
 #include <boost/test/unit_test.hpp>
+#include <sstream>
 #include "list.hpp"
 
 using FwdList = maslov::FwdList< int >;
+
+namespace
+{
+  std::ostream & printList(std::ostream & out, FwdList list)
+  {
+    for (auto it = list.begin(); it != list.end(); it++)
+    {
+      out << *it;
+    }
+    return out;
+  }
+  bool lessThanThree(const int & value)
+  {
+    return (value < 3);
+  }
+}
 
 BOOST_AUTO_TEST_SUITE(constructors)
 
@@ -15,10 +32,9 @@ BOOST_AUTO_TEST_CASE(fillConstructor)
 {
   FwdList list(4, 4);
   BOOST_TEST(list.size() == 4);
-  for (auto it = list.begin(); it != list.end(); ++it)
-  {
-    BOOST_TEST(*it == 4);
-  }
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "4444");
 }
 
 BOOST_AUTO_TEST_CASE(copyConstructor)
@@ -153,11 +169,9 @@ BOOST_AUTO_TEST_CASE(reverse)
   list.pushFront(2);
   list.pushFront(3);
   list.reverse();
-  BOOST_TEST(list.size() == 3);
-  auto it = list.begin();
-  BOOST_TEST(*it++ == 1);
-  BOOST_TEST(*it++ == 2);
-  BOOST_TEST(*it++ == 3);
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "123");
 }
 
 BOOST_AUTO_TEST_CASE(remove)
@@ -170,19 +184,12 @@ BOOST_AUTO_TEST_CASE(remove)
   list.pushFront(5);
   list.pushFront(4);
   list.remove(5);
-  BOOST_TEST(list.size() == 4);
-  size_t value = 4;
-  for (auto it = list.begin(); it != list.end(); ++it)
-  {
-    BOOST_TEST(*it == value);
-    value--;
-  }
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "4321");
+
 }
 
-bool lessThanThree(const size_t & value)
-{
-  return (value < 3);
-}
 BOOST_AUTO_TEST_CASE(removeIf)
 {
   FwdList list;
@@ -191,10 +198,9 @@ BOOST_AUTO_TEST_CASE(removeIf)
   list.pushFront(5);
   list.pushFront(2);
   list.removeIf(lessThanThree);
-  BOOST_TEST(list.size() == 2);
-  auto it = list.begin();
-  BOOST_TEST(*it++ == 5);
-  BOOST_TEST(*it++ == 3);
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "53");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
