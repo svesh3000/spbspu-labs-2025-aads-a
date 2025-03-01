@@ -23,7 +23,6 @@ namespace kushekbaev
       if (!it->second.empty())
       {
         valueList.push_back(it->second.front());
-        it->second.pop_front();
       }
     }
     return valueList;
@@ -37,8 +36,7 @@ namespace kushekbaev
     {
       if (sum > std::numeric_limits< unsigned long long >::max() - *it)
       {
-        throw std::logic_error("Overflow!");
-        return 1;
+        throw std::overflow_error("Overflow!");
       }
 
       sum += *it;
