@@ -55,22 +55,22 @@ typename rychkov::List< T >::reference rychkov::List< T >::emplace_front(Args&&.
 template< class T >
 void rychkov::List< T >::push_front(const value_type& value)
 {
-  return emplace_front(value);
+  emplace_front(value);
 }
 template< class T >
 void rychkov::List< T >::push_front(value_type&& value)
 {
-  return emplace_front(std::move(value));
+  emplace_front(std::move(value));
 }
 template< class T >
 void rychkov::List< T >::push_back(const value_type& value)
 {
-  return emplace_back(value);
+  emplace_back(value);
 }
 template< class T >
 void rychkov::List< T >::push_back(value_type&& value)
 {
-  return emplace_back(std::move(value));
+  emplace_back(std::move(value));
 }
 
 template< class T >

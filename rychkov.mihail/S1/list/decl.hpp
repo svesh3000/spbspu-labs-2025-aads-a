@@ -93,14 +93,16 @@ namespace rychkov
     void push_back(const value_type& value);
     void push_back(value_type&& value);
     void pop_back();
-    value_type back() const;
+    value_type& back();
+    const value_type& back() const;
     template< class... Args >
     reference emplace_back(Args&&... args);
 
     void push_front(const value_type& value);
     void push_front(value_type&& value);
     void pop_front();
-    value_type front() const;
+    value_type& front();
+    const value_type& front() const;
     template< class... Args >
     reference emplace_front(Args&&... args);
 

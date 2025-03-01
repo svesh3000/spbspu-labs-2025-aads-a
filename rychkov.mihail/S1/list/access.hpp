@@ -14,12 +14,22 @@ size_t rychkov::List< T >::size() const noexcept
   return size_;
 }
 template< class T >
-typename rychkov::List< T >::value_type rychkov::List< T >::front() const
+typename rychkov::List< T >::value_type& rychkov::List< T >::front()
 {
   return head_->data;
 }
 template< class T >
-typename rychkov::List< T >::value_type rychkov::List< T >::back() const
+const typename rychkov::List< T >::value_type& rychkov::List< T >::front() const
+{
+  return head_->data;
+}
+template< class T >
+typename rychkov::List< T >::value_type& rychkov::List< T >::back()
+{
+  return tail_->data;
+}
+template< class T >
+const typename rychkov::List< T >::value_type& rychkov::List< T >::back() const
 {
   return tail_->data;
 }
