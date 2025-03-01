@@ -7,5 +7,7 @@
 #include "list/comparison.hpp"
 #include "list/rest.hpp"
 #include "list/add_elements.hpp"
+#include "list/splice.hpp"
+#include "list/sort_based.hpp"
 
 #endif
