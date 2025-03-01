@@ -51,7 +51,7 @@ namespace karnauhova
     next->next = last;
     fake_->next = next;
   }
-  
+
   template< typename T >
   List< T >::List():
     fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
@@ -146,11 +146,6 @@ namespace karnauhova
   template< typename T >
   ListIterator< T > List< T >::end() const
   {
-   // NodeList< T >* now = fake_;
-    //while (now != fake_)
-   // {
-      //now = now->next;
-    //}
     return ListIterator< T >(fake_);
   }
 
