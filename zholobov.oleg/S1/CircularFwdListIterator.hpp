@@ -1,6 +1,7 @@
 #ifndef CIRCULARFWDLISTITERATOR_HPP
 #define CIRCULARFWDLISTITERATOR_HPP
 
+#include <memory>
 #include "CircularFwdList.hpp"
 
 namespace zholobov {
@@ -8,14 +9,61 @@ namespace zholobov {
   template < typename T >
   class CircularFwdListIterator {
   public:
+    using value_type = T;
+
     CircularFwdListIterator():
-      it_(nullptr)
+      node_(nullptr)
     {}
+    CircularFwdListIterator& operator++();
+    CircularFwdListIterator operator++(int);
+    value_type& operator*() const;
+    value_type* operator->() const;
+    bool operator==(const CircularFwdListIterator& other) const;
+    bool operator!=(const CircularFwdListIterator& other) const;
 
   private:
-    typename CircularFwdList< T >::Node_t* it_;
+    typename CircularFwdList< T >::Node_t* node_;
   };
 
+}
+
+template < typename T >
+zholobov::CircularFwdListIterator< T >& zholobov::CircularFwdListIterator< T >::operator++()
+{
+  node_ = node_->next;
+  return *this;
+}
+
+template < typename T >
+zholobov::CircularFwdListIterator< T > zholobov::CircularFwdListIterator< T >::operator++(int)
+{
+  CircularFwdList< T > temp(*this);
+  node_ = node_->next;
+  return temp;
+}
+
+template < typename T >
+typename zholobov::CircularFwdListIterator< T >::value_type& zholobov::CircularFwdListIterator< T >::operator*() const
+{
+  return node_->value;
+}
+
+template < typename T >
+typename zholobov::CircularFwdListIterator< T >::value_type* zholobov::CircularFwdListIterator< T >::operator->() const
+{
+  return std::addressof(node_->value);
+}
+
+template < typename T >
+bool zholobov::CircularFwdListIterator< T >::operator==(const CircularFwdListIterator& other) const
+{
+  return node_ == other.node_;
+}
+
+template < typename T >
+bool zholobov::CircularFwdListIterator< T >::operator!=(const CircularFwdListIterator& other) const
+{
+  return !(*this == other);
 }
 
 #endif
