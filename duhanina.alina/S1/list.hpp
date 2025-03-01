@@ -258,6 +258,34 @@ namespace duhanina
       push_back(value);
     }
   }
+
+  template< typename T >
+  bool List< T >::operator==(const List< T >& rhs) const
+  {
+    if (size() != rhs.size())
+    {
+      return false;
+    }
+
+    auto it1 = begin();
+    auto it2 = rhs.begin();
+    while (it1 != end())
+    {
+      if (*it1 != *it2)
+      {
+        return false;
+      }
+      ++it1;
+      ++it2;
+    }
+    return true;
+  }
+
+  template< typename T >
+  bool List< T >::operator!=(const List< T >& rhs) const
+  {
+    return !(*this == rhs);
+  }
 }
 
 #endif
