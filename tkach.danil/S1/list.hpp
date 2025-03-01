@@ -13,7 +13,8 @@ namespace tkach
   public:
     List();
     List(const List< T >& other);
-    List(List< T >&& other);
+    List(List< T >&& other) noexcept;
+    List(size_t count, const T & data);
     ~List();
     Iterator< T > begin() noexcept;
     Citerator< T > cbegin() const noexcept;
@@ -34,7 +35,8 @@ namespace tkach
     Node< T >* head_;
     Node< T >* tail_;
     size_t size_;
-    List< T > getList(const List< T >& other);
+    List< T > getList(const List< T >& other) const;
+    List< T > getList(size_t count, const T & data) const;
   };
 
   template< typename T >
@@ -51,7 +53,7 @@ namespace tkach
   }
 
   template< typename T >
-  List< T > List< T >::getList(const List< T >& other)
+  List< T > List< T >::getList(const List< T >& other) const
   {
     List< T > temp;
     if (other.empty())
@@ -73,6 +75,30 @@ namespace tkach
     }
     return temp;
   }
+
+  template< typename T >
+  List< T > List< T >::getList(size_t count, const T & data) const
+  {
+    List< T > temp;
+    for (size_t i = 0; i < count; ++i)
+    {
+      try
+      {
+        temp.pushFront(data);
+      }
+      catch (const std::bad_alloc&)
+      {
+        temp.clear();
+        throw;
+      }
+    }
+    return temp;
+  }
+
+  template< typename T >
+  List< T >::List(size_t count, const T & data):
+    List(getList(count, data))
+  {}
 
   template< typename T >
   Iterator< T > List< T >::begin() noexcept
@@ -217,7 +243,7 @@ namespace tkach
   }
 
   template< typename T >
-  List< T >::List(List< T >&& other):
+  List< T >::List(List< T >&& other) noexcept:
     head_(other.head_),
     tail_(other.tail_),
     size_(other.size_)

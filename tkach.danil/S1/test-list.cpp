@@ -125,6 +125,16 @@ BOOST_AUTO_TEST_CASE(list_swap_test)
   BOOST_TEST(*it == 2);
 }
 
+BOOST_AUTO_TEST_CASE(list_fill_test)
+{
+  List< int > list(5, 54);
+  auto it = list.begin();
+  for(size_t i = 0; i < list.size(); ++i)
+  {
+    *(it++) = 54;
+  }
+}
+
 BOOST_AUTO_TEST_CASE(list_begin_end_test)
 {
   List< int > list1;
