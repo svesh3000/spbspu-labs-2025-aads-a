@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_default_constructor)
 BOOST_AUTO_TEST_CASE(test_constructor_with_parameters)
 {
   list_t list1(0, 1);
-  BOOST_TEST(list.empty());
+  BOOST_TEST(list1.empty());
   list_t list(3, 5);
   BOOST_TEST(list.size() == 3);
 }
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_pop_back)
   list.push_back(2);
   list.pop_back();
   BOOST_TEST(list.back() == 1);
-  list1.push_back(5)
+  list1.push_back(5);
   list1.pop_back();
   BOOST_TEST(list1.empty());
 }
