@@ -88,16 +88,52 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(modifiers)
 
 BOOST_AUTO_TEST_CASE(pushFront)
-{}
+{
+  FwdList list;
+  list.push_front(1);
+  BOOST_TEST(list.size() == 1);
+  BOOST_TEST(list.front() == 1);
+  list.push_front(2);
+  BOOST_TEST(list.size() == 2);
+  BOOST_TEST(list.front() == 2);
+}
 
 BOOST_AUTO_TEST_CASE(popFront)
-{}
+{
+  FwdList list;
+  list.push_front(1);
+  list.push_front(2);
+  list.pop_front();
+  BOOST_TEST(list.size() == 1);
+  BOOST_TEST(list.front() == 1);
+  list.pop_front();
+  BOOST_TEST(list.empty());
+}
 
 BOOST_AUTO_TEST_CASE(swap)
-{}
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list2;
+  list2.push_front(3);
+  list2.push_front(4);
+  list2.push_front(5);
+  FwdList tempList1 = list1;
+  FwdList tempList2 = list2;
+  list1.swap(list2);
+  BOOST_TEST(list1 == tempList2);
+  BOOST_TEST(list2 == tempList1);
+}
 
 BOOST_AUTO_TEST_CASE(clear)
-{}
+{
+  FwdList list;
+  list.push_front(1);
+  list.push_front(2);
+  list.clear();
+  BOOST_TEST(list.empty());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
