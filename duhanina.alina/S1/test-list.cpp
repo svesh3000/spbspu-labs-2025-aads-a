@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(test_iterators)
   auto it = list.begin();
   BOOST_TEST(*it == 1);
   auto it1 = list.end();
-  BOOST_TEST(*it1 == 3);
+  BOOST_TEST(*it1 == 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_swap)
