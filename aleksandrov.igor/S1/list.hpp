@@ -22,7 +22,7 @@ namespace aleksandrov
     void popFront();
     void swap(List< T >& other);
     void clear() noexcept;
-    
+
   private:
     Node< T >* fake_;
     Node< T >* tail_;
@@ -40,12 +40,12 @@ namespace aleksandrov
     clear();
     delete fake_;
   }
-  
+
   template< typename T >
   Iterator< T > List< T >::begin() const
   {
     return Iterator< T >(fake_->next_);
-  }  
+  }
 
   template< typename T >
   T& List< T >::front()
@@ -83,7 +83,7 @@ namespace aleksandrov
     newNode->next_ = fake_->next_;
     if (!empty())
     {
-      fake_->next_ = newNode; 
+      fake_->next_ = newNode;
     }
     else
     {

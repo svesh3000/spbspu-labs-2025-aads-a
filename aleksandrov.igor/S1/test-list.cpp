@@ -79,3 +79,4 @@ BOOST_AUTO_TEST_CASE(clear)
   list.clear();
   BOOST_TEST(list.empty());
 }
+
