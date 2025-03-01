@@ -71,4 +71,18 @@ int main()
       resultSequences.push_back(currentSequence);
     }
   }
+
+  for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
+  {
+    const List< size_t > & sequence = *it;
+    for (auto numIt = sequence.begin(); numIt != sequence.end(); ++numIt)
+    {
+      if (numIt != sequence.begin())
+      {
+        std::cout << " ";
+      }
+      std::cout << *numIt;
+    }
+    std::cout << "\n";
+  }
 }
