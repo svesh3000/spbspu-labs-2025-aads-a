@@ -91,13 +91,8 @@ typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(
 template< typename T >
 typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs)
 {
-  clear();
-  delete tail_;
-  head_ = rhs.head_;
-  tail_ = rhs.tail_;
-  rhs.head_ = nullptr;
-  rhs.tail_ = nullptr;
-  size_ = rhs.size_;
+  FwdList< T > copied_rhs(std::move(rhs));
+  swap(copied_rhs);
   return *this;
 }
 
