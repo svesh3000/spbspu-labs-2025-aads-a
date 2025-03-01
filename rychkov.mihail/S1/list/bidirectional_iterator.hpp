@@ -82,7 +82,7 @@ namespace rychkov
     }
 
     template< bool isConst1 = isConst >
-    typename std::enable_if_t< isConst && isConst1, reference > operator*() noexcept
+    typename std::enable_if_t< !isConst && !isConst1, reference > operator*() noexcept
     {
       return node_->data;
     }
@@ -91,7 +91,7 @@ namespace rychkov
       return node_->data;
     }
     template< bool isConst1 = isConst >
-    typename std::enable_if_t< isConst && isConst1, pointer > operator->() noexcept
+    typename std::enable_if_t< !isConst && !isConst1, pointer > operator->() noexcept
     {
       return std::addressof(node_->data);
     }

@@ -46,12 +46,22 @@ typename rychkov::List< T >::const_iterator rychkov::List< T >::begin() const no
   return {head_};
 }
 template< class T >
+typename rychkov::List< T >::const_iterator rychkov::List< T >::cbegin() const noexcept
+{
+  return {head_};
+}
+template< class T >
 typename rychkov::List< T >::reverse_iterator rychkov::List< T >::rbegin() noexcept
 {
   return {tail_};
 }
 template< class T >
 typename rychkov::List< T >::const_reverse_iterator rychkov::List< T >::rbegin() const noexcept
+{
+  return {tail_};
+}
+template< class T >
+typename rychkov::List< T >::const_reverse_iterator rychkov::List< T >::crbegin() const noexcept
 {
   return {tail_};
 }
@@ -67,12 +77,22 @@ typename rychkov::List< T >::const_iterator rychkov::List< T >::end() const noex
   return {};
 }
 template< class T >
+typename rychkov::List< T >::const_iterator rychkov::List< T >::cend() const noexcept
+{
+  return {};
+}
+template< class T >
 typename rychkov::List< T >::reverse_iterator rychkov::List< T >::rend() noexcept
 {
   return {};
 }
 template< class T >
 typename rychkov::List< T >::const_reverse_iterator rychkov::List< T >::rend() const noexcept
+{
+  return {};
+}
+template< class T >
+typename rychkov::List< T >::const_reverse_iterator rychkov::List< T >::crend() const noexcept
 {
   return {};
 }
