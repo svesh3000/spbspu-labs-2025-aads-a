@@ -34,6 +34,7 @@ namespace asafov
 
     ~Forward_list()
     {
+
     }
 
     class const_iterator
@@ -58,7 +59,7 @@ namespace asafov
       {
         return current_->data_;
       }
-      
+
       T* operator->() const
       {
         return std::addressof(current_->data_);
@@ -143,12 +144,10 @@ namespace asafov
 
     T& front();
     T& back();
-
     void clear();
   private:
     Node* head_;
     Node* last_;
   };
-
 }
 #endif
