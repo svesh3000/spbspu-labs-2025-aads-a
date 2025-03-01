@@ -3,11 +3,12 @@
 
 #include <iostream>
 #include <forward_list>
+#include "list.hpp"
 
 namespace karnauhova
 {
-  int element_lists(std::forward_list<unsigned long long> lists, size_t index);
-  void count_lists(std::forward_list<std::pair<std::string, std::forward_list<unsigned long long>>> l, std::ostream& out);
+  int element_lists(karnauhova::List<unsigned long long> lists, size_t index);
+  void count_lists(karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> l, std::ostream& out);
 }
 
 #endif

@@ -1,7 +1,8 @@
 #include "count_sum.hpp"
 #include <limits>
+#include "output.hpp"
 
-int karnauhova::element_lists(std::forward_list<unsigned long long> lists, size_t index)
+int karnauhova::element_lists(karnauhova::List<unsigned long long> lists, size_t index)
 {
   size_t count = 1;
   auto it = lists.begin();
@@ -17,44 +18,39 @@ int karnauhova::element_lists(std::forward_list<unsigned long long> lists, size_
   return *it;
 }
 
-void karnauhova::count_lists(std::forward_list<std::pair<std::string, std::forward_list<unsigned long long>>> l, std::ostream& out)
+void karnauhova::count_lists(karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> l, std::ostream& out)
 {
-  int max_length = 0;
+  size_t max_length = max_lenght(l);
   unsigned long long sum = 0;
-  for (const auto& it : l)
-  {
-    if (std::distance((it.second).begin(), (it.second).end()) > max_length)
-    {
-      max_length = std::distance((it.second).begin(), (it.second).end());
-    }
-  }
   if (max_length == 0)
   {
     out << 0 << "\n";
     return;
   }
-  int* sums = new int[max_length];
-  for (int i = 0; i < max_length; ++i)
+  List< unsigned long long > sums;
+  for (size_t i = 0; i < max_length; ++i)
   {
     for (const auto& it : l)
     {
       unsigned long long element = element_lists(it.second, (i + 1));
       if (std::numeric_limits<unsigned long long>::max() - element < sum)
       {
-        delete[] sums;
         throw std::logic_error("Incorrect sum");
       }
       sum += element;
     }
-    sums[i] = sum;
+    sums.push_front(sum);
     sum = 0;
   }
-  out << sums[0];
-  for (int i = 1; i < max_length; i++)
+  sums.reverse();
+  out << sums.front();
+  auto it = sums.begin();
+  it++;
+  for (size_t i = 1; i < max_length; i++)
   {
     out << " ";
-    out << sums[i];
+    out << it.node->data;
+    it++;
   }
-  delete[] sums;
   out << "\n";
 }

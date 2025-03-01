@@ -1,10 +1,12 @@
 #ifndef NODELIST_HPP
 #define NODELIST_HPP
-
-template< typename T >
-struct NodeList
+namespace karnauhova
 {
-  T data;
-  NodeList< T >* next;
-};
+  template< typename T >
+  struct NodeList
+  {
+    T data;
+    NodeList< T >* next;
+  };
+}
 #endif

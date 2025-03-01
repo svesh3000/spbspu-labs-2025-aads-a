@@ -3,7 +3,7 @@
 
 BOOST_AUTO_TEST_CASE(test_element_access)
 {
-  List< int > list;
+  karnauhova::List< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(2);
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_element_access)
 
 BOOST_AUTO_TEST_CASE(test_capacity_list)
 {
-  List< int > list;
+  karnauhova::List< int > list;
   BOOST_TEST(list.empty() == true);
   list.push_front(0);
   list.push_front(1);
@@ -23,11 +23,22 @@ BOOST_AUTO_TEST_CASE(test_capacity_list)
 
 BOOST_AUTO_TEST_CASE(test_clear_list)
 {
-  List< int > list;
+  karnauhova::List< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(2);
   list.clear();
   BOOST_TEST(list.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_reverse_list)
+{
+  karnauhova::List< int > list;
+  list.push_front(0);
+  list.push_front(1);
+  list.push_front(2);
+  list.reverse();
+  BOOST_TEST(list.front() == 0);
+  BOOST_TEST(list.back() == 2);
 }
 

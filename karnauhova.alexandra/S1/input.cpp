@@ -3,11 +3,12 @@
 #include <string>
 #include <stdexcept>
 
-std::pair<std::string, std::forward_list<unsigned long long>> karnauhova::input_line(std::istream& in, std::string name)
+
+std::pair<std::string, karnauhova::List<unsigned long long>> karnauhova::input_line(std::istream& in, std::string name)
 {
   unsigned long long x = 0;
-  std::forward_list<unsigned long long> numbers{};
-  while (in >> x && !in.eof())
+  karnauhova::List<unsigned long long> numbers;
+  while (in >> x)
   {
     if (!x)
     {
@@ -17,6 +18,6 @@ std::pair<std::string, std::forward_list<unsigned long long>> karnauhova::input_
   }
   in.clear();
   numbers.reverse();
-  std::pair<std::string, std::forward_list<unsigned long long>> p (name, numbers);
+  std::pair<std::string, karnauhova::List<unsigned long long>> p (name, numbers);
   return p;
 }

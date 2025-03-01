@@ -1,33 +1,33 @@
 #include "output.hpp"
 
-void karnauhova::output_names(std::forward_list<std::pair<std::string, std::forward_list<unsigned long long>>> l, std::ostream& out)
+void karnauhova::output_names(karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> l, std::ostream& out)
 {
-  auto it = l.begin();
-  if (it == l.end())
+  if (l.size() == 0)
   {
     return;
   }
+  auto it = l.begin();
   out << it->first;
-  it++;
-  for (; it != l.end(); it++)
+  for (size_t i = (l.size() - 1); i > 0; i--)
   {
+    it++;
     out << " " << it->first;
   }
   out << "\n";
 }
 
-void karnauhova::output_element_lists(std::forward_list<unsigned long long> lists, size_t index, std::ostream& out, bool& first)
+void karnauhova::output_element_lists(karnauhova::List<unsigned long long> lists, size_t index, std::ostream& out, bool& first)
 {
   size_t count = 1;
   auto it = lists.begin();
-  while (it != lists.end() && count < index)
+  if (lists.size() < index)
+  {
+    return;
+  }
+  while (count < index)
   {
     it++;
     count++;
-  }
-  if (it == lists.end())
-  {
-    return;
   }
   if (!first)
   {
@@ -37,17 +37,10 @@ void karnauhova::output_element_lists(std::forward_list<unsigned long long> list
   out << *it;
 }
 
-void karnauhova::output_lists(std::forward_list<std::pair<std::string, std::forward_list<unsigned long long>>> l, std::ostream& out)
+void karnauhova::output_lists(karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> l, std::ostream& out)
 {
-  int max_length = 0;
-  for (const auto& it : l)
-  {
-    if (std::distance((it.second).begin(), (it.second).end()) > max_length)
-    {
-      max_length = std::distance((it.second).begin(), (it.second).end());
-    }
-  }
-  for (int i = 0; i < max_length; ++i)
+  size_t max_length = max_lenght(l);
+  for (size_t i = 0; i < max_length; ++i)
   {
     bool first = true;
     for (const auto& it : l)
@@ -56,4 +49,17 @@ void karnauhova::output_lists(std::forward_list<std::pair<std::string, std::forw
     }
     out << "\n";
   }
+}
+
+size_t karnauhova::max_lenght(karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> l)
+{
+  size_t max = 0;
+  for (const auto& it : l)
+  {
+    if ((it.second.size()) > max)
+    {
+      max = it.second.size();
+    }
+  }
+  return max;
 }
