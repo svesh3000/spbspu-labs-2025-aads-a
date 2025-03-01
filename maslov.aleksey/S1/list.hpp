@@ -1,7 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <iostream>
 #include <cstddef>
 #include <stdexcept>
 #include "node.hpp"
@@ -35,14 +34,15 @@ namespace maslov
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    void push_front(const T & value);
-    void pop_front();
+    void pushFront(const T & value);
+    void popFront();
     void swap(FwdList< T > & rhs) noexcept;
     void clear();
+
     void reverse() noexcept;
     void remove(const T & value);
     template < typename Predicate >
-    void remove_if(Predicate pred);
+    void removeIf(Predicate pred);
    private:
     FwdListNode< T > * fake_;
     size_t size_;
@@ -64,7 +64,7 @@ namespace maslov
     fake_->next = fake_;
     for (size_t i = 0; i < k; ++i)
     {
-      push_front(value);
+      pushFront(value);
     }
   }
 
@@ -86,7 +86,7 @@ namespace maslov
       FwdListNode< T > * current = rhs.fake_->next;
       while (current != rhs.fake_)
       {
-        push_front(current->data);
+        pushFront(current->data);
         current = current->next;
       }
       reverse();
@@ -164,28 +164,28 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::push_front(const T & value)
+  void FwdList< T >::pushFront(const T & value)
   {
     FwdListNode< T > * newNode = new FwdListNode< T >{value, nullptr};
     if (empty())
     {
-        newNode->next = fake_;
-        fake_->next = newNode;
+      newNode->next = fake_;
+      fake_->next = newNode;
     }
     else
     {
-        newNode->next = fake_->next;
-        fake_->next = newNode;
+      newNode->next = fake_->next;
+      fake_->next = newNode;
     }
     size_++;
   }
 
   template< typename T >
-  void FwdList< T >::pop_front()
+  void FwdList< T >::popFront()
   {
     if (empty())
     {
-        throw std::runtime_error("ERROR: empty list");
+      throw std::runtime_error("ERROR: empty list");
     }
     FwdListNode< T > * node = fake_->next;
     fake_->next = node->next;
@@ -198,7 +198,7 @@ namespace maslov
   {
     while (!empty())
     {
-      pop_front();
+      popFront();
     }
   }
 
@@ -228,12 +228,36 @@ namespace maslov
 
   template < typename T >
   void FwdList< T >::remove(const T & value)
-  {}
+  {
+    auto isEqual = [value](const T & element)
+    {
+      return element == value;
+    };
+    removeIf(isEqual);
+  }
 
   template< typename T >
   template < typename Predicate >
-  void FwdList< T >::remove_if(Predicate pred)
-  {}
+  void FwdList< T >::removeIf(Predicate pred)
+  {
+    FwdListNode< T > * current = fake_->next;
+    FwdListNode< T > * prev = fake_;
+    while (current != fake_)
+    {
+      if (pred(current->data))
+      {
+        prev->next = current->next;
+        delete current;
+        current = prev->next;
+        size_--;
+      }
+      else
+      {
+        prev = current;
+        current = current->next;
+      }
+    }
+  }
 
   template< typename T >
   void FwdList< T >::reverse() noexcept
@@ -247,10 +271,10 @@ namespace maslov
     FwdListNode< T > * next = nullptr;
     while (current != fake_)
     {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
+      next = current->next;
+      current->next = prev;
+      prev = current;
+      current = next;
     }
     fake_->next = prev;
   }

@@ -2,38 +2,29 @@
 #define ITERATOR_HPP
 
 #include <cassert>
-#include <memory>
 #include <iterator>
-#include <cstddef>
 #include "node.hpp"
 
 namespace maslov
 {
   template< typename T >
   
-  struct FwdListIterator
+  struct FwdListIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
-    using this_t = FwdListIterator< T >;
-    using value_type = T;
-    using iterator_category = std::forward_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using pointer = T *;
-    using reference = T &;
+    using thisT = FwdListIterator< T >;
 
     FwdListIterator();
     FwdListIterator(FwdListNode< T > *);
-    FwdListIterator(const this_t &) = default;
+    FwdListIterator(const thisT &) = default;
     ~FwdListIterator() = default;
-    this_t & operator=(const this_t &) = default;
 
+    thisT & operator=(const thisT &) = default;
     T & operator*();
     T * operator->();
-
-    this_t & operator++();
-    this_t operator++(int);
-
-    bool operator!=(const this_t &) const;
-    bool operator==(const this_t &) const;
+    thisT & operator++();
+    thisT operator++(int);
+    bool operator!=(const thisT &) const;
+    bool operator==(const thisT &) const;
    private:
     FwdListNode< T > * node_;
   };
@@ -63,7 +54,7 @@ namespace maslov
   }
 
   template< typename T >
-  typename FwdListIterator< T >::this_t & FwdListIterator< T >::operator++()
+  typename FwdListIterator< T >::thisT & FwdListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
     node_ = node_->next;
@@ -71,50 +62,43 @@ namespace maslov
   }
 
   template< typename T >
-  typename FwdListIterator< T >::this_t FwdListIterator< T >::operator++(int)
+  typename FwdListIterator< T >::thisT FwdListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
-    this_t temp = *this;
+    thisT temp = *this;
     ++(*this);
     return temp;
   }
 
   template< typename T >
-  bool FwdListIterator< T >::operator==(const this_t & rhs) const
+  bool FwdListIterator< T >::operator==(const thisT & rhs) const
   {
     return node_ == rhs.node_;
   }
 
   template< typename T >
-  bool FwdListIterator< T >::operator!=(const this_t & rhs) const
+  bool FwdListIterator< T >::operator!=(const thisT & rhs) const
   {
     return node_ != rhs.node_;
   }
 
   template < typename T >
-  struct FwdListConstIterator
+  struct FwdListConstIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
-    using this_t = FwdListConstIterator< T >;
-    using value_type = T;
-    using iterator_category = std::forward_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using pointer = const T *;
-    using reference = const T &;
+    using thisT = FwdListConstIterator< T >;
 
     FwdListConstIterator();
-    FwdListConstIterator(const this_t &) = default;
+    FwdListConstIterator(const thisT &) = default;
     FwdListConstIterator(FwdListNode< T > * node);
     ~FwdListConstIterator() = default;
-    this_t & operator=(const this_t &) = default;
 
-    this_t & operator++();
-    this_t operator++(int);
-
+    thisT & operator=(const thisT &) = default;
+    thisT & operator++();
+    thisT operator++(int);
     const T & operator*() const;
     const T * operator->() const;
-
-    bool operator==(const this_t &) const;
-    bool operator!=(const this_t &) const;
+    bool operator==(const thisT &) const;
+    bool operator!=(const thisT &) const;
    private:
     FwdListNode< T > * node_;
   };
@@ -144,7 +128,7 @@ namespace maslov
   }
 
   template< typename T >
-  typename FwdListConstIterator< T >::this_t & FwdListConstIterator< T >::operator++()
+  typename FwdListConstIterator< T >::thisT & FwdListConstIterator< T >::operator++()
   {
     assert(node_ != nullptr);
     node_ = node_->next;
@@ -152,22 +136,22 @@ namespace maslov
   }
 
   template< typename T >
-  typename FwdListConstIterator< T >::this_t FwdListConstIterator< T >::operator++(int)
+  typename FwdListConstIterator< T >::thisT FwdListConstIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
-    this_t temp = *this;
+    thisT temp = *this;
     ++(*this);
     return temp;
   }
 
   template< typename T >
-  bool FwdListConstIterator< T >::operator==(const this_t & rhs) const
+  bool FwdListConstIterator< T >::operator==(const thisT & rhs) const
   {
     return node_ == rhs.node_;
   }
 
   template< typename T >
-  bool FwdListConstIterator< T >::operator!=(const this_t & rhs) const
+  bool FwdListConstIterator< T >::operator!=(const thisT & rhs) const
   {
     return node_ != rhs.node_;
   }
