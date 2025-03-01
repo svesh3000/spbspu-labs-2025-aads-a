@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <utility>
+#include <list>
 #include <forward_list>
 #include "sum.hpp"
 
@@ -18,7 +18,7 @@ namespace aleksandrov
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list < unsigned long long > > > list;
+  std::forward_list< std::pair< std::string, std::forward_list< unsigned long long > > > list;
   std::string listName;
   size_t maxSubListSize = 0;
 
