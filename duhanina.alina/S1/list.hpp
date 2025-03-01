@@ -81,7 +81,9 @@ namespace duhanina
   }
 
   template < typename T >
-  List< T >::List(List&& other) noexcept : fake_(other.fake_), listSize_(other.listSize_)
+  List< T >::List(List&& other) noexcept:
+    fake_(other.fake_),
+    listSize_(other.listSize_)
   {
     other.fake_ = new Node< T >();
     other.fake_->next_ = other.fake_;
