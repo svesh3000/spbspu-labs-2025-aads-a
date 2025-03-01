@@ -7,9 +7,6 @@
 namespace tkach
 {
   template< typename T >
-  class List;
-
-  template< typename T >
   class Citerator: public std::iterator< std::forward_iterator_tag, T>
   {
   public:
