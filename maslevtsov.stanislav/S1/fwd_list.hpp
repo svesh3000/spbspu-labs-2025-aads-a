@@ -49,10 +49,56 @@ maslevtsov::FwdList< T >::FwdList():
 }
 
 template< typename T >
+maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
+  FwdList()
+{
+  FwdList< T > reversed;
+  for (auto i = rhs.begin(); i != rhs.end(); ++i) {
+    reversed.push_front(*i);
+  }
+  for (auto i = reversed.begin(); i != reversed.end(); ++i) {
+    push_front(*i);
+  }
+  tail_->data_ = *reversed.begin();
+  tail_->next_ = head_;
+}
+
+template< typename T >
+maslevtsov::FwdList< T >::FwdList(FwdList&& rhs):
+  head_(rhs.head_),
+  tail_(rhs.tail_),
+  size_(rhs.size_)
+{
+  rhs.head_ = nullptr;
+  rhs.tail_ = nullptr;
+}
+
+template< typename T >
 maslevtsov::FwdList< T >::~FwdList()
 {
   clear();
   delete tail_;
+}
+
+template< typename T >
+typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs)
+{
+  FwdList< T > copied_rhs(rhs);
+  swap(copied_rhs);
+  return *this;
+}
+
+template< typename T >
+typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs)
+{
+  clear();
+  delete tail_;
+  head_ = rhs.head_;
+  tail_ = rhs.tail_;
+  rhs.head_ = nullptr;
+  rhs.tail_ = nullptr;
+  size_ = rhs.size_;
+  return *this;
 }
 
 template< typename T >
@@ -77,8 +123,7 @@ template< typename T >
 T& maslevtsov::FwdList< T >::back() const
 {
   FwdIterator< T > it = begin();
-  for (; it != end(); ++it)
-    ;
+  for (; it != end(); ++it);
   return *it;
 }
 
