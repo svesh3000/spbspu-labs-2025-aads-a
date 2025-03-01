@@ -34,17 +34,54 @@ BOOST_AUTO_TEST_CASE(copyConstructor)
 }
 
 BOOST_AUTO_TEST_CASE(moveConstructor)
-{}
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list3 = list1;
+  FwdList list2 = std::move(list1);
+  BOOST_TEST(list1.empty());
+  BOOST_TEST(list2 == list3);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operators)
 
 BOOST_AUTO_TEST_CASE(copyOperator)
-{}
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list2;
+  list2 = list1;
+  BOOST_TEST(list2 == list1);
+}
 
 BOOST_AUTO_TEST_CASE(moveOperator)
-{}
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list3 = list1;
+  FwdList list2;
+  list2 = std::move(list1);
+  BOOST_TEST(list2 == list3);
+  BOOST_TEST(list1.empty());
+}
+
+BOOST_AUTO_TEST_CASE(equalOperator)
+{
+  FwdList list1;
+  list1.push_front(1);
+  list1.push_front(2);
+  FwdList list2;
+  list2.push_front(1);
+  list2.push_front(2);
+  BOOST_TEST(list1 == list2);
+  list1.push_front(3);
+  BOOST_TEST(list1 != list2);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
