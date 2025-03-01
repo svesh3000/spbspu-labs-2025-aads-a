@@ -85,6 +85,7 @@ int main()
   {
     std::cout << " " << *it;
   }
+
   std::cout << "\n";
   return 0;
 }
