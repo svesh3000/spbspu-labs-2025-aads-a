@@ -50,6 +50,11 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     big_iter = list_temp.begin();
     pre_big_iter = list_temp.before_begin();
 
+    if (list_temp.empty())
+    {
+      break;
+    }
+    
     while (r_iter_list != list_iterators.end())
     {
       if ((* r_iter_list) == (* big_iter).second.end())
@@ -61,26 +66,14 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
         continue;
       }
 
-      ++r_iter_list;
-      ++big_iter;
-      ++pre_iter_list;
-      ++pre_big_iter;
-    }
-
-    r_iter_list = list_iterators.begin();
-    big_iter = list_temp.begin();
-    if (list_temp.empty())
-    {
-      break;
-    }
-    
-    while (r_iter_list != list_iterators.end())
-    {
       out << ** r_iter_list << ' ';
       ++(* r_iter_list);
       ++r_iter_list;
+      ++pre_iter_list;
       ++big_iter;
+      ++pre_big_iter;
     }
+
     out << '\n';
   }
 }
