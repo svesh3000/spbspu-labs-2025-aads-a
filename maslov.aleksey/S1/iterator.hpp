@@ -3,14 +3,22 @@
 
 #include <cassert>
 #include <memory>
+#include <iterator>
+#include <cstddef>
 #include "node.hpp"
 
 namespace maslov
 {
   template< typename T >
+  
   struct FwdListIterator
   {
     using this_t = FwdListIterator< T >;
+    using value_type = T;
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T *;
+    using reference = T &;
 
     FwdListIterator();
     FwdListIterator(FwdListNode< T > *);
@@ -87,6 +95,11 @@ namespace maslov
   struct FwdListConstIterator
   {
     using this_t = FwdListConstIterator< T >;
+    using value_type = T;
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const T *;
+    using reference = const T &;
 
     FwdListConstIterator();
     FwdListConstIterator(const this_t &) = default;

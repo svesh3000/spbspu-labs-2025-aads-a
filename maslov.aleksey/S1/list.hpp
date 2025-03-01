@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <iostream>
 #include <cstddef>
 #include <stdexcept>
 #include "node.hpp"
@@ -20,16 +21,19 @@ namespace maslov
     FwdList< T > & operator=(const FwdList< T > & rhs);
     FwdList< T > & operator=(FwdList< T > && rhs) noexcept;
 
+    bool operator==(const FwdList< T > & rhs) const;
+    bool operator!=(const FwdList< T >& rhs) const;
+
     FwdListIterator< T > begin();
-    FwdListConstIterator< T > cbegin() const;
+    FwdListConstIterator< T > begin() const;
     FwdListIterator< T > end();
-    FwdListConstIterator< T > cend() const;
+    FwdListConstIterator< T > end() const;
 
     T & front() noexcept;
     const T & front() const noexcept;
 
     bool empty() const noexcept;
-    size_t max_size() const noexcept;
+    size_t size() const noexcept;
 
     void push_front(const T & value);
     void pop_front();
@@ -85,6 +89,7 @@ namespace maslov
         push_front(current->data);
         current = current->next;
       }
+      reverse();
     }
   }
 
@@ -146,7 +151,7 @@ namespace maslov
   }
 
   template< typename T >
-  size_t FwdList< T >::max_size() const noexcept
+  size_t FwdList< T >::size() const noexcept
   {
     return size_;
   }
@@ -204,7 +209,7 @@ namespace maslov
   }
 
   template< typename T >
-  FwdListConstIterator< T > FwdList< T >::cbegin() const
+  FwdListConstIterator< T > FwdList< T >::begin() const
   {
     return FwdListConstIterator< T >(fake_->next);
   }
@@ -216,7 +221,7 @@ namespace maslov
   }
 
   template< typename T >
-  FwdListConstIterator< T > FwdList< T >::cend() const
+  FwdListConstIterator< T > FwdList< T >::end() const
   {
     return FwdListConstIterator< T >(fake_);
   }
@@ -233,7 +238,7 @@ namespace maslov
   template< typename T >
   void FwdList< T >::reverse() noexcept
   {
-    if (empty() || max_size() == 1)
+    if (empty() || size() == 1)
     {
       return;
     }
@@ -248,6 +253,33 @@ namespace maslov
         current = next;
     }
     fake_->next = prev;
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator==(const FwdList< T > & rhs) const
+  {
+    if (size_ != rhs.size_)
+    {
+      return false;
+    }
+    auto it1 = begin();
+    auto it2 = rhs.begin();
+    while (it1 != end())
+    {
+      if (*it1 != *it2)
+      {
+        return false;
+      }
+      ++it1;
+      ++it2;
+    }
+    return true;
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator!=(const FwdList< T > & rhs) const
+  {
+    return !(*this == rhs);
   }
 }
 #endif

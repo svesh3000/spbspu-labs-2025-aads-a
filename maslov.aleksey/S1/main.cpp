@@ -17,7 +17,7 @@ int main()
       numbers.push_front(number);
     }
     numbers.reverse();
-    maxSize = std::max(maxSize, numbers.max_size());
+    maxSize = std::max(maxSize, numbers.size());
     listOfPairs.push_front(std::make_pair(name, numbers));
     std::cin.clear();
   }
