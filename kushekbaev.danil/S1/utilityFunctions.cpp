@@ -28,7 +28,7 @@ namespace kushekbaev
     return valueList;
   }
 
-  unsigned long long calcSumOfList(std::list< unsigned long long >& list)
+  size_t calcSumOfList(std::list< unsigned long long >& list)
   {
     size_t sum = 0;
     for (auto it = ++list.begin(); it != list.end(); ++it)
@@ -40,5 +40,6 @@ namespace kushekbaev
 
       sum += *it;
     }
+    return sum;
   }
 }
