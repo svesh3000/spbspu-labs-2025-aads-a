@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
-#include "utilityFunctions.hpp"
+#include <list>
+#include <string>
 
 using pairedList = std::list< std::pair<std::string, std::list< unsigned long long > > >;
 
