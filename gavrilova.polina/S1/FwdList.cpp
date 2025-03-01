@@ -1,13 +1,15 @@
 #include "FwdList.hpp"
 #include "IteratorFwd.hpp"
 
-FwdList::FwdList() : fake(new NodeFwdList<T>{T{}, nullptr}),
-                     nodeCount(0)
+FwdList::FwdList() :
+  fake(new NodeFwdList<T>{T{}, nullptr}),
+  nodeCount(0)
 {
 }
 
-FwdList::FwdList(const FwdList &other) : fake(new NodeFwdList<T>{T{}, nullptr}),
-                                         nodeCount(0)
+FwdList::FwdList(const FwdList &other) :
+  fake(new NodeFwdList<T>{T{}, nullptr}),
+  nodeCount(0)
 {
   for (auto it = other.begin(); it != other.end(); ++it)
   {
@@ -15,8 +17,9 @@ FwdList::FwdList(const FwdList &other) : fake(new NodeFwdList<T>{T{}, nullptr}),
   }
 }
 
-FwdList::FwdList(FwdList &&other) noexcept : fake(other.fake),
-                                             nodeCount(other.nodeCount)
+FwdList::FwdList(FwdList &&other) noexcept :
+  fake(other.fake),
+  nodeCount(other.nodeCount)
 {
   other.fake = nullptr;
   other.nodeCount = 0;
@@ -59,17 +62,17 @@ FwdList::~FwdList()
   delete fake;
 }
 
-IteratorFwd begin()
+IteratorFwd FwdList::begin() const
 {
   return IteratorFwd(fake->next);
 }
 
-IteratorFwd end()
+IteratorFwd FwdList::end() const
 {
   return IteratorFwd(fake);
 }
 
-T &front()
+T & FwdList::front()
 {
   if (empty())
   {
@@ -78,7 +81,7 @@ T &front()
   return fake->next->data;
 }
 
-T &back()
+T & FwdList::back()
 {
   if (empty())
   {
