@@ -1,6 +1,8 @@
 #ifndef ITERATORS_HPP
 #define ITERATORS_HPP
 #include <cassert>
+#include <iostream>
+#include "list.hpp"
 #include "listNode.hpp"
 
 namespace alymova
@@ -29,7 +31,7 @@ namespace alymova
   };
   template< typename T >
   struct ConstIterator:
-    public std::iterator<std::bidirectional_iterator_tag, T >
+    public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
     ConstIterator();

@@ -1,11 +1,20 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cassert>
-#include "iterators.hpp"
-#include "listNode.hpp"
+#include <cstddef>
+#include <stdexcept>
+//#include "iterators.hpp"
+//#include "listNode.hpp"
 
 namespace alymova
 {
+  template< typename T >
+  struct ListNode;
+  template< typename T >
+  struct Iterator;
+  template< typename T >
+  struct ConstIterator;
+
   template< typename T >
   class List
   {
