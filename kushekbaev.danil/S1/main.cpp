@@ -16,7 +16,7 @@ namespace
       maxSize = std::max(maxSize, it->second.size());
     }
 
-    return maxSize;
+    return maxSize + 1;
   }
 }
 
