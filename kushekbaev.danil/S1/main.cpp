@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include "utilityFunctions.hpp"
+#include "utilityFunctions.cpp"
 
 using pairedList = std::list< std::pair<std::string, std::list< unsigned long long > > >;
 
@@ -40,21 +41,28 @@ int main()
   for (size_t i = 0; i != maxSize; ++i)
   {
     std::list< unsigned long long > rowList;
-    for (auto j = pairsList.begin(); j != pairsList.end(); ++j)
+    for (auto tmp_it = pairsList.begin(); tmp_it != pairsList.end(); ++tmp_it)
     {
-      if (!j->second.empty())
+      if (!tmp_it->second.empty())
       {
-        rowList.push_back(j->second.front());
-        j->second.pop_front();
+        rowList.push_back(tmp_it->second.front());
+        tmp_it->second.pop_front();
       }
     }
     if (!rowList.empty())
     {
       std::cout << *sumList.begin();
-      for (auto j = ++sumList.begin(); j != sumList.end(); ++j)
+      for (auto tmp_it = ++sumList.begin(); tmp_it != sumList.end(); ++tmp_it)
       {
-        std::cout << "_" << *j;
+        std::cout << "_" << *tmp_it;
       }
+      std::cout << "\n";
+      sumList.push_back(kushekbaev::calcSumOfList(rowList));
     }
+  }
+  std::cout << *sumList.begin();
+  for (auto it = ++sumList.begin(); it != sumList.end(); ++it)
+  {
+    std::cout << "_" << *it;
   }
 }
