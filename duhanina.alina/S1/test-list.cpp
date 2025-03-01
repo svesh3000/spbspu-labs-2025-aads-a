@@ -3,18 +3,18 @@
 
 using namespace duhanina;
 using list_t = List<int>;
-namespace
-{
-  std::ostream& outputList(std::ostream& out, List< int >* list)
-  {
-    for (constIterator< int > it = list->cbegin(); it != list->cend(); ++it)
-    {
-      out << *it;
-    }
-    return out;
-  }
-}
+namespace duhanina {
 
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Iterator<T>& it) {
+  if (it.ptr_ != nullptr) {
+    os << "Iterator(" << *it << ")"; // Используем оператор * для вывода значения
+  } else {
+    os << "Iterator(nullptr)";
+  }
+  return os;
+}
+}
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
   list_t list;
