@@ -23,14 +23,16 @@ public:
 
   FwdList& operator=(const FwdList& other);
   FwdList& operator=(FwdList&& other) noexcept;
+
   bool operator==(const FwdList& other) const;
   bool operator!=(const FwdList& other) const;
   bool operator<(const FwdList& other) const;
   bool operator>(const FwdList& other) const;
-  
+
   IteratorFwd begin() const;
   IteratorFwd end() const;
   T& front();
+  T& back();
   bool empty() const noexcept;
   size_t size() const noexcept;
   void push_front(const T& value);
