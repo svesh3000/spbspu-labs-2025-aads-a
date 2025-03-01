@@ -1,14 +1,13 @@
 #ifndef ITERATORS_HPP
 #define ITERATORS_HPP
 #include <cassert>
-#include <iostream>
 #include "list.hpp"
 #include "listNode.hpp"
 
 namespace alymova
 {
-  template< typename T >
-  class List;
+  //template< typename T >
+  //class List;
 
   template< typename T >
   struct Iterator:

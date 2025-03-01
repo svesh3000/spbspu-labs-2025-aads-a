@@ -3,8 +3,6 @@
 #include <cassert>
 #include <cstddef>
 #include <stdexcept>
-//#include "iterators.hpp"
-//#include "listNode.hpp"
 
 namespace alymova
 {
