@@ -1,9 +1,9 @@
 #include <iostream>
 #include <limits>
-#include <list>
+#include <forward_list>
 #include <string>
 
-using pairedList = std::list< std::pair<std::string, std::list< unsigned long long > > >;
+using pairedList = std::forward_list< std::pair<std::string, std::forward_list< unsigned long long > > >;
 
 namespace
 {
@@ -13,7 +13,7 @@ namespace
 
     for (const auto& pair : pairsList)
     {
-      maxSize = std::max(maxSize, pair.second.size());
+      maxSize = std::max(maxSize, pair.second.max_size  ());
     }
 
     return maxSize;
@@ -27,13 +27,13 @@ int main()
 
   while (std::cin >> listNumber)
   {
-    std::list< unsigned long long > inputValueList;
+    std::forward_list< unsigned long long > inputValueList;
     unsigned long long value = 0;
     while (std::cin >> value)
     {
-      inputValueList.push_back(value);
+      inputValueList.push_front(value);
     }
-    pairsList.push_back(std::make_pair(listNumber, inputValueList));
+    pairsList.push_front(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
   }
 
@@ -51,24 +51,24 @@ int main()
   std::cout << "\n";
 
   size_t maxSize = calcOfSize(pairsList);
-  std::list< std::list< unsigned long long > > valueList;
+  std::forward_list< std::forward_list< unsigned long long > > valueList;
 
   for (size_t i = 0; i < maxSize; ++i)
   {
-    std::list< unsigned long long > rowList;
+    std::forward_list< unsigned long long > rowList;
     for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
     {
-      if (i < it->second.size())
+      if (i < it->second.max_size ())
       {
         auto valueIt = it->second.begin();
         for (size_t j = 0; j < i; j++)
         {
           ++valueIt;
         }
-        rowList.push_back(*valueIt);
+        rowList.push_front(*valueIt);
       }
     }
-    valueList.push_back(rowList);
+    valueList.push_front(rowList);
   }
 
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
@@ -81,8 +81,8 @@ int main()
     std::cout << "\n";
   }
 
-  std::list< unsigned long long > sumList;
-
+  std::forward_list< unsigned long long > sumList;
+  
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
   {
     unsigned long long sum = 0;
@@ -95,7 +95,7 @@ int main()
       }
       sum += *valueIt;
     }
-    sumList.push_back(sum);
+    sumList.push_front(sum);
   }
 
   std::cout << *(sumList.begin());
