@@ -42,8 +42,8 @@ public:
   void splice(const FwdList& other);
   void reverse();
 private:
-  NodeFwdList* fake_;
-  size_t size_;
+  NodeFwdList< T >* fake;
+  size_t nodeCount;
 };
 
 #endif

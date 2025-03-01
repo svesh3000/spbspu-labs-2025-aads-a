@@ -102,7 +102,7 @@ T & FwdList::back()
   {
     current = current->next;
   }
-  return current->data
+  return current->data;
 }
 
 template< class T >

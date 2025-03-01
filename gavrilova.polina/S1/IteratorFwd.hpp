@@ -6,14 +6,14 @@
 #include "FwdList.hpp"
 
 template< typename T >
-struct ListIterator: public std::iterator< std::forward_iterator_tag, int >
+struct IteratorFwd: public std::iterator< std::forward_iterator_tag, int >
 {
   NodeFwdList< T >* node_;
-  using this_t = ListIterator< T >;
+  using this_t = IteratorFwd< T >;
 
-  ListIterator(): node(nullptr) {};
-  ~ListIterator() = default;
-  ListIterator(const this_t&) = default;
+  IteratorFwd(): node(nullptr) {};
+  ~IteratorFwd() = default;
+  IteratorFwd(const this_t&) = default;
   this_t& operator=(const this_t&) = default;
 
   this_t& operator++();
