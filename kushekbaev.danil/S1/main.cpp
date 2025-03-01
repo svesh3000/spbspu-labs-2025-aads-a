@@ -52,7 +52,7 @@ int main()
       std::cerr << "Overflow!";
       return 1;
     }
-    
+
     std::list< unsigned long long > outputList = valueList;
     while (!outputList.empty())
     {
