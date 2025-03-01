@@ -1,15 +1,13 @@
 #include "FwdList.hpp"
 #include "IteratorFwd.hpp"
 
-FwdList::FwdList():
-  fake(new NodeFwdList<T>{T{}, nullptr}),
-  nodeCount(0) 
-{}
+FwdList::FwdList() : fake(new NodeFwdList<T>{T{}, nullptr}),
+                     nodeCount(0)
+{
+}
 
-
-FwdList::FwdList(const FwdList &other):
-  fake(new NodeFwdList<T>{T{}, nullptr}),
-  nodeCount(0)
+FwdList::FwdList(const FwdList &other) : fake(new NodeFwdList<T>{T{}, nullptr}),
+                                         nodeCount(0)
 {
   for (auto it = other.begin(); it != other.end(); ++it)
   {
@@ -17,20 +15,19 @@ FwdList::FwdList(const FwdList &other):
   }
 }
 
-FwdList::FwdList(FwdList &&other) noexcept:
-  fake(other.fake),
-  nodeCount(other.nodeCount)
+FwdList::FwdList(FwdList &&other) noexcept : fake(other.fake),
+                                             nodeCount(other.nodeCount)
 {
   other.fake = nullptr;
   other.nodeCount = 0;
 }
 
-FwdList & FwdList::operator=(const FwdList &other)
+FwdList &FwdList::operator=(const FwdList &other)
 {
   if (this == &other)
   {
     return *this;
-  }   
+  }
   clear();
   for (auto it = other.begin(); it != other.end(); ++it)
   {
@@ -39,11 +36,11 @@ FwdList & FwdList::operator=(const FwdList &other)
   return *this;
 }
 
-FwdList & FwdList::operator=(FwdList &&other) noexcept
+FwdList &FwdList::operator=(FwdList &&other) noexcept
 {
   if (this == &other)
   {
-    return *this; 
+    return *this;
   }
   clear();
   delete fake;
@@ -60,6 +57,40 @@ FwdList::~FwdList()
 {
   clear();
   delete fake;
+}
+
+IteratorFwd begin()
+{
+  return IteratorFwd(fake->next);
+}
+
+IteratorFwd end()
+{
+  return IteratorFwd(fake);
+}
+
+T &front()
+{
+  if (empty())
+  {
+    throw std::out_of_range("List is empty");
+  }
+  return fake->next->data;
+}
+
+T &back()
+{
+  if (empty())
+  {
+    throw std::out_of_range("List is empty");
+  }
+
+  NodeFwdList<T> *current = fake->next;
+  while (current->next != fake->next)
+  {
+    current = current->next;
+  }
+  return current->data
 }
 
 bool FwdList::empty() const
