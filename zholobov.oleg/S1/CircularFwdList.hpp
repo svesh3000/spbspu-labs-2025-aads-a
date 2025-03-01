@@ -9,6 +9,9 @@ namespace zholobov {
   class CircularFwdListIterator;
 
   template < typename T >
+  class CircularFwdListConstIterator;
+
+  template < typename T >
   class CircularFwdList {
   public:
     CircularFwdList():
@@ -18,6 +21,7 @@ namespace zholobov {
     CircularFwdList(CircularFwdList&& other) noexcept;
 
     friend class CircularFwdListIterator< T >;
+    friend class CircularFwdListConstIterator< T >;
 
   private:
     struct Node_t {
