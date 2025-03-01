@@ -126,12 +126,7 @@ namespace averenkov
   template < class T >
   typename List< T >::Iter List< T >::end() const
   {
-    Node< T >* current = fake_;
-    while (current->next_ != fake_)
-    {
-      current = current->next_;
-    }
-    return Iter(current);
+    return Iter(fake_);
   }
 
   template < class T >
@@ -143,12 +138,7 @@ namespace averenkov
   template < class T>
   typename List< T >::Iterc List<T>::cend() const
   {
-    Node< T >* current = fake_;
-    while (current->next_ != fake_)
-    {
-      current = current->next_;
-    }
-    return Iterc(current);
+    return Iterc(fake_);
   }
 
   template < class T >
