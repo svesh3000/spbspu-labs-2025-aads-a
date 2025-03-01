@@ -20,11 +20,14 @@ namespace zholobov {
     using iterator = CircularFwdListIterator< T >;
     using const_iterator = CircularFwdListConstIterator< T >;
 
-    CircularFwdList():
-      head_(nullptr), tail_(nullptr), size_(0) {};
-    ~CircularFwdList();
+    CircularFwdList();
+    explicit CircularFwdList(size_t n);
+    CircularFwdList(size_t n, const value_type& val);
+
     CircularFwdList(const CircularFwdList& other);
     CircularFwdList(CircularFwdList&& other) noexcept;
+
+    ~CircularFwdList();
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -35,8 +38,11 @@ namespace zholobov {
     const_reference front() const;
     reference back();
     const_reference back() const;
+
     bool empty() const noexcept;
     size_t size() const;
+
+    void assign(size_t n, const value_type& val);
     void push_front(const value_type& val);
     void push_front(value_type&& val);
     void push_back(const value_type& val);
@@ -44,6 +50,16 @@ namespace zholobov {
 
     void pop_front();
     void pop_back();
+    void remove(const value_type& val);
+    template < class Predicate >
+    void remove_if(Predicate pred);
+
+    void splice_after(const_iterator pos, CircularFwdList< T >& other);
+    void splice_after(const_iterator pos, CircularFwdList< T >&& other);
+    void splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator it);
+    void splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator it);
+    void splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator first, const_iterator last);
+    void splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator first, const_iterator last);
 
     void swap(CircularFwdList& other) noexcept;
     void clear() noexcept;
