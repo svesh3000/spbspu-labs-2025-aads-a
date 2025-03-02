@@ -1,8 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
-using namespace duhanina;
-using list_t = List<int>;
+using list_t = duhanina::List< int >;
 
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
