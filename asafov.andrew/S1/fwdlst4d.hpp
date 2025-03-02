@@ -146,15 +146,14 @@ namespace asafov
       else
       {
         Node* current = head_;
-        Node* next_node = nullptr;
-        do
+        Node* next = nullptr;
+        while (current != last_)
         {
-          next_node = current->next_;
-          delete current;
-          current = next_node;
-        } while (current != head_);
-        head_ = nullptr;
-        last_ = nullptr;
+          next = current->next_;
+          delete current_;
+          current = next;
+        }
+        delete last_;
       }
     }
     private:
