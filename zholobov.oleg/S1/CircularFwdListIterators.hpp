@@ -2,7 +2,8 @@
 #define CIRCULARFWDLISTITERATORS_HPP
 
 #include <memory>
-#include "CircularFwdList.hpp"
+
+#include "FwdListNode.hpp"
 
 namespace zholobov {
 
@@ -12,7 +13,7 @@ namespace zholobov {
     using value_type = T;
 
     CircularFwdListIterator();
-    explicit CircularFwdListIterator(typename CircularFwdList< T >::Node_t** node);
+    explicit CircularFwdListIterator(FwdListNode< value_type >** node);
     CircularFwdListIterator& operator++();
     CircularFwdListIterator operator++(int);
     value_type& operator*() const;
@@ -21,7 +22,7 @@ namespace zholobov {
     bool operator!=(const CircularFwdListIterator& other) const;
 
   private:
-    typename CircularFwdList< T >::Node_t** node_;
+    FwdListNode< value_type >** node_;
   };
 
   template < typename T >
@@ -30,7 +31,7 @@ namespace zholobov {
     using value_type = const T;
 
     CircularFwdListConstIterator();
-    explicit CircularFwdListConstIterator(typename CircularFwdList< T >::Node_t* const* node);
+    explicit CircularFwdListConstIterator(FwdListNode< value_type >* const* node);
     CircularFwdListConstIterator& operator++();
     CircularFwdListConstIterator operator++(int);
     value_type& operator*() const;
@@ -39,7 +40,7 @@ namespace zholobov {
     bool operator!=(const CircularFwdListConstIterator& other) const;
 
   private:
-    typename CircularFwdList< T >::Node_t* const* node_;
+    FwdListNode< value_type >* const* node_;
   };
 
 }
@@ -50,7 +51,7 @@ zholobov::CircularFwdListIterator< T >::CircularFwdListIterator():
 {}
 
 template < typename T >
-zholobov::CircularFwdListIterator< T >::CircularFwdListIterator(typename CircularFwdList< T >::Node_t** node):
+zholobov::CircularFwdListIterator< T >::CircularFwdListIterator(FwdListNode< value_type >** node):
   node_(node)
 {}
 
@@ -64,7 +65,7 @@ zholobov::CircularFwdListIterator< T >& zholobov::CircularFwdListIterator< T >::
 template < typename T >
 zholobov::CircularFwdListIterator< T > zholobov::CircularFwdListIterator< T >::operator++(int)
 {
-  CircularFwdList< T > temp(*this);
+  CircularFwdListIterator< T > temp(*this);
   node_ = std::addressof((*node_)->next);
   return temp;
 }
@@ -101,7 +102,7 @@ zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator():
 {}
 
 template < typename T >
-zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(typename CircularFwdList< T >::Node_t* const* node):
+zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNode< value_type >* const* node):
   node_(node)
 {}
 
@@ -115,7 +116,7 @@ zholobov::CircularFwdListConstIterator< T >& zholobov::CircularFwdListConstItera
 template < typename T >
 zholobov::CircularFwdListConstIterator< T > zholobov::CircularFwdListConstIterator< T >::operator++(int)
 {
-  CircularFwdList< T > temp(*this);
+  CircularFwdListIterator< T > temp(*this);
   node_ = std::addressof((*node_)->next);
   return temp;
 }
