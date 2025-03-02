@@ -140,7 +140,7 @@ namespace asafov
       for (auto at = head; &at != &last_;)
       {
         end = at;
-        at = at->next_
+        at = at->next_;
         delete end;
       }
       delete last_;
