@@ -2,7 +2,7 @@
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
-{  
+{
   for (size_t i = 0; i < size; i++)
   {
     if(begins[i]!=ends[i])
