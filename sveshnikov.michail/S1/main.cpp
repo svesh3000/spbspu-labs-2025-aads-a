@@ -21,6 +21,13 @@ int main()
   }
   outputNamesLists(std::cout, list) << '\n';
   outputNewLists(std::cout, list) << '\n';
-  outputSumsNewLists(std::cout, list) << '\n';
+  try
+  {
+    outputSumsNewLists(std::cout, list) << '\n';
+  }
+  catch(const std::overflow_error& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
   return 0;
 }

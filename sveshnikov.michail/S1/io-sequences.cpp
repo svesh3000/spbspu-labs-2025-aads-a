@@ -1,11 +1,13 @@
 #include "io-sequences.hpp"
 #include <iostream>
 #include <iterator>
+#include <limits>
 
 namespace
 {
   void inputOneList(std::istream &in, list_ull_t &data);
   std::ostream &outputOneList(std::ostream &out, const list_pair_t &list, size_t size);
+  unsigned long long findSum(const list_pair_t &list, size_t size);
   size_t getSizeList(iter_t i);
   size_t getNumNewLists(iter_t begin, iter_t end);
 
@@ -31,7 +33,16 @@ namespace
     }
     for (iter_list_ull_t it = data_copied.cbegin(); it != data_copied.cend(); it++)
     {
-      data.push_front(*it);
+      try
+      {
+        data.push_front(*it);
+      }
+      catch (std::bad_alloc &e)
+      {
+        data_copied.clear();
+        data.clear();
+        throw;
+      }
     }
   }
 
@@ -79,6 +90,29 @@ namespace
     }
     return out;
   }
+
+  unsigned long long findSum(const list_pair_t &list, size_t size)
+  {
+    unsigned long long sum = 0;
+    for (iter_t it = list.cbegin(); it != list.cend(); it++)
+    {
+      if (size >= getSizeList(it))
+      {
+        continue;
+      }
+      iter_list_ull_t it_data = it->second.cbegin();
+      for (size_t i = 0; i < size; i++)
+      {
+        it_data++;
+      }
+      if (sum > std::numeric_limits< unsigned long long >::max() - *it_data)
+      {
+        throw std::overflow_error("ERROR: Overflow when calculating the amount!");
+      }
+      sum += *it_data;
+    }
+    return sum;
+  }
 }
 
 void sveshnikov::inputLists(std::istream &in, list_pair_t &list)
@@ -124,5 +158,11 @@ std::ostream &sveshnikov::outputNewLists(std::ostream &out, const list_pair_t &l
 
 std::ostream &sveshnikov::outputSumsNewLists(std::ostream &out, const list_pair_t &list)
 {
+  out << findSum(list, 0);
+  size_t num_new_lists = getNumNewLists(list.cbegin(), list.cend());
+  for (size_t size_list = 1; size_list != num_new_lists; size_list++)
+  {
+    out << " " << findSum(list, size_list);
+  }
   return out;
 }
