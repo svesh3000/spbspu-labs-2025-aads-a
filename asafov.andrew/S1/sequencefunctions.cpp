@@ -79,7 +79,7 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
   {
     std::cout << *it << ' ' << std::flush;
   }
-  
+
   std::cout << '\n';
 
   delete[] begins;
