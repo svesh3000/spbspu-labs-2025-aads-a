@@ -100,51 +100,41 @@ template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(CircularFwdList&& other) noexcept:
   head_(nullptr), tail_(nullptr), size_(0)
 {
-  std::swap(head_, other.head_);
-  std::swap(tail_, other.tail_);
-  std::swap(size_, other.size_);
+  swap(other);
 }
 
 template < typename T >
-zholobov::CircularFwdList< T >::~CircularFwdList()
+inline zholobov::CircularFwdList< T >::~CircularFwdList()
 {
-  if (size_ != 0) {
-    FwdListNode< value_type >* curr = head_->next;
-    while (curr != head_) {
-      FwdListNode< value_type >* temp = curr;
-      curr = curr->next;
-      delete temp;
-    }
-    delete head_;
-  }
+  clear();
 }
 
 template < typename T >
-typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::begin() noexcept
+inline typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::begin() noexcept
 {
   return (size_ == 0) ? iterator(nullptr) : iterator(std::addressof(head_));
 }
 
 template < typename T >
-typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::begin() const noexcept
+inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::begin() const noexcept
 {
-  return (size_ == 0) ? iterator(nullptr) : const_iterator(std::addressof(head_));
+  return (size_ == 0) ? const_iterator(nullptr) : const_iterator(std::addressof(head_));
 }
 
 template < typename T >
-typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::end() noexcept
+inline typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::end() noexcept
 {
   return (size_ == 0) ? iterator(nullptr) : iterator(std::addressof(tail_->next));
 }
 
 template < typename T >
-typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::end() const noexcept
+inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::end() const noexcept
 {
-  return (size_ == 0) ? iterator(nullptr) : const_iterator(std::addressof(tail_->next));
+  return (size_ == 0) ? const_iterator(nullptr) : const_iterator(std::addressof(tail_->next));
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::push_front(const value_type& val)
+inline void zholobov::CircularFwdList< T >::push_front(const value_type& val)
 {
   auto new_node = new FwdListNode< value_type >(val, head_);
   head_ = new_node;
@@ -156,7 +146,7 @@ void zholobov::CircularFwdList< T >::push_front(const value_type& val)
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::push_front(value_type&& val)
+inline void zholobov::CircularFwdList< T >::push_front(value_type&& val)
 {
   auto new_node = new FwdListNode< value_type >(std::move(val), head_);
   head_ = new_node;
@@ -193,6 +183,67 @@ inline void zholobov::CircularFwdList< T >::push_back(value_type&& val)
   }
   tail_ = new_node;
   ++size_;
+}
+
+template < typename T >
+inline void zholobov::CircularFwdList< T >::pop_front()
+{
+  if (size_ == 0) {
+    return;
+  } else if (size == 1) {
+    delete head_;
+    head_ = nullptr;
+    tail_ = nullptr;
+  } else {
+    FwdListNode< value_type >* temp = head_;
+    head_ = head_->next;
+    tail_->next = head_;
+    delete temp;
+  }
+  --size_;
+}
+
+template < typename T >
+inline void zholobov::CircularFwdList< T >::pop_back()
+{
+  if (size_ == 0) {
+    return;
+  } else if (size_ == 1) {
+    delete tail_;
+    head_ = nullptr;
+    tail_ = nullptr;
+  } else {
+    FwdListNode< value_type >* cur = head_;
+    while (cur->next != tail_) {
+      ++cur;
+    }
+    delete tail_;
+    tail_ = cur;
+    tail_->next = head_;
+  }
+  --size_;
+}
+
+template < typename T >
+inline void zholobov::CircularFwdList< T >::swap(CircularFwdList& other) noexcept
+{
+  std::swap(head_, other.head_);
+  std::swap(tail_, other.tail_);
+  std::swap(size_, other.size_);
+}
+
+template < typename T >
+void zholobov::CircularFwdList< T >::clear() noexcept
+{
+  if (size_ != 0) {
+    FwdListNode< value_type >* curr = head_->next;
+    while (curr != head_) {
+      FwdListNode< value_type >* temp = curr;
+      curr = curr->next;
+      delete temp;
+    }
+    delete head_;
+  }
 }
 
 #endif

@@ -29,7 +29,7 @@ int main()
   zholobov::CircularFwdList< std::pair< IntList::iterator, IntList::iterator > > iter_list;
   for (auto it = list.begin(); it != list.end(); ++it) {
     std::cout << it->first << " ";
-    iter_list.push_back(std::pair< IntList::iterator, IntList::iterator >(it->second.begin(), it->second.end()));
+    iter_list.push_back(std::make_pair(it->second.begin(), it->second.end()));
   }
   std::cout << "\n";
 

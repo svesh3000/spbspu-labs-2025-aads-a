@@ -31,7 +31,7 @@ namespace zholobov {
     using value_type = const T;
 
     CircularFwdListConstIterator();
-    explicit CircularFwdListConstIterator(FwdListNode< value_type >* const* node);
+    explicit CircularFwdListConstIterator(FwdListNode< T >* const* node);
     CircularFwdListConstIterator& operator++();
     CircularFwdListConstIterator operator++(int);
     value_type& operator*() const;
@@ -40,7 +40,7 @@ namespace zholobov {
     bool operator!=(const CircularFwdListConstIterator& other) const;
 
   private:
-    FwdListNode< value_type >* const* node_;
+    FwdListNode< T >* const* node_;
   };
 
 }
@@ -102,7 +102,7 @@ zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator():
 {}
 
 template < typename T >
-zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNode< value_type >* const* node):
+zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNode< T >* const* node):
   node_(node)
 {}
 
