@@ -78,6 +78,7 @@ namespace asafov
       Node* current_;
       Node* last_;
     };
+
     const_iterator cbegin() const
     {
       return const_iterator(head_, last_);
@@ -150,7 +151,7 @@ namespace asafov
         while (current != last_)
         {
           next = current->next_;
-          delete current_;
+          delete current;
           current = next;
         }
         delete last_;
