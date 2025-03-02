@@ -15,7 +15,6 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      Node(const Node& node) noexcept: data_(node.data_), next_(node.next_) {}
       ~Node() = default;
     };
   public:
@@ -37,6 +36,11 @@ namespace asafov
       last_(last)
       {}
       ~const_iterator() = default;
+
+      const_iterator(const iterator&) = default;
+      const_iterator(iterator&&) = default;
+      const_iterator& operator=(const iterator&) = default;
+      const_iterator& operator=(iterator&&) = default;
 
       const T& operator*() const
       {
@@ -125,7 +129,10 @@ namespace asafov
       }
     }
 
-    T& front();
+    T& front()
+    {
+      return head_->data_;
+    }
     T& back();
     void clear();
   private:
