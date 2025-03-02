@@ -3,16 +3,10 @@
 
 #include <cstddef>
 #include <algorithm>
+#include "NodeFwdList.hpp"
 #include "IteratorFwd.hpp"
 
-template< typename T >
-struct NodeFwdList
-{
-  T data;
-  NodeFwdList< T >* next;
-};
-
-template< typename T >
+template< class T >
 class FwdList
 {
 public:
@@ -29,8 +23,8 @@ public:
   bool operator<(const FwdList& other) const;
   bool operator>(const FwdList& other) const;
 
-  IteratorFwd begin() const;
-  IteratorFwd end() const;
+  IteratorFwd< T > begin() const;
+  IteratorFwd< T > end() const;
   T& front();
   T& back();
   bool empty() const noexcept;

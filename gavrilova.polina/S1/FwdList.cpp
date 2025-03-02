@@ -1,14 +1,13 @@
 #include "FwdList.hpp"
-#include "IteratorFwd.hpp"
 
 template< class T >
-FwdList::FwdList() :
+FwdList< T >::FwdList() :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
 {}
 
 template< class T >
-FwdList::FwdList(const FwdList &other) :
+FwdList< T >::FwdList(const FwdList &other) :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
 {
@@ -19,7 +18,7 @@ FwdList::FwdList(const FwdList &other) :
 }
 
 template< class T >
-FwdList::FwdList(FwdList &&other) noexcept :
+FwdList< T >::FwdList(FwdList &&other) noexcept :
   fake(other.fake),
   nodeCount(other.nodeCount)
 {
@@ -28,7 +27,7 @@ FwdList::FwdList(FwdList &&other) noexcept :
 }
 
 template< class T >
-FwdList &FwdList::operator=(const FwdList &other)
+FwdList< T > &FwdList< T >::operator=(const FwdList &other)
 {
   if (this == &other)
   {
@@ -43,7 +42,7 @@ FwdList &FwdList::operator=(const FwdList &other)
 }
 
 template< class T >
-FwdList &FwdList::operator=(FwdList &&other) noexcept
+FwdList< T > &FwdList< T >::operator=(FwdList &&other) noexcept
 {
   if (this == &other)
   {
@@ -61,26 +60,26 @@ FwdList &FwdList::operator=(FwdList &&other) noexcept
 }
 
 template< class T >
-FwdList::~FwdList()
+FwdList< T >::~FwdList()
 {
   clear();
   delete fake;
 }
 
 template< class T >
-IteratorFwd FwdList::begin() const
+IteratorFwd< T > FwdList< T >::begin() const
 {
-  return IteratorFwd(fake->next);
+  return IteratorFwd< T >(fake->next);
 }
 
 template< class T >
-IteratorFwd FwdList::end() const
+IteratorFwd< T > FwdList< T >::end() const
 {
-  return IteratorFwd(fake);
+  return IteratorFwd< T >(fake);
 }
 
 template< class T >
-T & FwdList::front()
+T & FwdList< T >::front()
 {
   if (empty())
   {
@@ -90,7 +89,7 @@ T & FwdList::front()
 }
 
 template< class T >
-T & FwdList::back()
+T & FwdList< T >::back()
 {
   if (empty())
   {
@@ -106,19 +105,19 @@ T & FwdList::back()
 }
 
 template< class T >
-bool FwdList::empty() const
+bool FwdList< T >::empty() const noexcept
 {
   return nodeCount == 0;
 }
 
 template< class T >
-size_t FwdList::size() const
+size_t FwdList< T >::size() const noexcept
 {
   return nodeCount;
 }
 
 template< class T >
-void FwdList::push_front(const T &value)
+void FwdList< T >::push_front(const T &value)
 {
   NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake->next};
   fake->next = newNode;
@@ -126,7 +125,7 @@ void FwdList::push_front(const T &value)
 }
 
 template< class T >
-void FwdList::pop_front()
+void FwdList< T >::pop_front()
 {
   if (empty())
   {
@@ -139,7 +138,7 @@ void FwdList::pop_front()
 }
 
 template< class T >
-void FwdList::clear()
+void FwdList< T >::clear()
 {
   while (!empty())
   {
@@ -148,7 +147,7 @@ void FwdList::clear()
 }
 
 template< class T >
-void FwdList::remove(const T &value)
+void FwdList< T >::remove(const T &value)
 {
   NodeFwdList<T> *current = fake;
   while (current->next != fake)
@@ -168,7 +167,7 @@ void FwdList::remove(const T &value)
 }
 
 template< class T >
-void FwdList::splice(const FwdList<T> &other)
+void FwdList< T >::splice(const FwdList<T> &other)
 {
   if (other.empty())
   {
@@ -186,7 +185,7 @@ void FwdList::splice(const FwdList<T> &other)
 }
 
 template< class T >
-void FwdList::reverse()
+void FwdList< T >::reverse()
 {
   if (empty())
     return;
@@ -206,15 +205,15 @@ void FwdList::reverse()
 }
 
 template< class T >
-bool FwdList::operator==(const FwdList<T> &other) const
+bool FwdList< T >::operator==(const FwdList<T> &other) const
 {
   if (nodeCount != other.nodeCount)
   {
     return false;
   }
 
-  IteratorFwd it1 = begin();
-  IteratorFwd it2 = other.begin();
+  IteratorFwd< T > it1 = begin();
+  IteratorFwd< T > it2 = other.begin();
   while (it1 != end())
   {
     if (*it1 != *it2)
@@ -226,16 +225,16 @@ bool FwdList::operator==(const FwdList<T> &other) const
 }
 
 template< class T >
-bool FwdList::operator!=(const FwdList<T> &other) const
+bool FwdList< T >::operator!=(const FwdList<T> &other) const
 {
   return !(*this == other);
 }
 
 template< class T >
-bool FwdList::operator<(const FwdList<T> &other) const
+bool FwdList< T >::operator<(const FwdList<T> &other) const
 {
-  IteratorFwd it1 = begin();
-  IteratorFwd it2 = other.begin();
+  IteratorFwd< T > it1 = begin();
+  IteratorFwd< T > it2 = other.begin();
   while (it1 != end() && it2 != other.end())
   {
     if (*it1 < *it2)
@@ -253,7 +252,7 @@ bool FwdList::operator<(const FwdList<T> &other) const
 }
 
 template< class T >
-bool FwdList::operator>(const FwdList<T> &other) const
+bool FwdList< T >::operator>(const FwdList<T> &other) const
 {
   return other < *this;
 }

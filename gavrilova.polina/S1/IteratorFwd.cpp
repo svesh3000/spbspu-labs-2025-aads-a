@@ -1,13 +1,13 @@
 #include "IteratorFwd.hpp"
 
-template< typename T >
+template< class T >
 IteratorFwd< T >& IteratorFwd< T >::operator++()
 {
   node = node->next;
   return *this;
 }
 
-template< typename T >
+template< class T >
 IteratorFwd<T> IteratorFwd<T>::operator++(int)
 {
   IteratorFwd< T > result(*this);
@@ -15,25 +15,25 @@ IteratorFwd<T> IteratorFwd<T>::operator++(int)
   return result;
 }
 
-template< typename T >
+template< class T >
 bool IteratorFwd<T>::operator==(const this_t& rhs) const
 {
   return node == rhs.node;
 }
 
-template< typename T >
+template< class T >
 bool IteratorFwd<T>::operator!=(const this_t& rhs) const
 {
   return !(rhs == *this);
 }
 
-template< typename T >
+template< class T >
 T& IteratorFwd<T>::operator*()
 {
   return node->data;
 }
 
-template< typename T >
+template< class T >
 T* IteratorFwd<T>::operator->()
 {
   return std::addressof(node->data);

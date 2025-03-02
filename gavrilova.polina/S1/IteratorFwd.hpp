@@ -1,14 +1,13 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
-#include <memory>
 #include <iterator>
-#include "FwdList.hpp"
+#include "NodeFwdList.hpp"
 
-template< typename T >
+template< class T >
 struct IteratorFwd: public std::iterator< std::forward_iterator_tag, int >
 {
-  NodeFwdList< T >* node_;
+  NodeFwdList< T >* node;
   using this_t = IteratorFwd< T >;
 
   IteratorFwd(): node(nullptr) {};
