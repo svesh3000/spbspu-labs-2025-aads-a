@@ -9,22 +9,12 @@ namespace asafov
   {
     class Node
     {
-      void del()
-      {
-        if (next_ != nullptr)
-      {
-        delete next_;
-      }
     public:
       T data_;
-      Node* next_ = nullptr;
+      Node* next_;
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      ~Node()
-      {
-        del();
-      }
     };
   public:
     Forward_list() noexcept:
@@ -34,13 +24,12 @@ namespace asafov
 
     ~Forward_list()
     {
-      del();
+      clear();
     }
 
     class const_iterator
     {
       friend class Forward_list;
-      }
     public:
       const_iterator():
       current_(nullptr),
@@ -84,6 +73,7 @@ namespace asafov
       {
         return !(*this == rhs);
       }
+
     private:
       Node* current_;
       Node* last_;
@@ -144,16 +134,19 @@ namespace asafov
       return head_->data_;
     }
     T& back();
-    void clear();
-    void del()
+    void clear()
     {
-      if (next_ != nullptr)
+      Node* end = nullptr;
+      for (auto at = head; &at != &last_;)
       {
-        delete head_;
+        end = at;
+        at = at->next_
+        delete end;
       }
+      delete last_;
     }
-  private:
-    Node* head_ = nullptr;
+    private:
+    Node* head_;
     Node* last_;
   };
 }
