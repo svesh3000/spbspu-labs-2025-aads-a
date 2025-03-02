@@ -18,6 +18,7 @@ namespace asafov
       ~Node()
       {
         delete next_;
+        next_ = nullptr;
       }
     };
   public:
@@ -144,22 +145,7 @@ namespace asafov
 
     void clear()
     {
-      if (head_ == nullptr)
-      {
-        return;
-      }
-      else
-      {
-        Node* current = head_;
-        Node* next = nullptr;
-        while (current != last_)
-        {
-          next = current->next_;
-          delete current;
-          current = next;
-        }
-        delete last_;
-      }
+      delete head_
     }
     private:
     Node* head_;
