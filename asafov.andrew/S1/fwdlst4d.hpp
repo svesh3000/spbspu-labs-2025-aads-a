@@ -17,7 +17,10 @@ namespace asafov
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
       ~Node()
       {
-        delete next_;
+        if (next_ != nullptr)
+        {
+          delete next_;
+        }
       };
     };
   public:
@@ -28,7 +31,10 @@ namespace asafov
 
     ~Forward_list()
     {
-      delete head_;
+      if (next_ != nullptr)
+      {
+        delete head_;
+      }
     }
 
     class const_iterator
