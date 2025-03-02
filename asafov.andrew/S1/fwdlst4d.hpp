@@ -17,8 +17,11 @@ namespace asafov
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
       ~Node()
       {
-        delete next_;
-        next_ = nullptr;
+        if (next_ != nullptr)
+        {
+          delete next_;
+          next_ = nullptr;
+        }
       }
     };
   public:
