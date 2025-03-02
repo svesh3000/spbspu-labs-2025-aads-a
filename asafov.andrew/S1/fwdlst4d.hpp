@@ -11,7 +11,7 @@ namespace asafov
     {
     public:
       T data_;
-      Node* next_ = nullptr;
+      Node* next_(nullptr);
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
@@ -145,7 +145,7 @@ namespace asafov
     T& back();
     void clear();
   private:
-    Node* head_;
+    Node* head_(nullptr);
     Node* last_;
   };
 }
