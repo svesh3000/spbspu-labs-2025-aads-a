@@ -10,19 +10,47 @@ bool rychkov::List< T >::operator==(const List& rhs) const
   {
     return false;
   }
-  for (const_iterator i = begin(), j = rhs.begin(); (i != end()) && (j != rhs.end()); ++i, ++j)
-  {
-    if (*i != *j)
-    {
-      return false;
-    }
-  }
-  return true;
+  return compare(rhs, std::equal_to<>());
 }
 template< class T >
 bool rychkov::List< T >::operator!=(const List& rhs) const
 {
   return !(*this == rhs);
+}
+template< class T >
+bool rychkov::List< T >::operator<=(const List& rhs) const
+{
+  return compare(rhs, std::less_equal<>());
+}
+template< class T >
+bool rychkov::List< T >::operator>=(const List& rhs) const
+{
+  return compare(rhs, std::greater_equal<>());
+}
+template< class T >
+bool rychkov::List< T >::operator<(const List& rhs) const
+{
+  return compare(rhs, std::less<>());
+}
+template< class T >
+bool rychkov::List< T >::operator>(const List& rhs) const
+{
+  return compare(rhs, std::greater<>());
+}
+
+template< class T >
+template< class C >
+bool rychkov::List< T >::compare(const List& rhs, C comp) const
+{
+  const_iterator i = begin(), j = rhs.begin();
+  for (; (i != end()) && (j != rhs.end()); ++i, ++j)
+  {
+    if (!comp(*i, *j))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 #endif
