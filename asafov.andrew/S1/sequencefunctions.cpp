@@ -2,10 +2,10 @@
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
-{
+{  
   for (size_t i = 0; i < size; i++)
   {
-    if(ends[i]!=begins[i])
+    if(begins[i]!=ends[i])
     {
       return false;
     }
@@ -45,17 +45,19 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
 {
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
-  sequence_list_t::const_iterator seqiter = sequences.begin();
+  sequence_list_t::const_iterator seqiter = sequences.cbegin();
+
   size_t size = 0;
-  for (auto iter = sequences.begin(); iter != sequences.end(); ++iter)
+  for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
     std::cout << iter->first << ' ' << std::flush;
-    begins[size] = iter->second.begin();
-    ends[size] = iter->second.end();
-    ++size;
+    begins[size] = iter->second.cbegin();
+    ends[size] = iter->second.cend();
+    ++size;  
   }
   std::cout << '\n';
-  seqiter = sequences.begin();
+  
+  seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
   {
@@ -72,8 +74,14 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
     sums.push_back(sum);
     std::cout << '\n';
   }
-  for (auto n : sums) out << n << ' ' << std::flush;
+
+  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
+  {
+    std::cout << *it << ' ' << std::flush;
+  }
+  
   std::cout << '\n';
+
   delete[] begins;
   delete[] ends;
 }
