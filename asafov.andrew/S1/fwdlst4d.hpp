@@ -134,8 +134,7 @@ namespace asafov
       return head_->data_;
     }
     T& back(){
-      auto it = end();
-      return *it;
+      return last_->data_;
     }
     void clear()
     {
