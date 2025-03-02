@@ -84,7 +84,7 @@ namespace
       {
         it_data++;
       }
-      if (sum > std::numeric_limits< unsigned long long >::max() - *it_data)
+      if (sum > std::numeric_limits<unsigned long long>::max() - *it_data)
       {
         throw std::overflow_error("ERROR: Overflow when calculating the amount!");
       }
@@ -107,7 +107,7 @@ void sveshnikov::inputLists(std::istream &in, list_pair_t &list)
     {
       list_reverse.push_front(sequence);
     }
-    catch(const std::bad_alloc& e)
+    catch (const std::bad_alloc &e)
     {
       list_reverse.clear();
       throw;
@@ -121,9 +121,9 @@ void sveshnikov::inputLists(std::istream &in, list_pair_t &list)
   {
     try
     {
-    list.push_front(*it);
+      list.push_front(*it);
     }
-    catch(const std::bad_alloc& e)
+    catch (const std::bad_alloc &e)
     {
       list_reverse.clear();
       list.clear();
@@ -145,12 +145,8 @@ std::ostream &sveshnikov::outputNamesLists(std::ostream &out, const list_pair_t 
 std::ostream &sveshnikov::outputNewLists(std::ostream &out, const list_pair_t &list)
 {
   size_t num_new_lists = getMaxSizeLists(list);
-  if (num_new_lists == 0)
-  {
-    return out;
-  }
   size_t size_list = 0;
-  while (size_list + 1 != num_new_lists)
+  while (size_list + 1 < num_new_lists)
   {
     outputOneList(out, list, size_list) << '\n';
     size_list++;
@@ -162,13 +158,8 @@ std::ostream &sveshnikov::outputNewLists(std::ostream &out, const list_pair_t &l
 std::ostream &sveshnikov::outputSumsNewLists(std::ostream &out, const list_pair_t &list)
 {
   size_t num_new_lists = getMaxSizeLists(list);
-  if (num_new_lists == 0)
-  {
-    out << 0;
-    return out;
-  }
   out << findSum(list, 0);
-  for (size_t size_list = 1; size_list != num_new_lists; size_list++)
+  for (size_t size_list = 1; size_list < num_new_lists; size_list++)
   {
     out << " " << findSum(list, size_list);
   }

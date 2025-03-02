@@ -13,7 +13,6 @@ namespace sveshnikov
 
   size_t getSizeDataList(iter_t i);
   size_t getMaxSizeLists(const list_pair_t &list);
-  void transposeDataList(list_pair_t &list);
 }
 
 #endif
