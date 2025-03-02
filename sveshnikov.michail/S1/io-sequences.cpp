@@ -2,14 +2,13 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include "list-manip.hpp"
 
 namespace
 {
   void inputOneList(std::istream &in, list_ull_t &data);
   std::ostream &outputOneList(std::ostream &out, const list_pair_t &list, size_t size);
   unsigned long long findSum(const list_pair_t &list, size_t size);
-  size_t getSizeList(iter_t i);
-  size_t getNumNewLists(iter_t begin, iter_t end);
 
   void inputOneList(std::istream &in, list_ull_t &data)
   {
@@ -46,26 +45,6 @@ namespace
     }
   }
 
-  size_t getSizeList(iter_t i)
-  {
-    size_t len = 0;
-    for (iter_list_ull_t j = i->second.cbegin(); j != i->second.cend(); j++)
-    {
-      len++;
-    }
-    return len;
-  }
-
-  size_t getNumNewLists(iter_t begin, iter_t end)
-  {
-    size_t num_lines = 0;
-    for (iter_t i = begin; i != end; i++)
-    {
-      num_lines = std::max(num_lines, getSizeList(i));
-    }
-    return num_lines;
-  }
-
   std::ostream &outputOneList(std::ostream &out, const list_pair_t &list, size_t size)
   {
     bool first = true;
@@ -96,7 +75,7 @@ namespace
     unsigned long long sum = 0;
     for (iter_t it = list.cbegin(); it != list.cend(); it++)
     {
-      if (size >= getSizeList(it))
+      if (size >= sveshnikov::getSizeDataList(it))
       {
         continue;
       }
