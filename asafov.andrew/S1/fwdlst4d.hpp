@@ -133,11 +133,14 @@ namespace asafov
     {
       return head_->data_;
     }
-    T& back();
+    T& back(){
+      auto it = end();
+      return *it;
+    }
     void clear()
     {
       Node* end = nullptr;
-      for (auto at = head; &at != &last_;)
+      for (auto at = head_; &at != &last_;)
       {
         end = at;
         at = at->next_;
