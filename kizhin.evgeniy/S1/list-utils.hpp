@@ -6,7 +6,8 @@
 
 namespace kizhin {
   NumbersT::value_type safeAccumulate(const NumbersT&, NumbersT::value_type = {});
-  ForwardList< NumbersT > convert(const ForwardList< NumbersT >&);
+  ForwardList< NumbersT > transpose(const ForwardList< NumbersT >&);
 }
 
 #endif
+

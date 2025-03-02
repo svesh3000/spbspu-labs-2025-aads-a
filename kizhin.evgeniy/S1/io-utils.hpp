@@ -9,6 +9,8 @@ namespace kizhin {
   std::istream& inputSequences(std::istream&, NamesT&, ForwardList< NumbersT >&);
   template < typename T >
   std::ostream& outputList(std::ostream&, const ForwardList< T >&);
+  template < typename T >
+  std::ostream& outputListWithNewLine(std::ostream&, const ForwardList< T >&);
 }
 
 template < typename T >
@@ -18,11 +20,22 @@ std::ostream& kizhin::outputList(std::ostream& out, const ForwardList< T >& list
     return out;
   }
   out << list.front();
-  using const_iterator = typename ForwardList< T >::const_iterator;
-  for (const_iterator i = ++list.begin(), end = list.end(); i != end; ++i) {
+  for (auto i = ++list.begin(), end = list.end(); i != end; ++i) {
     out << ' ' << *i;
   }
   return out;
 }
 
+template < typename T >
+std::ostream& kizhin::outputListWithNewLine(std::ostream& out,
+    const ForwardList< T >& list)
+{
+  outputList(out, list);
+  if (!list.empty()) {
+    out << '\n';
+  }
+  return out;
+}
+
 #endif
+

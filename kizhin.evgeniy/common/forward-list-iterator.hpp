@@ -1,5 +1,5 @@
-#ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_ITERATOR_HPP
-#define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_ITERATOR_HPP
+#ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_ITERATOR_HPP
+#define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_ITERATOR_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -9,7 +9,7 @@
 namespace kizhin {
   namespace detail {
     template < typename T, bool IsConst >
-    class ForwardListIterator
+    class ForwardListIterator final
     {
     public:
       using value_type = T;

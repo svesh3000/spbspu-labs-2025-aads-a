@@ -1,6 +1,6 @@
 #include "test-utils.hpp"
 
-void kizhin::testInvariants(const ListT& list)
+void kizhin::testForwardListInvariants(const ListT& list)
 {
   BOOST_TEST(list.empty() == (list.size() == 0));
   BOOST_TEST(list.empty() == (list.begin() == list.end()));
