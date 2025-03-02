@@ -24,7 +24,7 @@ namespace asafov
       ~Node()
       {
         del();
-      };
+      }
     };
   public:
     Forward_list() noexcept:
@@ -146,11 +146,12 @@ namespace asafov
     T& back();
     void clear();
     void del()
-      {
-        if (next_ != nullptr)
+    {
+      if (next_ != nullptr)
       {
         delete head_;
       }
+    }
   private:
     Node* head_ = nullptr;
     Node* last_;
