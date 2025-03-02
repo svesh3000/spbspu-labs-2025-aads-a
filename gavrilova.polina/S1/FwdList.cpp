@@ -1,13 +1,13 @@
 #include "FwdList.hpp"
 
 template< class T >
-FwdList< T >::FwdList() :
+gavrilova::FwdList< T >::FwdList() :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
 {}
 
 template< class T >
-FwdList< T >::FwdList(const FwdList &other) :
+gavrilova::FwdList< T >::FwdList(const FwdList &other) :
   fake(new NodeFwdList<T>{T{}, nullptr}),
   nodeCount(0)
 {
@@ -18,7 +18,7 @@ FwdList< T >::FwdList(const FwdList &other) :
 }
 
 template< class T >
-FwdList< T >::FwdList(FwdList &&other) noexcept :
+gavrilova::FwdList< T >::FwdList(FwdList &&other) noexcept :
   fake(other.fake),
   nodeCount(other.nodeCount)
 {
@@ -27,7 +27,7 @@ FwdList< T >::FwdList(FwdList &&other) noexcept :
 }
 
 template< class T >
-FwdList< T > &FwdList< T >::operator=(const FwdList &other)
+gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(const FwdList &other)
 {
   if (this == &other)
   {
@@ -42,7 +42,7 @@ FwdList< T > &FwdList< T >::operator=(const FwdList &other)
 }
 
 template< class T >
-FwdList< T > &FwdList< T >::operator=(FwdList &&other) noexcept
+gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(FwdList &&other) noexcept
 {
   if (this == &other)
   {
@@ -60,26 +60,26 @@ FwdList< T > &FwdList< T >::operator=(FwdList &&other) noexcept
 }
 
 template< class T >
-FwdList< T >::~FwdList()
+gavrilova::FwdList< T >::~FwdList()
 {
   clear();
   delete fake;
 }
 
 template< class T >
-IteratorFwd< T > FwdList< T >::begin() const
+gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::begin() const
 {
   return IteratorFwd< T >(fake->next);
 }
 
 template< class T >
-IteratorFwd< T > FwdList< T >::end() const
+gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::end() const
 {
   return IteratorFwd< T >(fake);
 }
 
 template< class T >
-T & FwdList< T >::front()
+T & gavrilova::FwdList< T >::front()
 {
   if (empty())
   {
@@ -89,7 +89,7 @@ T & FwdList< T >::front()
 }
 
 template< class T >
-T & FwdList< T >::back()
+T & gavrilova::FwdList< T >::back()
 {
   if (empty())
   {
@@ -105,19 +105,19 @@ T & FwdList< T >::back()
 }
 
 template< class T >
-bool FwdList< T >::empty() const noexcept
+bool gavrilova::FwdList< T >::empty() const noexcept
 {
   return nodeCount == 0;
 }
 
 template< class T >
-size_t FwdList< T >::size() const noexcept
+size_t gavrilova::FwdList< T >::size() const noexcept
 {
   return nodeCount;
 }
 
 template< class T >
-void FwdList< T >::push_front(const T &value)
+void gavrilova::FwdList< T >::push_front(const T &value)
 {
   NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake->next};
   fake->next = newNode;
@@ -125,7 +125,7 @@ void FwdList< T >::push_front(const T &value)
 }
 
 template< class T >
-void FwdList< T >::pop_front()
+void gavrilova::FwdList< T >::pop_front()
 {
   if (empty())
   {
@@ -138,7 +138,7 @@ void FwdList< T >::pop_front()
 }
 
 template< class T >
-void FwdList< T >::clear()
+void gavrilova::FwdList< T >::clear()
 {
   while (!empty())
   {
@@ -147,7 +147,7 @@ void FwdList< T >::clear()
 }
 
 template< class T >
-void FwdList< T >::remove(const T &value)
+void gavrilova::FwdList< T >::remove(const T &value)
 {
   NodeFwdList<T> *current = fake;
   while (current->next != fake)
@@ -167,7 +167,7 @@ void FwdList< T >::remove(const T &value)
 }
 
 template< class T >
-void FwdList< T >::splice(const FwdList<T> &other)
+void gavrilova::FwdList< T >::splice(const FwdList<T> &other)
 {
   if (other.empty())
   {
@@ -185,7 +185,7 @@ void FwdList< T >::splice(const FwdList<T> &other)
 }
 
 template< class T >
-void FwdList< T >::reverse()
+void gavrilova::FwdList< T >::reverse()
 {
   if (empty())
     return;
@@ -205,7 +205,7 @@ void FwdList< T >::reverse()
 }
 
 template< class T >
-bool FwdList< T >::operator==(const FwdList<T> &other) const
+bool gavrilova::FwdList< T >::operator==(const FwdList<T> &other) const
 {
   if (nodeCount != other.nodeCount)
   {
@@ -225,13 +225,13 @@ bool FwdList< T >::operator==(const FwdList<T> &other) const
 }
 
 template< class T >
-bool FwdList< T >::operator!=(const FwdList<T> &other) const
+bool gavrilova::FwdList< T >::operator!=(const FwdList<T> &other) const
 {
   return !(*this == other);
 }
 
 template< class T >
-bool FwdList< T >::operator<(const FwdList<T> &other) const
+bool gavrilova::FwdList< T >::operator<(const FwdList<T> &other) const
 {
   IteratorFwd< T > it1 = begin();
   IteratorFwd< T > it2 = other.begin();
@@ -252,7 +252,7 @@ bool FwdList< T >::operator<(const FwdList<T> &other) const
 }
 
 template< class T >
-bool FwdList< T >::operator>(const FwdList<T> &other) const
+bool gavrilova::FwdList< T >::operator>(const FwdList<T> &other) const
 {
   return other < *this;
 }
