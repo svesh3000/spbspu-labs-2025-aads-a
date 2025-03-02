@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <limits>
 
 int main()
 {
@@ -8,6 +9,7 @@ int main()
   std::string line = "";
   std::cin >> line;
   size_t maxSizeOfNumList = 0;
+  constexpr unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
   while (!std::cin.eof())
   {
     std::pair< std::string, std::list< int > > pair;
@@ -15,7 +17,13 @@ int main()
     std::cin >> line;
     while (!std::cin.eof() && isdigit(line[0]))
     {
-      pair.second.push_back(strtoull(line.c_str(), nullptr, 0));
+      unsigned long long currentValue = strtoull(line.c_str(), nullptr, 0);
+      if (currentValue >= maxValue)
+      {
+        std::cerr << "Overflow\n";
+        return 1;
+      }
+      pair.second.push_back(currentValue);
       std::cin >> line;
     }
     if (maxSizeOfNumList < pair.second.size())
@@ -54,21 +62,26 @@ int main()
 
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
+    bool isSpaceAvailable = false;
     for (auto it = listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
-      if (it->second.size() <= i)
+      if (it->second.size() > i)
       {
-        continue;
+        if (isSpaceAvailable)
+        {
+          std::cout << " ";
+        }
+        auto current = std::next(it->second.begin(), i);
+        std::cout << *current;
+        isSpaceAvailable = true;
       }
-      auto current = std::next(it->second.begin(), i);
-      std::cout << *current << " ";
     }
     if ((--listOfPairs.end())->second.size() <= i)
     {
       std::cout << "\n";
       continue;
     }
-    std::cout << *(std::next((--(listOfPairs.end()))->second.begin(), i)) << "\n";
+    std::cout << " " << *(std::next((--(listOfPairs.end()))->second.begin(), i)) << "\n";
   }
 
   for (auto it = listOfLineSums.begin(); it != --listOfLineSums.end(); ++it)
