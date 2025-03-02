@@ -50,7 +50,7 @@ namespace
     bool first = true;
     for (iter_t it = list.cbegin(); it != list.cend(); it++)
     {
-      if (size >= getSizeList(it))
+      if (size >= sveshnikov::getSizeDataList(it))
       {
         continue;
       }
@@ -98,17 +98,37 @@ void sveshnikov::inputLists(std::istream &in, list_pair_t &list)
 {
   std::string name_sequence;
   list_pair_t list_reverse;
-  while (!in.eof())
+  while (in >> name_sequence)
   {
-    in >> name_sequence;
     list_ull_t data_sequence;
     inputOneList(in, data_sequence);
     pair_t sequence = {name_sequence, data_sequence};
-    list_reverse.push_front(sequence);
+    try
+    {
+      list_reverse.push_front(sequence);
+    }
+    catch(const std::bad_alloc& e)
+    {
+      list_reverse.clear();
+      throw;
+    }
+  }
+  if (list_reverse.empty())
+  {
+    throw std::logic_error("ERROR: Input is empty!\n");
   }
   for (iter_t it = list_reverse.cbegin(); it != list_reverse.cend(); it++)
   {
+    try
+    {
     list.push_front(*it);
+    }
+    catch(const std::bad_alloc& e)
+    {
+      list_reverse.clear();
+      list.clear();
+      throw;
+    }
   }
 }
 
@@ -124,7 +144,11 @@ std::ostream &sveshnikov::outputNamesLists(std::ostream &out, const list_pair_t 
 
 std::ostream &sveshnikov::outputNewLists(std::ostream &out, const list_pair_t &list)
 {
-  size_t num_new_lists = getNumNewLists(list.cbegin(), list.cend());
+  size_t num_new_lists = getMaxSizeLists(list);
+  if (num_new_lists == 0)
+  {
+    return out;
+  }
   size_t size_list = 0;
   while (size_list + 1 != num_new_lists)
   {
@@ -137,8 +161,13 @@ std::ostream &sveshnikov::outputNewLists(std::ostream &out, const list_pair_t &l
 
 std::ostream &sveshnikov::outputSumsNewLists(std::ostream &out, const list_pair_t &list)
 {
+  size_t num_new_lists = getMaxSizeLists(list);
+  if (num_new_lists == 0)
+  {
+    out << 0;
+    return out;
+  }
   out << findSum(list, 0);
-  size_t num_new_lists = getNumNewLists(list.cbegin(), list.cend());
   for (size_t size_list = 1; size_list != num_new_lists; size_list++)
   {
     out << " " << findSum(list, size_list);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "io-sequences.hpp"
+#include "list-manip.hpp"
 
 int main()
 {
@@ -20,14 +21,18 @@ int main()
     return 1;
   }
   outputNamesLists(std::cout, list) << '\n';
-  outputNewLists(std::cout, list) << '\n';
+  if (sveshnikov::getMaxSizeLists(list) != 0)
+  {
+    outputNewLists(std::cout, list) << '\n';
+  }
   try
   {
     outputSumsNewLists(std::cout, list) << '\n';
   }
-  catch(const std::overflow_error& e)
+  catch (const std::overflow_error &e)
   {
     std::cerr << e.what() << '\n';
+    return 1;
   }
   return 0;
 }

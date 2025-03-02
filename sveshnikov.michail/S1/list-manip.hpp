@@ -12,8 +12,8 @@ namespace sveshnikov
   using iter_t = list_pair_t::const_iterator;
 
   size_t getSizeDataList(iter_t i);
-  size_t getNumNewLists(const list_pair_t &list);
-  void transposeDataList(const list_pair_t &list);
+  size_t getMaxSizeLists(const list_pair_t &list);
+  void transposeDataList(list_pair_t &list);
 }
 
 #endif
