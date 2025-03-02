@@ -145,7 +145,7 @@ namespace asafov
 
     void clear()
     {
-      delete head_
+      delete head_;
     }
     private:
     Node* head_;
