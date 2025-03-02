@@ -36,10 +36,6 @@ namespace asafov
       current_(node),
       last_(last)
       {}
-      const_iterator(const const_iterator& data) noexcept:
-      current_(data.current_),
-      last_(data.last_)
-      {}
       ~const_iterator() = default;
 
       const T& operator*() const

@@ -49,12 +49,12 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
   size_t size = 0;
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
-    std::cout << iter->first << ' ' << std::flush;
+    out << iter->first << ' ' << std::flush;
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
     ++size;
   }
-  std::cout << '\n';
+  out << '\n';
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
@@ -65,18 +65,18 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
       if (begins[i] != ends[i])
       {
         sum += *begins[i];
-        std::cout << *begins[i] << ' ' << std::flush;
+        out << *begins[i] << ' ' << std::flush;
         ++begins[i];
       }
     }
     sums.push_back(sum);
-    std::cout << '\n';
+    out << '\n';
   }
   for (auto it = sums.cbegin(); it != sums.cend(); ++it)
   {
-    std::cout << *it << ' ' << std::flush;
+    out << *it << ' ' << std::flush;
   }
-  std::cout << '\n';
+  out << '\n';
   delete[] begins;
   delete[] ends;
 }
