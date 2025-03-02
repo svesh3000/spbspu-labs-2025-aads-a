@@ -24,19 +24,6 @@ namespace asafov
     last_(nullptr)
     {}
 
-    Forward_list(Forward_list&& data) noexcept:
-    head_(data.head_),
-    last_(data.last_)
-    {
-      data.head_ = nullptr;
-      data.last_ = nullptr;
-    }
-
-    ~Forward_list()
-    {
-
-    }
-
     class const_iterator
     {
       friend class Forward_list;
