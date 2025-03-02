@@ -59,8 +59,6 @@ maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
   for (auto i = reversed.begin(); i != reversed.end(); ++i) {
     push_front(*i);
   }
-  tail_->data_ = *reversed.begin();
-  tail_->next_ = head_;
 }
 
 template< typename T >
