@@ -136,6 +136,31 @@ BOOST_AUTO_TEST_CASE(list_fill_test)
   }
 }
 
+BOOST_AUTO_TEST_CASE(list_erase_after_test)
+{
+  List< size_t > list;
+  for (size_t i = 1; i <= 5; ++i)
+  {
+    list.pushBack(i);
+  }
+  auto it = list.erase_after(list.cbegin());
+  BOOST_TEST(*(it++) == 3);
+  BOOST_TEST(*(it++) == 4);
+  BOOST_TEST(*(it++) == 5);
+  BOOST_TEST(*it == 1);
+}
+
+BOOST_AUTO_TEST_CASE(list_erase_after_first_last_test)
+{
+  List< size_t > list;
+  for (size_t i = 1; i <= 5; ++i)
+  {
+    list.pushBack(i);
+  }
+  auto it = list.erase_after(list.cbegin(), std::next(list.cbegin(), 3));
+  BOOST_TEST(*it == 4);
+}
+
 BOOST_AUTO_TEST_CASE(list_begin_end_test)
 {
   List< int > list1;

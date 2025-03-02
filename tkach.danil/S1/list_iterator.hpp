@@ -7,8 +7,12 @@
 namespace tkach
 {
   template< typename T >
+  class List;
+
+  template< typename T >
   class Iterator: public std::iterator< std::forward_iterator_tag, T>
   {
+    friend class List < T >;
   public:
     using this_t = Iterator< T >;
     Iterator();

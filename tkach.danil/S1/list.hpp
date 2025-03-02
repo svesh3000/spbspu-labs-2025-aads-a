@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <cstddef>
 #include "node.hpp"
 #include "list_const_iterator.hpp"
 #include "list_iterator.hpp"
@@ -29,6 +30,8 @@ namespace tkach
     void pushFront(T&& data);
     void pushBack(T&& data);
     void popFront();
+    Iterator< T > erase_after(Citerator <T> pos);
+    Iterator< T > erase_after(Citerator <T> first, Citerator <T> last);
     void clear();
     void swap(List< T >& other) noexcept;
   private:
@@ -210,21 +213,14 @@ namespace tkach
   {
     if (empty())
     {
-      return;
+      throw std::logic_error("No elements in list");
     }
-    Node< T >* temp = head_;
-    if (head_ == tail_)
+    Iterator< T > it = erase_after(Citerator< T >(tail_));
+    if (it.node_ != nullptr)
     {
-      head_ = nullptr;
-      tail_ = nullptr;
+      head_ = it.node_;
+      tail_->next_ = head_;
     }
-    else
-    {
-      tail_->next_ = head_->next_;
-      head_ = head_->next_;
-    }
-    delete temp;
-    size_--;
   }
 
   template< typename T >
@@ -251,6 +247,44 @@ namespace tkach
     other.head_ = nullptr;
     other.tail_ = nullptr;
     other.size_ = 0;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase_after(Citerator< T > pos)
+  {
+    if (empty())
+    {
+      throw std::logic_error("No elements in list");
+    }
+    if (head_ == tail_)
+    {
+      delete head_;
+      head_ = nullptr;
+      tail_ = nullptr;
+      size_--;
+      return Iterator< T >();
+    }
+    else
+    {
+      Iterator< T > it(const_cast< Node< T >* >(pos.node_));
+      Node< T >* list_delete = it.node_->next_;
+      it.node_->next_ = list_delete->next_;
+      delete list_delete;
+      size_--;
+      return Iterator< T >(it.node_->next_);
+    }
+    return Iterator< T >();
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase_after(Citerator < T > first, Citerator < T > last)
+  {
+    while (std::next(first) != last)
+    {
+      erase_after(first);
+      first++;
+    }
+    return Iterator< T >(const_cast< Node< T >* >(last.node_));
   }
 }
 
