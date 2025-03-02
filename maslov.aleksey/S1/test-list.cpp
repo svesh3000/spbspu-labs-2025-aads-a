@@ -87,12 +87,8 @@ BOOST_AUTO_TEST_CASE(moveOperator)
 
 BOOST_AUTO_TEST_CASE(equalOperator)
 {
-  FwdList list1;
-  list1.pushFront(1);
-  list1.pushFront(2);
-  FwdList list2;
-  list2.pushFront(1);
-  list2.pushFront(2);
+  FwdList list1{1, 2};
+  FwdList list2{1, 2};
   BOOST_TEST(list1 == list2);
   list1.pushFront(3);
   BOOST_TEST(list1 != list2);
@@ -115,9 +111,7 @@ BOOST_AUTO_TEST_CASE(pushFront)
 
 BOOST_AUTO_TEST_CASE(popFront)
 {
-  FwdList list;
-  list.pushFront(1);
-  list.pushFront(2);
+  FwdList list{1, 2};
   list.popFront();
   BOOST_TEST(list.size() == 1);
   BOOST_TEST(list.front() == 1);
@@ -127,13 +121,8 @@ BOOST_AUTO_TEST_CASE(popFront)
 
 BOOST_AUTO_TEST_CASE(swap)
 {
-  FwdList list1;
-  list1.pushFront(1);
-  list1.pushFront(2);
-  FwdList list2;
-  list2.pushFront(3);
-  list2.pushFront(4);
-  list2.pushFront(5);
+  FwdList list1{1, 2};
+  FwdList list2{3, 4, 5};
   FwdList tempList1 = list1;
   FwdList tempList2 = list2;
   list1.swap(list2);
