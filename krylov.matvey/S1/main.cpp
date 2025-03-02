@@ -5,25 +5,18 @@
 
 int main()
 {
-  std::list< std::pair< std::string, std::list< int > > > listOfPairs;
+  std::list< std::pair< std::string, std::list< unsigned long long > > > listOfPairs;
   std::string line = "";
   std::cin >> line;
   size_t maxSizeOfNumList = 0;
-  constexpr unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
   while (!std::cin.eof())
   {
-    std::pair< std::string, std::list< int > > pair;
+    std::pair< std::string, std::list< unsigned long long > > pair;
     pair.first = line;
     std::cin >> line;
     while (!std::cin.eof() && isdigit(line[0]))
     {
-      unsigned long long currentValue = strtoull(line.c_str(), nullptr, 0);
-      if (currentValue >= maxValue)
-      {
-        std::cerr << "Overflow\n";
-        return 1;
-      }
-      pair.second.push_back(currentValue);
+      pair.second.push_back(strtoull(line.c_str(), nullptr, 0));
       std::cin >> line;
     }
     if (maxSizeOfNumList < pair.second.size())
@@ -44,7 +37,9 @@ int main()
   }
   std::cout << (--listOfPairs.end())->first << "\n";
 
-  std::list< int > listOfLineSums;
+  std::list< unsigned long long > listOfLineSums;
+  bool wasOverflow = false;
+  unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
     int sumOfLine = 0;
@@ -55,6 +50,11 @@ int main()
         continue;
       }
       auto currentValue = std::next(it->second.begin(), i);
+      if (maxValue - sumOfLine < *currentValue)
+      {
+        wasOverflow = true;
+        break;
+      }
       sumOfLine += *currentValue;
     }
     listOfLineSums.push_back(sumOfLine);
@@ -83,7 +83,11 @@ int main()
     }
     std::cout << " " << *(std::next((--(listOfPairs.end()))->second.begin(), i)) << "\n";
   }
-
+  if (wasOverflow)
+  {
+    std::cerr << "Overflow!\n";
+    return 1;
+  }
   for (auto it = listOfLineSums.begin(); it != --listOfLineSums.end(); ++it)
   {
     std::cout << *it << " ";
