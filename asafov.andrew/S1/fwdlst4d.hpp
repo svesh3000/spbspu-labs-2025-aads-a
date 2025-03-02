@@ -15,13 +15,21 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      ~Node() = default;
+      ~Node()
+      {
+        delete next_;
+      };
     };
   public:
     Forward_list() noexcept:
     head_(nullptr),
     last_(nullptr)
     {}
+
+    ~Forward_list()
+    {
+      delete head_;
+    }
 
     class const_iterator
     {
