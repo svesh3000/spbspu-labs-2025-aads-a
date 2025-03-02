@@ -56,7 +56,7 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
     ++size;  
   }
   std::cout << '\n';
-  
+
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
