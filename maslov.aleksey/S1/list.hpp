@@ -17,8 +17,8 @@ namespace maslov
 
     FwdList();
     FwdList(size_t k, const T & value);
-    template< typename InputIterator >
-    FwdList(InputIterator first, InputIterator last);
+    FwdList(iterator first, iterator last);
+    FwdList(cIterator first, cIterator last);
     FwdList(std::initializer_list< T > il);
     FwdList(const FwdList< T > & rhs);
     FwdList(FwdList< T > && rhs) noexcept;
@@ -32,8 +32,10 @@ namespace maslov
 
     iterator begin();
     cIterator begin() const;
+    cIterator cbegin() const;
     iterator end();
     cIterator end() const;
+    cIterator cend() const;
 
     T & front();
     const T & front() const;
@@ -45,8 +47,8 @@ namespace maslov
     void popFront();
     void swap(FwdList< T > & rhs) noexcept;
     void clear();
-    template< typename InputIterator >
-    void assign(InputIterator first, InputIterator last);
+    void assign(iterator first, iterator last);
+    void assign(cIterator first, cIterator last);
     void assign(size_t n, const T & val);
     void assign(std::initializer_list< T > il);
 
@@ -63,7 +65,7 @@ namespace maslov
    private:
     FwdListNode< T > * fake_;
     size_t size_;
-    bool isValidIterator(const cIterator & it) const;
+    //bool isValidIterator(const cIterator & it) const;
   };
 
   template< typename T >
@@ -76,14 +78,45 @@ namespace maslov
 
   template< typename T >
   FwdList< T >::FwdList(size_t k, const T & value):
-    fake_(new FwdListNode< T >{T(), nullptr}),
-    size_(0)
+    FwdList()
   {
-    fake_->next = fake_;
     for (size_t i = 0; i < k; ++i)
     {
       pushFront(value);
     }
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(iterator first, iterator last):
+    FwdList()
+  {
+    for (auto it = first; it != last; ++it)
+    {
+      pushFront(*it);
+    }
+    reverse();
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(cIterator first, cIterator last):
+    FwdList()
+  {
+    for (auto it = first; it != last; ++it)
+    {
+      pushFront(*it);
+    }
+    reverse();
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(std::initializer_list< T > il):
+    FwdList()
+  {
+    for (auto it = il.begin(); it != il.end(); ++it)
+    {
+      pushFront(*it);
+    }
+    reverse();
   }
 
   template< typename T >
@@ -92,19 +125,6 @@ namespace maslov
     clear();
     delete fake_;
   }
-
-  template< typename T >
-  template< typename InputIterator >
-  FwdList< T >::FwdList(InputIterator first, InputIterator last):
-    FwdList()
-  {
-    assign(first, last);
-  }
-
-  template< typename T >
-  FwdList< T >::FwdList(std::initializer_list< T > il):
-    FwdList(il.begin(), il.end())
-  {}
 
   template< typename T >
   FwdList< T >::FwdList(const FwdList< T > & rhs):
@@ -245,6 +265,12 @@ namespace maslov
   }
 
   template< typename T >
+  FwdListConstIterator< T > FwdList< T >::cbegin() const
+  {
+    return FwdListConstIterator< T >(fake_->next);
+  }
+
+  template< typename T >
   FwdListIterator< T > FwdList< T >::end()
   {
     return FwdListIterator< T >(fake_);
@@ -252,6 +278,12 @@ namespace maslov
 
   template< typename T >
   FwdListConstIterator< T > FwdList< T >::end() const
+  {
+    return FwdListConstIterator< T >(fake_);
+  }
+
+  template< typename T >
+  FwdListConstIterator< T > FwdList< T >::cend() const
   {
     return FwdListConstIterator< T >(fake_);
   }
@@ -344,7 +376,7 @@ namespace maslov
       return;
     }
     FwdListNode< T > * insert = fake_;
-    for (auto it = begin(); it != position; ++it)
+    for (auto it = cbegin(); it != position; ++it)
     {
       insert = insert->next;
     }
@@ -380,21 +412,21 @@ namespace maslov
       throw std::invalid_argument("ERROR: Invalid iterator"); 
     }*/
     FwdListNode< T > * insert = fake_;
-    for (auto it = begin(); it != position; ++it)
+    for (auto it = cbegin(); it != position; ++it)
     {
       insert = insert->next;
     }
     insert = insert->next;
     FwdListNode< T > * current = fwdlst.fake_;
     FwdListNode< T > * spliceNode = nullptr;
-    for (auto it = fwdlst.begin(); it != fwdlst.end(); ++it)
+    for (auto it = fwdlst.cbegin(); it != fwdlst.cend(); ++it)
     {
+      current = current->next;
       if (it == i)
       {
         spliceNode = current->next;
         break;
       }
-      current = current->next;
     }
     if (!spliceNode)
     {
@@ -426,7 +458,7 @@ namespace maslov
       throw std::invalid_argument("ERROR: Invalid iterator"); 
     }*/
     FwdListNode< T > * insert = fake_;
-    for (auto it = begin(); it != position; ++it)
+    for (auto it = cbegin(); it != position; ++it)
     {
       insert = insert->next;
     }
@@ -437,8 +469,9 @@ namespace maslov
     FwdListNode< T > * temp = fwdlst.fake_;
     FwdListNode< T > * afterLastNode = nullptr;
     size_t count = 0;
-    for (auto it = fwdlst.begin(); it != fwdlst.end(); it++)
+    for (auto it = fwdlst.cbegin(); it != fwdlst.cend(); it++)
     {
+      temp = temp->next;
       if (it == first)
       {
         beforeBeginNode = temp;
@@ -449,11 +482,10 @@ namespace maslov
       if (++tempIt == last)
       {
         lastNode = temp->next;
-        afterLastNode = temp->next->next;
+        afterLastNode = lastNode->next;
         count++;
         break;
       }
-      temp = temp->next;
       count++;
     }
     if (!beginNode || !lastNode)
@@ -475,14 +507,14 @@ namespace maslov
     spliceAfter(position, fwdlst, first, last);
   }
 
-  template< typename T >
+  /*template< typename T >
   bool FwdList< T >::isValidIterator(const cIterator & it) const
   {
-    if (it == end())
+    if (it == cend())
     {
       return true;
     }
-    for (auto currentIt = begin(); currentIt != end(); ++currentIt)
+    for (auto currentIt = cbegin(); currentIt != cend(); ++currentIt)
     {
       if (currentIt == it)
       {
@@ -490,33 +522,34 @@ namespace maslov
       }
     }
     return false;
-  }
+  }*/
+
   template< typename T >
-  template< typename InputIterator >
-  void FwdList< T >::assign(InputIterator first, InputIterator last)
+  void FwdList< T >::assign(iterator first, iterator last)
   {
-    clear();
-    for (auto it = first; it != last; ++it)
-    {
-      pushFront(*it);
-    }
-    reverse();
+    FwdList temp(first, last);
+    swap(temp);
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(cIterator first, cIterator last)
+  {
+    FwdList temp(first, last);
+    swap(temp);
   }
 
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
   { 
-    clear();
-    for (size_t i = 0; i < n; i++)
-    {
-      pushFront(val);
-    }
+    FwdList temp(n, val);
+    swap(temp);
   }
 
   template< typename T >
   void FwdList< T >::assign(std::initializer_list< T > il)
   {
-    assign(il.begin(), il.end());
+    FwdList temp(il);
+    swap(temp);
   }
 }
 #endif
