@@ -37,11 +37,6 @@ namespace asafov
       {}
       ~const_iterator() = default;
 
-      const_iterator(const iterator&) = default;
-      const_iterator(iterator&&) = default;
-      const_iterator& operator=(const iterator&) = default;
-      const_iterator& operator=(iterator&&) = default;
-
       const T& operator*() const
       {
         return current_->data_;
