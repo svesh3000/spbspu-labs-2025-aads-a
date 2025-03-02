@@ -1,5 +1,5 @@
-#ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_HPP
-#define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S1_FORWARD_LIST_HPP
+#ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_HPP
+#define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_HPP
 
 #include <cassert>
 #include <initializer_list>
@@ -12,7 +12,7 @@
 
 namespace kizhin {
   template < typename T >
-  class ForwardList
+  class ForwardList final
   {
   public:
     using value_type = T;
@@ -42,10 +42,10 @@ namespace kizhin {
     const_iterator end() const noexcept;
     const_iterator beforeBegin() const noexcept;
 
-    reference front();
-    reference back();
-    const_reference front() const;
-    const_reference back() const;
+    reference front() noexcept;
+    reference back() noexcept;
+    const_reference front() const noexcept;
+    const_reference back() const noexcept;
     bool empty() const noexcept;
     size_type size() const noexcept;
 
@@ -77,7 +77,7 @@ namespace kizhin {
     void clear() noexcept;
     void swap(ForwardList&) noexcept;
 
-    void reverse();
+    void reverse() noexcept;
     void spliceAfter(const_iterator, ForwardList&);
     void spliceAfter(const_iterator, ForwardList&, const_iterator);
     void spliceAfter(const_iterator, ForwardList&, const_iterator, const_iterator);
@@ -225,28 +225,28 @@ namespace kizhin {
   }
 
   template < typename T >
-  typename ForwardList< T >::reference ForwardList< T >::front()
+  typename ForwardList< T >::reference ForwardList< T >::front() noexcept
   {
     assert(!empty());
     return beforeBegin_->next->data;
   }
 
   template < typename T >
-  typename ForwardList< T >::reference ForwardList< T >::back()
+  typename ForwardList< T >::reference ForwardList< T >::back() noexcept
   {
     assert(!empty());
     return end_->data;
   }
 
   template < typename T >
-  typename ForwardList< T >::const_reference ForwardList< T >::front() const
+  typename ForwardList< T >::const_reference ForwardList< T >::front() const noexcept
   {
     assert(!empty());
     return beforeBegin_->next->data;
   }
 
   template < typename T >
-  typename ForwardList< T >::const_reference ForwardList< T >::back() const
+  typename ForwardList< T >::const_reference ForwardList< T >::back() const noexcept
   {
     assert(!empty());
     return end_->data;
@@ -467,7 +467,7 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::reverse()
+  void ForwardList< T >::reverse() noexcept
   {
     Node* prev = nullptr;
     Node* curr = beforeBegin_->next;
@@ -634,3 +634,4 @@ namespace kizhin {
 }
 
 #endif
+

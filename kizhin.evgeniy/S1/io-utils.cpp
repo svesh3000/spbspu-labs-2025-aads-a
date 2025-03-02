@@ -15,3 +15,4 @@ std::istream& kizhin::inputSequences(std::istream& in, NamesT& names,
   in.clear();
   return in;
 }
+

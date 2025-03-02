@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <stdexcept>
 #include "io-utils.hpp"
 #include "list-utils.hpp"
@@ -11,11 +12,8 @@ int main()
     if (!inputSequences(std::cin, names, numbers)) {
       throw std::logic_error("Failed to input");
     }
-    numbers = convert(numbers);
-    outputList(std::cout, names);
-    if (!names.empty()) {
-      std::cout << '\n';
-    }
+    numbers = transpose(numbers);
+    outputListWithNewLine(std::cout, names);
     auto isEmptyList = [](const auto& list) -> bool
     {
       return list.empty();
@@ -25,22 +23,16 @@ int main()
       return 0;
     }
     for (const NumbersT& num : numbers) {
-      outputList(std::cout, num);
-      if (!num.empty()) {
-        std::cout << '\n';
-      }
+      outputListWithNewLine(std::cout, num);
     }
     ForwardList< NumbersT::value_type > sums;
-    using iterator = ForwardList< NumbersT >::iterator;
-    for (iterator i = numbers.begin(), end = numbers.end(); i != end; ++i) {
-      sums.pushBack(safeAccumulate(*i));
+    for (const auto& list : numbers) {
+      sums.pushBack(safeAccumulate(list));
     }
-    outputList(std::cout, sums);
-    if (!sums.empty()) {
-      std::cout << '\n';
-    }
+    outputListWithNewLine(std::cout, sums);
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << '\n';
     return 1;
   }
 }
+

@@ -6,8 +6,9 @@
 
 namespace kizhin {
   using ListT = ForwardList< double >;
-  void testInvariants(const ListT&);
+  void testForwardListInvariants(const ListT&);
   void testComparisonInvariants(const ListT&, const ListT&);
 }
 
 #endif
+
