@@ -217,15 +217,6 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::fill(Iter first, Iter last, const T& value)
-  {
-    for (Iter it = first; it != last; it++)
-    {
-      *it = value;
-    }
-  }
-
-  template < class T >
   void List< T >::swap(List& rhs)
   {
     std::swap(fake_, rhs.fake_);
@@ -280,15 +271,15 @@ namespace averenkov
     {
       return;
     }
-    Node< T >* posNode = pos.node_;
-    Node< T >* firstNode = first.node_;
+    Node< T >* posNode = pos.getNode();
+    Node< T >* firstNode = first.getNode();
     Node< T >* lastNode = firstNode;
     Node< T >* prevNode = rhs.fake_;
     while (prevNode->next_ != firstNode)
     {
       prevNode = prevNode->next_;
     }
-    while (lastNode->next_ != last.node_)
+    while (lastNode->next_ != last.getNode())
     {
       lastNode = lastNode->next_;
     }
@@ -297,7 +288,7 @@ namespace averenkov
     posNode->next_ = firstNode;
     size_t count = 0;
     Node< T >* temp = firstNode;
-    while (temp != last.node_)
+    while (temp != last.getNode())
     {
       count++;
       temp = temp->next_;

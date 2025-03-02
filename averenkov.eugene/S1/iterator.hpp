@@ -23,12 +23,21 @@ namespace averenkov
     bool operator==(const ListIterator< T >&) const;
     bool operator!=(const ListIterator< T >&) const;
 
+    Node< T >* getNode();
+
   private:
     Node< T >* node_;
 
   };
 
-  template< typename T >
+
+  template< class T >
+  Node< T >*  ListIterator< T >::getNode()
+  {
+    return node_;
+  }
+
+  template< class T >
   ListIterator< T >& ListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
@@ -36,7 +45,7 @@ namespace averenkov
     return *this;
   }
 
-  template< typename T >
+  template< class T >
   ListIterator< T > ListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
@@ -45,27 +54,27 @@ namespace averenkov
     return result;
   }
 
-  template< typename T >
+  template< class T >
   T& ListIterator< T >::operator*()
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
-  template< typename T >
+  template< class T >
   T* ListIterator< T >::operator->()
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
-  template< typename T >
+  template< class T >
   bool ListIterator< T >::operator==(const ListIterator< T >& rhs) const
   {
     return node_ == rhs.node_;
   }
 
-  template< typename T >
+  template< class T >
   bool ListIterator< T >::operator!=(const ListIterator< T >& rhs) const
   {
     return !(rhs == *this);
