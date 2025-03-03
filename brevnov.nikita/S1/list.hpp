@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <initializer_list>
-#include "node.hpp"
+#include "constiterator.hpp"
 namespace brevnov
 {
   template< typename T >
