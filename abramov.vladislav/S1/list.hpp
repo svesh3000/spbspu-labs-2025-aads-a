@@ -22,6 +22,7 @@ namespace abramov
     List(std::initializer_list< T > il);
     List(Iterator< T > begin, Iterator< T > end);
     ~List();
+    List< T > &operator=(std::initializer_list< T > il);
     T &front();
     const T &front() const;
     T &back();
@@ -88,6 +89,14 @@ namespace abramov
   List< T >::~List()
   {
     clear();
+  }
+
+  template< class T >
+  List< T > &List< T >::operator=(std::initializer_list< T > il)
+  {
+    List< T > copy{ il };
+    swap(copy);
+    return *this;
   }
 
   template< class T >
