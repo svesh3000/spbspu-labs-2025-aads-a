@@ -12,6 +12,7 @@ int main()
   using ListElem = std::pair< std::string, IntList >;
   zholobov::CircularFwdList< ListElem > list;
   zholobov::CircularFwdList< list_elem_type > sum_list;
+  bool is_overflow = false;
   try {
     while (std::cin.good()) {
       std::string line;
@@ -64,7 +65,7 @@ int main()
           if (sum <= std::numeric_limits< list_elem_type >::max() - val) {
             sum += val;
           } else {
-            throw std::overflow_error("Overflow error");
+            is_overflow = true;
           }
         }
       }
@@ -76,7 +77,9 @@ int main()
   } catch (const std::bad_alloc& e) {
     std::cerr << e.what() << '\n';
     return 1;
-  } catch (const std::overflow_error& e) {
+  }
+
+  if (is_overflow) {
     std::cerr << "Overflow error\n";
     return 1;
   }
