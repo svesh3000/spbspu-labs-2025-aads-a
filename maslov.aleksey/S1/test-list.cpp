@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(rangeConstructor)
   std::initializer_list< int > il{1, 2, 3};
   FwdList list1(il.begin(), il.end());
   FwdList list2({1, 2, 3});
-  BOOST_TEST(list2 == list1); 
+  BOOST_TEST(list2 == list1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(insertAfter)
   std::ostringstream out;
   printList(out, list);
   BOOST_TEST(out.str() == "231");
-  
+
   auto it2 = list.insertAfter(list.cbegin(), 4, 4);
   BOOST_TEST(*it2 == 4);
   out.str("");

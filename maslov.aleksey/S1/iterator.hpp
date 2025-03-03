@@ -24,7 +24,7 @@ namespace maslov
     thisT operator++(int);
     bool operator!=(const thisT &) const;
     bool operator==(const thisT &) const;
-  
+
     FwdListNode< T > * getNode() const;
    private:
     FwdListNode< T > * node_;

@@ -422,7 +422,7 @@ namespace maslov
 
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
-  { 
+  {
     FwdList temp(n, val);
     swap(temp);
   }
@@ -475,7 +475,7 @@ namespace maslov
 
   template< typename T >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, const T & val)
-  { 
+  {
     FwdListNode< T > * newNode = new FwdListNode< T >{val, nullptr};
     FwdListNode< T > * positionNode = position.getNode();
     newNode->next = positionNode->next;
@@ -496,7 +496,6 @@ namespace maslov
     for (size_t i = 0; i < n - 1; ++i)
     {
       insertAfter(position, val);
-      
     }
     iterator temp = insertAfter(position, val);
     return temp;
