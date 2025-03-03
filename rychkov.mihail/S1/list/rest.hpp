@@ -16,9 +16,12 @@ void rychkov::List< T >::swap(List& rhs) noexcept
 template< class T >
 void rychkov::List< T >::reverse() noexcept
 {
-  for (const_iterator i = begin(); i != end(); ++i)
+  const_iterator i = begin();
+  while (i != end())
   {
-    std::swap(i.node_->prev, i.node_->next);
+    const_iterator temp = i;
+    ++i;
+    std::swap(temp.node_->prev, temp.node_->next);
   }
   std::swap(head_, tail_);
 }

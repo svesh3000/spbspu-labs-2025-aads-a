@@ -19,14 +19,7 @@ rychkov::List< T >::~List()
 template< class T >
 void rychkov::List< T >::clear() noexcept
 {
-  while (head_ != nullptr)
-  {
-    node_t< value_type >* temp = head_;
-    head_ = head_->next;
-    delete temp;
-  }
-  tail_ = nullptr;
-  size_ = 0;
+  erase(begin(), end());
 }
 
 template< class T >

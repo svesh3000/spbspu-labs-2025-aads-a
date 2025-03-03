@@ -67,8 +67,8 @@ namespace rychkov
     void insert(const_iterator pos, InputIt from, InputIt to);
     void insert(const_iterator pos, std::initializer_list< value_type > rhs);
 
-    void erase(const_iterator pos);
-    void erase(const_iterator from, const_iterator to);
+    iterator erase(const_iterator pos);
+    iterator erase(const_iterator from, const_iterator to);
 
     void reverse() noexcept;
     void merge(List& rhs);
