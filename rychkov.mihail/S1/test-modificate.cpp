@@ -9,7 +9,9 @@ BOOST_AUTO_TEST_CASE(emplace_test)
   BOOST_TEST(list.emplace(list.begin(), 5) == 5);
   BOOST_TEST(list.emplace(list.begin(), 2) == 2);
   BOOST_TEST(list.emplace(list.end(), 6) == 6);
-  rychkov::List< int > expected = {2, 5, 6};
+  BOOST_TEST(list.emplace(++(++list.begin()), 8) == 8);
+  BOOST_TEST(list.emplace(++(++list.begin()), 0) == 0);
+  rychkov::List< int > expected = {2, 5, 0, 8, 6};
   BOOST_TEST(list == expected);
 }
 BOOST_AUTO_TEST_CASE(emplace_spec_test)

@@ -58,6 +58,7 @@ namespace rychkov
     size_type remove_if(C condition);
     void splice(const_iterator pos, List& rhs);
     void splice(const_iterator pos, List&& rhs);
+    void splice(const_iterator pos, List& rhs, const_iterator it);
     void splice(const_iterator pos, List& rhs, const_iterator from, const_iterator to);
 
     void insert(const_iterator pos, const value_type& value);
