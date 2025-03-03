@@ -1,6 +1,6 @@
 #include "list_manipulations.hpp"
 
-void lanovenko::printSequencesName(const std::list<std::pair<std::string, std::list<unsigned long long>>> temporary, std::ostream& out)
+void lanovenko::printSequencesName(const list_of_pairs temporary, std::ostream& out)
 {
   if (temporary.empty())
   {
@@ -42,7 +42,7 @@ void lanovenko::printSumList(const std::list<int> &sumList, bool sumLimit, std::
   out << '\n';
 }
 
-void lanovenko::printSequences(const std::list<std::pair<std::string, std::list<unsigned long long>>> temporary, size_t maxSize, bool &sumLimit, std::ostream &out)
+void lanovenko::printSequences(const list_of_pairs temporary, size_t maxSize, bool& sumLimit, std::ostream& out)
 {
   std::list<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)

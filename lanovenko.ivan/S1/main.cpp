@@ -8,12 +8,12 @@
 
 int main()
 {
-  std::list < std::pair<std::string, std::list<unsigned long long>>> myList;
+  lanovenko::list_of_pairs myList;
   std::string sequenceName = "";
   while (std::cin >> sequenceName)
   {
     unsigned long long element = 0;
-    std::list<unsigned long long> temporaryList{};
+    lanovenko::list_ull temporaryList{};
     while (std::cin >> element)
     {
       temporaryList.push_back(element);
