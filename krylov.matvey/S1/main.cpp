@@ -6,13 +6,13 @@
 
 int main()
 {
-  krylov::List< std::pair< std::string, krylov::List< unsigned long long > > > listOfPairs;
+  std::list< std::pair< std::string, std::list< unsigned long long > > > listOfPairs;
   std::string line = "";
   std::cin >> line;
   size_t maxSizeOfNumList = 0;
   while (!std::cin.eof())
   {
-    std::pair< std::string, krylov::List< unsigned long long > > pair;
+    std::pair< std::string, std::list< unsigned long long > > pair;
     pair.first = line;
     std::cin >> line;
     while (!std::cin.eof() && isdigit(line[0]))
@@ -38,7 +38,7 @@ int main()
   }
   std::cout << (--listOfPairs.end())->first << "\n";
 
-  krylov::List< unsigned long long > listOfLineSums;
+  std::list< unsigned long long > listOfLineSums;
   bool wasOverflow = false;
   unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
