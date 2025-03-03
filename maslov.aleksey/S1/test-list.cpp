@@ -168,6 +168,26 @@ BOOST_AUTO_TEST_CASE(assignFill)
   BOOST_TEST(out.str() == "444");
 }
 
+BOOST_AUTO_TEST_CASE(eraseAfter)
+{
+  FwdList list({1, 2, 3});
+  auto it = ++list.cbegin();
+  maslov::FwdListIterator< int > tempIt = list.eraseAfter(it);
+  BOOST_TEST(*(++tempIt) == 1);
+  std::ostringstream out1;
+  printList(out1, list);
+  BOOST_TEST(out1.str() == "12");
+
+  list.assign({1, 2, 3, 4, 5});
+  auto first = list.cbegin();
+  auto last = list.cend();
+  tempIt = list.eraseAfter(first, last);
+  BOOST_TEST(*(++tempIt) == 1);
+  std::ostringstream out2;
+  printList(out2, list);
+  BOOST_TEST(out2.str() == "1");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operations)

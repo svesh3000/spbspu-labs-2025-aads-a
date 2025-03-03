@@ -55,6 +55,14 @@ namespace maslov
     void assign(InputIterator first, InputIterator last);
     void assign(size_t n, const T & val);
     void assign(std::initializer_list< T > il);
+    iterator eraseAfter(cIterator position);
+    iterator eraseAfter(cIterator position, cIterator last);
+    iterator insertAfter(cIterator position, const T & val);
+    iterator insertAfter(cIterator position, T && val);
+    iterator insertAfter(cIterator position, size_t n, const T & val);
+    template< typename InputIterator, typename = enableIf< InputIterator > >
+    iterator insertAfter(cIterator position, InputIterator first, InputIterator last);
+    iterator insertAfter(cIterator, std::initializer_list< T > il);
 
     void reverse() noexcept;
     void remove(const T & value);
@@ -539,5 +547,67 @@ namespace maslov
     FwdList temp(il);
     swap(temp);
   }
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::eraseAfter(cIterator position)
+  {
+    assert(!empty());
+    auto last = position;
+    ++last;
+    assert(last != cend());
+    ++last;
+    return eraseAfter(position, last);
+  }
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::eraseAfter(cIterator position, cIterator last)
+  {
+    assert(!empty());
+    if (position == last)
+    {
+      return iterator(last.getNode());
+    }
+    FwdListNode< T > * lastNode = last.getNode();
+    assert(++last != cend());
+    FwdListNode< T > * firstNode = position.getNode();
+    FwdListNode< T > * currentNode = firstNode->next;
+    while (currentNode != lastNode)
+    {
+      FwdListNode< T > * temp = currentNode;
+      currentNode = currentNode->next;
+      delete temp;
+      --size_;
+    }
+    if (lastNode->next == fake_)
+    {
+      firstNode->next = fake_->next;
+    }
+    else
+    {
+      firstNode->next = lastNode;
+    }
+    return iterator(lastNode);
+  }
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, const T & val)
+  {}
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, T && val)
+  {}
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, size_t n, const T & val)
+  {}
+
+  template< typename T >
+  template< typename InputIterator, typename >
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, InputIterator first, InputIterator last)
+  {}
+
+  template< typename T >
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator, std::initializer_list< T > il)
+  {}
 }
 #endif

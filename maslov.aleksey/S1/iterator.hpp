@@ -24,6 +24,8 @@ namespace maslov
     thisT operator++(int);
     bool operator!=(const thisT &) const;
     bool operator==(const thisT &) const;
+  
+    FwdListNode< T > * getNode() const;
    private:
     FwdListNode< T > * node_;
   };
@@ -80,6 +82,11 @@ namespace maslov
   {
     return node_ != rhs.node_;
   }
+  template< typename T >
+  FwdListNode< T > * FwdListIterator< T >::getNode() const
+  {
+    return node_;
+  }
 
   template < typename T >
   struct FwdListConstIterator final: public std::iterator< std::forward_iterator_tag, T >
@@ -98,6 +105,8 @@ namespace maslov
     const T * operator->() const;
     bool operator==(const thisT &) const;
     bool operator!=(const thisT &) const;
+
+    FwdListNode< T > * getNode() const;
    private:
     FwdListNode< T > * node_;
   };
@@ -153,6 +162,12 @@ namespace maslov
   bool FwdListConstIterator< T >::operator!=(const thisT & rhs) const
   {
     return node_ != rhs.node_;
+  }
+
+  template< typename T >
+  FwdListNode< T > * FwdListConstIterator< T >::getNode() const
+  {
+    return node_;
   }
 }
 #endif
