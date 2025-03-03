@@ -34,17 +34,19 @@ int main()
     }
 
     zholobov::CircularFwdList< std::pair< IntList::const_iterator, IntList::const_iterator > > iter_list;
-    bool first = true;
-    for (auto it = list.begin(); it != list.end(); ++it) {
-      if (first) {
-        std::cout << it->first;
-        first = false;
-      } else {
-        std::cout << " " << it->first;
+    if (!list.empty()) {
+      bool first = true;
+      for (auto it = list.begin(); it != list.end(); ++it) {
+        if (first) {
+          std::cout << it->first;
+          first = false;
+        } else {
+          std::cout << " " << it->first;
+        }
+        iter_list.push_back(std::make_pair(it->second.cbegin(), it->second.cend()));
       }
-      iter_list.push_back(std::make_pair(it->second.cbegin(), it->second.cend()));
+      std::cout << "\n";
     }
-    std::cout << "\n";
 
     bool is_done_printing = true;
     do {
@@ -76,7 +78,7 @@ int main()
   }
 
   if (is_overflow) {
-    std::cout << "Overflow error\n";
+    std::cerr << "Overflow error\n";
     return 1;
   }
 
