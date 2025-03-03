@@ -19,8 +19,9 @@ namespace asafov
       {
         if (next_ != nullptr)
         {
-          delete clear(next_);
+          auto temp = next_;
           next_ = nullptr;
+          delete clear(temp);
           return this;
         }
         else
@@ -155,8 +156,10 @@ namespace asafov
     {
       if (head_ != nullptr)
       {
-        head_->clear();
+        auto temp = head_;
         head_ = nullptr;
+        head_->clear();
+        
       }
     }
     private:
