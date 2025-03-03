@@ -127,9 +127,9 @@ namespace rychkov
     template< class C >
     bool compare(const List& rhs, C comp) const;
     template< class C >
-    const_iterator merge_sort(C& compare, const_iterator from, size_t size_);
+    const_iterator merge_sort(C& compare, const_iterator& from, size_t size_);
     template< class C >
-    void unsafeMerge(C& compare, const_iterator& from, const_iterator& to,
+    const_iterator unsafeMerge(C& compare, const_iterator& from, const_iterator to,
         const_iterator insfrom, const_iterator insto);
   };
 }

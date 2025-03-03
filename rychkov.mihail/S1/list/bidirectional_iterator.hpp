@@ -7,7 +7,7 @@
 namespace rychkov
 {
   template< class T >
-  struct List;
+  class List;
   template< class T >
   struct node_t
   {
@@ -82,16 +82,16 @@ namespace rychkov
     }
 
     template< bool isConst1 = isConst >
-    typename std::enable_if_t< !isConst && !isConst1, reference > operator*() noexcept
+    typename std::enable_if_t< !isConst && !isConst1, value_type& > operator*() noexcept
     {
       return node_->data;
     }
-    const reference operator*() const noexcept
+    const value_type& operator*() const noexcept
     {
       return node_->data;
     }
     template< bool isConst1 = isConst >
-    typename std::enable_if_t< !isConst && !isConst1, pointer > operator->() noexcept
+    typename std::enable_if_t< !isConst && !isConst1, value_type* > operator->() noexcept
     {
       return std::addressof(node_->data);
     }
