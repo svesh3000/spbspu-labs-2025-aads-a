@@ -33,7 +33,8 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
   if (forward_list.empty())
   {
-    throw std::logic_error("Empty input!");
+    out << 0 << '\n';
+    return;
   }
 
   list_iter list_iterators;
