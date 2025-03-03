@@ -1,5 +1,5 @@
-#ifndef SPLICE_HPP
-#define SPLICE_HPP
+#ifndef ERASORS_SPLICE_HPP
+#define ERASORS_SPLICE_HPP
 
 #include "decl.hpp"
 
@@ -67,6 +67,35 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
 
   rhs.size_ -= erasedSize;
   size_ += erasedSize;
+}
+
+template< class T >
+void rychkov::List< T >::erase(const_iterator pos)
+{
+  if (pos == end())
+  {
+    return;
+  }
+  size_--;
+  if (pos == begin())
+  {
+    head_ = head_->next;
+    head_->prev = nullptr;
+  }
+  else
+  {
+    pos.node_->prev->next = pos.node_->next;
+  }
+  if (pos == const_iterator{tail_})
+  {
+    tail_ = tail_->prev;
+    tail_->next = nullptr;
+  }
+  else
+  {
+    pos.node_->next->prev = pos.node_->prev;
+  }
+  delete pos.node_;
 }
 
 #endif
