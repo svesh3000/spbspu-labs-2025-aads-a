@@ -15,20 +15,6 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      Node* node_clear(Node* clearble)
-      {
-        if (clearble->next_ != nullptr)
-        {
-          auto temp = clearble->next_;
-          clearble->next_ = nullptr;
-          delete node_clear(temp);
-          return clearble;
-        }
-        else
-        {
-          return clearble;
-        }
-      }
     };
   public:
     Forward_list() noexcept:
@@ -150,6 +136,21 @@ namespace asafov
     }
     T& back(){
       return last_->data_;
+    }
+
+    Node* node_clear(Node* clearble)
+    {
+      if (clearble->next_ != nullptr)
+      {
+        auto temp = clearble->next_;
+        clearble->next_ = nullptr;
+        delete node_clear(temp);
+        return clearble;
+      }
+      else
+      {
+        return clearble;
+      }
     }
 
     void clear()
