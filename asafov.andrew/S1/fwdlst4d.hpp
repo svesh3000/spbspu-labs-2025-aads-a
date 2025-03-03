@@ -159,7 +159,6 @@ namespace asafov
         auto temp = head_;
         head_ = nullptr;
         head_->clear();
-        
       }
     }
     private:
