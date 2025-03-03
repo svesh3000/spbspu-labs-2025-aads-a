@@ -15,7 +15,9 @@ namespace brevnov
     template< typename InputIterator >
     List< T >(InputIterator begin, InputIterator end);
     List< T >(initializer_list<value_type> il);
+    ~List();
 
+    void clear();
   private:
     Node< T > * head_;
     Node< T > * tail_;
@@ -74,5 +76,23 @@ namespace brevnov
   List::List(initializer_list<value_type> il):
     List(il.begin(), il.end())
   {}
+
+  template< typename T >
+  List::~List()
+  {
+    clear();
+    delete tail;
+  }
+
+  template< typename T >
+  List::clear()
+  {
+    while (!clear())
+    {
+      popFront();
+    }
+  }
+
+  
 }  
 #endif
