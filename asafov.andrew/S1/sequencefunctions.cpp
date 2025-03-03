@@ -35,6 +35,10 @@ sequence_list_t asafov::getSequences(std::istream& in)
     {
       in.clear();
     }
+    if (list.empty())
+    {
+      list.push_back(0);
+    }
     sequence_t pair = make_pair(name, list);
     data.push_back(pair);
   } while (!in.eof());
@@ -49,7 +53,7 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
   size_t size = 0;
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
-    out << iter->first << ' ' << std::flush;
+    out << iter->first << ' ';
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
     ++size;
@@ -65,16 +69,19 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
       if (begins[i] != ends[i])
       {
         sum += *begins[i];
-        out << *begins[i] << ' ' << std::flush;
+        out << *begins[i] << ' ';
         ++begins[i];
       }
     }
     sums.push_back(sum);
     out << '\n';
   }
-  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
+  auto it = sums.cbegin();
+  out << *it;
+  ++it;
+  for (; it != sums.cend(); ++it)
   {
-    out << *it << ' ' << std::flush;
+    out << ' ' << *it ;
   }
   out << '\n';
   delete[] begins;
