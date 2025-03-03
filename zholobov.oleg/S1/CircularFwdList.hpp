@@ -29,8 +29,10 @@ namespace zholobov {
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
+    const_iterator cbegin() const noexcept;
     iterator end() noexcept;
     const_iterator end() const noexcept;
+    const_iterator cend() const noexcept;
 
     reference front();
     const_reference front() const;
@@ -83,16 +85,21 @@ zholobov::CircularFwdList< T >::CircularFwdList(const CircularFwdList& other):
 {
   FwdListNode< value_type >* other_p = other.head_;
   if (other_p != nullptr) {
-    head_ = new FwdListNode< value_type >(other_p->value, head_);
-    ++size_;
-    other_p = other_p->next;
-    FwdListNode< value_type >* prev = head_;
-    while (other_p != other.head_) {
-      auto curr = new FwdListNode< value_type >(other_p->value, head_);
+    try {
+      head_ = new FwdListNode< value_type >(other_p->value, head_);
       ++size_;
-      prev->next = curr;
-    };
-    tail_ = prev;
+      other_p = other_p->next;
+      FwdListNode< value_type >* prev = head_;
+      while (other_p != other.head_) {
+        auto curr = new FwdListNode< value_type >(other_p->value, head_);
+        ++size_;
+        prev->next = curr;
+      };
+      tail_ = prev;
+    } catch (const std::bad_alloc&) {
+      clear();
+      throw;
+    }
   }
 }
 
@@ -118,6 +125,12 @@ inline typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdLi
 template < typename T >
 inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::begin() const noexcept
 {
+  return cbegin();
+}
+
+template < typename T >
+inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::cbegin() const noexcept
+{
   return (size_ == 0) ? const_iterator(nullptr) : const_iterator(std::addressof(head_));
 }
 
@@ -130,7 +143,19 @@ inline typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdLi
 template < typename T >
 inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::end() const noexcept
 {
+  return cend();
+}
+
+template < typename T >
+inline typename zholobov::CircularFwdList< T >::const_iterator zholobov::CircularFwdList< T >::cend() const noexcept
+{
   return (size_ == 0) ? const_iterator(nullptr) : const_iterator(std::addressof(tail_->next));
+}
+
+template < typename T >
+inline bool zholobov::CircularFwdList< T >::empty() const noexcept
+{
+  return size_ == 0;
 }
 
 template < typename T >
