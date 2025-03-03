@@ -1,6 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
+BOOST_AUTO_TEST_CASE(init_list)
+{
+  abramov::List< int > list{ 1, 2, 3 };
+  BOOST_TEST(list.front() == 1);
+  BOOST_TEST(list.back() == 3);
+}
+
 BOOST_AUTO_TEST_CASE(empty)
 {
   abramov::List< int > list;
@@ -49,12 +56,8 @@ BOOST_AUTO_TEST_CASE(popBack)
 
 BOOST_AUTO_TEST_CASE(swap)
 {
-  abramov::List< int > list1;
-  abramov::List< int > list2;
-  list1.pushBack(1);
-  list1.pushBack(2);
-  list2.pushBack(3);
-  list2.pushBack(4);
+  abramov::List< int > list1{ 1, 2 };
+  abramov::List< int > list2{ 3, 4 };
   list1.swap(list2);
   BOOST_TEST(list1.front() == 3);
   BOOST_TEST(list1.back() == 4);
@@ -64,16 +67,14 @@ BOOST_AUTO_TEST_CASE(swap)
 
 BOOST_AUTO_TEST_CASE(clear)
 {
-  abramov::List< int > list;
-  list.pushBack(1);
-  list.pushBack(2);
+  abramov::List< int > list{ 1, 2 };
   list.clear();
   BOOST_TEST(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(begin)
 {
-  abramov::List< int > list;
+  abramov::List< int > list{ 1, 0 };
   list.pushFront(0);
   list.pushFront(1);
   auto iter = list.begin();
@@ -82,9 +83,7 @@ BOOST_AUTO_TEST_CASE(begin)
 
 BOOST_AUTO_TEST_CASE(end)
 {
-  abramov::List< int > list;
-  list.pushBack(1);
-  list.pushBack(2);
+  abramov::List< int > list{ 1, 2 };
   auto iter1 = list.begin();
   auto iter2 = list.end();
   ++iter1;
@@ -95,10 +94,7 @@ BOOST_AUTO_TEST_CASE(end)
 
 BOOST_AUTO_TEST_CASE(fill)
 {
-  abramov::List< int > list;
-  list.pushBack(0);
-  list.pushBack(1);
-  list.pushBack(2);
+  abramov::List< int > list{ 0, 1, 2 };
   auto iter1 = list.begin();
   auto iter2 = list.end();
   list.fill(iter1, iter2, 3);
@@ -109,35 +105,22 @@ BOOST_AUTO_TEST_CASE(fill)
 
 BOOST_AUTO_TEST_CASE(find)
 {
-  abramov::List< int > list;
-  list.pushBack(0);
-  list.pushBack(1);
-  list.pushBack(2);
-  list.pushBack(1);
+  abramov::List< int > list{ 0, 1, 2, 1};
   auto it = list.find(list.begin(), list.end(), 1);
   BOOST_TEST(*it == 1);
 }
 
 BOOST_AUTO_TEST_CASE(remove_test)
 {
-  abramov::List< int > list;
-  list.pushBack(0);
-  list.pushBack(1);
-  list.pushBack(1);
-  list.pushBack(2);
+  abramov::List< int > list{ 0, 1, 1, 2 };
   auto it = list.remove(list.begin(), list.end(), 1);
   BOOST_TEST(*it == 1);
 }
 
 BOOST_AUTO_TEST_CASE(splice)
 {
-  abramov::List< int > list1;
-  list1.pushBack(3);
-  list1.pushBack(4);
-  list1.pushBack(5);
-  abramov::List< int > list2;
-  list2.pushBack(1);
-  list2.pushBack(2);
+  abramov::List< int > list1{ 3, 4, 5 };
+  abramov::List< int > list2{ 1, 2 };
   auto it = list1.cbegin();
   list1.splice(it, list2);
   it = list1.cbegin();
@@ -145,9 +128,7 @@ BOOST_AUTO_TEST_CASE(splice)
   {
     BOOST_TEST(*(it++) == i);
   }
-  abramov::List< int > list3;
-  list3.pushBack(6);
-  list3.pushBack(7);
+  abramov::List< int > list3{ 6, 7 };
   list1.splice(++list1.cbegin(), list3);
   it = ++list1.cbegin();
   for (size_t i = 6; i < 8; ++i)
