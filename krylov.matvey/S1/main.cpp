@@ -32,7 +32,7 @@ int main()
     return 0;
   }
 
-  for (auto it = listOfPairs.begin(); it != --listOfPairs.end(); ++it)
+  for (auto it = listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
   {
     std::cout << it->first << " ";
   }
@@ -77,7 +77,7 @@ int main()
         isSpaceAvailable = true;
       }
     }
-    if ((--listOfPairs.end())->second.size() <= i)
+    if ((--(listOfPairs.end()))->second.size() <= i)
     {
       std::cout << "\n";
       continue;
@@ -89,10 +89,10 @@ int main()
     std::cerr << "Overflow!\n";
     return 1;
   }
-  for (auto it = listOfLineSums.begin(); it != --listOfLineSums.end(); ++it)
+  for (auto it = listOfLineSums.begin(); it != --(listOfLineSums.end()); ++it)
   {
     std::cout << *it << " ";
   }
-  std::cout << *(--listOfLineSums.end()) << "\n";
+  std::cout << *(--(listOfLineSums.end())) << "\n";
 }
 

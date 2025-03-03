@@ -29,6 +29,7 @@ namespace krylov
     using pointer = T*;
     using reference = T&;
     Iterator(Node< T >* node);
+    Iterator(Node< T >* node, const List< T >* list);
     T& operator*();
     T* operator->();
     Iterator& operator++();
@@ -39,6 +40,7 @@ namespace krylov
     bool operator==(const Iterator& other) const;
   private:
     Node< T >* current_;
+    const List< T >* list_;
     friend class List< T >;
   };
 
@@ -46,10 +48,11 @@ namespace krylov
   class List
   {
   public:
+    friend class Iterator< T >;
     List();
     ~List();
-    Iterator< T > begin();
-    Iterator< T > end();
+    Iterator< T > begin() const;
+    Iterator< T > end() const;
     void push_back(const T& value);
     void pop_back();
     T& front();
@@ -87,7 +90,14 @@ namespace krylov
 
   template < typename T >
   Iterator< T >::Iterator(Node< T >* node):
-    current_(node)
+    current_(node),
+    list_(nullptr)
+  {}
+
+  template < typename T >
+  Iterator< T >::Iterator(Node< T >* node, const List< T >* list):
+    current_(node),
+    list_(list)
   {}
 
   template < typename T >
@@ -120,7 +130,14 @@ namespace krylov
   template < typename T >
   Iterator< T >& Iterator< T >::operator--()
   {
-    current_ = current_->prev_;
+    if (current_ == nullptr)
+    {
+      current_ = list_->tail_;
+    }
+    else
+    {
+      current_ = current_->prev_;
+    }
     return *this;
   }
 
@@ -145,15 +162,15 @@ namespace krylov
   }
 
   template < typename T >
-  Iterator< T > List< T >::begin()
+  Iterator< T > List< T >::begin() const
   {
     return Iterator< T >(head_);
   }
 
   template < typename T >
-  Iterator< T > List< T >::end()
+  Iterator< T > List< T >::end() const
   {
-    return Iterator< T >(nullptr);
+    return Iterator< T >(nullptr, this);
   }
 
   template < typename T >
