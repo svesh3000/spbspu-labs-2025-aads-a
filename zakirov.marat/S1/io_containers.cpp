@@ -1,6 +1,8 @@
 #include "io_containers.hpp"
 #include <cstring>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
 
 void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 {
@@ -29,9 +31,11 @@ void zakirov::get_list_ull(std::istream & in, list_ull & forward_list)
 
 void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
+
   list_iter list_iterators;
-  list_pair::iterator pair_iter = forward_list.begin();
   list_iter::iterator iter_list = list_iterators.before_begin();
+  list_pair::iterator pair_iter = forward_list.begin();
+  unsigned long long int number_sum = 0;
   size_t list_size = 0;
   size_t deleted = 0;
   while (pair_iter != forward_list.end())
@@ -51,14 +55,20 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   }
 
   out << '\n';
+  list_ull list_added;
+  list_ull::iterator iter_added = list_added.before_begin();
+  bool flag_overflow = false;
+
   while (deleted != list_size)
   {
     deleted = 0;
+    number_sum = 0;
     iter_list = list_iterators.begin();
     pair_iter = forward_list.begin();
     if ((* iter_list) != (* pair_iter).second.end())
     {
       out << ** iter_list;
+      number_sum += (** iter_list);
       ++(* iter_list);
     }
     else
@@ -73,7 +83,13 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     {
       if ((* iter_list) != (* pair_iter).second.end())
       {
+        if (number_sum > std::numeric_limits< unsigned long long >::max() - ** iter_list)
+        {
+          flag_overflow = true;
+        }
+
         out << ' ' << ** iter_list;
+        number_sum += (** iter_list);
         ++(* iter_list);
       }
       else
@@ -83,7 +99,25 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
       ++pair_iter;
     }
-
-    out << '\n';
+    if (deleted != list_size)
+    {
+      list_added.insert_after(iter_added, number_sum);
+      out << '\n';
+    }
+    number_sum = 0;
   }
+
+  if (flag_overflow)
+  {
+    throw std::logic_error("Stack overflow!");
+  }
+
+  iter_added = list_added.begin();
+  out << * iter_added;
+  ++iter_added;
+  for (; iter_added != list_added.end(); ++iter_added)
+  {
+    out << ' ' << * iter_added;
+  }
+  out << '\n';
 }
