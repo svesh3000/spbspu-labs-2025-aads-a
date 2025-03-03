@@ -35,10 +35,6 @@ sequence_list_t asafov::getSequences(std::istream& in)
     {
       in.clear();
     }
-    if (list.empty())
-    {
-      list.push_back(0);
-    }
     sequence_t pair = make_pair(name, list);
     data.push_back(pair);
   } while (!in.eof());
@@ -57,6 +53,13 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
     ++size;
+  }
+  auto temp = sequences.cbegin();
+  auto temp2 = begins[0];
+  if (++temp == sequences.cend() && ++temp2 == ends[0])
+  {
+    out << 0 << '\n';
+    return;
   }
   out << '\n';
   seqiter = sequences.cbegin();
