@@ -111,13 +111,19 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   {
     throw std::logic_error("Stack overflow!");
   }
-
-  iter_added = list_added.begin();
-  out << * iter_added;
-  ++iter_added;
-  for (; iter_added != list_added.end(); ++iter_added)
+  else if (list_added.empty())
   {
-    out << ' ' << * iter_added;
+    out << 0 << '\n';
   }
-  out << '\n';
+  else
+  {
+    iter_added = list_added.begin();
+    out << * iter_added;
+    ++iter_added;
+    for (; iter_added != list_added.end(); ++iter_added)
+    {
+      out << ' ' << * iter_added;
+    }
+    out << '\n';
+  }
 }
