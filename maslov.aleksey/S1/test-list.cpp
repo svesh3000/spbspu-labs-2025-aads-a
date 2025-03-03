@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(fillConstructor)
 
 BOOST_AUTO_TEST_CASE(copyConstructor)
 {
-  FwdList list1{1, 2};
+  FwdList list1({1, 2});
   FwdList list2 = list1;
   BOOST_TEST(list1 == list2);
   list2.pushFront(3);
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(copyConstructor)
 
 BOOST_AUTO_TEST_CASE(moveConstructor)
 {
-  FwdList list1{1, 2};
+  FwdList list1({1, 2});
   FwdList list3 = list1;
   FwdList list2 = std::move(list1);
   BOOST_TEST(list1.empty());
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_SUITE(operators)
 
 BOOST_AUTO_TEST_CASE(copyOperator)
 {
-  FwdList list1{1, 2};
+  FwdList list1({1, 2});
   FwdList list2;
   list2 = list1;
   BOOST_TEST(list2 == list1);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(copyOperator)
 
 BOOST_AUTO_TEST_CASE(moveOperator)
 {
-  FwdList list1{1, 2};
+  FwdList list1({1, 2});
   FwdList list3 = list1;
   FwdList list2;
   list2 = std::move(list1);
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(moveOperator)
 
 BOOST_AUTO_TEST_CASE(equalOperator)
 {
-  FwdList list1{1, 2};
-  FwdList list2{1, 2};
+  FwdList list1({1, 2});
+  FwdList list2({1, 2});
   BOOST_TEST(list1 == list2);
   list1.pushFront(3);
   BOOST_TEST(list1 != list2);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(pushFront)
 
 BOOST_AUTO_TEST_CASE(popFront)
 {
-  FwdList list = {1, 2};
+  FwdList list({1, 2});
   list.popFront();
   BOOST_TEST(list.size() == 1);
   BOOST_TEST(list.front() == 2);
@@ -113,8 +113,8 @@ BOOST_AUTO_TEST_CASE(popFront)
 
 BOOST_AUTO_TEST_CASE(swap)
 {
-  FwdList list1 = {1, 2};
-  FwdList list2 = {3, 4, 5};
+  FwdList list1({1, 2});
+  FwdList list2({3, 4, 5});
   FwdList tempList1 = list1;
   FwdList tempList2 = list2;
   list1.swap(list2);
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(swap)
 
 BOOST_AUTO_TEST_CASE(clear)
 {
-  FwdList list{1, 2};
+  FwdList list({1, 2});
   list.clear();
   BOOST_TEST(list.empty());
 }
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(reverse)
   listOneElement.reverse();
   BOOST_TEST(listOneElement.size() == 1);
   BOOST_TEST(listOneElement.front() == 1);
-  FwdList list{1, 2, 3};
+  FwdList list({1, 2, 3});
   list.reverse();
   std::ostringstream out;
   printList(out, list);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(reverse)
 
 BOOST_AUTO_TEST_CASE(remove)
 {
-  FwdList list{1, 2, 5, 3, 5, 4};
+  FwdList list({1, 2, 5, 3, 5, 4});
   list.remove(5);
   std::ostringstream out;
   printList(out, list);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(remove)
 
 BOOST_AUTO_TEST_CASE(removeIf)
 {
-  FwdList list{2, 5, 3, 1};
+  FwdList list({2, 5, 3, 1});
   list.removeIf(lessThanThree);
   std::ostringstream out;
   printList(out, list);
@@ -210,8 +210,8 @@ BOOST_AUTO_TEST_CASE(removeIf)
 
 BOOST_AUTO_TEST_CASE(SpliceAfter)
 {
-  FwdList list1{1, 2, 3};
-  FwdList list2{4, 5, 6};
+  FwdList list1({1, 2, 3});
+  FwdList list2({4, 5, 6});
   list1.spliceAfter(list1.cbegin(), list2);
   std::ostringstream out1;
   printList(out1, list1);
@@ -223,8 +223,8 @@ BOOST_AUTO_TEST_CASE(SpliceAfter)
 
 BOOST_AUTO_TEST_CASE(SpliceAfterPoint)
 {
-  FwdList list1{1, 2, 3};
-  FwdList list2{4, 5, 6};
+  FwdList list1({1, 2, 3});
+  FwdList list2({4, 5, 6});
   auto it = ++list2.cbegin();
   list1.spliceAfter(list1.cbegin(), list2, it);
   std::ostringstream out1;
@@ -238,8 +238,8 @@ BOOST_AUTO_TEST_CASE(SpliceAfterPoint)
 }
 BOOST_AUTO_TEST_CASE(SpliceAfterRange)
 {
-  FwdList list1{1, 2, 3};
-  FwdList list2{4, 5, 6, 7, 8};
+  FwdList list1({1, 2, 3});
+  FwdList list2({4, 5, 6, 7, 8});
   auto begin = ++list2.cbegin();
   auto last = list2.cbegin();
   for (size_t i = 0; i < 4; i++)
