@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <type_traits>
 #include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
@@ -14,11 +15,14 @@ namespace maslov
   {
     using cIterator = FwdListConstIterator< T >;
     using iterator = FwdListIterator< T >;
+    template< typename InputIterator >
+    using enableIf = std::enable_if_t< std::is_convertible< decltype(*std::declval< InputIterator >()),
+        T >::value >;
 
     FwdList();
     FwdList(size_t k, const T & value);
-    FwdList(iterator first, iterator last);
-    FwdList(cIterator first, cIterator last);
+    template< typename InputIterator, typename = enableIf< InputIterator > >
+    FwdList(InputIterator first, InputIterator last);
     FwdList(std::initializer_list< T > il);
     FwdList(const FwdList< T > & rhs);
     FwdList(FwdList< T > && rhs) noexcept;
@@ -47,8 +51,8 @@ namespace maslov
     void popFront();
     void swap(FwdList< T > & rhs) noexcept;
     void clear();
-    void assign(iterator first, iterator last);
-    void assign(cIterator first, cIterator last);
+    template< typename InputIterator, typename = enableIf< InputIterator > >
+    void assign(InputIterator first, InputIterator last);
     void assign(size_t n, const T & val);
     void assign(std::initializer_list< T > il);
 
@@ -87,18 +91,8 @@ namespace maslov
   }
 
   template< typename T >
-  FwdList< T >::FwdList(iterator first, iterator last):
-    FwdList()
-  {
-    for (auto it = first; it != last; ++it)
-    {
-      pushFront(*it);
-    }
-    reverse();
-  }
-
-  template< typename T >
-  FwdList< T >::FwdList(cIterator first, cIterator last):
+  template< typename InputIterator, typename >
+  FwdList< T >::FwdList(InputIterator first, InputIterator last):
     FwdList()
   {
     for (auto it = first; it != last; ++it)
@@ -525,14 +519,8 @@ namespace maslov
   }*/
 
   template< typename T >
-  void FwdList< T >::assign(iterator first, iterator last)
-  {
-    FwdList temp(first, last);
-    swap(temp);
-  }
-
-  template< typename T >
-  void FwdList< T >::assign(cIterator first, cIterator last)
+  template< typename InputIterator, typename >
+  void FwdList< T >::assign(InputIterator first, InputIterator last)
   {
     FwdList temp(first, last);
     swap(temp);
