@@ -62,7 +62,7 @@ namespace maslov
     iterator insertAfter(cIterator position, size_t n, const T & val);
     template< typename InputIterator, typename = enableIf< InputIterator > >
     iterator insertAfter(cIterator position, InputIterator first, InputIterator last);
-    iterator insertAfter(cIterator, std::initializer_list< T > il);
+    iterator insertAfter(cIterator position, std::initializer_list< T > il);
 
     void reverse() noexcept;
     void remove(const T & value);
@@ -591,23 +591,49 @@ namespace maslov
 
   template< typename T >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, const T & val)
-  {}
+  { 
+    FwdListNode< T > * newNode = new FwdListNode< T >{val, nullptr};
+    FwdListNode< T >* positionNode = position.getNode();
+    newNode->next = positionNode->next;
+    positionNode->next = newNode;
+    ++size_;
+    return iterator(newNode);
+  }
 
   template< typename T >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, T && val)
-  {}
+  {
+    return insertAfter(position, val);
+  }
 
   template< typename T >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, size_t n, const T & val)
-  {}
+  {
+    for (size_t i = 0; i < n; ++i)
+    {
+      insertAfter(position, val);
+      position++;
+    }
+    return iterator(position.getNode());
+  }
 
   template< typename T >
   template< typename InputIterator, typename >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, InputIterator first, InputIterator last)
-  {}
+  {
+    while (first != last)
+    {
+      insertAfter(position, *first);
+      position++;
+      ++first;
+    }
+    return iterator(position.getNode());
+  }
 
   template< typename T >
-  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator, std::initializer_list< T > il)
-  {}
+  typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, std::initializer_list< T > il)
+  {
+    return insertAfter(position, il.begin(), il.end());
+  }
 }
 #endif
