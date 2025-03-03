@@ -21,6 +21,7 @@ namespace asafov
         {
           delete clear(next_);
           next_ = nullptr;
+          return this;
         }
         else
         {
