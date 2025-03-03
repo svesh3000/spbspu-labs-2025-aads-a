@@ -21,6 +21,11 @@ namespace brevnov
     List< T > & operator=(List< T > && copy);
     List< T > & operator=(initializer_list<value_type> il);
 
+    T& front() noexcept;
+    const T& front() noexcept const;
+    T& back() noexcept;
+    const T& back() noexcept const;
+
     void clear();
     void swap(List< T > & hl);
   private:
@@ -129,5 +134,31 @@ namespace brevnov
     std::swap(cpy);
     return *this;
   }
+
+  template< typename T >
+  T& List< T >::front() noexcept
+  {
+    return head_->data;
+  }
+
+  template< typename T >
+  const T& List< T >::front() noexcept const
+  {
+    return head_->data;
+  }
+
+  template< typename T >
+  T& List< T >::back() noexcept
+  {
+    return tail_->data;
+  }
+
+  template< typename T >
+  const T& back() noexcept const
+  {
+    return tail_->data;
+  }
+
+  
 }  
 #endif
