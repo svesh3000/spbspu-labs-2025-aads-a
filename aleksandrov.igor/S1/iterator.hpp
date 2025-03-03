@@ -7,7 +7,7 @@
 namespace aleksandrov
 {
   template< typename T >
-  class Iterator: public std::iterator< std::forward_iterator_tag, int >
+  class Iterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     Iterator():
@@ -21,7 +21,7 @@ namespace aleksandrov
     Iterator< T >& operator=(const Iterator< T >&) = default;
 
     Iterator< T >& operator++();
-    Iterator< T >& operator++(int);
+    Iterator< T > operator++(int);
 
     T& operator*();
     T* operator->();
@@ -40,7 +40,7 @@ namespace aleksandrov
   }
 
   template< typename T >
-  Iterator< T >& Iterator< T >::operator++(int)
+  Iterator< T > Iterator< T >::operator++(int)
   {
     Iterator< T > result(*this);
     ++(*this);
