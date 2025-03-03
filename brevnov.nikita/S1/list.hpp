@@ -17,7 +17,12 @@ namespace brevnov
     List< T >(initializer_list<value_type> il);
     ~List();
 
+    List< T > & operator=(const List< T > & copy);
+    List< T > & operator=(List< T > && copy);
+    List< T > & operator=(initializer_list<value_type> il);
+
     void clear();
+    void swap(List< T > & hl);
   private:
     Node< T > * head_;
     Node< T > * tail_;
@@ -25,14 +30,14 @@ namespace brevnov
   }
 
   template< typename T >
-  List::List():
+  List< T >::List():
     head_(nullptr),
     tail_(new Node< T >(T())),
     size_(0)
   {}
 
   template< typename T >
-  List::List(size_t n, const T& val):
+  List< T >::List(size_t n, const T& val):
     List()
   {
     for (size_t i = 0, i < n; i++)
@@ -42,7 +47,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List::List(const List< T > & copy)
+  List< T >::List(const List< T > & copy)
   {
     for (ConstIterator< T > it = copy.begin(); it != copy.end(); ++it)
     {
@@ -51,7 +56,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List::List(List< T > && del):
+  List< T >::List(List< T > && del):
     head_(del.head_),
     tail_(del.tail_),
     size_(del.size_)
@@ -63,7 +68,7 @@ namespace brevnov
 
   template< typename T >
   template< typename InputIterator >
-  List::List(InputIterator begin, InputIterator end):
+  List< T >::List(InputIterator begin, InputIterator end):
     List()
   {
     for (; begin != end; ++begin)
@@ -73,7 +78,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List::List(initializer_list<value_type> il):
+  List< T >::List(initializer_list<value_type> il):
     List(il.begin(), il.end())
   {}
 
@@ -85,7 +90,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List::clear()
+  List< T >::clear()
   {
     while (!clear())
     {
@@ -93,6 +98,36 @@ namespace brevnov
     }
   }
 
-  
+  template< typename T >
+  List< T > & List< T >::operator=(const List< T > & copy)
+  {
+    List< T > cpy(copy);
+    std::swap(cpy);
+    return *this;
+  }
+
+  template< typename T >
+  void List< T >::swap(List< T > & hl):
+  {
+    std::swap(head_, hl.head_);
+    std::swap(tail_, hl.tail_);
+    std::swap(size_, hl.size_);
+  }
+
+  template< typename T >
+  List< T > & List< T >::operator=(List< T > && copy)
+  {
+    List< T > cpy(std::move(copy));
+    std::swap(cpy);
+    return *this;
+  }
+
+  template< typename T >
+  List< T > & List< T >::operator=(initializer_list<value_type> il)
+  {
+    List< T > cpy(il);
+    std::swap(cpy);
+    return *this;
+  }
 }  
 #endif
