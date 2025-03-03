@@ -70,32 +70,86 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
 }
 
 template< class T >
-void rychkov::List< T >::erase(const_iterator pos)
+typename rychkov::List< T >::iterator rychkov::List< T >::erase(const_iterator pos)
 {
-  if (pos == end())
+  if (pos != end())
   {
-    return;
+    return erase(pos, ++const_iterator(pos));
   }
-  size_--;
-  if (pos == begin())
+  return end();
+}
+template< class T >
+typename rychkov::List< T >::iterator rychkov::List< T >::erase(const_iterator from, const_iterator to)
+{
+  if (from == to)
   {
-    head_ = head_->next;
-    head_->prev = nullptr;
+    return end();
+  }
+  if (from == begin())
+  {
+    head_ = to.node_;
+    if (head_ != nullptr)
+    {
+      head_->prev = nullptr;
+    }
   }
   else
   {
-    pos.node_->prev->next = pos.node_->next;
+    from.node_->prev->next = to.node_;
   }
-  if (pos == const_iterator{tail_})
+  if (to == end())
   {
-    tail_ = tail_->prev;
-    tail_->next = nullptr;
+    tail_ = from.node_->prev;
+    if (tail_ != nullptr)
+    {
+      tail_->next = nullptr;
+    }
   }
   else
   {
-    pos.node_->next->prev = pos.node_->prev;
+    to.node_->prev = from.node_->prev;
   }
-  delete pos.node_;
+  while (from != to)
+  {
+    const_iterator temp = from++;
+    delete temp.node_;
+    --size_;
+  }
+  return {to.node_};
+}
+
+template< class T >
+typename rychkov::List< T >::size_type rychkov::List< T >::remove(const value_type& value)
+{
+  size_type result = 0;
+  const_iterator i = begin();
+  while (i != end())
+  {
+    const_iterator temp = i++;
+    if (*temp == value)
+    {
+      erase(temp);
+      result++;
+    }
+  }
+  return result;
+}
+template< class T >
+template< class C >
+typename rychkov::List< T >::size_type rychkov::List< T >::remove_if(C condition)
+{
+  size_type result = 0;
+  const_iterator i = begin();
+  while (i != end())
+  {
+    const_iterator temp = i++;
+    if (condition(*temp))
+    {
+      erase(temp);
+      result++;
+    }
+  }
+  return result;
 }
 
 #endif
