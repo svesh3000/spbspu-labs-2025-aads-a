@@ -10,6 +10,7 @@ int main()
   using ListElem = std::pair< std::string, IntList >;
   zholobov::CircularFwdList< ListElem > list;
   zholobov::CircularFwdList< unsigned int > sum_list;
+  bool is_overflow = false;
   try {
     while (std::cin.good()) {
       std::string line;
@@ -25,7 +26,7 @@ int main()
         if (ss >> elem) {
           int_list.push_back(elem);
         } else {
-          throw std::overflow_error("Overflow error");
+          is_overflow = true;
         }
       }
       ListElem list_elem(std::move(name), std::move(int_list));
@@ -72,22 +73,23 @@ int main()
   } catch (const std::bad_alloc& e) {
     std::cerr << e.what() << '\n';
     return 1;
-  } catch (const std::overflow_error& e) {
-    std::cerr << e.what() << '\n';
+  }
+
+  if (is_overflow) {
+    std::cout << "Overflow error\n";
     return 1;
   }
 
   if (sum_list.empty()) {
     std::cout << "0\n";
-    return (list.empty()) ? 0 : 1;
+  } else {
+    auto it = sum_list.begin();
+    std::cout << *it++;
+    for (; it != sum_list.end(); ++it) {
+      std::cout << " " << *it;
+    }
+    std::cout << "\n";
   }
-
-  auto it = sum_list.begin();
-  std::cout << *it++;
-  for (; it != sum_list.end(); ++it) {
-    std::cout << " " << *it;
-  }
-  std::cout << "\n";
 
   return 0;
 }
