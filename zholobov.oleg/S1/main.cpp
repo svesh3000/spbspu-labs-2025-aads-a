@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <utility>
 
@@ -6,11 +7,11 @@
 
 int main()
 {
-  using IntList = zholobov::CircularFwdList< unsigned int >;
+  using list_elem_type = unsigned long;
+  using IntList = zholobov::CircularFwdList< list_elem_type >;
   using ListElem = std::pair< std::string, IntList >;
   zholobov::CircularFwdList< ListElem > list;
-  zholobov::CircularFwdList< unsigned int > sum_list;
-  bool is_overflow = false;
+  zholobov::CircularFwdList< list_elem_type > sum_list;
   try {
     while (std::cin.good()) {
       std::string line;
@@ -21,13 +22,9 @@ int main()
       if (!(ss >> name)) {
         break;
       }
-      while (!ss.eof()) {
-        int elem = 0;
-        if (ss >> elem) {
-          int_list.push_back(elem);
-        } else {
-          is_overflow = true;
-        }
+      list_elem_type elem = 0;
+      while (ss >> elem) {
+        int_list.push_back(elem);
       }
       ListElem list_elem(std::move(name), std::move(int_list));
       list.push_back(std::move(list_elem));
@@ -51,11 +48,11 @@ int main()
     bool is_done_printing = true;
     do {
       is_done_printing = true;
-      unsigned int sum = 0;
+      list_elem_type sum = 0;
       bool first = true;
       for (auto it = iter_list.begin(); it != iter_list.end(); ++it) {
         if (it->first != it->second) {
-          unsigned int val = *(it->first);
+          list_elem_type val = *(it->first);
           if (first) {
             std::cout << val;
             first = false;
@@ -64,7 +61,11 @@ int main()
           }
           ++it->first;
           is_done_printing = false;
-          sum += val;
+          if (sum <= std::numeric_limits< list_elem_type >::max() - val) {
+            sum += val;
+          } else {
+            throw std::overflow_error("Overflow error");
+          }
         }
       }
       if (!is_done_printing) {
@@ -75,9 +76,7 @@ int main()
   } catch (const std::bad_alloc& e) {
     std::cerr << e.what() << '\n';
     return 1;
-  }
-
-  if (is_overflow) {
+  } catch (const std::overflow_error& e) {
     std::cerr << "Overflow error\n";
     return 1;
   }
