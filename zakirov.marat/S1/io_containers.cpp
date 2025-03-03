@@ -31,6 +31,11 @@ void zakirov::get_list_ull(std::istream & in, list_ull & forward_list)
 
 void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
+  if (forward_list.empty())
+  {
+    throw std::logic_error("Empty input!");
+  }
+
   list_iter list_iterators;
   list_iter::iterator iter_list = list_iterators.before_begin();
   list_pair::iterator pair_iter = forward_list.begin();
