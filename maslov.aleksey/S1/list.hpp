@@ -77,7 +77,6 @@ namespace maslov
    private:
     FwdListNode< T > * fake_;
     size_t size_;
-    //bool isValidIterator(const cIterator & it) const;
   };
 
   template< typename T >
@@ -373,27 +372,8 @@ namespace maslov
   template< typename T >
   void FwdList< T >::spliceAfter(cIterator position, FwdList< T > & fwdlst)
   {
-    if (fwdlst.empty())
-    {
-      return;
-    }
-    FwdListNode< T > * insert = fake_;
-    for (auto it = cbegin(); it != position; ++it)
-    {
-      insert = insert->next;
-    }
-    insert = insert->next;
-    FwdListNode< T > * last = fwdlst.fake_;
-    while(last->next != fwdlst.fake_)
-    {
-      last = last->next;
-    }
-    FwdListNode< T > * after = insert->next;
-    insert->next = fwdlst.fake_->next;
-    last->next = after;
-    size_ += fwdlst.size_;
-    fwdlst.size_ = 0;
-    fwdlst.fake_->next = fwdlst.fake_;
+    insertAfter(position, fwdlst.cbegin(), fwdlst.cend());
+    fwdlst.clear();
   }
 
   template< typename T >
@@ -405,40 +385,9 @@ namespace maslov
   template< typename T >
   void FwdList< T >::spliceAfter(cIterator position, FwdList< T > & fwdlst, cIterator i)
   {
-    if (fwdlst.empty())
-    {
-      return;
-    }
-    /*if (!isValidIterator(position))
-    {
-      throw std::invalid_argument("ERROR: Invalid iterator"); 
-    }*/
-    FwdListNode< T > * insert = fake_;
-    for (auto it = cbegin(); it != position; ++it)
-    {
-      insert = insert->next;
-    }
-    insert = insert->next;
-    FwdListNode< T > * current = fwdlst.fake_;
-    FwdListNode< T > * spliceNode = nullptr;
-    for (auto it = fwdlst.cbegin(); it != fwdlst.cend(); ++it)
-    {
-      current = current->next;
-      if (it == i)
-      {
-        spliceNode = current->next;
-        break;
-      }
-    }
-    if (!spliceNode)
-    {
-      throw std::invalid_argument("ERROR: Invalid iterator");
-    }
-    current->next = spliceNode->next;
-    spliceNode->next = insert->next;
-    insert->next = spliceNode;
-    fwdlst.size_--;
-    size_++;
+    auto value = i.getNode()->next->data;
+    insertAfter(position, value);
+    fwdlst.eraseAfter(i);
   }
 
   template< typename T >
@@ -451,55 +400,9 @@ namespace maslov
   void FwdList< T >::spliceAfter(cIterator position,
       FwdList< T > & fwdlst, cIterator first, cIterator last)
   {
-    if (first == last)
-    {
-      return;
-    }
-    /*if (!isValidIterator(position))
-    {
-      throw std::invalid_argument("ERROR: Invalid iterator"); 
-    }*/
-    FwdListNode< T > * insert = fake_;
-    for (auto it = cbegin(); it != position; ++it)
-    {
-      insert = insert->next;
-    }
-    insert = insert->next;
-    FwdListNode< T > * beforeBeginNode = fwdlst.fake_;
-    FwdListNode< T > * beginNode = nullptr;
-    FwdListNode< T > * lastNode = nullptr;
-    FwdListNode< T > * temp = fwdlst.fake_;
-    FwdListNode< T > * afterLastNode = nullptr;
-    size_t count = 0;
-    for (auto it = fwdlst.cbegin(); it != fwdlst.cend(); it++)
-    {
-      temp = temp->next;
-      if (it == first)
-      {
-        beforeBeginNode = temp;
-        beginNode = temp->next;
-        count = 0;
-      }
-      auto tempIt = it;
-      if (++tempIt == last)
-      {
-        lastNode = temp->next;
-        afterLastNode = lastNode->next;
-        count++;
-        break;
-      }
-      count++;
-    }
-    if (!beginNode || !lastNode)
-    {
-      throw std::invalid_argument("ERROR: Invalid iterator");
-    }
-    FwdListNode< T > * after = insert->next;
-    insert->next = beginNode;
-    beforeBeginNode->next = afterLastNode;
-    lastNode->next = after;
-    size_ += count;
-    fwdlst.size_ -= count;
+    cIterator temp = first;
+    insertAfter(position, ++temp, last);
+    fwdlst.eraseAfter(first, last);
   }
 
   template< typename T >
@@ -508,23 +411,6 @@ namespace maslov
   {
     spliceAfter(position, fwdlst, first, last);
   }
-
-  /*template< typename T >
-  bool FwdList< T >::isValidIterator(const cIterator & it) const
-  {
-    if (it == cend())
-    {
-      return true;
-    }
-    for (auto currentIt = cbegin(); currentIt != cend(); ++currentIt)
-    {
-      if (currentIt == it)
-      {
-        return true;
-      }
-    }
-    return false;
-  }*/
 
   template< typename T >
   template< typename InputIterator, typename >
@@ -552,11 +438,16 @@ namespace maslov
   typename FwdList< T >::iterator FwdList< T >::eraseAfter(cIterator position)
   {
     assert(!empty());
-    auto last = position;
-    ++last;
-    assert(last != cend());
-    ++last;
-    return eraseAfter(position, last);
+    FwdListNode< T > * removeNode = position.getNode()->next;
+    if (removeNode == fake_)
+    {
+      return end();
+    }
+    FwdListNode< T > * nextNode = removeNode->next;
+    position.getNode()->next = nextNode;
+    delete removeNode;
+    --size_;
+    return iterator(nextNode);
   }
 
   template< typename T >
@@ -568,24 +459,17 @@ namespace maslov
       return iterator(last.getNode());
     }
     FwdListNode< T > * lastNode = last.getNode();
-    assert(++last != cend());
     FwdListNode< T > * firstNode = position.getNode();
     FwdListNode< T > * currentNode = firstNode->next;
-    while (currentNode != lastNode)
+    FwdListNode< T > * temp = nullptr;
+    while (currentNode != lastNode && currentNode != fake_)
     {
-      FwdListNode< T > * temp = currentNode;
-      currentNode = currentNode->next;
-      delete temp;
+      temp = currentNode->next;
+      delete currentNode;
+      currentNode = temp;
       --size_;
     }
-    if (lastNode->next == fake_)
-    {
-      firstNode->next = fake_->next;
-    }
-    else
-    {
-      firstNode->next = lastNode;
-    }
+    firstNode->next = lastNode;
     return iterator(lastNode);
   }
 
@@ -593,7 +477,7 @@ namespace maslov
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, const T & val)
   { 
     FwdListNode< T > * newNode = new FwdListNode< T >{val, nullptr};
-    FwdListNode< T >* positionNode = position.getNode();
+    FwdListNode< T > * positionNode = position.getNode();
     newNode->next = positionNode->next;
     positionNode->next = newNode;
     ++size_;
@@ -609,25 +493,26 @@ namespace maslov
   template< typename T >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, size_t n, const T & val)
   {
-    for (size_t i = 0; i < n; ++i)
+    for (size_t i = 0; i < n - 1; ++i)
     {
       insertAfter(position, val);
-      position++;
+      
     }
-    return iterator(position.getNode());
+    iterator temp = insertAfter(position, val);
+    return temp;
   }
 
   template< typename T >
   template< typename InputIterator, typename >
   typename FwdList< T >::iterator FwdList< T >::insertAfter(cIterator position, InputIterator first, InputIterator last)
   {
-    while (first != last)
+    iterator temp = iterator(position.getNode());
+    for (auto it = first; it != last; ++it)
     {
-      insertAfter(position, *first);
+      temp = insertAfter(position, *it);
       position++;
-      ++first;
     }
-    return iterator(position.getNode());
+    return temp;
   }
 
   template< typename T >

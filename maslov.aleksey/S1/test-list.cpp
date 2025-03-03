@@ -55,6 +55,36 @@ BOOST_AUTO_TEST_CASE(moveConstructor)
   BOOST_TEST(list2 == list3);
 }
 
+BOOST_AUTO_TEST_CASE(initializerListConstructor)
+{
+
+  std::initializer_list< int > il{1, 2, 3};
+  FwdList list1(il);
+  FwdList list2;
+  list2.pushFront(3);
+  list2.pushFront(2);
+  list2.pushFront(1);
+  BOOST_TEST(list2 == list1);
+}
+
+BOOST_AUTO_TEST_CASE(rangeConstructor)
+{
+  std::initializer_list< int > il{1, 2, 3};
+  FwdList list1(il.begin(), il.end());
+  FwdList list2({1, 2, 3});
+  BOOST_TEST(list2 == list1); 
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(elementAccess)
+
+BOOST_AUTO_TEST_CASE(front)
+{
+  FwdList list({1, 2, 3});
+  BOOST_TEST(list.front() == 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operators)
@@ -129,7 +159,7 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_TEST(list.empty());
 }
 
-BOOST_AUTO_TEST_CASE(assignInitializer)
+BOOST_AUTO_TEST_CASE(assignInitializerList)
 {
   FwdList list;
   list.pushFront(1);
@@ -187,6 +217,7 @@ BOOST_AUTO_TEST_CASE(eraseAfter)
   printList(out, list);
   BOOST_TEST(out.str() == "1");
 }
+
 BOOST_AUTO_TEST_CASE(insertAfter)
 {
   FwdList list;
@@ -259,7 +290,7 @@ BOOST_AUTO_TEST_CASE(removeIf)
   BOOST_TEST(out.str() == "53");
 }
 
-BOOST_AUTO_TEST_CASE(SpliceAfter)
+BOOST_AUTO_TEST_CASE(SpliceAfterEntireList)
 {
   FwdList list1({1, 2, 3});
   FwdList list2({4, 5, 6});
@@ -272,7 +303,7 @@ BOOST_AUTO_TEST_CASE(SpliceAfter)
   BOOST_TEST(out2.str() == "");
 }
 
-BOOST_AUTO_TEST_CASE(SpliceAfterPoint)
+BOOST_AUTO_TEST_CASE(SpliceAfterSingle)
 {
   FwdList list1({1, 2, 3});
   FwdList list2({4, 5, 6});
@@ -287,11 +318,11 @@ BOOST_AUTO_TEST_CASE(SpliceAfterPoint)
   BOOST_TEST(list2.size() == 2);
   BOOST_TEST(list1.size() == 4);
 }
-BOOST_AUTO_TEST_CASE(SpliceAfterRange)
+BOOST_AUTO_TEST_CASE(SpliceAfterElementRange)
 {
   FwdList list1({1, 2, 3});
   FwdList list2({4, 5, 6, 7, 8});
-  auto begin = ++list2.cbegin();
+  auto begin = list2.cbegin();
   auto last = list2.cbegin();
   for (size_t i = 0; i < 4; i++)
   {
@@ -302,8 +333,8 @@ BOOST_AUTO_TEST_CASE(SpliceAfterRange)
   printList(out1, list1);
   std::ostringstream out2;
   printList(out2, list2);
-  BOOST_TEST(out1.str() == "167823");
-  BOOST_TEST(out2.str() == "45");
+  BOOST_TEST(out1.str() == "156723");
+  BOOST_TEST(out2.str() == "48");
   BOOST_TEST(list2.size() == 2);
   BOOST_TEST(list1.size() == 6);
 }
