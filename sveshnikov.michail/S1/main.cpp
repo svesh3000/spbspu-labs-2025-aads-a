@@ -6,19 +6,11 @@ int main()
 {
   using namespace sveshnikov;
   list_pair_t list;
-  try
-  {
-    inputLists(std::cin, list);
-  }
-  catch (const std::bad_alloc &e)
-  {
-    std::cerr << e.what() << '\n';
-    return 1;
-  }
+  inputLists(std::cin, list);
   if (list.empty())
   {
-    std::cerr << "ERROR: Input is empty!\n";
-    return 1;
+    std::cout << "0\n";
+    return 0;
   }
   outputNamesLists(std::cout, list) << '\n';
   if (sveshnikov::getMaxSizeLists(list) != 0)
@@ -30,6 +22,11 @@ int main()
     outputSumsNewLists(std::cout, list) << '\n';
   }
   catch (const std::overflow_error &e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
+  catch (const std::bad_alloc &e)
   {
     std::cerr << e.what() << '\n';
     return 1;
