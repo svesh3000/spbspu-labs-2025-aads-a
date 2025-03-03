@@ -30,6 +30,16 @@ namespace tkach
     void pushFront(T&& data);
     void pushBack(T&& data);
     void popFront();
+    void spliceAfter(Citerator< T > pos, List< T >& other);
+    void spliceAfter(Citerator< T > pos, List< T >&& other);
+    void spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first);
+    void spliceAfter(Citerator< T > pos, List< T >&& other, Citerator< T > first);
+    void spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first, Citerator< T > last);
+    void spliceAfter(Citerator< T > pos, List< T >&& other, Citerator< T > first, Citerator< T > last);
+    void remove(const T& value);
+    template< class UnaryPredicate>
+    void removeIf(UnaryPredicate p);
+    void assign(size_t count, const T& value);
     Iterator< T > erase_after(Citerator <T> pos);
     Iterator< T > erase_after(Citerator <T> first, Citerator <T> last);
     void clear();
@@ -99,7 +109,7 @@ namespace tkach
   }
 
   template< typename T >
-  List< T >::List(size_t count, const T & data):
+  List< T >::List(const size_t count, const T & data):
     List(getList(count, data))
   {}
 
@@ -213,14 +223,9 @@ namespace tkach
   {
     if (empty())
     {
-      throw std::logic_error("No elements in list");
+      return;
     }
-    Iterator< T > it = erase_after(Citerator< T >(tail_));
-    if (it.node_ != nullptr)
-    {
-      head_ = it.node_;
-      tail_->next_ = head_;
-    }
+    erase_after(Citerator< T >(tail_));
   }
 
   template< typename T >
@@ -229,6 +234,38 @@ namespace tkach
     while (head_)
     {
       popFront();
+    }
+  }
+
+  template< typename T >
+  void List< T >::remove(const T& value)
+  {
+    removeIf([&](const T& temp) {return temp == value;});
+  }
+
+  template< typename T >
+  template< class UnaryPredicate>
+  void List< T >::removeIf(UnaryPredicate p)
+  {
+    if (empty())
+    {
+      return;
+    }
+    auto it = ++cbegin();
+    for (; it != cend();)
+    {
+      if (p(*(std::next(it))))
+      {
+        erase_after(it);
+      }
+      else
+      {
+        it++;
+      }
+    }
+    if (p(*(++it)))
+    {
+      erase_after(Citerator< T >(head_));
     }
   }
 
@@ -268,6 +305,14 @@ namespace tkach
     {
       Iterator< T > it(const_cast< Node< T >* >(pos.node_));
       Node< T >* list_delete = it.node_->next_;
+      if (pos.node_ == tail_)
+      {
+        head_ = head_->next_;
+      }
+      if (pos.node_->next_ == tail_)
+      {
+        tail_ = const_cast< Node< T >* >(pos.node_);
+      }
       it.node_->next_ = list_delete->next_;
       delete list_delete;
       size_--;
@@ -277,12 +322,102 @@ namespace tkach
   }
 
   template< typename T >
+  void List< T >::assign(size_t count, const T& value)
+  {
+    List< T > temp(count, value);
+    swap(temp);
+  }
+
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >& other)
+  {
+    if (other.empty())
+    {
+      return;
+    }
+    Node< T >* temp = const_cast< Node< T >* >(pos.node_);
+    Node< T >* temp2 = temp->next_;
+    if (temp == tail_)
+    {
+      tail_ = other.tail_;
+    }
+    temp->next_ = other.head_;
+    other.tail_->next_ = temp2;
+    size_ += other.size_;
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
+  }
+
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >&& other)
+  {
+    spliceAfter(pos, other);
+  }
+
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first)
+  {
+    spliceAfter(pos, other, first, std::next(first, 2)); 
+  }
+
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >&& other, Citerator< T > first)
+  {
+    spliceAfter(pos, other, first, std::next(first, 2));
+  }
+  
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first, Citerator< T > last)
+  {
+    if (other.empty() || first.node_ == nullptr || last.node_ == nullptr || (std::next(first) == last))
+    {
+      return;
+    }
+    size_t splice_size = std::distance(first, last) - 1;
+    Node< T >* temp = const_cast< Node< T >* >(pos.node_);
+    Node< T >* temp_first = const_cast< Node< T >* >(first.node_);
+    Node< T >* temp_last = const_cast< Node< T >* >(last.node_);
+    Node< T >* temp_next = temp->next_;
+    if (first.node_ == other.head_ && last.node_ == other.head_)
+    {
+      size_ += other.size() - 1;
+      other.size_ = 1;
+    }
+    else
+    {
+      size_ += splice_size;
+      other.size_ -= splice_size;
+    }
+    if (temp == tail_)
+    {
+      tail_ = temp_last;
+    }
+    temp->next_ = temp_first->next_;
+    while (temp->next_ != temp_last)
+    {
+      temp = temp->next_;
+    }
+    temp->next_ = temp_next;
+    temp_first->next_ = temp_last;
+    if (last.node_ == other.head_)
+    {
+      other.tail_ = temp_first;
+    }
+  }
+
+  template< typename T >
+  void List< T >::spliceAfter(Citerator< T > pos, List< T >&& other, Citerator< T > first, Citerator< T > last)
+  {
+    spliceAfter(pos, other, first, last);
+  }
+  
+  template< typename T >
   Iterator< T > List< T >::erase_after(Citerator < T > first, Citerator < T > last)
   {
     while (std::next(first) != last)
     {
       erase_after(first);
-      first++;
     }
     return Iterator< T >(const_cast< Node< T >* >(last.node_));
   }
