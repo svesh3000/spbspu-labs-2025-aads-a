@@ -15,13 +15,13 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      Node* clear(Node* clearble)
+      Node* node_clear(Node* clearble)
       {
         if (clearble->next_ != nullptr)
         {
           auto temp = clearble->next_;
           clearble->next_ = nullptr;
-          delete clear(temp);
+          delete node_clear(temp);
           return clearble;
         }
         else
@@ -158,7 +158,7 @@ namespace asafov
       {
         auto temp = head_;
         head_ = nullptr;
-        clear(temp);
+        node_clear(temp);
       }
     }
     private:
