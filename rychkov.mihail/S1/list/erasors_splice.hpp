@@ -14,6 +14,11 @@ void rychkov::List< T >::splice(const_iterator pos, List&& rhs)
   splice(pos, rhs);
 }
 template< class T >
+void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator it)
+{
+  splice(pos, rhs, it, ++const_iterator(it));
+}
+template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator from, const_iterator to)
 {
   if (from == to)
@@ -21,8 +26,15 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
     return;
   }
   size_type erasedSize = 0;
-  for (const_iterator i = from; i != to; ++i, ++erasedSize)
-  {}
+  if ((from == rhs.begin()) && (to == rhs.end()))
+  {
+    erasedSize = rhs.size_;
+  }
+  else
+  {
+    for (const_iterator i = from; i != to; ++i, ++erasedSize)
+    {}
+  }
 
   if (from == rhs.begin())
   {

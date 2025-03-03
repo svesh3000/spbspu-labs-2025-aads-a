@@ -61,7 +61,7 @@ rychkov::List< T >::List(InputIt from, InputIt to):
   }
   tail_ = new node_t< value_type >{*from};
   head_ = tail_;
-  size_++;
+  ++size_;
   ++from;
   for (; from != to; ++from)
   {
@@ -78,7 +78,7 @@ template< class T >
 rychkov::List< T >& rychkov::List< T >::operator=(const List& rhs)
 {
   List< T > temp(rhs);
-  std::swap(*this, temp);
+  swap(temp);
   return *this;
 }
 template< class T >

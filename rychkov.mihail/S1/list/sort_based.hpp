@@ -60,9 +60,9 @@ typename rychkov::List< T >::const_iterator rychkov::List< T >::merge_sort(C& co
   {
     return from;
   }
-  const_iterator mid = merge_sort(compare, from, count / 2);
+  const_iterator mid = merge_sort(compare, from, (count + 1) / 2);
   const_iterator postMid = ++const_iterator{mid};
-  const_iterator to = merge_sort(compare, postMid, (count + 1) / 2);
+  const_iterator to = merge_sort(compare, postMid, count / 2);
   return unsafeMerge(compare, from, mid, postMid, to);
 }
 template< class T >
@@ -126,6 +126,10 @@ template< class T >
 template< class C >
 void rychkov::List< T >::merge(List& rhs, C compare)
 {
+  if (rhs.begin() == rhs.end())
+  {
+    return;
+  }
   const_iterator from = begin();
   const_iterator to = unsafeMerge(compare, from, {tail_}, rhs.begin(), {rhs.tail_});
   size_ += rhs.size_;

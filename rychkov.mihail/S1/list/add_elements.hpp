@@ -12,10 +12,18 @@ typename rychkov::List< T >::reference rychkov::List< T >::emplace(const_iterato
   node_t< value_type >* inserted = new node_t< value_type >{{std::forward<Args>(args)...}};
   if (begin() == end())
   {
-    tail_ = head_ = inserted;
+    head_ = inserted;
+    tail_ = inserted;
   }
-  else{
-    if (pos == end())
+  else
+  {
+    if (pos == begin())
+    {
+      inserted->next = head_;
+      head_->prev = inserted;
+      head_ = inserted;
+    }
+    else if (pos == end())
     {
       inserted->prev = tail_;
       tail_->next = inserted;
@@ -23,17 +31,10 @@ typename rychkov::List< T >::reference rychkov::List< T >::emplace(const_iterato
     }
     else
     {
+      inserted->prev = pos.node_->prev;
+      pos.node_->prev->next = inserted;
       inserted->next = pos.node_;
-    }
-    if (pos == begin())
-    {
-      inserted->next = head_;
-      head_->prev = inserted;
-      head_ = inserted;
-    }
-    else
-    {
-      inserted->next = pos.node_;
+      pos.node_->prev = inserted;
     }
   }
   size_++;
