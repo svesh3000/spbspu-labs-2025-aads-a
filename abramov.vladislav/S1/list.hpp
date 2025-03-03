@@ -20,6 +20,7 @@ namespace abramov
   {
     List();
     List(std::initializer_list< T > il);
+    List(Iterator< T > begin, Iterator< T > end);
     ~List();
     T &front();
     const T &front() const;
@@ -68,6 +69,18 @@ namespace abramov
     for (auto iter = il.begin(); iter != il.end(); ++iter)
     {
       pushBack(*iter);
+    }
+  }
+
+  template< class T >
+  List< T >::List(Iterator< T > begin, Iterator< T > end):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {
+    for (auto it = begin; it != end; ++it)
+    {
+      pushBack(*it);
     }
   }
 
