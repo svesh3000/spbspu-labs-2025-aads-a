@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include <cstddef>
 #include <algorithm>
+#include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
 #include "cIterator.hpp"
@@ -18,6 +19,7 @@ namespace abramov
   struct List
   {
     List();
+    List(std::initializer_list< T > il);
     ~List();
     T &front();
     const T &front() const;
@@ -56,6 +58,18 @@ namespace abramov
     tail_(nullptr),
     size_(0)
   {}
+
+  template< class T >
+  List< T >::List(std::initializer_list < T > il):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {
+    for (auto iter = il.begin(); iter != il.end(); ++iter)
+    {
+      pushBack(*iter);
+    }
+  }
 
   template< class T >
   List< T >::~List()
