@@ -80,7 +80,7 @@ namespace
       {
         list_sums.insert_after(it_sums, sum);
       }
-      catch(const std::bad_alloc& e)
+      catch (const std::bad_alloc &e)
       {
         list_sums.clear();
         throw;
