@@ -22,11 +22,6 @@ namespace asafov
     last_(nullptr)
     {}
 
-    ~Forward_list()
-    {
-      clear();
-    }
-
     class const_iterator
     {
       friend class Forward_list;
@@ -136,31 +131,6 @@ namespace asafov
     }
     T& back(){
       return last_->data_;
-    }
-
-    Node* node_clear(Node* clearble)
-    {
-      if (clearble->next_ != nullptr)
-      {
-        auto temp = clearble->next_;
-        clearble->next_ = nullptr;
-        delete node_clear(temp);
-        return clearble;
-      }
-      else
-      {
-        return clearble;
-      }
-    }
-
-    void clear()
-    {
-      if (head_ != nullptr)
-      {
-        auto temp = head_;
-        head_ = nullptr;
-        node_clear(temp);
-      }
     }
     private:
     Node* head_;
