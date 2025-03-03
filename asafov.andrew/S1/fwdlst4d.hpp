@@ -15,12 +15,16 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
-      ~Node()
+      Node* clear()
       {
         if (next_ != nullptr)
         {
-          delete next_;
+          delete clear(next_);
           next_ = nullptr;
+        }
+        else
+        {
+          return this;
         }
       }
     };
@@ -148,8 +152,11 @@ namespace asafov
 
     void clear()
     {
-      delete head_;
-      head_ = nullptr;
+      if (head_ != nullptr)
+      {
+        head_->clear();
+        head_ = nullptr;
+      }
     }
     private:
     Node* head_;
