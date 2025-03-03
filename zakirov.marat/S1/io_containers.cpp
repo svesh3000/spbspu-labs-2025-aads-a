@@ -31,7 +31,6 @@ void zakirov::get_list_ull(std::istream & in, list_ull & forward_list)
 
 void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 {
-
   list_iter list_iterators;
   list_iter::iterator iter_list = list_iterators.before_begin();
   list_pair::iterator pair_iter = forward_list.begin();
@@ -65,6 +64,22 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     number_sum = 0;
     iter_list = list_iterators.begin();
     pair_iter = forward_list.begin();
+    while ((* iter_list) == (* pair_iter).second.end() && iter_list != list_iterators.end())
+    {
+      ++iter_list;
+      ++pair_iter;
+      ++deleted;
+      if (deleted == list_size)
+      {
+        break;
+      }
+    }
+
+    if (deleted == list_size)
+    {
+      break;
+    }
+
     if ((* iter_list) != (* pair_iter).second.end())
     {
       out << ** iter_list;
@@ -99,9 +114,11 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
       ++pair_iter;
     }
+
     if (deleted != list_size)
     {
       list_added.insert_after(iter_added, number_sum);
+      ++iter_added;
       out << '\n';
     }
     number_sum = 0;
@@ -124,6 +141,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     {
       out << ' ' << * iter_added;
     }
+
     out << '\n';
   }
 }
