@@ -47,7 +47,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   ++output_iter;
   for (output_iter; output_iter != forward_list.end(); ++output_iter)
   {
-    out << '_' << (* output_iter).first;
+    out << ' ' << (* output_iter).first;
   }
 
   out << '\n';
@@ -56,19 +56,31 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     deleted = 0;
     iter_list = list_iterators.begin();
     pair_iter = forward_list.begin();
+    if ((* iter_list) != (* pair_iter).second.end())
+    {
+      out << ** iter_list;
+      ++(* iter_list);
+    }
+    else
+    {
+      ++deleted;
+    }
+
+    ++iter_list;
+    ++pair_iter;
 
     while (iter_list != list_iterators.end())
     {
-      if ((* iter_list) == (* pair_iter).second.end())
+      if ((* iter_list) != (* pair_iter).second.end())
       {
-        ++iter_list;
-        ++pair_iter;
+        out << ' ' << ** iter_list;
+        ++(* iter_list);
+      }
+      else
+      {
         ++deleted;
-        continue;
       }
 
-      out << ** iter_list << '_';
-      ++(* iter_list);
       ++iter_list;
       ++pair_iter;
     }
