@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(list_mods_test)
 
 }
 
-BOOST_AUTO_TEST_CASE(list_splice_test)
+BOOST_AUTO_TEST_CASE(list_operations_test)
 {
   demehin::List< int > lst1(3, 5);
   demehin::List< int > lst2(3, 4);
@@ -151,6 +151,16 @@ BOOST_AUTO_TEST_CASE(list_splice_test)
   std::ostringstream out2;
   printList(out2, lst2);
   BOOST_TEST(out2.str() == "211455544");
+
+  std::ostringstream out3;
+  lst2.remove(5);
+  printList(out3, lst2);
+  BOOST_TEST(out3.str() == "211444");
+
+  lst2.removeIf([](int n){ return n < 4; });
+  std::ostringstream out4;
+  printList(out4, lst2);
+  BOOST_TEST(out4.str() == "444");
 
 }
 
