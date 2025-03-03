@@ -49,7 +49,7 @@ namespace brevnov
   template< typename T >
   List< T >::List(const List< T > & copy)
   {
-    for (ConstIterator< T > it = copy.begin(); it != copy.end(); ++it)
+    for (ConstIterator< T > it = copy.cbegin(); it != copy.cend(); ++it)
     {
       push_back(*it);
     }
