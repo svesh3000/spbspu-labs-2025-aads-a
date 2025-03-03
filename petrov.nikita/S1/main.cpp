@@ -25,6 +25,18 @@ int main()
     head.push_front({ sequence_num, subhead });
   }
   head.reverse();
+  std::clog << "===============" << "\n";
+  std::clog << "Lists' output:" << "\n";
+  for (auto it = head.begin(); it != head.end(); ++it)
+  {
+    std::clog << it->first;
+    for (auto it_in = it->second.begin(); it_in != it->second.end(); ++it_in)
+    {
+      std::clog << " " << *it_in;
+    }
+    std::clog << "\n";
+  }
+  std::clog << "===============" << "\n";
   std::cout << head.begin()->first;
   size_t count = 1;
   for (auto it = ++head.begin(); it != head.end(); ++it)
@@ -34,16 +46,27 @@ int main()
   }
   std::cout << "\n";
   std::forward_list< int > sums = {};
-  int sum = 0;
-  for (auto it = head.begin(); it != head.end(); ++it)
+  for (size_t i = 0; i < count; i++)
   {
-    auto it_in = it->second.begin();
-    std::cout << *it_in << " ";
-    sum += *it_in;
+    int sum = 0;
+    for (auto it = head.begin(); it != head.end(); ++it)
+    {
+      auto it_in = it->second.begin();
+      for (size_t j = 0; j < i; j++)
+      {
+        ++it_in;
+      }
+      std::cout << *it_in << " ";
+      sum += *it_in;
+    }
+    sums.push_front(sum);
+    std::cout << "\b\n";
   }
-  std::cout << "\b\n";
-  sums.push_front(sum);
   sums.reverse();
   std::cout << *sums.begin();
+  for (auto it = ++sums.begin(); it != sums.end(); ++it)
+  {
+    std::cout << " " << *it;
+  }
   std::cout << "\n";
 }
