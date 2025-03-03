@@ -19,6 +19,16 @@ BOOST_AUTO_TEST_CASE(range_constructor)
   }
 }
 
+BOOST_AUTO_TEST_CASE(operator_test)
+{
+  abramov::List< int > list1 = { 1, 2, 3 };
+  auto it = list1.begin();
+  for (size_t i = 1; i < 4; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(empty)
 {
   abramov::List< int > list;
