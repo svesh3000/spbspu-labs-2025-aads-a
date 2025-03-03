@@ -116,7 +116,7 @@ zholobov::CircularFwdListConstIterator< T >& zholobov::CircularFwdListConstItera
 template < typename T >
 zholobov::CircularFwdListConstIterator< T > zholobov::CircularFwdListConstIterator< T >::operator++(int)
 {
-  CircularFwdListIterator< T > temp(*this);
+  CircularFwdListConstIterator< T > temp(*this);
   node_ = std::addressof((*node_)->next);
   return temp;
 }
