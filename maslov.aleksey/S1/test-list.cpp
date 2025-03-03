@@ -134,29 +134,29 @@ BOOST_AUTO_TEST_CASE(assignInitializer)
   FwdList list;
   list.pushFront(1);
   list.assign({2});
-  std::ostringstream out1;
-  printList(out1, list);
-  BOOST_TEST(out1.str() == "2");
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "2");
 
   list.assign({1, 2, 3});
-  std::ostringstream out2;
-  printList(out2, list);
-  BOOST_TEST(out2.str() == "123");
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "123");
 }
 
 BOOST_AUTO_TEST_CASE(assignRange)
 {
   FwdList list({1, 2, 3});
   list.assign(list.begin(), list.end());
-  std::ostringstream out1;
-  printList(out1, list);
-  BOOST_TEST(out1.str() == "123");
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "123");
 
   list.assign({7, 8, 9});
   list.assign(list.cbegin(), list.cend());
-  std::ostringstream out2;
-  printList(out2, list);
-  BOOST_TEST(out2.str() == "789");
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "789");
 }
 
 BOOST_AUTO_TEST_CASE(assignFill)
@@ -174,18 +174,49 @@ BOOST_AUTO_TEST_CASE(eraseAfter)
   auto it = ++list.cbegin();
   maslov::FwdListIterator< int > tempIt = list.eraseAfter(it);
   BOOST_TEST(*(++tempIt) == 1);
-  std::ostringstream out1;
-  printList(out1, list);
-  BOOST_TEST(out1.str() == "12");
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "12");
 
   list.assign({1, 2, 3, 4, 5});
   auto first = list.cbegin();
   auto last = list.cend();
   tempIt = list.eraseAfter(first, last);
   BOOST_TEST(*(++tempIt) == 1);
-  std::ostringstream out2;
-  printList(out2, list);
-  BOOST_TEST(out2.str() == "1");
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "1");
+}
+BOOST_AUTO_TEST_CASE(insertAfter)
+{
+  FwdList list;
+  auto it1 = list.insertAfter(list.cend(), 1);
+  BOOST_TEST(*it1 == 1);
+  it1 = list.insertAfter(list.cend(), 2);
+  it1 = list.insertAfter(list.cbegin(), 3);
+  BOOST_TEST(*it1 == 3);
+  std::ostringstream out;
+  printList(out, list);
+  BOOST_TEST(out.str() == "231");
+  
+  auto it2 = list.insertAfter(list.cbegin(), 4, 4);
+  BOOST_TEST(*it2 == 4);
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "2444431");
+
+  FwdList list1({5, 5, 6, 7});
+  auto it3 = list.insertAfter(++list.cbegin(), list1.cbegin(), list1.cend());
+  BOOST_TEST(*it3 == 7);
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "24556744431");
+
+  auto it4 = list.insertAfter(list.cbegin(), {8, 9});
+  BOOST_TEST(*it4 == 9);
+  out.str("");
+  printList(out, list);
+  BOOST_TEST(out.str() == "2894556744431");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
