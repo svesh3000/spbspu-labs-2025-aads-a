@@ -358,7 +358,7 @@ namespace tkach
   template< typename T >
   void List< T >::spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first)
   {
-    spliceAfter(pos, other, first, std::next(first, 2)); 
+    spliceAfter(pos, other, first, std::next(first, 2));
   }
 
   template< typename T >
@@ -366,7 +366,7 @@ namespace tkach
   {
     spliceAfter(pos, other, first, std::next(first, 2));
   }
-  
+
   template< typename T >
   void List< T >::spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first, Citerator< T > last)
   {
@@ -411,7 +411,7 @@ namespace tkach
   {
     spliceAfter(pos, other, first, last);
   }
-  
+
   template< typename T >
   Iterator< T > List< T >::erase_after(Citerator < T > first, Citerator < T > last)
   {
