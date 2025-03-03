@@ -149,6 +149,7 @@ namespace asafov
     void clear()
     {
       delete head_;
+      head_ = nullptr;
     }
     private:
     Node* head_;
