@@ -4,8 +4,6 @@
 #include <memory>
 namespace asafov
 {
-
-
   template<typename T>
   class Forward_list
   {
@@ -25,7 +23,6 @@ namespace asafov
     head_(nullptr),
     last_(nullptr)
     {}
-
     Forward_list(Forward_list&& data) noexcept:
     head_(data.head_),
     last_(data.last_)
@@ -33,12 +30,10 @@ namespace asafov
       data.head_ = nullptr;
       data.last_ = nullptr;
     }
-
     ~Forward_list()
     {
       clear();
     }
-
     class const_iterator
     {
       friend class Forward_list;
@@ -56,17 +51,14 @@ namespace asafov
       last_(data.last_)
       {}
       ~const_iterator() = default;
-
       const T& operator*() const
       {
         return current_->data_;
       }
-
       T* operator->() const
       {
         return std::addressof(current_->data_);
       }
-
       const_iterator& operator++()
       {
         if (current_ && current_ != last_)
@@ -79,12 +71,10 @@ namespace asafov
         }
         return *this;
       }
-
       bool operator==(const const_iterator& rhs) const
       {
         return current_ == rhs.current_;
       }
-
       bool operator!=(const const_iterator& rhs) const
       {
         return !(*this == rhs);
@@ -101,7 +91,6 @@ namespace asafov
     {
       return const_iterator(nullptr, last_);
     }
-
     void push_front(const T& value);
     void pop_front()
     {
@@ -134,7 +123,6 @@ namespace asafov
     }
     void pop_back();
     void swap();
-
     size_t size() const
     {
       size_t i = 0;
@@ -158,11 +146,6 @@ namespace asafov
     
     T& front();
     T& back();
-
-
-
-    
-
     void clear()
     {
       if (head_ != last_)
@@ -175,6 +158,5 @@ namespace asafov
     Node* head_;
     Node* last_;
   };
-
 }
 #endif
