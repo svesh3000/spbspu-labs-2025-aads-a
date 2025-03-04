@@ -36,6 +36,10 @@ int main()
       std::cout << "\n";
     }
   }
+  if (!sequence_num.empty())
+  {
+    std::cout << "\n";
+  }
   std::forward_list< size_t > sums = {};
   do
   {
