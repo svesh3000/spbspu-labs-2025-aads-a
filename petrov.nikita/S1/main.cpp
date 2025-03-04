@@ -98,9 +98,11 @@ int main()
   else
   {
     sums.reverse();
-    for (auto it = sums.begin(); it != sums.end(); ++it)
+    auto it = sums.begin();
+    std::cout << *(it++);
+    for (; it != sums.end(); ++it)
     {
-      std::cout << *it << " ";
+      std::cout << " " << *it;
     }
   }
   std::cout << "\n";
