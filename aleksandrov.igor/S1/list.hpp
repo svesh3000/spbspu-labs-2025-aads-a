@@ -120,11 +120,11 @@ namespace aleksandrov
     {
       return 0;
     }
-    size_t size = 1;
-    while (tempPtr != tail_)
+    size_t size = 0;
+    while (tempPtr != fake_)
     {
-      tempPtr = tempPtr->next_;
       ++size;
+      tempPtr = tempPtr->next_;
     }
     return size;
   }
@@ -133,10 +133,15 @@ namespace aleksandrov
   void List< T >::pushFront(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
-    newNode->next_ = fake_->next_;
-    fake_->next_ = newNode;
-    if (size() - 1)
+    if (!empty())
     {
+      newNode->next_ = fake_->next_;
+      fake_->next_ = newNode;
+    }
+    else
+    {
+      newNode->next_ = fake_->next_;
+      fake_->next_ = newNode;
       tail_ = newNode;
       newNode->next_ = fake_;
     }
@@ -170,17 +175,6 @@ namespace aleksandrov
   }
 
   template< typename T >
-  void List< T >::popBack()
-  {
-    if (!empty())
-    {
-      auto tempPtr = tail_;
-      tail_->next_ = fake_;
-      delete tempPtr;
-    }
-  }
-
-  template< typename T >
   void List< T >::swap(List< T >& other)
   {
     std::swap(fake_, other.fake_);
@@ -195,39 +189,6 @@ namespace aleksandrov
       popFront();
     }
   }
-
-  template< typename T >
-  void List< T >::remove(const T& value)
-  {
-    auto beforeIt = fake_;
-    for (auto it = begin(); it != end(); ++it)
-    {
-      if (*it == value)
-      {
-        auto tempPtr = it;
-        beforeIt->next_ = it->next_;
-        delete tempPtr;
-      }
-      ++beforeIt;
-    }
-  }
-
-  template< typename T >
-  Iterator< T > List< T >::insertAfter(Iterator< T > pos, const T& value)
-  {
-    auto tempPtr = pos->next_;
-    if (!tempPtr)
-    {
-      pushBack(value);
-    }
-    else
-    {
-      Node< T >* newNode = new Node< T >(value);
-      pos->next_ = newNode;
-      newNode->next_ = tempPtr;
-    }
-  }
-
 }
 
 #endif

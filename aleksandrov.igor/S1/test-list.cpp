@@ -6,18 +6,24 @@ BOOST_AUTO_TEST_CASE(construction)
   aleksandrov::List< int > list;
 }
 
-BOOST_AUTO_TEST_CASE(begin)
+BOOST_AUTO_TEST_CASE(begin_end)
 {
-  aleksandrov::List< double > list;
-  list.pushFront(1.23);
-  BOOST_TEST(*(list.begin()) == 1.23);
+  aleksandrov::List< int > list;
+  list.pushBack(12);
+  list.pushBack(34);
+  list.pushBack(56);
+  BOOST_TEST(*list.begin() == 12);
+  BOOST_TEST(*list.end() == 56);
 }
 
-BOOST_AUTO_TEST_CASE(front)
+BOOST_AUTO_TEST_CASE(front_back)
 {
   aleksandrov::List< char > list;
   list.pushFront('a');
-  BOOST_TEST(list.front() == 'a');
+  list.pushFront('b');
+  list.pushFront('c');
+  BOOST_TEST(list.front() == 'c');
+  BOOST_TEST(list.back() == 'a');
 }
 
 BOOST_AUTO_TEST_CASE(empty)
@@ -41,10 +47,19 @@ BOOST_AUTO_TEST_CASE(size)
 BOOST_AUTO_TEST_CASE(pushFront)
 {
   aleksandrov::List< float > list;
-  list.pushFront(1.0);
-  BOOST_TEST(list.front() == 1.0);
-  list.pushFront(3.14);
-  BOOST_TEST(list.front() == 3.14);
+  list.pushFront(1.0f);
+  BOOST_TEST(list.front() == 1.0f);
+  list.pushFront(3.14f);
+  BOOST_TEST(list.front() == 3.14f);
+}
+
+BOOST_AUTO_TEST_CASE(pushBack)
+{
+  aleksandrov::List< float > list;
+  list.pushBack(2.5f);
+  BOOST_TEST(list.back() == 2.5f);
+  list.pushBack(5.0f);
+  BOOST_TEST(list.back() == 5.0f);
 }
 
 BOOST_AUTO_TEST_CASE(popFront)
@@ -59,14 +74,13 @@ BOOST_AUTO_TEST_CASE(popFront)
 BOOST_AUTO_TEST_CASE(swap)
 {
   aleksandrov::List< int > list1;
-  list1.pushFront(1);
-  list1.pushFront(2);
+  list1.pushBack(1);
+  list1.pushBack(2);
   aleksandrov::List< int > list2;
-  list2.pushFront(3);
-  auto it = list1.begin();
+  list2.pushBack(3);
   list1.swap(list2);
   BOOST_TEST(list1.front() == 3);
-  BOOST_TEST(*it == 1);
+  BOOST_TEST(list2.back() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(clear)
