@@ -143,7 +143,6 @@ namespace asafov
         return false;
       }
     }
-    
     T& front();
     T& back();
     void clear()
