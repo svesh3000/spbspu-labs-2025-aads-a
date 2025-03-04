@@ -2,6 +2,7 @@
 #define TEST_UTILS
 
 #include <functional>
+#include <iterator>
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
@@ -39,6 +40,12 @@ namespace rychkov
       BOOST_TEST((i == left.rend()));
       BOOST_TEST((j == right.rend()));
     }
+  }
+  template< class Iter >
+  Iter shift(Iter i, typename std::iterator_traits< Iter >::difference_type distance)
+  {
+    std::advance(i, distance);
+    return i;
   }
 }
 

@@ -31,8 +31,9 @@ namespace rychkov
     {}
     template< bool isConst1 = isConst >
     BidirectionalIterator(typename std::enable_if_t< isConst && isConst1,
-            BidirectionalIterator< value_type, false, isReversed > > rhs) noexcept:
-      node_(rhs.node_)
+          BidirectionalIterator< value_type, false, isReversed > > rhs) noexcept:
+      node_(rhs.node_),
+      prevIter_(rhs.prevIter_)
     {}
 
     bool operator==(BidirectionalIterator rhs) const noexcept
@@ -48,10 +49,12 @@ namespace rychkov
     {
       if (isReversed)
       {
+        prevIter_ = node_;
         node_ = node_->prev;
       }
       else
       {
+        prevIter_ = node_;
         node_ = node_->next;
       }
       return *this;
@@ -66,11 +69,27 @@ namespace rychkov
     {
       if (isReversed)
       {
-        node_ = node_->next;
+        if (node_ == nullptr)
+        {
+          node_ = prevIter_;
+        }
+        else
+        {
+          node_ = node_->next;
+        }
+        prevIter_ = node_->next;
       }
       else
       {
-        node_ = node_->prev;
+        if (node_ == nullptr)
+        {
+          node_ = prevIter_;
+        }
+        else
+        {
+          node_ = node_->prev;
+        }
+        prevIter_ = node_->prev;
       }
       return *this;
     }
@@ -103,8 +122,10 @@ namespace rychkov
     friend class rychkov::List< T >;
     friend class BidirectionalIterator< value_type, true, isReversed >;
     node_t< T >* node_;
-    BidirectionalIterator(node_t< T >* node) noexcept:
-      node_(node)
+    node_t< T >* prevIter_;
+    BidirectionalIterator(node_t< T >* node, node_t< T >* iteratingTail) noexcept:
+      node_(node),
+      prevIter_(node_ == nullptr ? iteratingTail : node_->prev)
     {}
   };
 }

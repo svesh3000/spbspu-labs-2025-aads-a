@@ -2,6 +2,7 @@
 #define ERASORS_SPLICE_HPP
 
 #include "declaration.hpp"
+#include <functional.hpp>
 
 template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List& rhs)
@@ -47,12 +48,12 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
   const_iterator insertedTail;
   if (to == rhs.end())
   {
-    insertedTail = rhs.tail_;
+    insertedTail = {rhs.tail_, rhs.tail_};
     rhs.tail_ = from.node_->prev;
   }
   else
   {
-    insertedTail = to.node_->prev;
+    insertedTail = {to.node_->prev, to.node_->prev};
     to.node_->prev = from.node_->prev;
   }
 
@@ -61,10 +62,15 @@ void rychkov::List< T >::splice(const_iterator pos, List& rhs, const_iterator fr
     head_ = from.node_;
     from.node_->prev = nullptr;
   }
-  else
+  else if (pos != end())
   {
     pos.node_->prev->next = from.node_;
     from.node_->prev = pos.node_->prev;
+  }
+  else
+  {
+    tail_->next = from.node_;
+    from.node_->prev = tail_;
   }
   if (pos == end())
   {
@@ -127,24 +133,23 @@ typename rychkov::List< T >::iterator rychkov::List< T >::erase(const_iterator f
     delete temp.node_;
     --size_;
   }
-  return {to.node_};
+  return {to.node_, tail_};
+}
+template< class T >
+void rychkov::List< T >::pop_back()
+{
+  erase(--end());
+}
+template< class T >
+void rychkov::List< T >::pop_front()
+{
+  erase(begin());
 }
 
 template< class T >
 typename rychkov::List< T >::size_type rychkov::List< T >::remove(const value_type& value)
 {
-  size_type result = 0;
-  const_iterator i = begin();
-  while (i != end())
-  {
-    const_iterator temp = i++;
-    if (*temp == value)
-    {
-      erase(temp);
-      result++;
-    }
-  }
-  return result;
+  return remove_if(compare_to_value< std::equal_to<>, value_type >{std::equal_to<>(), value});
 }
 template< class T >
 template< class C >

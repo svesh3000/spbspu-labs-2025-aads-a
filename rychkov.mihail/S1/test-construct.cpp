@@ -33,7 +33,8 @@ BOOST_AUTO_TEST_CASE(S1_array_ptrs_test)
   int expected[] = {2, 5, 3, 9};
   rychkov::List< int > list(expected, expected + rychkov::size(expected));
   BOOST_TEST(list.size() == 4);
-  BOOST_TEST(list.front() == *expected);
+  BOOST_TEST(!list.empty());
+  BOOST_TEST(list.front() == expected[0]);
   BOOST_TEST(list.back() == expected[rychkov::size(expected) - 1]);
 
   BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + rychkov::size(expected)));
@@ -87,6 +88,7 @@ BOOST_AUTO_TEST_CASE(move_test)
   rychkov::List< int > list1 = list;
   rychkov::List< int > list2;
   rychkov::fullCompare(list, list2 = std::move(list1));
+  rychkov::fullCompare(list1, {});
 }
 BOOST_AUTO_TEST_CASE(initializer_list_test)
 {
