@@ -54,13 +54,6 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
     ends[size] = iter->second.cend();
     ++size;
   }
-  auto temp = sequences.cbegin();
-  auto temp2 = begins[0];
-  if (++temp == sequences.cend() && ++temp2 == ends[0])
-  {
-    out << 0 << '\n';
-    return;
-  }
   out << '\n';
   seqiter = sequences.cbegin();
   data_list_t sums;

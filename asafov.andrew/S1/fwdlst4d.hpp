@@ -4,6 +4,8 @@
 #include <memory>
 namespace asafov
 {
+
+
   template<typename T>
   class Forward_list
   {
@@ -15,12 +17,27 @@ namespace asafov
       Node() noexcept: data_(NULL), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
+      Node(const Node& node) noexcept: data_(node.data_), next_(node.next_) {}
+      ~Node() = default;
     };
   public:
     Forward_list() noexcept:
     head_(nullptr),
     last_(nullptr)
     {}
+
+    Forward_list(Forward_list&& data) noexcept:
+    head_(data.head_),
+    last_(data.last_)
+    {
+      data.head_ = nullptr;
+      data.last_ = nullptr;
+    }
+
+    ~Forward_list()
+    {
+      clear();
+    }
 
     class const_iterator
     {
@@ -33,6 +50,10 @@ namespace asafov
       const_iterator(Node* node, Node* last):
       current_(node),
       last_(last)
+      {}
+      const_iterator(const const_iterator& data) noexcept:
+      current_(data.current_),
+      last_(data.last_)
       {}
       ~const_iterator() = default;
 
@@ -68,12 +89,10 @@ namespace asafov
       {
         return !(*this == rhs);
       }
-
     private:
       Node* current_;
       Node* last_;
     };
-
     const_iterator cbegin() const
     {
       return const_iterator(head_, last_);
@@ -84,7 +103,19 @@ namespace asafov
     }
 
     void push_front(const T& value);
-    void pop_front();
+    void pop_front()
+    {
+      if (head_ != last_)
+      {
+        last_->next_ = head_->next_;
+        delete head_;
+      }
+      else {
+        delete head_;
+        head_ = nullptr;
+        last_ = nullptr;
+      }
+    }
     void push_back(const T& value)
     {
       Node* new_node = new Node(value);
@@ -124,17 +155,26 @@ namespace asafov
         return false;
       }
     }
+    
+    T& front();
+    T& back();
 
-    T& front()
+
+
+    
+
+    void clear()
     {
-      return head_->data_;
+      if (head_ != last_)
+      {
+        pop_front();
+      }
+      pop_front();
     }
-    T& back(){
-      return last_->data_;
-    }
-    private:
+  private:
     Node* head_;
     Node* last_;
   };
+
 }
 #endif
