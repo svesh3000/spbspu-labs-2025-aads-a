@@ -63,7 +63,7 @@ int main()
           }
           else
           {
-            std::cerr << "ERROR: Overflow" << "\n";
+            std::cerr << "\n" << "ERROR: Overflow" << "\n";
             return 1;
           }
         }
@@ -77,7 +77,7 @@ int main()
           }
           else
           {
-            std::cerr << "ERROR: Overflow" << "\n";
+            std::cerr << "\n" << "ERROR: Overflow" << "\n";
             return 1;
           }
         }
@@ -93,7 +93,7 @@ int main()
   while (!head.empty());
   if (sums.empty())
   {
-    std::cout << "\b" << 0;
+    std::cout << 0 << "\n";
   }
   else
   {
