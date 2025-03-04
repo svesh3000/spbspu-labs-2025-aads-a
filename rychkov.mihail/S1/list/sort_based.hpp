@@ -131,7 +131,7 @@ void rychkov::List< T >::merge(List& rhs, C compare)
     return;
   }
   const_iterator from = begin();
-  const_iterator to = unsafeMerge(compare, from, {tail_}, rhs.begin(), {rhs.tail_});
+  const_iterator to = unsafeMerge(compare, from, {tail_, tail_}, rhs.begin(), {rhs.tail_, rhs.tail_});
   size_ += rhs.size_;
   head_ = from.node_;
   tail_ = to.node_;

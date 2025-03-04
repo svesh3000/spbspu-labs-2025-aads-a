@@ -1,5 +1,5 @@
-#ifndef ADD_ELEMENTS_HPP
-#define ADD_ELEMENTS_HPP
+#ifndef INSERTERS_HPP
+#define INSERTERS_HPP
 
 #include "declaration.hpp"
 
@@ -32,8 +32,8 @@ typename rychkov::List< T >::reference rychkov::List< T >::emplace(const_iterato
     else
     {
       inserted->prev = pos.node_->prev;
-      pos.node_->prev->next = inserted;
       inserted->next = pos.node_;
+      pos.node_->prev->next = inserted;
       pos.node_->prev = inserted;
     }
   }
