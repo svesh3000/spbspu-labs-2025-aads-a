@@ -27,7 +27,14 @@ int main()
   }
   head.reverse();
   auto it = head.begin();
-  std::cout << (it++)->first;
+  if (!sequence_num.empty())
+  {
+    std::cout << (it++)->first;
+  }
+  else
+  {
+    ++it;
+  }
   for (; it != head.end(); ++it)
   {
     std::cout << " " << it->first;
@@ -93,11 +100,7 @@ int main()
     }
   }
   while (!head.empty());
-  if (sums.empty() && sequence_num.empty())
-  {
-    return 0;
-  }
-  else if (sums.empty())
+  if (sums.empty())
   {
     std::cout << 0;
   }
