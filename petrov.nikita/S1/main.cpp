@@ -63,7 +63,8 @@ int main()
           }
           else
           {
-            std::cerr << "\n" << "ERROR: Overflow" << "\n";
+            std::cout << "\n";
+            std::cerr << "ERROR: Overflow" << "\n";
             return 1;
           }
         }
@@ -77,7 +78,8 @@ int main()
           }
           else
           {
-            std::cerr << "\n" << "ERROR: Overflow" << "\n";
+            std::cout << "\n";
+            std::cerr << "ERROR: Overflow" << "\n";
             return 1;
           }
         }
@@ -91,7 +93,11 @@ int main()
     }
   }
   while (!head.empty());
-  if (sums.empty())
+  if (sums.empty() && sequence_num.empty())
+  {
+    return 0;
+  }
+  else if (sums.empty())
   {
     std::cout << 0;
   }
