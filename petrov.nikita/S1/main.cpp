@@ -27,19 +27,15 @@ int main()
   }
   head.reverse();
   auto it = head.begin();
-  if (!sequence_num.empty())
-  {
-    std::cout << (it++)->first;
-  }
-  else
-  {
-    ++it;
-  }
+  std::cout << (it++)->first;
   for (; it != head.end(); ++it)
   {
     std::cout << " " << it->first;
+    if (it._M_next() == head.end())
+    {
+      std::cout << "\n";
+    }
   }
-  std::cout << "\n";
   std::forward_list< size_t > sums = {};
   do
   {
