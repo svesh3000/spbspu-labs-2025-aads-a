@@ -2,7 +2,9 @@
 #define LIST_HPP
 #include <initializer_list>
 #include <stdexcept>
+#include <utility>
 #include "constIterator.hpp"
+#include "node.hpp"
 
 namespace kiselev
 {
@@ -24,12 +26,12 @@ namespace kiselev
     List< T >& operator=(List< T >&&) noexcept;
     List< T >& operator=(std::initializer_list< T >);
 
-    bool operator==(const List< T >&) const;
-    bool operator!=(const List< T >&) const;
-    bool operator<(const List< T >&) const;
-    bool operator>(const List< T >&) const;
-    bool operator<=(const List< T >&) const;
-    bool operator>=(const List< T >&) const;
+    bool operator==(const List< T >&) const noexcept;
+    bool operator!=(const List< T >&) const noexcept;
+    bool operator<(const List< T >&) const noexcept;
+    bool operator>(const List< T >&) const noexcept;
+    bool operator<=(const List< T >&) const noexcept;
+    bool operator>=(const List< T >&) const noexcept;
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > cbegin() const noexcept;
@@ -44,13 +46,13 @@ namespace kiselev
     T& back() noexcept;
     const T& back() const noexcept;
 
-    void pushBack(const T&);
-    void pushFront(const T&);
+    void pushBack(const T);
+    void pushFront(const T);
 
-    void popBack();
-    void popFront();
+    void popBack() noexcept;
+    void popFront() noexcept;
 
-    void clear();
+    void clear() noexcept;
     void swap(List< T >&) noexcept;
 
     void assign(size_t, const T&);
@@ -58,8 +60,8 @@ namespace kiselev
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T >);
 
-    Iterator< T > erase(ConstIterator< T >);
-    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
+    Iterator< T > erase(ConstIterator< T >) noexcept;
+    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last) noexcept;
 
     Iterator< T > insert(ConstIterator< T >, const T&);
     Iterator< T > insert(ConstIterator< T >, T&&);
@@ -68,17 +70,17 @@ namespace kiselev
     Iterator< T > insert(ConstIterator< T > pos, InputIterator first, InputIterator last);
     Iterator< T > insert(ConstIterator< T >, std::initializer_list< T >);
 
-    void remove(const T&);
+    void remove(const T&) noexcept;
     template< typename Predicate >
-    void remove_if(Predicate);
+    void remove_if(Predicate) noexcept;
 
-    void splice(ConstIterator< T >, List< T >&);
-    void splice(ConstIterator< T >, List< T >&&);
-    void splice(ConstIterator< T > position, List< T >&, ConstIterator< T > i);
-    void splice(ConstIterator< T > position, List< T >&&, ConstIterator< T > i);
-    void splice(ConstIterator< T > pos, List< T >&, ConstIterator< T > first, ConstIterator< T > last);
-    void splice(ConstIterator< T > pos, List< T >&&, ConstIterator< T > first, ConstIterator< T > last);
-    void reverse();
+    void splice(ConstIterator< T >, List< T >&) noexcept;
+    void splice(ConstIterator< T >, List< T >&&) noexcept;
+    void splice(ConstIterator< T > position, List< T >&, ConstIterator< T > i) noexcept;
+    void splice(ConstIterator< T > position, List< T >&&, ConstIterator< T > i) noexcept;
+    void splice(ConstIterator< T > pos, List< T >&, ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void splice(ConstIterator< T > pos, List< T >&&, ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void reverse() noexcept;
 
 
   private:
@@ -92,7 +94,7 @@ namespace kiselev
   template< typename T >
   List< T >::List():
     head_(nullptr),
-    end_(new Node< T >(T())),
+    end_(new Node< T >()),
     size_(0)
   {
     end_->next_ = end_;
@@ -111,15 +113,12 @@ namespace kiselev
 
   template< typename T >
   List< T >::List(List< T >&& list) noexcept:
-    head_(list.head_),
-    end_(list.end_),
-    size_(list.size_)
+    head_(std::exchange(list.head_, nullptr)),
+    end_(std::exchange(list.end_, new Node< T >())),
+    size_(std::exchange(list.size_, 0))
   {
-    list.head_ = nullptr;
-    list.end_ = new Node< T >(T());
     list.end_->next_ = list.end_;
     list.end_->prev_ = list.end_;
-    list.size_ = 0;
   }
 
   template< typename T >
@@ -180,7 +179,7 @@ namespace kiselev
   }
 
   template< typename T >
-  bool List< T >::operator==(const List<T>& list) const
+  bool List< T >::operator==(const List<T>& list) const noexcept
   {
     if (size_ == list.size_)
     {
@@ -199,13 +198,13 @@ namespace kiselev
   }
 
   template< typename T >
-  bool List< T >::operator!=(const List<T>& list) const
+  bool List< T >::operator!=(const List<T>& list) const noexcept
   {
     return !(*this == list);
   }
 
   template< typename T >
-  bool List< T >::operator<(const List< T >& list) const
+  bool List< T >::operator<(const List< T >& list) const noexcept
   {
     size_t min = std::min(size_, list.size_);
     ConstIterator< T > thisIt = cbegin();
@@ -221,19 +220,19 @@ namespace kiselev
   }
 
   template< typename T >
-  bool List< T >::operator>(const List< T >& list) const
+  bool List< T >::operator>(const List< T >& list) const noexcept
   {
     return list < *this;
   }
 
   template< typename T >
-  bool List< T >::operator<=(const List< T >& list) const
+  bool List< T >::operator<=(const List< T >& list) const noexcept
   {
     return !(*this > list);
   }
 
   template< typename T >
-  bool List< T >::operator>=(const List<T>& list) const
+  bool List< T >::operator>=(const List<T>& list) const noexcept
   {
     return !(*this < list);
   }
@@ -299,33 +298,33 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::pushBack(const T& data)
+  void List< T >::pushBack(const T data)
   {
     insert(cend(), data);
   }
 
   template< typename T >
-  void List< T >::pushFront(const T& data)
+  void List< T >::pushFront(const T data)
   {
     insert(cbegin(), data);
   }
 
   template< typename T >
-  void List< T >::popBack()
+  void List< T >::popBack() noexcept
   {
     assert(!empty());
     erase(ConstIterator< T >(end_->prev_));
   }
 
   template< typename T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
     assert(!empty());
     erase(cbegin());
   }
 
   template< typename T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -364,7 +363,7 @@ namespace kiselev
   }
 
   template< typename T >
-  Iterator< T > List< T >::erase(ConstIterator< T > position)
+  Iterator< T > List< T >::erase(ConstIterator< T > position) noexcept
   {
     Iterator< T > it(position.node_->next_);
     if (position == cbegin())
@@ -383,7 +382,7 @@ namespace kiselev
   }
 
   template< typename T >
-  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
+  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     for (; first != last;)
     {
@@ -393,7 +392,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::remove(const T& data)
+  void List< T >::remove(const T& data) noexcept
   {
     if (size_ == 1)
     {
@@ -420,7 +419,7 @@ namespace kiselev
 
   template< typename T >
   template< typename Predicate >
-  void List< T >::remove_if(Predicate pred)
+  void List< T >::remove_if(Predicate pred) noexcept
   {
     for (ConstIterator< T > it = cbegin(); it != cend();)
     {
@@ -436,31 +435,31 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& list)
+  void List< T >::splice(ConstIterator< T > position, List< T >& list) noexcept
   {
     splice(position, list, list.cbegin(), list.cend());
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >&& list)
+  void List< T >::splice(ConstIterator< T > position, List< T >&& list) noexcept
   {
     splice(position, list);
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i)
+  void List< T >::splice(ConstIterator< T > position, List< T >& list, ConstIterator< T > i) noexcept
   {
     splice(position, list, i, std::next(i));
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >&& list, ConstIterator< T > i)
+  void List< T >::splice(ConstIterator< T > position, List< T >&& list, ConstIterator< T > i) noexcept
   {
     splice(position, list, i);
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::splice(ConstIterator< T > pos, List< T >& list, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     Node< T >* firstNode = first.node_;
     Node< T >* lastNode = last.node_->prev_;
@@ -500,7 +499,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > pos, List< T >&& list, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::splice(ConstIterator< T > pos, List< T >&& list, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     splice(pos, list, first, last);
   }
@@ -607,7 +606,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void List< T >::reverse()
+  void List< T >::reverse() noexcept
   {
     if (empty() || size_ == 1)
     {

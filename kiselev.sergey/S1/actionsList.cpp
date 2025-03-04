@@ -4,78 +4,36 @@
 
 namespace
 {
-  size_t searchMax(const list& list_)
+  size_t searchMax(const kiselev::list& list)
   {
     size_t max = 0;
-    for (auto begin = list_.cbegin(); begin != list_.cend(); ++begin)
+    for (auto begin = list.cbegin(); begin != list.cend(); ++begin)
     {
       max = std::max(max, begin->second.size());
     }
     return max;
   }
 
-  numberList calcucationSum(list& list_)
+  unsigned long long checkSum(unsigned long long sum, unsigned long long number)
   {
-    auto it = list_.cbegin();
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    numberList sum;
-    for (size_t i = 0; i < searchMax(list_); ++i)
+    if (max - number < sum)
     {
-      unsigned long long summa = 0;
-      it = list_.begin();
-      for (; it != list_.cend(); ++it)
-      {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
-        {
-          continue;
-        }
-        std::advance(nit, i);
-        if (max - *nit < summa)
-        {
-          throw std::overflow_error("Overflow for unsigned long long");
-        }
-        summa += *nit;
-      }
-      sum.pushBack(summa);
+      throw std::overflow_error("Overflow for unsigned long long");
     }
+    sum += number;
     return sum;
   }
 
-  std::ostream& outputSum(std::ostream& output, const numberList& list)
+  kiselev::numberList calcucationSum(kiselev::list& list)
   {
-    for (auto it = list.cbegin(); it != list.cend(); ++it)
+    auto it = list.cbegin();
+    kiselev::numberList listSum;
+    for (size_t i = 0; i < searchMax(list); ++i)
     {
-      if (it != list.cbegin())
-      {
-        output << " ";
-      }
-      output << *it;
-    }
-    return output;
-  }
-
-  std::ostream& outputName(std::ostream& output, const list& list_)
-  {
-    for (auto it = list_.cbegin(); it != list_.cend(); ++it)
-    {
-      if (it != list_.cbegin())
-      {
-        output << " ";
-      }
-      output << it->first;
-    }
-    return output;
-  }
-
-  std::ostream& outputNumbers(std::ostream& output, const list& list_)
-  {
-    auto it = list_.cbegin();
-    for (size_t i = 0; i < searchMax(list_); ++i)
-    {
-      bool first = true;
-      it = list_.cbegin();
-      for (; it != list_.cend(); ++it)
+      unsigned long long sum = 0;
+      it = list.begin();
+      for (; it != list.cend(); ++it)
       {
         auto nit = it->second.cbegin();
         if (i >= it->second.size())
@@ -83,27 +41,67 @@ namespace
           continue;
         }
         std::advance(nit, i);
-        if (!first)
+        sum = checkSum(sum, *nit);
+      }
+      listSum.pushBack(sum);
+    }
+    return listSum;
+  }
+
+  std::ostream& outputSum(std::ostream& output, const kiselev::numberList& list)
+  {
+    output << list.front();
+    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
+    {
+      output << " " << *it;
+    }
+    return output;
+  }
+
+  std::ostream& outputName(std::ostream& output, const kiselev::list& list)
+  {
+    output << list.front().first;
+    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
+    {
+      output << " " << it->first;
+    }
+    return output;
+  }
+
+  std::ostream& outputNumbers(std::ostream& output, const kiselev::list& list)
+  {
+    auto it = list.cbegin();
+    for (size_t i = 0; i < searchMax(list); ++i)
+    {
+      it = list.cbegin();
+      for (; it != list.cend(); ++it)
+      {
+        auto nit = it->second.cbegin();
+        if (i >= it->second.size())
+        {
+          continue;
+        }
+        std::advance(nit, i);
+        if (it != list.cbegin())
         {
           output << " ";
         }
-        first = false;
         output << *nit;
       }
       output << "\n";
-      it = list_.cbegin();
     }
     return output;
   }
 }
-list kiselev::createList(std::istream& input)
+
+kiselev::list kiselev::createList(std::istream& input)
 {
   std::string name;
-  list list_;
+  list list;
   while (input >> name)
   {
     numberList numbers;
-    unsigned long long number = 0;
+    unsigned long long number;
     while (input >> number)
     {
       if (!input)
@@ -113,9 +111,9 @@ list kiselev::createList(std::istream& input)
       numbers.pushBack(number);
     }
     input.clear();
-    list_.pushBack(pair(name, numbers));
+    list.pushBack(pair(name, numbers));
   }
-  return list_;
+  return list;
 }
 
 std::ostream& kiselev::output(std::ostream& output, list& list_)
@@ -130,8 +128,8 @@ std::ostream& kiselev::output(std::ostream& output, list& list_)
     return output << "0\n";
   }
   outputNumbers(output, list_);
-  numberList summ = calcucationSum(list_);
-  outputSum(output, summ) << "\n";
+  numberList sum = calcucationSum(list_);
+  outputSum(output, sum) << "\n";
   return output;
 }
 

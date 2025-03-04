@@ -7,16 +7,16 @@
 using namespace kiselev;
 namespace
 {
-  void createList(List< int >* list, int count)
+  void createList(List< int >& list, int count)
   {
     for (int i = 0; i < count; ++i)
     {
-      list->pushBack(i);
+      list.pushBack(i);
     }
   }
-  std::ostream& outputList(std::ostream& out, List< int >* list)
+  std::ostream& outputList(std::ostream& out, List< int >& list)
   {
-    for (ConstIterator< int > it = list->cbegin(); it != list->cend(); ++it)
+    for (ConstIterator< int > it = list.cbegin(); it != list.cend(); ++it)
     {
       out << *it;
     }
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(default_and_copy_and_move_constructor)
 {
   List< int > list;
   BOOST_TEST(list.empty());
-  createList(&list, 4);
+  createList(list, 4);
   List< int > copyList(list);
   BOOST_TEST((copyList == list));
   List< int > list2(std::move(list));
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(range_constructor)
   List< int > list;
   List< int > list2(list.cbegin(), list.cend());
   BOOST_TEST(list2.empty());
-  createList(&list, 5);
+  createList(list, 5);
   List< int > list3(list.cbegin(), list.cend());
   BOOST_TEST(list3.size() == 5);
 }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(initializer_list_constructor)
 BOOST_AUTO_TEST_CASE(copy_assignment_operator)
 {
   List< int > list;
-  createList(&list, 5);
+  createList(list, 5);
   List< int > copyList;
   copyList = list;
   BOOST_TEST((list == copyList));
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(pop_front)
 BOOST_AUTO_TEST_CASE(clear)
 {
   List< int > list;
-  createList(&list, 4);
+  createList(list, 4);
   list.clear();
   BOOST_TEST(list.empty());
 }
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_CASE(erase_pos)
 {
   List< int > list;
-  createList(&list, 20);
+  createList(list, 20);
   ConstIterator< int > begin = list.cbegin();
   Iterator< int > it = list.erase(begin);
   BOOST_CHECK(it == list.begin());
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(remove)
   list.pushBack(i);
   list.remove(i);
   BOOST_TEST(list.empty());
-  createList(&list, 10);
+  createList(list, 10);
   list.pushBack(1);
   list.remove(1);
   BOOST_TEST(list.size() == 9);
@@ -196,67 +196,67 @@ BOOST_AUTO_TEST_CASE(remove)
 BOOST_AUTO_TEST_CASE(splice_list)
 {
   List< int > list1;
-  createList(&list1, 5);
+  createList(list1, 5);
   List< int > list2;
-  createList(&list2, 3);
+  createList(list2, 3);
   ConstIterator< int > it = ++list1.cbegin();
   list1.splice(it, list2);
   std::ostringstream out;
-  outputList(out, &list1);
+  outputList(out, list1);
   BOOST_TEST(out.str() == "00121234");
   List< int > list3;
-  createList(&list3, 5);
+  createList(list3, 5);
   List< int > list4;
-  createList(&list4, 3);
+  createList(list4, 3);
   it = ++list3.cbegin();
   list3.splice(it, std::move(list4));
   std::ostringstream out2;
-  outputList(out2, &list3);
+  outputList(out2, list3);
   BOOST_TEST(out2.str() == "00121234");
 
 }
 BOOST_AUTO_TEST_CASE(splice_element)
 {
   List< int > list;
-  createList(&list, 4);
+  createList(list, 4);
   List< int > list2;
-  createList(&list2, 3);
+  createList(list2, 3);
   std::ostringstream out1;
   ConstIterator< int > it = list.cbegin();
   ConstIterator< int > element = ++list2.cbegin();
   list.splice(it, list2, element);
   std::ostringstream out;
-  outputList(out, &list);
+  outputList(out, list);
   BOOST_TEST(out.str() == "10123");
   it = list.cbegin();
   element = list2.cbegin();
   list.splice(it, std::move(list2), element);
   std::ostringstream out2;
-  outputList(out2, &list);\
+  outputList(out2, list);\
   BOOST_TEST(out2.str() == "010123");
 }
 
 BOOST_AUTO_TEST_CASE(splice_range)
 {
   List< int > list;
-  createList(&list, 4);
+  createList(list, 4);
   List< int > list2;
-  createList(&list2, 3);
+  createList(list2, 3);
   ConstIterator< int > pos = list.cend();
   ConstIterator< int > first = ++list2.cbegin();
   ConstIterator< int > last = list2.cend();
   list.splice(pos, list2, first, last);
   std::ostringstream out;
-  outputList(out, &list);
+  outputList(out, list);
   BOOST_TEST(out.str() == "012312");
   List< int > list3;
-  createList(&list3, 3);
+  createList(list3, 3);
   pos = list.cbegin();
   first = list3.cbegin();
   last = --list3.cend();
   list.splice(pos, std::move(list3), first, last);
   std::ostringstream out2;
-  outputList(out2, &list);
+  outputList(out2, list);
   BOOST_TEST(out2.str() == "01012312");
 }
 
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(insert_element)
 BOOST_AUTO_TEST_CASE(insert_fill)
 {
   List< int > list;
-  createList(&list, 5);
+  createList(list, 5);
   size_t i = 0;
   Iterator< int > res = list.insert(list.cbegin(), i, 3);
   BOOST_TEST((res == list.begin()));
@@ -289,11 +289,11 @@ BOOST_AUTO_TEST_CASE(insert_fill)
 BOOST_AUTO_TEST_CASE(insert_range)
 {
   List< int > list;
-  createList(&list, 5);
+  createList(list, 5);
   List< int > list2;
   Iterator< int > res = list.insert(list.cbegin(), list2.cbegin(), list2.cend());
   BOOST_TEST((res == list.begin()));
-  createList(&list2, 4);
+  createList(list2, 4);
   res = list.insert(list.cbegin(), ++list2.cbegin(), list2.cend());
   BOOST_TEST((res == list.begin()));
 }
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(insert_range)
 BOOST_AUTO_TEST_CASE(insert_initializer)
 {
   List< int > list;
-  createList(&list, 5);
+  createList(list, 5);
   std::initializer_list< int > il = { 1, 2, 3 };
   Iterator< int > it = list.insert(list.cbegin(), il.begin(), il.end());
   BOOST_TEST((it == list.begin()));
@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE(assign_range_initializer)
 {
   List< int > list;
   List< int > list2;
-  createList(&list2, 5);
+  createList(list2, 5);
   list.assign(list2.begin(), list2.end());
   BOOST_TEST(list.size() == 5);
   std::initializer_list< int > il = { 1, 2, 3 };
@@ -331,9 +331,9 @@ BOOST_AUTO_TEST_CASE(assign_range_initializer)
 BOOST_AUTO_TEST_CASE(operator_equal)
 {
   List< int > list;
-  createList(&list, 5);
+  createList(list, 5);
   List< int > list2;
-  createList(&list2, 5);
+  createList(list2, 5);
   bool isEqual = list == list2;
   BOOST_TEST(isEqual);
   list2.pushBack(1);
@@ -347,11 +347,11 @@ BOOST_AUTO_TEST_CASE(operator_equal)
 BOOST_AUTO_TEST_CASE(operator_unequal)
 {
   List< int > list;
-  createList(&list, 3);
+  createList(list, 3);
   List< int > list2;
   bool isUnequal = list != list2;
   BOOST_TEST(isUnequal);
-  createList(&list2, 3);
+  createList(list2, 3);
   isUnequal = list != list2;
   BOOST_TEST(!isUnequal);
 }
@@ -422,10 +422,10 @@ BOOST_AUTO_TEST_CASE(reverse)
   list.reverse();
   BOOST_TEST(list.empty());
   list.pushBack(1);
-  createList(&list, 4);
+  createList(list, 4);
   list.reverse();
   std::ostringstream out;
-  outputList(out, &list);
+  outputList(out, list);
   BOOST_TEST(out.str() == "32101");
 }
 

@@ -4,7 +4,7 @@ int main()
 {
   try
   {
-    list listPairs = kiselev::createList(std::cin);
+    kiselev::list listPairs = kiselev::createList(std::cin);
     kiselev::output(std::cout, listPairs);
     return 0;
   }
