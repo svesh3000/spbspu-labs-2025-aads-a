@@ -1,7 +1,7 @@
 #ifndef CONSTRUCT_DESTRUCT_HPP
 #define CONSTRUCT_DESTRUCT_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 #include <utility>
 

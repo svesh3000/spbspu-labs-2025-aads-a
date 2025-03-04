@@ -1,7 +1,7 @@
 #ifndef ERASORS_SPLICE_HPP
 #define ERASORS_SPLICE_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 template< class T >
 void rychkov::List< T >::splice(const_iterator pos, List& rhs)

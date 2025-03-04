@@ -1,7 +1,7 @@
 #ifndef ACCESS_HPP
 #define ACCESS_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 template< class T >
 bool rychkov::List< T >::empty() const noexcept
@@ -9,27 +9,27 @@ bool rychkov::List< T >::empty() const noexcept
   return size_ == 0;
 }
 template< class T >
-size_t rychkov::List< T >::size() const noexcept
+typename rychkov::List< T >::size_type rychkov::List< T >::size() const noexcept
 {
   return size_;
 }
 template< class T >
-typename rychkov::List< T >::value_type& rychkov::List< T >::front()
+typename rychkov::List< T >::reference rychkov::List< T >::front()
 {
   return head_->data;
 }
 template< class T >
-const typename rychkov::List< T >::value_type& rychkov::List< T >::front() const
+typename rychkov::List< T >::const_reference rychkov::List< T >::front() const
 {
   return head_->data;
 }
 template< class T >
-typename rychkov::List< T >::value_type& rychkov::List< T >::back()
+typename rychkov::List< T >::reference rychkov::List< T >::back()
 {
   return tail_->data;
 }
 template< class T >
-const typename rychkov::List< T >::value_type& rychkov::List< T >::back() const
+typename rychkov::List< T >::const_reference rychkov::List< T >::back() const
 {
   return tail_->data;
 }

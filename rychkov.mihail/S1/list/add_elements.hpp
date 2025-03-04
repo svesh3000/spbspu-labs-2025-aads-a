@@ -1,7 +1,7 @@
-#ifndef EMPLACE_HPP
-#define EMPLACE_HPP
+#ifndef ADD_ELEMENTS_HPP
+#define ADD_ELEMENTS_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 #include <utility>
 
