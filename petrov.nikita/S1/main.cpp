@@ -55,9 +55,9 @@ int main()
       {
         if (it == head.begin())
         {
+          std::cout << *it->second.begin();
           if (sum <= std::numeric_limits< size_t >::max() - *it->second.begin())
           {
-            std::cout << *it->second.begin();
             sum += *it->second.begin();
             it->second.pop_front();
           }
@@ -69,9 +69,9 @@ int main()
         }
         else
         {
+          std::cout << " " << *it->second.begin();
           if (sum <= std::numeric_limits< size_t >::max() - *it->second.begin())
           {
-            std::cout << " " << *it->second.begin();
             sum += *it->second.begin();
             it->second.pop_front();
           }
@@ -93,7 +93,7 @@ int main()
   while (!head.empty());
   if (sums.empty())
   {
-    std::cout << 0;
+    std::cout << "\b" << 0;
   }
   else
   {
