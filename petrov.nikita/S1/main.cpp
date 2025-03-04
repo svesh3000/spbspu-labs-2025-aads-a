@@ -26,20 +26,19 @@ int main()
     head.push_front({ sequence_num, subhead });
   }
   head.reverse();
+  if (sequence_num.empty())
+  {
+    std::cout << 0;
+    std::cout << "\n";
+    return 0;
+  }
   auto it = head.begin();
   std::cout << (it++)->first;
   for (; it != head.end(); ++it)
   {
     std::cout << " " << it->first;
-    if (it._M_next() == head.end())
-    {
-      std::cout << "\n";
-    }
   }
-  if (!sequence_num.empty())
-  {
-    std::cout << "\n";
-  }
+  std::cout << "\n";
   std::forward_list< size_t > sums = {};
   do
   {
