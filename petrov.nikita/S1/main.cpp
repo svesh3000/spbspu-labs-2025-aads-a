@@ -93,7 +93,7 @@ int main()
   while (!head.empty());
   if (sums.empty())
   {
-    std::cout << 0 << "\n";
+    std::cout << 0;
   }
   else
   {
