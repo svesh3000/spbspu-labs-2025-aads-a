@@ -1,6 +1,5 @@
 #include <algorithm>
-#include <boost/test/unit_test.hpp>
-#include "list.hpp"
+#include "test_utils.hpp"
 
 namespace rychkov
 {
@@ -18,25 +17,22 @@ BOOST_AUTO_TEST_CASE(empty_test)
   rychkov::List< int > list;
   BOOST_TEST(list.size() == 0);
   BOOST_TEST(list.empty());
-  BOOST_REQUIRE(list.begin() == list.end());
+  BOOST_TEST((list.begin() == list.end()));
 }
 BOOST_AUTO_TEST_CASE(initializer_list_test)
 {
-  int expected[] = {2, 5, 3, 9};
-  rychkov::List< int > list = {2, 5, 3, 9};
-  BOOST_TEST(list.size() == rychkov::size(expected));
-  BOOST_TEST(!list.empty());
-  BOOST_TEST(list.front() == *expected);
-  BOOST_TEST(list.back() == expected[rychkov::size(expected) - 1]);
-
-  BOOST_TEST(std::equal(list.begin(), list.end(), expected, expected + rychkov::size(expected)));
+  std::initializer_list< int > expected = {2, 5, 3, 9};
+  rychkov::List< int > list = expected;
+  BOOST_TEST(list.size() == expected.size());
+  BOOST_TEST(list.front() == *expected.begin());
+  BOOST_TEST(list.back() == *(expected.end() - 1));
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected.begin(), expected.end()));
 }
 BOOST_AUTO_TEST_CASE(S1_array_ptrs_test)
 {
   int expected[] = {2, 5, 3, 9};
   rychkov::List< int > list(expected, expected + rychkov::size(expected));
   BOOST_TEST(list.size() == 4);
-  BOOST_TEST(!list.empty());
   BOOST_TEST(list.front() == *expected);
   BOOST_TEST(list.back() == expected[rychkov::size(expected) - 1]);
 
@@ -64,14 +60,15 @@ BOOST_AUTO_TEST_CASE(copy_test)
 {
   rychkov::List< int > list = {2, 5, 3, 9};
   rychkov::List< int > list2 = list;
-  BOOST_TEST(list == list2);
+  rychkov::fullCompare(list, list2);
 }
 BOOST_AUTO_TEST_CASE(move_test)
 {
-  int expected[] = {2, 5, 3, 9};
-  rychkov::List< int > list(expected, expected + rychkov::size(expected));
-  rychkov::List< int > list2 = std::move(list);
-  BOOST_TEST(std::equal(list2.begin(), list2.end(), expected, expected + rychkov::size(expected)));
+  rychkov::List< int > list = {2, 5, 3, 9};
+  rychkov::List< int > list1 = list;
+  rychkov::List< int > list2 = std::move(list1);
+  rychkov::fullCompare(list, list2);
+  rychkov::fullCompare(list1, {});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -80,25 +77,22 @@ BOOST_AUTO_TEST_SUITE(S1_assignment_test)
 
 BOOST_AUTO_TEST_CASE(copy_test)
 {
-  rychkov::List< int > list = {1, 2, 3};
+  rychkov::List< int > list1 = {1, 2, 3};
   rychkov::List< int > list2;
-  list2 = list;
-  BOOST_TEST(list == list2);
+  rychkov::fullCompare(list1, list2 = list1);
 }
 BOOST_AUTO_TEST_CASE(move_test)
 {
   rychkov::List< int > list = {7, 3, 5};
+  rychkov::List< int > list1 = list;
   rychkov::List< int > list2;
-  list2 = std::move(list);
-  rychkov::List< int > list3 = {7, 3, 5};
-  BOOST_TEST(list2 == list3);
+  rychkov::fullCompare(list, list2 = std::move(list1));
 }
 BOOST_AUTO_TEST_CASE(initializer_list_test)
 {
-  rychkov::List< int > list = {7, 3, 5};
+  rychkov::List< int > list1 = {7, 3, 5};
   rychkov::List< int > list2;
-  list2 = {7, 3, 5};
-  BOOST_TEST(list == list2);
+  rychkov::fullCompare(list1, list2 = {7, 3, 5});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

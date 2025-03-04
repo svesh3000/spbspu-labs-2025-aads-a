@@ -1,7 +1,7 @@
 #ifndef REST_HPP
 #define REST_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 #include <utility>
 #include <functional>

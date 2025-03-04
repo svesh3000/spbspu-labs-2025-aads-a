@@ -1,7 +1,7 @@
 #ifndef SORT_BASED_HPP
 #define SORT_BASED_HPP
 
-#include "decl.hpp"
+#include "declaration.hpp"
 
 #include <functional>
 #include <utility>
