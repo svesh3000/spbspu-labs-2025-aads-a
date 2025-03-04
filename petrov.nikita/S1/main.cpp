@@ -34,7 +34,7 @@ int main()
   }
   std::cout << "\n";
   std::forward_list< size_t > sums = {};
-  do 
+  do
   {
     size_t sum = 0;
     auto it = head.begin();
