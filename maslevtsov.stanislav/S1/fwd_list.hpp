@@ -52,12 +52,14 @@ template< typename T >
 maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
   FwdList()
 {
-  FwdList< T > reversed;
-  for (auto i = rhs.begin(); i != rhs.end(); ++i) {
-    reversed.push_front(*i);
-  }
-  for (auto i = reversed.begin(); i != reversed.end(); ++i) {
-    push_front(*i);
+  if (!rhs.empty()) {
+    FwdList< T > reversed;
+    for (auto i = rhs.begin(); i != rhs.end(); ++i) {
+      reversed.push_front(*i);
+    }
+    for (auto i = reversed.begin(); i != reversed.end(); ++i) {
+      push_front(*i);
+    }
   }
 }
 
@@ -67,6 +69,7 @@ maslevtsov::FwdList< T >::FwdList(FwdList&& rhs):
   tail_(rhs.tail_),
   size_(rhs.size_)
 {
+  rhs.size_ = 0;
   rhs.head_ = nullptr;
   rhs.tail_ = nullptr;
 }
