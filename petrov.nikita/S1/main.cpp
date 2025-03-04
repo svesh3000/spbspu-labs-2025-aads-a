@@ -1,4 +1,3 @@
-#include <cstring>
 #include <iostream>
 #include <forward_list>
 
@@ -37,36 +36,50 @@ int main()
     std::clog << "\n";
   }
   std::clog << "===============" << "\n";
-  std::cout << head.begin()->first;
-  size_t count = 1;
-  for (auto it = ++head.begin(); it != head.end(); ++it)
+  auto it = head.begin();
+  std::cout << (it++)->first;
+  for (; it != head.end(); ++it)
   {
     std::cout << " " << it->first;
-    count++;
   }
   std::cout << "\n";
   std::forward_list< int > sums = {};
-  for (size_t i = 0; i < count; i++)
+  do 
   {
     int sum = 0;
-    for (auto it = head.begin(); it != head.end(); ++it)
+    auto it = head.begin();
+    while (it != head.end())
     {
-      auto it_in = it->second.begin();
-      for (size_t j = 0; j < i; j++)
+      if (it->second.empty())
       {
-        ++it_in;
+        auto temp = it._M_next();
+        head.remove(*it);
+        it = temp;
+        if (it == head.end())
+        {
+          break;
+        }
+        continue;
       }
-      std::cout << *it_in << " ";
-      sum += *it_in;
+      else
+      {
+        std::cout << *it->second.begin() << " ";
+        sum += *it->second.begin();
+        it->second.pop_front();
+      }
+      ++it;
     }
-    sums.push_front(sum);
-    std::cout << "\b\n";
+    if (sum)
+    {
+      sums.push_front(sum);
+      std::cout << "\n";
+    }
   }
+  while (!head.empty());
   sums.reverse();
-  std::cout << *sums.begin();
-  for (auto it = ++sums.begin(); it != sums.end(); ++it)
+  for (auto it = sums.begin(); it != sums.end(); ++it)
   {
-    std::cout << " " << *it;
+    std::cout << *it << " ";
   }
   std::cout << "\n";
 }
