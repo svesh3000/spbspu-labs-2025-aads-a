@@ -10,19 +10,19 @@ namespace demehin
     Node< T >* prev_;
     Node< T >* next_;
 
-    Node();
-    Node(const T&);
+    //Node();
+    Node(const T&) noexcept;
   };
 
-  template< typename T >
-  Node< T >::Node():
-    data_(T()),
-    prev_(nullptr),
-    next_(nullptr)
-  {}
+  //template< typename T >
+  //Node< T >::Node():
+    //data_(T()),
+    //prev_(nullptr),
+    //next_(nullptr)
+  //{}
 
   template< typename T >
-  Node< T >::Node(const T& data):
+  Node< T >::Node(const T& data) noexcept:
     data_(data),
     prev_(nullptr),
     next_(nullptr)

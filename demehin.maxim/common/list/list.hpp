@@ -24,55 +24,55 @@ namespace demehin
     ~List();
 
     List< T >& operator=(const List< T >&);
-    bool operator==(const List< T >&) const;
-    bool operator!=(const List< T >&) const;
-    bool operator<(const List< T >&) const;
-    bool operator<=(const List< T >&) const;
-    bool operator>(const List< T >&) const;
-    bool operator>=(const List< T >&) const;
+    bool operator==(const List< T >&) const noexcept;
+    bool operator!=(const List< T >&) const noexcept;
+    bool operator<(const List< T >&) const noexcept;
+    bool operator<=(const List< T >&) const noexcept;
+    bool operator>(const List< T >&) const noexcept;
+    bool operator>=(const List< T >&) const noexcept;
 
-    Iter begin() const;
-    Iter end() const;
+    Iter begin() const noexcept;
+    Iter end() const noexcept;
 
-    cIter cbegin() const;
-    cIter cend() const;
+    cIter cbegin() const noexcept;
+    cIter cend() const noexcept;
 
-    size_t size() const;
+    size_t size() const noexcept;
 
-    void pop_front();
-    void pop_back();
+    void pop_front() noexcept;
+    void pop_back() noexcept;
 
     void push_front(const T&);
     void push_back(const T&);
 
-    T& front();
-    T& back();
+    T& front() noexcept;
+    T& back() noexcept;
 
-    bool empty();
+    bool empty() noexcept;
 
-    void clear();
+    void clear() noexcept;
 
-    void swap(List&);
+    void swap(List&) noexcept;
 
-    void splice(cIter pos, List< T >&);
-    void splice(cIter pos, List< T >&&);
-    void splice(cIter pos, List< T >&, cIter it);
-    void splice(cIter pos, List< T >&&, cIter it);
-    void splice(cIter pos, List< T >&, cIter first, cIter last);
-    void splice(cIter pos, List< T >&&, cIter first, cIter last);
+    void splice(cIter pos, List< T >&) noexcept;
+    void splice(cIter pos, List< T >&&) noexcept;
+    void splice(cIter pos, List< T >&, cIter it) noexcept;
+    void splice(cIter pos, List< T >&&, cIter it) noexcept;
+    void splice(cIter pos, List< T >&, cIter first, cIter last) noexcept;
+    void splice(cIter pos, List< T >&&, cIter first, cIter last) noexcept;
 
-    void fill(Iter first, Iter last, const T&);
+    void fill(Iter first, Iter last, const T&) noexcept;
 
-    void remove(const T&);
+    void remove(const T&) noexcept;
     template< typename UnaryPredicate >
-    void removeIf(UnaryPredicate);
+    void removeIf(UnaryPredicate) noexcept;
 
     void assign(size_t, const T&);
     void assign(Iter, Iter);
     void assign(std::initializer_list < T >);
 
-    Iter erase(cIter pos);
-    Iter erase(cIter first, cIter last);
+    Iter erase(cIter pos) noexcept;
+    Iter erase(cIter first, cIter last) noexcept;
 
     Iter insert(cIter, const T&);
     Iter insert(cIter, T&&);
@@ -141,7 +141,7 @@ namespace demehin
   }
 
   template< typename T >
-  bool List< T >::operator==(const List< T >& rhs) const
+  bool List< T >::operator==(const List< T >& rhs) const noexcept
   {
     if (size() != rhs.size())
     {
@@ -163,13 +163,13 @@ namespace demehin
   }
 
   template< typename T >
-  bool List< T >::operator!=(const List< T >& rhs) const
+  bool List< T >::operator!=(const List< T >& rhs) const noexcept
   {
     return !(*this == rhs);
   }
 
   template< typename T >
-  bool List< T >::operator<(const List< T >& rhs) const
+  bool List< T >::operator<(const List< T >& rhs) const noexcept
   {
     auto it1 = begin();
     auto it2 = rhs.begin();
@@ -191,25 +191,25 @@ namespace demehin
   }
 
   template< typename T >
-  bool List< T >::operator<=(const List< T >& rhs) const
+  bool List< T >::operator<=(const List< T >& rhs) const noexcept
   {
     return *this < rhs || *this == rhs;
   }
 
   template< typename T >
-  bool List< T >::operator>(const List< T >& rhs) const
+  bool List< T >::operator>(const List< T >& rhs) const noexcept
   {
     return !(*this <= rhs);
   }
 
   template< typename T >
-  bool List< T >::operator>=(const List< T >& rhs) const
+  bool List< T >::operator>=(const List< T >& rhs) const noexcept
   {
     return *this > rhs || *this == rhs;
   }
 
   template< typename T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -241,31 +241,31 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::begin() const
+  ListIterator< T > List< T >::begin() const noexcept
   {
     return ListIterator< T >(fake_->next_);
   }
 
   template< typename T >
-  ListIterator< T > List< T >::end() const
+  ListIterator< T > List< T >::end() const noexcept
   {
     return ListIterator< T >(tail_->next_);
   }
 
   template< typename T >
-  cListIterator< T > List< T >::cbegin() const
+  cListIterator< T > List< T >::cbegin() const noexcept
   {
     return cListIterator< T >(fake_->next_);
   }
 
   template< typename T >
-  cListIterator< T > List< T >::cend() const
+  cListIterator< T > List< T >::cend() const noexcept
   {
     return cListIterator< T >(tail_->next_);
   }
 
   template< typename T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     Node* todelete = fake_->next_;
     fake_->next_ = todelete->next_;
@@ -282,7 +282,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     Node* todelete = tail_;
     tail_ = tail_->prev_;
@@ -341,31 +341,31 @@ namespace demehin
   }
 
   template< typename T >
-  T& List< T >::front()
+  T& List< T >::front() noexcept
   {
     return fake_->next_->data_;
   }
 
   template< typename T >
-  T& List< T >::back()
+  T& List< T >::back() noexcept
   {
     return tail_->data_;
   }
 
   template< typename T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
   template< typename T >
-  bool List< T >::empty()
+  bool List< T >::empty() noexcept
   {
     return size_ == 0;
   }
 
   template< typename T >
-  void List< T >::swap(List< T >& other)
+  void List< T >::swap(List< T >& other) noexcept
   {
     std::swap(fake_->next_, other.fake_->next_);
     std::swap(tail_, other.tail_);
@@ -373,7 +373,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::fill(ListIterator< T > first, ListIterator< T > last, const T& value)
+  void List< T >::fill(ListIterator< T > first, ListIterator< T > last, const T& value) noexcept
   {
     for (; first != last; ++first)
     {
@@ -382,26 +382,56 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >& other)
+  void List< T >::splice(cListIterator< T > pos, List< T >& other) noexcept
   {
     if (other.empty())
     {
       return;
     }
 
-    insert(pos, other.begin(), other.end());
-    other.clear();
+    Node* first = other.fake_->next_;
+    Node* last = other.tail_;
+    Node* posNode = pos.getNode();
+    Node* posPrev = posNode->prev_;
+
+    if (posPrev != nullptr)
+    {
+      posPrev->next_ = first;
+    }
+
+    first->prev_ = posPrev;
+
+    if (posNode != nullptr)
+    {
+      posNode->prev_ = last;
+    }
+
+    last->next_ = posNode;
+
+    if (fake_->next_ == posNode)
+    {
+      fake_->next_ = first;
+    }
+    if (tail_ == posPrev)
+    {
+      tail_ = last;
+    }
+
+    size_ += other.size();
+    other.size_ = 0;
+    other.fake_ = nullptr;
+    other.tail_ = nullptr;
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >&& other)
+  void List< T >::splice(cListIterator< T > pos, List< T >&& other) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > it)
+  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > it) noexcept
   {
     if (other.empty() || pos == cend() || it == other.cbegin())
     {
@@ -422,7 +452,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > it)
+  void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > it) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
@@ -430,7 +460,7 @@ namespace demehin
 
   template< typename T >
   void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > first,
-    cListIterator< T > last)
+    cListIterator< T > last) noexcept
   {
     if (other.empty() || pos == cend())
     {
@@ -473,14 +503,14 @@ namespace demehin
 
   template< typename T >
   void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > first,
-    cListIterator< T > last)
+    cListIterator< T > last) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
   }
 
   template< typename T >
-  void List< T >::remove(const T& value)
+  void List< T >::remove(const T& value) noexcept
   {
     for (auto it = cbegin(); it != cend(); it++)
     {
@@ -493,7 +523,7 @@ namespace demehin
 
   template< typename T >
   template< typename UnaryPredicate >
-  void List< T >::removeIf(UnaryPredicate p)
+  void List< T >::removeIf(UnaryPredicate p) noexcept
   {
     for (auto it = cbegin(); it != cend(); it++)
     {
@@ -535,7 +565,7 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::erase(cListIterator< T > pos)
+  ListIterator< T > List< T >::erase(cListIterator< T > pos) noexcept
   {
     const Node* todelete = pos.getNode();
     ListIterator< T > toreturn(todelete->next_);
@@ -562,7 +592,7 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::erase(cListIterator< T > first, cListIterator< T > last)
+  ListIterator< T > List< T >::erase(cListIterator< T > first, cListIterator< T > last) noexcept
   {
     ListIterator< T > toreturn;
     for (auto it = first; it != last; it++)
