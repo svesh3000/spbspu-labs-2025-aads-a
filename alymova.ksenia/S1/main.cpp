@@ -8,37 +8,30 @@
 
 int main()
 {
-  list_pair_t list;
+  using namespace alymova;
   try
   {
+    list_pair_t list;
     alymova::inputProcess(std::cin, list);
+    if (list.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+    alymova::outputListString(std::cout, list);
+    std::cout << "\n";
+    alymova::outputProcess(std::cout, list);
+    list_int_t sums = countSums(list);
+    if (sums.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+    alymova::outputListInt(std::cout, sums);
+    std::cout << "\n";
   }
-  catch (const std::bad_alloc& e)
+  catch (const std::exception& e)
   {
-    std::cerr << "Allocate error\n";
+    std::cerr << e.what() << "\n";
   }
-
-  if (list.empty())
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-  alymova::outputListString(std::cout, list);
-  std::cout << "\n";
-
-  bool overflow = false;
-  list_int_t sums;
-  alymova::outputProcess(std::cout, list, sums, overflow);
-  if (overflow)
-  {
-    std::cerr << "Summation is incorrect\n";
-    return 1;
-  }
-  if (sums.empty())
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-  alymova::outputListInt(std::cout, sums);
-  std::cout << "\n";
 }

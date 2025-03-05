@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace alymova
 {
@@ -19,12 +20,12 @@ namespace alymova
   public:
     List();
     List(const List< T >& other);
-    List(List< T >&& other);
+    List(List< T >&& other) noexcept;
     List(size_t n, const T& value = T());
-    ~List();
+    ~List() noexcept;
 
     List< T >& operator=(const List< T >& other);
-    List< T >& operator=(List< T >&& other);
+    List< T >& operator=(List< T >&& other) noexcept;
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > begin() const noexcept;
@@ -49,23 +50,39 @@ namespace alymova
     void clear() noexcept;
 
     void remove(const T& value) noexcept;
-    void remove_if(bool (*pred)(const T& value));
+    template< typename Predicate >
+    void remove_if(Predicate pred);
+    //void remove_if(bool (*pred)(const T& value));
   private:
     ListNode< T >* fake_;
     ListNode< T >* head_;
 
-    void do_null() noexcept;
     void push_single(ListNode< T >* node);
     ListNode< T >* get_last_node();
+    bool is_equal_node(const T& value, const T& data);
   };
+
   template< typename T >
-  bool operator==(const List< T >& lhs, const List< T >& rhs)
+  struct EqualNode
+  {
+    const T& value;
+    EqualNode(const T& new_value):
+      value(new_value)
+    {}
+    bool operator()(const T& data)
+    {
+      return value == data;
+    }
+  };
+
+  template< typename T >
+  bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
   {
     if (lhs.size() != rhs.size())
     {
       return false;
     }
-    for (ConstIterator< T > it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
+    for (auto it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
     {
       if ((*it_lhs) != (*it_rhs))
       {
@@ -74,24 +91,26 @@ namespace alymova
     }
     return true;
   }
+
   template< typename T >
-  bool operator!=(const List< T >& lhs, const List< T >& rhs)
+  bool operator!=(const List< T >& lhs, const List< T >& rhs) noexcept
   {
     return (!(lhs == rhs));
   }
 
   template< typename T >
   List< T >::List():
-    fake_(new ListNode< T >(T(), nullptr, nullptr)),
+    fake_(new ListNode< T >{T(), nullptr, nullptr}),
     head_(fake_)
   {}
+
   template< typename T >
   List< T >::List(const List< T >& other):
     List()
   {
     try
     {
-      for (ConstIterator< T > it = other.cbegin(); it != other.cend(); ++it)
+      for (auto it = other.cbegin(); it != other.cend(); ++it)
       {
         push_back(*(it));
       }
@@ -102,13 +121,13 @@ namespace alymova
       throw;
     }
   }
+
   template< typename T >
-  List< T >::List(List< T >&& other):
-    fake_(other.fake_),
-    head_(other.head_)
-  {
-    other.do_null();
-  }
+  List< T >::List(List< T >&& other) noexcept:
+    fake_(std::exchange(other.fake_, nullptr)),
+    head_(std::exchange(other.head_, nullptr))
+  {}
+
   template< typename T >
   List< T >::List(size_t n, const T& value):
     List()
@@ -118,94 +137,108 @@ namespace alymova
       push_back(value);
     }
   }
+
   template< typename T >
   List< T >& List< T >::operator=(const List< T >& other)
   {
-    if (this != std::addressof(other))
-    {
-      List< T > copy(other);
-      swap(copy);
-    }
+    assert(this != std::addressof(other) && "Assigning a list to itself");
+    List< T > copy(other);
+    swap(copy);
     return *this;
   }
+
   template< typename T >
-  List< T >& List< T >::operator=(List< T >&& other)
+  List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
+    assert(this != std::addressof(other) && "Assigning a list to itself");
     clear();
-    fake_ = other.fake_;
-    head_ = other.head_;
-    other.do_null();
+    fake_ = std::exchange(other.fake_, nullptr);
+    head_ = std::exchange(other.head_, nullptr);
     return *this;
   }
+
   template< typename T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
+    delete fake_;
   }
+
   template< typename T >
   Iterator< T > List< T >::begin() noexcept
   {
     return Iterator< T >(head_);
   }
+
   template< typename T >
   ConstIterator< T > List< T >::begin() const noexcept
   {
     return ConstIterator< T >(head_);
   }
+
   template< typename T >
   ConstIterator< T > List< T >::cbegin() const noexcept
   {
     return begin();
   }
+
   template< typename T >
   Iterator< T > List< T >::end() noexcept
   {
     return Iterator< T >(fake_);
   }
+
   template< typename T >
   ConstIterator< T > List< T >::end() const noexcept
   {
     return ConstIterator< T >(fake_);
   }
+
   template< typename T >
   ConstIterator< T > List< T >::cend() const noexcept
   {
     return end();
   }
+
   template< typename T >
   T& List< T >::front() noexcept
   {
     assert(!empty());
-    return head_->data_;
+    return head_->data;
   }
+
   template< typename T >
   T& List< T >::back() noexcept
   {
     assert(!empty());
-    return fake_->prev_->data_;
+    return fake_->prev->data;
   }
+
   template< typename T >
   const T& List< T >::front() const noexcept
   {
     assert(!empty());
-    return head_->data_;
+    return head_->data;
   }
+
   template< typename T >
   const T& List< T >::back() const noexcept
   {
     assert(!empty());
-    return fake_->prev_->data_;
+    return fake_->prev->data;
   }
+
   template< typename T >
   bool List< T >::empty() const noexcept
   {
     return cbegin() == cend();
   }
+
   template< typename T >
   size_t List< T >::size() const noexcept
   {
     size_t size = 0;
-    ConstIterator< T > it = begin();
+    auto it = begin();
     while (it != end())
     {
       ++it;
@@ -213,10 +246,11 @@ namespace alymova
     }
     return size;
   }
+
   template< typename T >
   void List< T >::push_front(const T& value)
   {
-    ListNode< T >* node = new ListNode< T >(value, nullptr, nullptr);
+    auto node = new ListNode< T >{value, nullptr, nullptr};
     if (empty())
     {
       push_single(node);
@@ -225,23 +259,25 @@ namespace alymova
     {
       ListNode< T >* subhead = head_;
       head_ = node;
-      head_->next_ = subhead;
-      subhead->prev_ = head_;
+      head_->next = subhead;
+      subhead->prev = head_;
     }
   }
+
   template< typename T >
   void List< T >::pop_front() noexcept
   {
     assert(!empty());
-    ListNode< T >* subhead = head_->next_;
+    ListNode< T >* subhead = head_->next;
     delete head_;
     head_ = subhead;
-    head_->prev_ = nullptr;
+    head_->prev = nullptr;
   }
+
   template< typename T >
   void List< T >::push_back(const T& value)
   {
-    ListNode< T >* node = new ListNode< T >(value, nullptr, nullptr);
+    auto node = new ListNode< T >{value, nullptr, nullptr};
     if (empty())
     {
       push_single(node);
@@ -249,12 +285,13 @@ namespace alymova
     else
     {
       ListNode< T >* subhead = get_last_node();
-      subhead->next_ = node;
-      node->prev_ = subhead;
-      node->next_ = fake_;
-      fake_->prev_ = node;
+      subhead->next = node;
+      node->prev = subhead;
+      node->next = fake_;
+      fake_->prev = node;
     }
   }
+
   template< typename T >
   void List< T >::pop_back() noexcept
   {
@@ -263,22 +300,24 @@ namespace alymova
     if (size() == 1)
     {
       head_ = fake_;
-      fake_->prev_ = nullptr;
+      fake_->prev = nullptr;
       delete subhead;
     }
     else
     {
-      subhead->prev_->next_ = fake_;
-      fake_->prev_ = subhead->prev_;
+      subhead->prev->next = fake_;
+      fake_->prev = subhead->prev;
       delete subhead;
     }
   }
+
   template< typename T >
   void List< T >::swap(List< T >& other) noexcept
   {
     std::swap(fake_, other.fake_);
     std::swap(head_, other.head_);
   }
+
   template< typename T >
   void List< T >::clear() noexcept
   {
@@ -286,16 +325,24 @@ namespace alymova
     {
       pop_front();
     }
-    delete fake_;
   }
+
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {
+    auto pred = EqualNode< T >{value};
+    remove_if< EqualNode< T > >(pred);
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::remove_if(Predicate pred)
+  {
     assert(!empty());
     ListNode< T >* subhead = head_;
     for (Iterator< T > it = begin(); it != end(); ++it)
     {
-      if (*it == value)
+      if (pred(*it))
       {
         if (it == begin())
         {
@@ -307,63 +354,38 @@ namespace alymova
         }
         else
         {
-          subhead->prev_->next_ = subhead->next_;
-          subhead->next_->prev_ = subhead->prev_;
+          subhead->prev->next = subhead->next;
+          subhead->next->prev = subhead->prev;
           delete subhead;
         }
       }
-      subhead = subhead->next_;
+      subhead = subhead->next;
     }
   }
-  template< typename T >
-  void List< T >::remove_if(bool (*pred)(const T& value))
-  {
-    assert(!empty());
-    ListNode< T >* subhead = head_;
-    for (Iterator< T > it = begin(); it != end(); ++it)
-    {
-      if (*pred(*it))
-      {
-        if (it == begin())
-        {
-          pop_front();
-        }
-        else if (it == --end())
-        {
-          pop_back();
-        }
-        else
-        {
-          subhead->prev_->next_ = subhead->next_;
-          subhead->next_->prev_ = subhead->prev_;
-          delete subhead;
-        }
-      }
-      subhead = subhead->next_;
-    }
-  }
-  template< typename T >
-  void List< T >::do_null() noexcept
-  {
-    fake_ = nullptr;
-    head_ = nullptr;
-  }
+
   template< typename T >
   void List< T >::push_single(ListNode< T >* node)
   {
     head_ = node;
-    head_->next_ = fake_;
-    fake_->prev_ = head_;
+    head_->next = fake_;
+    fake_->prev = head_;
   }
+
   template< typename T >
   ListNode< T >* List< T >::get_last_node()
   {
     ListNode< T >* subhead = head_;
-    for (Iterator< T > it = ++begin(); it != end(); ++it)
+    for (auto it = ++begin(); it != end(); ++it)
     {
-      subhead = subhead->next_;
+      subhead = subhead->next;
     }
     return subhead;
+  }
+
+  template< typename T >
+  bool is_equal_node(const T& value, const T& data)
+  {
+    return data == value;
   }
 }
 #endif
