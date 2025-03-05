@@ -250,7 +250,7 @@ savintsev::List< T >::List(size_t n, const T & value):
 
 template< class T >
 savintsev::List< T >::List(int n, const T & value):
-  List(static_cast<size_t>(n), value)
+  List(static_cast< size_t >(n), value)
 {}
 
 template< class T >
@@ -682,7 +682,7 @@ typename savintsev::List< T >::iterator savintsev::List< T >::insert(const_it po
 template< class T >
 typename savintsev::List< T >::iterator savintsev::List< T >::insert(const_iterator pos, T && value)
 {
-  ListNode< T > * new_node = new ListNode< T >(std::move(value), pos, pos->prev);
+  ListNode< T > * new_node = new ListNode< T >(std::move(value), pos.node, pos.node->prev);
   list_size++;
   pos.node->prev->next = new_node;
   pos.node->prev = new_node;

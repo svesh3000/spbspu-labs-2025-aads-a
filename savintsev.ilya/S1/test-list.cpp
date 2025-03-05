@@ -6,7 +6,18 @@
 template< typename T >
 using lt = savintsev::List< T >;
 
-//default
+BOOST_AUTO_TEST_CASE(test_default_constructor)
+{
+  lt< int > mylist;
+  BOOST_TEST(mylist.size() == 0);
+
+  mylist.push_back(2006);
+  mylist.front() -= 2000;
+  BOOST_TEST(mylist.size() == 1);
+
+  int test[] = {6};
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 1);
+}
 
 BOOST_AUTO_TEST_CASE(test_fill_constructor)
 {
@@ -19,7 +30,16 @@ BOOST_AUTO_TEST_CASE(test_fill_constructor)
   BOOST_TEST(list1.size() == 8);
 }
 
-//range
+BOOST_AUTO_TEST_CASE(test_range_constructor)
+{
+  std::list< int > stdlist({9, 11, 2001});
+  lt< int > mylist(stdlist.begin(), stdlist.end());
+
+  mylist.push_back(77);
+  stdlist.push_back(77);
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), stdlist.begin(), stdlist.end());
+}
 
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
@@ -51,12 +71,25 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
   BOOST_TEST(*it == "orange");
 }
 
-//initial list
+BOOST_AUTO_TEST_CASE(test_initial_list_constructor)
+{
+  lt< std::string > mylist({"i", "love", "quake", "lll"});
+  std::string text;
+
+  for(auto it = mylist.begin(); it != mylist.end(); ++it)
+  {
+    text += *it;
+    text += " ";
+  }
+
+  std::string test = "i love quake lll ";
+  BOOST_TEST(text == test);
+}
 
 BOOST_AUTO_TEST_CASE(test_assign)
 {
-  savintsev::List< int > list1;
-  savintsev::List< int > list2;
+  lt< int > list1;
+  lt< int > list2;
   list1.assign(7, 100);
   auto it = list1.begin();
   for (size_t i = 0; i < 7; ++i)
@@ -87,7 +120,15 @@ BOOST_AUTO_TEST_CASE(test_begin_and_end)
 
 BOOST_AUTO_TEST_CASE(test_cbegin_and_cend)
 {
-  
+  lt< int > mylist = {5, 10, 15, 20};
+
+  int test[] = {5, 10, 15, 20};
+
+  size_t i = 0;
+  for (auto it = mylist.cbegin(); it != mylist.cend(); ++it)
+  {
+    BOOST_TEST(test[i++] == *it);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(test_clear)
@@ -103,7 +144,27 @@ BOOST_AUTO_TEST_CASE(test_clear)
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 2);
 }
 
-//emplace
+BOOST_AUTO_TEST_CASE(test_emplace)
+{
+  lt< std::pair< int, char > > mylist;
+
+  mylist.emplace(mylist.begin(), 100, 'x');
+  mylist.emplace(mylist.begin(), 200, 'y');
+
+  std::string points[] = {"(200,y)", "(100,x)"};
+
+  size_t i = 0;
+  for (auto & x: mylist)
+  {
+    std::string test = "(" + std::to_string(x.first) + "," + x.second + ")";
+    BOOST_TEST(test == points[i++]);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_back)
+{
+  
+}
 
 BOOST_AUTO_TEST_CASE(test_empty)
 {
@@ -138,7 +199,7 @@ BOOST_AUTO_TEST_CASE(test_front_and_back)
 
 //insert
 
-//merge
+//merge to do
 
 //operator=
 
@@ -211,7 +272,7 @@ BOOST_AUTO_TEST_CASE(test_size)
   BOOST_TEST(myints.size() == 19);
 }
 
-//sort
+//sort to do
 
 BOOST_AUTO_TEST_CASE(test_splice)
 {
@@ -269,4 +330,4 @@ BOOST_AUTO_TEST_CASE(test_swap)
   BOOST_TEST(second.size() == 3);
 }
 
-//unique
+//unique to do
