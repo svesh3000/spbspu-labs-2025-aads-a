@@ -23,12 +23,11 @@ namespace kizhin {
     {
     };
 
-    template < typename It >
-    using enable_if_input_it_impl = std::enable_if< is_input_iterator< It >::value, int >;
+    template < typename T >
+    constexpr bool is_input_iterator_v = is_input_iterator< T >::value;
 
-    template < typename It >
-    using enable_if_input_iterator = typename enable_if_input_it_impl< It >::type;
-
+    template < typename T >
+    using enable_if_input_iterator = std::enable_if_t< is_input_iterator_v< T >, int >;
   }
 }
 
