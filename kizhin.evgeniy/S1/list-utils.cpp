@@ -5,8 +5,8 @@
 kizhin::ForwardList< kizhin::NumbersT > kizhin::transpose(
     const ForwardList< NumbersT >& source)
 {
-  using ListIter = NumbersT::const_iterator;
-  ForwardList< std::pair< ListIter, ListIter > > iters;
+  using NumberIter = NumbersT::const_iterator;
+  ForwardList< std::pair< NumberIter, NumberIter > > iters;
   for (const auto& nums : source) {
     iters.emplaceBack(nums.begin(), nums.end());
   }

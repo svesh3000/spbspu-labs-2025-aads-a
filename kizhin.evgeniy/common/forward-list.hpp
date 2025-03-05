@@ -116,11 +116,10 @@ namespace kizhin {
   }
 
   template < typename T >
-  ForwardList< T >::ForwardList(const ForwardList& rhs): ForwardList()
+  ForwardList< T >::ForwardList(const ForwardList& rhs):
+    ForwardList()
   {
-    for (const_iterator i = rhs.begin(), end = rhs.end(); i != end; ++i) {
-      pushBack(*i);
-    }
+    insertAfter(beforeBegin(), rhs.begin(), rhs.end());
   }
 
   template < typename T >
@@ -128,31 +127,27 @@ namespace kizhin {
     beforeBegin_(std::exchange(rhs.beforeBegin_, nullptr)),
     end_(std::exchange(rhs.end_, nullptr)),
     size_(std::exchange(rhs.size_, 0))
-  {
-  }
+  {}
 
   template < typename T >
-  ForwardList< T >::ForwardList(size_type size, const_reference value): ForwardList()
+  ForwardList< T >::ForwardList(size_type size, const_reference value):
+    ForwardList()
   {
-    for (size_type i = 0; i != size; ++i) {
-      pushBack(value);
-    }
+    insertAfter(beforeBegin(), size, value);
   }
 
   template < typename T >
   template < typename InputIt, detail::enable_if_input_iterator< InputIt > >
-  ForwardList< T >::ForwardList(InputIt first, InputIt last): ForwardList()
+  ForwardList< T >::ForwardList(InputIt first, InputIt last):
+    ForwardList()
   {
-    for (; first != last; ++first) {
-      pushBack(*first);
-    }
+    insertAfter(beforeBegin(), first, last);
   }
 
   template < typename T >
   ForwardList< T >::ForwardList(std::initializer_list< value_type > init):
     ForwardList(init.begin(), init.end())
-  {
-  }
+  {}
 
   template < typename T >
   ForwardList< T >::~ForwardList()
