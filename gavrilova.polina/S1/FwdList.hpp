@@ -96,7 +96,7 @@ gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(FwdList &&other) noe
     return *this;
   }
   clear();
-  delete fake;
+  delete[] reinterpret_cast< char* >(fake);;
   fake = other.fake;
   nodeCount = other.nodeCount;
 
