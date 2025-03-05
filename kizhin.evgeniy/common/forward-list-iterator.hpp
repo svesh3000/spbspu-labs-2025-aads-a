@@ -55,7 +55,7 @@ namespace kizhin {
     typename ForwardListIterator< T, IsConst >::pointer ForwardListIterator< T,
         IsConst >::operator->() const noexcept
     {
-      assert(node_);
+      assert(node_ && "ForwardListIterator: dereferencing empty iterator (operator->)");
       return std::addressof(node_->data);
     }
 
@@ -63,7 +63,7 @@ namespace kizhin {
     typename ForwardListIterator< T, IsConst >::reference ForwardListIterator< T,
         IsConst >::operator*() const noexcept
     {
-      assert(node_);
+      assert(node_ && "ForwardListIterator: dereferencing empty iterator (operator*)");
       return node_->data;
     }
 
@@ -71,7 +71,7 @@ namespace kizhin {
     ForwardListIterator< T, IsConst >& ForwardListIterator< T,
         IsConst >::operator++() noexcept
     {
-      assert(node_);
+      assert(node_ && "ForwardListIterator: incrementing empty iterator");
       node_ = node_->next;
       return *this;
     }
