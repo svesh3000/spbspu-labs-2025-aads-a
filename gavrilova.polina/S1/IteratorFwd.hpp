@@ -2,11 +2,12 @@
 #define ITERATOR_HPP
 
 #include <iterator>
+#include <cassert>
 #include "NodeFwdList.hpp"
 
 namespace gavrilova {
   template< class T >
-  struct IteratorFwd: public std::iterator< std::forward_iterator_tag, int >
+  struct IteratorFwd: public std::iterator< std::forward_iterator_tag, T >
   {
     NodeFwdList< T >* node_;
     using this_t = IteratorFwd< T >;
@@ -56,12 +57,14 @@ bool gavrilova::IteratorFwd<T>::operator!=(const this_t& rhs) const
 template< class T >
 T& gavrilova::IteratorFwd<T>::operator*()
 {
+  assert(node_!=nullptr);
   return node_->data;
 }
 
 template< class T >
 T* gavrilova::IteratorFwd<T>::operator->()
 {
+  assert(node_!=nullptr);
   return std::addressof(node_->data);
 }
 #endif

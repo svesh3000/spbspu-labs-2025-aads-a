@@ -48,7 +48,9 @@ template< class T >
 gavrilova::FwdList< T >::FwdList() :
   fake(reinterpret_cast< NodeFwdList< T >* >(new char[sizeof(NodeFwdList< T >)])),
   nodeCount(0)
-{}
+{
+  fake->next = fake;
+}
 
 template< class T >
 gavrilova::FwdList< T >::FwdList(const FwdList &other) :
@@ -82,6 +84,7 @@ gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(const FwdList &other
   {
     push_front(*it);
   }
+  reverse();
   return *this;
 }
 
@@ -107,7 +110,7 @@ template< class T >
 gavrilova::FwdList< T >::~FwdList()
 {
   clear();
-   delete[] reinterpret_cast< char* >(fake);
+  delete[] reinterpret_cast< char* >(fake);
 }
 
 template< class T >
@@ -218,7 +221,7 @@ void gavrilova::FwdList< T >::splice(const FwdList<T> &other)
     return;
   }
 
-  NodeFwdList<T> *lastNode = fake->next;
+  NodeFwdList<T> *lastNode = fake;
   while (lastNode->next != fake)
   {
     lastNode = lastNode->next;
@@ -231,21 +234,21 @@ void gavrilova::FwdList< T >::splice(const FwdList<T> &other)
 template< class T >
 void gavrilova::FwdList< T >::reverse()
 {
-  if (empty())
-    return;
-
-  NodeFwdList<T> *prev = nullptr;
-  NodeFwdList<T> *current = fake->next;
-  NodeFwdList<T> *next = nullptr;
-
-  while (current != fake)
+  if (fake->next == fake)
   {
-    next = current->next;
-    current->next = prev;
-    prev = current;
-    current = next;
+    return;
   }
-  fake->next = prev;
+  NodeFwdList< T >* next = fake->next;
+  NodeFwdList< T >* last = fake;
+  while (next->next != fake)
+  {
+    NodeFwdList< T >* remember = next->next;
+    next->next = last;
+    last = next;
+    next = remember;
+  }
+  next->next = last;
+  fake->next = next;
 }
 
 template< class T >
