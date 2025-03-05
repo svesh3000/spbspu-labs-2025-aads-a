@@ -15,16 +15,20 @@ namespace kizhin {
     };
 
     template < typename T >
-    struct is_input_iterator< T,
-        void_t< typename std::iterator_traits< T >::iterator_category > >:
-      std::is_base_of< std::input_iterator_tag,
-          typename std::iterator_traits< T >::iterator_category >
+    using iter_category = typename std::iterator_traits< T >::iterator_category;
+
+    template < typename T >
+    struct is_input_iterator< T, void_t< iter_category< T > > >:
+      std::is_base_of< std::input_iterator_tag, iter_category< T > >
     {
     };
 
     template < typename It >
-    using enable_if_input_iterator =
-        typename std::enable_if< is_input_iterator< It >::value, int >::type;
+    using enable_if_input_it_impl = std::enable_if< is_input_iterator< It >::value, int >;
+
+    template < typename It >
+    using enable_if_input_iterator = typename enable_if_input_it_impl< It >::type;
+
   }
 }
 

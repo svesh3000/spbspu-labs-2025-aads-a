@@ -478,8 +478,8 @@ BOOST_AUTO_TEST_CASE(splice_after_end)
   const ListT expectedSecond{ 10, 11, 12, 2, 3, 4, 5 };
   ListT first = { 1, 2, 3, 4, 5 };
   ListT second = { 10, 11, 12 };
-  second.spliceAfter(std::next(second.begin(), second.size() - 1), first, first.begin(),
-      first.end());
+  const auto pos = std::next(second.begin(), second.size() - 1);
+  second.spliceAfter(pos, first, first.begin(), first.end());
   testForwardListInvariants(first);
   testForwardListInvariants(second);
   BOOST_TEST(first == expectedFirst);
