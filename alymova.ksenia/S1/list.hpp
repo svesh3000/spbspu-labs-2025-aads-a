@@ -48,6 +48,7 @@ namespace alymova
     void pop_back() noexcept;
     void swap(List< T >& other) noexcept;
     void clear() noexcept;
+    void assign(size_t n, const T& value);
 
     void remove(const T& value) noexcept;
     template< typename Predicate >
@@ -323,6 +324,15 @@ namespace alymova
     while (!empty())
     {
       pop_front();
+    }
+  }
+  template <typename T >
+  void List< T >::assign(size_t n, const T& value)
+  {
+    clear();
+    for (size_t i = 0; i < n; i++)
+    {
+      push_back(value);
     }
   }
 

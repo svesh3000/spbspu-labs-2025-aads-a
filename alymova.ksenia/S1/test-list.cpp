@@ -147,3 +147,11 @@ BOOST_AUTO_TEST_CASE(test_remove)
   BOOST_TEST(list3.size() == 1);
   BOOST_TEST(list3.front() == 11);
 }
+BOOST_AUTO_TEST_CASE(test_assign)
+{
+  using list_t = alymova::List< int >;
+  list_t list1;
+  list1.assign(5, 1);
+  list_t list2 = list_t{5, 1};
+  BOOST_TEST(list1 == list2);
+}
