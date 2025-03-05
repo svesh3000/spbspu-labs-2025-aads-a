@@ -1,6 +1,7 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_ITERATOR_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_ITERATOR_HPP
 
+#include <cassert>
 #include <iterator>
 #include <type_traits>
 #include "forward-list-fwd-declaration.hpp"
@@ -19,15 +20,14 @@ namespace kizhin {
       using iterator_category = std::forward_iterator_tag;
 
       ForwardListIterator() = default;
-      template < bool OtherIsConst,
-          typename std::enable_if< IsConst && !OtherIsConst, int >::type = 0 >
-      ForwardListIterator(const ForwardListIterator< T, OtherIsConst >& other);
+      template < bool IsRhsConst, std::enable_if_t< IsConst && !IsRhsConst, int > = 0 >
+      ForwardListIterator(const ForwardListIterator< T, IsRhsConst >&) noexcept;
 
       pointer operator->() const noexcept;
       reference operator*() const noexcept;
 
-      ForwardListIterator& operator++();
-      ForwardListIterator operator++(int);
+      ForwardListIterator& operator++() noexcept;
+      ForwardListIterator operator++(int) noexcept;
 
     private:
       using Node = detail::Node< value_type >;
@@ -38,59 +38,63 @@ namespace kizhin {
 
       friend class ForwardListIterator< T, !IsConst >;
       friend class ::kizhin::ForwardList< value_type >;
-      template < typename U, bool c1, bool c2 >
-      friend bool operator==(const ForwardListIterator< U, c1 >&,
-          const ForwardListIterator< U, c2 >&);
+      template < typename U, bool IsLhsConst, bool IsRhsConst >
+      friend bool operator==(const ForwardListIterator< U, IsLhsConst >&,
+          const ForwardListIterator< U, IsRhsConst >&) noexcept;
     };
 
     template < typename T, bool IsConst >
-    template < bool OtherIsConst,
-        typename std::enable_if< IsConst && !OtherIsConst, int >::type >
+    template < bool IsRhsConst, std::enable_if_t< IsConst && !IsRhsConst, int > >
     ForwardListIterator< T, IsConst >::ForwardListIterator(
-        const ForwardListIterator< T, OtherIsConst >& rhs):
+        const ForwardListIterator< T, IsRhsConst >& rhs) noexcept:
       node_(rhs.node_)
     {
     }
 
-    template < typename T, bool c >
-    typename ForwardListIterator< T, c >::pointer ForwardListIterator< T,
-        c >::operator->() const noexcept
+    template < typename T, bool IsConst >
+    typename ForwardListIterator< T, IsConst >::pointer ForwardListIterator< T,
+        IsConst >::operator->() const noexcept
     {
+      assert(node_);
       return std::addressof(node_->data);
     }
 
-    template < typename T, bool c >
-    typename ForwardListIterator< T, c >::reference ForwardListIterator< T,
-        c >::operator*() const noexcept
+    template < typename T, bool IsConst >
+    typename ForwardListIterator< T, IsConst >::reference ForwardListIterator< T,
+        IsConst >::operator*() const noexcept
     {
+      assert(node_);
       return node_->data;
     }
 
-    template < typename T, bool c >
-    ForwardListIterator< T, c >& ForwardListIterator< T, c >::operator++()
+    template < typename T, bool IsConst >
+    ForwardListIterator< T, IsConst >& ForwardListIterator< T,
+        IsConst >::operator++() noexcept
     {
+      assert(node_);
       node_ = node_->next;
       return *this;
     }
 
-    template < typename T, bool c >
-    ForwardListIterator< T, c > ForwardListIterator< T, c >::operator++(int)
+    template < typename T, bool IsConst >
+    ForwardListIterator< T, IsConst > ForwardListIterator< T, IsConst >::operator++(
+        int) noexcept
     {
       ForwardListIterator tmp(*this);
       ++(*this);
       return tmp;
     }
 
-    template < typename T, bool c1, bool c2 >
-    bool operator==(const ForwardListIterator< T, c1 >& lhs,
-        const ForwardListIterator< T, c2 >& rhs)
+    template < typename T, bool IsLhsConst, bool IsRhsConst >
+    bool operator==(const ForwardListIterator< T, IsLhsConst >& lhs,
+        const ForwardListIterator< T, IsRhsConst >& rhs) noexcept
     {
       return lhs.node_ == rhs.node_;
     }
 
-    template < typename T, bool c1, bool c2 >
-    bool operator!=(const ForwardListIterator< T, c1 >& lhs,
-        const ForwardListIterator< T, c2 >& rhs)
+    template < typename T, bool IsLhsConst, bool IsRhsConst >
+    bool operator!=(const ForwardListIterator< T, IsLhsConst >& lhs,
+        const ForwardListIterator< T, IsRhsConst >& rhs) noexcept
     {
       return !(lhs == rhs);
     }
