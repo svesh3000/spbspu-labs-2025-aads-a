@@ -1,8 +1,22 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <utility>
 #include "iterator.hpp"
 #include "cIterator.hpp"
 #include "node.hpp"
+
+namespace
+{
+  template< typename T >
+  void setOtherPos(demehin::cListIterator< T >& otherPos, const demehin::cListIterator< T >& begin,
+    const demehin::cListIterator< T >& pos)
+  {
+    for (auto it = begin; it != pos; ++it)
+    {
+      otherPos++;
+    }
+  }
+}
 
 namespace demehin
 {
@@ -235,9 +249,9 @@ namespace demehin
     tail_(rhs.tail_),
     size_(rhs.size_)
   {
-    rhs.fake_ = nullptr;
-    rhs.tail_ = nullptr;
-    rhs.size_ = 0;
+    std::exchange(rhs.fake_, nullptr);
+    std::exchange(rhs.tail_, nullptr);
+    std::exchange(rhs.size_, 0);
   }
 
   template< typename T >
@@ -367,7 +381,7 @@ namespace demehin
   template< typename T >
   void List< T >::swap(List< T >& other) noexcept
   {
-    std::swap(fake_->next, other.fake_->next);
+    std::swap(fake_, other.fake_);
     std::swap(tail_, other.tail_);
     std::swap(size_, other.size_);
   }
@@ -418,9 +432,9 @@ namespace demehin
     }
 
     size_ += other.size();
-    other.size_ = 0;
-    other.fake_ = nullptr;
-    other.tail_ = nullptr;
+    std::exchange(other.size_, 0);
+    std::exchange(other.fake_, nullptr);
+    std::exchange(other.tail_, nullptr);
   }
 
   template< typename T >
@@ -537,31 +551,34 @@ namespace demehin
   template< typename T >
   void List< T >::assign(size_t count, const T& value)
   {
-    clear();
+    List< T > temp;
     for (size_t i = 0; i < count; i++)
     {
-      push_back(value);
+      temp.push_back(value);
     }
+    swap(temp);
   }
 
   template< typename T >
   void List< T >::assign(ListIterator< T > first, ListIterator< T > last)
   {
-    clear();
+    List< T > temp;
     for (auto it = first; it != last; it++)
     {
-      push_back(*it);
+      temp.push_back(*it);
     }
+    swap(temp);
   }
 
   template< typename T >
   void List< T >::assign(std::initializer_list< T > ilist)
   {
-    clear();
+    List< T > temp;
     for (const T& value : ilist)
     {
-      push_back(value);
+      temp.push_back(value);
     }
+    swap(temp);
   }
 
   template< typename T >
@@ -636,11 +653,15 @@ namespace demehin
       return ListIterator< T >(pos.getNode());
     }
 
-    ListIterator< T > toreturn = insert(pos, value);
+    List< T > temp(*this);
+    cListIterator< T > tempPos = temp.cbegin();
+    setOtherPos(tempPos, cbegin(), pos);
+    ListIterator< T > toreturn = temp.insert(tempPos, value);
     for (size_t i = 1; i < count; i++)
     {
-      insert(pos, value);
+      temp.insert(tempPos, value);
     }
+    swap(temp);
     return toreturn;
   }
 
@@ -653,11 +674,15 @@ namespace demehin
       return ListIterator< T >(pos.getNode());
     }
 
+    List< T > temp(*this);
+    cListIterator< T > tempPos = temp.cbegin();
+    setOtherPos(tempPos, cbegin(), pos);
     ListIterator< T > toreturn;
     for (auto it = first; it != last; it++)
     {
-      toreturn = insert(pos, *it);
+      toreturn = temp.insert(tempPos, *it);
     }
+    swap(temp);
     return toreturn;
   }
 
