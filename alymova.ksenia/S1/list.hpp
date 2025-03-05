@@ -52,7 +52,6 @@ namespace alymova
     void remove(const T& value) noexcept;
     template< typename Predicate >
     void remove_if(Predicate pred);
-    //void remove_if(bool (*pred)(const T& value));
   private:
     ListNode< T >* fake_;
     ListNode< T >* head_;
@@ -340,8 +339,12 @@ namespace alymova
   {
     assert(!empty());
     ListNode< T >* subhead = head_;
-    for (Iterator< T > it = begin(); it != end(); ++it)
+    auto it = begin();
+    while (it != end())
     {
+      Iterator< T > it_next = ++it;
+      --it;
+      ListNode< T >* subnext = subhead->next;
       if (pred(*it))
       {
         if (it == begin())
@@ -359,7 +362,8 @@ namespace alymova
           delete subhead;
         }
       }
-      subhead = subhead->next;
+      subhead = subnext;
+      it = it_next;
     }
   }
 

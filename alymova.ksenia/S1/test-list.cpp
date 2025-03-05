@@ -104,29 +104,15 @@ BOOST_AUTO_TEST_CASE(test_swap)
   BOOST_TEST(list1 == list3);
 }
 
-
-
-bool single_digit(const int& value)
+bool is_divided_10(const int& value)
 {
-  return (value < 10 && value > -10);
+  return value % 10 == 0;
 }
 struct SingleDigit
 {
   bool operator()(const int& value)
   {
     return (value < 10 && value > -10);
-  }
-};
-template< typename T >
-struct EqualNode
-{
-  const T& value;
-  EqualNode(const T& new_value):
-    value(new_value)
-  {}
-  bool operator()(const T& data)
-  {
-    return value == data;
   }
 };
 BOOST_AUTO_TEST_CASE(test_remove)
@@ -152,12 +138,12 @@ BOOST_AUTO_TEST_CASE(test_remove)
   list_t list3 = {5, 10};
   list3.push_back(1);
 
-  int value = 10;
-  EqualNode< int > pred = EqualNode< int >{value};
-  list3.remove_if< EqualNode< int > >(pred);
+  list3.remove_if(SingleDigit());
+  BOOST_TEST(list3.size() == 5);
+  BOOST_TEST(list3.back() == 10);
 
-  SingleDigit sd = SingleDigit{};
-  list3.remove_if< SingleDigit >(sd);
-  BOOST_TEST(list3.size() == 6);
-  BOOST_TEST(list3.front() == 10);
+  list3.push_back(11);
+  list3.remove_if(is_divided_10);
+  BOOST_TEST(list3.size() == 1);
+  BOOST_TEST(list3.front() == 11);
 }
