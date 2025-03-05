@@ -45,7 +45,6 @@ namespace tkach
     void clear();
     void swap(List< T >& other) noexcept;
   private:
-    Node< T >* head_;
     Node< T >* tail_;
     size_t size_;
     List< T > getList(const List< T >& other) const;
@@ -54,8 +53,7 @@ namespace tkach
 
   template< typename T >
   List< T >::List():
-    head_(nullptr),
-    tail_(head_),
+    tail_(nullptr),
     size_(0)
   {}
 
@@ -116,25 +114,25 @@ namespace tkach
   template< typename T >
   Iterator< T > List< T >::begin() noexcept
   {
-    return Iterator< T >(head_);
+    return Iterator< T >(tail_->next_);
   }
 
   template< typename T >
   Iterator< T > List< T >::end() noexcept
   {
-    return Iterator< T >(head_);
+    return Iterator< T >(tail_->next_);
   }
 
   template< typename T >
   Citerator< T > List< T >::cbegin() const noexcept
   {
-    return Citerator< T >(head_);
+    return Citerator< T >(tail_->next_);
   }
 
   template< typename T >
   Citerator< T > List< T >::cend() const noexcept
   {
-    return Citerator< T >(head_);
+    return Citerator< T >(tail_->next_);
   }
 
   template< typename T >
@@ -146,7 +144,7 @@ namespace tkach
   template< typename T >
   const T& List< T >::front() const
   {
-    return head_->data_;
+    return tail_->next_->data_;
   }
 
   template< typename T >
@@ -158,7 +156,6 @@ namespace tkach
   template< typename T >
   void List< T >::swap(List< T >& other) noexcept
   {
-    std::swap(head_, other.head_);
     std::swap(tail_, other.tail_);
     std::swap(size_, other.size_);
   }
@@ -183,18 +180,16 @@ namespace tkach
   template< typename T >
   void List< T >::pushFront(T&& data)
   {
-    Node< T >* new_node = new Node< T >(std::move(data), head_);
-    if (!head_)
+    Node< T >* new_node = new Node< T >(std::move(data), nullptr);
+    if (empty())
     {
-      head_ = new_node;
-      head_->next_ = head_;
-      tail_ = head_;
+      tail_ = new_node;
+      tail_->next_ = tail_;
     }
     else
     {
+      new_node->next_ = tail_->next_;
       tail_->next_ = new_node;
-      new_node->next_ = head_;
-      head_ = new_node;
     }
     size_++;
   }
@@ -202,16 +197,15 @@ namespace tkach
   template< typename T >
   void List< T >::pushBack(T&& data)
   {
-    Node< T >* new_node = new Node< T >(std::move(data), head_);
-    if (!head_)
+    Node< T >* new_node = new Node< T >(std::move(data), nullptr);
+    if (empty())
     {
-      head_ = new_node;
-      head_->next_ = head_;
-      tail_ = head_;
+      tail_ = new_node;
+      tail_->next_ = tail_;
     }
     else
     {
-      new_node->next_ = head_;
+      new_node->next_ = tail_->next_;
       tail_->next_ = new_node;
       tail_ = new_node;
     }
@@ -231,7 +225,7 @@ namespace tkach
   template< typename T >
   void List< T >::clear()
   {
-    while (head_)
+    while (tail_)
     {
       popFront();
     }
@@ -265,7 +259,7 @@ namespace tkach
     }
     if (p(*(++it)))
     {
-      erase_after(Citerator< T >(head_));
+      erase_after(Citerator< T >(tail_->next_));
     }
   }
 
@@ -277,11 +271,9 @@ namespace tkach
 
   template< typename T >
   List< T >::List(List< T >&& other) noexcept:
-    head_(other.head_),
     tail_(other.tail_),
     size_(other.size_)
   {
-    other.head_ = nullptr;
     other.tail_ = nullptr;
     other.size_ = 0;
   }
@@ -293,10 +285,9 @@ namespace tkach
     {
       throw std::logic_error("No elements in list");
     }
-    if (head_ == tail_)
+    if (tail_->next_ == tail_)
     {
-      delete head_;
-      head_ = nullptr;
+      delete tail_;
       tail_ = nullptr;
       size_--;
       return Iterator< T >();
@@ -305,10 +296,6 @@ namespace tkach
     {
       Iterator< T > it(const_cast< Node< T >* >(pos.node_));
       Node< T >* list_delete = it.node_->next_;
-      if (pos.node_ == tail_)
-      {
-        head_ = head_->next_;
-      }
       if (pos.node_->next_ == tail_)
       {
         tail_ = const_cast< Node< T >* >(pos.node_);
@@ -341,10 +328,9 @@ namespace tkach
     {
       tail_ = other.tail_;
     }
-    temp->next_ = other.head_;
+    temp->next_ = (other.tail_)->next_;
     other.tail_->next_ = temp2;
     size_ += other.size_;
-    other.head_ = nullptr;
     other.tail_ = nullptr;
     other.size_ = 0;
   }
@@ -379,7 +365,7 @@ namespace tkach
     Node< T >* temp_first = const_cast< Node< T >* >(first.node_);
     Node< T >* temp_last = const_cast< Node< T >* >(last.node_);
     Node< T >* temp_next = temp->next_;
-    if (first.node_ == other.head_ && last.node_ == other.head_)
+    if (first.node_ == (other.tail_)->next_ && last.node_ == (other.tail_)->next_)
     {
       size_ += other.size() - 1;
       other.size_ = 1;
@@ -388,6 +374,10 @@ namespace tkach
     {
       size_ += splice_size;
       other.size_ -= splice_size;
+    }
+    if (last.node_ == (other.tail_)->next_)
+    {
+      other.tail_ = temp_first;
     }
     if (temp == tail_)
     {
@@ -400,10 +390,6 @@ namespace tkach
     }
     temp->next_ = temp_next;
     temp_first->next_ = temp_last;
-    if (last.node_ == other.head_)
-    {
-      other.tail_ = temp_first;
-    }
   }
 
   template< typename T >
