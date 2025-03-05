@@ -1,6 +1,7 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_COMPARISON_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_COMPARISON_HPP
 
+#include <algorithm>
 #include "forward-list-fwd-declaration.hpp"
 
 namespace kizhin {
