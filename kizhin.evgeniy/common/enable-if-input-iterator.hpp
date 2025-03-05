@@ -11,8 +11,7 @@ namespace kizhin {
 
     template < typename T, typename = void >
     struct is_input_iterator: std::false_type
-    {
-    };
+    {};
 
     template < typename T >
     using iter_category = typename std::iterator_traits< T >::iterator_category;
@@ -20,8 +19,7 @@ namespace kizhin {
     template < typename T >
     struct is_input_iterator< T, void_t< iter_category< T > > >:
       std::is_base_of< std::input_iterator_tag, iter_category< T > >
-    {
-    };
+    {};
 
     template < typename T >
     constexpr bool is_input_iterator_v = is_input_iterator< T >::value;

@@ -34,7 +34,9 @@ namespace kizhin {
 
       Node* node_ = nullptr;
 
-      explicit ForwardListIterator(Node* node): node_(node) {}
+      explicit ForwardListIterator(Node* node):
+        node_(node)
+      {}
 
       friend class ForwardListIterator< T, !IsConst >;
       friend class ::kizhin::ForwardList< value_type >;
@@ -48,8 +50,7 @@ namespace kizhin {
     ForwardListIterator< T, IsConst >::ForwardListIterator(
         const ForwardListIterator< T, IsRhsConst >& rhs) noexcept:
       node_(rhs.node_)
-    {
-    }
+    {}
 
     template < typename T, bool IsConst >
     typename ForwardListIterator< T, IsConst >::pointer ForwardListIterator< T,

@@ -22,12 +22,10 @@ int main()
       std::cout << "0\n";
       return 0;
     }
-    for (const NumbersT& num : numbers) {
-      outputListWithNewLine(std::cout, num);
-    }
     ForwardList< NumbersT::value_type > sums;
-    for (const auto& list : numbers) {
-      sums.pushBack(safeAccumulate(list));
+    for (const auto& num : numbers) {
+      outputListWithNewLine(std::cout, num);
+      sums.pushBack(safeAccumulate(num));
     }
     outputListWithNewLine(std::cout, sums);
   } catch (const std::exception& e) {
