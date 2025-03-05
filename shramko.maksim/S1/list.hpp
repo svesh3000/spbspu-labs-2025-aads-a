@@ -1,8 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include "listNode.hpp"
-#include "iterators.hpp"
+#include "node.hpp"
+#include "iterator.hpp"
+#include <cstddef>
 
 namespace shramko
 {
@@ -11,21 +12,26 @@ namespace shramko
   {
   public:
     FwdList();
+    FwdList(const FwdList& rhs);
+    FwdList(FwdList&& rhs);
     ~FwdList();
-  
-    FwdIterator< T > begin();
-    FwdIterator< T > end();
+
+    FwdList< T > begin() const noexcept;
+    FwdList< T > end() const noexcept;
+
+    FwdList& operator=(const FwdList& rhs) const noexcept;
+    FwdList& operator=(FwdList&& rhs) const noexcept;
 
     T& front() const;
-  
-    std::size_t size() const;
-    bool empty() const;
-  
-    void push_front(const T& value);
+    T& back() const;
+
+    std::size_t size() const noexcept;
+    bool empty() const noexcept;
+
     void push_front(T&& value);
-    void pop_front();
-    void swap(FwdList& other);
-    void clear();
+    void pop_front() noexcept;
+    void swap(FwdList& other) noexcept;
+    void clear() noexcept;
   
   private:
     FwdListNode< T >* head_;
@@ -43,6 +49,27 @@ shramko::FwdList< T >::FwdList():
   tail_->next_ = tail_;
 }
 
+shramko::FwdList< T >::FwdList():
+  FwdList();
+{
+  FwdList< T > revers;
+  for (auto i = rhs.begin(); i != rhs.end(); ++i)
+  {
+    revers.push_front(*i);
+  }
+  for (auto i = revers.begin(); i != revers.end(); ++i)
+  {
+    push_front(*i);
+  }
+}
+
+template<typename T>
+shramko::FwdList<T>::FwdList(FwdList&& rhs):
+  head_{std::exchange(rhs.head_, nullptr)}, 
+  tail_{std::exchange(rhs.tail_, nullptr)},
+  size_{std::exchange(rhs.size_, 0)}
+{}
+
 template< typename T >
 shramko::FwdList< T >::~FwdList()
 {
@@ -51,7 +78,7 @@ shramko::FwdList< T >::~FwdList()
 }
 
 template< typename T >
-shramko::FwdIterator< T > shramko::FwdList< T >::begin()
+shramko::FwdIterator< T > shramko::FwdList< T >::begin() const noexcept
 {
   return FwdIterator< T >(head_);
 }
@@ -65,7 +92,15 @@ shramko::FwdIterator< T > shramko::FwdList< T >::end()
 template< typename T >
 T& shramko::FwdList< T >::front() const
 {
-  return head_->data_;
+  return assert(head_);
+}
+
+template< typename T >
+T& shramko::FwdList< T >::back() const
+{
+  FwdIterator< T > it = begin();
+  for (; it != end(); ++it)
+  return *it
 }
 
 template< typename T >
@@ -78,15 +113,6 @@ template< typename T >
 bool shramko::FwdList< T >::empty() const
 {
   return size_ == 0;
-}
-
-template< typename T >
-void shramko::FwdList< T >::push_front(const T& value)
-{
-  FwdListNode< T >* new_node = new FwdListNode< T >(value);
-  new_node->next_ = empty() ? tail_ : head_;
-  tail_->next_ = new_node;
-  ++size_;
 }
 
 template< typename T >
