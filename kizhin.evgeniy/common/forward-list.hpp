@@ -227,28 +227,28 @@ namespace kizhin {
   template < typename T >
   typename ForwardList< T >::reference ForwardList< T >::front() noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: front() called on empty list");
     return beforeBegin_->next->data;
   }
 
   template < typename T >
   typename ForwardList< T >::reference ForwardList< T >::back() noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: back() called on empty list");
     return end_->data;
   }
 
   template < typename T >
   typename ForwardList< T >::const_reference ForwardList< T >::front() const noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: front() called on empty list");
     return beforeBegin_->next->data;
   }
 
   template < typename T >
   typename ForwardList< T >::const_reference ForwardList< T >::back() const noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: back() called on empty list");
     return end_->data;
   }
 
@@ -304,7 +304,7 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::emplaceAfter(
       const_iterator position, Args&&... args)
   {
-    assert(position != end());
+    assert(position != end() && "ForwardList: emplaceAfter called with end iterator");
     if (position == beforeBegin()) {
       emplaceFront(std::forward< Args >(args)...);
       return iterator(beforeBegin_->next);
@@ -322,7 +322,7 @@ namespace kizhin {
   template < typename T >
   void ForwardList< T >::popBack() noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: popBack() called on empty list");
     Node* current = beforeBegin_;
     while (current->next != end_) {
       current = current->next;
@@ -336,7 +336,7 @@ namespace kizhin {
   template < typename T >
   void ForwardList< T >::popFront() noexcept
   {
-    assert(!empty());
+    assert(!empty() && "ForwardList: popFront() called on empty list");
     Node* tmp = beforeBegin_->next->next;
     delete beforeBegin_->next;
     beforeBegin_->next = tmp;
@@ -350,9 +350,9 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::eraseAfter(
       const_iterator position)
   {
-    assert(!empty());
-    assert(position != end());
-    assert(position.node_ != end_);
+    assert(!empty() && "ForwardList: cannot erase from empty list");
+    assert(position != end() && "ForwardList: cannot erase after end iterator");
+    assert(position.node_ != end_ && "ForwardList: cannot erase after last element");
     return eraseAfter(position, std::next(position, 2));
   }
 
@@ -360,8 +360,8 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::eraseAfter(const_iterator first,
       const_iterator last)
   {
-    assert(!empty());
-    assert(first.node_ != last.node_);
+    assert(!empty() && "ForwardList: cannot erase from empty list");
+    assert(first.node_ != last.node_ && "ForwardList: empty erase range (first, last)");
     Node* firstPtr = first.node_->next;
     Node* lastPtr = last.node_;
     while (firstPtr != lastPtr) {
@@ -403,7 +403,7 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
       const_iterator position, value_type value)
   {
-    assert(position != end());
+    assert(position != end() && "ForwardList: insertAfter called with end iterator");
     return emplaceAfter(position, std::move(value));
   }
 
@@ -411,7 +411,7 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
       const_iterator position, size_type size, const_reference value)
   {
-    assert(position != end());
+    assert(position != end() && "ForwardList: insertAfter called with end iterator");
     if (size == 0) {
       return iterator(position.node_);
     }
@@ -428,7 +428,7 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
       const_iterator position, InputIt first, InputIt last)
   {
-    assert(position != end());
+    assert(position != end() && "ForwardList: insertAfter called with end iterator");
     if (first == last) {
       return iterator(position.node_);
     }
@@ -445,7 +445,7 @@ namespace kizhin {
   typename ForwardList< T >::iterator ForwardList< T >::insertAfter(
       const_iterator position, std::initializer_list< value_type > init)
   {
-    assert(position != end());
+    assert(position != end() && "ForwardList: insertAfter called with end iterator");
     return insertAfter(position, init.begin(), init.end());
   }
 
