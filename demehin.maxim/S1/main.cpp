@@ -7,6 +7,7 @@
 namespace
 {
   using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< unsigned long long > > >;
+  using ullList = demehin::List< unsigned long long >;
 
   size_t defineMaxSize(ListOfPairs pairsList)
   {
@@ -47,6 +48,29 @@ namespace
     }
   }
 
+  ullList formNumLst(ListOfPairs& pairsList)
+  {
+    ullList numsList;
+    for (auto it = pairsList.begin(); it != pairsList.end(); it++)
+    {
+      if (!it->second.empty())
+      {
+        numsList.push_back(it->second.front());
+        it->second.pop_front();
+      }
+    }
+    return numsList;
+  }
+
+  void printNums(std::ostream& out, const ullList& numsList)
+  {
+    out << numsList.front();
+    for (auto it = ++numsList.begin(); it != numsList.end(); it++)
+    {
+      out << " " << *it;
+    }
+  }
+
   void printValues(std::ostream& out, ListOfPairs pairsList)
   {
     size_t max_size = defineMaxSize(pairsList);
@@ -56,36 +80,19 @@ namespace
       return;
     }
 
-    demehin::List< unsigned long long > sumList;
+    ullList sumList;
+
     for (size_t i = 0; i < max_size; i++)
     {
-      demehin::List< unsigned long long > numsList;
-      for (auto it = pairsList.begin(); it != pairsList.end(); it++)
-      {
-        if (!it->second.empty())
-        {
-          numsList.push_back(it->second.front());
-          it->second.pop_front();
-        }
-      }
-
+      ullList numsList = formNumLst(pairsList);
       if (!numsList.empty())
       {
-        out << numsList.front();
-        for (auto it = ++numsList.begin(); it != numsList.end(); it++)
-        {
-          out << " " << *it;
-        }
+        printNums(out, numsList);
         out << "\n";
         sumList.push_back(calculateSum(numsList));
       }
     }
-
-    out << sumList.front();
-    for (auto it = ++sumList.begin(); it != sumList.end(); it++)
-    {
-      out << " " << *it;
-    }
+    printNums(out, sumList);
   }
 }
 
@@ -96,7 +103,7 @@ int main()
   while (std::cin >> nodeName)
   {
     demehin::List< unsigned long long > numsList;
-    unsigned long long num = 0;
+    unsigned long long num;
     while (std::cin >> num)
     {
       numsList.push_back(num);
