@@ -101,8 +101,8 @@ namespace demehin
     tail_(nullptr),
     size_(0)
   {
-    fake_->next_ = nullptr;
-    fake_->prev_ = nullptr;
+    fake_->next = nullptr;
+    fake_->prev = nullptr;
   }
 
   template< typename T >
@@ -221,11 +221,11 @@ namespace demehin
   List< T >::List(const List< T >& rhs):
     List()
   {
-    Node* current = rhs.fake_->next_;
+    Node* current = rhs.fake_->next;
     while (current != nullptr)
     {
-      push_back(current->data_);
-      current = current->next_;
+      push_back(current->data);
+      current = current->next;
     }
   }
 
@@ -243,35 +243,35 @@ namespace demehin
   template< typename T >
   ListIterator< T > List< T >::begin() const noexcept
   {
-    return ListIterator< T >(fake_->next_);
+    return ListIterator< T >(fake_->next);
   }
 
   template< typename T >
   ListIterator< T > List< T >::end() const noexcept
   {
-    return ListIterator< T >(tail_->next_);
+    return ListIterator< T >(tail_->next);
   }
 
   template< typename T >
   cListIterator< T > List< T >::cbegin() const noexcept
   {
-    return cListIterator< T >(fake_->next_);
+    return cListIterator< T >(fake_->next);
   }
 
   template< typename T >
   cListIterator< T > List< T >::cend() const noexcept
   {
-    return cListIterator< T >(tail_->next_);
+    return cListIterator< T >(tail_->next);
   }
 
   template< typename T >
   void List< T >::pop_front() noexcept
   {
-    Node* todelete = fake_->next_;
-    fake_->next_ = todelete->next_;
-    if (fake_->next_ != nullptr)
+    Node* todelete = fake_->next;
+    fake_->next = todelete->next;
+    if (fake_->next != nullptr)
     {
-      fake_->next_->prev_ = fake_;
+      fake_->next->prev = fake_;
     }
     else
     {
@@ -285,15 +285,15 @@ namespace demehin
   void List< T >::pop_back() noexcept
   {
     Node* todelete = tail_;
-    tail_ = tail_->prev_;
+    tail_ = tail_->prev;
 
     if (tail_ != nullptr)
     {
-      tail_->next_ = nullptr;
+      tail_->next = nullptr;
     }
     else
     {
-      fake_->next_ = nullptr;
+      fake_->next = nullptr;
     }
 
     delete todelete;
@@ -304,16 +304,16 @@ namespace demehin
   void List< T >::push_back(const T& data)
   {
     Node* new_node = new Node(data);
-    new_node->next_ = nullptr;
-    new_node->prev_ = tail_;
+    new_node->next = nullptr;
+    new_node->prev = tail_;
     if (tail_ != nullptr)
     {
-      tail_->next_ = new_node;
+      tail_->next = new_node;
     }
     else
     {
-      fake_->next_ = new_node;
-      new_node->prev_ = fake_;
+      fake_->next = new_node;
+      new_node->prev = fake_;
     }
 
     tail_ = new_node;
@@ -324,32 +324,32 @@ namespace demehin
   void List< T >::push_front(const T& data)
   {
     Node* new_node = new Node(data);
-    new_node->next_ = fake_->next_;
+    new_node->next = fake_->next;
 
-    if (fake_->next_ != nullptr)
+    if (fake_->next != nullptr)
     {
-      fake_->next_->prev_ = new_node;
+      fake_->next->prev = new_node;
     }
     else
     {
       tail_ = new_node;
     }
 
-    new_node->prev_ = fake_;
-    fake_->next_ = new_node;
+    new_node->prev = fake_;
+    fake_->next = new_node;
     size_++;
   }
 
   template< typename T >
   T& List< T >::front() noexcept
   {
-    return fake_->next_->data_;
+    return fake_->next->data;
   }
 
   template< typename T >
   T& List< T >::back() noexcept
   {
-    return tail_->data_;
+    return tail_->data;
   }
 
   template< typename T >
@@ -367,7 +367,7 @@ namespace demehin
   template< typename T >
   void List< T >::swap(List< T >& other) noexcept
   {
-    std::swap(fake_->next_, other.fake_->next_);
+    std::swap(fake_->next, other.fake_->next);
     std::swap(tail_, other.tail_);
     std::swap(size_, other.size_);
   }
@@ -389,28 +389,28 @@ namespace demehin
       return;
     }
 
-    Node* first = other.fake_->next_;
+    Node* first = other.fake_->next;
     Node* last = other.tail_;
     Node* posNode = pos.getNode();
-    Node* posPrev = posNode->prev_;
+    Node* posPrev = posNode->prev;
 
     if (posPrev != nullptr)
     {
-      posPrev->next_ = first;
+      posPrev->next = first;
     }
 
-    first->prev_ = posPrev;
+    first->prev = posPrev;
 
     if (posNode != nullptr)
     {
-      posNode->prev_ = last;
+      posNode->prev = last;
     }
 
-    last->next_ = posNode;
+    last->next = posNode;
 
-    if (fake_->next_ == posNode)
+    if (fake_->next == posNode)
     {
-      fake_->next_ = first;
+      fake_->next = first;
     }
     if (tail_ == posPrev)
     {
@@ -440,13 +440,13 @@ namespace demehin
 
     Node* itNode = it.getNode();
     Node* posNode = pos.getNode();
-    Node* itPrevNode = itNode->prev_;
+    Node* itPrevNode = itNode->prev;
 
-    itPrevNode->next_ = itNode->next_;
-    itNode->prev_ = posNode->prev_;
-    itNode->next_ = posNode;
-    posNode->prev_->next_ = itNode;
-    posNode->prev_ = itNode;
+    itPrevNode->next = itNode->next;
+    itNode->prev = posNode->prev;
+    itNode->next = posNode;
+    posNode->prev->next = itNode;
+    posNode->prev = itNode;
     size_++;
     other.size_--;
   }
@@ -470,32 +470,32 @@ namespace demehin
     Node* posNode = pos.getNode();
     Node* firstNode = first.getNode();
     Node* lastNode = last.getNode();
-    Node* posPrevNode = posNode->prev_;
-    Node* lastNextNode = lastNode->next_;
+    Node* posPrevNode = posNode->prev;
+    Node* lastNextNode = lastNode->next;
 
     size_t node_cnt = 1;
-    for (Node* current = firstNode; current != lastNode; current = current->next_)
+    for (Node* current = firstNode; current != lastNode; current = current->next)
     {
       node_cnt++;
     }
 
     if (lastNextNode != nullptr)
     {
-      lastNextNode->prev_ = firstNode->prev_;
+      lastNextNode->prev = firstNode->prev;
     }
 
     if (posPrevNode != nullptr)
     {
-      posPrevNode->next_ = firstNode;
+      posPrevNode->next = firstNode;
     }
     else
     {
-      fake_->next_ = firstNode;
+      fake_->next = firstNode;
     }
 
-    firstNode->prev_ = posPrevNode;
-    lastNode->next_ = posNode;
-    posNode->prev_ = lastNode;
+    firstNode->prev = posPrevNode;
+    lastNode->next = posNode;
+    posNode->prev = lastNode;
 
     size_ += node_cnt;
     other.size_ -= node_cnt;
@@ -568,23 +568,23 @@ namespace demehin
   ListIterator< T > List< T >::erase(cListIterator< T > pos) noexcept
   {
     const Node* todelete = pos.getNode();
-    ListIterator< T > toreturn(todelete->next_);
-    if (todelete == fake_->next_)
+    ListIterator< T > toreturn(todelete->next);
+    if (todelete == fake_->next)
     {
-      fake_->next_ = todelete->next_;
+      fake_->next = todelete->next;
     }
     else
     {
-      todelete->prev_->next_ = todelete->next_;
+      todelete->prev->next = todelete->next;
     }
 
     if (todelete == tail_)
     {
-      tail_ = todelete->prev_;
+      tail_ = todelete->prev;
     }
     else
     {
-      todelete->next_->prev_ = todelete->prev_;
+      todelete->next->prev = todelete->prev;
     }
     size_--;
     delete todelete;
@@ -613,10 +613,10 @@ namespace demehin
 
     Node* newNode = new Node(value);
     Node* posNode = pos.getNode();
-    newNode->next_ = posNode;
-    newNode->prev_ = posNode->prev_;
-    posNode->prev_->next_ = newNode;
-    posNode->prev_ = newNode;
+    newNode->next = posNode;
+    newNode->prev = posNode->prev;
+    posNode->prev->next = newNode;
+    posNode->prev = newNode;
     size_++;
     return ListIterator< T >(newNode);
   }

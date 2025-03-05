@@ -46,7 +46,7 @@ namespace demehin
   typename ListIterator< T >::this_t& ListIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    node_ = node_->next_;
+    node_ = node_->next;
     return *this;
   }
 
@@ -63,7 +63,7 @@ namespace demehin
   typename ListIterator< T >::this_t& ListIterator< T >::operator--() noexcept
   {
     assert(node_ != nullptr);
-    node_ = node_->prev_;
+    node_ = node_->prev;
     return *this;
   }
 
@@ -80,14 +80,14 @@ namespace demehin
   T& ListIterator< T >::operator*() noexcept
   {
     assert(node_ != nullptr);
-    return node_->data_;
+    return node_->data;
   }
 
   template< typename T >
   T* ListIterator< T >::operator->() noexcept
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data_);
+    return std::addressof(node_->data);
   }
 
   template< typename T >

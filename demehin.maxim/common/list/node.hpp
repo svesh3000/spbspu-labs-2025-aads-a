@@ -6,26 +6,18 @@ namespace demehin
   template< typename T >
   struct Node
   {
-    T data_;
-    Node< T >* prev_;
-    Node< T >* next_;
+    T data;
+    Node< T >* prev;
+    Node< T >* next;
 
-    //Node();
     Node(const T&) noexcept;
   };
 
-  //template< typename T >
-  //Node< T >::Node():
-    //data_(T()),
-    //prev_(nullptr),
-    //next_(nullptr)
-  //{}
-
   template< typename T >
-  Node< T >::Node(const T& data) noexcept:
-    data_(data),
-    prev_(nullptr),
-    next_(nullptr)
+  Node< T >::Node(const T& value) noexcept:
+    data(value),
+    prev(nullptr),
+    next(nullptr)
   {}
 }
 
