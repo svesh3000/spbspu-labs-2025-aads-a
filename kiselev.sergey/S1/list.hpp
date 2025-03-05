@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <initializer_list>
+#include <new>
 #include <stdexcept>
 #include <utility>
 #include "constIterator.hpp"
@@ -94,11 +95,9 @@ namespace kiselev
   template< typename T >
   List< T >::List():
     head_(nullptr),
-    end_(new Node< T >()),
+    end_(nullptr),
     size_(0)
   {
-    end_->next_ = end_;
-    end_->prev_ = end_;
   }
 
   template< typename T>
@@ -510,6 +509,15 @@ namespace kiselev
     Node< T >* node = new Node< T >(data);
     if (empty())
     {
+      try
+      {
+        end_ = new Node< T >();
+      }
+      catch (const std::bad_alloc&)
+      {
+        delete node;
+        throw;
+      }
       node->next_ = end_;
       node->prev_ = end_;
       end_->prev_ = node;
