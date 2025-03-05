@@ -50,6 +50,9 @@ namespace alymova
     void clear() noexcept;
     void assign(size_t n, const T& value);
 
+    void splice(Iterator< T > position, List< T >& other);
+    void splice(Iterator< T > position, List< T >& other, Iterator< T > i);
+    void splice(Iterator< T > position, List< T >& other, Iterator< T > first, Iterator< T > last);
     void remove(const T& value) noexcept;
     template< typename Predicate >
     void remove_if(Predicate pred);
@@ -333,6 +336,40 @@ namespace alymova
     for (size_t i = 0; i < n; i++)
     {
       push_back(value);
+    }
+  }
+  template< typename T >
+  void List< T >::splice(Iterator< T > position, List< T >& other)
+  {
+    auto other_it = other.begin();
+    while (other_it != other.end())
+    {
+      Iterator< T > other_it_next = ++other_it;
+      --other_it;
+      ListNode< T >* node_now = position.get_node();
+      ListNode< T >* other_node_now = other_it.get_node();
+      if (position == begin())
+      {
+        head_ = other_node_now;
+      }
+      else
+      {
+        node_now->prev->next = other_node_now;
+      }
+      if (other_it == other.begin())
+      {
+        other.head_ = other_node_now->next;
+      }
+      else
+      {
+        other_node_now->prev->next = other_node_now->next;
+      }
+      other_node_now->next->prev = other_node_now->prev;
+      other_node_now->prev = node_now->prev;
+      other_node_now->next = node_now;
+      node_now->prev = other_node_now;
+
+      other_it = other_it_next;
     }
   }
 

@@ -155,3 +155,24 @@ BOOST_AUTO_TEST_CASE(test_assign)
   list_t list2 = list_t{5, 1};
   BOOST_TEST(list1 == list2);
 }
+BOOST_AUTO_TEST_CASE(test_splice)
+{
+  using list_t = alymova::List< int >;
+  list_t list1, list2;
+  for (size_t i = 1; i <= 4; i++)
+  {
+    list1.push_back(i);
+  }
+  for (size_t i = 1; i <= 3; i++)
+  {
+    list2.push_back(i * 10);
+  }
+  auto position = list1.begin();
+  ++position;
+  list1.splice(position, list2);
+  BOOST_TEST(list1.size() == 7);
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list1.back() == 4);
+  BOOST_TEST(*position == 2);
+  BOOST_TEST(list2.size() == 0);
+}

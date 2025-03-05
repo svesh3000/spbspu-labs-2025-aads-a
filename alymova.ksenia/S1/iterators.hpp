@@ -21,6 +21,7 @@ namespace alymova
     bool operator!=(const Iterator< T >& other) noexcept;
     T& operator*() noexcept;
     T* operator->() noexcept;
+    ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;
     ListNode< T >* node_;
@@ -40,6 +41,7 @@ namespace alymova
     bool operator!=(const ConstIterator< T >& other) noexcept;
     const T& operator*() noexcept;
     const T* operator->() noexcept;
+    const ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;
     const ListNode< T >* node_;
@@ -116,6 +118,12 @@ namespace alymova
   }
 
   template< typename T >
+  ListNode< T >* Iterator< T >::get_node() noexcept
+  {
+    return node_;
+  }
+
+  template< typename T >
   ConstIterator< T >::ConstIterator():
     node_(nullptr)
   {}
@@ -183,6 +191,12 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     return std::addressof(node_->data);
+  }
+
+  template< typename T >
+  const ListNode< T >* ConstIterator< T >::get_node() noexcept
+  {
+    return node_;
   }
 }
 #endif
