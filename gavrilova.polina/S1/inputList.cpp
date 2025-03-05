@@ -1,8 +1,8 @@
 #include "inputList.hpp"
 
-std::forward_list< unsigned long long > gavrilova::inputNumbers (std::istream& in, size_t& curLen)
+gavrilova::FwdList< unsigned long long > gavrilova::inputNumbers (std::istream& in, size_t& curLen)
 {
-  std::forward_list< unsigned long long > numbers;
+  FwdList< unsigned long long > numbers;
   unsigned long long num = 0;
   curLen = 0;
   while (in >> num && !in.eof()) {
@@ -13,4 +13,3 @@ std::forward_list< unsigned long long > gavrilova::inputNumbers (std::istream& i
   numbers.reverse();
   return numbers;
 }
-

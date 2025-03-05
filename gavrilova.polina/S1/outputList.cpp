@@ -26,15 +26,14 @@ std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
   out << "\n";
   return out;
 }
-std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out, gavrilova::FLPairs list, size_t maxLen, size_t n)
+gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n)
 {
-  using fwdlistOfPairs = std::forward_list< std::pair< std::string, std::forward_list< ULL > > >;
-  fwdlistOfPairs::iterator beginList = list.begin();
-  std::forward_list< ULL >::iterator ptr_arr[1000] = {};
-  std::forward_list< ULL >::iterator ptr_end_arr[1000] = {};
-  std::forward_list< ULL > sums = {};
+  auto beginList = list.begin();
+  IteratorFwd< ULL > ptr_arr[1000] = {};
+  IteratorFwd< ULL > ptr_end_arr[1000] = {};
+  FwdList< ULL > sums = {};
 
-  fwdlistOfPairs::iterator ptr = beginList;
+  auto ptr = beginList;
   for (size_t i = 0; i < n; ++i) {
     ptr_arr[i] = ptr->second.begin();
     ptr_end_arr[i] = ptr->second.end();
@@ -49,14 +48,14 @@ std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out,
     if (ind == n) {
       break;
     }
-    out << *ptr_arr[ind];
+    out << ptr_arr[ind].node_->data;
     curSum = addition(curSum, *ptr_arr[ind]);
     ++ptr_arr[ind];
     for (size_t j = ind + 1; j < n; ++j) {
       if (ptr_arr[j] == ptr_end_arr[j]) {
         continue;
       }
-      out << " " << *ptr_arr[j];
+      out << " " << ptr_arr[j].node_->data;
       curSum = addition(curSum, *ptr_arr[j]);
       ++ptr_arr[j];
     }
@@ -66,7 +65,7 @@ std::forward_list< unsigned long long > gavrilova::outNumbers(std::ostream& out,
   sums.reverse();
   return sums;
 }
-std::ostream& gavrilova::outFwdListULL(std::ostream& out, std::forward_list< ULL > list) {
+std::ostream& gavrilova::outFwdListULL(std::ostream& out, FwdList< ULL > list) {
   auto ptr = list.begin();
   auto end = list.end();
   out << *ptr;

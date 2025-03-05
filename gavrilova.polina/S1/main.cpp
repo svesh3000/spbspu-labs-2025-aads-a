@@ -1,27 +1,26 @@
-#include <forward_list>
 #include <string>
 #include "iostream"
 #include "inputList.hpp"
 #include "outputList.hpp"
-
+#include "FwdList.hpp"
 
 int main() {
   using namespace gavrilova;
   using ULL = unsigned long long;
-  std::forward_list< std::pair< std::string, std::forward_list< ULL > > > listOfPairs{};
+  FwdList< std::pair< std::string, FwdList< ULL > > > listOfPairs{};
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
   size_t curLen = 0;
   while (std::cin >> name && !std::cin.eof()) {
-    std::forward_list< ULL > numbers = inputNumbers(std::cin, curLen);
+    FwdList< ULL > numbers = inputNumbers(std::cin, curLen);
     maxLen = (maxLen < curLen) ? curLen : maxLen;
     listOfPairs.push_front({name, numbers});
     ++numOfPairs;
   }
   listOfPairs.reverse();
   outNames(std::cout, listOfPairs);
-  std::forward_list< ULL > sums {};
+  FwdList< ULL > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
   } catch(const std::overflow_error& e) {
@@ -36,4 +35,3 @@ int main() {
     outFwdListULL(std::cout, sums);
   }
 }
-
