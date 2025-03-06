@@ -10,7 +10,7 @@ namespace demehin
     Node< T >* prev;
     Node< T >* next;
 
-    Node(const T&) noexcept;
+    explicit Node(const T&) noexcept;
   };
 
   template< typename T >

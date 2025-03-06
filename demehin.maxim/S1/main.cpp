@@ -3,11 +3,12 @@
 #include <string>
 #include <algorithm>
 #include <list/list.hpp>
+#include <calc_utils.hpp>
 
 namespace
 {
-  using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< unsigned long long > > >;
   using ullList = demehin::List< unsigned long long >;
+  using ListOfPairs = demehin::List< std::pair< std::string, ullList > >;
 
   size_t defineMaxSize(const ListOfPairs& pairsList)
   {
@@ -19,21 +20,12 @@ namespace
     return max_size;
   }
 
-  unsigned long long calculateSum(demehin::List< unsigned long long > nums)
+  unsigned long long calculateSum(const ullList& nums)
   {
     unsigned long long sum = 0;
-    if (nums.empty())
-    {
-      return 0;
-    }
-    unsigned long long max = std::numeric_limits< unsigned long long >::max();
     for (auto it = nums.begin(); it != nums.end(); it++)
     {
-      if (sum > max - *it)
-      {
-        throw std::overflow_error("error: overflow");
-      }
-      sum += *it;
+      sum = demehin::getCheckedSum(sum, *it);
     }
 
     return sum;
@@ -41,8 +33,9 @@ namespace
 
   void printLstNames(std::ostream& out, const ListOfPairs& pairsList)
   {
-    out << pairsList.begin()->first;
-    for (auto it = ++pairsList.begin(); it != pairsList.end(); ++it)
+    auto begin = pairsList.begin();
+    out << begin->first;
+    for (auto it = ++begin; it != pairsList.end(); ++it)
     {
       out << " " << it->first;
     }
@@ -94,22 +87,36 @@ namespace
     }
     printNums(out, sumList);
   }
+
+  void inputLists(std::istream& in, ListOfPairs& pairsList)
+  {
+    std::string nodeName;
+    while (std::cin >> nodeName)
+    {
+      ullList numsList;
+      unsigned long long num;
+      while (in >> num)
+      {
+        numsList.push_back(num);
+      }
+      pairsList.push_back(std::make_pair(nodeName, numsList));
+      in.clear();
+    }
+  }
+
 }
 
 int main()
 {
-  demehin::List< std::pair< std::string, demehin::List< unsigned long long > > > pairsList;
-  std::string nodeName;
-  while (std::cin >> nodeName)
+  ListOfPairs pairsList;
+  try
   {
-    demehin::List< unsigned long long > numsList;
-    unsigned long long num;
-    while (std::cin >> num)
-    {
-      numsList.push_back(num);
-    }
-    pairsList.push_back(std::make_pair(nodeName, numsList));
-    std::cin.clear();
+    inputLists(std::cin, pairsList);
+  }
+  catch(const std::bad_alloc&)
+  {
+    std::cout << "error: bad_alloc\n";
+    return 1;
   }
 
   if (pairsList.size() == 0)
@@ -128,6 +135,11 @@ int main()
   catch (const std::overflow_error& e)
   {
     std::cerr << e.what() << "\n";
+    return 1;
+  }
+  catch (const std::bad_alloc&)
+  {
+    std::cerr << "error: bad_alloc\n";
     return 1;
   }
 

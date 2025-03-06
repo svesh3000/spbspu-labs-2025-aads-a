@@ -31,7 +31,7 @@ namespace demehin
     List(List< T >&&);
 
     List(size_t, const T&);
-    List(std::initializer_list< T >);
+    explicit List(std::initializer_list< T >);
     List(Iter, Iter);
 
     ~List();
@@ -61,7 +61,7 @@ namespace demehin
     T& front() const noexcept;
     T& back() const noexcept;
 
-    bool empty() noexcept;
+    bool empty() const noexcept;
 
     void clear() noexcept;
 
@@ -372,7 +372,7 @@ namespace demehin
   }
 
   template< typename T >
-  bool List< T >::empty() noexcept
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }

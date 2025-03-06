@@ -15,7 +15,7 @@ namespace demehin
     using Ptr = typename std::conditional< isConst, const T*, T* >::type;
 
     ListIterator() noexcept;
-    ListIterator(Node< T >*) noexcept;
+    explicit ListIterator(Node< T >*) noexcept;
 
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
