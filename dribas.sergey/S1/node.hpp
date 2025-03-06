@@ -1,6 +1,8 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
+#include <utility>
+
 namespace
 {
  template < class T >
@@ -11,21 +13,24 @@ public:
   Node< T >* next_;
   Node< T >* prev_;
 
-  Node()
-  {
+  Node():
    data_(T()),
    prev_(nullptr),
    next_(nullptr)
    {}
+
+  Node(T&& data):
+    prev_(nullptr),
+    next_(nullptr)
+  {
+    std::move(data);
   }
 
-  Node(const& T)
-  {
-   data_(data),
-   prev_(nullptr),
-   next_(nullptr)
-   {}
-  }
+  Node(const T& data):
+    data_(data),
+    prev_(nullptr),
+    next_(nullptr)
+  {}
  };
 }
 

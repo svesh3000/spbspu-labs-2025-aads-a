@@ -55,7 +55,16 @@ namespace dribas
   };
 }
 
-template < class T >
+template< class T >
+void dribas::List< T >::push_front(const T& value)
+{
+  Node< T >* list = Node< T >(value);
+  list_->prev_ = list;
+  list->next_ = list_;
+  list_ = list;
+}
+
+template< class T >
 const dribas::List< T >* dribas::List< T >::operator[](size_t id) const
 {
   Node< T >* returned = list_;
@@ -65,13 +74,13 @@ const dribas::List< T >* dribas::List< T >::operator[](size_t id) const
   return returned;
 }
 
-template < class T >
+template< class T >
 dribas::List< T >* dribas::List< T >::operator[](size_t id)
 {
   return const_cast< List< T >* >(static_cast< const List< T >* >(this)->operator[](id));
 }
 
-template < class T >
+template< class T >
 const dribas::List< T >* dribas::List< T >::at(size_t id) const
 {
   if (id > size_) {
@@ -80,19 +89,51 @@ const dribas::List< T >* dribas::List< T >::at(size_t id) const
   return this[id];
 }
 
-template < class T >
+template< class T >
 dribas::List< T >* dribas::List< T >::at(size_t id)
 {
   return const_cast< List< T >* >(static_cast< const List< T >* >(this)->at(id)); 
 }
 
-template < class T >
+template< class T >
+T& dribas::List< T >::front()
+{
+  return list_->data_;
+}
+
+template< class T >
+T& dribas::List< T >::back()
+{
+  Node< T >* current = list_; 
+  while (current->next_) {
+    current = current->next;
+  }
+  return current->data_;
+}
+
+template< class T >
+const T& dribas::List< T >::back() const
+{
+  Node< T >* current = list_; 
+  while (current->next_) {
+    current = current->next;
+  }
+  return current->data_;
+}
+
+template< class T >
+const T& dribas::List< T >::front() const
+{
+  return list_->data_;
+}
+
+template< class T >
 dribas::List< T >::List():
   list_(new Node< T >()),
   size_(0)
 {}
 
-template < class T > 
+template< class T > 
 dribas::List< T >::List(const List< T >& rhs):
   list_(nullptr),
   size_(rhs.size_)
@@ -102,26 +143,26 @@ dribas::List< T >::List(const List< T >& rhs):
   }
 }
 
-template < class T >
+template< class T >
 void dribas::List< T >::swap(List< T >& rhs)
 {
   std::swap(list_, rhs.list_);
   std::swap(size_, rhs.size_);
 }
 
-template < class T >
+template< class T >
 bool dribas::List< T >::empty() const noexcept
 {
   return size_ == 0;
 }
 
-template < class T>
+template< class T>
 size_t dribas::List< T >::size() const noexcept
 {
   return size_;
 }
 
-template < class T >
+template< class T >
 dribas::List< T >& dribas::List< T >::operator=(List< T >& other)
 {
   List< T > copy(other);
@@ -129,7 +170,7 @@ dribas::List< T >& dribas::List< T >::operator=(List< T >& other)
   return *this;
 }
 
-template < class T >
+template< class T >
 dribas::List< T >& dribas::List< T >::operator=(List< T >&& other) noexcept
 {
   list_ = std::move_if_noexcept(other.list_);
@@ -137,8 +178,8 @@ dribas::List< T >& dribas::List< T >::operator=(List< T >&& other) noexcept
   return *this;
 }
 
-template < class T >
-dribas::List< T >::List(List< T >&& rhs) noexcept:
+template< class T >
+dribas::List< T >::List(List< T >&& rhs) noexcept
 {
   clear();
   size_ = rhs.size_;
