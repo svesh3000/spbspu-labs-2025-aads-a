@@ -41,18 +41,18 @@ namespace gavrilova {
     void assign(size_t count, const T& value);
     void assign(IteratorFwd< T > first, IteratorFwd< T > last);
   private:
-    NodeFwdList< T >* fake;
-    size_t nodeCount;
+    NodeFwdList< T >* fake_;
+    size_t nodeCount_;
   };
 
 }
 
 template< class T >
 gavrilova::FwdList< T >::FwdList() :
-  fake(reinterpret_cast< NodeFwdList< T >* >(new char[sizeof(NodeFwdList< T >)])),
-  nodeCount(0)
+  fake_(reinterpret_cast< NodeFwdList< T >* >(new char[sizeof(NodeFwdList< T >)])),
+  nodeCount_(0)
 {
-  fake->next = fake;
+  fake_->next = fake_;
 }
 
 template< class T >
@@ -68,11 +68,11 @@ gavrilova::FwdList< T >::FwdList(const FwdList &other) :
 
 template< class T >
 gavrilova::FwdList< T >::FwdList(FwdList &&other) noexcept :
-  fake(other.fake),
-  nodeCount(other.nodeCount)
+  fake_(other.fake_),
+  nodeCount_(other.nodeCount_)
 {
-  other.fake = nullptr;
-  other.nodeCount = 0;
+  other.fake_ = nullptr;
+  other.nodeCount_ = 0;
 }
 
 template< class T >
@@ -99,12 +99,12 @@ gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(FwdList &&other) noe
     return *this;
   }
   clear();
-  delete[] reinterpret_cast< char* >(fake);;
-  fake = other.fake;
-  nodeCount = other.nodeCount;
+  delete[] reinterpret_cast< char* >(fake_);;
+  fake_ = other.fake_;
+  nodeCount_ = other.nodeCount_;
 
-  other.fake = nullptr;
-  other.nodeCount = 0;
+  other.fake_ = nullptr;
+  other.nodeCount_ = 0;
 
   return *this;
 }
@@ -113,19 +113,19 @@ template< class T >
 gavrilova::FwdList< T >::~FwdList()
 {
   clear();
-  delete[] reinterpret_cast< char* >(fake);
+  delete[] reinterpret_cast< char* >(fake_);
 }
 
 template< class T >
 gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::begin() const
 {
-  return IteratorFwd< T >(fake->next);
+  return IteratorFwd< T >(fake_->next);
 }
 
 template< class T >
 gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::end() const
 {
-  return IteratorFwd< T >(fake);
+  return IteratorFwd< T >(fake_);
 }
 
 template< class T >
@@ -135,7 +135,7 @@ T & gavrilova::FwdList< T >::front()
   {
     throw std::out_of_range("List is empty");
   }
-  return fake->next->data;
+  return fake_->next->data;
 }
 
 // template< class T >
@@ -157,21 +157,21 @@ T & gavrilova::FwdList< T >::front()
 template< class T >
 bool gavrilova::FwdList< T >::empty() const noexcept
 {
-  return nodeCount == 0;
+  return nodeCount_ == 0;
 }
 
 template< class T >
 size_t gavrilova::FwdList< T >::size() const noexcept
 {
-  return nodeCount;
+  return nodeCount_;
 }
 
 template< class T >
 void gavrilova::FwdList< T >::push_front(const T &value)
 {
-  NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake->next};
-  fake->next = newNode;
-  ++nodeCount;
+  NodeFwdList<T> *newNode = new NodeFwdList<T>{value, fake_->next};
+  fake_->next = newNode;
+  ++nodeCount_;
 }
 
 template< class T >
@@ -181,10 +181,10 @@ void gavrilova::FwdList< T >::pop_front()
   {
     throw std::out_of_range("List is empty");
   }
-  NodeFwdList<T> *temp = fake->next;
-  fake->next = fake->next->next;
+  NodeFwdList<T> *temp = fake_->next;
+  fake_->next = fake_->next->next;
   delete temp;
-  --nodeCount;
+  --nodeCount_;
 }
 
 template< class T >
@@ -199,15 +199,15 @@ void gavrilova::FwdList< T >::clear()
 template< class T >
 void gavrilova::FwdList< T >::remove(const T &value)
 {
-  NodeFwdList<T> *current = fake;
-  while (current->next != fake)
+  NodeFwdList<T> *current = fake_;
+  while (current->next != fake_)
   {
     if (current->next->data == value)
     {
       NodeFwdList<T> *temp = current->next;
       current->next = current->next->next;
       delete temp;
-      --nodeCount;
+      --nodeCount_;
     }
     else
     {
@@ -224,14 +224,14 @@ void gavrilova::FwdList< T >::splice(const FwdList<T> &other)
     return;
   }
 
-  NodeFwdList<T> *lastNode = fake;
-  while (lastNode->next != fake)
+  NodeFwdList<T> *lastNode = fake_;
+  while (lastNode->next != fake_)
   {
     lastNode = lastNode->next;
   }
 
-  lastNode->next = other.fake->next;
-  nodeCount += other.nodeCount;
+  lastNode->next = other.fake_->next;
+  nodeCount_ += other.nodeCount_;
 }
 
 template< class T >
@@ -241,23 +241,23 @@ void gavrilova::FwdList< T >::reverse()
     return;
 
   NodeFwdList<T> *prev = nullptr;
-  NodeFwdList<T> *current = fake->next;
+  NodeFwdList<T> *current = fake_->next;
   NodeFwdList<T> *next = nullptr;
 
-  while (current != fake)
+  while (current != fake_)
   {
     next = current->next;
     current->next = prev;
     prev = current;
     current = next;
   }
-  fake->next = prev;
+  fake_->next = prev;
 }
 
 template< class T >
 bool gavrilova::FwdList< T >::operator==(const FwdList<T> &other) const
 {
-  if (nodeCount != other.nodeCount)
+  if (nodeCount_ != other.nodeCount_)
   {
     return false;
   }
@@ -298,7 +298,7 @@ bool gavrilova::FwdList< T >::operator<(const FwdList<T> &other) const
     ++it1;
     ++it2;
   }
-  return nodeCount < other.nodeCount;
+  return nodeCount_ < other.nodeCount_;
 }
 
 template< class T >
@@ -311,7 +311,7 @@ template< class T>
 void gavrilova::FwdList< T >::swap(FwdList< T >& other ) noexcept
 {
   std::swap(fake_, other.fake_);
-  std::swap(size_, other.size_);
+  std::swap(nodeCount_, other.nodeCount_);
 }
 
 template< class T>
