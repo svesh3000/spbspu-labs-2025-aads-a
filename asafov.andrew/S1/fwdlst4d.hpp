@@ -22,29 +22,11 @@ namespace asafov
     head_(nullptr),
     last_(nullptr)
     {}
-    Forward_list(Forward_list&& data) noexcept:
-    head_(data.head_),
-    last_(data.last_)
-    {
-      data.head_ = nullptr;
-      data.last_ = nullptr;
-    }
-    Forward_list(T& data)
-    {
-      head_ = data->head_;
-      last_ = data->last_;
-    }
-    Forward_list(T&& data)
-    {
-      head_ = data->head_;
-      last_ = data->last_;
-      data->head_ = nullptr;
-      data->last_ = nullptr;
-    }
     ~Forward_list()
     {
       clear();
     }
+
     class const_iterator
     {
       friend class Forward_list;
@@ -57,11 +39,8 @@ namespace asafov
       current_(node),
       last_(last)
       {}
-      const_iterator(const const_iterator& data) noexcept:
-      current_(data.current_),
-      last_(data.last_)
-      {}
       ~const_iterator() = default;
+
       const T& operator*() const
       {
         return current_->data_;
