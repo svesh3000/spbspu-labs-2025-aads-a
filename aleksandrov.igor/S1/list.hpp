@@ -3,6 +3,8 @@
 
 #include "node.hpp"
 #include "iterator.hpp"
+#include "cIterator.hpp"
+#include <cassert>
 
 namespace aleksandrov
 {
@@ -16,23 +18,27 @@ namespace aleksandrov
     List(List< T >&& rhs) noexcept;
     ~List();
 
-    Iterator< T > begin() const;
-    Iterator< T > end() const;
-    T& front();
-    T& back();
-    bool empty();
-    size_t size();
+    Iterator< T > begin() const noexcept;
+    Iterator< T > end() const noexcept;
+    T& front() noexcept;
+    T& back() noexcept;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void pushFront(const T& value);
     void pushBack(const T& value);
-    void popFront();
-    void popBack();
-    void swap(List< T >& other);
+    void popFront() noexcept;
+    void popBack() noexcept;
+    void swap(List< T >& other) noexcept;
     void clear() noexcept;
 
     void remove(const T& value);
+    template< typename UnaryPredicate >
+    void removeIf(UnaryPredicate p);
 
     Iterator< T > insertAfter(Iterator< T > pos, const T& value);
+    Iterator< T > eraseAfter(Iterator< T > pos);
+    Iterator< T > eraseAfter(Iterator< T > first, Iterator< T > last);
 
   private:
     Node< T >* fake_;
@@ -83,37 +89,39 @@ namespace aleksandrov
   }
 
   template< typename T >
-  Iterator< T > List< T >::begin() const
+  Iterator< T > List< T >::begin() const noexcept
   {
     return Iterator< T >(fake_->next_);
   }
 
   template< typename T >
-  Iterator< T > List< T >::end() const
+  Iterator< T > List< T >::end() const noexcept
   {
     return Iterator< T >(tail_);
   }
 
   template< typename T >
-  T& List< T >::front()
+  T& List< T >::front() noexcept
   {
+    assert(begin() != nullptr);
     return *begin();
   }
 
   template< typename T >
-  T& List< T >::back()
+  T& List< T >::back() noexcept
   {
+    assert(end() != nullptr);
     return *end();
   }
 
   template< typename T >
-  bool List< T >::empty()
+  bool List< T >::empty() const noexcept
   {
     return size() == 0;
   }
 
   template< typename T >
-  size_t List< T >::size()
+  size_t List< T >::size() const noexcept
   {
     auto tempPtr = fake_->next_;
     if (!tempPtr)
@@ -164,18 +172,36 @@ namespace aleksandrov
   }
 
   template< typename T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
-    if (!empty())
-    {
-      auto tempPtr = fake_->next_;
-      fake_->next_ = tempPtr->next_;
-      delete tempPtr;
-    }
+    assert(!empty());
+    auto tempPtr = fake_->next_;
+    fake_->next_ = tempPtr->next_;
+    delete tempPtr;
   }
 
   template< typename T >
-  void List< T >::swap(List< T >& other)
+  void List< T >::popBack() noexcept
+  {
+    assert(!empty());
+    auto beforeTail = fake_->next_;
+    while (beforeTail->next_ != tail_)
+    {
+      beforeTail = beforeTail->next_;
+    }
+    if (size() == 1)
+    {
+      fake_->next_ = nullptr;
+    }
+    else
+    {
+      beforeTail->next_ = fake_;
+    }
+    delete tail_;
+  }
+
+  template< typename T >
+  void List< T >::swap(List< T >& other) noexcept
   {
     std::swap(fake_, other.fake_);
     std::swap(tail_, other.tail_);
@@ -188,6 +214,65 @@ namespace aleksandrov
     {
       popFront();
     }
+  }
+
+
+  template< typename T >
+  void List< T >::remove(const T& value)
+  {
+    const auto pred = [&value](const T& rhs)
+    {
+      return value == rhs;
+    };
+    removeIf(pred);
+  }
+
+  template< typename T >
+  template< typename UnaryPredicate >
+  void List< T >::removeIf(UnaryPredicate p)
+  {
+    assert(!empty());
+    for (Iterator< T > beforeIt(fake_), it = begin(); it != fake_;)
+    {
+      if (p(*it))
+      {
+        it = eraseAfter(beforeIt);
+      }
+      else
+      {
+        beforeIt = it++;
+      }
+    }
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::eraseAfter(Iterator< T > pos)
+  {
+    assert(!empty());
+    assert(pos.getNode());
+    assert(pos != end());
+    assert(pos.getNode() != tail_);
+
+    Node< T >* posPtr = pos.getNode();
+    Node< T >* toErase = posPtr->next_;
+    posPtr->next_ = toErase->next_;
+    if (toErase == tail_)
+    {
+      tail_ = posPtr;
+    }
+    delete toErase;
+    return Iterator< T >(posPtr->next_);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::eraseAfter(Iterator< T > first, Iterator< T > last)
+  {
+    assert(first != last);
+    for (auto it = first; it != last; ++it)
+    {
+      eraseAfter(it);
+    }
+    return last;
   }
 }
 

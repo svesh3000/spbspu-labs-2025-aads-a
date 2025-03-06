@@ -3,7 +3,8 @@
 
 BOOST_AUTO_TEST_CASE(construction)
 {
-  aleksandrov::List< int > list;
+  aleksandrov::List< int > list1;
+  aleksandrov::List< char >list2(52, '\0');
 }
 
 BOOST_AUTO_TEST_CASE(begin_end)
@@ -65,10 +66,22 @@ BOOST_AUTO_TEST_CASE(pushBack)
 BOOST_AUTO_TEST_CASE(popFront)
 {
   aleksandrov::List< int > list;
+  list.pushBack(123);
+  list.pushBack(456);
   list.popFront();
-  list.pushFront(2025);
-  list.popFront();
+  BOOST_TEST(list.front() == 456);
+}
+
+BOOST_AUTO_TEST_CASE(popBack)
+{
+  aleksandrov::List< double > list;
+  list.pushFront(1000);
+  list.popBack();
   BOOST_TEST(list.empty());
+  list.pushBack(1);
+  list.pushBack(2);
+  list.popBack();
+  BOOST_TEST(list.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(swap)
@@ -94,3 +107,29 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_TEST(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(remove_if)
+{
+  aleksandrov::List< char > list;
+  list.pushBack('a');
+  list.pushBack('a');
+  list.remove('a');
+  BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(eraseAfter)
+{
+  aleksandrov::List< int > list;
+  list.pushBack(1);
+  list.pushBack(2);
+  list.eraseAfter(list.begin());
+  BOOST_TEST(list.size() == 1);
+  for (int i = 2; i < 8; ++i)
+  {
+    list.pushBack(i);
+  }
+  auto first = std::next(list.begin());
+  auto last = std::next(first, 4);
+  auto it = list.eraseAfter(first, last);
+  BOOST_TEST(*it == 6);
+  BOOST_TEST(list.size() == 5);
+}
