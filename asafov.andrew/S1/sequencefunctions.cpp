@@ -2,7 +2,7 @@
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
-{
+{  
   for (size_t i = 0; i < size; i++)
   {
     if(begins[i]!=ends[i])
@@ -13,8 +13,9 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
   return true;
 }
 
-void asafov::getSequences(sequence_list_t& data, std::istream& in)
+sequence_list_t asafov::getSequences(std::istream& in)
 {
+  sequence_list_t data;
   do
   {
     std::string name;
@@ -37,6 +38,7 @@ void asafov::getSequences(sequence_list_t& data, std::istream& in)
     sequence_t pair = make_pair(name, list);
     data.push_back(pair);
   } while (!in.eof());
+  return data;
 }
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
@@ -44,15 +46,17 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
+
   size_t size = 0;
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
-    out << iter->first << ' ';
+    std::cout << iter->first << ' ' << std::flush;
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
-    ++size;
+    ++size;  
   }
-  out << '\n';
+  std::cout << '\n';
+  
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
@@ -63,21 +67,21 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
       if (begins[i] != ends[i])
       {
         sum += *begins[i];
-        out << *begins[i] << ' ';
+        std::cout << *begins[i] << ' ' << std::flush;
         ++begins[i];
       }
     }
     sums.push_back(sum);
-    out << '\n';
+    std::cout << '\n';
   }
-  auto it = sums.cbegin();
-  out << *it;
-  ++it;
-  for (; it != sums.cend(); ++it)
+
+  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
   {
-    out << ' ' << *it ;
+    std::cout << *it << ' ' << std::flush;
   }
-  out << '\n';
+  
+  std::cout << '\n';
+
   delete[] begins;
   delete[] ends;
 }
