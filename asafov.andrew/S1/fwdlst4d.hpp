@@ -41,6 +41,10 @@ namespace asafov
       data->head_ = nullptr;
       data->last_ = nullptr;
     }
+    ~Forward_list()
+    {
+      clear();
+    }
     class const_iterator
     {
       friend class Forward_list;

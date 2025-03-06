@@ -1,4 +1,4 @@
-/*#include "sequencefunctions.h"
+#include "sequencefunctions.h"
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
@@ -13,9 +13,8 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
   return true;
 }
 
-sequence_list_t asafov::getSequences(std::istream& in)
+void asafov::getSequences(sequence_list_t& data, std::istream& in)
 {
-  sequence_list_t data;
   do
   {
     std::string name;
@@ -38,10 +37,9 @@ sequence_list_t asafov::getSequences(std::istream& in)
     sequence_t pair = make_pair(name, list);
     data.push_back(pair);
   } while (!in.eof());
-  return data;
 }
 
-void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
+void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
 {
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
@@ -82,4 +80,4 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
   out << '\n';
   delete[] begins;
   delete[] ends;
-}*/
+}
