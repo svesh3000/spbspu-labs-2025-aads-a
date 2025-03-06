@@ -2,14 +2,13 @@
 #define LIST_HPP
 #include <utility>
 #include "iterator.hpp"
-#include "cIterator.hpp"
 #include "node.hpp"
 
 namespace
 {
   template< typename T >
-  void setOtherPos(demehin::cListIterator< T >& otherPos, const demehin::cListIterator< T >& begin,
-    const demehin::cListIterator< T >& pos)
+  void setOtherPos(demehin::ListIterator< T, true >& otherPos, const demehin::ListIterator< T, true >& begin,
+    const demehin::ListIterator< T, true >& pos)
   {
     for (auto it = begin; it != pos; ++it)
     {
@@ -24,8 +23,8 @@ namespace demehin
   struct List
   {
   public:
-    using Iter = ListIterator< T >;
-    using cIter = cListIterator< T >;
+    using Iter = ListIterator< T, false >;
+    using cIter = ListIterator< T, true >;
 
     List();
     List(const List< T >&);
@@ -134,7 +133,7 @@ namespace demehin
   }
 
   template< typename T >
-  List< T >::List(ListIterator< T > first, ListIterator< T > last):
+  List< T >::List(Iter first, Iter last):
     List()
   {
     assign(first, last);
@@ -255,27 +254,27 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::begin() const noexcept
+  typename List< T >::Iter List< T >::begin() const noexcept
   {
-    return ListIterator< T >(fake_->next);
+    return Iter(fake_->next);
   }
 
   template< typename T >
-  ListIterator< T > List< T >::end() const noexcept
+  typename List< T >::Iter List< T >::end() const noexcept
   {
-    return ListIterator< T >(tail_->next);
+    return Iter(tail_->next);
   }
 
   template< typename T >
-  cListIterator< T > List< T >::cbegin() const noexcept
+  typename List< T >::cIter List< T >::cbegin() const noexcept
   {
-    return cListIterator< T >(fake_->next);
+    return cIter(fake_->next);
   }
 
   template< typename T >
-  cListIterator< T > List< T >::cend() const noexcept
+  typename List< T >::cIter List< T >::cend() const noexcept
   {
-    return cListIterator< T >(tail_->next);
+    return cIter(tail_->next);
   }
 
   template< typename T >
@@ -387,7 +386,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::fill(ListIterator< T > first, ListIterator< T > last, const T& value) noexcept
+  void List< T >::fill(Iter first, Iter last, const T& value) noexcept
   {
     for (; first != last; ++first)
     {
@@ -396,7 +395,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >& other) noexcept
+  void List< T >::splice(cIter pos, List< T >& other) noexcept
   {
     if (other.empty())
     {
@@ -438,14 +437,14 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >&& other) noexcept
+  void List< T >::splice(cIter pos, List< T >&& other) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > it) noexcept
+  void List< T >::splice(cIter pos, List< T >& other, cIter it) noexcept
   {
     if (other.empty() || pos == cend() || it == other.cbegin())
     {
@@ -466,15 +465,14 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > it) noexcept
+  void List< T >::splice(cIter pos, List< T >&& other, cIter it) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >& other, cListIterator< T > first,
-    cListIterator< T > last) noexcept
+  void List< T >::splice(cIter pos, List< T >& other, cIter first, cIter last) noexcept
   {
     if (other.empty() || pos == cend())
     {
@@ -516,8 +514,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::splice(cListIterator< T > pos, List< T >&& other, cListIterator< T > first,
-    cListIterator< T > last) noexcept
+  void List< T >::splice(cIter pos, List< T >&& other, cIter first, cIter last) noexcept
   {
     List< T > tempList(std::move(other));
     splice(tempList);
@@ -560,7 +557,7 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::assign(ListIterator< T > first, ListIterator< T > last)
+  void List< T >::assign(Iter first, Iter last)
   {
     List< T > temp;
     for (auto it = first; it != last; it++)
@@ -582,10 +579,10 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::erase(cListIterator< T > pos) noexcept
+  typename List< T >::Iter List< T >::erase(cIter pos) noexcept
   {
     const Node* todelete = pos.getNode();
-    ListIterator< T > toreturn(todelete->next);
+    Iter toreturn(todelete->next);
     if (todelete == fake_->next)
     {
       fake_->next = todelete->next;
@@ -609,9 +606,9 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::erase(cListIterator< T > first, cListIterator< T > last) noexcept
+  typename List< T >::Iter List< T >::erase(cIter first, cIter last) noexcept
   {
-    ListIterator< T > toreturn;
+    Iter toreturn;
     for (auto it = first; it != last; it++)
     {
       toreturn = erase(it);
@@ -620,7 +617,7 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, const T& value)
+  typename List< T >::Iter List< T >::insert(cIter pos, const T& value)
   {
     if (empty())
     {
@@ -635,28 +632,28 @@ namespace demehin
     posNode->prev->next = newNode;
     posNode->prev = newNode;
     size_++;
-    return ListIterator< T >(newNode);
+    return Iter(newNode);
   }
 
   template< typename T >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, T&& value)
+  typename List< T >::Iter List< T >::insert(cIter pos, T&& value)
   {
     T temp_val = std::move(value);
     return insert(pos, temp_val);
   }
 
   template< typename T >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, size_t count, const T& value)
+  typename List< T >::Iter List< T >::insert(cIter pos, size_t count, const T& value)
   {
     if (count == 0)
     {
-      return ListIterator< T >(pos.getNode());
+      return Iter(pos.getNode());
     }
 
     List< T > temp(*this);
-    cListIterator< T > tempPos = temp.cbegin();
+    cIter tempPos = temp.cbegin();
     setOtherPos(tempPos, cbegin(), pos);
-    ListIterator< T > toreturn = temp.insert(tempPos, value);
+    Iter toreturn = temp.insert(tempPos, value);
     for (size_t i = 1; i < count; i++)
     {
       temp.insert(tempPos, value);
@@ -667,17 +664,17 @@ namespace demehin
 
   template< typename T >
   template< typename InputIt >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, InputIt first, InputIt last)
+  typename List< T >::Iter List< T >::insert(cIter pos, InputIt first, InputIt last)
   {
     if (first == last)
     {
-      return ListIterator< T >(pos.getNode());
+      return Iter(pos.getNode());
     }
 
     List< T > temp(*this);
-    cListIterator< T > tempPos = temp.cbegin();
+    cIter tempPos = temp.cbegin();
     setOtherPos(tempPos, cbegin(), pos);
-    ListIterator< T > toreturn;
+    Iter toreturn;
     for (auto it = first; it != last; it++)
     {
       toreturn = temp.insert(tempPos, *it);
@@ -687,11 +684,11 @@ namespace demehin
   }
 
   template< typename T >
-  ListIterator< T > List< T >::insert(cListIterator< T > pos, std::initializer_list< T > ilist)
+  typename List< T >::Iter List< T >::insert(cIter pos, std::initializer_list< T > ilist)
   {
     if (ilist.size() == 0)
     {
-      return ListIterator< T >(pos.getNode());
+      return Iter(pos.getNode());
     }
 
     return insert(pos, ilist.begin(), ilist.end());

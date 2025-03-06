@@ -9,7 +9,7 @@ namespace
   using ListOfPairs = demehin::List< std::pair< std::string, demehin::List< unsigned long long > > >;
   using ullList = demehin::List< unsigned long long >;
 
-  size_t defineMaxSize(ListOfPairs pairsList)
+  size_t defineMaxSize(const ListOfPairs& pairsList)
   {
     size_t max_size = 0;
     for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
@@ -71,7 +71,7 @@ namespace
     }
   }
 
-  void printValues(std::ostream& out, ListOfPairs pairsList)
+  void printValues(std::ostream& out, ListOfPairs& pairsList)
   {
     size_t max_size = defineMaxSize(pairsList);
     if (max_size == 0)
