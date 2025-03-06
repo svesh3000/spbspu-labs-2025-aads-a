@@ -1,5 +1,5 @@
 #include "sequencefunctions.h"
-#include <algorithm>
+#include <stdexcept>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
 {
@@ -64,7 +64,15 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     {
       if (begins[i] != ends[i])
       {
-        sum += *begins[i];
+        try
+        {
+          sum += *begins[i];
+        }
+        catch (std::overflow_error&)
+        {
+          std::cerr << "owerflow!";
+          return;
+        }
         out << *begins[i] << ' ' << std::flush;
         ++begins[i];
       }
@@ -76,7 +84,10 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   {
     out << *it << ' ' << std::flush;
   }
-  out << '\n';
+  if (sequences.size() != 0)
+  {
+    out << '\n';
+  }
   delete[] begins;
   delete[] ends;
 }
