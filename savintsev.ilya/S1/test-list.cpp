@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(test_erase)
   lt< int > mylist;
   lt< int >::iterator it1, it2;
 
-  for (int i = 1; i < 10; ++i) 
+  for (int i = 1; i < 10; ++i)
   {
     mylist.push_back(i * 10);
   }
