@@ -37,6 +37,9 @@ namespace gavrilova {
     void remove(const T& value);
     void splice(const FwdList& other);
     void reverse();
+    void swap(FwdList< T >& other) noexcept;
+    void assign(size_t count, const T& value);
+    void assign(IteratorFwd< T > first, IteratorFwd< T > last);
   private:
     NodeFwdList< T >* fake;
     size_t nodeCount;
@@ -302,6 +305,35 @@ template< class T >
 bool gavrilova::FwdList< T >::operator>(const FwdList<T> &other) const
 {
   return other < *this;
+}
+
+template< class T>
+void gavrilova::FwdList< T >::swap(FwdList< T >& other ) noexcept
+{
+  std::swap(fake_, other.fake_);
+  std::swap(size_, other.size_);
+}
+
+template< class T>
+void gavrilova::FwdList< T>::assign(size_t count, const T& value)
+{
+  clear();
+  for (size_t i = 0; i < count; ++i)
+  {
+    push_front(value);
+  }
+}
+
+template< class T>
+void gavrilova::FwdList< T>::assign(IteratorFwd< T > first, IteratorFwd< T > last)
+{
+  clear();
+  while(first != last)
+  {
+    push_front(*first);
+    ++first;
+  }
+  reverse();
 }
 
 #endif
