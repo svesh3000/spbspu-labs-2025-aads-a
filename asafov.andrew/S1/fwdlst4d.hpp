@@ -1,6 +1,5 @@
 #ifndef FORWARD_LIST_H
 #define FORWARD_LIST_H
-#include <iostream>
 #include <memory>
 namespace asafov
 {
@@ -30,9 +29,17 @@ namespace asafov
       data.head_ = nullptr;
       data.last_ = nullptr;
     }
-    ~Forward_list()
+    Forward_list(T& data)
     {
-      clear();
+      head_ = data->head_;
+      last_ = data->last_;
+    }
+    Forward_list(T&& data)
+    {
+      head_ = data->head_;
+      last_ = data->last_;
+      data->head_ = nullptr;
+      data->last_ = nullptr;
     }
     class const_iterator
     {
@@ -91,19 +98,13 @@ namespace asafov
     {
       return const_iterator(nullptr, last_);
     }
-    void push_front(const T& value);
-    void pop_front()
+    const_iterator begin() const
     {
-      if (head_ != last_)
-      {
-        last_->next_ = head_->next_;
-        delete head_;
-      }
-      else {
-        delete head_;
-        head_ = nullptr;
-        last_ = nullptr;
-      }
+      return const_iterator(head_, last_);
+    }
+    const_iterator end() const
+    {
+      return const_iterator(nullptr, last_);
     }
     void push_back(const T& value)
     {
@@ -121,7 +122,6 @@ namespace asafov
         last_ = new_node;
       }
     }
-    void pop_back();
     void swap();
     size_t size() const
     {
@@ -143,15 +143,28 @@ namespace asafov
         return false;
       }
     }
+    void pop_front()
+    {
+      if (head_ != head_->next_)
+      {
+        Node* temp = head_;
+        head_ = head_->next_;
+        last_->next_ = head_;
+        delete temp;
+      }
+      else{
+        delete head_;
+        head_ = nullptr;
+        last_ = nullptr;
+      }
+    }
     T& front();
     T& back();
-    void clear()
-    {
-      if (head_ != last_)
-      {
+
+    void clear(){
+      while (!empty()){
         pop_front();
       }
-      pop_front();
     }
   private:
     Node* head_;
