@@ -237,21 +237,21 @@ void gavrilova::FwdList< T >::splice(const FwdList<T> &other)
 template< class T >
 void gavrilova::FwdList< T >::reverse()
 {
-  if (empty())
-    return;
-
-  NodeFwdList<T> *prev = nullptr;
-  NodeFwdList<T> *current = fake_->next;
-  NodeFwdList<T> *next = nullptr;
-
-  while (current != fake_)
+  if (fake_->next == fake_)
   {
-    next = current->next;
-    current->next = prev;
-    prev = current;
-    current = next;
+    return;
   }
-  fake_->next = prev;
+  NodeFwdList< T >* next = fake_->next;
+  NodeFwdList< T >* last = fake_;
+  while (next->next != fake_)
+  {
+    NodeFwdList< T >* remember = next->next;
+    next->next = last;
+    last = next;
+    next = remember;
+  }
+  next->next = last;
+  fake_->next = next;
 }
 
 template< class T >
