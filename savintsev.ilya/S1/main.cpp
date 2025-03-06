@@ -52,10 +52,7 @@ int main()
       auto temp_it = it->second.begin();
       if (it->second.size() > i)
       {
-        for (size_t next = 0; next < i; ++next)
-        {
-          temp_it++;
-        }
+        std::advance(temp_it, i);
         if (printed != 0)
         {
           std::cout << " ";
@@ -91,10 +88,3 @@ int main()
   }
   std::cout << "\n";
 }
-
-/*
-first 1 1 1
-second 2 2 2 2
-third
-fourth 4 4
-*/

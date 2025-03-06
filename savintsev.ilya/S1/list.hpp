@@ -48,26 +48,26 @@ namespace savintsev
     void push_back(T && value);
     void pop_front();
     void pop_back();
-    void swap(List & rhs);
+    void swap(List & rhs) noexcept;
     void clear() noexcept;
 
-    void remove(const T & value);
+    void remove(const T & value) noexcept;
     template< class Predicate >
-    void remove_if(Predicate pred);
+    void remove_if(Predicate pred) noexcept;
 
-    void splice(const_iterator pos, List & rhs);
-    void splice(const_iterator pos, List && rhs);
-    void splice(const_iterator pos, List & rhs, const_iterator i);
-    void splice(const_iterator pos, List && rhs, const_iterator i);
-    void splice(const_it pos, List & rhs, const_it first, const_it last);
-    void splice(const_it pos, List && rhs, const_it first, const_it last);
+    void splice(const_iterator pos, List & rhs) noexcept;
+    void splice(const_iterator pos, List && rhs) noexcept;
+    void splice(const_iterator pos, List & rhs, const_iterator i) noexcept;
+    void splice(const_iterator pos, List && rhs, const_iterator i) noexcept;
+    void splice(const_it pos, List & rhs, const_it first, const_it last) noexcept;
+    void splice(const_it pos, List && rhs, const_it first, const_it last) noexcept;
 
     void assign(const_iterator first, const_iterator last);
     void assign(size_t n, const T & value);
     void assign(std::initializer_list< T > il);
 
-    iterator erase(const_iterator pos);
-    iterator erase(const_iterator first, const_iterator last);
+    iterator erase(const_iterator pos) noexcept;
+    iterator erase(const_iterator first, const_iterator last) noexcept;
 
     iterator insert(const_iterator pos, const T & value);
     iterator insert(const_iterator pos, size_t n, const T & value);
@@ -108,24 +108,24 @@ namespace savintsev
   };
 
   template< class T >
-  bool operator==(const List< T > & lhs, const List< T > & rhs);
+  bool operator==(const List< T > & lhs, const List< T > & rhs) noexcept;
 
   template< class T >
-  bool operator!=(const List< T > & lhs, const List< T > & rhs);
+  bool operator!=(const List< T > & lhs, const List< T > & rhs) noexcept;
 
   template< class T >
-  bool operator<(const List< T > & lhs, const List< T > & rhs);
+  bool operator<(const List< T > & lhs, const List< T > & rhs) noexcept;
   template< class T >
-  bool operator<=(const List< T > & lhs, const List< T > & rhs);
+  bool operator<=(const List< T > & lhs, const List< T > & rhs) noexcept;
 
   template< class T >
-  bool operator>(const List< T > & lhs, const List< T > & rhs);
+  bool operator>(const List< T > & lhs, const List< T > & rhs) noexcept;
   template< class T >
-  bool operator>=(const List< T > & lhs, const List< T > & rhs);
+  bool operator>=(const List< T > & lhs, const List< T > & rhs) noexcept;
 }
 
 template< class T >
-bool savintsev::operator==(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator==(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   if (lhs.size() != rhs.size())
   {
@@ -144,13 +144,13 @@ bool savintsev::operator==(const List< T > & lhs, const List< T > & rhs)
 }
 
 template< class T >
-bool savintsev::operator!=(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator!=(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   return (!(lhs == rhs));
 }
 
 template< class T >
-bool savintsev::operator<(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator<(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   auto jt = rhs.cbegin();
   for (auto it = lhs.cbegin(); it != lhs.cend(); ++it)
@@ -169,19 +169,19 @@ bool savintsev::operator<(const List< T > & lhs, const List< T > & rhs)
 }
 
 template< class T >
-bool savintsev::operator<=(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator<=(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   return (!(rhs < lhs));
 }
 
 template< class T >
-bool savintsev::operator>(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator>(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   return (rhs < lhs);
 }
 
 template< class T >
-bool savintsev::operator>=(const List< T > & lhs, const List< T > & rhs)
+bool savintsev::operator>=(const List< T > & lhs, const List< T > & rhs) noexcept
 {
   return (!(lhs < rhs));
 }
@@ -439,7 +439,7 @@ void savintsev::List< T >::pop_back()
 }
 
 template< class T >
-void savintsev::List< T >::swap(List & rhs)
+void savintsev::List< T >::swap(List & rhs) noexcept
 {
   std::swap(dummy->next->prev, rhs.dummy->next->prev);
   std::swap(dummy->prev->next, rhs.dummy->prev->next);
@@ -458,7 +458,7 @@ void savintsev::List< T >::clear() noexcept
 }
 
 template< class T >
-void savintsev::List< T >::remove(const T & value)
+void savintsev::List< T >::remove(const T & value) noexcept
 {
   for (auto it = cbegin(); it != cend(); ++it)
   {
@@ -475,7 +475,7 @@ void savintsev::List< T >::remove(const T & value)
 
 template< class T >
 template< class Predicate >
-void savintsev::List< T >::remove_if(Predicate pred)
+void savintsev::List< T >::remove_if(Predicate pred) noexcept
 {
   for (auto it = cbegin(); it != cend(); ++it)
   {
@@ -512,7 +512,7 @@ typename savintsev::List< T >::iterator savintsev::List< T >::emplace_front(Args
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_iterator pos, List & rhs)
+void savintsev::List< T >::splice(const_iterator pos, List & rhs) noexcept
 {
   list_size += rhs.list_size;
   rhs.list_size = 0;
@@ -527,13 +527,13 @@ void savintsev::List< T >::splice(const_iterator pos, List & rhs)
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_iterator pos, List && rhs)
+void savintsev::List< T >::splice(const_iterator pos, List && rhs) noexcept
 {
   splice(pos, rhs);
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_iterator pos, List & rhs, const_iterator i)
+void savintsev::List< T >::splice(const_iterator pos, List & rhs, const_iterator i) noexcept
 {
   pos.node->prev->next = i.node;
   pos.node->prev = i.node;
@@ -546,13 +546,13 @@ void savintsev::List< T >::splice(const_iterator pos, List & rhs, const_iterator
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_iterator pos, List && rhs, const_iterator i)
+void savintsev::List< T >::splice(const_iterator pos, List && rhs, const_iterator i) noexcept
 {
   splice(pos, rhs, i);
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_it pos, List & rhs, const_it first, const_it last)
+void savintsev::List< T >::splice(const_it pos, List & rhs, const_it first, const_it last) noexcept
 {
   size_t dist = std::distance(first, last);
   list_size += dist;
@@ -571,7 +571,7 @@ void savintsev::List< T >::splice(const_it pos, List & rhs, const_it first, cons
 }
 
 template< class T >
-void savintsev::List< T >::splice(const_it pos, List && rhs, const_it first, const_it last)
+void savintsev::List< T >::splice(const_it pos, List && rhs, const_it first, const_it last) noexcept
 {
   splice(pos, rhs, first, last);
 }
@@ -607,7 +607,7 @@ void savintsev::List< T >::assign(std::initializer_list< T > il)
 }
 
 template< class T >
-typename savintsev::List< T >::iterator savintsev::List< T >::erase(const_iterator pos)
+typename savintsev::List< T >::iterator savintsev::List< T >::erase(const_iterator pos) noexcept
 {
   iterator result(pos.node->next);
   pos.node->prev->next = pos.node->next;
@@ -618,7 +618,7 @@ typename savintsev::List< T >::iterator savintsev::List< T >::erase(const_iterat
 }
 
 template< class T >
-typename savintsev::List< T >::iterator savintsev::List< T >::erase(const_iterator first, const_iterator last)
+typename savintsev::List< T >::iterator savintsev::List< T >::erase(const_iterator first, const_iterator last) noexcept
 {
   iterator result = nullptr;
   for (auto it = first; it != last; ++it)

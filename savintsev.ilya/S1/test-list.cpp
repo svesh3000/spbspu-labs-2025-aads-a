@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_begin_and_end)
     *it = 18;
   }
 
-  lt< int > eighteens(5, 18); 
+  lt< int > eighteens(5, 18);
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), eighteens.begin(), eighteens.end());
 }
 
@@ -270,8 +270,6 @@ BOOST_AUTO_TEST_CASE(test_insert)
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 12);
 }
 
-//merge to do
-
 BOOST_AUTO_TEST_CASE(test_operator_equal)
 {
   lt< int > mylist(4, 20);
@@ -365,8 +363,6 @@ BOOST_AUTO_TEST_CASE(test_size)
   BOOST_TEST(myints.size() == 19);
 }
 
-//sort to do
-
 BOOST_AUTO_TEST_CASE(test_splice)
 {
   lt< int > mylist1, mylist2;
@@ -422,5 +418,3 @@ BOOST_AUTO_TEST_CASE(test_swap)
   BOOST_TEST(first.size() == 5);
   BOOST_TEST(second.size() == 3);
 }
-
-//unique to do
