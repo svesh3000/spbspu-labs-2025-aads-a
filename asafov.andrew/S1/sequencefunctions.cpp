@@ -1,4 +1,4 @@
-#include "sequencefunctions.h"
+/*#include "sequencefunctions.h"
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
@@ -82,4 +82,4 @@ void asafov::outputSequences(sequence_list_t sequences, std::ostream& out)
   out << '\n';
   delete[] begins;
   delete[] ends;
-}
+}*/
