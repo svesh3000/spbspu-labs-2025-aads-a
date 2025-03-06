@@ -163,7 +163,39 @@ BOOST_AUTO_TEST_CASE(test_emplace)
 
 BOOST_AUTO_TEST_CASE(test_emplace_back)
 {
-  
+  lt< std::pair< int, char > > mylist;
+
+  mylist.emplace_back(10, 'a');
+  mylist.emplace_back(20, 'b');
+  mylist.emplace_back(30, 'c');
+
+  std::string points[] = {"(10,a)", "(20,b)", "(30,c)"};
+
+  size_t i = 0;
+  for (auto & x: mylist)
+  {
+    std::string test = "(" + std::to_string(x.first) + "," + x.second + ")";
+    BOOST_TEST(test == points[i++]);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_front)
+{
+  lt< std::pair< int, char > > mylist;
+
+  mylist.emplace_back(10, 'a');
+  mylist.emplace_back(20, 'b');
+  mylist.emplace_back(30, 'c');
+
+  std::string points[] = {"(10,a)", "(20,b)", "(30,c)"};
+  points->reserve();
+
+  size_t i = 0;
+  for (auto & x: mylist)
+  {
+    std::string test = "(" + std::to_string(x.first) + "," + x.second + ")";
+    BOOST_TEST(test == points[i++]);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(test_empty)
@@ -184,7 +216,26 @@ BOOST_AUTO_TEST_CASE(test_empty)
   BOOST_TEST(sum == 55);
 }
 
-//erase
+BOOST_AUTO_TEST_CASE(test_erase)
+{
+  lt< int > mylist;
+  lt< int >::iterator it1, it2;
+
+  for (int i = 1; i < 10; ++i) 
+  {
+    mylist.push_back(i * 10);
+  }
+  it1 = it2 = mylist.begin();
+  advance(it2, 6);
+  ++it1;
+  it1 = mylist.erase (it1);
+  it2 = mylist.erase (it2);
+  ++it1;
+  --it2;
+  mylist.erase (it1,it2);
+  int test[] = {10, 30, 60, 80, 90};
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 5);
+}
 
 BOOST_AUTO_TEST_CASE(test_front_and_back)
 {
@@ -197,11 +248,38 @@ BOOST_AUTO_TEST_CASE(test_front_and_back)
   BOOST_TEST(mylist.front() == 55);
 }
 
-//insert
+BOOST_AUTO_TEST_CASE(test_insert)
+{
+  lt< int > mylist;
+  lt< int >::iterator it;
+
+  for (size_t i = 1; i <= 5; ++i)
+  {
+    mylist.push_back(i);
+  }
+  it = mylist.begin();
+  ++it;
+  mylist.insert(it, 10);
+  mylist.insert (it, 2, 20);
+  --it;
+  std::list< int > newlist(2,30);
+  mylist.insert(it, newlist.begin(), newlist.end());
+  ++it;
+  mylist.insert(it, {50, 60});
+  int test[] = {1, 10, 20, 30, 30, 20, 50, 60, 2, 3, 4, 5};
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 12);
+}
 
 //merge to do
 
-//operator=
+BOOST_AUTO_TEST_CASE(test_operator_equal)
+{
+  lt< int > mylist(4, 20);
+  mylist = {19, 19, 19};
+  int test[] = {19, 19, 19};
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 3);
+  BOOST_TEST(mylist.size() == 3);
+}
 
 BOOST_AUTO_TEST_CASE(test_push_and_pop)
 {
@@ -224,7 +302,7 @@ BOOST_AUTO_TEST_CASE(test_push_and_pop)
 
 BOOST_AUTO_TEST_CASE(test_remove)
 {
-  savintsev::List< int > list1;
+  lt< int > list1;
   list1.push_back(0);
   list1.push_back(0);
   list1.push_back(4);
@@ -254,7 +332,22 @@ BOOST_AUTO_TEST_CASE(test_remove_if)
   }
 }
 
-//reverse
+BOOST_AUTO_TEST_CASE(test_reverse)
+{
+  lt< int > mylist;
+
+  for (int i = 1; i < 10; ++i)
+  {
+    mylist.push_back(i);
+  }
+  mylist.reverse();
+  std::list< int > test;
+  for (int i = 1; i < 10; ++i)
+  {
+    test.push_back(10 - i);
+  }
+  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test.begin(), test.end());
+}
 
 BOOST_AUTO_TEST_CASE(test_size)
 {

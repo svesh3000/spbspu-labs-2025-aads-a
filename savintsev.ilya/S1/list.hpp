@@ -18,7 +18,7 @@ namespace savintsev
     List();
     ~List();
     List(const List & rhs);
-    List(List && rhs) noexcept;
+    List(List && rhs);
     List(size_t n, const T & value);
     List(int n, const T & value);
     template< class InputIterator >
@@ -220,11 +220,14 @@ savintsev::List< T >::List(const List & rhs):
 }
 
 template< class T >
-savintsev::List< T >::List(List && rhs) noexcept:
+savintsev::List< T >::List(List && rhs):
   dummy(rhs.dummy),
   list_size(rhs.list_size)
 {
-  rhs.dummy = nullptr;
+  ListNode< T > * new_dummy = new ListNode< T >();
+  rhs.dummy = new_dummy;
+  rhs.dummy->next = rhs.dummy;
+  rhs.dummy->prev = rhs.dummy;
   rhs.list_size = 0;
 }
 
@@ -374,6 +377,7 @@ savintsev::List< T > & savintsev::List< T >::operator=(std::initializer_list< T 
   {
     push_back(*it);
   }
+  return *this;
 }
 
 template< class T >
@@ -698,17 +702,13 @@ typename savintsev::List< T >::iterator savintsev::List< T >::insert(const_itera
 template< class T >
 void savintsev::List< T >::reverse() noexcept
 {
-  const_iterator it = cbegin();
-  for (size_t i = 0; i < size(); ++i)
+  ListNode< T > * pos = dummy;
+  do
   {
-    dummy->next = it.node->next;
-    dummy->prev->next = it.node;
-    it.node->prev = dummy->prev;
-    dummy->prev = it.node;
-    it.node->next = dummy;
-    dummy->next->prev = dummy;
-    it = cbegin();
+    std::swap(pos->next, pos->prev);
+    pos = pos->prev;
   }
+  while (pos != dummy);
 }
 
 #endif
