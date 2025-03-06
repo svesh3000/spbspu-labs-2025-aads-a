@@ -46,17 +46,15 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
-
   size_t size = 0;
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
     std::cout << iter->first << ' ' << std::flush;
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
-    ++size;  
+    ++size;
   }
   std::cout << '\n';
-
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
@@ -74,14 +72,11 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     sums.push_back(sum);
     std::cout << '\n';
   }
-
   for (auto it = sums.cbegin(); it != sums.cend(); ++it)
   {
     std::cout << *it << ' ' << std::flush;
   }
-
   std::cout << '\n';
-
   delete[] begins;
   delete[] ends;
 }
