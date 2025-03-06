@@ -21,6 +21,8 @@ namespace alymova
     bool operator!=(const Iterator< T >& other) noexcept;
     T& operator*() noexcept;
     T* operator->() noexcept;
+    //bool operator<(const Iterator< T >& other) noexcept;
+    //bool operator>(const Iterator< T >& other) noexcept;
     ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;
@@ -41,6 +43,8 @@ namespace alymova
     bool operator!=(const ConstIterator< T >& other) noexcept;
     const T& operator*() noexcept;
     const T* operator->() noexcept;
+    //bool operator<(const ConstIterator< T >& other) noexcept;
+    //bool operator>(const ConstIterator< T >& other) noexcept;
     const ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;

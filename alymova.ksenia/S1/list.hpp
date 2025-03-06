@@ -341,38 +341,56 @@ namespace alymova
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other)
   {
+    assert(*this != other && "Splicing a list to itself");
     auto other_it = other.begin();
     while (other_it != other.end())
     {
       Iterator< T > other_it_next = ++other_it;
       --other_it;
-      ListNode< T >* node_now = position.get_node();
-      ListNode< T >* other_node_now = other_it.get_node();
-      if (position == begin())
-      {
-        head_ = other_node_now;
-      }
-      else
-      {
-        node_now->prev->next = other_node_now;
-      }
-      if (other_it == other.begin())
-      {
-        other.head_ = other_node_now->next;
-      }
-      else
-      {
-        other_node_now->prev->next = other_node_now->next;
-      }
-      other_node_now->next->prev = other_node_now->prev;
-      other_node_now->prev = node_now->prev;
-      other_node_now->next = node_now;
-      node_now->prev = other_node_now;
-
+      splice(position, other, other_it);
       other_it = other_it_next;
     }
   }
-
+  template< typename T >
+  void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > other_it)
+  {
+    assert(position.get_node() != nullptr && "Iterator is not valid");
+    assert(other_it.get_node() != nullptr && "Iterator is not valid");
+    ListNode< T >* node_now = position.get_node();
+    ListNode< T >* other_node_now = other_it.get_node();
+    if (position == begin())
+    {
+      head_ = other_node_now;
+    }
+    else
+    {
+      node_now->prev->next = other_node_now;
+    }
+    if (other_it == other.begin())
+    {
+      other.head_ = other_node_now->next;
+    }
+    else
+    {
+      other_node_now->prev->next = other_node_now->next;
+    }
+    other_node_now->next->prev = other_node_now->prev;
+    other_node_now->prev = node_now->prev;
+    other_node_now->next = node_now;
+    node_now->prev = other_node_now;
+  }
+  template< typename T >
+  void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > first, Iterator< T > last)
+  {
+    auto other_it = first;
+    while (other_it != last)
+    {
+      Iterator< T > other_it_next = ++other_it;
+      --other_it;
+      splice(position, other, other_it);
+      other_it = other_it_next;
+    }
+  }
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {

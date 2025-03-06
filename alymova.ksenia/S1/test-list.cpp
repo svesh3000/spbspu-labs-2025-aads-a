@@ -167,12 +167,44 @@ BOOST_AUTO_TEST_CASE(test_splice)
   {
     list2.push_back(i * 10);
   }
-  auto position = list1.begin();
-  ++position;
-  list1.splice(position, list2);
+  auto iter1 = list2.begin();
+  list1.splice(list1.begin(), list2, iter1); //10 1 2 3 4; 20 30
+  BOOST_TEST(list1.front() == 10);
+  BOOST_TEST(list2.front() == 20);
+  BOOST_TEST(*iter1 == 10);
+  BOOST_TEST(list1.size() == 5);
+  BOOST_TEST(list2.size() == 2);
+
+  auto iter2 = --list2.end();
+  list1.splice(list1.begin(), list2, iter2); //30 10 1 2 3 4; 20
+  BOOST_TEST(list1.front() == 30);
+  BOOST_TEST(list2.front() == 20);
+  BOOST_TEST(*iter2 == 30);
+  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(list2.size() == 1);
+
+  auto iter3 = list2.begin();
+  list1.splice(--list1.end(), list2, iter3); //30 10 1 2 3 20 4;
+  BOOST_TEST(*iter3 == 20);
+  BOOST_TEST(*(++iter3) == 4);
   BOOST_TEST(list1.size() == 7);
-  BOOST_TEST(list1.front() == 1);
-  BOOST_TEST(list1.back() == 4);
-  BOOST_TEST(*position == 2);
-  BOOST_TEST(list2.size() == 0);
+  BOOST_TEST(list2.empty());
+  
+  for (size_t i = 1; i <= 3; i++)
+  {
+    list2.push_back(i * 100);
+  }
+  list2.splice(--list2.end(), list1, iter3); // 30 10 1 2 3 4; 100 200 4 300
+  BOOST_TEST(list1.back() == 20);
+  BOOST_TEST(*(++iter3) == 300);
+  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(list2.size() == 4);
+
+  list_t list3;
+  list_t list2_copy = list2;
+  list2.splice(list2.begin(), list3);
+  BOOST_TEST(list2 == list2_copy);
+
+  list2.splice(list2.begin(), list3, list3.begin(), list3.end());
+  BOOST_TEST(list2 == list2_copy);
 }
