@@ -28,6 +28,8 @@ namespace aleksandrov
 
     bool operator!=(const Iterator< T >&) const;
     bool operator==(const Iterator< T >&) const;
+
+    Node< T >* getNode() const;
   private:
     Node< T >* node_;
   };
@@ -69,6 +71,12 @@ namespace aleksandrov
   bool Iterator< T >::operator!=(const Iterator< T >& rhs) const
   {
     return !(rhs == *this);
+  }
+
+  template< typename T >
+  Node< T >* Iterator< T >::getNode() const
+  {
+    return node_;
   }
 }
 
