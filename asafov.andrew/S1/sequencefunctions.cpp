@@ -2,7 +2,7 @@
 #include <algorithm>
 
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
-{  
+{
   for (size_t i = 0; i < size; i++)
   {
     if(begins[i]!=ends[i])
@@ -56,7 +56,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     ++size;  
   }
   std::cout << '\n';
-  
+
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, sequences.size()))
@@ -79,7 +79,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   {
     std::cout << *it << ' ' << std::flush;
   }
-  
+
   std::cout << '\n';
 
   delete[] begins;
