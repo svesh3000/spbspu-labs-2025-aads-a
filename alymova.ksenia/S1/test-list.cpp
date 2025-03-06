@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
   BOOST_TEST(*(++iter3) == 4);
   BOOST_TEST(list1.size() == 7);
   BOOST_TEST(list2.empty());
-  
+
   for (size_t i = 1; i <= 3; i++)
   {
     list2.push_back(i * 100);
