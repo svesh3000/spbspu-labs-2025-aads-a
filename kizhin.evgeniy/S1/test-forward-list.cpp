@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(initializer_list_assignment_operator)
 BOOST_AUTO_TEST_SUITE_END();
 BOOST_AUTO_TEST_SUITE(modifiers);
 
-BOOST_AUTO_TEST_CASE(push_back)
+BOOST_AUTO_TEST_CASE(push_back_lvalue)
 {
   constexpr ListT::value_type value = 7;
   constexpr ListT::size_type initSize = 77;
@@ -130,12 +130,34 @@ BOOST_AUTO_TEST_CASE(push_back)
   BOOST_TEST(list.back() == value);
 }
 
-BOOST_AUTO_TEST_CASE(push_front)
+BOOST_AUTO_TEST_CASE(push_back_rvalue)
+{
+  constexpr ListT::value_type value = 7;
+  constexpr ListT::size_type initSize = 77;
+  ListT list(initSize);
+  list.pushBack(std::move(value));
+  testForwardListInvariants(list);
+  BOOST_TEST(list.size() == initSize + 1);
+  BOOST_TEST(list.back() == value);
+}
+
+BOOST_AUTO_TEST_CASE(push_front_lvalue)
 {
   constexpr ListT::value_type value = 7;
   constexpr ListT::size_type initSize = 77;
   ListT list(initSize);
   list.pushFront(value);
+  testForwardListInvariants(list);
+  BOOST_TEST(list.size() == initSize + 1);
+  BOOST_TEST(list.front() == value);
+}
+
+BOOST_AUTO_TEST_CASE(push_front_rvalue)
+{
+  constexpr ListT::value_type value = 7;
+  constexpr ListT::size_type initSize = 77;
+  ListT list(initSize);
+  list.pushFront(std::move(value));
   testForwardListInvariants(list);
   BOOST_TEST(list.size() == initSize + 1);
   BOOST_TEST(list.front() == value);

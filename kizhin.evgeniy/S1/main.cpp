@@ -14,10 +14,10 @@ int main()
     }
     numbers = transpose(numbers);
     outputListWithNewLine(std::cout, names);
-    auto isEmptyList = [](const auto& list) -> bool
+    struct
     {
-      return list.empty();
-    };
+      bool operator()(const NumbersT& nums) { return nums.empty(); }
+    } isEmptyList;
     if (names.empty() || std::all_of(numbers.begin(), numbers.end(), isEmptyList)) {
       std::cout << "0\n";
       return 0;
