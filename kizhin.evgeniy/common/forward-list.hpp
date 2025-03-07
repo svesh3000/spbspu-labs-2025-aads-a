@@ -49,8 +49,10 @@ namespace kizhin {
     bool empty() const noexcept;
     size_type size() const noexcept;
 
-    void pushBack(value_type);
-    void pushFront(value_type);
+    void pushBack(const_reference);
+    void pushBack(value_type&&);
+    void pushFront(const_reference);
+    void pushFront(value_type&&);
     template < typename... Args >
     void emplaceBack(Args&&...);
     template < typename... Args >
@@ -260,13 +262,25 @@ namespace kizhin {
   }
 
   template < typename T >
-  void ForwardList< T >::pushBack(value_type value)
+  void ForwardList< T >::pushBack(const_reference value)
+  {
+    emplaceBack(value);
+  }
+
+  template < typename T >
+  void ForwardList< T >::pushBack(value_type&& value)
   {
     emplaceBack(std::move(value));
   }
 
   template < typename T >
-  void ForwardList< T >::pushFront(value_type value)
+  void ForwardList< T >::pushFront(const_reference value)
+  {
+    emplaceFront(value);
+  }
+
+  template < typename T >
+  void ForwardList< T >::pushFront(value_type&& value)
   {
     emplaceFront(std::move(value));
   }
