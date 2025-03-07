@@ -4,7 +4,7 @@
 namespace rychkov
 {
   template< class T, size_t N >
-  static size_t size( const T (&array)[N] ) noexcept
+  static size_t size(const T (&array)[N]) noexcept
   {
     return N;
   }
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(fill_test)
   BOOST_TEST(list.back() == initValue);
 
   size_t len = 0;
-  for (int i : list)
+  for (int i: list)
   {
     BOOST_TEST(len < initSize);
     BOOST_TEST(i == initValue);
