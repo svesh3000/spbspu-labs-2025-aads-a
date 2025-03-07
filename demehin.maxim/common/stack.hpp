@@ -12,15 +12,89 @@ namespace demehin
     ~Stack();
 
     void push(T rhs);
-    T drop();
+    T& top() const;
+    void pop();
+
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
   private:
     T* data_;
     size_t size_;
     size_t capacity_;
-    bool isEmpty_;
+
+    void resize();
   };
 
+  template< typename T >
+  Stack< T >::Stack():
+    data_(nullptr),
+    size_(0),
+    capacity_(100)
+  {
+    data_ = new T[capacity_];
+  }
+
+  template< typename T >
+  Stack< T >::~Stack()
+  {
+    delete[] data_;
+  }
+
+  template< typename T >
+  void Stack< T >::push(T rhs)
+  {
+    if (size_ == capacity_)
+    {
+      resize();
+    }
+    data_[size_++] = rhs;
+  }
+
+  template< typename T >
+  T& Stack< T >::top() const
+  {
+    if (empty())
+    {
+      throw std::logic_error("empty");
+    }
+    return data_[size_ - 1];
+  }
+
+  template< typename T >
+  void Stack< T >::pop()
+  {
+    if (empty())
+    {
+      throw std::logic_error("empty");
+    }
+    size_--;
+  }
+
+  template< typename T >
+  void Stack< T >::resize()
+  {
+    capacity_ *= 2;
+    T* newData = new T[capacity_];
+    for (size_t i = 0; i < size_; i++)
+    {
+      newData[i] = data_[i];
+    }
+    delete[] data_;
+    data_ = newData;
+  }
+
+  template< typename T >
+  bool Stack< T >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename T >
+  size_t Stack< T >::size() const noexcept
+  {
+    return size_;
+  }
 }
 
 #endif
