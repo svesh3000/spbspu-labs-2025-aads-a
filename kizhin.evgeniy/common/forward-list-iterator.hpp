@@ -4,7 +4,7 @@
 #include <cassert>
 #include <iterator>
 #include <type_traits>
-#include "forward-list-fwd-declaration.hpp"
+#include "forward-list-fwd.hpp"
 #include "forward-list-node.hpp"
 
 namespace kizhin {
