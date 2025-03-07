@@ -7,18 +7,18 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
 {
   using list_t = alymova::List< int >;
 
-  list_t list1 = {3, 1};
+  list_t list1(3, 1);
   list_t list2(list1);
   BOOST_TEST(list1 == list2);
 
-  list_t list3(std::move(list_t{3, 1}));
+  list_t list3(std::move(list_t(3, 1)));
   BOOST_TEST(list1 == list3);
 
-  list_t list4 = {5, 2};
+  list_t list4(5, 2);
   list3 = list4;
   BOOST_TEST(list3 == list4);
 
-  list4 = list_t{3, 1};
+  list4 = list_t(3, 1);
   BOOST_TEST(list4 == list1);
   BOOST_TEST(list4 != list3);
 }

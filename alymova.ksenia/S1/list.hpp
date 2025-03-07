@@ -22,6 +22,8 @@ namespace alymova
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
     List(size_t n, const T& value = T());
+    template< typename InputIterator>
+    List(InputIterator first, InputIterator last);
     ~List() noexcept;
 
     List< T >& operator=(const List< T >& other);
@@ -111,17 +113,9 @@ namespace alymova
   List< T >::List(const List< T >& other):
     List()
   {
-    try
+    for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      for (auto it = other.cbegin(); it != other.cend(); ++it)
-      {
-        push_back(*(it));
-      }
-    }
-    catch (const std::bad_alloc& e)
-    {
-      clear();
-      throw;
+      push_back(*it);
     }
   }
 
@@ -138,6 +132,22 @@ namespace alymova
     for (size_t i = 0; i < n; i++)
     {
       push_back(value);
+    }
+    /*catch (const std::bad_alloc& e)
+    {
+      clear();
+      throw;
+    }*/
+  }
+  template< typename T >
+  template< typename InputIterator>
+  List< T >::List(InputIterator first, InputIterator last):
+    List()
+  {
+    while (first != last)
+    {
+      push_back(*first);
+      first++;
     }
   }
 
