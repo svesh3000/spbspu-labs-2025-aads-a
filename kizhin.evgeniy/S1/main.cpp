@@ -13,7 +13,10 @@ int main()
       throw std::logic_error("Failed to input");
     }
     numbers = transpose(numbers);
-    outputListWithNewLine(std::cout, names);
+    outputList(std::cout, names);
+    if (!names.empty()) {
+      std::cout << '\n';
+    }
     struct
     {
       bool operator()(const NumbersT& nums) { return nums.empty(); }
@@ -23,11 +26,18 @@ int main()
       return 0;
     }
     ForwardList< NumbersT::value_type > sums;
-    for (const auto& num : numbers) {
-      outputListWithNewLine(std::cout, num);
+    for (const auto& num: numbers) {
+      outputList(std::cout, num);
+      if (!num.empty()) {
+        std::cout << '\n';
+      }
       sums.pushBack(safeAccumulate(num));
     }
-    outputListWithNewLine(std::cout, sums);
+    outputList(std::cout, sums);
+    if (!sums.empty()) {
+      std::cout << '\n';
+    }
+
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << '\n';
     return 1;
