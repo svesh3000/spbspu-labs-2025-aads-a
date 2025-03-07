@@ -39,12 +39,12 @@ int main()
 
   rychkov::List< rychkov::List< size_t > > result;
   char space[2] = "\0";
-  for (const decltype(entered)::value_type& i : entered)
+  for (const decltype(entered)::value_type& i: entered)
   {
     std::cout << space << i.first;
     space[0] = ' ';
     decltype(result)::iterator wPoint = result.begin();
-    for (size_t j : i.second)
+    for (size_t j: i.second)
     {
       if (wPoint != result.end())
       {
@@ -65,10 +65,10 @@ int main()
   rychkov::List< size_t > sums(0, result.size());
   decltype(sums)::iterator wPoint = sums.begin();
   bool wasOverflowed = false;
-  for (const decltype(result)::value_type& i : result)
+  for (const decltype(result)::value_type& i: result)
   {
     space[0] = '\0';
-    for (size_t j : i)
+    for (size_t j: i)
     {
       if (std::numeric_limits< size_t >::max() - *wPoint < j)
       {
@@ -94,7 +94,7 @@ int main()
   else
   {
     space[0] = '\0';
-    for (decltype(sums)::value_type i : sums)
+    for (decltype(sums)::value_type i: sums)
     {
       std::cout << space << i;
       space[0] = ' ';
