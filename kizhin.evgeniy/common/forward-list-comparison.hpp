@@ -2,8 +2,8 @@
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_FORWARD_LIST_COMPARISON_HPP
 
 #include <algorithm>
-#include "algorithms.hpp"
-#include "forward-list-fwd-declaration.hpp"
+#include "algorithm-utils.hpp"
+#include "forward-list-fwd.hpp"
 
 namespace kizhin {
   template < typename T >
