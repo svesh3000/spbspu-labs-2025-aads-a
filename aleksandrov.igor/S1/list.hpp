@@ -85,7 +85,7 @@ namespace aleksandrov
     }
     return *newList;
   }
-  
+
   template< typename T >
   List< T >::List(List< T >&& rhs) noexcept:
     fake_(rhs.fake_),
