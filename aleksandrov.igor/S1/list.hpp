@@ -83,6 +83,8 @@ namespace aleksandrov
   List< T >& List< T >::operator=(const List< T >& rhs)
   {
     List< T >* newList = new List< T >;
+    clear();
+    delete fake_;
     fake_ = newList->fake_;
     tail_ = newList->tail_;
     for (auto it = rhs.begin(); it != rhs.end(); ++it)
@@ -292,9 +294,10 @@ namespace aleksandrov
   template< typename T >
   void List< T >::splice(cIterator< T > pos, List< T >& other)
   {
+    Node< T >* node = pos.getNode();
+    assert(node != nullptr);
     if (!other.empty())
     {
-      Node< T >* node = pos.getNode();
       Node< T >* beforePos = begin().getNode();
       while (beforePos->next_ != node)
       {
@@ -311,12 +314,10 @@ namespace aleksandrov
   template< typename T >
   void List< T >::assign(size_t count, const T& value)
   {
-    List< T >* newList = new List< T >;
     clear();
-    delete fake_;
     for (size_t i = 0; i < count; ++i)
     {
-      newList->pushBack(value);
+      pushBack(value);
     }
   }
 
@@ -324,7 +325,7 @@ namespace aleksandrov
   Iterator< T > List< T >::eraseAfter(Iterator< T > pos)
   {
     assert(!empty());
-    assert(pos.getNode());
+    assert(pos.getNode() != nullptr);
     assert(pos.getNode() != tail_);
     Node< T >* posPtr = pos.getNode();
     Node< T >* toErase = posPtr->next_;
