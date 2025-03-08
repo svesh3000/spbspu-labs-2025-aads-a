@@ -161,9 +161,26 @@ BOOST_AUTO_TEST_CASE(test_assign)
 {
   using list_t = alymova::List< int >;
   list_t list1;
-  list1.assign(5, 1);
-  list_t list2(static_cast< size_t >(5), 1);
-  BOOST_TEST(list1 == list2);
+  list1.assign(static_cast< size_t >(0), 1);
+  BOOST_TEST(list1.empty());
+
+  list1.assign(static_cast< size_t >(5), 1);
+  list_t list_comp(static_cast< size_t >(5), 1);
+  BOOST_TEST(list1 == list_comp);
+
+  list_t list2 = {1, 2, 3};
+  list2.assign(list1.begin(), list1.begin());
+  BOOST_TEST(list2.empty());
+
+  list2.assign(list1.begin(), list1.end());
+  BOOST_TEST(list2 == list1);
+
+  list2.assign({});
+  BOOST_TEST(list2.empty());
+
+  list2.assign({1, 2, 3});
+  list_comp = {1, 2, 3};
+  BOOST_TEST(list2 == list_comp);
 }
 BOOST_AUTO_TEST_CASE(test_splice)
 {
