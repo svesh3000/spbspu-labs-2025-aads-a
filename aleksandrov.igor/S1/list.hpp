@@ -21,7 +21,9 @@ namespace aleksandrov
     ~List();
 
     Iterator< T > begin() const noexcept;
+    cIterator< T > cbegin() const noexcept;
     Iterator< T > end() const noexcept;
+    cIterator< T > cend() const noexcept;
     T& front() noexcept;
     T& back() noexcept;
     bool empty() const noexcept;
@@ -37,11 +39,15 @@ namespace aleksandrov
     void remove(const T& value);
     template< typename UnaryPredicate >
     void removeIf(UnaryPredicate p);
+    void splice(cIterator< T > pos, List< T >& other);
+    void assign(size_t count, const T& value);
 
     Iterator< T > insertAfter(Iterator< T > pos, const T& value);
     Iterator< T > eraseAfter(Iterator< T > pos);
     Iterator< T > eraseAfter(Iterator< T > first, Iterator< T > last);
 
+    bool operator==(const List< T >& rhs) const;
+    bool operator!=(const List< T >& rhs) const;
   private:
     Node< T >* fake_;
     Node< T >* tail_;
@@ -120,9 +126,21 @@ namespace aleksandrov
   }
 
   template< typename T >
+  cIterator< T > List< T >::cbegin() const noexcept
+  {
+    return cIterator< T >(fake_->next_);
+  }
+
+  template< typename T >
   Iterator< T > List< T >::end() const noexcept
   {
-    return empty() ? tail_ : Iterator< T >(tail_->next_);
+    return empty() ? Iterator< T >(tail_) : Iterator< T >(tail_->next_);
+  }
+
+  template< typename T >
+  cIterator< T > List< T >::cend() const noexcept
+  {
+    return empty() ? cIterator< T >(tail_) : cIterator< T >(tail_->next_);
   }
 
   template< typename T >
@@ -273,12 +291,42 @@ namespace aleksandrov
   }
 
   template< typename T >
+  void List< T >::splice(cIterator< T > pos, List< T >& other)
+  {
+    if (!other.empty())
+    {
+      Node< T >* node = pos.getNode();
+      Node< T >* beforePos = begin().getNode();
+      while (beforePos->next_ != node)
+      {
+	beforePos = beforePos->next_;
+      }
+      beforePos->next_ = other.fake_->next_;
+      other.fake_->next_ = nullptr;
+      Node< T >* temp = other.tail_;
+      temp->next_ = node;
+      other.tail_ = nullptr;
+    }
+  }
+
+  template< typename T >
+  void List< T >::assign(size_t count, const T& value)
+  {
+    List< T >* newList = new List< T >;
+    clear();
+    delete fake_;
+    for (size_t i = 0; i < count; ++i)
+    {
+      newList->pushBack(value);
+    }
+  }
+
+  template< typename T >
   Iterator< T > List< T >::eraseAfter(Iterator< T > pos)
   {
     assert(!empty());
     assert(pos.getNode());
     assert(pos.getNode() != tail_);
-
     Node< T >* posPtr = pos.getNode();
     Node< T >* toErase = posPtr->next_;
     posPtr->next_ = toErase->next_;
@@ -299,6 +347,33 @@ namespace aleksandrov
       eraseAfter(it);
     }
     return last;
+  }
+
+  template< typename T >
+  bool List< T >::operator==(const List< T >& rhs) const
+  {
+    if (size() != rhs.size())
+    {
+      return false;
+    }
+    auto it = begin();
+    auto rhsIt = rhs.begin();
+    while (it != end())
+    {
+      if (*it != *rhsIt)
+      {
+	return false;
+      }
+      ++it;
+      ++rhsIt;
+    }
+    return true;
+  }
+
+  template< typename T >
+  bool List< T >::operator!=(const List< T >& rhs) const
+  {
+    return !(*this == rhs);
   }
 }
 
