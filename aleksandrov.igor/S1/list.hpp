@@ -261,7 +261,6 @@ namespace aleksandrov
     }
   }
 
-
   template< typename T >
   void List< T >::remove(const T& value)
   {
