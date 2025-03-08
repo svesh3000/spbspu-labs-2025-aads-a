@@ -389,13 +389,15 @@ void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFw
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator it)
+void zholobov::CircularFwdList< T >::splice_after(const_iterator pos,
+                                                  CircularFwdList< T >& other, const_iterator it)
 {
   splice_after(pos, std::move(other), it);
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator it)
+void zholobov::CircularFwdList< T >::splice_after(const_iterator pos,
+                                                  CircularFwdList< T >&& other, const_iterator it)
 {
   FwdListNode< value_type >* p = head_;
   const_iterator this_it = cbegin();
@@ -420,13 +422,15 @@ void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFw
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator first, const_iterator last)
+void zholobov::CircularFwdList< T >::splice_after(
+  const_iterator pos, CircularFwdList< T >& other, const_iterator first, const_iterator last)
 {
   splice_after(pos, std::move(other), first, last);
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator first, const_iterator last)
+void zholobov::CircularFwdList< T >::splice_after(
+  const_iterator pos, CircularFwdList< T >&& other, const_iterator first, const_iterator last)
 {
   FwdListNode< value_type >* p = head_;
   FwdListNode< value_type >* other_first = nullptr;
