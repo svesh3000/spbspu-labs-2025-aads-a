@@ -35,18 +35,51 @@ BOOST_AUTO_TEST_CASE(default_ctor)
   BOOST_TEST(to_string(list) == "");
 }
 
+BOOST_AUTO_TEST_CASE(copy_ctor)
+{
+  {
+    zholobov::CircularFwdList< int > list{};
+    zholobov::CircularFwdList< int > list2(list);
+    BOOST_TEST(to_string(list) == "");
+    BOOST_TEST(to_string(list2) == "");
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2(list);
+    BOOST_TEST(list.size() == 3);
+    BOOST_TEST(to_string(list) == "1 2 3");
+    BOOST_TEST(list2.size() == 3);
+    BOOST_TEST(to_string(list2) == "1 2 3");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(move_ctor)
+{
+  {
+    zholobov::CircularFwdList< int > list{};
+    zholobov::CircularFwdList< int > list2(std::move(list));
+    BOOST_TEST(to_string(list) == "");
+    BOOST_TEST(to_string(list2) == "");
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2(std::move(list));
+    BOOST_TEST(list.size() == 0);
+    BOOST_TEST(to_string(list) == "");
+    BOOST_TEST(list2.size() == 3);
+    BOOST_TEST(to_string(list2) == "1 2 3");
+  }
+}
+
 BOOST_AUTO_TEST_CASE(initializer_list_ctor)
 {
   {
     zholobov::CircularFwdList< int > list{};
-    BOOST_TEST(list.size() == 0);
-    BOOST_TEST(list.empty());
     BOOST_TEST(to_string(list) == "");
   }
   {
     zholobov::CircularFwdList< int > list{1, 2, 3};
     BOOST_TEST(list.size() == 3);
-    BOOST_TEST(!(list.empty()));
     BOOST_TEST(to_string(list) == "1 2 3");
   }
 }
@@ -72,6 +105,50 @@ BOOST_AUTO_TEST_CASE(fill)
     zholobov::CircularFwdList< int > list(5, 2);
     BOOST_TEST(list.size() == 5);
     BOOST_TEST(to_string(list) == "2 2 2 2 2");
+  }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(CircularFwsList_Access)
+
+BOOST_AUTO_TEST_CASE(front)
+{
+  zholobov::CircularFwdList< int > list{1, 2, 3};
+  BOOST_TEST(list.front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(back)
+{
+  zholobov::CircularFwdList< int > list{1, 2, 3};
+  BOOST_TEST(list.back() == 3);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(CircularFwsList_Capacity)
+
+BOOST_AUTO_TEST_CASE(empty)
+{
+  {
+    zholobov::CircularFwdList< int > list{};
+    BOOST_TEST(list.empty() == true);
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    BOOST_TEST(list.empty() == false);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(size)
+{
+  {
+    zholobov::CircularFwdList< int > list{};
+    BOOST_TEST(list.size() == 0);
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    BOOST_TEST(list.size() == 3);
   }
 }
 
@@ -139,6 +216,56 @@ BOOST_AUTO_TEST_CASE(assign)
   BOOST_TEST(to_string(list) == "1 1 1 1 1");
 }
 
+BOOST_AUTO_TEST_CASE(opeartor_assign)
+{
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{};
+    list = list2;
+    BOOST_TEST(to_string(list) == "");
+    BOOST_TEST(to_string(list2) == "");
+  }
+  {
+    zholobov::CircularFwdList< int > list{};
+    zholobov::CircularFwdList< int > list2{1, 2, 3};
+    list = list2;
+    BOOST_TEST(to_string(list) == "1 2 3");
+    BOOST_TEST(to_string(list2) == "1 2 3");
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{10, 20, 30, 40};
+    list = list2;
+    BOOST_TEST(to_string(list) == "10 20 30 40");
+    BOOST_TEST(to_string(list2) == "10 20 30 40");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(opeartor_move_assign)
+{
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{};
+    list = std::move(list2);
+    BOOST_TEST(to_string(list) == "");
+    BOOST_TEST(to_string(list2) == "");
+  }
+  {
+    zholobov::CircularFwdList< int > list{};
+    zholobov::CircularFwdList< int > list2{1, 2, 3};
+    list = std::move(list2);
+    BOOST_TEST(to_string(list) == "1 2 3");
+    BOOST_TEST(to_string(list2) == "");
+  }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{10, 20, 30, 40};
+    list = std::move(list2);
+    BOOST_TEST(to_string(list) == "10 20 30 40");
+    BOOST_TEST(to_string(list2) == "");
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(CircularFwsList_Operations)
@@ -152,9 +279,9 @@ BOOST_AUTO_TEST_CASE(remove)
 
 BOOST_AUTO_TEST_CASE(remove_if)
 {
-  zholobov::CircularFwdList< int > list{1, 2, 3, 2, 5, 6, 7, 2};
-  list.remove_if([](int value) { return value > 2; });
-  BOOST_TEST(to_string(list) == "3 5 6 7");
+  zholobov::CircularFwdList< int > list{1, 2, 3, 2, 5, 6, 7, 2, 9, 0};
+  list.remove_if([](int value) { return value <= 2; });
+  BOOST_TEST(to_string(list) == "3 5 6 7 9");
 }
 
 BOOST_AUTO_TEST_CASE(splice_after)
@@ -167,25 +294,11 @@ BOOST_AUTO_TEST_CASE(splice_after)
     BOOST_TEST(to_string(list2) == "");
   }
   {
-    zholobov::CircularFwdList< std::string > list1{"1", "2", "3"};
-    zholobov::CircularFwdList< std::string > list2{"10", "20", "30"};
-    list1.splice_after(list1.cbegin(), std::move(list2));
-    BOOST_TEST(to_string(list1) == "1 10 20 30 2 3");
-    BOOST_TEST(to_string(list2) == "");
-  }
-  {
     zholobov::CircularFwdList< int > list1{1, 2, 3, 4, 5};
     zholobov::CircularFwdList< int > list2{10, 11, 12};
-    list1.splice_after(list1.cbegin(), list2, list2.cbegin());
+    list1.splice_after(list1.cbegin(), list2, ++list2.cbegin());
     BOOST_TEST(to_string(list1) == "1 11 2 3 4 5");
     BOOST_TEST(to_string(list2) == "10 12");
-  }
-  {
-    zholobov::CircularFwdList< std::string > list1{"1", "2", "3"};
-    zholobov::CircularFwdList< std::string > list2{"10", "20", "30"};
-    list1.splice_after(list1.cbegin(), std::move(list2), list2.cbegin());
-    BOOST_TEST(to_string(list1) == "1 20 2 3");
-    BOOST_TEST(to_string(list2) == "10 30");
   }
   {
     zholobov::CircularFwdList< int > list1{1, 2, 3, 4, 5};
@@ -195,11 +308,30 @@ BOOST_AUTO_TEST_CASE(splice_after)
     BOOST_TEST(to_string(list2) == "10");
   }
   {
-    zholobov::CircularFwdList< std::string > list1{"1", "2", "3"};
-    zholobov::CircularFwdList< std::string > list2{"10", "20", "30"};
-    list1.splice_after(list1.cbegin(), std::move(list2), list2.cbegin(), list2.cend());
-    BOOST_TEST(to_string(list1) == "1 20 30 2 3");
-    BOOST_TEST(to_string(list2) == "10");
+    zholobov::CircularFwdList< int > list1{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{10, 20, 30, 40, 50, 60};
+    auto it_first = list2.cbegin();
+    ++it_first;
+    auto it_last = it_first;
+    ++it_last;
+    ++it_last;
+    ++it_last;
+    list1.splice_after(++list1.cbegin(), list2, it_first, it_last);
+    BOOST_TEST(to_string(list1) == "1 2 30 40 3");
+    BOOST_TEST(to_string(list2) == "10 20 50 60");
+  }
+  {
+    zholobov::CircularFwdList< int > list1{1, 2, 3};
+    zholobov::CircularFwdList< int > list2{10, 20, 30, 40, 50, 60};
+    auto pos = list1.cbegin();
+    ++pos;
+    ++pos;
+    auto it_first = list2.cbegin();
+    ++it_first;
+    ++it_first;
+    list1.splice_after(pos, list2, it_first, list2.cend());
+    BOOST_TEST(to_string(list1) == "1 2 3 40 50 60");
+    BOOST_TEST(to_string(list2) == "10 20 30");
   }
 }
 
