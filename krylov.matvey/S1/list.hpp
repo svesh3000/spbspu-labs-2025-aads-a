@@ -115,7 +115,14 @@ namespace krylov
   template < typename T >
   Iterator< T >& Iterator< T >::operator++()
   {
-    current_ = current_->next_;
+    if (current_ && current_->next_)
+    {
+      current_ = current_->next_;
+    }
+    else
+    {
+      current_ = nullptr;
+    }
     return *this;
   }
 
@@ -130,7 +137,7 @@ namespace krylov
   template < typename T >
   Iterator< T >& Iterator< T >::operator--()
   {
-    if (current_ == nullptr)
+    if (!current_)
     {
       current_ = list_->tail_;
     }
