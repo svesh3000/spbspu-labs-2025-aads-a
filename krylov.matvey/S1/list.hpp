@@ -119,10 +119,6 @@ namespace krylov
     {
       current_ = current_->next_;
     }
-    else
-    {
-      current_ = nullptr;
-    }
     return *this;
   }
 

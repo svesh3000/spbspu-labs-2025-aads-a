@@ -37,7 +37,6 @@ int main()
     std::cout << it->first << " ";
   }
   std::cout << (--listOfPairs.end())->first << "\n";
-
   krylov::List< unsigned long long > listOfLineSums;
   bool wasOverflow = false;
   unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
