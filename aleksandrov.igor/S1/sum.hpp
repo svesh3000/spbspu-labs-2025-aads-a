@@ -1,11 +1,11 @@
 #ifndef SUM_HPP
 #define SUM_HPP
 
-#include <forward_list>
+#include "list.hpp"
 
 namespace aleksandrov
 {
-  unsigned long long calcSum(const std::forward_list< unsigned long long >& list);
+  unsigned long long calcSum(List< unsigned long long >& list);
 }
 
 #endif

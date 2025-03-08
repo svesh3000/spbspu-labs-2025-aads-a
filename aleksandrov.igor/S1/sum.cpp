@@ -1,11 +1,11 @@
 #include "sum.hpp"
-#include <forward_list>
+#include "list.hpp"
 #include <limits>
 #include <stdexcept>
 
 namespace aleksandrov
 {
-  unsigned long long calcSum(const std::forward_list< unsigned long long >& list)
+  unsigned long long calcSum(List< unsigned long long >& list)
   {
     const unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
     unsigned long long sum = 0;
