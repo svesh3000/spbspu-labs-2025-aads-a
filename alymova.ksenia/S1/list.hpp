@@ -51,13 +51,15 @@ namespace alymova
     void pop_front() noexcept;
     void push_back(const T& value);
     void pop_back() noexcept;
-    void swap(List< T >& other) noexcept;
     Iterator< T > insert(Iterator< T > position, const T& value);
     Iterator< T > insert(Iterator< T > position, T&& value);
     Iterator< T > insert(Iterator< T > position, size_t n, const T& value);
     template< typename InputIterator >
     Iterator< T > insert(Iterator< T > position, InputIterator first, InputIterator last);
     Iterator< T > insert(Iterator< T > position, std::initializer_list< T > il);
+    Iterator< T > erase(Iterator< T > position);
+    Iterator< T > erase(Iterator< T > first, Iterator< T > last);
+    void swap(List< T >& other) noexcept;
     void clear() noexcept;
     void assign(size_t n, const T& value);
 
@@ -351,13 +353,6 @@ namespace alymova
   }
 
   template< typename T >
-  void List< T >::swap(List< T >& other) noexcept
-  {
-    std::swap(fake_, other.fake_);
-    std::swap(head_, other.head_);
-  }
-
-  template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, const T& value)
   {
     T copy = value;
@@ -372,7 +367,7 @@ namespace alymova
     else
     {
       auto node_new = new ListNode< T >{copy, nullptr, nullptr};
-      ListNode< T >* node_now = position.get_node();
+      ListNode< T >* node_now = position.getNode();
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
@@ -395,7 +390,7 @@ namespace alymova
     else
     {
       auto node_new = new ListNode< T >{value, nullptr, nullptr};
-      ListNode< T >* node_now = position.get_node();
+      ListNode< T >* node_now = position.getNode();
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
@@ -410,8 +405,8 @@ namespace alymova
     Iterator< T > return_it = insert(position, value);
     for (size_t i = 1; i < n; i++)
     {
-      Iterator< T > temp_it = insert(position, value);
-      temp_it = return_it;
+      Iterator< T > tmp_it = insert(position, value);
+      tmp_it = return_it;
     }
     return return_it;
   }
@@ -424,8 +419,8 @@ namespace alymova
     ++first;
     while (first != last)
     {
-      Iterator< T > temp_it = insert(position, *first);
-      temp_it = return_it;
+      Iterator< T > tmp_it = insert(position, *first);
+      tmp_it = return_it;
       ++first;
     }
     return return_it;
@@ -439,10 +434,54 @@ namespace alymova
     ++it;
     for(; it != il.end(); ++it)
     {
-      Iterator< T > temp_it = insert(position, *it);
-      temp_it = return_it;
+      Iterator< T > tmp_it = insert(position, *it);
+      tmp_it = return_it;
     }
     return return_it;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(Iterator< T > position)
+  {
+    Iterator< T > return_it = ++position;
+    --position;
+    if (position == begin())
+    {
+      pop_front();
+    }
+    else if (position == --end())
+    {
+      pop_back();
+    }
+    else
+    {
+      ListNode< T >* node = position.getNode();
+      node->prev->next = node->next;
+      node->next->prev = node->prev;
+      delete node;
+    }
+    return return_it;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(Iterator< T > first, Iterator< T > last)
+  {
+    while (first != last)
+    {
+      Iterator< T > next = ++first;
+      --first;
+      Iterator < T > tmp_it = erase(first);
+      tmp_it = last;
+      first = next;
+    }
+    return last;
+  }
+
+  template< typename T >
+  void List< T >::swap(List< T >& other) noexcept
+  {
+    std::swap(fake_, other.fake_);
+    std::swap(head_, other.head_);
   }
 
   template< typename T >
@@ -481,12 +520,12 @@ namespace alymova
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > other_it)
   {
-    assert(position.get_node() != nullptr && "Iterator is not valid");
-    assert(other_it.get_node() != nullptr && "Iterator is not valid");
+    assert(position.getNode() != nullptr && "Iterator is not valid");
+    assert(other_it.getNode() != nullptr && "Iterator is not valid");
     assert(other_it != other.end() && "Iterator is not valid");
 
-    ListNode< T >* node_now = position.get_node();
-    ListNode< T >* other_node_now = other_it.get_node();
+    ListNode< T >* node_now = position.getNode();
+    ListNode< T >* other_node_now = other_it.getNode();
     if (position == begin())
     {
       head_ = other_node_now;

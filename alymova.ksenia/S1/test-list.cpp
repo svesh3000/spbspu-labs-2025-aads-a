@@ -251,5 +251,29 @@ BOOST_AUTO_TEST_CASE(test_insert)
   list2.clear();
   it_res = list2.insert(list2.begin(), {4, 4, 4, 1, 2, 3});
   BOOST_TEST(list2 == list_comp);
+  bool b = (it_res == list2.begin());
+  BOOST_TEST(b);
+}
+BOOST_AUTO_TEST_CASE(test_erase)
+{
+  using list_t = alymova::List< int >;
+  list_t list1{1, 2, 3, 4, 5};
+  auto it_res = list1.erase(list1.begin());
+  BOOST_TEST(list1.front() == 2);
+  BOOST_TEST(*it_res == 2);
+
+  it_res = list1.erase(--(list1.end()));
+  BOOST_TEST(list1.back() == 4);
+  bool b = (it_res == list1.end());
+  BOOST_TEST(b);
+
+  it_res = list1.erase(++(list1.begin()));
+  list_t list_comp = {2, 4};
+  BOOST_TEST(list1 == list_comp);
   BOOST_TEST(*it_res == 4);
+
+  it_res = list1.erase(list1.begin(), list1.end());
+  BOOST_TEST(list1.empty());
+  b = (it_res == list1.end());
+  BOOST_TEST(b);
 }
