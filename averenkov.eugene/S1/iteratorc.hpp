@@ -7,18 +7,18 @@
 namespace averenkov
 {
   template< class T >
-  struct ConstListIterator : public std::iterator<std::forward_iterator_tag, T>
+  struct ConstListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     ConstListIterator() = default;
-    ConstListIterator(Node< T >* node) : node_(node) {};
+    explicit ConstListIterator(Node< T >* node) noexcept;
     ~ConstListIterator() = default;
 
     ConstListIterator< T >& operator++();
     ConstListIterator< T > operator++(int);
 
-    const T& operator*();
-    const T* operator->();
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
 
     bool operator==(const ConstListIterator< T >&) const;
     bool operator!=(const ConstListIterator< T >&) const;
@@ -34,6 +34,12 @@ namespace averenkov
   Node< T >*  ConstListIterator< T >::getNode()
   {
     return node_;
+  }
+
+  template< class T >
+  ConstListIterator< T >::ConstListIterator(Node< T >* node) noexcept:
+    node_(node)
+  {
   }
 
   template< class T >
@@ -54,14 +60,14 @@ namespace averenkov
   }
 
   template< class T >
-  const T& ConstListIterator< T >::operator*()
+  T& ConstListIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< class T >
-  const T* ConstListIterator< T >::operator->()
+  T* ConstListIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);

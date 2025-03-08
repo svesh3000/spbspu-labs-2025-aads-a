@@ -1,17 +1,17 @@
 #include <iostream>
 #include <utility>
 #include <string>
-#include <algorithm>
 #include <limits>
 #include "list.hpp"
 
 int main()
 {
-  averenkov::List< std::pair< std::string, averenkov::List< unsigned long long > > > list;
+  using namespace averenkov;
+  List< std::pair< std::string, List< unsigned long long > > > list;
   std::string name;
   while (std::cin >> name)
   {
-    averenkov::List< unsigned long long > numbersList;
+    List< unsigned long long > numbersList;
     unsigned long long number = 0;
     while (std::cin >> number)
     {
@@ -31,7 +31,7 @@ int main()
     std::cout << " " << it->first;
   }
   std::cout << "\n";
-  averenkov::List< averenkov::List< unsigned long long > > result;
+  List< List< unsigned long long > > result;
   size_t maxLen = 0;
   for (auto it = list.begin(); it != list.end(); it++)
   {
@@ -42,7 +42,7 @@ int main()
   }
   for (size_t i = 0; i < maxLen; i++)
   {
-    averenkov::List< unsigned long long > sublist;
+    List< unsigned long long > sublist;
     for (auto it = list.begin(); it != list.end(); it++)
     {
       if (i < it->second.size())
@@ -66,7 +66,7 @@ int main()
     }
     std::cout << "\n";
   }
-  averenkov::List< unsigned long long > sums;
+  List< unsigned long long > sums;
   for (auto it = result.begin(); it != result.end(); it++)
   {
     unsigned long long sum = 0;

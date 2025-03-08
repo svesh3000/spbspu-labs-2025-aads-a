@@ -17,41 +17,41 @@ namespace averenkov
     List(size_t, const T&);
     ~List();
 
-    using Iter = ListIterator< T >;
-    using Iterc = ConstListIterator< T >;
+    using Iter_t = ListIterator< T >;
+    using Iterc_t = ConstListIterator< T >;
 
-    Iter begin() const;
-    Iter end() const;
+    Iter_t begin() const noexcept;
+    Iter_t end() const noexcept;
 
-    Iterc cbegin() const;
-    Iterc cend() const;
+    Iterc_t cbegin() const noexcept;
+    Iterc_t cend() const noexcept;
 
-    T& front();
-    T& back();
+    T& front() const noexcept;
+    T& back() const noexcept;
 
-    bool empty();
+    bool empty() const noexcept;
 
-    size_t size() const;
+    size_t size() const noexcept;
 
-    void push_front(const T&);
+    void push_front(const T&) ;
     void push_back(const T&);
-    void pop_front();
-    void pop_back();
-    void swap(List&);
-    void clear();
+    void pop_front() noexcept;
+    void pop_back() noexcept;
+    void swap(List&) noexcept;
+    void clear() noexcept;
 
-    void fill(Iter first, Iter last, const T&);
+    void fill(Iter_t first, Iter_t last, const T&);
 
     void remove(const T&);
     template< class UnaryPredicate >
     void removeIf(UnaryPredicate);
 
-    void splice(Iterc pos, List< T >&);
-    void splice(Iterc pos, List< T >&&);
-    void splice(Iterc pos, List< T >&, Iterc it);
-    void splice(Iterc pos, List< T >&&, Iterc it);
-    void splice(Iterc pos, List< T >&, Iterc first, Iterc last);
-    void splice(Iterc pos, List< T >&&, Iterc first, Iterc last);
+    void splice(Iterc_t pos, List< T >&);
+    void splice(Iterc_t pos, List< T >&&);
+    void splice(Iterc_t pos, List< T >&, Iterc_t it);
+    void splice(Iterc_t pos, List< T >&&, Iterc_t it);
+    void splice(Iterc_t pos, List< T >&, Iterc_t first, Iterc_t last);
+    void splice(Iterc_t pos, List< T >&&, Iterc_t first, Iterc_t last);
 
     void assign(size_t, const T&);
 
@@ -64,16 +64,16 @@ namespace averenkov
   };
 
   template < class T >
-  List< T >::List()
-    : size_(0)
+  List< T >::List():
+    size_(0)
   {
     fake_ = new Node< T >(T());
     fake_->next_ = fake_;
   }
 
   template < class T >
-  List< T >::List(const List< T >& rhs)
-    : List()
+  List< T >::List(const List< T >& rhs):
+    List()
   {
     Node< T >* current = rhs.fake_->next_;
     while (current != rhs.fake_)
@@ -84,13 +84,15 @@ namespace averenkov
   }
 
   template < class T >
-  List< T >::List(List< T >&& rhs): List()
+  List< T >::List(List< T >&& rhs):
+    List()
   {
     swap(rhs);
   }
 
   template < class T >
-  List< T >::List(size_t count, const T& value): List()
+  List< T >::List(size_t count, const T& value):
+    List()
   {
     while (count--)
     {
@@ -106,50 +108,50 @@ namespace averenkov
   }
 
   template < class T >
-  size_t List<T>::size() const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
   template < class T >
-  bool List<T>::empty()
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < class T >
-  typename List< T >::Iter List< T >::begin() const
+  typename List< T >::Iter_t List< T >::begin() const noexcept
   {
-    return Iter(fake_->next_);
+    return Iter_t(fake_->next_);
   }
 
   template < class T >
-  typename List< T >::Iter List< T >::end() const
+  typename List< T >::Iter_t List< T >::end() const noexcept
   {
-    return Iter(fake_);
+    return Iter_t(fake_);
   }
 
   template < class T >
-  typename List< T >::Iterc List<T>::cbegin() const
+  typename List< T >::Iterc_t List<T>::cbegin() const noexcept
   {
-    return Iterc(fake_->next_);
+    return Iterc_t(fake_->next_);
   }
 
   template < class T>
-  typename List< T >::Iterc List<T>::cend() const
+  typename List< T >::Iterc_t List<T>::cend() const noexcept
   {
-    return Iterc(fake_);
+    return Iterc_t(fake_);
   }
 
   template < class T >
-  T& List< T >::front()
+  T& List< T >::front() const noexcept
   {
     assert(!empty());
     return fake_->next_->data_;
   }
 
   template < class T >
-  T& List< T >::back()
+  T& List< T >::back() const noexcept
   {
     assert(!empty());
     Node< T >* current = fake_;
@@ -184,7 +186,7 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     assert(!empty());
     Node< T >* temp = fake_->next_;
@@ -194,7 +196,7 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     assert(!empty());
     Node< T >* current = fake_;
@@ -208,7 +210,7 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -217,7 +219,7 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::swap(List& rhs)
+  void List< T >::swap(List& rhs) noexcept
   {
     std::swap(fake_, rhs.fake_);
     std::swap(size_, rhs.size_);
@@ -244,7 +246,7 @@ namespace averenkov
   }
 
   template < class T >
-  template <class UnaryPredicate>
+  template < class UnaryPredicate >
   void List< T >::removeIf(UnaryPredicate pred)
   {
     Node< T >* current = fake_;
@@ -265,7 +267,7 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >& rhs, Iterc first, Iterc last)
+  void List< T >::splice(Iterc_t pos, List< T >& rhs, Iterc_t first, Iterc_t last)
   {
     if (first == last || rhs.empty())
     {
@@ -298,33 +300,33 @@ namespace averenkov
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >& rhs)
+  void List< T >::splice(Iterc_t pos, List< T >& rhs)
   {
     splice(pos, rhs, rhs.cbegin(), rhs.cend());
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >&& rhs)
+  void List< T >::splice(Iterc_t pos, List< T >&& rhs)
   {
     splice(pos, rhs);
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >& rhs, Iterc it)
+  void List< T >::splice(Iterc_t pos, List< T >& rhs, Iterc_t it)
   {
-    Iterc next_ = it;
+    Iterc_t next_ = it;
     next_++;
     splice(pos, rhs, it, next_);
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >&& rhs, Iterc it)
+  void List< T >::splice(Iterc_t pos, List< T >&& rhs, Iterc_t it)
   {
     splice(pos, rhs, it);
   }
 
   template < class T >
-  void List< T >::splice(Iterc pos, List< T >&& rhs, Iterc first, Iterc last)
+  void List< T >::splice(Iterc_t pos, List< T >&& rhs, Iterc_t first, Iterc_t last)
   {
     splice(pos, rhs, first, last);
   }
@@ -332,13 +334,21 @@ namespace averenkov
   template < class T >
   void List< T >::assign(size_t count, const T& value)
   {
-    clear();
-    while (count--)
+    List< T > copy = this;
+    try
     {
-      push_back(value);
+      while (count--)
+      {
+        push_back(value);
+      }
     }
+    catch (...)
+    {
+      copy.clear();
+      return;
+    }
+    swap(copy);
   }
-
 };
 
 
