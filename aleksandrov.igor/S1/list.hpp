@@ -298,7 +298,7 @@ namespace aleksandrov
       Node< T >* beforePos = begin().getNode();
       while (beforePos->next_ != node)
       {
-	beforePos = beforePos->next_;
+        beforePos = beforePos->next_;
       }
       beforePos->next_ = other.fake_->next_;
       other.fake_->next_ = nullptr;
@@ -361,7 +361,7 @@ namespace aleksandrov
     {
       if (*it != *rhsIt)
       {
-	return false;
+        return false;
       }
       ++it;
       ++rhsIt;
