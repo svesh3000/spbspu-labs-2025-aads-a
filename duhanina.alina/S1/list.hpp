@@ -265,8 +265,7 @@ namespace duhanina
     }
     catch (...)
     {
-      clear(temp);
-      throw;
+      temp.clear();
     }
     swap(temp);
   }
