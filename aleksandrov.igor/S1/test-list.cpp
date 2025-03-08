@@ -131,6 +131,27 @@ BOOST_AUTO_TEST_CASE(remove_if)
   BOOST_TEST(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(splice)
+{
+  aleksandrov::List< int > list1(7, 0);
+  aleksandrov::List< int > list2(3, 1);
+  auto itBefore = list1.cbegin();
+  auto itAfter = list1.cbegin();
+  std::advance(itBefore, 2);
+  list1.splice(itBefore, list2);
+  std::advance(itAfter, 2);
+  BOOST_TEST(list1.size() == 10);
+  BOOST_TEST(*itBefore == 0);
+  BOOST_TEST(*itAfter == 1);
+}
+
+BOOST_AUTO_TEST_CASE(assign)
+{
+  aleksandrov::List< char > list(2, 'a');
+  list.assign(5, 'b');
+  BOOST_TEST(list.size() == 5);
+}
+
 BOOST_AUTO_TEST_CASE(eraseAfter)
 {
   aleksandrov::List< int > list;
@@ -148,3 +169,13 @@ BOOST_AUTO_TEST_CASE(eraseAfter)
   BOOST_TEST(*it == 6);
   BOOST_TEST(list.size() == 5);
 }
+
+BOOST_AUTO_TEST_CASE(bool_operators)
+{
+  aleksandrov::List< unsigned char > list1(3, 'x');
+  aleksandrov::List< unsigned char > list2(3, 'y');
+  aleksandrov::List< unsigned char > list3(3, 'x');
+  BOOST_TEST(list1 != list2);
+  BOOST_TEST(list1 == list3);
+}
+
