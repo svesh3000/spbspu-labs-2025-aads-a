@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <utility>
+#include <initializer_list>
 
 namespace alymova
 {
@@ -24,10 +25,12 @@ namespace alymova
     List(size_t n, const T& value = T());
     template< typename InputIterator>
     List(InputIterator first, InputIterator last);
+    List(std::initializer_list< T > il);
     ~List() noexcept;
 
     List< T >& operator=(const List< T >& other);
     List< T >& operator=(List< T >&& other) noexcept;
+    List< T >& operator=(std::initializer_list< T > il);
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > begin() const noexcept;
@@ -49,6 +52,12 @@ namespace alymova
     void push_back(const T& value);
     void pop_back() noexcept;
     void swap(List< T >& other) noexcept;
+    Iterator< T > insert(Iterator< T > position, const T& value);
+    Iterator< T > insert(Iterator< T > position, T&& value);
+    Iterator< T > insert(Iterator< T > position, size_t n, const T& value);
+    template< typename InputIterator >
+    Iterator< T > insert(Iterator< T > position, InputIterator first, InputIterator last);
+    Iterator< T > insert(Iterator< T > position, std::initializer_list< T > il);
     void clear() noexcept;
     void assign(size_t n, const T& value);
 
@@ -115,7 +124,8 @@ namespace alymova
   {
     for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      push_back(*it);
+      const T copy = *it;
+      push_back(copy);
     }
   }
 
@@ -131,13 +141,9 @@ namespace alymova
   {
     for (size_t i = 0; i < n; i++)
     {
-      push_back(value);
+      const T copy = value;
+      push_back(copy);
     }
-    /*catch (const std::bad_alloc& e)
-    {
-      clear();
-      throw;
-    }*/
   }
   template< typename T >
   template< typename InputIterator>
@@ -146,8 +152,20 @@ namespace alymova
   {
     while (first != last)
     {
-      push_back(*first);
+      const T copy = *first;
+      push_back(copy);
       first++;
+    }
+  }
+
+  template< typename T >
+  List< T >::List(std::initializer_list< T > il):
+    List()
+  {
+    for (auto it = il.begin(); it != il.end(); ++it)
+    {
+      const T copy = *it;
+      push_back(copy);
     }
   }
 
@@ -167,6 +185,14 @@ namespace alymova
     clear();
     fake_ = std::exchange(other.fake_, nullptr);
     head_ = std::exchange(other.head_, nullptr);
+    return *this;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(std::initializer_list< T > il)
+  {
+    List< T > copy(il);
+    swap(copy);
     return *this;
   }
 
@@ -332,6 +358,94 @@ namespace alymova
   }
 
   template< typename T >
+  Iterator< T > List< T >::insert(Iterator< T > position, const T& value)
+  {
+    T copy = value;
+    if (position == begin())
+    {
+      push_front(copy);
+    }
+    else if(position == end())
+    {
+      push_back(copy);
+    }
+    else
+    {
+      auto node_new = new ListNode< T >{copy, nullptr, nullptr};
+      ListNode< T >* node_now = position.get_node();
+      node_now->prev->next = node_new;
+      node_new->prev = node_now->prev;
+      node_now->prev = node_new;
+      node_new->next = node_now;
+    }
+    return {--position};
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(Iterator< T > position, T&& value)
+  {
+    if (position == begin())
+    {
+      push_front(value);
+    }
+    else if(position == end())
+    {
+      push_back(value);
+    }
+    else
+    {
+      auto node_new = new ListNode< T >{value, nullptr, nullptr};
+      ListNode< T >* node_now = position.get_node();
+      node_now->prev->next = node_new;
+      node_new->prev = node_now->prev;
+      node_now->prev = node_new;
+      node_new->next = node_now;
+    }
+    return --position;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(Iterator< T > position, size_t n, const T& value)
+  {
+    Iterator< T > return_it = insert(position, value);
+    for (size_t i = 1; i < n; i++)
+    {
+      Iterator< T > temp_it = insert(position, value);
+      temp_it = return_it;
+    }
+    return return_it;
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  Iterator< T > List< T >::insert(Iterator< T > position, InputIterator first, InputIterator last)
+  {
+    Iterator< T > return_it = insert(position, *first);
+    ++first;
+    while (first != last)
+    {
+      Iterator< T > temp_it = insert(position, *first);
+      temp_it = return_it;
+      ++first;
+    }
+    return return_it;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert(Iterator< T > position, std::initializer_list< T > il)
+  {
+    auto it = il.begin();
+    Iterator< T > return_it = insert(position, *it);
+    ++it;
+    for(; it != il.end(); ++it)
+    {
+      Iterator< T > temp_it = insert(position, *it);
+      temp_it = return_it;
+    }
+    return return_it;
+  }
+
+  template< typename T >
   void List< T >::clear() noexcept
   {
     while (!empty())
@@ -339,15 +453,18 @@ namespace alymova
       pop_front();
     }
   }
+
   template <typename T >
   void List< T >::assign(size_t n, const T& value)
   {
     clear();
     for (size_t i = 0; i < n; i++)
     {
-      push_back(value);
+      const T copy = value;
+      push_back(copy);
     }
   }
+
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other)
   {
@@ -366,6 +483,8 @@ namespace alymova
   {
     assert(position.get_node() != nullptr && "Iterator is not valid");
     assert(other_it.get_node() != nullptr && "Iterator is not valid");
+    assert(other_it != other.end() && "Iterator is not valid");
+
     ListNode< T >* node_now = position.get_node();
     ListNode< T >* other_node_now = other_it.get_node();
     if (position == begin())

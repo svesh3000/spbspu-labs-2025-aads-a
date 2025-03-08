@@ -7,32 +7,42 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
 {
   using list_t = alymova::List< int >;
 
-  list_t list1(3, 1);
+  list_t list1;
+  BOOST_TEST(list1.empty());
   list_t list2(list1);
   BOOST_TEST(list1 == list2);
 
-  list_t list3(std::move(list_t(3, 1)));
-  BOOST_TEST(list1 == list3);
+  list_t list3(std::move(list_t(static_cast< size_t >(3), 1)));
+  BOOST_TEST(list3.size() == 3);
+  BOOST_TEST(list3.front() == 1);
 
-  list_t list4(5, 2);
+  list_t list4(list3.begin(), list3.end());
+  BOOST_TEST(list4 == list3);
+
+  list_t list5({1, 1, 1});
+  BOOST_TEST(list5 == list3);
+
   list3 = list4;
   BOOST_TEST(list3 == list4);
 
-  list4 = list_t(3, 1);
-  BOOST_TEST(list4 == list1);
-  BOOST_TEST(list4 != list3);
+  list4 = list_t(static_cast< size_t >(3), 1);
+  BOOST_TEST(list4 == list5);
+
+  list4 = {2, 2, 2};
+  list_t list6{2, 2, 2};
+  BOOST_TEST(list4 == list6);
 }
 BOOST_AUTO_TEST_CASE(test_list_iterators)
 {
   using list_t = alymova::List< int >;
 
-  list_t list = {3, 1};
+  list_t list(static_cast< size_t >(3), 1);
   auto iter_b = list.begin();
   auto iter_e = list.end();
   BOOST_TEST(*iter_b == 1);
   BOOST_TEST(*iter_e == 0);
 
-  const list_t list1 = {2, 3};
+  const list_t list1(static_cast< size_t >(2), 3);
   auto citer_b = list1.cbegin();
   auto citer_e = list1.cend();
   BOOST_TEST(*citer_b == 3);
@@ -89,7 +99,7 @@ BOOST_AUTO_TEST_CASE(test_base_interface)
   list.pop_back();
   BOOST_TEST(list.back() == 20);
 
-  const list_t list1 = {3, 1};
+  const list_t list1((size_t)3, 1);
   BOOST_TEST(list1.front() == 1);
   BOOST_TEST(list1.back() == 1);
 }
@@ -120,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
   using list_t = alymova::List< int >;
   using list_str_t = alymova::List< std::string >;
 
-  list_str_t list1 = {1, "cat"};
+  list_str_t list1(1, "cat");
   list1.remove("cat");
   BOOST_TEST(list1.size() == 0);
 
@@ -129,13 +139,13 @@ BOOST_AUTO_TEST_CASE(test_remove)
   list1.remove("student");
   BOOST_TEST(list1.back() == "dog");
 
-  list_str_t list2 = {10, "cat"};
+  list_str_t list2(10, "cat");
   list2.push_back("fox");
   list2.push_front("dolphin");
   list2.remove("cat");
   BOOST_TEST(list2.size() == 2);
 
-  list_t list3 = {5, 10};
+  list_t list3((size_t)5, 10);
   list3.push_back(1);
 
   list3.remove_if(SingleDigit());
@@ -152,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_assign)
   using list_t = alymova::List< int >;
   list_t list1;
   list1.assign(5, 1);
-  list_t list2 = list_t{5, 1};
+  list_t list2(static_cast< size_t >(5), 1);
   BOOST_TEST(list1 == list2);
 }
 BOOST_AUTO_TEST_CASE(test_splice)
@@ -207,4 +217,39 @@ BOOST_AUTO_TEST_CASE(test_splice)
 
   list2.splice(list2.begin(), list3, list3.begin(), list3.end());
   BOOST_TEST(list2 == list2_copy);
+}
+BOOST_AUTO_TEST_CASE(test_insert)
+{
+  using list_t = alymova::List< int >;
+  list_t list1{1, 2, 3};
+  alymova::Iterator< int > it_res = list1.insert(list1.begin(), 10);
+  list_t list_comp{10, 1, 2, 3};
+  BOOST_TEST(*it_res = 10);
+  BOOST_TEST(list1 == list_comp);
+
+  it_res = list1.insert(list1.end(), 20);
+  list_comp.push_back(20);
+  BOOST_TEST(list1 == list_comp);
+  BOOST_TEST(*it_res = 20);
+
+  it_res = list1.insert(++(list1.begin()), 30);
+  list_comp = {10, 30, 1, 2, 3, 20};
+  BOOST_TEST(list1 == list_comp);
+  BOOST_TEST(*it_res == 30);
+
+  list1 = {1, 2, 3};
+  list_comp = {4, 4, 4, 1, 2, 3};
+  it_res = list1.insert(list1.begin(), (size_t)3, 4);
+  BOOST_TEST(list1 == list_comp);
+  BOOST_TEST(*it_res == 4);
+
+  list_t list2;
+  it_res = list2.insert(list2.begin(), list1.begin(), list1.end());
+  BOOST_TEST(list2 == list_comp);
+  BOOST_TEST(*it_res == 4);
+
+  list2.clear();
+  it_res = list2.insert(list2.begin(), {4, 4, 4, 1, 2, 3});
+  BOOST_TEST(list2 == list_comp);
+  BOOST_TEST(*it_res == 4);
 }

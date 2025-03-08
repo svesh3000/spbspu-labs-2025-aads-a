@@ -17,12 +17,10 @@ namespace alymova
     Iterator< T > operator++(int) noexcept;
     Iterator< T >& operator--() noexcept;
     Iterator< T > operator--(int) noexcept;
-    bool operator==(const Iterator< T >& other) noexcept;
-    bool operator!=(const Iterator< T >& other) noexcept;
+    bool operator==(const Iterator< T >& other) const noexcept;
+    bool operator!=(const Iterator< T >& other) const noexcept;
     T& operator*() noexcept;
     T* operator->() noexcept;
-    //bool operator<(const Iterator< T >& other) noexcept;
-    //bool operator>(const Iterator< T >& other) noexcept;
     ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;
@@ -39,12 +37,10 @@ namespace alymova
     ConstIterator< T > operator++(int) noexcept;
     ConstIterator< T >& operator--() noexcept;
     ConstIterator< T > operator--(int) noexcept;
-    bool operator==(const ConstIterator< T >& other) noexcept;
-    bool operator!=(const ConstIterator< T >& other) noexcept;
+    bool operator==(const ConstIterator< T >& other) const noexcept;
+    bool operator!=(const ConstIterator< T >& other) const noexcept;
     const T& operator*() noexcept;
     const T* operator->() noexcept;
-    //bool operator<(const ConstIterator< T >& other) noexcept;
-    //bool operator>(const ConstIterator< T >& other) noexcept;
     const ListNode< T >* get_node() noexcept;
   private:
     friend class List< T >;
@@ -96,13 +92,13 @@ namespace alymova
   }
 
   template< typename T >
-  bool Iterator< T >::operator==(const Iterator< T >& other) noexcept
+  bool Iterator< T >::operator==(const Iterator< T >& other)  const noexcept
   {
     return node_ == other.node_;
   }
 
   template< typename T >
-  bool Iterator< T >::operator!=(const Iterator< T >& other) noexcept
+  bool Iterator< T >::operator!=(const Iterator< T >& other) const noexcept
   {
     return node_ != other.node_;
   }
@@ -172,13 +168,13 @@ namespace alymova
   }
 
   template< typename T >
-  bool ConstIterator< T >::operator==(const ConstIterator< T >& other) noexcept
+  bool ConstIterator< T >::operator==(const ConstIterator< T >& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< typename T >
-  bool ConstIterator< T >::operator!=(const ConstIterator< T >& other) noexcept
+  bool ConstIterator< T >::operator!=(const ConstIterator< T >& other) const noexcept
   {
     return node_ != other.node_;
   }
