@@ -11,13 +11,13 @@ BOOST_AUTO_TEST_CASE(empty_constructor_test)
 }
 BOOST_AUTO_TEST_CASE(push_test)
 {
-  rychkov::Stack< int > stack1;
-  stack1.push(3);
-  stack1.push(9);
-  BOOST_TEST(!stack1.empty());
-  BOOST_TEST(stack1.size() == 2);
-  BOOST_TEST(stack1.capacity() >= 2);
-  BOOST_TEST(stack1.top() == 9);
+  rychkov::Stack< int > stack;
+  stack.push(3);
+  stack.push(9);
+  BOOST_TEST(!stack.empty());
+  BOOST_TEST(stack.size() == 2);
+  BOOST_TEST(stack.capacity() >= 2);
+  BOOST_TEST(stack.top() == 9);
 }
 BOOST_AUTO_TEST_CASE(copy_test)
 {
