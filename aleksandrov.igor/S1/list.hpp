@@ -15,7 +15,9 @@ namespace aleksandrov
     List();
     List(size_t count, const T& value);
     List(const List< T >& rhs);
+    List& operator=(const List& rhs);
     List(List< T >&& rhs) noexcept;
+    List& operator=(List&& rhs) noexcept;
     ~List();
 
     Iterator< T > begin() const noexcept;
@@ -72,13 +74,36 @@ namespace aleksandrov
   }
 
   template< typename T >
+  List< T >& List< T >::operator=(const List< T >& rhs)
+  {
+    List< T >* newList = new List< T >;
+    fake_ = newList->fake_;
+    tail_ = newList->tail_;
+    for (auto it = rhs.begin(); it != rhs.end(); ++it)
+    {
+      newList->pushBack(*it);
+    }
+    return *newList;
+  }
+  
+  template< typename T >
   List< T >::List(List< T >&& rhs) noexcept:
     fake_(rhs.fake_),
     tail_(rhs.tail_)
   {
-    rhs.fake_ = new Node< T >();
-    rhs.fake_->next_ = rhs.fake_;
+    rhs.fake_ = new Node< T >;
     rhs.tail_ = nullptr;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(List< T >&& rhs) noexcept
+  {
+    clear();
+    fake_ = rhs.fake_;
+    tail_ = rhs.tail_;
+    rhs.fake_ = new Node< T >;
+    rhs.tail_ = nullptr;
+    return *this;
   }
 
   template< typename T >
@@ -141,15 +166,12 @@ namespace aleksandrov
   void List< T >::pushFront(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
-    if (!empty())
+    bool wasEmpty = empty();
+    newNode->next_ = fake_->next_;
+    fake_->next_ = newNode;
+
+    if (wasEmpty)
     {
-      newNode->next_ = fake_->next_;
-      fake_->next_ = newNode;
-    }
-    else
-    {
-      newNode->next_ = fake_->next_;
-      fake_->next_ = newNode;
       tail_ = newNode;
       newNode->next_ = fake_;
     }
@@ -160,6 +182,7 @@ namespace aleksandrov
   {
     Node< T >* newNode = new Node< T >(value);
     newNode->next_ = fake_;
+
     if (!empty())
     {
       tail_->next_ = newNode;
@@ -177,6 +200,10 @@ namespace aleksandrov
     assert(!empty());
     auto tempPtr = fake_->next_;
     fake_->next_ = tempPtr->next_;
+    if (tempPtr == tail_)
+    {
+      tail_ = nullptr;
+    }
     delete tempPtr;
   }
 
