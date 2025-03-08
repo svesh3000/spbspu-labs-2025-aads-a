@@ -4,7 +4,23 @@
 BOOST_AUTO_TEST_CASE(construction)
 {
   aleksandrov::List< int > list1;
-  aleksandrov::List< char >list2(52, '\0');
+  aleksandrov::List< int > list2(52, '\0');
+  aleksandrov::List< int > list3(list2);
+  aleksandrov::List< int > list4(std::move(list2));
+  aleksandrov::List< int > list5({10, 1});
+  BOOST_TEST(list4.size() == 52);
+  BOOST_TEST(list5.size() == 10);
+}
+
+BOOST_AUTO_TEST_CASE(assignment)
+{
+  aleksandrov::List< char > list1(2, 'a');
+  aleksandrov::List< char > list2;
+  list2 = list1;
+  BOOST_TEST(list2.size() == list1.size( ));
+  aleksandrov::List< char > list3;
+  list3 = std::move(list2);
+  BOOST_TEST(list3.size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(begin_end)
@@ -14,7 +30,6 @@ BOOST_AUTO_TEST_CASE(begin_end)
   list.pushBack(34);
   list.pushBack(56);
   BOOST_TEST(*list.begin() == 12);
-  // BOOST_TEST(list.end() == nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(front_back)
