@@ -268,7 +268,7 @@ namespace duhanina
       clear(temp);
       throw;
     }
-    std::swap(temp);
+    swap(temp);
   }
 
   template< typename T >
