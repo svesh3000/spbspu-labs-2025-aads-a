@@ -16,32 +16,33 @@ namespace duhanina
     ~List();
 
     List(const List< T >& list);
-    List(List&& other) noexcept;
+    List(List&& other);
 
-    Iterator< T > begin() const;
-    Iterator< T > end() const;
-    constIterator< T > cbegin() const;
-    constIterator< T > cend() const;
+    Iterator< T > begin() const noexcept;
+    Iterator< T > end() const noexcept;
+    constIterator< T > cbegin() const noexcept;
+    constIterator< T > cend() const noexcept;
 
-    T& front();
-    T& back();
+    T& front() noexcept;
+    T& back() noexcept;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void push_front(const T& value);
     void push_back(const T& value);
-    void pop_front();
-    void pop_back();
-    void clear();
+    void pop_front() noexcept;
+    void pop_back() noexcept;
+    void clear() noexcept;
     void swap(List& other) noexcept;
-    void remove(const T& value);
+    void remove(const T& value) noexcept;
     template < typename Predicate >
-    void remove_if(Predicate pred);
+    void remove_if(Predicate pred) noexcept;
     void assign(size_t count, const T& value);
 
-    bool operator==(const List< T >&) const;
-    bool operator!=(const List< T >&) const;
+    bool operator==(const List< T >&) const noexcept;
+    bool operator!=(const List< T >&) const noexcept;
+
   private:
     Node< T >* fake_;
     size_t listSize_;
@@ -83,7 +84,7 @@ namespace duhanina
   }
 
   template < typename T >
-  List< T >::List(List&& other) noexcept:
+  List< T >::List(List&& other):
     fake_(other.fake_),
     listSize_(other.listSize_)
   {
@@ -93,37 +94,37 @@ namespace duhanina
   }
 
   template < typename T >
-  Iterator< T > List< T >::begin() const
+  Iterator< T > List< T >::begin() const noexcept
   {
     return Iterator< T >(fake_->next_);
   }
 
   template < typename T >
-  Iterator< T > List< T >::end() const
+  Iterator< T > List< T >::end() const noexcept
   {
     return Iterator< T >(fake_);
   }
 
   template < typename T >
-  constIterator< T > List< T >::cbegin() const
+  constIterator< T > List< T >::cbegin() const noexcept
   {
     return constIterator< T >(fake_->next_);
   }
 
   template < typename T >
-  constIterator< T > List< T >::cend() const
+  constIterator< T > List< T >::cend() const noexcept
   {
     return constIterator< T >(fake_);
   }
 
   template < typename T >
-  T& List< T >::front()
+  T& List< T >::front() noexcept
   {
     return fake_->next_->data_;
   }
 
   template < typename T >
-  T& List< T >::back()
+  T& List< T >::back() noexcept
   {
     Node< T >* current = fake_->next_;
     while (current->next_ != fake_)
@@ -134,13 +135,13 @@ namespace duhanina
   }
 
   template < typename T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return listSize_ == 0;
   }
 
   template < typename T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return listSize_;
   }
@@ -169,7 +170,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     Node< T >* temp = fake_->next_;
     fake_->next_ = temp->next_;
@@ -178,7 +179,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     Node< T >* current = fake_;
     while (current->next_->next_ != fake_)
@@ -191,7 +192,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -207,7 +208,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::remove(const T& value)
+  void List< T >::remove(const T& value) noexcept
   {
     Node< T >* current = fake_->next_;
     Node< T >* prev = fake_;
@@ -230,7 +231,7 @@ namespace duhanina
 
   template < typename T >
   template <typename Predicate>
-  void List< T >::remove_if(Predicate pred)
+  void List< T >::remove_if(Predicate pred) noexcept
   {
     Node< T >* current = fake_->next_;
     Node< T >* prev = fake_;
@@ -254,15 +255,24 @@ namespace duhanina
   template < typename T >
   void List< T >::assign(size_t count, const T& value)
   {
-    clear();
-    for (size_t i = 0; i < count; ++i)
+    List< T > temp;
+    try
     {
-      push_back(value);
+      for (size_t i = 0; i < count; ++i)
+      {
+        temp.push_back(value);
+      }
     }
+    catch (...)
+    {
+      clear(temp);
+      throw;
+    }
+    std::swap(temp);
   }
 
   template< typename T >
-  bool List< T >::operator==(const List< T >& rhs) const
+  bool List< T >::operator==(const List< T >& rhs) const noexcept
   {
     if (size() != rhs.size())
     {
@@ -284,7 +294,7 @@ namespace duhanina
   }
 
   template< typename T >
-  bool List< T >::operator!=(const List< T >& rhs) const
+  bool List< T >::operator!=(const List< T >& rhs) const noexcept
   {
     return !(*this == rhs);
   }

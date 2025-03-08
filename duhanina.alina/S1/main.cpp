@@ -1,7 +1,6 @@
 #include <iostream>
 #include <utility>
 #include <string>
-#include <algorithm>
 #include <limits>
 #include "list.hpp"
 
