@@ -48,7 +48,7 @@ namespace aleksandrov
   template< typename T >
   List< T >::List():
     fake_(new Node< T >()),
-    tail_(nullptr)
+    tail_(fake_)
   {}
 
   template< typename T >
@@ -77,7 +77,7 @@ namespace aleksandrov
     tail_(rhs.tail_)
   {
     rhs.fake_ = new Node< T >();
-    rhs.fake_->next = rhs.fake_;
+    rhs.fake_->next_ = rhs.fake_;
     rhs.tail_ = nullptr;
   }
 
@@ -97,7 +97,7 @@ namespace aleksandrov
   template< typename T >
   Iterator< T > List< T >::end() const noexcept
   {
-    return Iterator< T >(tail_);
+    return Iterator< T >(tail_->next_);
   }
 
   template< typename T >

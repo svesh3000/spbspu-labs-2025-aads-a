@@ -1,12 +1,11 @@
 #include <iostream>
 #include <string>
-#include <list>
-#include <forward_list>
+#include "list.hpp"
 #include "sum.hpp"
 
 namespace aleksandrov
 {
-  void outputList(const std::forward_list< unsigned long long >& list, std::ostream& output)
+  void outputList(List< unsigned long long >& list, std::ostream& output)
   {
     output << list.front();
     for (auto it = ++list.begin(); it != list.end(); ++it)
@@ -18,21 +17,17 @@ namespace aleksandrov
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list< unsigned long long > > > list;
+  aleksandrov::List< std::pair< std::string, aleksandrov::List< unsigned long long > > > list;
   std::string listName;
   size_t maxSubListSize = 0;
-
-  auto listIter = list.before_begin();
   while (std::cin >> listName)
   {
-    std::forward_list< unsigned long long > numList;
-    auto numListIter = numList.before_begin();
+    aleksandrov::List< unsigned long long > numList;
     unsigned long long num = 0;
     size_t numCount = 0;
     while (std::cin >> num)
     {
-      numList.insert_after(numListIter, num);
-      ++numListIter;
+      numList.pushBack(num);
       ++numCount;
       if (maxSubListSize < numCount)
       {
@@ -40,16 +35,13 @@ int main()
       }
     }
     std::cin.clear();
-    list.insert_after(listIter, std::make_pair(listName, numList));
-    ++listIter;
+    list.pushBack(std::make_pair(listName, numList));
   }
 
-  std::forward_list< std::string > nameList;
-  auto nameListIter = nameList.before_begin();
+  aleksandrov::List< std::string > nameList;
   for (auto it = list.begin(); it != list.end(); ++it)
   {
-    nameList.insert_after(nameListIter, it->first);
-    ++nameListIter;
+    nameList.pushBack(it->first);
   }
 
   if (nameList.empty())
@@ -64,13 +56,11 @@ int main()
   }
   std::cout << "\n";
 
-  std::forward_list< std::forward_list < unsigned long long > > yaNumList;
-  auto yaNumListIter = yaNumList.before_begin();
+  aleksandrov::List< aleksandrov::List< unsigned long long > > yaNumList;
   size_t shift = 0;
   while (shift != maxSubListSize)
   {
-    std::forward_list< unsigned long long > numList;
-    auto numListIter = numList.before_begin();
+    aleksandrov::List< unsigned long long > numList;
     for (auto it = list.begin(); it != list.end(); ++it)
     {
       auto shiftedIt = it->second.begin();
@@ -80,13 +70,11 @@ int main()
       }
       if (shiftedIt != it->second.end())
       {
-        numList.insert_after(numListIter, *shiftedIt);
-        ++numListIter;
+        numList.pushBack(*shiftedIt);
       }
     }
     ++shift;
-    yaNumList.insert_after(yaNumListIter, numList);
-    ++yaNumListIter;
+    yaNumList.pushBack(numList);
   }
 
   if (yaNumList.empty())
@@ -100,15 +88,13 @@ int main()
     std::cout << "\n";
   }
 
-  std::forward_list< unsigned long long > sumList;
-  auto sumListIter = sumList.before_begin();
+  aleksandrov::List< unsigned long long > sumList;
   for (auto it = yaNumList.begin(); it != yaNumList.end(); ++it)
   {
     try
     {
       unsigned long long sum = aleksandrov::calcSum(*it);
-      sumList.insert_after(sumListIter, sum);
-      ++sumListIter;
+      sumList.pushBack(sum);
     }
     catch (const std::overflow_error& e)
     {
