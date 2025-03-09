@@ -9,8 +9,9 @@ namespace sveshnikov
   {
   public:
     FwdIterator();
-    ~FwdIterator() = default;
+    FwdIterator(node_t< T > *node);
     FwdIterator(const FwdIterator< T > &) = default;
+    ~FwdIterator() = default;
     FwdIterator< T > &operator=(const FwdIterator< T > &) = default;
     FwdIterator< T > &operator++() noexcept;
     FwdIterator< T > operator++(int) noexcept;
@@ -29,6 +30,11 @@ namespace sveshnikov
   template < typename T >
   FwdIterator< T >::FwdIterator():
     node_(nullptr)
+  {}
+
+  template < typename T >
+  FwdIterator< T >::FwdIterator(node_t< T > *node):
+    node_(node)
   {}
 
   template < typename T >
