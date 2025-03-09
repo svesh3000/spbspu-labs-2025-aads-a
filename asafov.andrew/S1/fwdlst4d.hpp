@@ -144,18 +144,22 @@ namespace asafov
     void pop_front()
     {
       if (!head_) return;
-
-      Node* temp = head_;
-      head_ = head_->next_;
-      if (head_ == nullptr)
+      if (head_ == last_)
       {
+        delete head_;
+        head_ = nullptr;
         last_ = nullptr;
       }
-      delete temp;
+      else
+      {
+        Node* temp = head_;
+        head_ = head_->next_;
+        last_->next_ = head_;
+        delete temp;
+      }
     }
     T& front();
     T& back();
-
     void clear(){
       while (!empty()){
         pop_front();
