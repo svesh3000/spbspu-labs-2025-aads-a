@@ -72,6 +72,7 @@ namespace alymova
     void remove(const T& value) noexcept;
     template< typename Predicate >
     void remove_if(Predicate pred);
+    void reverse() noexcept;
   private:
     ListNode< T >* fake_;
     ListNode< T >* head_;
@@ -678,6 +679,30 @@ namespace alymova
       subhead = subnext;
       it = it_next;
     }
+  }
+  template< typename T >
+  void List< T >::reverse() noexcept
+  {
+    if (size() < 2)
+    {
+      return;
+    }
+    auto it = ++begin();
+    std::swap(head_->next, head_->prev);
+    head_->next = fake_;
+    while (it != --end())
+    {
+      auto it_next = ++it;
+      --it;
+      ListNode< T >* node = it.getNode();
+      std::swap(node->next, node->prev);
+      it = it_next;
+    }
+    ListNode< T >* tail = it.getNode();
+    std::swap(tail->next, tail->prev);
+    tail->prev = nullptr;
+    fake_->prev = head_;
+    head_ = tail;
   }
 
   template< typename T >

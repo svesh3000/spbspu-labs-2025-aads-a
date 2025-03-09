@@ -320,3 +320,21 @@ BOOST_AUTO_TEST_CASE(test_ralational_operators)
   BOOST_TEST(list1 < list2);
   BOOST_TEST(list2 > list1);
 }
+BOOST_AUTO_TEST_CASE(test_reverse)
+{
+  using list_t = alymova::List< int >;
+  list_t list1;
+  list_t list_comp = list1;
+  list1.reverse();
+  BOOST_TEST(list1 == list_comp);
+
+  list1 = {1, 2};
+  list_comp = {2, 1};
+  list1.reverse();
+  BOOST_TEST(list1 == list_comp);
+
+  list1 = {1, 2, 3, 4, 5};
+  list_comp = {5, 4, 3, 2, 1};
+  list1.reverse();
+  BOOST_TEST(list1 == list_comp);
+}
