@@ -85,22 +85,6 @@ namespace asafov
       return const_iterator(nullptr, last_);
     }
     void push_back(const T& value)
-    {
-      Node* new_node = new Node(value);
-      if (!head_)
-      {
-        head_ = new_node;
-        last_ = new_node;
-        new_node->next_ = head_;
-      }
-      else
-      {
-        last_->next_ = new_node;
-        new_node->next_ = head_;
-        last_ = new_node;
-      }
-    }
-    void push_back(const T& value)
 {
   Node* new_node = new Node(value);
   if (!head_)
