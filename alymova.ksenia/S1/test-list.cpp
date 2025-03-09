@@ -113,14 +113,15 @@ BOOST_AUTO_TEST_CASE(test_swap)
   list1.swap(list2);
   BOOST_TEST(list1 == list3);
 }
-
-bool is_divided_10(const int& value)
+template< typename T >
+bool is_divided_10(const T& value)
 {
   return value % 10 == 0;
 }
+template< typename T >
 struct SingleDigit
 {
-  bool operator()(const int& value)
+  bool operator()(const T& value)
   {
     return (value < 10 && value > -10);
   }
@@ -148,12 +149,12 @@ BOOST_AUTO_TEST_CASE(test_remove)
   list_t list3((size_t)5, 10);
   list3.push_back(1);
 
-  list3.remove_if(SingleDigit());
+  list3.remove_if(SingleDigit< int >());
   BOOST_TEST(list3.size() == 5);
   BOOST_TEST(list3.back() == 10);
 
   list3.push_back(11);
-  list3.remove_if(is_divided_10);
+  list3.remove_if(is_divided_10< int >);
   BOOST_TEST(list3.size() == 1);
   BOOST_TEST(list3.front() == 11);
 }
@@ -338,10 +339,11 @@ BOOST_AUTO_TEST_CASE(test_reverse)
   list1.reverse();
   BOOST_TEST(list1 == list_comp);
 }
+template< typename T >
 struct forEmplace
 {
-  int one;
-  int two;
+  T one;
+  T two;
   bool operator==(const forEmplace& other) const
   {
     return (one == other.one) && (two == other.two);
@@ -353,11 +355,11 @@ struct forEmplace
 };
 BOOST_AUTO_TEST_CASE(test_emplace)
 {
-  using list_t = alymova::List< forEmplace >;
+  using list_t = alymova::List< forEmplace< int > >;
   list_t list1;
-  forEmplace object{1, 2};
+  forEmplace< int > object{1, 2};
   list_t list_comp{1, object};
-  alymova::Iterator< forEmplace > it_res = list1.emplace_front(1, 2);
+  alymova::Iterator< forEmplace< int > > it_res = list1.emplace_front(1, 2);
   BOOST_TEST(list1 == list_comp);
   bool b = (*it_res == object);
   BOOST_TEST(b);
@@ -376,9 +378,10 @@ BOOST_AUTO_TEST_CASE(test_emplace)
   b = (*it_res == object);
   BOOST_TEST(b);
 }
+template< typename T >
 struct isDividedOther
 {
-  bool operator()(int one, int two)
+  bool operator()(const T& one, const T& two)
   {
     return (one % two == 0);
   }
@@ -399,9 +402,17 @@ BOOST_AUTO_TEST_CASE(test_unique)
   BOOST_TEST(list1 == list_comp);
 
   list_comp.erase(++(list_comp.begin()), list_comp.end());
-  list1.unique(isDividedOther());
+  list1.unique(isDividedOther< int >());
   BOOST_TEST(list1 == list_comp);
 }
+template< typename T >
+struct isGreater
+{
+  bool operator()(const T& one, const T& two)
+  {
+    return one > two;
+  }
+};
 BOOST_AUTO_TEST_CASE(test_sort)
 {
   using list_t = alymova::List< int >;
@@ -414,12 +425,57 @@ BOOST_AUTO_TEST_CASE(test_sort)
   BOOST_TEST(list1.front() == 1);
   BOOST_TEST(list1.size() == 1);
 
-  list1 = {1, 2, 3};
-  list_t list_comp{1, 2, 3};
+  list1 = {1, 2, 2, 3};
+  list_t list_comp{1, 2, 2, 3};
   list1.sort();
   BOOST_TEST(list1 == list_comp);
 
-  list1 = {2, 3, 1};
+  list1 = {2, 3, 1, 2};
   list1.sort();
   BOOST_TEST(list1 == list_comp);
+
+  list_comp = {3, 2, 2, 1};
+  list1.sort(isGreater< int >());
+  BOOST_TEST(list1 == list_comp);
+}
+template< typename T >
+bool less_node(const T& one, const T& two)
+{
+  return one < two;
+}
+BOOST_AUTO_TEST_CASE(test_merge)
+{
+  using list_t = alymova::List< int >;
+  list_t list1{1, 2, 3, 4};
+  list_t list_comp = list1;
+  list1.merge(list1);
+  BOOST_TEST(list1 == list_comp);
+
+  list_t list2{3, 2, 1};
+  try
+  {
+    list1.merge(list2);
+  }
+  catch (const std::exception& e)
+  {
+    BOOST_TEST(list1 == list_comp);
+  }
+
+  list2.clear();
+  list1.merge(list2);
+  BOOST_TEST(list1 == list_comp);
+
+  list2 = {0, 0, 0};
+  list_comp = {0, 0, 0, 1, 2, 3, 4};
+  list1.merge(list2);
+  BOOST_TEST(list1 == list_comp);
+
+  list2 = {2, 2, 4, 5};
+  list_comp = {0, 0, 0, 1, 2, 2, 2, 3, 4, 4, 5};
+  list1.merge(list2);
+  BOOST_TEST(list1 == list_comp);
+
+  list1.clear();
+  list2.sort(isGreater< int >());
+  list1.merge(list2, isGreater< int >());
 }

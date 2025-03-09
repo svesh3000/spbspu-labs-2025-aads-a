@@ -84,6 +84,9 @@ namespace alymova
     void sort();
     template< typename Predicate >
     void sort(Predicate pred);
+    void merge(List< T >& other);
+    template< typename Predicate >
+    void merge(List< T >& other, Predicate pred);
     void reverse() noexcept;
   private:
     ListNode< T >* fake_;
@@ -120,6 +123,9 @@ namespace alymova
 
   template< typename T >
   bool less_node(const T& one, const T& two);
+
+  template< typename T, typename Predicate >
+  bool is_sorted(const List< T >& list, Predicate pred);
 
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
@@ -212,6 +218,7 @@ namespace alymova
       push_back_value(copy);
     }
   }
+
   template< typename T >
   template< typename InputIterator >
   List< T >::List(InputIterator first, InputIterator last):
@@ -357,7 +364,7 @@ namespace alymova
   void List< T >::assign(size_t n, const T& value)
   {
     clear();
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; ++i)
     {
       const T copy = value;
       push_back_value(copy);
@@ -516,11 +523,10 @@ namespace alymova
   {
     Iterator< T > return_it = insert(position, *first);
     ++first;
-    while (first != last)
+    for (; first != last; ++first)
     {
       Iterator< T > tmp_it = insert(position, *first);
       tmp_it = return_it;
-      ++first;
     }
     return return_it;
   }
@@ -528,22 +534,13 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, std::initializer_list< T > il)
   {
-    auto it = il.begin();
-    Iterator< T > return_it = insert(position, *it);
-    ++it;
-    for(; it != il.end(); ++it)
-    {
-      Iterator< T > tmp_it = insert(position, *it);
-      tmp_it = return_it;
-    }
-    return return_it;
+    return insert(position, il.begin(), il.end());
   }
 
   template< typename T >
   Iterator< T > List< T >::erase(Iterator< T > position)
   {
-    Iterator< T > return_it = ++position;
-    --position;
+    Iterator< T > return_it = position.next();
     if (position == begin())
     {
       pop_front();
@@ -567,14 +564,14 @@ namespace alymova
   {
     while (first != last)
     {
-      Iterator< T > next = ++first;
-      --first;
+      Iterator< T > next = first.next();
       Iterator < T > tmp_it = erase(first);
       tmp_it = last;
       first = next;
     }
     return last;
   }
+
   template< typename T >
   template< typename... Args >
   Iterator< T > List< T >::emplace_front(Args&&... args)
@@ -616,15 +613,9 @@ namespace alymova
   void List< T >::splice(Iterator< T > position, List< T >& other)
   {
     assert(*this != other && "Splicing a list to itself");
-    auto other_it = other.begin();
-    while (other_it != other.end())
-    {
-      Iterator< T > other_it_next = ++other_it;
-      --other_it;
-      splice(position, other, other_it);
-      other_it = other_it_next;
-    }
+    splice(position, other, other.begin(), other.end());
   }
+
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > other_it)
   {
@@ -655,18 +646,19 @@ namespace alymova
     other_node_now->next = node_now;
     node_now->prev = other_node_now;
   }
+
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > first, Iterator< T > last)
   {
     auto other_it = first;
     while (other_it != last)
     {
-      Iterator< T > other_it_next = ++other_it;
-      --other_it;
+      Iterator< T > other_it_next = other_it.next();
       splice(position, other, other_it);
       other_it = other_it_next;
     }
   }
+
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {
@@ -679,31 +671,14 @@ namespace alymova
   void List< T >::remove_if(Predicate pred)
   {
     assert(!empty());
-    ListNode< T >* subhead = head_;
     auto it = begin();
     while (it != end())
     {
-      Iterator< T > it_next = ++it;
-      --it;
-      ListNode< T >* subnext = subhead->next;
+      Iterator< T > it_next = it.next();
       if (pred(*it))
       {
-        if (it == begin())
-        {
-          pop_front();
-        }
-        else if (it == --end())
-        {
-          pop_back();
-        }
-        else
-        {
-          subhead->prev->next = subhead->next;
-          subhead->next->prev = subhead->prev;
-          delete subhead;
-        }
+        erase(it);
       }
-      subhead = subnext;
       it = it_next;
     }
   }
@@ -723,8 +698,7 @@ namespace alymova
     ++it;
     while (it != end() && it.node_ != nullptr)
     {
-      Iterator< T > it_next = ++it;
-      --it;
+      Iterator< T > it_next = it.next();
       if (pred(*it, subhead->data))
       {
         erase(it);
@@ -750,8 +724,7 @@ namespace alymova
     for (auto it1 = begin(); it1 != end(); ++it1)
     {
       auto min_it = it1;
-      auto it2 = ++it1;
-      --it1;
+      auto it2 = it1.next();
       for (; it2 != end(); ++it2)
       {
         if (pred(*it2, *min_it))
@@ -760,6 +733,38 @@ namespace alymova
         }
       }
       std::swap(*it1, *min_it);
+    }
+  }
+
+  template< typename T >
+  void List< T >::merge(List< T >& other)
+  {
+    merge(other, less_node< T >);
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::merge(List< T >& other, Predicate pred)
+  {
+    if (this == &other)
+    {
+      return;
+    }
+    if (!(is_sorted(*this, pred), is_sorted(other, pred)))
+    {
+      throw std::logic_error("Lists are not sorted");
+    }
+    auto it_other = other.begin();
+    auto it = begin();
+    while (!other.empty())
+    {
+      auto it_other_next = it_other.next();
+      while (!pred(*it_other, *it) && it != end())
+      {
+        ++it;
+      }
+      splice(it, other, it_other);
+      it_other = it_other_next;
     }
   }
 
@@ -775,8 +780,7 @@ namespace alymova
     head_->next = fake_;
     while (it != --end())
     {
-      auto it_next = ++it;
-      --it;
+      auto it_next = it.next();
       ListNode< T >* node = it.node_;
       std::swap(node->next, node->prev);
       it = it_next;
@@ -799,18 +803,13 @@ namespace alymova
   template< typename T >
   ListNode< T >* List< T >::get_last_node()
   {
+    assert(!empty());
     ListNode< T >* subhead = head_;
     for (auto it = ++begin(); it != end(); ++it)
     {
       subhead = subhead->next;
     }
     return subhead;
-  }
-
-  template< typename T >
-  bool is_equal_node(const T& value, const T& data)
-  {
-    return data == value;
   }
 
   template< typename T >
@@ -829,6 +828,23 @@ namespace alymova
       node->next = fake_;
       fake_->prev = node;
     }
+  }
+
+  template< typename T, typename Predicate >
+  bool is_sorted(const List< T >& list, Predicate pred)
+  {
+    if (list.size() < 2)
+    {
+      return true;
+    }
+    for (auto it = ++(list.begin()); it != list.end(); ++it)
+    {
+      if (!pred(*(it.prev()), *it) && *(it.prev()) != *it)
+      {
+        return false;
+      }
+    }
+    return true;
   }
 }
 #endif
