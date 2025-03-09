@@ -338,3 +338,42 @@ BOOST_AUTO_TEST_CASE(test_reverse)
   list1.reverse();
   BOOST_TEST(list1 == list_comp);
 }
+struct forEmplace
+{
+  int one;
+  int two;
+  bool operator==(const forEmplace& other) const
+  {
+    return (one == other.one) && (two == other.two);
+  }
+  bool operator!=(const forEmplace& other) const
+  {
+    return !(*this == other);
+  }
+};
+BOOST_AUTO_TEST_CASE(test_emplace)
+{
+  using list_t = alymova::List< forEmplace >;
+  list_t list1;
+  forEmplace object{1, 2};
+  list_t list_comp{1, object};
+  alymova::Iterator< forEmplace > it_res = list1.emplace_front(1, 2);
+  BOOST_TEST(list1 == list_comp);
+  bool b = (*it_res == object);
+  BOOST_TEST(b);
+
+  object = {3, 4};
+  list_comp.push_back(object);
+  it_res = list1.emplace_back(3, 4);
+  BOOST_TEST(list1 == list_comp);
+  b = (*it_res == object);
+  BOOST_TEST(b);
+
+  object = {5, 6};
+  list_comp.insert(++(list_comp.begin()), object);
+  it_res = list1.emplace(++(list1.begin()), 5, 6);
+  BOOST_TEST(list1 == list_comp);
+  b = (*it_res == object);
+  BOOST_TEST(b);
+
+}

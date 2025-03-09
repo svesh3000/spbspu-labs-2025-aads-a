@@ -63,6 +63,12 @@ namespace alymova
     Iterator< T > insert(Iterator< T > position, std::initializer_list< T > il);
     Iterator< T > erase(Iterator< T > position);
     Iterator< T > erase(Iterator< T > first, Iterator< T > last);
+    template< typename... Args >
+    Iterator< T > emplace_front(Args&&... args);
+    template< typename... Args >
+    Iterator< T > emplace_back(Args&&... args);
+    template< typename... Args >
+    Iterator< T > emplace(Iterator< T > position, Args&&... args);
     void swap(List< T >& other) noexcept;
     void clear() noexcept;
 
@@ -459,13 +465,13 @@ namespace alymova
     else
     {
       auto node_new = new ListNode< T >{copy, nullptr, nullptr};
-      ListNode< T >* node_now = position.getNode();
+      ListNode< T >* node_now = position.node_;
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
       node_new->next = node_now;
     }
-    return {--position};
+    return --position;
   }
 
   template< typename T >
@@ -482,7 +488,7 @@ namespace alymova
     else
     {
       auto node_new = new ListNode< T >{value, nullptr, nullptr};
-      ListNode< T >* node_now = position.getNode();
+      ListNode< T >* node_now = position.node_;
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
@@ -547,7 +553,7 @@ namespace alymova
     }
     else
     {
-      ListNode< T >* node = position.getNode();
+      ListNode< T >* node = position.node_;
       node->prev->next = node->next;
       node->next->prev = node->prev;
       delete node;
@@ -567,6 +573,26 @@ namespace alymova
       first = next;
     }
     return last;
+  }
+  template< typename T >
+  template< typename... Args >
+  Iterator< T > List< T >::emplace_front(Args&&... args)
+  {
+    return insert(begin(), T{args...});
+  }
+
+  template< typename T >
+  template< typename... Args >
+  Iterator< T > List< T >::emplace_back(Args&&... args)
+  {
+    return insert(end(), T{args...});
+  }
+
+  template< typename T >
+  template< typename... Args >
+  Iterator< T > List< T >::emplace(Iterator< T > position, Args&&... args)
+  {
+    return insert(position, T{args...});
   }
 
   template< typename T >
@@ -601,12 +627,12 @@ namespace alymova
   template< typename T >
   void List< T >::splice(Iterator< T > position, List< T >& other, Iterator< T > other_it)
   {
-    assert(position.getNode() != nullptr && "Iterator is not valid");
-    assert(other_it.getNode() != nullptr && "Iterator is not valid");
+    assert(position.node_ != nullptr && "Iterator is not valid");
+    assert(other_it.node_ != nullptr && "Iterator is not valid");
     assert(other_it != other.end() && "Iterator is not valid");
 
-    ListNode< T >* node_now = position.getNode();
-    ListNode< T >* other_node_now = other_it.getNode();
+    ListNode< T >* node_now = position.node_;
+    ListNode< T >* other_node_now = other_it.node_;
     if (position == begin())
     {
       head_ = other_node_now;
@@ -694,11 +720,11 @@ namespace alymova
     {
       auto it_next = ++it;
       --it;
-      ListNode< T >* node = it.getNode();
+      ListNode< T >* node = it.node_;
       std::swap(node->next, node->prev);
       it = it_next;
     }
-    ListNode< T >* tail = it.getNode();
+    ListNode< T >* tail = it.node_;
     std::swap(tail->next, tail->prev);
     tail->prev = nullptr;
     fake_->prev = head_;
