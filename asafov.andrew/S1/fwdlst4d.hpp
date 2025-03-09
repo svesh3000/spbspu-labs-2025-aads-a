@@ -50,13 +50,16 @@ namespace asafov
       }
       const_iterator& operator++()
       {
-        if (current_ && current_ != last_)
+        if (current_)
         {
-          current_ = current_->next_;
-        }
-        else
-        {
-          current_ = nullptr;
+          if (current_ == last_)
+          {
+            current_ = nullptr;
+          }
+          else
+          {
+            current_ = current_->next_;
+          }
         }
         return *this;
       }
@@ -158,10 +161,16 @@ namespace asafov
         delete temp;
       }
     }
-    T& front();
-    T& back();
-    void clear(){
-      while (!empty()){
+    T& front(){
+      return head_->data_;
+    };
+    T& back(){
+      return last_->data_;
+    }
+    void clear()
+    {
+      while (!empty())
+      {
         pop_front();
       }
     }
