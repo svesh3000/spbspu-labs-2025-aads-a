@@ -1,5 +1,5 @@
-#ifndef FWDLIST_ITERATOR_HPP
-#define FWDLIST_ITERATOR_HPP
+#ifndef CONST_FWDITERATOR_HPP
+#define CONST_FWDITERATOR_HPP
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov
@@ -14,9 +14,7 @@ namespace sveshnikov
     FwdIterator< T > &operator=(const FwdIterator< T > &) = default;
     FwdIterator< T > &operator++() noexcept;
     FwdIterator< T > operator++(int) noexcept;
-    T &operator*() noexcept;
     const T &operator*() const noexcept;
-    T *operator->() noexcept;
     const T *operator->() const noexcept;
     bool operator!=(const FwdIterator< T > &) const noexcept;
     bool operator==(const FwdIterator< T > &) const noexcept;
@@ -61,22 +59,10 @@ namespace sveshnikov
   }
 
   template < typename T >
-  T &FwdIterator< T >::operator*() noexcept
-  {
-    return const_cast< T & >(static_cast< const this_t & >(*this).operator*());
-  }
-
-  template < typename T >
   const T &FwdIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data;
-  }
-
-  template < typename T >
-  T *FwdIterator< T >::operator->() noexcept
-  {
-    return const_cast< T * >(static_cast< const this_t * >(this)->operator->());
   }
 
   template < typename T >
