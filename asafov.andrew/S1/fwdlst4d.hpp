@@ -49,20 +49,13 @@ namespace asafov
         return std::addressof(current_->data_);
       }
       const_iterator& operator++()
-      {
-        if (current_)
-        {
-          if (current_ == last_)
-          {
-            current_ = nullptr;
-          }
-          else
-          {
-            current_ = current_->next_;
-          }
-        }
-        return *this;
-      }
+{
+  if (current_)
+  {
+    current_ = (current_ == last_) ? nullptr : current_->next_;
+  }
+  return *this;
+}
       bool operator==(const const_iterator& rhs) const
       {
         return current_ == rhs.current_;
@@ -107,32 +100,36 @@ namespace asafov
         last_ = new_node;
       }
     }
-    void push_back(T&& value)
-    {
-      Node* new_node = new Node(value);
-      if (!head_)
-      {
-        head_ = new_node;
-        last_ = new_node;
-        new_node->next_ = head_;
-      }
-      else
-      {
-        last_->next_ = new_node;
-        new_node->next_ = head_;
-        last_ = new_node;
-      }
-    }
+    void push_back(const T& value)
+{
+  Node* new_node = new Node(value);
+  if (!head_)
+  {
+    head_ = last_ = new_node;
+    new_node->next_ = new_node; // Ensure circularity
+  }
+  else
+  {
+    last_->next_ = new_node;
+    new_node->next_ = head_; // Maintain circular nature
+    last_ = new_node;
+  }
+}
+
     void swap();
     size_t size() const
-    {
-      size_t i = 0;
-      for (const_iterator it = cbegin(); it != cend(); ++it)
-      {
-        ++i;
-      }
-      return i;
-    }
+{
+  if (!head_) return 0;
+  
+  size_t i = 1;
+  for (Node* it = head_; it != last_; it = it->next_)
+  {
+    ++i;
+  }
+  return i;
+}
+
+
     bool empty() const
     {
       if (size() == 0)
@@ -145,22 +142,23 @@ namespace asafov
       }
     }
     void pop_front()
-    {
-      if (!head_) return;
-      if (head_ == last_)
-      {
-        delete head_;
-        head_ = nullptr;
-        last_ = nullptr;
-      }
-      else
-      {
-        Node* temp = head_;
-        head_ = head_->next_;
-        last_->next_ = head_;
-        delete temp;
-      }
-    }
+{
+  if (!head_) return;
+  
+  if (head_ == last_)
+  {
+    delete head_;
+    head_ = last_ = nullptr;
+  }
+  else
+  {
+    Node* temp = head_;
+    head_ = head_->next_;
+    last_->next_ = head_; // Ensure last node correctly points to new head
+    delete temp;
+  }
+}
+
     T& front(){
       return head_->data_;
     };
@@ -168,11 +166,13 @@ namespace asafov
       return last_->data_;
     }
     void clear()
-    {
-      while (!empty())
-      {
-        pop_front();
-      }
+{
+  while (head_)
+  {
+    pop_front();
+  }
+}
+
     }
   private:
     Node* head_;
