@@ -78,6 +78,9 @@ namespace alymova
     void remove(const T& value) noexcept;
     template< typename Predicate >
     void remove_if(Predicate pred);
+    void unique();
+    template< typename Predicate >
+    void unique(Predicate pred);
     void reverse() noexcept;
   private:
     ListNode< T >* fake_;
@@ -85,7 +88,6 @@ namespace alymova
 
     void push_single(ListNode< T >* node);
     ListNode< T >* get_last_node();
-    bool is_equal_node(const T& value, const T& data);
     void push_back_value(const T value);
   };
 
@@ -108,17 +110,10 @@ namespace alymova
   bool operator>=(const List< T >& lhs, const List< T >& rhs) noexcept;
 
   template< typename T >
-  struct EqualNode
-  {
-    const T& value;
-    EqualNode(const T& new_value):
-      value(new_value)
-    {}
-    bool operator()(const T& data)
-    {
-      return value == data;
-    }
-  };
+  struct EqualNode;
+
+  template< typename T >
+  bool equal_node(const T& one, const T& two);
 
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
@@ -706,6 +701,36 @@ namespace alymova
       it = it_next;
     }
   }
+
+  template< typename T >
+  void List< T >::unique()
+  {
+    unique(equal_node< T >);
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::unique(Predicate pred)
+  {
+    ListNode< T >* subhead = head_;
+    auto it = begin();
+    ++it;
+    while (it != end() && it.node_ != nullptr)
+    {
+      Iterator< T > it_next = ++it;
+      --it;
+      if (pred(*it, subhead->data))
+      {
+        erase(it);
+      }
+      else
+      {
+        subhead = subhead->next;
+      }
+      it = it_next;
+    }
+  }
+
   template< typename T >
   void List< T >::reverse() noexcept
   {

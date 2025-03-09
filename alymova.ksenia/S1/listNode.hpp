@@ -10,5 +10,24 @@ namespace alymova
     ListNode< T >* next;
     ListNode< T >* prev;
   };
+
+  template< typename T >
+  struct EqualNode
+  {
+    const T& value;
+    EqualNode(const T& new_value):
+      value(new_value)
+    {}
+    bool operator()(const T& data)
+    {
+      return value == data;
+    }
+  };
+
+  template< typename T >
+  bool equal_node(const T& one, const T& two)
+  {
+    return one == two;
+  }
 }
 #endif

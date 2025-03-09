@@ -375,5 +375,30 @@ BOOST_AUTO_TEST_CASE(test_emplace)
   BOOST_TEST(list1 == list_comp);
   b = (*it_res == object);
   BOOST_TEST(b);
+}
+struct isDividedOther
+{
+  bool operator()(int one, int two)
+  {
+    return (one % two == 0);
+  }
+};
+BOOST_AUTO_TEST_CASE(test_unique)
+{
+  using list_t = alymova::List< int >;
+  list_t list1;
+  list1.unique();
+  BOOST_TEST(list1.empty());
 
+  list1 = {1, 1, 2, 2, 3, 4, 4, 4, 5};
+  list_t list_comp{1, 2, 3, 4, 5};
+  list1.unique();
+  BOOST_TEST(list1 == list_comp);
+
+  list1.unique();
+  BOOST_TEST(list1 == list_comp);
+
+  list_comp.erase(++(list_comp.begin()), list_comp.end());
+  list1.unique(isDividedOther());
+  BOOST_TEST(list1 == list_comp);
 }
