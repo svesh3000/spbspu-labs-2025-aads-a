@@ -81,6 +81,9 @@ namespace alymova
     void unique();
     template< typename Predicate >
     void unique(Predicate pred);
+    void sort();
+    template< typename Predicate >
+    void sort(Predicate pred);
     void reverse() noexcept;
   private:
     ListNode< T >* fake_;
@@ -114,6 +117,9 @@ namespace alymova
 
   template< typename T >
   bool equal_node(const T& one, const T& two);
+
+  template< typename T >
+  bool less_node(const T& one, const T& two);
 
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
@@ -728,6 +734,32 @@ namespace alymova
         subhead = subhead->next;
       }
       it = it_next;
+    }
+  }
+
+  template< typename T >
+  void List< T >::sort()
+  {
+    sort(less_node< T >);
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::sort(Predicate pred)
+  {
+    for (auto it1 = begin(); it1 != end(); ++it1)
+    {
+      auto min_it = it1;
+      auto it2 = ++it1;
+      --it1;
+      for (; it2 != end(); ++it2)
+      {
+        if (pred(*it2, *min_it))
+        {
+          min_it = it2;
+        }
+      }
+      std::swap(*it1, *min_it);
     }
   }
 

@@ -402,3 +402,24 @@ BOOST_AUTO_TEST_CASE(test_unique)
   list1.unique(isDividedOther());
   BOOST_TEST(list1 == list_comp);
 }
+BOOST_AUTO_TEST_CASE(test_sort)
+{
+  using list_t = alymova::List< int >;
+  list_t list1;
+  list1.sort();
+  BOOST_TEST(list1.empty());
+
+  list1.push_back(1);
+  list1.sort();
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list1.size() == 1);
+
+  list1 = {1, 2, 3};
+  list_t list_comp{1, 2, 3};
+  list1.sort();
+  BOOST_TEST(list1 == list_comp);
+
+  list1 = {2, 3, 1};
+  list1.sort();
+  BOOST_TEST(list1 == list_comp);
+}

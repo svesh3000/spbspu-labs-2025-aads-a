@@ -29,5 +29,11 @@ namespace alymova
   {
     return one == two;
   }
+
+  template< typename T >
+  bool less_node(const T& one, const T& two)
+  {
+    return one < two;
+  }
 }
 #endif
