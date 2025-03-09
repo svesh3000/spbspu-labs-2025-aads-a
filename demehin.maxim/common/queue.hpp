@@ -1,6 +1,8 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include <utility>
+#include <cstddef>
+#include <stdexcept>
 
 namespace demehin
 {
