@@ -3,7 +3,7 @@
 #include <ostream>
 
 namespace {
-  int safe_sum(unsigned long long a, unsigned long long b)
+  int checked_sum(unsigned long long a, unsigned long long b)
   {
     const unsigned long long max_ull = std::numeric_limits< unsigned long long >::max();
     if (max_ull - a > b) {
@@ -12,7 +12,7 @@ namespace {
     throw std::overflow_error("overflow");
   }
 
-  void print_list_elements(std::ostream& out, maslevtsov::list_t& list) noexcept
+  void print_list_elements(std::ostream& out, const maslevtsov::list_t& list) noexcept
   {
     if (!list.empty()) {
       out << *list.begin();
@@ -23,59 +23,55 @@ namespace {
   }
 }
 
-std::size_t maslevtsov::get_max_pairs_list_size(pairs_list_t& list) noexcept
+std::size_t maslevtsov::get_max_pairs_list_size(const pairs_list_t& list) noexcept
 {
-  if (!list.empty()) {
-    std::size_t maximum = 0, size = 0;
-    for (auto i = list.begin(); i != list.end(); ++i) {
-      if ((*i).second.empty()) {
-        continue;
-      }
-      for (auto j = i->second.begin(); j != i->second.end(); ++j) {
-        ++size;
-      }
-      maximum = maximum > size ? maximum : size;
-    }
-    return maximum;
+  std::size_t maximum = 0;
+  for (auto i = list.begin(); i != list.end(); ++i) {
+    maximum = std::max(maximum, i->second.size());
   }
-  return 0;
+  return maximum;
 }
 
-std::size_t maslevtsov::get_sum_of_list_elements(list_t& list)
+void maslevtsov::get_lists_sums(list_t& sums, const pairs_list_t& pairs_list)
 {
-  if (!list.empty()) {
-    std::size_t result = 0;
-    for (auto i = list.begin(); i != list.end(); ++i) {
-      result = safe_sum(result, *i);
+  std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
+  for (std::size_t i = 0; i != max_pairs_list_size; ++i) {
+    std::size_t cur_sum = 0;
+    for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j) {
+      list_t cur_list = j->second;
+      if (cur_list.size() > i) {
+        auto it = cur_list.begin();
+        for (std::size_t k = 0; k != i; ++k, ++it);
+        cur_sum = checked_sum(cur_sum, *it);
+      }
     }
-    return result;
+    sums.push_back(cur_sum);
   }
-  return 0;
 }
 
-void maslevtsov::print_lists_info(std::ostream& out, pairs_list_t pairs_list)
+void maslevtsov::print_lists_info(std::ostream& out, const pairs_list_t& pairs_list)
 {
-  if (!pairs_list.empty()) {
-    std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
-    list_t sums;
-    for (std::size_t i = 0; i != max_pairs_list_size; ++i) {
-      list_t column_elements;
-      for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j) {
-        if (!j->second.empty()) {
-          column_elements.push_back(j->second.front());
-          j->second.pop_front();
-        }
-      }
-      if (!column_elements.empty()) {
-        print_list_elements(out, column_elements);
-        out << '\n';
-        sums.push_back(get_sum_of_list_elements(column_elements));
+  std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
+  for (std::size_t i = 0; i != max_pairs_list_size; ++i) {
+    list_t column_elements;
+    for (auto j = pairs_list.begin(); j != pairs_list.end(); ++j) {
+      list_t cur_list = j->second;
+      if (cur_list.size() > i) {
+        auto it = cur_list.begin();
+        for (std::size_t k = 0; k != i; ++k, ++it);
+        column_elements.push_back(*it);
       }
     }
-    if (sums.empty()) {
-      out << 0;
-    } else {
-      print_list_elements(out, sums);
+    if (!column_elements.empty()) {
+      print_list_elements(out, column_elements);
+      out << '\n';
     }
   }
+  list_t sums;
+  get_lists_sums(sums, pairs_list);
+  if (sums.empty()) {
+    out << 0;
+    return;
+  }
+  print_list_elements(out, sums);
 }

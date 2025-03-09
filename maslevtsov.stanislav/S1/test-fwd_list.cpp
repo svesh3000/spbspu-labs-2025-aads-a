@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(end_test)
   list.push_front(0);
   list.push_front(1);
   auto it = list.end();
-  BOOST_TEST(*it == 0);
+  BOOST_TEST(*it == 1);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(const_ref_front_test)
   BOOST_TEST(list.front() == n);
 }
 
-BOOST_AUTO_TEST_CASE(move_front_test)
+BOOST_AUTO_TEST_CASE(front_test)
 {
   maslevtsov::FwdList< int > list;
   list.push_front(0);
