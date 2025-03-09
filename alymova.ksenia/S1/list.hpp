@@ -83,6 +83,24 @@ namespace alymova
   };
 
   template< typename T >
+  bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
+  bool operator!=(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
+  bool operator<(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
+  bool operator<=(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
+  bool operator>(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
+  bool operator>=(const List< T >& lhs, const List< T >& rhs) noexcept;
+
+  template< typename T >
   struct EqualNode
   {
     const T& value;
@@ -116,6 +134,41 @@ namespace alymova
   bool operator!=(const List< T >& lhs, const List< T >& rhs) noexcept
   {
     return (!(lhs == rhs));
+  }
+
+  template< typename T >
+  bool operator<(const List< T >& lhs, const List< T >& rhs) noexcept
+  {
+    if (lhs.size() != rhs.size())
+    {
+      return lhs.size() < rhs.size();
+    }
+    for (auto it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
+    {
+      if ((*it_lhs) != (*it_rhs))
+      {
+        return (*it_lhs) < (*it_rhs);
+      }
+    }
+    return false;
+  }
+
+  template< typename T >
+  bool operator<=(const List< T >& lhs, const List< T >& rhs) noexcept
+  {
+    return (!(rhs < lhs));
+  }
+
+  template< typename T >
+  bool operator>(const List< T >& lhs, const List< T >& rhs) noexcept
+  {
+    return (rhs < lhs);
+  }
+
+  template< typename T >
+  bool operator>=(const List< T >& lhs, const List< T >& rhs) noexcept
+  {
+    return (!(lhs < rhs));
   }
 
   template< typename T >

@@ -294,3 +294,29 @@ BOOST_AUTO_TEST_CASE(test_erase)
   b = (it_res == list1.end());
   BOOST_TEST(b);
 }
+
+BOOST_AUTO_TEST_CASE(test_ralational_operators)
+{
+  using list_t = alymova::List< int >;
+  list_t list1;
+  list_t list2;
+  BOOST_TEST(list1 == list2);
+  BOOST_TEST(list1 >= list2);
+  BOOST_TEST(list1 <= list2);
+
+  list1 = {1, 2, 3};
+  list2 = {1, 2, 3};
+  BOOST_TEST(list1 == list2);
+  BOOST_TEST(list1 <= list2);
+  BOOST_TEST(list1 >= list2);
+
+  list2.pop_back();
+  BOOST_TEST(list1 != list2);
+  BOOST_TEST(list1 > list2);
+  BOOST_TEST(list2 < list1);
+
+  list2.push_back(4);
+  BOOST_TEST(list1 != list2);
+  BOOST_TEST(list1 < list2);
+  BOOST_TEST(list2 > list1);
+}
