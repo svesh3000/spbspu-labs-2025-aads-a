@@ -118,19 +118,19 @@ kiselev::list kiselev::createList(std::istream& input)
   return list;
 }
 
-std::ostream& kiselev::output(std::ostream& output, list& list_)
+std::ostream& kiselev::output(std::ostream& output, list& list)
 {
-  if (list_.empty())
+  if (list.empty())
   {
     return output << "0\n";
   }
-  outputName(output, list_) << "\n";
-  if (list_.front().second.empty())
+  outputName(output, list) << "\n";
+  if (list.front().second.empty())
   {
     return output << "0\n";
   }
-  outputNumbers(output, list_);
-  numberList sum = calcucationSum(list_);
+  outputNumbers(output, list);
+  numberList sum = calcucationSum(list);
   outputSum(output, sum) << "\n";
   return output;
 }
