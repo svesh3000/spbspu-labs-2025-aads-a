@@ -172,8 +172,6 @@ namespace asafov
     pop_front();
   }
 }
-
-    }
   private:
     Node* head_;
     Node* last_;
