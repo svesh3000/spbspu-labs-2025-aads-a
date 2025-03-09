@@ -115,12 +115,10 @@ namespace asafov
     last_ = new_node;
   }
 }
-
     void swap();
     size_t size() const
 {
   if (!head_) return 0;
-  
   size_t i = 1;
   for (Node* it = head_; it != last_; it = it->next_)
   {
@@ -128,8 +126,6 @@ namespace asafov
   }
   return i;
 }
-
-
     bool empty() const
     {
       if (size() == 0)
@@ -144,7 +140,6 @@ namespace asafov
     void pop_front()
 {
   if (!head_) return;
-  
   if (head_ == last_)
   {
     delete head_;
@@ -158,7 +153,6 @@ namespace asafov
     delete temp;
   }
 }
-
     T& front(){
       return head_->data_;
     };
