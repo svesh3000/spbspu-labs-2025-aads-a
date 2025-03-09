@@ -11,7 +11,7 @@ namespace asafov
     public:
       T data_;
       Node* next_;
-      Node() noexcept: data_(NULL), next_(nullptr) {}
+      Node() noexcept: data_(), next_(nullptr) {}
       Node(const T& smh, Node* ptr) noexcept: data_(smh), next_(ptr) {}
       Node(const T& smh) noexcept: data_(smh), next_(nullptr) {}
       Node(const Node& node) noexcept: data_(node.data_), next_(node.next_) {}
