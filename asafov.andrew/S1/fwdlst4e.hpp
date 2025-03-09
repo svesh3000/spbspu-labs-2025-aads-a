@@ -149,17 +149,18 @@ namespace asafov
     }
 
     void pop_front()
-    {
-      if (!head_) return; // Список пуст
+{
+    if (!head_) return;
 
-      Node* temp = head_;
-      head_ = head_->next_;
-      if (head_ == nullptr)
-      {
-        last_ = nullptr; // Если список стал пустым
-      }
-      delete temp;
+    Node* temp = head_;
+    head_ = head_->next_;
+    
+    if (temp == last_) {
+        last_ = nullptr;
     }
+    
+    delete temp;
+}
 
     T& front()
     {
