@@ -1,5 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
+#include <utility>
 
 namespace demehin
 {
@@ -9,6 +10,8 @@ namespace demehin
   public:
 
     Stack();
+    Stack(const Stack&);
+    Stack(Stack&&);
     ~Stack();
 
     void push(T rhs);
@@ -33,6 +36,30 @@ namespace demehin
     capacity_(100)
   {
     data_ = new T[capacity_];
+  }
+
+  template< typename T >
+  Stack< T >::Stack(const Stack& rhs):
+    data_(nullptr),
+    size_(rhs.size_),
+    capacity_(rhs.capacity_)
+  {
+    data_ = new T[capacity_];
+    for (size_t i = 0; i < size_; i++)
+    {
+      data_[i] = rhs.data_[i];
+    }
+  }
+
+  template< typename T >
+  Stack< T >::Stack(Stack&& rhs):
+    data_(rhs.data_),
+    size_(rhs.size_),
+    capacity_(rhs.capacity_)
+  {
+    std::exchange(rhs.data_, nullptr);
+    std::exchange(rhs.size_, 0);
+    std::exchange(rhs.capacity_, 0);
   }
 
   template< typename T >
