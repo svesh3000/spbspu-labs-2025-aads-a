@@ -152,7 +152,9 @@ namespace asafov
 {
     if (!head_) return;
     Node* temp = head_;
-    head_ = head_->next_;
+    if (head_->next_ == nullptr){
+        delete head_;
+    }
     if (temp == last_) {
         last_ = nullptr;
     }
