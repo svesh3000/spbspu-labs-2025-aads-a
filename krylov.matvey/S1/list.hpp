@@ -1,5 +1,6 @@
 #ifndef LIST_HPP
 #define LIST_HPP
+#include <iostream>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -14,8 +15,8 @@ namespace krylov
   {
   public:
     T data_;
-    Node* prev_;
-    Node* next_;
+    Node< T >* prev_;
+    Node< T >* next_;
     Node(const T& value);
   };
 
@@ -28,6 +29,7 @@ namespace krylov
     using difference_type = std::ptrdiff_t;
     using pointer = T*;
     using reference = T&;
+    Iterator();
     Iterator(Node< T >* node);
     Iterator(Node< T >* node, const List< T >* list);
     T& operator*();
@@ -51,6 +53,7 @@ namespace krylov
     friend class Iterator< T >;
     List();
     ~List();
+    List(const List< T >& other);
     Iterator< T > begin() const;
     Iterator< T > end() const;
     void push_back(const T& value);
@@ -89,6 +92,20 @@ namespace krylov
   }
 
   template < typename T >
+  List< T >::List(const List< T >& other):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {
+    Node< T >* current = other.head_;
+    while (current)
+    {
+      push_back(current->data_);
+      current = current->next_;
+    }
+  }
+
+  template < typename T >
   Iterator< T >::Iterator(Node< T >* node):
     current_(node),
     list_(nullptr)
@@ -109,7 +126,7 @@ namespace krylov
   template < typename T >
   T* Iterator< T >::operator->()
   {
-    return &current_->data_;
+    return &(current_->data_);
   }
 
   template < typename T >
@@ -118,6 +135,10 @@ namespace krylov
     if (current_ && current_->next_)
     {
       current_ = current_->next_;
+    }
+    else
+    {
+      current_ = nullptr;
     }
     return *this;
   }
@@ -212,6 +233,7 @@ namespace krylov
       head_ = nullptr;
     }
     delete temp;
+    temp = nullptr;
     --size_;
   }
 

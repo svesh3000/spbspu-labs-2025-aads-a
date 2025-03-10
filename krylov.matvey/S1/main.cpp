@@ -42,7 +42,7 @@ int main()
   unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
-    int sumOfLine = 0;
+    unsigned long long sumOfLine = 0;
     for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
     {
       if (it->second.size() <= i)
