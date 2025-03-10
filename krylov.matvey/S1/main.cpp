@@ -88,10 +88,17 @@ int main()
     std::cerr << "Overflow!\n";
     return 1;
   }
-  for (auto it = listOfLineSums.begin(); it != --(listOfLineSums.end()); ++it)
+  if (listOfLineSums.size())
   {
-    std::cout << *it << " ";
+    for (auto it = listOfLineSums.begin(); it != --(listOfLineSums.end()); ++it)
+    {
+      std::cout << *it << " ";
+    }
+    std::cout << *(--(listOfLineSums.end())) << "\n";
   }
-  std::cout << *(--(listOfLineSums.end())) << "\n";
+  else
+  {
+    std::cout << "0\n";
+  }
 }
 
