@@ -4,8 +4,11 @@
 BOOST_AUTO_TEST_CASE(construction)
 {
   aleksandrov::List< int > list1;
+  BOOST_TEST(list1.empty());
   aleksandrov::List< char > list2(52, '\0');
+  BOOST_TEST(list2.size() == 52);
   aleksandrov::List< char > list3(list2);
+  BOOST_TEST(list3.size() == 52);
   aleksandrov::List< char > list4(std::move(list2));
   BOOST_TEST(list4.size() == 52);
   aleksandrov::List< int > list5{0, 1, 2, 3, 4, 5};
@@ -42,7 +45,9 @@ BOOST_AUTO_TEST_CASE(front_back)
   list.pushFront('b');
   list.pushFront('c');
   BOOST_TEST(list.front() == 'c');
+  BOOST_TEST(list.cfront() == list.front());
   BOOST_TEST(list.back() == 'a');
+  BOOST_TEST(list.cback() == list.back());
 }
 
 BOOST_AUTO_TEST_CASE(empty)
@@ -129,8 +134,8 @@ BOOST_AUTO_TEST_CASE(remove_if)
 
 BOOST_AUTO_TEST_CASE(splice)
 {
-  aleksandrov::List< int > list1(static_cast< size_t >(7), 0);
-  aleksandrov::List< int > list2(static_cast< size_t >(3), 1);
+  aleksandrov::List< int > list1(7ull, 0);
+  aleksandrov::List< int > list2(3ull, 1);
   auto itBefore = list1.cbegin();
   auto itAfter = list1.cbegin();
   std::advance(itBefore, 2);
