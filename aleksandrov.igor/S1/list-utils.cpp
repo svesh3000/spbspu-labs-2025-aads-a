@@ -1,7 +1,8 @@
-#include "sum.hpp"
+#include "list-utils.hpp"
 #include "list.hpp"
 #include <limits>
 #include <stdexcept>
+#include <iostream>
 
 namespace aleksandrov
 {
@@ -23,6 +24,15 @@ namespace aleksandrov
       }
     }
     return sum;
+  }
+
+  void outputList(List< unsigned long long >& list, std::ostream& output)
+  {
+    output << list.front();
+    for (auto it = ++list.begin(); it != list.end(); ++it)
+    {
+      output << " " << *it;
+    }
   }
 }
 

@@ -2,10 +2,13 @@
 #define ITERATOR_HPP
 
 #include <iterator>
-#include "node.hpp"
+#include "list.hpp"
 
 namespace aleksandrov
 {
+  template< typename T >
+  class List;
+
   template< typename T >
   class Iterator: public std::iterator< std::forward_iterator_tag, T >
   {
@@ -16,8 +19,8 @@ namespace aleksandrov
     Iterator(Node< T >* node):
       node_(node)
     {}
-    ~Iterator() = default;
     Iterator(const Iterator< T >&) = default;
+    ~Iterator() = default;
     Iterator< T >& operator=(const Iterator< T >&) = default;
 
     Iterator< T >& operator++();
@@ -28,9 +31,8 @@ namespace aleksandrov
 
     bool operator!=(const Iterator< T >&) const;
     bool operator==(const Iterator< T >&) const;
-
-    Node< T >* getNode() const;
   private:
+    friend List< T >;
     Node< T >* node_;
   };
 
@@ -71,12 +73,6 @@ namespace aleksandrov
   bool Iterator< T >::operator!=(const Iterator< T >& rhs) const
   {
     return !(rhs == *this);
-  }
-
-  template< typename T >
-  Node< T >* Iterator< T >::getNode() const
-  {
-    return node_;
   }
 }
 
