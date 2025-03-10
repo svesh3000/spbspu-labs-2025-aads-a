@@ -52,6 +52,7 @@ namespace krylov
   public:
     friend class Iterator< T >;
     List();
+    List(size_t n, const T& value);
     ~List();
     List(const List< T >& other);
     Iterator< T > begin() const;
@@ -64,6 +65,7 @@ namespace krylov
     size_t size() const;
     void clear();
     void swap(List< T >& other);
+    void assign(size_t n, const T& value);
 
   private:
     Node< T >* head_;
@@ -86,6 +88,25 @@ namespace krylov
   {}
 
   template < typename T >
+  List< T >::List(const size_t n, const T& value):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {
+    try
+    {
+      for (size_t i = 0; i < n; ++i)
+      {
+        push_back(value);
+      }
+    }
+    catch (const std::bad_alloc& e)
+    {
+      clear();
+    }
+  }
+
+  template < typename T >
   List< T >::~List()
   {
     clear();
@@ -102,6 +123,23 @@ namespace krylov
     {
       push_back(current->data_);
       current = current->next_;
+    }
+  }
+
+  template< typename T >
+  void List< T >::assign(size_t n, const T& value)
+  {
+    clear();
+    try
+    {
+      for (size_t i = 0; i < n; ++i)
+      {
+        push_back(value);
+      }
+    }
+    catch (const std::bad_alloc& e)
+    {
+      clear();
     }
   }
 
@@ -233,7 +271,6 @@ namespace krylov
       head_ = nullptr;
     }
     delete temp;
-    temp = nullptr;
     --size_;
   }
 

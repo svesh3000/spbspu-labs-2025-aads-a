@@ -14,6 +14,27 @@ BOOST_AUTO_TEST_CASE(test_push_back)
   BOOST_TEST(list.back() == 20);
 }
 
+BOOST_AUTO_TEST_CASE(test_fill_constructor)
+{
+  List< int > list(5, 27);
+  BOOST_TEST(list.front() == 27);
+  BOOST_TEST(list.back() == 27);
+  BOOST_TEST(list.size() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(test_assign)
+{
+  List< int > list;
+  list.assign(17, 52);
+  BOOST_TEST(list.size() == 17);
+  BOOST_TEST(list.front() == 52);
+  BOOST_TEST(list.back() == 52);
+  list.assign(21, 44);
+  BOOST_TEST(list.size() == 21);
+  BOOST_TEST(list.front() == 44);
+  BOOST_TEST(list.back() == 44);
+}
+
 BOOST_AUTO_TEST_CASE(test_pop_back)
 {
   List< int > list;
