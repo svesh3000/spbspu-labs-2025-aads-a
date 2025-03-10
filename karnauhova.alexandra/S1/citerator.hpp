@@ -39,7 +39,7 @@ namespace karnauhova
   template< typename T >
   ConstListIterator< T > ConstListIterator<T>::operator++(int)
   {
-    ListIterator< T > result(*this);
+    ConstListIterator< T > result(*this);
     ++(*this);
     return result;
   }

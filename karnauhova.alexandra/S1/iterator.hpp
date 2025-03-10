@@ -56,7 +56,7 @@ namespace karnauhova
   {
     return !(rhs == *this);
   }
-  
+
   template< typename T >
   T& ListIterator< T >::operator*()
   {

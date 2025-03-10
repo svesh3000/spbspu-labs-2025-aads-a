@@ -150,13 +150,13 @@ namespace karnauhova
   }
 
   template< typename T >
-  List< T >::CIterator List< T >::cbegin() const
+  ConstListIterator< T > List< T >::cbegin() const
   {
     return CIterator(fake_->next);
   }
 
   template< typename T >
-  List< T >::CIterator List< T >::cend() const
+  ConstListIterator< T > List< T >::cend() const
   {
     return CIterator(fake_);
   }
