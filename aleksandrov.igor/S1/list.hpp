@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "iterator.hpp"
 #include "cIterator.hpp"
+#include "list-utils.hpp"
 #include <initializer_list>
 #include <cassert>
 
@@ -67,6 +68,11 @@ namespace aleksandrov
 
     bool operator==(const List< T >&) const noexcept;
     bool operator!=(const List< T >&) const noexcept;
+    bool operator<(const List< T >&) const noexcept;
+    bool operator<=(const List< T >&) const noexcept;
+    bool operator>(const List< T >&) const noexcept;
+    bool operator>=(const List< T >&) const noexcept;
+    void reverse() noexcept;
   private:
     Node< T >* fake_;
     Node< T >* tail_;
@@ -477,6 +483,51 @@ namespace aleksandrov
   bool List< T >::operator!=(const List< T >& rhs) const noexcept
   {
     return !(*this == rhs);
+  }
+
+  template< typename T >
+  bool List< T >::operator<(const List< T >& rhs) const noexcept
+  {
+    return lexicographicalCompare(cbegin(), cend(), rhs.cbegin(), rhs.cend());
+  }
+
+  template< typename T >
+  bool List< T >::operator<=(const List< T >& rhs) const noexcept
+  {
+    return !(*this > rhs);
+  }
+
+  template< typename T >
+  bool List< T >::operator>(const List< T >& rhs) const noexcept
+  {
+    return !(*this < rhs || *this == rhs);
+  }
+
+  template< typename T >
+  bool List< T >::operator>=(const List< T >& rhs) const noexcept
+  {
+    return !(*this < rhs);
+  }
+
+  template< typename T >
+  void List< T >::reverse() noexcept
+  {
+    if (size() <= 1)
+    {
+      return;
+    }
+    Node< T >* beforePos = fake_;
+    Node< T >* pos = fake_->next;
+    Node< T >* afterPos = pos->next;
+    fake_->next = tail_;
+    tail_ = pos;
+    while (pos != fake_)
+    {
+      pos->next = beforePos;
+      beforePos = pos;
+      pos = afterPos;
+      afterPos = afterPos->next;
+    }
   }
 }
 
