@@ -254,7 +254,7 @@ void dribas::List<T>::pop_front() {
     head_ = head_->next_;
     if (head_) {
       head_->prev_ = nullptr;
-    } else { 
+    } else {
       tail_ = nullptr;
     }
     delete forDelete;
