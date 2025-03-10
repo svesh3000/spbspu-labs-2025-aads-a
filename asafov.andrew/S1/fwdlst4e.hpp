@@ -12,21 +12,41 @@ namespace asafov
     public:
       T data_;
       Node* next_;
-      Node(const T& smh, Node* ptr = nullptr) noexcept: data_(smh), next_(ptr) {}
+      Node(const T& smh, Node* ptr) noexcept:
+      data_(smh),
+      next_(ptr)
+      {}
     };
 
   public:
-    Forward_list() noexcept: head_(nullptr), last_(nullptr) {}
-    
-    ~Forward_list() { clear(); }
+    Forward_list() noexcept:
+    head_(nullptr),
+    last_(nullptr)
+    {}
+
+    ~Forward_list()
+    {
+      clear();
+    }
 
     class const_iterator
     {
       friend class Forward_list;
     public:
-      const_iterator(Node* node, Node* last) : current_(node), last_(last) {}
+      const_iterator(Node* node, Node* last):
+      current_(node),
+      last_(last)
+      {}
 
-      const T& operator*() const { return current_->data_; }
+      const T& operator*() const
+      {
+        return current_->data_;
+      }
+
+      T* operator->() const
+      {
+        return std::addressof(current_->data_);
+      }
 
       const_iterator& operator++()
       {
@@ -37,16 +57,28 @@ namespace asafov
         return *this;
       }
 
-      bool operator==(const const_iterator& rhs) const { return current_ == rhs.current_; }
-      bool operator!=(const const_iterator& rhs) const { return !(*this == rhs); }
+      bool operator==(const const_iterator& rhs) const
+      {
+        return current_ == rhs.current_;
+      }
+      bool operator!=(const const_iterator& rhs) const
+      {
+        return !(*this == rhs);
+      }
 
     private:
       Node* current_;
       Node* last_;
     };
 
-    const_iterator cbegin() const { return const_iterator(head_, last_); }
-    const_iterator cend() const { return const_iterator(nullptr, last_); }
+    const_iterator cbegin() const
+    {
+      return const_iterator(head_, last_);
+    }
+    const_iterator cend() const
+    {
+      return const_iterator(nullptr, last_);
+    }
 
     void push_back(const T& value)
     {
@@ -69,11 +101,16 @@ namespace asafov
       if (!head_) return 0;
       size_t count = 1;
       for (Node* it = head_; it != last_; it = it->next_)
-        ++count;
+      {
+        count++;
+      }
       return count;
     }
 
-    bool empty() const { return head_ == nullptr; }
+    bool empty() const
+    {
+      return head_ == nullptr;
+    }
 
     void pop_front()
     {
@@ -95,7 +132,10 @@ namespace asafov
 
     void clear()
     {
-      while (head_) { pop_front(); }
+      while (head_)
+      {
+        pop_front();
+      }
     }
 
   private:
