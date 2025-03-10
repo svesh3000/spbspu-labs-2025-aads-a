@@ -115,7 +115,6 @@ namespace asafov
     void pop_front()
     {
       if (!head_) return;
-      
       if (head_ == last_)
       {
         delete head_;
