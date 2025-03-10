@@ -1,22 +1,24 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
+#include <cstdlib>
+
 namespace aleksandrov
 {
   template< typename T>
   struct Node
   {
-    T data_;
-    Node< T >* next_;
+    T data;
+    Node< T >* next;
 
     Node():
-      data_(T()),
-      next_(nullptr)
+      data(),
+      next(nullptr)
     {}
 
     Node(const T& data):
-      data_(data),
-      next_(nullptr)
+      data(data),
+      next(nullptr)
     {}
   };
 }

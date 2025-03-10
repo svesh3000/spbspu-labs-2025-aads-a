@@ -39,7 +39,7 @@ namespace aleksandrov
   template< typename T >
   Iterator< T >& Iterator< T >::operator++()
   {
-    node_ = node_->next_;
+    node_ = node_->next;
     return *this;
   }
 
@@ -54,13 +54,13 @@ namespace aleksandrov
   template< typename T >
   T& Iterator< T >::operator*()
   {
-    return node_->data_;
+    return node_->data;
   }
 
   template< typename T >
   T* Iterator< T >::operator->()
   {
-    return std::addressof(node_->data_);
+    return std::addressof(node_->data);
   }
 
   template< typename T >
