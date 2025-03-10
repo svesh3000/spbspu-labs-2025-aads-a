@@ -1,7 +1,6 @@
-#ifndef VARIANT_TOOLS_HPP
-#define VARIANT_TOOLS_HPP
+#ifndef TOOLS_HPP
+#define TOOLS_HPP
 
-#include <type_traits>
 #include <type_traits.hpp>
 
 namespace rychkov
@@ -24,42 +23,25 @@ namespace rychkov
   template< class... Types >
   constexpr size_t variant_size_v = sizeof...(Types);
 
-  namespace details
-  {
-    template< class T >
-    void copy_function(byte* data, const byte* rhs)
-    {
-      new (data) T(*reinterpret_cast< const T*& >(rhs));
-    }
-    using copier_t = void (*)(byte*, const byte*);
-    template< class T >
-    void move_function(byte* data, byte* rhs)
-    {
-      new(data) T(std::move(*reinterpret_cast< T* >(rhs)));
-    }
-    using mover_t = void (*)(byte*, byte*);
-    template< class T >
-    void destructor_function(byte* data)
-    {
-      reinterpret_cast< T* >(data)->~T();
-    }
-    using destructor_t = void (*)(byte*);
-  }
-
   template< class U, class T >
-  constexpr size_t find_uniq_type_in_pack()
+  constexpr size_t find_unique()
   {
     return !std::is_same< U, T >::value;
   }
   template< class U, class T1, class T2, class... Types >
+  constexpr size_t find_unique()
+  {
+    constexpr bool found = std::is_same< U, T1 >::value;
+    constexpr size_t resultAfterThis = find_unique< U, T2, Types... >();
+    static_assert(!found || (resultAfterThis == 1 + sizeof...(Types)));
+    return found ? 0 : 1 + resultAfterThis;
+  }
+  template< class U, class... Types >
   constexpr size_t find_uniq_type_in_pack()
   {
-    if (std::is_same< U, T1 >::value)
-    {
-      static_assert(find_uniq_type_in_pack< U, T2, Types... >() == 1 + sizeof...(Types));
-      return 0;
-    }
-    return 1 + find_uniq_type_in_pack< U, T2, Types... >();
+    constexpr size_t result = find_unique< U, Types... >();
+    static_assert(result != sizeof...(Types));
+    return result;
   }
 
   template< class T >
@@ -68,6 +50,29 @@ namespace rychkov
   template< size_t N >
   struct in_place_index_t
   {};
+
+  namespace details
+  {
+    template< class T >
+    void copy_function(byte* data, const byte* rhs)
+    {
+      new (data) T(*reinterpret_cast< const T*& >(rhs));
+    }
+    using copier_t = void (*)(byte*, const byte*);
+    template< class T, bool Nothrow >
+    void move_function(byte* data, byte* rhs) noexcept(Nothrow)
+    {
+      new(data) T(std::move(*reinterpret_cast< T* >(rhs)));
+    }
+    template< bool Nothrow >
+    using mover_t = void (*)(byte*, byte*) noexcept(Nothrow);
+    template< class T >
+    void destructor_function(byte* data)
+    {
+      reinterpret_cast< T* >(data)->~T();
+    }
+    using destructor_t = void (*)(byte*);
+  }
 }
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef TYPE_TRAITS_HPP
 #define TYPE_TRAITS_HPP
 
+#include <type_traits>
+
 namespace rychkov
 {
   template< bool Logic1, bool... Logics >
