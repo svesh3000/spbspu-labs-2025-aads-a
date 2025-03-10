@@ -250,14 +250,14 @@ dribas::List< T >& dribas::List< T >::operator=(const List< T >& other)
 template < class T >
 void dribas::List<T>::pop_front() {
   if (!empty()) {
-    Node<T>* newHead = head_->next_;
-    delete head_;
-    head_ = newHead;
-    if (head_ != nullptr) {
+    Node<T>* forDelete = head_;
+    head_ = head_->next_;
+    if (head_) {
       head_->prev_ = nullptr;
-    } else {
+    } else { 
       tail_ = nullptr;
     }
+    delete forDelete;
     size_--;
   }
 }
