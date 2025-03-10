@@ -48,7 +48,6 @@ namespace dribas
     void swap(List< T >& rhs);
     void clear() noexcept;
 
-    List(size_t);
     private:
       Node < T >* head_;
       Node < T >* tail_;
@@ -119,7 +118,29 @@ void dribas::List< T >::push_front(const T& value)
 {
   Node< T >* newNode = new Node< T >(value);
   newNode->next_ = head_;
+  if (head_ != nullptr) {
+    head_->prev_ = newNode;
+  }
   head_ = newNode;
+  if (tail_ == nullptr) {
+    tail_ = newNode;
+  }
+  size_++;
+}
+
+template< class T >
+void dribas::List< T >::push_front(T&& value)
+{
+  Node< T >* newNode = new Node< T >(std::move(value));
+  newNode->next_ = head_;
+  if (head_ != nullptr) {
+    head_->prev_ = newNode;
+  }
+  head_ = newNode;
+  if (tail_ == nullptr) {
+    tail_ = newNode;
+  }
+  size_++;
 }
 
 template< class T >
@@ -141,7 +162,7 @@ dribas::Node< T >* dribas::List< T >::operator[](size_t id)
 template< class T >
 const dribas::Node< T >* dribas::List< T >::at(size_t id) const
 {
-  if (id > size_) {
+  if (id >= size_) {
     throw std::out_of_range("ID IS OUT OF RANGE");
   }
   return (*this)[id];
@@ -245,9 +266,13 @@ template< class T >
 dribas::List< T >& dribas::List< T >::operator=(List< T >&& other) noexcept
 {
   if (this != std::addressof(other)) {
-    head_ = std::move_if_noexcept(other.head_);
-    tail_ = std::move_if_noexcept(other.tail_);
-    size_ = std::move_if_noexcept(other.size_);
+    clear();
+    head_ = other.head_;
+    tail_ = other.tail_;
+    size_ = other.size_;
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
   }
   return *this;
 }
