@@ -327,7 +327,7 @@ namespace kiselev
   void List< T >::popBack() noexcept
   {
     assert(!empty());
-    erase(constIterator(end_->prev_));
+    erase(ConstIterator(end_->prev_));
   }
 
   template< typename T >
