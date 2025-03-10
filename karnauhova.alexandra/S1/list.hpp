@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <algorithm>
 #include "iterator.hpp"
+#include "citerator.hpp"
 #include "nodelist.hpp"
 
 namespace karnauhova
@@ -13,13 +14,18 @@ namespace karnauhova
   public:
     using Node = NodeList< T >;
     using Iterator = ListIterator< T >;
+    using CIterator = ConstListIterator< T >;
     List();
     List(const List< T >& other);
     ~List();
     bool empty() const noexcept;
     size_t size() const noexcept;
+
     Iterator begin() const;
     Iterator end() const;
+    CIterator cbegin() const;
+    CIterator cend() const;
+
     T& front();
     T& back();
     void clear();
@@ -144,6 +150,18 @@ namespace karnauhova
   }
 
   template< typename T >
+  List< T >::CIterator List< T >::cbegin() const
+  {
+    return CIterator(fake_->next);
+  }
+
+  template< typename T >
+  List< T >::CIterator List< T >::cend() const
+  {
+    return CIterator(fake_);
+  }
+
+  template< typename T >
   ListIterator< T > List< T >::end() const
   {
     return ListIterator< T >(fake_);
@@ -161,4 +179,5 @@ namespace karnauhova
     return size_;
   }
 }
+
 #endif
