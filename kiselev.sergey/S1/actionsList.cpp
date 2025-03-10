@@ -25,14 +25,14 @@ namespace
     return sum;
   }
 
-  kiselev::numberList calcucationSum(kiselev::list& list)
+  kiselev::numberList calcucationSum(const kiselev::list& list)
   {
     auto it = list.cbegin();
     kiselev::numberList listSum;
     for (size_t i = 0; i < searchMax(list); ++i)
     {
       unsigned long long sum = 0;
-      it = list.begin();
+      it = list.cbegin();
       for (; it != list.cend(); ++it)
       {
         auto nit = it->second.cbegin();
@@ -118,7 +118,7 @@ kiselev::list kiselev::createList(std::istream& input)
   return list;
 }
 
-std::ostream& kiselev::output(std::ostream& output, list& list)
+std::ostream& kiselev::output(std::ostream& output, const list& list)
 {
   if (list.empty())
   {
