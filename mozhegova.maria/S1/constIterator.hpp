@@ -8,13 +8,16 @@
 namespace mozhegova
 {
   template< typename T >
+  class List;
+
+  template< typename T >
   struct ConstIterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
+    friend class List< T >;
   public:
-    ConstIterator(): node_(nullptr) {};
+    ConstIterator();
     ConstIterator(const ConstIterator< T > &) = default;
-    ConstIterator(Node< T > * node): node_(node) {}
     ~ConstIterator() = default;
     ConstIterator< T > & operator=(const ConstIterator< T > &) = default;
 
@@ -24,16 +27,26 @@ namespace mozhegova
     ConstIterator< T > & operator--();
     ConstIterator< T > operator--(int);
 
-    T & operator*() const;
-    T * operator->() const;
+    const T & operator*() const;
+    const T * operator->() const;
 
     bool operator==(const ConstIterator< T > &) const;
     bool operator!=(const ConstIterator< T > &) const;
-
-    Node< T > * getNode() const;
   private:
-    Node< T > * node_;
+    detail::Node< T > * node_;
+
+    ConstIterator(detail::Node< T > * node);
   };
+
+  template< typename T >
+  ConstIterator< T >::ConstIterator():
+    node_(nullptr)
+  {}
+
+  template< typename T >
+  ConstIterator< T >::ConstIterator(detail::Node< T > * node):
+    node_(node)
+  {}
 
   template< typename T >
   ConstIterator< T > & ConstIterator< T >::operator++()
@@ -70,14 +83,14 @@ namespace mozhegova
   }
 
   template< typename T >
-  T & ConstIterator< T >::operator*() const
+  const T & ConstIterator< T >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< typename T >
-  T * ConstIterator< T >::operator->() const
+  const T * ConstIterator< T >::operator->() const
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
@@ -93,12 +106,6 @@ namespace mozhegova
   bool ConstIterator< T >::operator!=(const ConstIterator< T > & rhs) const
   {
     return !(rhs == *this);
-  }
-
-  template< typename T >
-  Node< T > * ConstIterator< T >::getNode() const
-  {
-    return node_;
   }
 }
 

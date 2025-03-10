@@ -2,7 +2,7 @@
 #define LIST_HPP
 
 #include <initializer_list>
-#include "cstddef"
+#include <functional>
 #include "iterator.hpp"
 #include "constIterator.hpp"
 
@@ -23,30 +23,30 @@ namespace mozhegova
     List< T > & operator=(const List< T > &);
     List< T > & operator=(std::initializer_list< T >);
 
-    Iterator< T > begin() const;
-    Iterator< T > end() const;
-    ConstIterator< T > cbegin() const;
-    ConstIterator< T > cend() const;
+    Iterator< T > begin() const noexcept;
+    Iterator< T > end() const noexcept;
+    ConstIterator< T > cbegin() const noexcept;
+    ConstIterator< T > cend() const noexcept;
 
-    T & front();
-    const T & front() const;
-    T & back();
-    const T & back() const;
+    T & front() noexcept;
+    const T & front() const noexcept;
+    T & back() noexcept;
+    const T & back() const noexcept;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void push_front(const T &);
     void push_back(const T &);
-    void pop_front();
-    void pop_back();
+    void pop_front() noexcept;
+    void pop_back() noexcept;
 
-    void clear();
-    void swap(List< T > &);
+    void clear() noexcept;
+    void swap(List< T > &) noexcept;
 
-    void remove(const T &);
+    void remove(const T &) noexcept;
     template< typename condition >
-    void removeIf(condition);
+    void removeIf(condition) noexcept;
 
     void splice(ConstIterator< T > pos, List< T > & x);
     void splice(ConstIterator< T > pos, List< T > && x);
@@ -62,21 +62,21 @@ namespace mozhegova
     Iterator< T > insert(ConstIterator< T > pos, T && val);
     Iterator< T > insert(ConstIterator< T > pos, std::initializer_list< T >);
 
-    Iterator< T > erase(ConstIterator< T > pos);
-    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last);
+    Iterator< T > erase(ConstIterator< T > pos) noexcept;
+    Iterator< T > erase(ConstIterator< T > first, ConstIterator< T > last) noexcept;
 
     void assign(size_t, const T &);
     void assign(ConstIterator< T > first, ConstIterator< T > last);
     void assign(std::initializer_list< T >);
   private:
-    Node< T > * fake_;
-    Node< T > * tail_;
+    detail::Node< T > * fake_;
+    detail::Node< T > * tail_;
     size_t size_;
   };
 
   template< typename T >
   List< T >::List():
-    fake_(new Node< T >()),
+    fake_(new detail::Node< T >()),
     tail_(nullptr),
     size_(0)
   {}
@@ -145,61 +145,65 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > List< T >::begin() const
+  Iterator< T > List< T >::begin() const noexcept
   {
     return Iterator< T >(fake_->next_);
   }
 
   template< typename T >
-  Iterator< T > List< T >::end() const
+  Iterator< T > List< T >::end() const noexcept
   {
     return Iterator< T >(empty() ? fake_->next_ : tail_->next_);
   }
 
   template< typename T >
-  ConstIterator< T > List< T >::cbegin() const
+  ConstIterator< T > List< T >::cbegin() const noexcept
   {
     return ConstIterator< T >(fake_->next_);
   }
 
   template< typename T >
-  ConstIterator< T > List< T >::cend() const
+  ConstIterator< T > List< T >::cend() const noexcept
   {
     return ConstIterator< T >(empty() ? fake_->next_ : tail_->next_);
   }
 
   template< typename T >
-  T & List< T >::front()
+  T & List< T >::front() noexcept
   {
+    assert(fake_->next_ != nullptr);
     return fake_->next_->data_;
   }
 
   template< typename T >
-  const T & List< T >::front() const
+  const T & List< T >::front() const noexcept
   {
+    assert(fake_->next_ != nullptr);
     return fake_->next_->data_;
   }
 
   template< typename T >
-  T & List< T >::back()
+  T & List< T >::back() noexcept
   {
+    assert(tail_ != nullptr);
     return tail_->data_;
   }
 
   template< typename T >
-  const T & List< T >::back() const
+  const T & List< T >::back() const noexcept
   {
+    assert(tail_ != nullptr);
     return tail_->data_;
   }
 
   template< typename T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< typename T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
@@ -207,7 +211,7 @@ namespace mozhegova
   template< typename T >
   void List< T >::push_front(const T & data)
   {
-    Node< T > * newNode = new Node< T > (data);
+    detail::Node< T > * newNode = new detail::Node< T > (data);
     newNode->next_ = fake_->next_;
     if (!empty())
     {
@@ -225,7 +229,7 @@ namespace mozhegova
   template< typename T >
   void List< T >::push_back(const T & data)
   {
-    Node< T > * newNode = new Node< T > (data);
+    detail::Node< T > * newNode = new detail::Node< T > (data);
     if (!empty())
     {
       newNode->prev_ = tail_;
@@ -241,19 +245,19 @@ namespace mozhegova
   }
 
   template< typename T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     erase(cbegin());
   }
 
   template< typename T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     erase(ConstIterator< T >(tail_));
   }
 
   template< typename T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -262,34 +266,42 @@ namespace mozhegova
   }
 
   template< typename T >
-  void List< T >::swap(List< T > & otherList)
+  void List< T >::swap(List< T > & otherList) noexcept
   {
-    std::swap(fake_->next_, otherList.fake_->next_);
+    std::swap(fake_, otherList.fake_);
     std::swap(tail_, otherList.tail_);
     std::swap(size_, otherList.size_);
   }
 
   template< typename T >
-  void List< T >::remove(const T & val)
+  bool isSame(const T & a, const T & b)
   {
-    for (auto it = cbegin(); it != cend(); ++it)
-    {
-      if (*it == val)
-      {
-        erase(it);
-      }
-    }
+    return a == b;
+  }
+
+  template< typename T >
+  void List< T >::remove(const T & val) noexcept
+  {
+    removeIf(std::bind(isSame< T >, std::placeholders::_1, val));
   }
 
   template< typename T >
   template< typename condition >
-  void List< T >::removeIf(condition c)
+  void List< T >::removeIf(condition c) noexcept
   {
-    for (auto it = cbegin(); it != cend(); ++it)
+    Iterator< T > it = begin();
+    ConstIterator< T > cit = cbegin();
+    while (it != end() && cit != cend())
     {
-      if (c(*it))
+      if (c(*cit))
       {
-        erase(it);
+        it = erase(cit);
+        ++cit;
+      }
+      else
+      {
+        ++it;
+        ++cit;
       }
     }
   }
@@ -324,10 +336,7 @@ namespace mozhegova
   void List< T >::splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > first, ConstIterator< T > last)
   {
     insert(pos, first, last);
-    for (auto it = first; it != last; ++it)
-    {
-      x.erase(it);
-    }
+    x.erase(first, last);
   }
 
   template< typename T >
@@ -337,10 +346,10 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > List< T >::erase(ConstIterator< T > pos)
+  Iterator< T > List< T >::erase(ConstIterator< T > pos) noexcept
   {
     assert(!empty());
-    Node< T > * tempNode = pos.getNode();
+    detail::Node< T > * tempNode = pos.node_;
     Iterator< T > it(tempNode->next_);
     if (pos == cbegin())
     {
@@ -364,7 +373,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last)
+  Iterator< T > List< T >::erase(ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     Iterator< T > temp;
     for (auto it = first; it != last; ++it)
@@ -382,8 +391,8 @@ namespace mozhegova
       push_back(val);
       return begin();
     }
-    Node< T > * tempNode = pos.getNode();
-    Node< T > * newNode = new Node< T >(val);
+    detail::Node< T > * tempNode = pos.node_;
+    detail::Node< T > * newNode = new detail::Node< T >(val);
     tempNode->prev_->next_ = newNode;
     newNode->prev_ = tempNode->prev_;
     newNode->next_ = tempNode;
@@ -397,7 +406,7 @@ namespace mozhegova
   {
     if (n == 0)
     {
-      return Iterator< T >(pos.getNode());
+      return Iterator< T >(pos.node_);
     }
     Iterator< T > temp = insert(pos, val);
     for (size_t i = 1; i < n; i++)
@@ -413,7 +422,7 @@ namespace mozhegova
   {
     if (first == last)
     {
-      return Iterator< T >(pos.getNode());
+      return Iterator< T >(pos.node_);
     }
     Iterator< T > temp = insert(pos, *first);
     for (auto it = ++first; it != last; ++it)
@@ -438,31 +447,58 @@ namespace mozhegova
   template< typename T >
   void List< T >::assign(size_t n, const T & val)
   {
-    clear();
+    List< T > temp;
     for (size_t i = 0; i < n; i++)
     {
-      push_back(val);
+      try
+      {
+        temp.push_back(val);
+      }
+      catch(const std::bad_alloc &)
+      {
+        temp.clear();
+        throw;
+      }
     }
+    swap(temp);
   }
 
   template< typename T >
   void List< T >::assign(ConstIterator< T > first, ConstIterator< T > last)
   {
-    clear();
+    List< T > temp;
     for (auto it = first; it != last; ++it)
     {
-      push_back(*it);
+      try
+      {
+        temp.push_back(*it);
+      }
+      catch(const std::bad_alloc &)
+      {
+        temp.clear();
+        throw;
+      }
     }
+    swap(temp);
   }
 
   template< typename T >
   void List< T >::assign(std::initializer_list< T > il)
   {
-    clear();
+    List< T > temp;
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      push_back(*it);
+      try
+      {
+        temp.push_back(*it);
+      }
+      catch(const std::bad_alloc &)
+      {
+        temp.clear();
+        throw;
+      }
     }
+    swap(temp);
   }
 }
 
