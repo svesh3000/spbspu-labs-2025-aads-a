@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <list>
 #include <string>
-#include "fwd_list.hpp"
 
 namespace maslevtsov {
   using list_t = std::list< unsigned long long >;

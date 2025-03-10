@@ -25,8 +25,8 @@ namespace {
 
 std::size_t maslevtsov::get_max_pairs_list_size(const pairs_list_t& list) noexcept
 {
-  std::size_t maximum = 0;
-  for (auto i = list.begin(); i != list.end(); ++i) {
+  std::size_t maximum = list.begin()->second.size();
+  for (auto i = ++list.begin(); i != list.end(); ++i) {
     maximum = std::max(maximum, i->second.size());
   }
   return maximum;

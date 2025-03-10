@@ -49,8 +49,11 @@ template< typename T >
 maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
   FwdList()
 {
-  for (auto i = rhs.begin(); i != rhs.end(); ++i) {
-    push_back(*i);
+  if (!rhs.empty()) {
+    push_back(*(rhs.begin()));
+    for (auto i = ++rhs.begin(); i != rhs.end(); ++i) {
+      push_back(*i);
+    }
   }
 }
 
@@ -77,7 +80,7 @@ typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(
 template< typename T >
 typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs) noexcept
 {
-  FwdList< T > copied_rhs(std::move(rhs));
+  FwdList< T > copied_rhs(rhs);
   swap(copied_rhs);
   return *this;
 }
