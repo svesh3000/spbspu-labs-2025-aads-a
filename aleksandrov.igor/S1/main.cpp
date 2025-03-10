@@ -1,19 +1,7 @@
 #include <iostream>
 #include <string>
 #include "list.hpp"
-#include "sum.hpp"
-
-namespace aleksandrov
-{
-  void outputList(List< unsigned long long >& list, std::ostream& output)
-  {
-    output << list.front();
-    for (auto it = ++list.begin(); it != list.end(); ++it)
-    {
-      std::cout << " " << *it;
-    }
-  }
-}
+#include "list-utils.hpp"
 
 int main()
 {

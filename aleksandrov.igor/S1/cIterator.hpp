@@ -2,10 +2,13 @@
 #define CITERATOR_HPP
 
 #include <iterator>
-#include "node.hpp"
+#include "list.hpp"
 
 namespace aleksandrov
 {
+  template< typename T >
+  class List;
+
   template< typename T >
   class cIterator: public std::iterator< std::forward_iterator_tag, T >
   {
@@ -16,8 +19,8 @@ namespace aleksandrov
     cIterator(Node< T >* node):
       node_(node)
     {}
-    ~cIterator() = default;
     cIterator(const cIterator< T >&) = default;
+    ~cIterator() = default;
     cIterator< T >& operator=(const cIterator< T >&) = default;
 
     cIterator< T >& operator++();
@@ -28,9 +31,8 @@ namespace aleksandrov
 
     bool operator!=(const cIterator< T >&) const;
     bool operator==(const cIterator< T >&) const;
-
-    Node< T >* getNode() const;
   private:
+    friend List< T >;
     Node< T >* node_;
   };
 
@@ -71,12 +73,6 @@ namespace aleksandrov
   bool cIterator< T >::operator!=(const cIterator< T >& rhs) const
   {
     return !(rhs == *this);
-  }
-
-  template< typename T >
-  Node< T >* cIterator< T >::getNode() const
-  {
-    return node_;
   }
 }
 
