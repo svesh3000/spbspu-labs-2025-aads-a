@@ -189,10 +189,21 @@ BOOST_AUTO_TEST_CASE(erase)
 
 BOOST_AUTO_TEST_CASE(bool_operators)
 {
-  aleksandrov::List< unsigned char > list1(3, 'x');
-  aleksandrov::List< unsigned char > list2(3, 'y');
-  aleksandrov::List< unsigned char > list3(3, 'x');
+  aleksandrov::List< unsigned char > list1{'x', 'y', 'z'};
+  aleksandrov::List< unsigned char > list2{'a', 'b', 'c'};
+  aleksandrov::List< unsigned char > list3{'x', 'y', 'z'};
   BOOST_TEST(list1 != list2);
   BOOST_TEST(list1 == list3);
+  BOOST_TEST(list2 < list1);
+  BOOST_TEST(list2 <= list1);
+  BOOST_TEST(list3 > list2);
+  BOOST_TEST(list3 >= list1);
+}
+
+BOOST_AUTO_TEST_CASE(reverse)
+{
+  aleksandrov::List< float > list{1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
+  list.reverse();
+  BOOST_TEST(list.cfront() == 5.0f);
 }
 
