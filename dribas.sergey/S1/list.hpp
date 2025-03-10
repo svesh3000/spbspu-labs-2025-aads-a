@@ -17,6 +17,7 @@ namespace dribas
     List();
     List(const List< T >& rhs);
     List(List< T >&& rhs) noexcept;
+    ~List();
     
     //iterator begin() noexcept;
     //constItertor begin() const noexcept;
@@ -28,12 +29,12 @@ namespace dribas
     T& back();
     const T& back() const;
 
-    List< T >& operator=(List< T >& other);
+    List< T >& operator=(const List< T >& other);
     List< T >& operator=(List< T >&& other) noexcept;
-    List< T >* at(size_t id);
-    List< T >* operator[](size_t id);
-    const List< T >* at(size_t id) const;
-    const List< T >* operator[](size_t id) const;
+    Node< T >* at(size_t id);
+    Node< T >* operator[](size_t id);
+    const Node< T >* at(size_t id) const;
+    const Node< T >* operator[](size_t id) const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -46,28 +47,85 @@ namespace dribas
     void pop_back();
     void swap(List< T >& rhs);
     void clear() noexcept;
-    void move(List< T >&& rhs);
 
     List(size_t);
     private:
-      Node< T >* list_;
+      Node < T >* head_;
+      Node < T >* tail_;
       size_t size_;
   };
 }
 
 template< class T >
-void dribas::List< T >::push_front(const T& value)
-{
-  Node< T >* list = Node< T >(value);
-  list_->prev_ = list;
-  list->next_ = list_;
-  list_ = list;
+void dribas::List< T >::push_back(T&& value) {
+  Node< T >* newNode = new Node< T >(value);
+  if (tail_ == nullptr) {
+    head_ = tail_ = newNode;
+  } else {
+    tail_->next_ = newNode;
+    newNode->prev_ = tail_;
+    tail_ = newNode;
+  }
+  size_++;
 }
 
 template< class T >
-const dribas::List< T >* dribas::List< T >::operator[](size_t id) const
+void dribas::List< T >::push_back(const T& value) {
+  Node< T >* newNode = new Node< T >(value);
+  if (tail_ == nullptr) {
+    head_ = tail_ = newNode;
+  } else {
+    tail_->next_ = newNode;
+    newNode->prev_ = tail_;
+    tail_ = newNode;
+  }
+  size_++;
+}
+
+template < class T >
+void dribas::List<T>::pop_back()
 {
-  Node< T >* returned = list_;
+  if (!empty()) { 
+    if (head_ == tail_) {
+      delete head_;
+      head_ = nullptr;
+      tail_ = nullptr;
+    } else {
+      tail_ = tail_->prev_;
+      delete tail_->next_;
+      tail_->next_ = nullptr;
+    }
+    size_--;
+  }
+
+}
+
+template < class T >
+void dribas::List < T >::clear() noexcept
+{
+  while (size_ != 0) {
+    pop_front();
+  }
+}
+
+template< class T >
+dribas::List< T >::~List()
+{
+  clear();
+}
+
+template< class T >
+void dribas::List< T >::push_front(const T& value)
+{
+  Node< T >* newNode = new Node< T >(value);
+  newNode->next_ = head_;
+  head_ = newNode;
+}
+
+template< class T >
+const dribas::Node< T >* dribas::List< T >::operator[](size_t id) const
+{
+  Node< T >* returned = head_;
   for (size_t i = 0; i < id; i++ ) {
     returned = returned->next_;
   }
@@ -75,22 +133,22 @@ const dribas::List< T >* dribas::List< T >::operator[](size_t id) const
 }
 
 template< class T >
-dribas::List< T >* dribas::List< T >::operator[](size_t id)
+dribas::Node< T >* dribas::List< T >::operator[](size_t id)
 {
   return const_cast< List< T >* >(static_cast< const List< T >* >(this)->operator[](id));
 }
 
 template< class T >
-const dribas::List< T >* dribas::List< T >::at(size_t id) const
+const dribas::Node< T >* dribas::List< T >::at(size_t id) const
 {
   if (id > size_) {
     throw std::out_of_range("ID IS OUT OF RANGE");
   }
-  return this[id];
+  return (*this)[id];
 }
 
 template< class T >
-dribas::List< T >* dribas::List< T >::at(size_t id)
+dribas::Node< T >* dribas::List< T >::at(size_t id)
 {
   return const_cast< List< T >* >(static_cast< const List< T >* >(this)->at(id)); 
 }
@@ -98,56 +156,52 @@ dribas::List< T >* dribas::List< T >::at(size_t id)
 template< class T >
 T& dribas::List< T >::front()
 {
-  return list_->data_;
+  return head_->data_;
 }
 
 template< class T >
 T& dribas::List< T >::back()
 {
-  Node< T >* current = list_; 
-  while (current->next_) {
-    current = current->next;
-  }
-  return current->data_;
+  return tail_->data_;
 }
 
 template< class T >
 const T& dribas::List< T >::back() const
 {
-  Node< T >* current = list_; 
-  while (current->next_) {
-    current = current->next;
-  }
-  return current->data_;
+  return tail_->data_;
 }
 
 template< class T >
 const T& dribas::List< T >::front() const
 {
-  return list_->data_;
+  return head_->data_;
 }
 
 template< class T >
 dribas::List< T >::List():
-  list_(new Node< T >()),
+  head_(nullptr),
+  tail_(nullptr),
   size_(0)
 {}
 
 template< class T > 
 dribas::List< T >::List(const List< T >& rhs):
-  list_(nullptr),
+  head_(nullptr),
+  tail_(nullptr),
   size_(rhs.size_)
 {
-  for (size_t i = 0; i < size_; i++) {
-    list_->push_back(rhs[i]);
+  Node< T >* current = rhs.head_;
+  for (; current; current = current->next_) {
+    push_back(current->data_);
   }
 }
 
 template< class T >
 void dribas::List< T >::swap(List< T >& rhs)
 {
-  std::swap(list_, rhs.list_);
+  std::swap(head_, rhs.head_);
   std::swap(size_, rhs.size_);
+  std::swap(tail_, rhs.tail_);
 }
 
 template< class T >
@@ -163,18 +217,38 @@ size_t dribas::List< T >::size() const noexcept
 }
 
 template< class T >
-dribas::List< T >& dribas::List< T >::operator=(List< T >& other)
+dribas::List< T >& dribas::List< T >::operator=(const List< T >& other)
 {
-  List< T > copy(other);
-  swap(copy);
+  if (this != std::addressof(other)) {
+    List< T > copy(other);
+    swap(copy);
+  }
   return *this;
+}
+
+template < class T >
+void dribas::List<T>::pop_front() {
+  if (!empty()) {
+    Node<T>* newHead = head_->next_;
+    delete head_;
+    head_ = newHead;
+    if (head_ != nullptr) {
+      head_->prev_ = nullptr;
+    } else {
+      tail_ = nullptr;
+    }
+    size_--;
+  }
 }
 
 template< class T >
 dribas::List< T >& dribas::List< T >::operator=(List< T >&& other) noexcept
 {
-  list_ = std::move_if_noexcept(other.list_);
-  size_ = std::move_if_noexcept(other.size_);
+  if (this != std::addressof(other)) {
+    head_ = std::move_if_noexcept(other.head_);
+    tail_ = std::move_if_noexcept(other.tail_);
+    size_ = std::move_if_noexcept(other.size_);
+  }
   return *this;
 }
 
@@ -183,11 +257,11 @@ dribas::List< T >::List(List< T >&& rhs) noexcept
 {
   clear();
   size_ = rhs.size_;
+  head_ = rhs.head_;
+  tail_ = rhs.tail_;
   rhs.size_ = 0;
-  list_->data_ = rhs.list_->data_;
-  list_->next_ = rhs.list_->next_;
-  rhs.list_->data_ = T();
-  rhs.list_->next_ = nullptr;
+  rhs.tail_ = nullptr;
+  rhs.head_ = nullptr;
 }
 
 #endif

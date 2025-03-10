@@ -3,33 +3,32 @@
 
 #include <utility>
 
-namespace
+namespace dribas
 {
- template < class T >
- class Node
- {
-public:
-  T data_;
-  Node< T >* next_;
-  Node< T >* prev_;
+  template < class T >
+  class Node
+  {
+  public:
+    T data_;
+    Node< T >* next_;
+    Node< T >* prev_;
 
   Node():
-   data_(T()),
-   prev_(nullptr),
-   next_(nullptr)
-   {}
+    data_(T()),
+    next_(nullptr),
+    prev_(nullptr)
+  {}
 
   Node(T&& data):
+    data_(std::move(data)),
     prev_(nullptr),
     next_(nullptr)
-  {
-    std::move(data);
-  }
+  {}
 
   Node(const T& data):
     data_(data),
-    prev_(nullptr),
-    next_(nullptr)
+    next_(nullptr),
+    prev_(nullptr)
   {}
  };
 }
