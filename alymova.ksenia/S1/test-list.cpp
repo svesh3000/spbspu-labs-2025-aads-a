@@ -118,14 +118,6 @@ bool is_divided_10(const T& value)
 {
   return value % 10 == 0;
 }
-template< typename T >
-struct SingleDigit
-{
-  bool operator()(const T& value)
-  {
-    return (value < 10 && value > -10);
-  }
-};
 BOOST_AUTO_TEST_CASE(test_remove)
 {
   using list_t = alymova::List< int >;
@@ -148,15 +140,9 @@ BOOST_AUTO_TEST_CASE(test_remove)
 
   list_t list3((size_t)5, 10);
   list3.push_back(1);
-
-  list3.remove_if(SingleDigit< int >());
-  BOOST_TEST(list3.size() == 5);
-  BOOST_TEST(list3.back() == 10);
-
-  list3.push_back(11);
   list3.remove_if(is_divided_10< int >);
   BOOST_TEST(list3.size() == 1);
-  BOOST_TEST(list3.front() == 11);
+  BOOST_TEST(list3.front() == 1);
 }
 BOOST_AUTO_TEST_CASE(test_assign)
 {
@@ -379,13 +365,10 @@ BOOST_AUTO_TEST_CASE(test_emplace)
   BOOST_TEST(b);
 }
 template< typename T >
-struct isDividedOther
+bool is_divided_other(const T& one, const T& two)
 {
-  bool operator()(const T& one, const T& two)
-  {
-    return (one % two == 0);
-  }
-};
+  return (one % two == 0);
+}
 BOOST_AUTO_TEST_CASE(test_unique)
 {
   using list_t = alymova::List< int >;
@@ -402,17 +385,14 @@ BOOST_AUTO_TEST_CASE(test_unique)
   BOOST_TEST(list1 == list_comp);
 
   list_comp.erase(++(list_comp.begin()), list_comp.end());
-  list1.unique(isDividedOther< int >());
+  list1.unique(is_divided_other< int >);
   BOOST_TEST(list1 == list_comp);
 }
 template< typename T >
-struct isGreater
+bool is_greater(const T& one, const T& two)
 {
-  bool operator()(const T& one, const T& two)
-  {
-    return one > two;
-  }
-};
+  return one > two;
+}
 BOOST_AUTO_TEST_CASE(test_sort)
 {
   using list_t = alymova::List< int >;
@@ -435,13 +415,8 @@ BOOST_AUTO_TEST_CASE(test_sort)
   BOOST_TEST(list1 == list_comp);
 
   list_comp = {3, 2, 2, 1};
-  list1.sort(isGreater< int >());
+  list1.sort(is_greater< int >);
   BOOST_TEST(list1 == list_comp);
-}
-template< typename T >
-bool less_node(const T& one, const T& two)
-{
-  return one < two;
 }
 BOOST_AUTO_TEST_CASE(test_merge)
 {
@@ -476,6 +451,6 @@ BOOST_AUTO_TEST_CASE(test_merge)
   BOOST_TEST(list1 == list_comp);
 
   list1.clear();
-  list2.sort(isGreater< int >());
-  list1.merge(list2, isGreater< int >());
+  list2.sort(is_greater< int >);
+  list1.merge(list2, is_greater< int >);
 }

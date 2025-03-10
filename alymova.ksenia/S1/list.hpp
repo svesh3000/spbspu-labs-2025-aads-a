@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <utility>
 #include <initializer_list>
+#include <algorithm>
 
 namespace alymova
 {
@@ -94,7 +95,7 @@ namespace alymova
 
     void push_single(ListNode< T >* node);
     ListNode< T >* get_last_node();
-    void push_back_value(const T value);
+    void push_back_value(T value);
   };
 
   template< typename T >
@@ -117,15 +118,6 @@ namespace alymova
 
   template< typename T >
   struct EqualNode;
-
-  template< typename T >
-  bool equal_node(const T& one, const T& two);
-
-  template< typename T >
-  bool less_node(const T& one, const T& two);
-
-  template< typename T, typename Predicate >
-  bool is_sorted(const List< T >& list, Predicate pred);
 
   template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
@@ -565,7 +557,7 @@ namespace alymova
     while (first != last)
     {
       Iterator< T > next = first.next();
-      Iterator < T > tmp_it = erase(first);
+      Iterator< T > tmp_it = erase(first);
       tmp_it = last;
       first = next;
     }
@@ -662,8 +654,7 @@ namespace alymova
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {
-    auto pred = EqualNode< T >{value};
-    remove_if< EqualNode< T > >(pred);
+    remove_if(EqualNode< T >{value});
   }
 
   template< typename T >
@@ -686,7 +677,7 @@ namespace alymova
   template< typename T >
   void List< T >::unique()
   {
-    unique(equal_node< T >);
+    unique(std::equal_to< T >());
   }
 
   template< typename T >
@@ -714,7 +705,7 @@ namespace alymova
   template< typename T >
   void List< T >::sort()
   {
-    sort(less_node< T >);
+    sort(std::less< T >());
   }
 
   template< typename T >
@@ -739,7 +730,7 @@ namespace alymova
   template< typename T >
   void List< T >::merge(List< T >& other)
   {
-    merge(other, less_node< T >);
+    merge(other, std::less< T >());
   }
 
   template< typename T >
@@ -750,7 +741,7 @@ namespace alymova
     {
       return;
     }
-    if (!(is_sorted(*this, pred), is_sorted(other, pred)))
+    if (!(std::is_sorted(begin(), end(), pred) && std::is_sorted(other.begin(), other.end(), pred)))
     {
       throw std::logic_error("Lists are not sorted");
     }
@@ -828,23 +819,6 @@ namespace alymova
       node->next = fake_;
       fake_->prev = node;
     }
-  }
-
-  template< typename T, typename Predicate >
-  bool is_sorted(const List< T >& list, Predicate pred)
-  {
-    if (list.size() < 2)
-    {
-      return true;
-    }
-    for (auto it = ++(list.begin()); it != list.end(); ++it)
-    {
-      if (!pred(*(it.prev()), *it) && *(it.prev()) != *it)
-      {
-        return false;
-      }
-    }
-    return true;
   }
 }
 #endif

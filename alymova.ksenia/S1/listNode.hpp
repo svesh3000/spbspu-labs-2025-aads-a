@@ -23,17 +23,5 @@ namespace alymova
       return value == data;
     }
   };
-
-  template< typename T >
-  bool equal_node(const T& one, const T& two)
-  {
-    return one == two;
-  }
-
-  template< typename T >
-  bool less_node(const T& one, const T& two)
-  {
-    return one < two;
-  }
 }
 #endif
