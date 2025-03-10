@@ -1,7 +1,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-namespace mozhegova
+namespace mozhegova::detail
 {
   template< typename T >
   struct Node

@@ -5,21 +5,23 @@
 
 namespace
 {
-  using lop = mozhegova::List< std::pair< std::string, mozhegova::List< unsigned long long > > >;
-  size_t getMax(const lop & listOfPairs)
+  using listOfPairs = mozhegova::List< std::pair< std::string, mozhegova::List< unsigned long long > > >;
+
+  size_t getMax(const listOfPairs & list)
   {
     size_t maxNums = 0;
-    for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
+    for (auto it = list.begin(); it != list.end(); ++it)
     {
       maxNums = std::max(maxNums, it->second.size());
     }
     return maxNums;
   }
-  void printNums(std::ostream & out, const lop & listOfPairs)
+
+  void printNums(std::ostream & out, const listOfPairs & list)
   {
-    for (size_t i = 0; i < getMax(listOfPairs); i++)
+    for (size_t i = 0; i < getMax(list); i++)
     {
-      auto it = listOfPairs.begin();
+      auto it = list.begin();
       auto currIt = it->second.begin();
       if (it->second.size() > i)
       {
@@ -37,7 +39,7 @@ namespace
         out << *currIt;
       }
       ++it;
-      for (; it != listOfPairs.end(); ++it)
+      for (; it != list.end(); ++it)
       {
         currIt = it->second.begin();
         if (it->second.size() > i)
@@ -49,31 +51,38 @@ namespace
       out << "\n";
     }
   }
-  mozhegova::List< unsigned long long > calculateSum(const lop & listOfPairs)
+
+  void addWithCheck(unsigned long long & sum, const unsigned long long n)
+  {
+    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
+    if (max - n < sum)
+    {
+      throw std::overflow_error("Overflow");
+    }
+    sum += n;
+  }
+
+  mozhegova::List< unsigned long long > calculateSum(const listOfPairs & list)
   {
     mozhegova::List< unsigned long long > sumList;
-    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    for (size_t i = 0; i < getMax(listOfPairs); i++)
+    for (size_t i = 0; i < getMax(list); i++)
     {
       unsigned long long sum = 0;
-      auto it = listOfPairs.begin();
-      for (; it != listOfPairs.end(); ++it)
+      auto it = list.begin();
+      for (; it != list.end(); ++it)
       {
         auto currIt = it->second.begin();
         if (it->second.size() > i)
         {
           std::advance(currIt, i);
-          if (max - *currIt < sum)
-          {
-            throw std::overflow_error("Overflow");
-          }
-          sum += *currIt;
+          addWithCheck(sum, *currIt);
         }
       }
       sumList.push_back(sum);
     }
     return sumList;
   }
+
   void printSums(std::ostream & out, const mozhegova::List< unsigned long long > sumList)
   {
     out << *sumList.begin();

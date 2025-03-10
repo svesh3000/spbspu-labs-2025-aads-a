@@ -15,6 +15,32 @@ namespace
   }
 }
 
+BOOST_AUTO_TEST_CASE(constructors)
+{
+  mozhegova::List< int > list1;
+  BOOST_TEST(list1.empty());
+
+  mozhegova::List< int > list2(3, 5);
+  std::ostringstream out1;
+  printList(out1, list2);
+  BOOST_TEST(out1.str() == "555");
+
+  mozhegova::List< int > list3({1, 2, 3});
+  std::ostringstream out2;
+  printList(out2, list3);
+  BOOST_TEST(out2.str() == "123");
+
+  mozhegova::List< int > list4(list3.cbegin(), list3.cend());
+  std::ostringstream out3;
+  printList(out3, list4);
+  BOOST_TEST(out3.str() == "123");
+
+  mozhegova::List< int > list5(list2);
+  std::ostringstream out4;
+  printList(out4, list5);
+  BOOST_TEST(out4.str() == "555");
+}
+
 BOOST_AUTO_TEST_CASE(capacity)
 {
   mozhegova::List< int > list;
@@ -70,9 +96,12 @@ BOOST_AUTO_TEST_CASE(iterators)
   BOOST_TEST(*(list.cbegin()) == 1);
 }
 
-bool isEven(int a)
+namespace
 {
-  return a % 2 == 0;
+  bool isEven(int a)
+  {
+    return a % 2 == 0;
+  }
 }
 
 BOOST_AUTO_TEST_CASE(remove_and_remove_if)
