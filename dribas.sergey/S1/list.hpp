@@ -18,7 +18,7 @@ namespace dribas
     List(const List< T >& rhs);
     List(List< T >&& rhs) noexcept;
     ~List();
-    
+
     //iterator begin() noexcept;
     //constItertor begin() const noexcept;
     //iterator end() noexcept;
@@ -84,7 +84,7 @@ void dribas::List< T >::push_back(const T& value) {
 template < class T >
 void dribas::List<T>::pop_back()
 {
-  if (!empty()) { 
+  if (!empty()) {
     if (head_ == tail_) {
       delete head_;
       head_ = nullptr;
@@ -171,7 +171,7 @@ const dribas::Node< T >* dribas::List< T >::at(size_t id) const
 template< class T >
 dribas::Node< T >* dribas::List< T >::at(size_t id)
 {
-  return const_cast< List< T >* >(static_cast< const List< T >* >(this)->at(id)); 
+  return const_cast< List< T >* >(static_cast< const List< T >* >(this)->at(id));
 }
 
 template< class T >
@@ -205,7 +205,7 @@ dribas::List< T >::List():
   size_(0)
 {}
 
-template< class T > 
+template< class T >
 dribas::List< T >::List(const List< T >& rhs):
   head_(nullptr),
   tail_(nullptr),

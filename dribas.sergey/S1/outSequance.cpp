@@ -1,6 +1,6 @@
 #include "outSequance.hpp"
 #include <cstddef>
-#include <iostream> 
+#include <iostream>
 
 void dribas::getSequanceName(std::ostream& out, const List< std::pair< std::string, List< int > > >& sequance)
 {
