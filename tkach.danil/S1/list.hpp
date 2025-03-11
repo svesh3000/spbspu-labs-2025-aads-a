@@ -75,7 +75,7 @@ namespace tkach
     {
       while(first != last)
       {
-        pushBack(*(first++));     
+        pushBack(*(first++));
       }
     }
     catch (...)
