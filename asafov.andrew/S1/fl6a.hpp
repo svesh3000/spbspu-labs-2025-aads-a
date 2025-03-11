@@ -14,9 +14,11 @@ class forward_list
     next_(ptr)
     {}
   };
+
   Node* head_;
   Node* tail_;
   size_t size_;
+
 public:
   forward_list() noexcept:
   head_(nullptr),
@@ -31,21 +33,24 @@ public:
     current_(nullptr),
     last_(nullptr)
     {}
+
     const_iterator(Node* node, Node* last):
     current_(node),
     last_(last)
     {}
+
     const_iterator(const const_iterator& data) noexcept:
     current_(data.current_),
     last_(data.last_)
     {}
+
     ~const_iterator() = default;
 
     const T& operator*() const
     {
       return current_->data_;
     }
-  
+
     T* operator->() const
     {
       return std::addressof(current_->data_);
@@ -104,7 +109,8 @@ public:
       delete head_;
       head_ = nullptr;
     }
-    else {
+    else
+    {
       delete head_;
       head_ = nullptr;
       tail_ = nullptr;
