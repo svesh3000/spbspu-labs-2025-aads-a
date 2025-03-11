@@ -31,6 +31,11 @@ public:
   tail_(nullptr)
   {}
 
+  ~forward_list() noexcept
+  {
+    clear();
+  }
+
   class const_iterator
   {
     friend class Forward_list;
@@ -129,6 +134,14 @@ public:
       head_ = nullptr;
       tail_ = nullptr;
     }
+  }
+
+  void clear()
+  {
+    do
+    {
+      pop_front();
+    } while (empty());
   }
 
   void push_back(const T& value)
