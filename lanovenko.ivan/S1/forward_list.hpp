@@ -32,6 +32,7 @@ namespace lanovenko
     class ForwardListIterator final : public std::iterator<std::forward_iterator_tag, T>
     {
     public:
+      friend class ForwardList<T>;
       using this_t = ForwardListIterator;
       ForwardListIterator();
       ForwardListIterator(ForwardListNode* node);
@@ -45,6 +46,7 @@ namespace lanovenko
       bool operator==(const this_t&) const;
     private:
       ForwardListNode* node_;
+      bool firstIteration_;
     };
 
     ForwardListIterator begin() const noexcept;
@@ -58,11 +60,14 @@ namespace lanovenko
     void pop_front();
     void swap(ForwardList& fwsdlst);
     void clear() noexcept;
+    void push_back(const T& value);
+    void push_back(T&& value);
   private:
     ForwardListNode* head_;
     ForwardListNode* tail_;
     size_t size_;
     void push_front_value(ForwardListNode* node);
+    void push_back_value(ForwardListNode* node);
   };
 }
 
@@ -73,14 +78,14 @@ lanovenko::ForwardList< T >::ForwardListNode::ForwardListNode(T data):
 {}
 
 template < typename T >
-lanovenko::ForwardList< T >::ForwardList() :
+lanovenko::ForwardList< T >::ForwardList():
   head_(nullptr),
   tail_(nullptr),
   size_(0)
 {}
 
 template < typename T >
-lanovenko::ForwardList<T>::ForwardList(const ForwardList& rhs) :
+lanovenko::ForwardList<T>::ForwardList(const ForwardList& rhs):
   head_(nullptr),
   tail_(nullptr),
   size_(0)
@@ -136,12 +141,14 @@ lanovenko::ForwardList<T>::~ForwardList()
 
 template <typename T>
 lanovenko::ForwardList<T>::ForwardListIterator::ForwardListIterator():
-  node_(nullptr)
+  node_(nullptr),
+  firstIteration_(true)
 {}
 
 template <typename T>
 lanovenko::ForwardList<T>::ForwardListIterator::ForwardListIterator(ForwardListNode* node):
-  node_(node)
+  node_(node),
+  firstIteration_(true)
 {}
 
 template <typename T>
@@ -149,6 +156,7 @@ typename lanovenko::ForwardList<T>::ForwardListIterator& lanovenko::ForwardList<
 {
   assert(node_ != nullptr);
   node_ = node_->next_;
+  firstIteration_ = false;
   return *this;
 }
 
@@ -164,13 +172,13 @@ typename lanovenko::ForwardList<T>::ForwardListIterator lanovenko::ForwardList<T
 template <typename T>
 bool lanovenko::ForwardList<T>::ForwardListIterator::operator==(const this_t& rhs) const
 {
-  return node_ == rhs.node_;
+  return (node_ == rhs.node_ && this->firstIteration_ == rhs.firstIteration_);
 }
 
 template <typename T>
 bool lanovenko::ForwardList<T>::ForwardListIterator::operator!=(const this_t& rhs) const
 {
-  return !(rhs == *this);
+  return !(*this == rhs);
 }
 
 template <typename T>
@@ -196,7 +204,13 @@ typename lanovenko::ForwardList<T>::ForwardListIterator lanovenko::ForwardList<T
 template <typename T>
 typename lanovenko::ForwardList<T>::ForwardListIterator lanovenko::ForwardList<T>::end() const noexcept
 {
-  return ForwardListIterator(nullptr);
+  if (size_ == 0)
+  {
+    return ForwardListIterator(nullptr);
+  }
+  ForwardListIterator it(tail_->next_);
+  it.firstIteration_ = false;
+  return it;
 }
 
 template <typename T>
@@ -240,6 +254,7 @@ void lanovenko::ForwardList<T>::push_front_value(ForwardListNode* newNode)
   {
     tail_ = newNode;
   }
+  tail_->next_ = head_;
   size_++;
 }
 
@@ -262,13 +277,45 @@ void lanovenko::ForwardList<T>::pop_front()
   {
     ForwardListNode* toDelete = head_;
     head_ = head_->next_;
+    tail_->next_ = head_;
     delete toDelete;
     size_--;
   }
   if (empty())
   {
+    head_ = nullptr;
     tail_ = nullptr;
   }
+}
+
+template<typename T>
+void lanovenko::ForwardList<T>::push_back_value(ForwardListNode* newNode)
+{
+  if (!empty())
+  {
+    tail_->next_ = newNode;
+    tail_ = newNode;
+    tail_->next_ = head_;
+  }
+  if (empty())
+  {
+    head_ = newNode;
+    tail_ = newNode;
+    tail_->next_ = newNode;
+  }
+  size_++;
+}
+
+template<typename T>
+void lanovenko::ForwardList<T>::push_back(const T& value)
+{
+  push_back_value(new ForwardListNode(value));
+}
+
+template<typename T>
+void lanovenko::ForwardList<T>::push_back(T&& value)
+{
+  push_back_value(new ForwardListNode(std::move(value)));
 }
 
 template <typename T>
