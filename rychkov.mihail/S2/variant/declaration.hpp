@@ -1,7 +1,7 @@
 #ifndef DECLARATION_HPP
 #define DECLARATION_HPP
 
-#include <algorithm>
+#include "union_base.hpp"
 #include "tools.hpp"
 
 namespace rychkov
@@ -19,23 +19,22 @@ namespace rychkov
   const variant_alternative_t< N, Types... >* get_if(const Variant< Types... >* variant) noexcept;
 
   template< class... Types >
-  class Variant
+  class Variant: private details::VariantBaseAlias< Types... >
   {
   public:
-    template< class T0 = variant_alternative_t< 0, Types... > >
-    Variant() noexcept(std::is_nothrow_default_constructible< T0 >::value);
-    Variant(const Variant& rhs);
-    Variant(Variant&& rhs) noexcept(is_nothrow_move_constructible_v);
+    Variant() = default;
+    Variant(const Variant& rhs) = default;
+    Variant(Variant&& rhs) = default;
     template< class T >
     Variant(T&& value);
     template< class T, class... Args >
     Variant(in_place_type_t< T >, Args&&... args);
     template< size_t N, class... Args >
     Variant(in_place_index_t< N >, Args&&... args);
-    ~Variant();
+    ~Variant() = default;
 
-    Variant& operator=(const Variant& rhs);
-    Variant& operator=(Variant&& rhs) noexcept(is_nothrow_move_constructible_v);
+    Variant& operator=(const Variant& rhs) = default;
+    Variant& operator=(Variant&& rhs) = default;
 
     template< class T, class... Args >
     T& emplace(Args&&... args);
@@ -45,18 +44,6 @@ namespace rychkov
     size_t index() const noexcept;
     bool valueless_by_exception() const noexcept;
   private:
-    static constexpr bool is_nothrow_move_constructible_v = conjunction_v< std::is_trivially_move_constructible< Types >::value... >;
-    static constexpr size_t size_ = std::max({sizeof(Types)...});
-
-    using size_type = std::conditional_t< (size_ < 255), byte, size_t >;
-
-    size_type active_;
-    byte data_[size_];
-
-    void copy(const Variant& rhs);
-    void move(Variant&& rhs) noexcept(is_nothrow_move_constructible_v);
-    void destruct();
-
     template< class T, class... Ts >
     friend T* rychkov::get_if(Variant< Ts... >* variant) noexcept;
     template< class T, class... Ts >
@@ -89,7 +76,6 @@ namespace rychkov
 
   template< class T, class... Types >
   bool holds_alternative(const Variant< Types... >& variant) noexcept;
-  constexpr size_t variant_npos = -1U;
 }
 
 #endif

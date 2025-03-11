@@ -11,36 +11,36 @@ class rychkov::bad_variant_access: public std::exception
 template< class T, class... Types >
 T* rychkov::get_if(Variant< Types... >* variant) noexcept
 {
-  if (variant->active_ == find_uniq_type_in_pack< T, Types... >())
+  if (variant->index() == find_uniq_type_in_pack< T, Types... >())
   {
-    return reinterpret_cast< T* >(variant->data_);
+    return variant->template get< T >();
   }
   return nullptr;
 }
 template< class T, class... Types >
 const T* rychkov::get_if(const Variant< Types... >* variant) noexcept
 {
-  if (variant->active_ == find_uniq_type_in_pack< T, Types... >())
+  if (variant->index() == find_uniq_type_in_pack< T, Types... >())
   {
-    return reinterpret_cast< const T* >(variant->data_);
+    return variant->template get< T >();
   }
   return nullptr;
 }
 template< size_t N, class... Types >
 rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(Variant< Types... >* variant) noexcept
 {
-  if (variant->active_ == N)
+  if (variant->index() == N)
   {
-    return reinterpret_cast< variant_alternative_t< N, Types... >* >(variant->data_);
+    return variant->template get< variant_alternative_t< N, Types... > >();
   }
   return nullptr;
 }
 template< size_t N, class... Types >
 const rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(const Variant< Types... >* variant) noexcept
 {
-  if (variant->active_ == N)
+  if (variant->index() == N)
   {
-    return reinterpret_cast< const variant_alternative_t< N, Types... >* >(variant->data_);
+    return variant->template get< variant_alternative_t< N, Types... > >();
   }
   return nullptr;
 }
@@ -109,12 +109,12 @@ const rychkov::variant_alternative_t< N, Types... >&& rychkov::get(const Variant
 template< class... Types >
 size_t rychkov::Variant< Types... >::index() const noexcept
 {
-  return active_;
+  return this->active;
 }
 template< class... Types >
 bool rychkov::Variant< Types... >::valueless_by_exception() const noexcept
 {
-  return active_ == -1U;
+  return this->valueless();
 }
 
 template< class T, class... Types >

@@ -37,21 +37,28 @@ struct A
   int constr = 0;
 };
 
+//template class rychkov::Variant< A, int, char >;
+
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
 
 BOOST_AUTO_TEST_CASE(print_info_test)
 {
   rychkov::Variant< A, int32_t, char > variant;
-  rychkov::Variant< A, int32_t, char, A > variant2 = {rychkov::in_place_index_t< 3 >()};
+  *rychkov::get_if< A >(&variant) = A();
+  rychkov::Variant< A, int32_t, char, A > variant2{rychkov::in_place_index_t< 3 >()};
   rychkov::Variant< A, int32_t, char > variant3 = {rychkov::in_place_type_t< A >()};
-  rychkov::Variant< A, int32_t, char > variant4 = std::move(variant3);
-  *rychkov::get_if< A >(&variant3) = A();
-  variant2 = '3';
-  variant2 = 9;
-  if (rychkov::holds_alternative< int >(variant2))
+  variant3 = variant;
+  variant3 = std::move(variant);
+  variant3 = 934;
+  if (rychkov::holds_alternative< int >(variant3))
   {
-    std::cout << rychkov::get< 1 >(variant2) << '\n';
+    std::cout << rychkov::get< 1 >(variant3) << '\n';
   }
+  rychkov::Variant< A, int32_t, char > variant4 = std::move(variant3);
+  rychkov::Variant< int32_t, A, char > variant5;
+  variant5.emplace< A >();
+  variant5.emplace< 2 >('!');
+  std::cout << rychkov::get< char >(variant5) << '\n';
 }
 
 BOOST_AUTO_TEST_SUITE_END()

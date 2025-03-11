@@ -23,23 +23,26 @@ namespace rychkov
   template< class... Types >
   constexpr size_t variant_size_v = sizeof...(Types);
 
-  template< class U, class T >
-  constexpr size_t find_unique()
+  namespace details
   {
-    return !std::is_same< U, T >::value;
-  }
-  template< class U, class T1, class T2, class... Types >
-  constexpr size_t find_unique()
-  {
-    constexpr bool found = std::is_same< U, T1 >::value;
-    constexpr size_t resultAfterThis = find_unique< U, T2, Types... >();
-    static_assert(!found || (resultAfterThis == 1 + sizeof...(Types)));
-    return found ? 0 : 1 + resultAfterThis;
+    template< class U, class T >
+    constexpr size_t find_unique()
+    {
+      return !std::is_same< U, T >::value;
+    }
+    template< class U, class T1, class T2, class... Types >
+    constexpr size_t find_unique()
+    {
+      constexpr bool found = std::is_same< U, T1 >::value;
+      constexpr size_t resultAfterThis = find_unique< U, T2, Types... >();
+      static_assert(!found || (resultAfterThis == 1 + sizeof...(Types)));
+      return found ? 0 : 1 + resultAfterThis;
+    }
   }
   template< class U, class... Types >
   constexpr size_t find_uniq_type_in_pack()
   {
-    constexpr size_t result = find_unique< U, Types... >();
+    constexpr size_t result = details::find_unique< U, Types... >();
     static_assert(result != sizeof...(Types));
     return result;
   }
@@ -50,28 +53,35 @@ namespace rychkov
   template< size_t N >
   struct in_place_index_t
   {};
+  constexpr size_t variant_npos = static_cast< size_t >(-1);
 
   namespace details
   {
     template< class T >
-    void copy_function(byte* data, const byte* rhs)
+    void destructor(byte* lhs) noexcept
     {
-      new (data) T(*reinterpret_cast< const T*& >(rhs));
+      reinterpret_cast< T* >(lhs)->~T();
     }
-    using copier_t = void (*)(byte*, const byte*);
-    template< class T, bool Nothrow >
-    void move_function(byte* data, byte* rhs) noexcept(Nothrow)
+    template< bool Nothrow, class T >
+    void copy_ctor(byte* lhs, const byte* rhs) noexcept(Nothrow)
     {
-      new(data) T(std::move(*reinterpret_cast< T* >(rhs)));
+      new(lhs) T(*reinterpret_cast< const T* >(rhs));
     }
-    template< bool Nothrow >
-    using mover_t = void (*)(byte*, byte*) noexcept(Nothrow);
-    template< class T >
-    void destructor_function(byte* data)
+    template< bool Nothrow, class T >
+    void move_ctor(byte* lhs, byte* rhs) noexcept(Nothrow)
     {
-      reinterpret_cast< T* >(data)->~T();
+      new(lhs) T(std::move(*reinterpret_cast< T* >(rhs)));
     }
-    using destructor_t = void (*)(byte*);
+    template< bool Nothrow, class T >
+    void copy_assign(byte* lhs, const byte* rhs) noexcept(Nothrow)
+    {
+      *reinterpret_cast< T* >(lhs) = *reinterpret_cast< const T* >(rhs);
+    }
+    template< bool Nothrow, class T >
+    void move_assign(byte* lhs, byte* rhs) noexcept(Nothrow)
+    {
+      *reinterpret_cast< T* >(lhs) = std::move(*reinterpret_cast< T* >(rhs));
+    }
   }
 }
 
