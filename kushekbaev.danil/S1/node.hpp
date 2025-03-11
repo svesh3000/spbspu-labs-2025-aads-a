@@ -7,7 +7,7 @@ namespace kushekbaev
   struct Node
   {
     T data_;
-    Node< T > * next_;
+    Node< T >* next_;
   };
 }
 

@@ -62,27 +62,27 @@ namespace kushekbaev
     return result;
   }
 
-  template< typename T > 
+  template< typename T >
   T & Iterator< T >::operator*()
   {
     assert(node_ != nullptr);
     return node_ -> data_;
   }
 
-  template< typename T > 
+  template< typename T >
   T * Iterator< T >::operator->()
   {
     assert(node_ != nullptr);
     return std::addressof(node -> data_);
   }
 
-  template< typename T > 
+  template< typename T >
   bool Iterator< T >::operator!=(const this_t & other) const
   {
     return !(other == *this);
   }
 
-  template< typename T > 
+  template< typename T >
   bool Iterator< T >::operator==(const this_t & other) const
   {
     return node_ == other.node;
