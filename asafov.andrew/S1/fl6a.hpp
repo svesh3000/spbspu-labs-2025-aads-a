@@ -1,4 +1,6 @@
-#pragma once
+#ifndef FL6A_HPP
+
+#define FL6A_HPP
 
 #include <memory>
 
@@ -142,3 +144,5 @@ public:
     size_++;
   }
 };
+
+#endif
