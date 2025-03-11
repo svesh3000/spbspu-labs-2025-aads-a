@@ -17,13 +17,8 @@ BOOST_AUTO_TEST_CASE(end_test)
   lanovenko::ForwardList<int> testList;
   testList.push_front(1);
   testList.push_front(2);
-  auto it = testList.begin();
-  size_t res = 0;
-  for(;it != testList.end(); it++)
-  {
-    res++;
-  }
-  BOOST_TEST(res == 2);
+  auto it = testList.end();
+  BOOST_TEST(*it == 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -162,3 +157,23 @@ BOOST_AUTO_TEST_CASE(clear_test)
    testList.clear();
    BOOST_TEST(testList.empty() == true);
 }
+
+BOOST_AUTO_TEST_SUITE(push_back_test)
+
+BOOST_AUTO_TEST_CASE(to_empty_list_test)
+{
+  lanovenko::ForwardList<int> testList;
+  testList.push_back(1);
+  BOOST_TEST((*testList.begin()) == (*testList.end() == 1));
+  BOOST_TEST(testList.size() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(to_not_empty_list_test)
+{
+  lanovenko::ForwardList<int> testList;
+  testList.push_back(1);
+  testList.push_back(2);
+  BOOST_TEST(testList.size() == 2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
