@@ -138,10 +138,11 @@ public:
 
   void clear()
   {
-    do
+    if (head_ != last_)
     {
       pop_front();
-    } while (empty());
+    }
+    pop_front();
   }
 
   void push_back(const T& value)
