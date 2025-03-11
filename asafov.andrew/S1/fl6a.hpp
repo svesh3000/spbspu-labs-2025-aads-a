@@ -9,9 +9,13 @@ class forward_list
   {
     T data_;
     Node* next_;
-    explicit Node(const T& value, Node* ptr = nullptr) noexcept:
+    Node(const T& value, Node* ptr) noexcept:
     data_(value),
     next_(ptr)
+    {}
+    Node(const T& value) noexcept:
+    data_(value),
+    next_(nullptr)
     {}
   };
 
@@ -37,11 +41,6 @@ public:
     const_iterator(Node* node, Node* last):
     current_(node),
     last_(last)
-    {}
-
-    const_iterator(const const_iterator& data) noexcept:
-    current_(data.current_),
-    last_(data.last_)
     {}
 
     ~const_iterator() = default;
@@ -88,6 +87,14 @@ public:
     return const_iterator(head_, tail_);
   }
   const_iterator cend() const
+  {
+    return const_iterator(nullptr, tail_);
+  }
+  const_iterator begin() const
+  {
+    return const_iterator(head_, tail_);
+  }
+  const_iterator end() const
   {
     return const_iterator(nullptr, tail_);
   }
