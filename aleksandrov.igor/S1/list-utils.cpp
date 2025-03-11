@@ -34,5 +34,55 @@ namespace aleksandrov
       output << " " << *it;
     }
   }
+
+  void getPairsList(std::istream& input, PairsList& list)
+  {
+    std::string listName;
+    while (input >> listName)
+    {
+      List< unsigned long long > numList;
+      unsigned long long num = 0;
+      while (input >> num)
+      {
+        numList.pushBack(num);
+      }
+      input.clear();
+      list.pushBack(std::make_pair(listName, numList));
+    }
+  }
+
+  size_t calcMaxSubListSize(PairsList& list)
+  {
+    size_t maxSize = 0;
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+      maxSize = std::max(maxSize, it->second.size());
+    }
+    return maxSize;
+  }
+
+  void getTransposedList(PairsList& list, List< List< unsigned long long > >& toTranspose)
+  {
+    size_t shift = 0;
+    size_t maxSubListSize = calcMaxSubListSize(list);
+    while (shift != maxSubListSize)
+    {
+      List< unsigned long long > numList;
+      for (auto it = list.begin(); it != list.end(); ++it)
+      {
+        auto shiftedIt = it->second.begin();
+        for (size_t i = 0; i < shift && shiftedIt != it->second.end(); ++i)
+        {
+          ++shiftedIt;
+        }
+        if (shiftedIt != it->second.end())
+        {
+          numList.pushBack(*shiftedIt);
+        }
+      }
+      ++shift;
+      toTranspose.pushBack(numList);
+    }
+  }
 }
 
