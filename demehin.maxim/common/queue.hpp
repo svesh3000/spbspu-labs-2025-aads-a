@@ -14,6 +14,9 @@ namespace demehin
     Queue();
     Queue(const Queue&);
     Queue(Queue&&) noexcept;
+
+    Queue< T >& operator=(const Queue< T >&);
+
     ~Queue();
 
     void push(const T& rhs) noexcept;
@@ -23,6 +26,8 @@ namespace demehin
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void clear();
 
   private:
     T* data_;
@@ -63,6 +68,19 @@ namespace demehin
     std::exchange(rhs.data_, nullptr);
     std::exchange(rhs.size_, 0);
     std::exchange(rhs.capacity_, 0);
+  }
+
+  template< typename T >
+  Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
+  {
+    if (this != & rhs)
+    {
+      Queue< T > temp(rhs);
+      std::swap(data_, temp.data_);
+      std::swap(size_, temp.size_);
+      std::swap(capacity_, temp.capacity_);
+    }
+    return *this;
   }
 
   template< typename T >
@@ -140,6 +158,15 @@ namespace demehin
     }
     delete[] data_;
     data_ = newData;
+  }
+
+  template< typename T >
+  void Queue< T >::clear()
+  {
+    while (!empty())
+    {
+      pop();
+    }
   }
 }
 

@@ -85,7 +85,7 @@ namespace demehin
   {
     if (empty())
     {
-      throw std::logic_error("empty");
+      throw std::logic_error("empty1");
     }
     return data_[size_ - 1];
   }
@@ -95,7 +95,7 @@ namespace demehin
   {
     if (empty())
     {
-      throw std::logic_error("empty");
+      throw std::logic_error("empty2");
     }
     size_--;
   }
