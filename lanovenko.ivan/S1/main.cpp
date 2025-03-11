@@ -8,17 +8,18 @@
 
 int main()
 {
-  lanovenko::list_of_pairs myList;
+  using namespace lanovenko;
+  list_of_pairs myList;
   std::string sequenceName = "";
   while (std::cin >> sequenceName)
   {
     unsigned long long element = 0;
-    lanovenko::list_ull temporaryList{};
+    list_ull temporaryList{};
     while (std::cin >> element)
     {
       temporaryList.push_back(element);
     }
-    std::pair<std::string, std::list<unsigned long long>> temporaryPair{ sequenceName, temporaryList };
+    std::pair<std::string, ForwardList<unsigned long long>> temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
     if (std::cin.eof())
     {
@@ -26,7 +27,7 @@ int main()
     }
     std::cin.clear();
   }
-  lanovenko::printSequencesName(myList, std::cout);
+  printSequencesName(myList, std::cout);
   size_t maxSize = 0;
   for (auto it : myList)
   {
@@ -36,7 +37,7 @@ int main()
     }
   }
   bool sumLimit = false;
-  lanovenko::printSequences(myList, maxSize, sumLimit, std::cout);
+  printSequences(myList, maxSize, sumLimit, std::cout);
   if (sumLimit)
   {
     std::cerr << "Sum limit!\n";

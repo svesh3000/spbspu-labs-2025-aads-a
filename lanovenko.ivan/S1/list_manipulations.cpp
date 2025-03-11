@@ -20,7 +20,7 @@ bool lanovenko::isSumLimit(size_t a, size_t b)
   return (b > std::numeric_limits<int>::max() - a);
 }
 
-void lanovenko::printSumList(const std::list<int> &sumList, bool sumLimit, std::ostream &out)
+void lanovenko::printSumList(const ForwardList<int>& sumList, bool sumLimit, std::ostream& out)
 {
   if (sumLimit)
   {
@@ -44,7 +44,7 @@ void lanovenko::printSumList(const std::list<int> &sumList, bool sumLimit, std::
 
 void lanovenko::printSequences(const list_of_pairs temporary, size_t maxSize, bool& sumLimit, std::ostream& out)
 {
-  std::list<int> sumList{};
+  ForwardList<int> sumList{};
   for (size_t i = 0; i < maxSize; i++)
   {
     size_t res = 0;
