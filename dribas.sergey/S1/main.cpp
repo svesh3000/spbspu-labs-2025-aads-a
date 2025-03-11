@@ -15,4 +15,6 @@ int main()
 
   dribas::getSequanceName(std::cout, sequance);
   std::cout << '\n';
+  dribas::getSequanceNameSum(std::cout, sequance);
+  std::cout << '\n';
 }

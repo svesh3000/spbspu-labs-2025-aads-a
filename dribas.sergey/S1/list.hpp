@@ -158,7 +158,7 @@ const dribas::Node< T >* dribas::List< T >::operator[](size_t id) const
 template< class T >
 dribas::Node< T >* dribas::List< T >::operator[](size_t id)
 {
-  return const_cast< List< T >* >(static_cast< const List< T >* >(this)->operator[](id));
+  return const_cast< Node< T >* >(static_cast< const List< T >* >(this)->operator[](id));
 }
 
 template< class T >
@@ -173,7 +173,7 @@ const dribas::Node< T >* dribas::List< T >::at(size_t id) const
 template< class T >
 dribas::Node< T >* dribas::List< T >::at(size_t id)
 {
-  return const_cast< List< T >* >(static_cast< const List< T >* >(this)->at(id));
+  return const_cast< Node< T >* >(static_cast< const List< T >* >(this)->at(id));
 }
 
 template< class T >
@@ -211,7 +211,7 @@ template< class T >
 dribas::List< T >::List(const List< T >& rhs):
   head_(nullptr),
   tail_(nullptr),
-  size_(rhs.size_)
+  size_(0)
 {
   Node< T >* current = rhs.head_;
   for (; current; current = current->next_) {
