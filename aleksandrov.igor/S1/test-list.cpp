@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(assignment)
   aleksandrov::List< char > list1(2, 'a');
   aleksandrov::List< char > list2;
   list2 = list1;
-  BOOST_TEST(list2.size() == list1.size( ));
+  BOOST_TEST(list2.size() == list1.size());
   aleksandrov::List< char > list3;
   list3 = std::move(list2);
   BOOST_TEST(list3.size() == 2);
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(insert)
   aleksandrov::List< double > list{2.0, 3.0, 5.0};
   double value = 4.0;
   auto it = list.insertAfter(++list.cbegin(), value);
-  BOOST_TEST(*(++it) == 4.0);
+  BOOST_TEST(*it == 4.0);
   list.insertAfter(list.cend(), 1.0);
   BOOST_TEST(list.front() == 1.0);
 }
@@ -174,13 +174,13 @@ BOOST_AUTO_TEST_CASE(insert)
 BOOST_AUTO_TEST_CASE(erase)
 {
   aleksandrov::List< int > list{1, 2};
-  list.eraseAfter(list.begin());
+  list.eraseAfter(list.cbegin());
   BOOST_TEST(list.size() == 1);
   for (int i = 2; i < 8; ++i)
   {
     list.pushBack(i);
   }
-  auto first = std::next(list.begin());
+  auto first = std::next(list.cbegin());
   auto last = std::next(first, 4);
   auto it = list.eraseAfter(first, last);
   BOOST_TEST(*it == 6);
