@@ -8,6 +8,7 @@
 namespace dribas
 {
   void getSequanceName(std::ostream&, const List< std::pair< std::string, List< int > > >&);
+  void getSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< int > > >& sequance);
 }
 
 #endif

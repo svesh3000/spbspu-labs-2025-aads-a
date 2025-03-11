@@ -8,12 +8,13 @@ dribas::List< std::pair< std::string, dribas::List< int > > > dribas::getSequanc
     List< std::pair< std::string, List< int > > > allSequance;
     std::string sequance;
     while (input >> sequance) {
-      List< int > numbers;
+      List< int > numbers{};
       int number = 0;
       while (input >> number) {
         numbers.push_back(number);
       }
       allSequance.push_back(std::make_pair(sequance, numbers));
+      input.clear();
     }
     return allSequance;
 }

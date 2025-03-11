@@ -48,18 +48,19 @@ namespace dribas
     void swap(List< T >& rhs);
     void clear() noexcept;
 
-    private:
-      Node < T >* head_;
-      Node < T >* tail_;
-      size_t size_;
+  private:
+    Node < T >* head_;
+    Node < T >* tail_;
+    size_t size_;
   };
 }
 
 template< class T >
 void dribas::List< T >::push_back(T&& value) {
   Node< T >* newNode = new Node< T >(value);
-  if (tail_ == nullptr) {
-    head_ = tail_ = newNode;
+  if (!tail_) {
+    head_ = newNode;
+    tail_ = newNode;
   } else {
     tail_->next_ = newNode;
     newNode->prev_ = tail_;
@@ -71,8 +72,9 @@ void dribas::List< T >::push_back(T&& value) {
 template< class T >
 void dribas::List< T >::push_back(const T& value) {
   Node< T >* newNode = new Node< T >(value);
-  if (tail_ == nullptr) {
-    head_ = tail_ = newNode;
+  if (!tail_) {
+    head_ = newNode;
+    tail_ = newNode;
   } else {
     tail_->next_ = newNode;
     newNode->prev_ = tail_;
@@ -103,7 +105,7 @@ template < class T >
 void dribas::List < T >::clear() noexcept
 {
   while (size_ != 0) {
-    pop_front();
+    pop_back();
   }
 }
 
@@ -118,12 +120,12 @@ void dribas::List< T >::push_front(const T& value)
 {
   Node< T >* newNode = new Node< T >(value);
   newNode->next_ = head_;
-  if (head_ != nullptr) {
+  if (head_) {
     head_->prev_ = newNode;
   }
   head_ = newNode;
-  if (tail_ == nullptr) {
-    tail_ = newNode;
+  if (!tail_) {
+    tail_ = head_;
   }
   size_++;
 }
@@ -133,12 +135,12 @@ void dribas::List< T >::push_front(T&& value)
 {
   Node< T >* newNode = new Node< T >(std::move(value));
   newNode->next_ = head_;
-  if (head_ != nullptr) {
+  if (head_) {
     head_->prev_ = newNode;
   }
   head_ = newNode;
-  if (tail_ == nullptr) {
-    tail_ = newNode;
+  if (!tail_) {
+    tail_ = head_;
   }
   size_++;
 }
@@ -249,7 +251,7 @@ dribas::List< T >& dribas::List< T >::operator=(const List< T >& other)
 
 template < class T >
 void dribas::List<T>::pop_front() {
-  if (!empty()) {
+  if (size_) {
     Node<T>* forDelete = head_;
     head_ = head_->next_;
     if (head_) {
