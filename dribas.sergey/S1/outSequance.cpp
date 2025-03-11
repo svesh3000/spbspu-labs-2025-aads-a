@@ -19,7 +19,7 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
     maxSize = std::max(maxSize, sequance.at(i)->data_.second.size());
   }
   dribas::List< int > sums;
-  int sum = 0;  
+  int sum = 0;
   for (size_t i = 0; i < maxSize; i++) {
     for (size_t j = 0; j < sequance.size(); j++) {
       try {// ЭТО НЕЛЬЗЯ ТАК ОСТАВЛЯТЬ!!! ОБЯЗАТЕЛЬНО ПЕРЕДЕЛАТЬ!!!
