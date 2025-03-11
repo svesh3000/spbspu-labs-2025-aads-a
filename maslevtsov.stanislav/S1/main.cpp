@@ -20,8 +20,8 @@ int main()
     std::cout << 0 << '\n';
     return 0;
   }
-  std::cout << pairs_list.begin()->first;
-  for (auto i = ++pairs_list.begin(); i != pairs_list.end(); ++i) {
+  std::cout << pairs_list.cbegin()->first;
+  for (auto i = ++pairs_list.cbegin(); i != pairs_list.cend(); ++i) {
     std::cout << ' ' << i->first;
   }
   std::cout << '\n';

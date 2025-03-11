@@ -15,8 +15,8 @@ namespace {
   void print_list_elements(std::ostream& out, const maslevtsov::list_t& list) noexcept
   {
     if (!list.empty()) {
-      out << *list.begin();
-      for (auto j = ++list.begin(); j != list.end(); ++j) {
+      out << *list.cbegin();
+      for (auto j = ++list.cbegin(); j != list.cend(); ++j) {
         out << ' ' << *j;
       }
     }
@@ -24,17 +24,19 @@ namespace {
 
   void get_column_elements(maslevtsov::list_t& list, const maslevtsov::pairs_list_t& pairs_list, std::size_t border)
   {
-    maslevtsov::list_t cur_list = pairs_list.begin()->second;
+    maslevtsov::list_t cur_list = pairs_list.cbegin()->second;
     if (cur_list.size() > border) {
-      auto it = cur_list.begin();
-      for (std::size_t k = 0; k != border; ++k, ++it);
+      auto it = cur_list.cbegin();
+      for (std::size_t k = 0; k != border; ++k, ++it)
+        ;
       list.push_back(*it);
     }
-    for (auto j = ++pairs_list.begin(); j != pairs_list.end(); ++j) {
+    for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j) {
       maslevtsov::list_t cur_list = j->second;
       if (cur_list.size() > border) {
-        auto it = cur_list.begin();
-        for (std::size_t k = 0; k != border; ++k, ++it);
+        auto it = cur_list.cbegin();
+        for (std::size_t k = 0; k != border; ++k, ++it)
+          ;
         list.push_back(*it);
       }
     }
@@ -43,17 +45,19 @@ namespace {
   std::size_t get_cur_sum(const maslevtsov::pairs_list_t& pairs_list, std::size_t border)
   {
     std::size_t result = 0;
-    maslevtsov::list_t cur_list = pairs_list.begin()->second;
+    maslevtsov::list_t cur_list = pairs_list.cbegin()->second;
     if (cur_list.size() > border) {
-      auto it = cur_list.begin();
-      for (std::size_t k = 0; k != border; ++k, ++it);
+      auto it = cur_list.cbegin();
+      for (std::size_t k = 0; k != border; ++k, ++it)
+        ;
       result = checked_sum(result, *it);
     }
-    for (auto j = ++pairs_list.begin(); j != pairs_list.end(); ++j) {
+    for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j) {
       maslevtsov::list_t cur_list = j->second;
       if (cur_list.size() > border) {
-        auto it = cur_list.begin();
-        for (std::size_t k = 0; k != border; ++k, ++it);
+        auto it = cur_list.cbegin();
+        for (std::size_t k = 0; k != border; ++k, ++it)
+          ;
         result = checked_sum(result, *it);
       }
     }
@@ -63,8 +67,8 @@ namespace {
 
 std::size_t maslevtsov::get_max_pairs_list_size(const pairs_list_t& list) noexcept
 {
-  std::size_t maximum = list.begin()->second.size();
-  for (auto i = ++list.begin(); i != list.end(); ++i) {
+  std::size_t maximum = list.cbegin()->second.size();
+  for (auto i = ++list.cbegin(); i != list.cend(); ++i) {
     maximum = std::max(maximum, i->second.size());
   }
   return maximum;
