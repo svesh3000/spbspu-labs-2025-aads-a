@@ -1,6 +1,7 @@
 #ifndef FWDLIST_HPP
 #define FWDLIST_HPP
 
+#include <utility>
 #include "iterator.hpp"
 #include "node.hpp"
 
@@ -135,7 +136,7 @@ namespace kushekbaev
   void FwdList< T >::push_front(const T value)
   {
     assert(!empty());
-    Node< T >* newNode = new Node< T >{ value, nullptr }
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     newNode -> next_ = fake_ -> next;
     fake_ -> next_ = newNode;
     ++size_;
@@ -145,7 +146,7 @@ namespace kushekbaev
   void FwdList< T >::push_back(const T value)
   {
     assert(!empty());
-    Node< T >* newNode = new Node< T >{ value, nullptr }
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     newNode -> next_ = fake_;
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
@@ -183,8 +184,8 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::swap(FwdList& other) noexcept
   {
-    std::swap(fake_, other.fake_)
-    std::swap(size_, other.size_)
+    std::swap(fake_, other.fake_);
+    std::swap(size_, other.size_);
   }
 
   template< typename T >
@@ -200,9 +201,9 @@ namespace kushekbaev
   void FwdList< T >::remove(const T value)
   {
     Node< T >* current = fake_;
-    while (current -> next_ != fake)
+    while (current -> next_ != fake_)
     {
-      if (current -> next_ -> data = value)
+      if (current -> next_ -> data_ = value)
       {
         Node< T >* todelete = current -> next;
         current -> next = current -> next -> next;

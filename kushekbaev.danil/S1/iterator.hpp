@@ -12,7 +12,7 @@ namespace kushekbaev
   struct Iterator final: public std::iterator< std::forward_iterator_tag, T >
   {
     using this_t = Iterator< T >;
-    Node< T > *node;
+    Node< T >* node;
 
     Iterator();
     Iterator(Node< T > *);
@@ -24,15 +24,15 @@ namespace kushekbaev
     this_t operator++(int);
 
     T& operator*();
-    T* operator->();
+    T* operator -> ();
 
-    bool operator!=(const this_t &);
-    bool operator==(const this_t &);
+    bool operator!=(const this_t &) const;
+    bool operator==(const this_t &) const;
 
     Node< T > * getNode() const;
 
     private:
-      Node< T > * node_;
+      Node< T >* node_;
   };
 
   template< typename T >
@@ -48,44 +48,44 @@ namespace kushekbaev
   template< typename T >
   typename Iterator< T >::this_t & Iterator< T >::operator++()
   {
-    assert(node != nullptr);
-    node = node->next;
+    assert(node_ != nullptr);
+    node_ = node_ -> next;
     return *this;
   }
 
   template< typename T >
   typename Iterator< T >::this_t Iterator< T >::operator++(int)
   {
-    assert(node != nullptr);
+    assert(node_ != nullptr);
     this_t result(*this);
     ++(*this);
     return result;
   }
 
-  template< typename T >
+  template< typename T > 
   T & Iterator< T >::operator*()
   {
-    assert(node != nullptr);
-    return node->data;
+    assert(node_ != nullptr);
+    return node_ -> data_;
   }
 
-  template< typename T >
+  template< typename T > 
   T * Iterator< T >::operator->()
   {
-    assert(node != nullptr);
-    return std::addressof(node->data);
+    assert(node_ != nullptr);
+    return std::addressof(node -> data_);
   }
 
-  template< typename T >
-  bool Iterator< T >::operator!=(const this_t & other)
+  template< typename T > 
+  bool Iterator< T >::operator!=(const this_t & other) const
   {
     return !(other == *this);
   }
 
-  template< typename T >
-  bool Iterator< T >::operator==(const this_t & other)
+  template< typename T > 
+  bool Iterator< T >::operator==(const this_t & other) const
   {
-    return node == other.node;
+    return node_ == other.node;
   }
 
   template< typename T >
