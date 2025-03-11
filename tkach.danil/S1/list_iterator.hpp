@@ -17,7 +17,6 @@ namespace tkach
     using this_t = Iterator< T >;
     Iterator();
     Iterator(const this_t&) = default;
-    explicit Iterator(Node< T >* node);
     ~Iterator() = default;
     this_t& operator=(const this_t&) = default;
     this_t& operator++();
@@ -30,6 +29,7 @@ namespace tkach
     bool operator==(const this_t& rhs) const;
   private:
     Node< T >* node_;
+    explicit Iterator(Node< T >* node);
   };
 
   template< typename T >

@@ -111,6 +111,7 @@ namespace
 int main()
 {
   using namespace tkach;
+  List< size_t > list = {1, 3, 5};
   try
   {
     List< std::pair< std::string, List < size_t > > > fd_pair_list = inputLists(std::cin);

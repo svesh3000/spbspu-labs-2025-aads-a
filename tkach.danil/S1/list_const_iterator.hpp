@@ -17,7 +17,6 @@ namespace tkach
     using this_t = Citerator< T >;
     Citerator();
     Citerator(const this_t&) = default;
-    explicit Citerator(const Node< T >* node);
     ~Citerator() = default;
     this_t& operator=(const this_t&) = default;
     this_t& operator++();
@@ -27,7 +26,8 @@ namespace tkach
     bool operator!=(const this_t& rhs) const;
     bool operator==(const this_t& rhs) const;
   private:
-    const Node< T >* node_;
+    Node< T >* node_;
+    explicit Citerator(Node< T >* node);
   };
 
   template< typename T >
@@ -75,7 +75,7 @@ namespace tkach
   }
 
   template< typename T >
-  Citerator< T >::Citerator(const Node< T >* node):
+  Citerator< T >::Citerator(Node< T >* node):
     node_(node)
   {}
 }

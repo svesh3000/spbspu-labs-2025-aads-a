@@ -2,6 +2,8 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <initializer_list>
+#include <utility>
 #include "node.hpp"
 #include "list_const_iterator.hpp"
 #include "list_iterator.hpp"
@@ -16,6 +18,9 @@ namespace tkach
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
     List(size_t count, const T & data);
+    template< class InputIt>
+    List(InputIt first, InputIt last);
+    List(std::initializer_list< T > in_list);
     ~List();
     Iterator< T > begin() noexcept;
     Citerator< T > cbegin() const noexcept;
@@ -25,10 +30,10 @@ namespace tkach
     T& front();
     const T& front() const;
     size_t size() const;
-    void pushFront(const T& data);
-    void pushBack(const T& data);
-    void pushFront(T&& data);
-    void pushBack(T&& data);
+    template< class Q>
+    void pushFront(Q&& data);
+    template< class Q>
+    void pushBack(Q&& data);
     void popFront();
     void spliceAfter(Citerator< T > pos, List< T >& other);
     void spliceAfter(Citerator< T > pos, List< T >&& other);
@@ -55,6 +60,34 @@ namespace tkach
   List< T >::List():
     tail_(nullptr),
     size_(0)
+  {}
+
+  template< typename T >
+  template< typename InputIt >
+  List< T >::List(InputIt first, InputIt last):
+    List()
+  {
+    if (first == last)
+    {
+      return;
+    }
+    try
+    {
+      while(first != last)
+      {
+        pushBack(*(first++));     
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
+    }
+  }
+
+  template< typename T >
+  List< T >::List(std::initializer_list< T > in_list):
+    List(in_list.begin(), in_list.end())
   {}
 
   template< typename T >
@@ -161,26 +194,15 @@ namespace tkach
   }
 
   template< typename T >
-  void List< T >::pushFront(const T& data)
-  {
-    pushFront(T(data));
-  }
-
-  template< typename T >
   List< T >::List(const List< T >& other):
     List(getList(other))
   {}
 
-  template< typename T >
-  void List< T >::pushBack(const T& data)
+  template< class T >
+  template< class Q>
+  void List< T >::pushFront(Q&& data)
   {
-    pushBack(T(data));
-  }
-
-  template< typename T >
-  void List< T >::pushFront(T&& data)
-  {
-    Node< T >* new_node = new Node< T >(std::move(data), nullptr);
+    Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
     if (empty())
     {
       tail_ = new_node;
@@ -194,10 +216,11 @@ namespace tkach
     size_++;
   }
 
-  template< typename T >
-  void List< T >::pushBack(T&& data)
+  template< class T >
+  template< class Q>
+  void List< T >::pushBack(Q&& data)
   {
-    Node< T >* new_node = new Node< T >(std::move(data), nullptr);
+    Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
     if (empty())
     {
       tail_ = new_node;
@@ -234,7 +257,12 @@ namespace tkach
   template< typename T >
   void List< T >::remove(const T& value)
   {
-    removeIf([&](const T& temp) {return temp == value;});
+    removeIf(
+      [&](const T& temp)
+      {
+        return temp == value;
+      }
+    );
   }
 
   template< typename T >
@@ -294,11 +322,11 @@ namespace tkach
     }
     else
     {
-      Iterator< T > it(const_cast< Node< T >* >(pos.node_));
+      Iterator< T > it(pos.node_);
       Node< T >* list_delete = it.node_->next_;
       if (pos.node_->next_ == tail_)
       {
-        tail_ = const_cast< Node< T >* >(pos.node_);
+        tail_ = pos.node_;
       }
       it.node_->next_ = list_delete->next_;
       delete list_delete;
@@ -322,7 +350,7 @@ namespace tkach
     {
       return;
     }
-    Node< T >* temp = const_cast< Node< T >* >(pos.node_);
+    Node< T >* temp = pos.node_;
     Node< T >* temp2 = temp->next_;
     if (temp == tail_)
     {
@@ -361,9 +389,9 @@ namespace tkach
       return;
     }
     size_t splice_size = std::distance(first, last) - 1;
-    Node< T >* temp = const_cast< Node< T >* >(pos.node_);
-    Node< T >* temp_first = const_cast< Node< T >* >(first.node_);
-    Node< T >* temp_last = const_cast< Node< T >* >(last.node_);
+    Node< T >* temp = pos.node_;
+    Node< T >* temp_first = first.node_;
+    Node< T >* temp_last = last.node_;
     Node< T >* temp_next = temp->next_;
     if (first.node_ == (other.tail_)->next_ && last.node_ == (other.tail_)->next_)
     {
@@ -405,7 +433,7 @@ namespace tkach
     {
       erase_after(first);
     }
-    return Iterator< T >(const_cast< Node< T >* >(last.node_));
+    return Iterator< T >(last.node_);
   }
 }
 
