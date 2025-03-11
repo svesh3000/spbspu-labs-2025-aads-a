@@ -1,5 +1,5 @@
-#ifndef FWDITERATOR_HPP
-#define FWDITERATOR_HPP
+#ifndef FWD_ITERATOR_HPP
+#define FWD_ITERATOR_HPP
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov

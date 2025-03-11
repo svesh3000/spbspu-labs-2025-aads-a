@@ -6,8 +6,8 @@ namespace sveshnikov
   template < typename T >
   struct node_t
   {
-    T data;
-    node_t< T > *next;
+    T data_;
+    node_t< T > *next_;
   };
 }
 

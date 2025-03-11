@@ -1,5 +1,5 @@
-#ifndef CONST_ConstFwdIterator_HPP
-#define CONST_ConstFwdIterator_HPP
+#ifndef FWD_СITERATOR_HPP
+#define FWD_СITERATOR_HPP
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov
