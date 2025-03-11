@@ -1,9 +1,9 @@
 #include <iostream>
 #include <limits>
-#include <list>
 #include <string>
+#include "fwdlist.hpp"
 
-using pairedList = std::list< std::pair<std::string, std::list< unsigned long long > > >;
+using pairedList = kushekbaev::FwdList< std::pair<std::string, kushekbaev::FwdList< unsigned long long > > >;
 
 namespace
 {
@@ -27,7 +27,7 @@ int main()
 
   while (std::cin >> listNumber)
   {
-    std::list< unsigned long long > inputValueList;
+    kushekbaev::FwdList< unsigned long long > inputValueList;
     unsigned long long value = 0;
     while (std::cin >> value)
     {
@@ -51,11 +51,11 @@ int main()
   std::cout << "\n";
 
   size_t maxSize = calcOfSize(pairsList);
-  std::list< std::list< unsigned long long > > valueList;
+  kushekbaev::FwdList< kushekbaev::FwdList< unsigned long long > > valueList;
 
   for (size_t i = 0; i < maxSize; ++i)
   {
-    std::list< unsigned long long > rowList;
+    kushekbaev::FwdList< unsigned long long > rowList;
     for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
     {
       if (i < it->second.size())
@@ -81,7 +81,7 @@ int main()
     std::cout << "\n";
   }
 
-  std::list< unsigned long long > sumList;
+  kushekbaev::FwdList< unsigned long long > sumList;
 
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
   {
