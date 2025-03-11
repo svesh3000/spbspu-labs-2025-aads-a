@@ -87,8 +87,8 @@ maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
   FwdList()
 {
   if (!rhs.empty()) {
-    push_back(*(rhs.begin()));
-    for (auto i = ++rhs.begin(); i != rhs.end(); ++i) {
+    push_back(*(rhs.cbegin()));
+    for (auto i = ++rhs.cbegin(); i != rhs.cend(); ++i) {
       push_back(*i);
     }
   }
