@@ -138,7 +138,7 @@ public:
 
   void clear()
   {
-    if (head_ != last_)
+    if (head_ != tail_)
     {
       pop_front();
     }
