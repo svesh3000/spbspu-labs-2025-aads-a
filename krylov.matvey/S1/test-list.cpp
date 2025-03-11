@@ -22,6 +22,31 @@ BOOST_AUTO_TEST_CASE(test_fill_constructor)
   BOOST_TEST(list.size() == 5);
 }
 
+BOOST_AUTO_TEST_CASE(test_push_front)
+{
+  List< int > list;
+  list.push_front(13);
+  list.push_front(15);
+  BOOST_TEST(list.size() == 2);
+  BOOST_TEST(list.front() == 15);
+  BOOST_TEST(list.back() == 13);
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_front)
+{
+  List< int > list;
+  list.push_back(11);
+  list.push_back(12);
+  list.push_back(13);
+  list.pop_front();
+  BOOST_TEST(list.front() == 12);
+  BOOST_TEST(list.back() == 13);
+  list.pop_front();
+  list.pop_front();
+  BOOST_TEST(list.size() == 0);
+}
+
+
 BOOST_AUTO_TEST_CASE(test_assign)
 {
   List< int > list;

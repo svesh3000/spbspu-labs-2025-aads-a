@@ -58,7 +58,9 @@ namespace krylov
     Iterator< T > begin() const;
     Iterator< T > end() const;
     void push_back(const T& value);
+    void push_front(const T& value);
     void pop_back();
+    void pop_front();
     T& front();
     T& back();
     bool empty() const;
@@ -129,17 +131,24 @@ namespace krylov
   template< typename T >
   void List< T >::assign(size_t n, const T& value)
   {
-    clear();
+    const size_t originalSize = size();
     try
     {
       for (size_t i = 0; i < n; ++i)
       {
         push_back(value);
       }
+      for (size_t i = 0; i < originalSize; ++i)
+      {
+        pop_front();
+      }
     }
     catch (const std::bad_alloc& e)
     {
-      clear();
+      for (size_t i = 0; i < size() - originalSize; ++i)
+      {
+        pop_back();
+      }
     }
   }
 
@@ -254,6 +263,24 @@ namespace krylov
   }
 
   template < typename T >
+  void List< T >::push_front(const T& value)
+  {
+    Node< T >* newNode = new Node< T >(value);
+    if (!head_)
+    {
+      head_ = newNode;
+      tail_ = newNode;
+    }
+    else
+    {
+      head_->prev_ = newNode;
+      newNode->next_ = head_;
+      head_ = newNode;
+    }
+    ++size_;
+  }
+
+  template < typename T >
   void List< T >::pop_back()
   {
     if (!tail_)
@@ -269,6 +296,27 @@ namespace krylov
     else
     {
       head_ = nullptr;
+    }
+    delete temp;
+    --size_;
+  }
+
+  template < typename T >
+  void List< T >::pop_front()
+  {
+    if (!head_)
+    {
+      return;
+    }
+    Node< T >* temp = head_;
+    head_ = head_->next_;
+    if (head_)
+    {
+      head_->prev_ = nullptr;
+    }
+    else
+    {
+      tail_ = nullptr;
     }
     delete temp;
     --size_;
