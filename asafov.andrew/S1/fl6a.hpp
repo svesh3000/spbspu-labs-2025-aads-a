@@ -23,8 +23,6 @@ public:
   tail_(nullptr)
   {}
 
-
-
   class const_iterator
   {
     friend class Forward_list;
@@ -47,7 +45,7 @@ public:
     {
       return current_->data_;
     }
-      
+  
     T* operator->() const
     {
       return std::addressof(current_->data_);
@@ -88,7 +86,6 @@ public:
   {
     return const_iterator(nullptr, tail_);
   }
-  
 
   bool empty()
   {
@@ -98,8 +95,6 @@ public:
   {
     return size_;
   }
-
-
 
   void pop_front()
   {
@@ -115,7 +110,7 @@ public:
       tail_ = nullptr;
     }
   }
-  
+
   void push_back(const T& value)
   {
     Node* new_node = new Node(value);
@@ -133,10 +128,4 @@ public:
     }
     size_++;
   }
-
-
-
-
-
-  
 };
