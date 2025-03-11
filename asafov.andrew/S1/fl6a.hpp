@@ -107,7 +107,12 @@ public:
   }
   size_t size() const
   {
-    return size_;
+    size_t i = 0;
+    for (const_iterator it = cbegin(); it != cend(); ++it)
+    {
+      ++i;
+    }
+    return i;
   }
 
   void pop_front()
