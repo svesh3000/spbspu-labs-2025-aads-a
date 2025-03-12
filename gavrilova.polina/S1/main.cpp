@@ -25,7 +25,7 @@ int main() {
     outNames(std::cout, listOfPairs);
     std::cout << "\n";
   }
-  
+
   FwdList< ULL > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
