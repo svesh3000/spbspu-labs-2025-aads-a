@@ -14,6 +14,9 @@ class forward_list
     next_(ptr)
     {}
   };
+  Node* head_;
+  Node* tail_;
+  size_t size_;
 public:
   forward_list() noexcept:
   head_(nullptr),
@@ -47,6 +50,15 @@ public:
     current_(data.current_),
     last_(data.last_)
     {}
+    const_iterator& operator=(const const_iterator& data) noexcept
+    {
+      if (this != &data)
+      {
+        current_ = data.current_;
+        last_ = data.last_;
+      }
+      return *this;
+    }
     ~const_iterator() = default;
 
     const T& operator*() const
@@ -99,7 +111,6 @@ public:
   {
     return !head_;
   }
-
   size_t size() const
   {
     return size_;
@@ -143,9 +154,5 @@ public:
     }
     size_++;
   }
-private:
-  Node* head_;
-  Node* tail_;
-  size_t size_;
 };
 #endif
