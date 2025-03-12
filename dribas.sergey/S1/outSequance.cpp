@@ -25,8 +25,8 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
       try {// ЭТО НЕЛЬЗЯ ТАК ОСТАВЛЯТЬ!!! ОБЯЗАТЕЛЬНО ПЕРЕДЕЛАТЬ!!!
         out << sequance.at(j)->data_.second.at(i)->data_;
         sum += sequance.at(j)->data_.second.at(i)->data_;
-        if (!(j == sequance.size() - 1)) {
-          out << ' ';
+        if (j < sequance.size() - 1) {
+          out << " * ";
         }
       } catch (const std::out_of_range&) {
       }
@@ -37,8 +37,8 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
   }
   for (size_t i = 0; i < sums.size(); i++) {
     out << sums.at(i)->data_;
-    if (!(i == sums.size() - 1)) {
-      out << ' ';
+    if ((i < sums.size() - 1)) {
+      out << " * ";
     }
   }
 }
