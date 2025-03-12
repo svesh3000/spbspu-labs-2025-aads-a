@@ -21,9 +21,11 @@ int main() {
   }
   listOfPairs.reverse();
 
-  outNames(std::cout, listOfPairs);
-  std::cout << "\n";
-
+  if (numOfPairs) {
+    outNames(std::cout, listOfPairs);
+    std::cout << "\n";
+  }
+  
   FwdList< ULL > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
