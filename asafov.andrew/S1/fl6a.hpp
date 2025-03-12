@@ -24,7 +24,8 @@ namespace asafov
   public:
     Forward_list() noexcept:
     head_(nullptr),
-    tail_(nullptr)
+    tail_(nullptr),
+    size_(0)
     {}
 
     ~Forward_list() noexcept
@@ -125,7 +126,6 @@ namespace asafov
       {
         auto temp = head_;
         head_ = head_->next_;
-        tail_->next_ = head_;
         delete temp;
       }
       else
@@ -139,11 +139,10 @@ namespace asafov
 
     void clear()
     {
-      do
+      while (!empty())
       {
         pop_front();
       }
-      while (!empty());
     }
 
     void push_back(const T& value)
