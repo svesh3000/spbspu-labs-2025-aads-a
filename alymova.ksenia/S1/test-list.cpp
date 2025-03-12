@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   list_t list4(list3.begin(), list3.end());
   BOOST_TEST(list4 == list3);
 
-  list_t list5({1, 1, 1});
+  list_t list5{1, 1, 1};
   BOOST_TEST(list5 == list3);
 
   list3 = list4;
@@ -60,8 +60,7 @@ BOOST_AUTO_TEST_CASE(test_size)
   list_t list;
   BOOST_TEST(list.size() == 0);
 
-  int x = 1;
-  list.push_back(x);
+  list.push_back(1);
   BOOST_TEST(list.size() == 1);
 
   list.pop_back();
@@ -99,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_base_interface)
   list.pop_back();
   BOOST_TEST(list.back() == 20);
 
-  const list_t list1((size_t)3, 1);
+  const list_t list1(static_cast< size_t >(3), 1);
   BOOST_TEST(list1.front() == 1);
   BOOST_TEST(list1.back() == 1);
 }
@@ -107,9 +106,9 @@ BOOST_AUTO_TEST_CASE(test_swap)
 {
   using list_t = alymova::List< int >;
 
-  list_t list1 = {2, 5};
-  list_t list2 = {5, 2};
-  list_t list3 = list2;
+  list_t list1{2, 5};
+  list_t list2{5, 2};
+  list_t list3(list2);
   list1.swap(list2);
   BOOST_TEST(list1 == list3);
 }
@@ -138,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
   list2.remove("cat");
   BOOST_TEST(list2.size() == 2);
 
-  list_t list3((size_t)5, 10);
+  list_t list3(static_cast< size_t >(5), 10);
   list3.push_back(1);
   list3.remove_if(is_divided_10< int >);
   BOOST_TEST(list3.size() == 1);
@@ -147,6 +146,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
 BOOST_AUTO_TEST_CASE(test_assign)
 {
   using list_t = alymova::List< int >;
+
   list_t list1;
   list1.assign(static_cast< size_t >(0), 1);
   BOOST_TEST(list1.empty());
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(test_assign)
   list_t list_comp(static_cast< size_t >(5), 1);
   BOOST_TEST(list1 == list_comp);
 
-  list_t list2 = {1, 2, 3};
+  list_t list2{1, 2, 3};
   list2.assign(list1.begin(), list1.begin());
   BOOST_TEST(list2.empty());
 
@@ -172,7 +172,8 @@ BOOST_AUTO_TEST_CASE(test_assign)
 BOOST_AUTO_TEST_CASE(test_splice)
 {
   using list_t = alymova::List< int >;
-  list_t list1, list2;
+
+  list_t list1, list2, list_comp1, list_comp2;
   for (size_t i = 1; i <= 4; i++)
   {
     list1.push_back(i);
@@ -182,37 +183,39 @@ BOOST_AUTO_TEST_CASE(test_splice)
     list2.push_back(i * 10);
   }
   auto iter1 = list2.begin();
-  list1.splice(list1.begin(), list2, iter1); //10 1 2 3 4; 20 30
-  BOOST_TEST(list1.front() == 10);
-  BOOST_TEST(list2.front() == 20);
+  list1.splice(list1.begin(), list2, iter1);
+  list_comp1 = {10, 1, 2, 3, 4};
+  list_comp2 = {20, 30};
+  BOOST_TEST(list1 == list_comp1);
+  BOOST_TEST(list2 == list_comp2);
   BOOST_TEST(*iter1 == 10);
-  BOOST_TEST(list1.size() == 5);
-  BOOST_TEST(list2.size() == 2);
 
   auto iter2 = --list2.end();
-  list1.splice(list1.begin(), list2, iter2); //30 10 1 2 3 4; 20
-  BOOST_TEST(list1.front() == 30);
-  BOOST_TEST(list2.front() == 20);
+  list1.splice(list1.begin(), list2, iter2);
+  list_comp1.push_front(30);
+  list_comp2.pop_back();
+  BOOST_TEST(list1 == list_comp1);
+  BOOST_TEST(list2 == list_comp2);
   BOOST_TEST(*iter2 == 30);
-  BOOST_TEST(list1.size() == 6);
-  BOOST_TEST(list2.size() == 1);
 
   auto iter3 = list2.begin();
-  list1.splice(--list1.end(), list2, iter3); //30 10 1 2 3 20 4;
-  BOOST_TEST(*iter3 == 20);
-  BOOST_TEST(*(++iter3) == 4);
-  BOOST_TEST(list1.size() == 7);
+  list1.splice(--list1.end(), list2, iter3);
+  list_comp1 = {30, 10, 1, 2, 3, 20, 4};
+  BOOST_TEST(list1 == list_comp1);
   BOOST_TEST(list2.empty());
+  BOOST_TEST(*iter3 == 20);
 
   for (size_t i = 1; i <= 3; i++)
   {
     list2.push_back(i * 100);
   }
-  list2.splice(--list2.end(), list1, iter3); // 30 10 1 2 3 4; 100 200 4 300
-  BOOST_TEST(list1.back() == 20);
+  iter3 = --list1.end();
+  list2.splice(--list2.end(), list1, iter3);
+  list_comp1.pop_back();
+  list_comp2 = {100, 200, 4, 300};
+  BOOST_TEST(list1 == list_comp1);
+  BOOST_TEST(list2 == list_comp2);
   BOOST_TEST(*(++iter3) == 300);
-  BOOST_TEST(list1.size() == 6);
-  BOOST_TEST(list2.size() == 4);
 
   list_t list3;
   list_t list2_copy = list2;
@@ -225,6 +228,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
 BOOST_AUTO_TEST_CASE(test_insert)
 {
   using list_t = alymova::List< int >;
+
   list_t list1{1, 2, 3};
   alymova::Iterator< int > it_res = list1.insert(list1.begin(), 10);
   list_t list_comp{10, 1, 2, 3};
@@ -261,6 +265,7 @@ BOOST_AUTO_TEST_CASE(test_insert)
 BOOST_AUTO_TEST_CASE(test_erase)
 {
   using list_t = alymova::List< int >;
+
   list_t list1{1, 2, 3, 4, 5};
   auto it_res = list1.erase(list1.begin());
   BOOST_TEST(list1.front() == 2);
@@ -272,7 +277,7 @@ BOOST_AUTO_TEST_CASE(test_erase)
   BOOST_TEST(b);
 
   it_res = list1.erase(++(list1.begin()));
-  list_t list_comp = {2, 4};
+  list_t list_comp{2, 4};
   BOOST_TEST(list1 == list_comp);
   BOOST_TEST(*it_res == 4);
 
@@ -281,10 +286,10 @@ BOOST_AUTO_TEST_CASE(test_erase)
   b = (it_res == list1.end());
   BOOST_TEST(b);
 }
-
 BOOST_AUTO_TEST_CASE(test_ralational_operators)
 {
   using list_t = alymova::List< int >;
+
   list_t list1;
   list_t list2;
   BOOST_TEST(list1 == list2);
@@ -310,6 +315,7 @@ BOOST_AUTO_TEST_CASE(test_ralational_operators)
 BOOST_AUTO_TEST_CASE(test_reverse)
 {
   using list_t = alymova::List< int >;
+
   list_t list1;
   list_t list_comp = list1;
   list1.reverse();
@@ -342,6 +348,7 @@ struct forEmplace
 BOOST_AUTO_TEST_CASE(test_emplace)
 {
   using list_t = alymova::List< forEmplace< int > >;
+
   list_t list1;
   forEmplace< int > object{1, 2};
   list_t list_comp{1, object};
@@ -372,6 +379,7 @@ bool is_divided_other(const T& one, const T& two)
 BOOST_AUTO_TEST_CASE(test_unique)
 {
   using list_t = alymova::List< int >;
+
   list_t list1;
   list1.unique();
   BOOST_TEST(list1.empty());
@@ -396,6 +404,7 @@ bool is_greater(const T& one, const T& two)
 BOOST_AUTO_TEST_CASE(test_sort)
 {
   using list_t = alymova::List< int >;
+
   list_t list1;
   list1.sort();
   BOOST_TEST(list1.empty());
@@ -421,6 +430,7 @@ BOOST_AUTO_TEST_CASE(test_sort)
 BOOST_AUTO_TEST_CASE(test_merge)
 {
   using list_t = alymova::List< int >;
+
   list_t list1{1, 2, 3, 4};
   list_t list_comp = list1;
   list1.merge(list1);

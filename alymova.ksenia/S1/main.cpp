@@ -12,22 +12,22 @@ int main()
   try
   {
     list_pair_t list;
-    alymova::inputProcess(std::cin, list);
+    inputProcess(std::cin, list);
     if (list.empty())
     {
       std::cout << "0\n";
       return 0;
     }
-    alymova::outputListString(std::cout, list);
+    outputListString(std::cout, list);
     std::cout << "\n";
-    alymova::outputProcess(std::cout, list);
+    outputProcess(std::cout, list);
     list_int_t sums = countSums(list);
     if (sums.empty())
     {
       std::cout << "0\n";
       return 0;
     }
-    alymova::outputListInt(std::cout, sums);
+    outputListInt(std::cout, sums);
     std::cout << "\n";
   }
   catch (const std::exception& e)

@@ -6,11 +6,12 @@
 #include <utility>
 #include <initializer_list>
 #include <algorithm>
+#include "listNode.hpp"
 
 namespace alymova
 {
-  template< typename T >
-  struct ListNode;
+  using namespace detail;
+
   template< typename T >
   struct Iterator;
   template< typename T >
@@ -117,9 +118,6 @@ namespace alymova
   bool operator>=(const List< T >& lhs, const List< T >& rhs) noexcept;
 
   template< typename T >
-  struct EqualNode;
-
-  template< typename T >
   bool operator==(const List< T >& lhs, const List< T >& rhs) noexcept
   {
     if (lhs.size() != rhs.size())
@@ -145,18 +143,15 @@ namespace alymova
   template< typename T >
   bool operator<(const List< T >& lhs, const List< T >& rhs) noexcept
   {
-    if (lhs.size() != rhs.size())
-    {
-      return lhs.size() < rhs.size();
-    }
-    for (auto it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
+    auto it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin();
+    for (; it_lhs != lhs.cend() && it_rhs != rhs.cend(); ++it_lhs, ++it_rhs)
     {
       if ((*it_lhs) != (*it_rhs))
       {
         return (*it_lhs) < (*it_rhs);
       }
     }
-    return false;
+    return (it_lhs == lhs.cend() && it_rhs != rhs.cend());
   }
 
   template< typename T >
@@ -189,8 +184,7 @@ namespace alymova
   {
     for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      const T copy = *it;
-      push_back_value(copy);
+      push_back_value(T(*it));
     }
   }
 
@@ -206,8 +200,7 @@ namespace alymova
   {
     for (size_t i = 0; i < n; i++)
     {
-      const T copy = value;
-      push_back_value(copy);
+      push_back_value(T(value));
     }
   }
 
@@ -216,11 +209,9 @@ namespace alymova
   List< T >::List(InputIterator first, InputIterator last):
     List()
   {
-    while (first != last)
+    for(; first != last; ++first)
     {
-      const T copy = *first;
-      push_back_value(copy);
-      first++;
+      push_back_value(T(*first));
     }
   }
 
@@ -230,8 +221,7 @@ namespace alymova
   {
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      const T copy = *it;
-      push_back_value(copy);
+      push_back_value(T(*it));
     }
   }
 
@@ -343,23 +333,20 @@ namespace alymova
   size_t List< T >::size() const noexcept
   {
     size_t size = 0;
-    auto it = begin();
-    while (it != end())
+    for (auto it = begin(); it != end(); ++it)
     {
-      ++it;
       ++size;
     }
     return size;
   }
 
-  template <typename T >
+  template< typename T >
   void List< T >::assign(size_t n, const T& value)
   {
     clear();
     for (size_t i = 0; i < n; ++i)
     {
-      const T copy = value;
-      push_back_value(copy);
+      push_back_value(T(value));
     }
   }
 
@@ -370,8 +357,7 @@ namespace alymova
     clear();
     for (; first != last; ++first)
     {
-      const T copy = *first;
-      push_back_value(copy);
+      push_back_value(T(*first));
     }
   }
 
@@ -381,8 +367,7 @@ namespace alymova
     clear();
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      const T copy = *it;
-      push_back_value(copy);
+      push_back_value(T(*it));
     }
   }
 
@@ -453,18 +438,17 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, const T& value)
   {
-    T copy = value;
     if (position == begin())
     {
-      push_front(copy);
+      push_front(T(value));
     }
     else if(position == end())
     {
-      push_back(copy);
+      push_back(T(value));
     }
     else
     {
-      auto node_new = new ListNode< T >{copy, nullptr, nullptr};
+      auto node_new = new ListNode< T >{T(value), nullptr, nullptr};
       ListNode< T >* node_now = position.node_;
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
@@ -804,9 +788,9 @@ namespace alymova
   }
 
   template< typename T >
-  void List< T >::push_back_value(const T value)
+  void List< T >::push_back_value(T value)
   {
-    auto node = new ListNode< T >{value, nullptr, nullptr};
+    auto node = new ListNode< T >{std::move(value), nullptr, nullptr};
     if (empty())
     {
       push_single(node);
