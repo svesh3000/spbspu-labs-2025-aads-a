@@ -7,8 +7,8 @@
 
 namespace
 {
-  using ullList = demehin::List< unsigned long long >;
-  using ListOfPairs = demehin::List< std::pair< std::string, ullList > >;
+  using ListOfUll = demehin::List< unsigned long long >;
+  using ListOfPairs = demehin::List< std::pair< std::string, ListOfUll > >;
 
   size_t defineMaxSize(const ListOfPairs& pairsList)
   {
@@ -20,12 +20,12 @@ namespace
     return max_size;
   }
 
-  unsigned long long calculateSum(const ullList& nums)
+  unsigned long long calculateSum(const ListOfUll& nums)
   {
     unsigned long long sum = 0;
     for (auto it = nums.begin(); it != nums.end(); it++)
     {
-      sum = demehin::getCheckedSum(sum, *it);
+      sum = demehin::sumChecked(sum, *it);
     }
 
     return sum;
@@ -41,9 +41,9 @@ namespace
     }
   }
 
-  ullList formNumLst(ListOfPairs& pairsList)
+  ListOfUll formNumLst(const ListOfPairs& pairsList)
   {
-    ullList numsList;
+    ListOfUll numsList;
     for (auto it = pairsList.begin(); it != pairsList.end(); it++)
     {
       if (!it->second.empty())
@@ -55,7 +55,7 @@ namespace
     return numsList;
   }
 
-  void printNums(std::ostream& out, const ullList& numsList)
+  void printNums(std::ostream& out, const ListOfUll& numsList)
   {
     out << numsList.front();
     for (auto it = ++numsList.begin(); it != numsList.end(); it++)
@@ -64,20 +64,21 @@ namespace
     }
   }
 
-  void printValues(std::ostream& out, ListOfPairs& pairsList)
+  void printValues(std::ostream& out, const ListOfPairs& pairsList)
   {
-    size_t max_size = defineMaxSize(pairsList);
+    ListOfPairs lstCpy(pairsList);
+    size_t max_size = defineMaxSize(lstCpy);
     if (max_size == 0)
     {
       out << "0";
       return;
     }
 
-    ullList sumList;
+    ListOfUll sumList;
 
     for (size_t i = 0; i < max_size; i++)
     {
-      ullList numsList = formNumLst(pairsList);
+      ListOfUll numsList = formNumLst(lstCpy);
       if (!numsList.empty())
       {
         printNums(out, numsList);
@@ -93,7 +94,7 @@ namespace
     std::string nodeName;
     while (std::cin >> nodeName)
     {
-      ullList numsList;
+      ListOfUll numsList;
       unsigned long long num;
       while (in >> num)
       {

@@ -244,14 +244,10 @@ namespace demehin
 
   template< typename T >
   List< T >::List(List< T >&& rhs):
-    fake_(rhs.fake_),
-    tail_(rhs.tail_),
-    size_(rhs.size_)
-  {
-    std::exchange(rhs.fake_, nullptr);
-    std::exchange(rhs.tail_, nullptr);
-    std::exchange(rhs.size_, 0);
-  }
+    fake_(std::exchange(rhs.fake_, nullptr)),
+    tail_(std::exchange(rhs.tail_, nullptr)),
+    size_(std::exchange(rhs.size_, 0))
+  {}
 
   template< typename T >
   typename List< T >::Iter List< T >::begin() const noexcept
@@ -431,9 +427,9 @@ namespace demehin
     }
 
     size_ += other.size();
-    std::exchange(other.size_, 0);
-    std::exchange(other.fake_, nullptr);
-    std::exchange(other.tail_, nullptr);
+    other.size_ = 0;
+    other.fake_ = nullptr;
+    other.tail_ = nullptr;
   }
 
   template< typename T >

@@ -6,8 +6,9 @@
 namespace demehin
 {
   template< typename T >
-  T getCheckedSum(const T& sum, const T& summand)
+  T sumChecked(const T& sum, const T& summand)
   {
+    static_assert(std::is_integral< T >::value);
     T max = std::numeric_limits< T >::max();
     if (sum > max - summand)
     {
