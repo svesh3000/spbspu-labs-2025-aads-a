@@ -43,7 +43,7 @@ namespace
         std::advance(nit, i);
         sum = checkSum(sum, *nit);
       }
-      listSum.pushBack(sum);
+      listSum.push_back(sum);
     }
     return listSum;
   }
@@ -110,10 +110,10 @@ bocharov::list bocharov::createList(std::istream & input)
       {
         throw std::logic_error("Incorrect number");
       }
-      numbers.pushBack(number);
+      numbers.push_back(number);
     }
     input.clear();
-    list.pushBack(pair(name, numbers));
+    list.push_back(pair(name, numbers));
   }
   return list;
 }
