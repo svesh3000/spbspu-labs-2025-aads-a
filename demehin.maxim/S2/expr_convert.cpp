@@ -4,11 +4,13 @@
 
 namespace
 {
+  using lli = long long int;
+
   bool isNumber(const std::string& str)
   {
     try
     {
-      std::stoi(str);
+      std::stoll(str);
       return true;
     }
     catch(...)
@@ -22,7 +24,7 @@ namespace
     return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
-  int getOpPriority(const std::string& op)
+  lli  getOpPriority(const std::string& op)
   {
     if (op == "+" || op == "-")
     {
@@ -35,7 +37,7 @@ namespace
     return 0;
   }
 
-  int performOperation(int op1, int op2, const std::string& operation)
+  lli performOperation(lli op1, lli op2, const std::string& operation)
   {
     if (operation == "+")
     {
@@ -134,9 +136,9 @@ void demehin::convertStack(ExprsStack& infStack, ExprsStack& postStack)
   }
 }
 
-int demehin::calculateExpr(const ExprQueue& expr)
+lli demehin::calculateExpr(const ExprQueue& expr)
 {
-  Stack<int> stack;
+  Stack< lli > stack;
   ExprQueue exprCpy(expr);
   while (!exprCpy.empty())
   {
@@ -145,7 +147,7 @@ int demehin::calculateExpr(const ExprQueue& expr)
 
     if (isNumber(token))
     {
-      stack.push(std::stoi(token));
+      stack.push(std::stoll(token));
     }
     else
     {
@@ -153,12 +155,12 @@ int demehin::calculateExpr(const ExprQueue& expr)
       {
         throw std::logic_error("not enough operands");
       }
-      int op1 = stack.top();
+      lli op1 = stack.top();
       stack.pop();
-      int op2 = stack.top();
+      lli op2 = stack.top();
       stack.pop();
 
-      int result = performOperation(op2, op1, token);
+      lli result = performOperation(op2, op1, token);
       stack.push(result);
     }
   }
@@ -166,7 +168,7 @@ int demehin::calculateExpr(const ExprQueue& expr)
   return stack.top();
 }
 
-void demehin::getExprsValues(ExprsStack postStack, Stack<int>& values)
+void demehin::getExprsValues(ExprsStack postStack, Stack< lli >& values)
 {
   while (!postStack.empty())
   {

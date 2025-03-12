@@ -58,7 +58,7 @@ namespace
     }
   }
 
-  void printValues(std::ostream& out, demehin::Stack< int > stack)
+  void printValues(std::ostream& out, demehin::Stack< long long int  > stack)
   {
     if (stack.empty())
     {
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  demehin::Stack< int > res;
+  demehin::Stack< long long int > res;
   try
   {
     demehin::getExprsValues(postExprsStack, res);
