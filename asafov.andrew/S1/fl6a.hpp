@@ -86,7 +86,7 @@ public:
   {
     return const_iterator(nullptr, tail_);
   }
-  
+
   bool empty() const
   {
     return !head_;
@@ -95,7 +95,7 @@ public:
   {
     return size_;
   }
-  
+
   void pop_front()
   {
     if (head_ == nullptr)
@@ -116,7 +116,7 @@ public:
     delete temp;
     size_--;
   }
-  
+
   void push_back(const T& value)
   {
     Node* new_node = new Node(value);
