@@ -72,9 +72,6 @@ namespace zholobov {
     FwdListNode< value_type >* head_;
     FwdListNode< value_type >* tail_;
     size_t size_;
-
-    friend class CircularFwdListIterator< T >;
-    friend class CircularFwdListConstIterator< T >;
   };
 }
 

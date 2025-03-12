@@ -311,11 +311,8 @@ BOOST_AUTO_TEST_CASE(splice_after)
     zholobov::CircularFwdList< int > list1{1, 2, 3};
     zholobov::CircularFwdList< int > list2{10, 20, 30, 40, 50, 60};
     auto it_first = list2.cbegin();
-    ++it_first;
-    auto it_last = it_first;
-    ++it_last;
-    ++it_last;
-    ++it_last;
+    auto it_last = ++it_first;
+    std::advance(it_last, 3);
     list1.splice_after(++list1.cbegin(), list2, it_first, it_last);
     BOOST_TEST(to_string(list1) == "1 2 30 40 3");
     BOOST_TEST(to_string(list2) == "10 20 50 60");
@@ -324,11 +321,9 @@ BOOST_AUTO_TEST_CASE(splice_after)
     zholobov::CircularFwdList< int > list1{1, 2, 3};
     zholobov::CircularFwdList< int > list2{10, 20, 30, 40, 50, 60};
     auto pos = list1.cbegin();
-    ++pos;
-    ++pos;
+    std::advance(pos, 2);
     auto it_first = list2.cbegin();
-    ++it_first;
-    ++it_first;
+    std::advance(it_first, 2);
     list1.splice_after(pos, list2, it_first, list2.cend());
     BOOST_TEST(to_string(list1) == "1 2 3 40 50 60");
     BOOST_TEST(to_string(list2) == "10 20 30");

@@ -34,14 +34,14 @@ int main()
     zholobov::CircularFwdList< std::pair< IntList::const_iterator, IntList::const_iterator > > iter_list;
     if (!list.empty()) {
       bool first = true;
-      for (auto it = list.begin(); it != list.end(); ++it) {
+      for (const auto& elem : list) {
         if (first) {
-          std::cout << it->first;
           first = false;
         } else {
-          std::cout << " " << it->first;
+          std::cout << " ";
         }
-        iter_list.push_back(std::make_pair(it->second.cbegin(), it->second.cend()));
+        std::cout << elem.first;
+        iter_list.push_back(std::make_pair(elem.second.cbegin(), elem.second.cend()));
       }
       std::cout << "\n";
     }
@@ -51,16 +51,16 @@ int main()
       is_done_printing = true;
       list_elem_type sum = 0;
       bool first = true;
-      for (auto it = iter_list.begin(); it != iter_list.end(); ++it) {
-        if (it->first != it->second) {
-          list_elem_type val = *(it->first);
+      for (auto& elem : iter_list) {
+        if (elem.first != elem.second) {
+          list_elem_type val = *(elem.first);
           if (first) {
-            std::cout << val;
             first = false;
           } else {
-            std::cout << " " << val;
+            std::cout << " ";
           }
-          ++it->first;
+          std::cout << val;
+          ++elem.first;
           is_done_printing = false;
           if (sum <= std::numeric_limits< list_elem_type >::max() - val) {
             sum += val;
