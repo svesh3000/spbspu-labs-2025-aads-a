@@ -19,7 +19,6 @@ namespace kiselev
     using pointer = std::conditional_t< IsConst, const T*, T* >;
 
     ListIterator(): node_(nullptr) {}
-    ListIterator(Node< T >* node): node_(node) {}
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
     ListIterator(const ListIterator< T, OtherIsConst >& other): node_(other.node_) {}
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
@@ -39,6 +38,7 @@ namespace kiselev
 
   private:
     Node< T >* node_;
+    explicit ListIterator(Node< T >* node): node_(node) {}
   };
 
   template< typename T, bool IsConst >

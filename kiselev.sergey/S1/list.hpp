@@ -88,13 +88,11 @@ namespace kiselev
     void splice(ConstIterator pos, List< T >&&, ConstIterator first, ConstIterator last) noexcept;
     void reverse() noexcept;
 
-
   private:
 
     Node< T >* head_;
     Node< T >* end_;
     size_t size_;
-
   };
 
   template< typename T >
@@ -508,8 +506,6 @@ namespace kiselev
       pos.node_->prev_ = lastNode;
       lastNode->next_ = pos.node_;
     }
-
-
   }
 
   template< typename T >
@@ -638,7 +634,7 @@ namespace kiselev
     Node< T >* node = head_;
     head_ = end_->prev_;
     end_->prev_ = node;
-    ConstIterator it = head_;
+    ConstIterator it(head_);
     for (; it != cend(); ++it)
     {
       node = it.node_->next_;

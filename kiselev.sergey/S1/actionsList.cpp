@@ -9,12 +9,12 @@ namespace
     size_t max = 0;
     for (auto begin = list.cbegin(); begin != list.cend(); ++begin)
     {
-      max = std::max(max, begin->second.size());
+      max = begin->second.size() == 0 ? max : std::max(max, begin->second.size());
     }
     return max;
   }
 
-  unsigned long long checkSum(unsigned long long sum, unsigned long long number)
+  unsigned long long checkedSum(unsigned long long sum, unsigned long long number)
   {
     const unsigned long long max = std::numeric_limits< unsigned long long >::max();
     if (max - number < sum)
@@ -25,7 +25,7 @@ namespace
     return sum;
   }
 
-  kiselev::numberList calcucationSum(const kiselev::list& list)
+  kiselev::numberList calcucateSum(const kiselev::list& list)
   {
     auto it = list.cbegin();
     kiselev::numberList listSum;
@@ -41,7 +41,7 @@ namespace
           continue;
         }
         std::advance(nit, i);
-        sum = checkSum(sum, *nit);
+        sum = checkedSum(sum, *nit);
       }
       listSum.pushBack(sum);
     }
@@ -130,7 +130,7 @@ std::ostream& kiselev::output(std::ostream& output, const list& list)
     return output << "0\n";
   }
   outputNumbers(output, list);
-  numberList sum = calcucationSum(list);
+  numberList sum = calcucateSum(list);
   outputSum(output, sum) << "\n";
   return output;
 }
