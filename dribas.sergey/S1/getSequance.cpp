@@ -5,15 +5,15 @@
 #include "list.hpp"
 #include "constIterator.hpp"
 
-dribas::List< std::pair< std::string, dribas::List< int > > > dribas::getSequance(std::istream& input) {
-  List< std::pair< std::string, List< int > > > allSequance;
+dribas::List< std::pair< std::string, dribas::List< unsigned long long > > > dribas::getSequance(std::istream& input, bool& overflow) {
+  List< std::pair< std::string, List< unsigned long long > > > allSequance;
   std::string sequance;
   while (input >> sequance) {
-    List< int > numbers{};
+    List< unsigned long long > numbers{};
     unsigned long long number = 0;
     while (input >> number) {
       if (number > static_cast< unsigned long long >(std::numeric_limits< int >::max())) {
-        throw std::overflow_error("OverFlow!");
+        overflow = 1;
       }
       numbers.push_back(number);
     }

@@ -7,7 +7,7 @@
 
 namespace dribas
 {
-  List< std::pair< std::string, List< int > > > getSequance(std::istream&);
+  List< std::pair< std::string, List< unsigned long long > > > getSequance(std::istream&, bool&);
 }
 
 #endif

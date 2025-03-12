@@ -1,8 +1,9 @@
 #include "outSequance.hpp"
 #include <cstddef>
 #include <iostream>
+#include <limits>
 
-void dribas::getSequanceName(std::ostream& out, const List< std::pair< std::string, List< int > > >& sequance)
+void dribas::getSequanceName(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance)
 {
   for (size_t i = 0; i < sequance.size(); i++) {
     if (i != 0) {
@@ -12,7 +13,7 @@ void dribas::getSequanceName(std::ostream& out, const List< std::pair< std::stri
   }
 }
 
-void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< int > > >& sequance)
+void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance)
 {
   size_t maxSize = 0;
   for (size_t i = 0; i < sequance.size(); i++) {
@@ -23,8 +24,9 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
   if (maxSize == 0) {
     out << '0';
   }
-  dribas::List< int > sums;
-  int sum = 0;
+  bool isOverflow = false;
+  dribas::List< unsigned long long > sums;
+  unsigned long long sum = 0;
   for (size_t i = 0; i < maxSize; i++) {
     bool isFirst = true;
     for (size_t j = 0; j < sequance.size(); j++) {
@@ -34,21 +36,26 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
         }
         out << sequance.at(j)->data_.second.at(i)->data_;
         sum += sequance.at(j)->data_.second.at(i)->data_;
+        if (sequance.at(j)->data_.second.at(i)->data_ > std::numeric_limits< int >::max()) {
+          isOverflow = true;
+        }
         isFirst = false;
       }
     }
-    out << '\n';
     sums.push_back(sum);
     sum = 0;
   }
   bool isFirst = true;
-  for (size_t i = 0; i < sums.size(); i++) {
-    if (sums.at(i)) {
-      if (!isFirst) {
-        out << " ";
+  if (!isOverflow) {
+    out << '\n';
+    for (size_t i = 0; i < sums.size(); i++) {
+      if (sums.at(i)) {
+        if (!isFirst) {
+          out << " ";
+        }
+        out << sums.at(i)->data_;
+        isFirst = false;
       }
-      out << sums.at(i)->data_;
-      isFirst = false;
     }
   }
 }
