@@ -73,7 +73,7 @@ namespace
     }
   }
 
-  void printExprs(ExprsStack stack)
+  /*void printExprs(ExprsStack stack)
   {
     while (!stack.empty())
     {
@@ -85,7 +85,7 @@ namespace
       stack.pop();
       std::cout << "\n";
     }
-  }
+  }*/
 }
 
 int main(int argc, char* argv[])
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     inputExprs(std::cin, infExprsStack);
   }
 
-  printExprs(infExprsStack);
+  //printExprs(infExprsStack);
   ExprsStack postExprsStack;
   try
   {
