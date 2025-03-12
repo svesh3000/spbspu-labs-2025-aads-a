@@ -22,12 +22,12 @@ namespace asafov
       {}
     };
   public:
-    forward_list() noexcept:
+    Forward_list() noexcept:
     head_(nullptr),
     tail_(nullptr)
     {}
 
-    ~forward_list() noexcept
+    ~Forward_list() noexcept
     {
       clear();
     }
