@@ -25,12 +25,16 @@ namespace rychkov
     Variant() = default;
     Variant(const Variant& rhs) = default;
     Variant(Variant&& rhs) = default;
-    template< class T >
-    Variant(T&& value);
     template< class T, class... Args >
-    Variant(in_place_type_t< T >, Args&&... args);
+    explicit Variant(in_place_type_t< T >, Args&&... args);
     template< size_t N, class... Args >
-    Variant(in_place_index_t< N >, Args&&... args);
+    explicit Variant(in_place_index_t< N >, Args&&... args);
+    template< class T,
+          size_t RealTypeId = find_convertible< T, Types... >::value,
+          class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
+          class RealType = variant_alternative_t< RealTypeId, Types... >,
+          class = std::enable_if_t< exactly_once< RealType, Types... > > >
+    Variant(T&& value);
     ~Variant() = default;
 
     Variant& operator=(const Variant& rhs) = default;

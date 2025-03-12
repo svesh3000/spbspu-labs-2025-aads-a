@@ -46,6 +46,8 @@ namespace rychkov
     static_assert(result != sizeof...(Types));
     return result;
   }
+  template< class T, class... Types >
+  constexpr bool exactly_once = find_uniq_type_in_pack< T, Types... >() < sizeof...(Types);
 
   template< class T >
   struct in_place_type_t
@@ -82,7 +84,33 @@ namespace rychkov
     {
       *reinterpret_cast< T* >(lhs) = std::move(*reinterpret_cast< T* >(rhs));
     }
+
+    template< class T >
+    struct ArrConvertChecker
+    {
+      T value[1];
+    };
+    template< class Src, class Dest, class = void >
+    struct is_inarray_constructible: std::false_type
+    {};
+    template< class Src, class Dest >
+    struct is_inarray_constructible< Src, Dest, void_t< decltype(ArrConvertChecker< Dest >{{std::declval< Src >()}}) > >: std::true_type
+    {};
+    template< class Src, class Dest >
+    constexpr bool is_inarray_constructible_v = is_inarray_constructible< Src, Dest >::value;
   }
+  template< class T, class U, class... Types >
+  struct find_convertible
+  {
+    static constexpr bool is_convertible = details::is_inarray_constructible_v< T, U >;
+    static constexpr size_t value = is_convertible ? 0 : 1 + find_convertible< T, Types... >::value;
+    static_assert(!is_convertible || (find_convertible< T, Types... >::value == sizeof...(Types)));
+  };
+  template< class T, class U >
+  struct find_convertible< T, U >
+  {
+    static constexpr size_t value = !details::is_inarray_constructible_v< T, U >;
+  };
 }
 
 #endif

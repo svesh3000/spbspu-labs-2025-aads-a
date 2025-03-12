@@ -4,13 +4,12 @@
 #include "declaration.hpp"
 
 template< class... Types >
-template< class T >
+template< class T, size_t RealTypeId, class, class RealType, class >
 rychkov::Variant< Types... >::Variant(T&& value):
   details::VariantBaseAlias< Types... >(-1)
 {
-  using real_type = remove_cvref_t< T >;
-  new (this->storage) real_type(std::forward< T >(value));
-  this->active = find_uniq_type_in_pack< remove_cvref_t< T >, Types... >();
+  new (this->storage) RealType(std::forward< T >(value));
+  this->active = RealTypeId;
 }
 template< class... Types >
 template< class T, class... Args >

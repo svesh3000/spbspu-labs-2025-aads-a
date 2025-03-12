@@ -1,3 +1,4 @@
+#include <string>
 #include <boost/test/unit_test.hpp>
 #include "variant.hpp"
 
@@ -37,8 +38,6 @@ struct A
   int constr = 0;
 };
 
-//template class rychkov::Variant< A, int, char >;
-
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
 
 BOOST_AUTO_TEST_CASE(print_info_test)
@@ -46,7 +45,7 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   rychkov::Variant< A, int32_t, char > variant;
   *rychkov::get_if< A >(&variant) = A();
   rychkov::Variant< A, int32_t, char, A > variant2{rychkov::in_place_index_t< 3 >()};
-  rychkov::Variant< A, int32_t, char > variant3 = {rychkov::in_place_type_t< A >()};
+  rychkov::Variant< A, int32_t, char > variant3{rychkov::in_place_type_t< A >()};
   variant3 = variant;
   variant3 = std::move(variant);
   variant3 = 934;
@@ -59,6 +58,11 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   variant5.emplace< A >();
   variant5.emplace< 2 >('!');
   std::cout << rychkov::get< char >(variant5) << '\n';
+  rychkov::Variant< int32_t, A, char > variant6(72);
+  rychkov::Variant< int32_t, A, char > variant7(variant6);
+  std::cout << rychkov::get< int >(variant7) << '\n';
+  rychkov::Variant< char, std::string > variant8 = "works";
+  std::cout << rychkov::get< std::string >(variant8) << '\n';
 }
 
 BOOST_AUTO_TEST_SUITE_END()

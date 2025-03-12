@@ -11,20 +11,12 @@ class rychkov::bad_variant_access: public std::exception
 template< class T, class... Types >
 T* rychkov::get_if(Variant< Types... >* variant) noexcept
 {
-  if (variant->index() == find_uniq_type_in_pack< T, Types... >())
-  {
-    return variant->template get< T >();
-  }
-  return nullptr;
+  return get_if< find_uniq_type_in_pack< T, Types... >() >(variant);
 }
 template< class T, class... Types >
 const T* rychkov::get_if(const Variant< Types... >* variant) noexcept
 {
-  if (variant->index() == find_uniq_type_in_pack< T, Types... >())
-  {
-    return variant->template get< T >();
-  }
-  return nullptr;
+  return get_if< find_uniq_type_in_pack< T, Types... >() >(variant);
 }
 template< size_t N, class... Types >
 rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(Variant< Types... >* variant) noexcept
@@ -48,22 +40,12 @@ const rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(const Varia
 template< class T, class... Types >
 T& rychkov::get(Variant< Types... >& variant)
 {
-  T* resultPtr = get_if< T >(&variant);
-  if (resultPtr != nullptr)
-  {
-    return *resultPtr;
-  }
-  throw bad_variant_access();
+  return get< find_uniq_type_in_pack< T, Types... >() >(variant);
 }
 template< class T, class... Types >
 const T& rychkov::get(const Variant< Types... >& variant)
 {
-  T* resultPtr = get_if< T >(&variant);
-  if (resultPtr != nullptr)
-  {
-    return *resultPtr;
-  }
-  throw bad_variant_access();
+  return get< find_uniq_type_in_pack< T, Types... >() >(variant);
 }
 template< class T, class... Types >
 T&& rychkov::get(Variant< Types... >&& variant)
@@ -109,7 +91,7 @@ const rychkov::variant_alternative_t< N, Types... >&& rychkov::get(const Variant
 template< class... Types >
 size_t rychkov::Variant< Types... >::index() const noexcept
 {
-  return this->active;
+  return this->valueless() ? variant_npos : this->active;
 }
 template< class... Types >
 bool rychkov::Variant< Types... >::valueless_by_exception() const noexcept
