@@ -27,6 +27,19 @@ BOOST_AUTO_TEST_CASE(test_copy_operator)
   BOOST_TEST(list1.back() == list2.back());
 }
 
+BOOST_AUTO_TEST_CASE(test_move_operator)
+{
+  List< int > list1;
+  list1.push_back(1);
+  list1.push_back(2);
+  list1.push_back(3);
+  size_t originalSize = list1.size();
+  List< int > list2;
+  list2 = std::move(list1);
+  BOOST_TEST(list2.size() == originalSize);
+  BOOST_TEST(list1.empty());
+}
+
 BOOST_AUTO_TEST_CASE(test_fill_constructor)
 {
   List< int > list(5, 27);

@@ -53,7 +53,9 @@ namespace krylov
     friend class Iterator< T >;
     List();
     List(const List< T >& other);
+    List(List< T >&& other) noexcept;
     List< T >& operator=(const List< T >& other);
+    List< T >& operator=(List< T >&& other) noexcept;
     List(size_t n, const T& value);
     ~List();
     Iterator< T > begin() const;
@@ -128,6 +130,17 @@ namespace krylov
     }
   }
 
+  template <typename T>
+  List<T>::List(List<T>&& other) noexcept:
+    head_(other.head_),
+    tail_(other.tail_),
+    size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
+  }
+
   template< typename T >
   void List< T >::assign(size_t n, const T& value) noexcept
   {
@@ -153,6 +166,23 @@ namespace krylov
       current = current->next_;
     }
     swap(temp);
+    return *this;
+  }
+
+  template < typename T >
+  List< T >& List< T >::operator=(List< T >&& other) noexcept
+  {
+    if (this == &other)
+    {
+      return *this;
+    }
+    clear();
+    head_ = other.head_;
+    tail_ = other.tail_;
+    size_ = other.size_;
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
     return *this;
   }
 
