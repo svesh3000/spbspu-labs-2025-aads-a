@@ -4,7 +4,7 @@
 namespace asafov
 {
   template <typename T>
-  class forward_list
+  class Forward_list
   {
     struct Node
     {
@@ -143,7 +143,7 @@ namespace asafov
       {
         pop_front();
       }
-      while (!empty())
+      while (!empty());
     }
 
     void push_back(const T& value)
