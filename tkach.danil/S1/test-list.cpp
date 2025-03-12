@@ -440,6 +440,41 @@ BOOST_AUTO_TEST_CASE(list_range_constructor_test)
   BOOST_TEST(list2.size() == 2);
 }
 
+BOOST_AUTO_TEST_CASE(list_insert_after_test)
+{
+  List< size_t > list{1, 3, 5};
+  auto it = list.insert_after(list.cbegin(), 9);
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 9 3 5");
+  BOOST_TEST(list.size() == 4);
+  BOOST_TEST(*it == 9);
+}
+
+BOOST_AUTO_TEST_CASE(list_insert_after_tail_test)
+{
+  List< size_t > list{1, 3, 5};
+  auto it = list.insert_after(std::next(list.cbegin(), 2), 9);
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 3 5 9");
+  BOOST_TEST(list.size() == 4);
+  BOOST_TEST(*it == 9);
+}
+
+BOOST_AUTO_TEST_CASE(list_insert_after_lvalue_test)
+{
+  List< size_t > list{1, 3, 5};
+  size_t temp = 9;
+  auto it = list.insert_after(list.cbegin(), temp);
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 9 3 5");
+  BOOST_TEST(list.size() == 4);
+  BOOST_TEST(temp == 9);
+  BOOST_TEST(*it == 9);
+}
+
 BOOST_AUTO_TEST_CASE(list_range_constructor_first_equal_last_test)
 {
   List< size_t > list{1, 2, 3};
@@ -448,6 +483,98 @@ BOOST_AUTO_TEST_CASE(list_range_constructor_first_equal_last_test)
   outputList(out, list2);
   BOOST_TEST(out.str() == "");
   BOOST_TEST(list2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(list_insert_after_count_test)
+{
+  List< size_t > list{1, 3, 5};
+  size_t temp = 3;
+  auto it = list.insert_after(list.cbegin(), temp, 9);
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 9 9 9 3 5");
+  BOOST_TEST(list.size() == 6);
+  BOOST_TEST(*(it++) == 9);
+  BOOST_TEST(*it == 3);
+}
+
+BOOST_AUTO_TEST_CASE(list_insert_after_first_last_test)
+{
+  List< size_t > list{1, 3, 5};
+  List< size_t > list2{2, 4, 6, 8};
+  auto it = list.insert_after(list.cbegin(), list2.begin(), std::next(list2.begin(), 3));
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 2 4 6 3 5");
+  BOOST_TEST(list.size() == 6);
+  BOOST_TEST(*(it++) == 6);
+  BOOST_TEST(*it == 3);
+}
+
+BOOST_AUTO_TEST_CASE(list_insert_after_init_list_test)
+{
+  List< size_t > list{1, 3, 5};
+  auto it = list.insert_after(list.cbegin(), {2, 4, 6, 8});
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "1 2 4 6 8 3 5");
+  BOOST_TEST(list.size() == 7);
+  BOOST_TEST(*(it++) == 8);
+  BOOST_TEST(*it == 3);
+}
+
+BOOST_AUTO_TEST_CASE(list_assign_first_last_test)
+{
+  List< size_t > list{1, 3, 5};
+  List< size_t > list2{2, 4, 6, 8};
+  list.assign(list2.begin(), std::next(list2.begin(), 3));
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "2 4 6");
+  BOOST_TEST(list.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(list_assign_init_list_test)
+{
+  List< size_t > list{1, 3, 5};
+  list.assign({2, 4, 6, 8});
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "2 4 6 8");
+  BOOST_TEST(list.size() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(list_equal_lvalue_operator_test)
+{
+  List< size_t > list{1, 3, 5};
+  List< size_t > list2{2, 4, 6, 8};
+  list = list2;
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "2 4 6 8");
+  BOOST_TEST(list.size() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(list_equal_rvalue_operator_test)
+{
+  List< size_t > list{1, 3, 5};
+  List< size_t > list2{2, 4, 6, 8};
+  list = std::move(list2);
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "2 4 6 8");
+  BOOST_TEST(list.size() == 4);
+  BOOST_TEST(list2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(list_equal_rvalue_operator_init_list_test)
+{
+  List< size_t > list{1, 3, 5};
+  list = {2, 4, 6, 8};
+  std::ostringstream out;
+  outputList(out, list);
+  BOOST_TEST(out.str() == "2 4 6 8");
+  BOOST_TEST(list.size() == 4);
 }
 
 BOOST_AUTO_TEST_CASE(list_begin_end_test)

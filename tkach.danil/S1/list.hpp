@@ -22,6 +22,9 @@ namespace tkach
     List(InputIt first, InputIt last);
     List(std::initializer_list< T > in_list);
     ~List();
+    List< T >& operator=(const List< T >& other);
+    List< T >& operator=(List< T >&& other) noexcept;
+    List< T >& operator=(std::initializer_list< T > in_list);
     Iterator< T > begin() noexcept;
     Citerator< T > cbegin() const noexcept;
     Iterator< T > end() noexcept;
@@ -45,8 +48,17 @@ namespace tkach
     template< class UnaryPredicate>
     void removeIf(UnaryPredicate p);
     void assign(size_t count, const T& value);
-    Iterator< T > erase_after(Citerator <T> pos);
-    Iterator< T > erase_after(Citerator <T> first, Citerator <T> last);
+    template< class InputIt >
+    void assign(InputIt first, InputIt last);
+    void assign(std::initializer_list< T > in_list);
+    template< class Q>
+    Iterator< T > insert_after(Citerator < T > pos, Q&& value);
+    Iterator< T > insert_after(Citerator < T > pos, size_t count, const T & data);
+    template< class InputIt>
+    Iterator< T > insert_after(Citerator < T > pos, InputIt first, InputIt last);
+    Iterator< T > insert_after(Citerator < T > pos, std::initializer_list< T > in_list);
+    Iterator< T > erase_after(Citerator < T > pos);
+    Iterator< T > erase_after(Citerator < T > first, Citerator < T > last);
     void clear();
     void swap(List< T >& other) noexcept;
   private:
@@ -197,6 +209,38 @@ namespace tkach
   List< T >::List(const List< T >& other):
     List(getList(other))
   {}
+
+  template< typename T >
+  List< T >& List< T >::operator=(const List< T >& other)
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    List< T > temp(other);
+    swap(temp);
+    return *this;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(List< T >&& other) noexcept
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    List< T > temp(std::move(other));
+    swap(temp);
+    return *this;
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(std::initializer_list< T > in_list)
+  {
+    List< T > temp(std::move(in_list));
+    swap(temp);
+    return *this;
+  }
 
   template< class T >
   template< class Q>
@@ -427,7 +471,71 @@ namespace tkach
   }
 
   template< typename T >
-  Iterator< T > List< T >::erase_after(Citerator < T > first, Citerator < T > last)
+  template< class Q>
+  Iterator< T > List< T >::insert_after(Citerator< T > pos, Q&& value)
+  {
+    if (empty())
+    {
+      return Iterator< T >();
+    }
+    Node< T >* temp = pos.node_;
+    Node< T >* new_node = new Node< T >{std::forward< Q >(value), temp->next_};
+    if (temp == tail_)
+    {
+      tail_ = new_node;
+    }
+    temp->next_ = new_node;
+    size_++;
+    return Iterator< T >(new_node);
+  }
+
+  template< typename T >
+  template< class InputIt>
+  Iterator< T > List< T >::insert_after(Citerator < T > pos, InputIt first, InputIt last)
+  {
+    spliceAfter(pos, List< T >(first, last));
+    size_t splice_size = std::distance(first, last);
+    for (size_t i = 0; i < splice_size; ++i)
+    {
+      ++pos;
+    }
+    return Iterator< T >(pos.node_);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert_after(Citerator < T > pos, std::initializer_list< T > in_list)
+  {
+    return insert_after(pos, in_list.begin(), in_list.end());
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insert_after(Citerator< T > pos, size_t count, const T & data)
+  {
+    spliceAfter(pos, List< T >(count, data));
+    for (size_t i = 0; i < count; ++i)
+    {
+      ++pos;
+    }
+    return Iterator< T >(pos.node_);
+  }
+
+  template< typename T >
+  template< class InputIt >
+  void List< T >::assign(InputIt first, InputIt last)
+  {
+    List< T > temp(first, last);
+    swap(temp);
+  }
+
+  template< typename T >
+  void List< T >::assign(std::initializer_list< T > in_list)
+  {
+    List< T > temp(in_list);
+    swap(temp);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase_after(Citerator< T > first, Citerator< T > last)
   {
     while (std::next(first) != last)
     {
