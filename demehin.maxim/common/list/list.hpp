@@ -4,19 +4,6 @@
 #include "iterator.hpp"
 #include "node.hpp"
 
-namespace
-{
-  template< typename T >
-  void setOtherPos(demehin::ListIterator< T, true >& otherPos, const demehin::ListIterator< T, true >& begin,
-    const demehin::ListIterator< T, true >& pos)
-  {
-    for (auto it = begin; it != pos; ++it)
-    {
-      otherPos++;
-    }
-  }
-}
-
 namespace demehin
 {
   template< typename T >
@@ -646,16 +633,25 @@ namespace demehin
       return Iter(pos.getNode());
     }
 
-    List< T > temp(*this);
-    cIter tempPos = temp.cbegin();
-    setOtherPos(tempPos, cbegin(), pos);
-    Iter toreturn = temp.insert(tempPos, value);
-    for (size_t i = 1; i < count; i++)
+    Iter result = insert(pos, value);
+    size_t inserted = 0;
+    try
     {
-      temp.insert(tempPos, value);
+      for (size_t i = 1; i < count; i++)
+      {
+        insert(pos, value);
+        inserted++;
+      }
     }
-    swap(temp);
-    return toreturn;
+    catch (const std::bad_alloc&)
+    {
+      while (inserted-- > 0)
+      {
+        erase(--pos);
+      }
+      throw;
+    }
+    return result;
   }
 
   template< typename T >
@@ -667,16 +663,25 @@ namespace demehin
       return Iter(pos.getNode());
     }
 
-    List< T > temp(*this);
-    cIter tempPos = temp.cbegin();
-    setOtherPos(tempPos, cbegin(), pos);
-    Iter toreturn;
-    for (auto it = first; it != last; it++)
+    Iter result = insert(pos, *first);
+    size_t inserted = 1;
+    try
     {
-      toreturn = temp.insert(tempPos, *it);
+      for (++first; first != last; first++)
+      {
+        insert(pos, *first);
+        inserted++;
+      }
     }
-    swap(temp);
-    return toreturn;
+    catch (const std::bad_alloc&)
+    {
+      while (inserted-- > 0)
+      {
+        erase(--pos);
+      }
+      throw;
+    }
+    return result;
   }
 
   template< typename T >
