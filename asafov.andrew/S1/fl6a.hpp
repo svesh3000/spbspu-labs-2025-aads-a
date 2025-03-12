@@ -19,7 +19,7 @@ public:
   head_(nullptr),
   tail_(nullptr)
   {}
-  
+
   class const_iterator
   {
     friend class Forward_list;
