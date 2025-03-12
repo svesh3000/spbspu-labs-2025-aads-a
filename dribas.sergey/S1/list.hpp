@@ -98,7 +98,6 @@ void dribas::List<T>::pop_back()
     }
     size_--;
   }
-
 }
 
 template < class T >
@@ -250,9 +249,9 @@ dribas::List< T >& dribas::List< T >::operator=(const List< T >& other)
 }
 
 template < class T >
-void dribas::List<T>::pop_front() {
+void dribas::List< T >::pop_front() {
   if (size_) {
-    Node<T>* forDelete = head_;
+    Node< T >* forDelete = head_;
     head_ = head_->next_;
     if (head_) {
       head_->prev_ = nullptr;
@@ -282,7 +281,6 @@ dribas::List< T >& dribas::List< T >::operator=(List< T >&& other) noexcept
 template< class T >
 dribas::List< T >::List(List< T >&& rhs) noexcept
 {
-  clear();
   size_ = rhs.size_;
   head_ = rhs.head_;
   tail_ = rhs.tail_;

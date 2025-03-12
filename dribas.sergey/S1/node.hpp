@@ -21,8 +21,8 @@ namespace dribas
 
   Node(T&& data):
     data_(std::move(data)),
-    prev_(nullptr),
-    next_(nullptr)
+    next_(nullptr),
+    prev_(nullptr)
   {}
 
   Node(const T& data):

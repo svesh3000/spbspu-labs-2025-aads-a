@@ -16,29 +16,36 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
 {
   size_t maxSize = 0;
   for (size_t i = 0; i < sequance.size(); i++) {
-    maxSize = std::max(maxSize, sequance.at(i)->data_.second.size());
+    if (sequance.at(i)) {
+      maxSize = std::max(maxSize, sequance.at(i)->data_.second.size());
+    }
   }
   dribas::List< int > sums;
   int sum = 0;
   for (size_t i = 0; i < maxSize; i++) {
+    bool isFirst = true;
     for (size_t j = 0; j < sequance.size(); j++) {
-      try {// ЭТО НЕЛЬЗЯ ТАК ОСТАВЛЯТЬ!!! ОБЯЗАТЕЛЬНО ПЕРЕДЕЛАТЬ!!!
+      if (sequance.at(j) && i < sequance.at(j)->data_.second.size()) {
+        if (!isFirst) {
+          out << " ";
+        }
         out << sequance.at(j)->data_.second.at(i)->data_;
         sum += sequance.at(j)->data_.second.at(i)->data_;
-        if (j < sequance.size() - 1) {
-          out << " * ";
-        }
-      } catch (const std::out_of_range&) {
+        isFirst = false;
       }
     }
     out << '\n';
     sums.push_back(sum);
     sum = 0;
   }
+  bool isFirst = true;
   for (size_t i = 0; i < sums.size(); i++) {
-    out << sums.at(i)->data_;
-    if ((i < sums.size() - 1)) {
-      out << " * ";
+    if (sums.at(i)) {
+      if (!isFirst) {
+        out << " ";
+      }
+      out << sums.at(i)->data_;
+      isFirst = false;
     }
   }
 }
