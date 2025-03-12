@@ -9,13 +9,12 @@
 #include "ConstIteratorFwd.hpp"
 
 namespace gavrilova {
-  
   template< class T >
   class FwdList
   {
   public:
     using Iterator = gavrilova::IteratorFwd< T >;
-    using CIterator = gavrilova::ConstIteratorFwd< T >;  
+    using CIterator = gavrilova::ConstIteratorFwd< T >;
 
     FwdList();
     FwdList(const FwdList& other);
@@ -58,7 +57,7 @@ namespace gavrilova {
     void splice(CIterator pos, FwdList< T >&&, CIterator it) noexcept;
     void splice(CIterator pos, FwdList< T >&, CIterator first, CIterator last) noexcept;
     void splice(CIterator pos, FwdList< T >&&, CIterator first, CIterator last) noexcept;
-    
+
     void reverse();
     void swap(FwdList< T >& other) noexcept;
 
