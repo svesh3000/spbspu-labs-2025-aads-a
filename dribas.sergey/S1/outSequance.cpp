@@ -42,20 +42,23 @@ void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::s
         isFirst = false;
       }
     }
+    if (!(i == maxSize - 1 && isOverflow)) {
+      out << '\n';
+    }
     sums.push_back(sum);
     sum = 0;
   }
+  if (isOverflow) {
+    return;
+  }
   bool isFirst = true;
-  if (!isOverflow) {
-    out << '\n';
-    for (size_t i = 0; i < sums.size(); i++) {
-      if (sums.at(i)) {
-        if (!isFirst) {
-          out << " ";
-        }
-        out << sums.at(i)->data_;
-        isFirst = false;
+  for (size_t i = 0; i < sums.size(); i++) {
+    if (sums.at(i)) {
+      if (!isFirst) {
+        out << " ";
       }
+      out << sums.at(i)->data_;
+      isFirst = false;
     }
   }
 }
