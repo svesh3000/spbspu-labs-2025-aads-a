@@ -17,12 +17,23 @@ class forward_list
 public:
   forward_list() noexcept:
   head_(nullptr),
-  tail_(nullptr)
+  tail_(nullptr),
+  size_(0)
   {}
+
+  ~forward_list()
+  {
+    while (head_ != nullptr)
+    {
+      Node* temp = head_;
+      head_ = head_->next_;
+      delete temp;
+    }
+  }
 
   class const_iterator
   {
-    friend class Forward_list;
+    friend class forward_list;
   public:
     const_iterator():
     current_(nullptr),
