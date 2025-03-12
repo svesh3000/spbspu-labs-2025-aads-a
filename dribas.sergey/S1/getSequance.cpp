@@ -1,20 +1,27 @@
 #include "getSequance.hpp"
 #include <cstddef>
 #include <iostream>
+#include <limits>
 #include "list.hpp"
 #include "constIterator.hpp"
 
 dribas::List< std::pair< std::string, dribas::List< int > > > dribas::getSequance(std::istream& input) {
-    List< std::pair< std::string, List< int > > > allSequance;
-    std::string sequance;
-    while (input >> sequance) {
-      List< int > numbers{};
-      int number = 0;
-      while (input >> number) {
-        numbers.push_back(number);
+  List< std::pair< std::string, List< int > > > allSequance;
+  std::string sequance;
+  while (input >> sequance) {
+    List< int > numbers{};
+    long long int number = 0;
+    while (input >> number) {
+      if (number > std::numeric_limits< int >::max()) {
+        throw std::overflow_error("OverFlow!");
       }
-      allSequance.push_back(std::make_pair(sequance, numbers));
-      input.clear();
+      if (number < std::numeric_limits< int >::min()) {
+        throw std::overflow_error("OverFlow!");
+      }
+      numbers.push_back(number);
     }
-    return allSequance;
+    allSequance.push_back(std::make_pair(sequance, numbers));
+    input.clear();
+  }
+  return allSequance;
 }

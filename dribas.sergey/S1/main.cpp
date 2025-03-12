@@ -5,16 +5,17 @@
 int main()
 {
   dribas::List< std::pair< std::string, dribas::List< int > > > sequance;
-
   try {
     sequance = dribas::getSequance(std::cin);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
     return 1;
   }
-
-  dribas::getSequanceName(std::cout, sequance);
-  std::cout << '\n';
-  dribas::getSequanceNameSum(std::cout, sequance);
-  std::cout << '\n';
+  if (!sequance.empty()) {
+    dribas::getSequanceName(std::cout, sequance);
+    std::cout << '\n';
+    dribas::getSequanceNameSum(std::cout, sequance);
+    std::cout << '\n';
+  }
+  return 0;
 }
