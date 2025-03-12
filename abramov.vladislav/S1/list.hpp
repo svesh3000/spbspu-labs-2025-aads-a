@@ -19,27 +19,27 @@ namespace abramov
   struct List
   {
     List();
+    List(size_t n, T val);
     List(std::initializer_list< T > il);
     List(Iterator< T > begin, Iterator< T > end);
     ~List();
     List< T > &operator=(std::initializer_list< T > il);
-    T &front();
-    const T &front() const;
-    T &back();
-    const T &back() const;
+    T &front() noexcept;
+    const T &front() const noexcept;
+    T &back() noexcept;
+    const T &back() const noexcept;
     void pushBack(const T &data);
     void pushFront(const T &data);
-    void popBack();
-    void popFront();
+    void popBack() noexcept;
+    void popFront() noexcept;
     void swap(List &rhs) noexcept;
     void clear();
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
     Iterator< T > begin() const;
     Iterator< T > end() const;
     ConstIterator< T > cbegin() const;
     ConstIterator< T > cend() const;
-    void fill(Iterator< T > begin, Iterator< T > end, const T &val);
     Iterator< T > find(Iterator< T > begin, Iterator< T > end, const T &val);
     template< class C >
     Iterator< T > find_if(Iterator< T > begin, Iterator< T > end, C condition);
@@ -60,6 +60,25 @@ namespace abramov
     tail_(nullptr),
     size_(0)
   {}
+
+  template< class T >
+  List< T >::List(size_t n, T val):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(n)
+  {
+    try
+    {
+      for (size_t i = 0; i < n; ++i)
+      {
+        pushBack(val);
+      }
+    }
+    catch (const std::bad_alloc &)
+    {
+      clear(head_);
+    }
+  }
 
   template< class T >
   List< T >::List(std::initializer_list < T > il):
@@ -100,25 +119,25 @@ namespace abramov
   }
 
   template< class T >
-  T &List< T >::front()
+  T &List< T >::front() noexcept
   {
     return const_cast< T& >(const_cast< const List< T >* >(this)->front());
   }
 
   template< class T >
-  const T &List< T >::front() const
+  const T &List< T >::front() const noexcept
   {
     return head_->data_;
   }
 
   template< class T >
-  T &List< T >::back()
+  T &List< T >::back() noexcept
   {
     return const_cast< T& >(const_cast< const List< T >* >(this)->back());
   }
 
   template< class T >
-  const T &List< T >::back() const
+  const T &List< T >::back() const noexcept
   {
     return tail_->data_;
   }
@@ -160,7 +179,7 @@ namespace abramov
   }
 
   template< class T >
-  void List< T >::popBack()
+  void List< T >::popBack() noexcept
   {
     if (!empty())
     {
@@ -182,7 +201,7 @@ namespace abramov
   }
 
   template< class T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
     if (!empty())
     {
@@ -224,13 +243,13 @@ namespace abramov
   }
 
   template< class T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< class T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
@@ -257,16 +276,6 @@ namespace abramov
   ConstIterator< T > List< T >::cend() const
   {
     return ConstIterator< T >(nullptr);
-  }
-
-  template< class T >
-  void List< T >::fill(Iterator< T > begin, Iterator< T > end, const T &val)
-  {
-    while (begin != end)
-    {
-      *begin = val;
-      ++begin;
-    }
   }
 
   template< class T >

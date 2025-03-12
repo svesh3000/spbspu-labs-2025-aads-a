@@ -113,17 +113,6 @@ BOOST_AUTO_TEST_CASE(end)
   BOOST_TEST(b);
 }
 
-BOOST_AUTO_TEST_CASE(fill)
-{
-  abramov::List< int > list{ 0, 1, 2 };
-  auto iter1 = list.begin();
-  auto iter2 = list.end();
-  list.fill(iter1, iter2, 3);
-  BOOST_TEST(list.front() == 3);
-  BOOST_TEST(*(++iter1) == 3);
-  BOOST_TEST(list.back() == 3);
-}
-
 BOOST_AUTO_TEST_CASE(find)
 {
   abramov::List< int > list{ 0, 1, 2, 1};
