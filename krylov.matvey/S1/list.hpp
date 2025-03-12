@@ -52,23 +52,23 @@ namespace krylov
   public:
     friend class Iterator< T >;
     List();
+    List(const List< T >& other);
+    List< T >& operator=(const List< T >& other);
     List(size_t n, const T& value);
     ~List();
-    List(const List< T >& other);
     Iterator< T > begin() const;
     Iterator< T > end() const;
     void push_back(const T& value);
     void push_front(const T& value);
-    void pop_back();
-    void pop_front();
+    void pop_back() noexcept;
+    void pop_front() noexcept;
     T& front();
     T& back();
-    bool empty() const;
-    size_t size() const;
-    void clear();
-    void swap(List< T >& other);
-    void assign(size_t n, const T& value);
-
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    void clear() noexcept;
+    void swap(List< T >& other) noexcept;
+    void assign(size_t n, const T& value) noexcept;
   private:
     Node< T >* head_;
     Node< T >* tail_;
@@ -129,27 +129,31 @@ namespace krylov
   }
 
   template< typename T >
-  void List< T >::assign(size_t n, const T& value)
+  void List< T >::assign(size_t n, const T& value) noexcept
   {
-    const size_t originalSize = size();
-    try
+    List< T > temp(n, value);
+    if (temp.head_ != nullptr)
     {
-      for (size_t i = 0; i < n; ++i)
-      {
-        push_back(value);
-      }
-      for (size_t i = 0; i < originalSize; ++i)
-      {
-        pop_front();
-      }
+      swap(temp);
     }
-    catch (const std::bad_alloc& e)
+  }
+
+  template < typename T >
+  List< T >& List< T >::operator=(const List< T >& other)
+  {
+    if (this == &other)
     {
-      for (size_t i = 0; i < size() - originalSize; ++i)
-      {
-        pop_back();
-      }
+      return *this;
     }
+    List< T > temp;
+    Node< T >* current = other.head_;
+    while (current)
+    {
+      temp.push_back(current->data_);
+      current = current->next_;
+    }
+    swap(temp);
+    return *this;
   }
 
   template < typename T >
@@ -281,7 +285,7 @@ namespace krylov
   }
 
   template < typename T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     if (!tail_)
     {
@@ -302,7 +306,7 @@ namespace krylov
   }
 
   template < typename T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     if (!head_)
     {
@@ -343,19 +347,19 @@ namespace krylov
   }
 
   template < typename T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < typename T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
   template < typename T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -364,7 +368,7 @@ namespace krylov
   }
 
   template < typename T >
-  void List< T >::swap(List< T >& other)
+  void List< T >::swap(List< T >& other) noexcept
   {
     std::swap(head_, other.head_);
     std::swap(tail_, other.tail_);
