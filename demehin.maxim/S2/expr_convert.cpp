@@ -19,7 +19,7 @@ namespace
 
   bool isOperator(const std::string& str)
   {
-    return str == "+" || str == "-" || str == "*" || str == "/";
+    return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
   int getOpPriority(const std::string& op)
@@ -28,7 +28,7 @@ namespace
     {
       return 1;
     }
-    if (op == "*" || op == "/")
+    if (op == "*" || op == "/" || op == "%")
     {
       return 2;
     }
@@ -56,6 +56,14 @@ namespace
         throw std::logic_error("division by zero");
       }
       return op1 / op2;
+    }
+    if (operation == "%")
+    {
+      if (op2 == 0)
+      {
+        throw std::logic_error("zero modulation");
+      }
+      return op1 % op2;
     }
     throw std::logic_error("invalid operation");
   }

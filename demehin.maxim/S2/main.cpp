@@ -22,7 +22,7 @@ namespace
         {
           stack.push(exprQueue);
         }
-        break;
+        //break;
       }
 
       std::string token;
