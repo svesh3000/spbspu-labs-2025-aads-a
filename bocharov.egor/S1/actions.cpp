@@ -1,137 +1,123 @@
 #include "actions.hpp"
 #include <limits>
-#include <stdexcept>
+#include <ostream>
 
 namespace
 {
-  size_t searchMax(const bocharov::list & list)
+  unsigned long long checked_sum(unsigned long long a, unsigned long long b)
   {
-    size_t max = 0;
-    for (auto begin = list.cbegin(); begin != list.cend(); ++begin)
+    const unsigned long long max_ull = std::numeric_limits< unsigned long long >::max();
+    if (max_ull - a > b)
     {
-      max = std::max(max, begin->second.size());
+      return a + b;
     }
-    return max;
+    throw std::overflow_error("overflow");
   }
 
-  unsigned long long checkSum(unsigned long long sum, unsigned long long number)
+  void print_list_elements(std::ostream & out, const bocharov::list_t & list) noexcept
   {
-    const unsigned long long max = std::numeric_limits< unsigned long long >::max();
-    if (max - number < sum)
+    if (!list.empty())
     {
-      throw std::overflow_error("Overflow for unsigned long long");
-    }
-    sum += number;
-    return sum;
-  }
-
-  bocharov::numberList calcucationSum(bocharov::list & list)
-  {
-    auto it = list.cbegin();
-    bocharov::numberList listSum;
-    for (size_t i = 0; i < searchMax(list); ++i)
-    {
-      unsigned long long sum = 0;
-      it = list.begin();
-      for (; it != list.cend(); ++it)
+      out << *list.cbegin();
+      for (auto j = ++list.cbegin(); j != list.cend(); ++j)
       {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
-        {
-          continue;
-        }
-        std::advance(nit, i);
-        sum = checkSum(sum, *nit);
+        out << ' ' << *j;
       }
-      listSum.push_back(sum);
     }
-    return listSum;
   }
 
-  std::ostream & outputSum(std::ostream & output, const bocharov::numberList & list)
+  void get_column_elements(bocharov::list_t & list, const bocharov::pairs_list_t & pairs_list, std::size_t border)
   {
-    output << list.front();
-    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
+    bocharov::list_t cur_list = pairs_list.cbegin()->second;
+    if (cur_list.size() > border)
     {
-      output << " " << *it;
-    }
-    return output;
-  }
-
-  std::ostream & outputName(std::ostream & output, const bocharov::list & list)
-  {
-    output << list.front().first;
-    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
-    {
-      output << " " << it->first;
-    }
-    return output;
-  }
-
-  std::ostream & outputNumbers(std::ostream & output, const bocharov::list & list)
-  {
-    auto it = list.cbegin();
-    for (size_t i = 0; i < searchMax(list); ++i)
-    {
-      bool first = true;
-      it = list.cbegin();
-      for (; it != list.cend(); ++it)
+      auto it = cur_list.cbegin();
+      for (std::size_t k = 0; k != border; ++k, ++it)
       {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
-        {
-          continue;
-        }
-        std::advance(nit, i);
-        if (!first)
-        {
-          output << " ";
-        }
-        first = false;
-        output << *nit;
+        list.push_back(*it);
       }
-      output << "\n";
     }
-    return output;
+    for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j)
+    {
+      bocharov::list_t cur_list = j->second;
+      if (cur_list.size() > border)
+      {
+        auto it = cur_list.cbegin();
+        for (std::size_t k = 0; k != border; ++k, ++it)
+        {
+          list.push_back(*it);
+        }
+      }
+    }
+  }
+
+  std::size_t get_cur_sum(const bocharov::pairs_list_t & pairs_list, std::size_t border)
+  {
+    std::size_t result = 0;
+    bocharov::list_t cur_list = pairs_list.cbegin()->second;
+    if (cur_list.size() > border)
+    {
+      auto it = cur_list.cbegin();
+      for (std::size_t k = 0; k != border; ++k, ++it)
+      {
+        result = checked_sum(result, *it);
+      }
+    }
+    for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j)
+    {
+      bocharov::list_t cur_list = j->second;
+      if (cur_list.size() > border)
+      {
+        auto it = cur_list.cbegin();
+        for (std::size_t k = 0; k != border; ++k, ++it)
+        {
+          result = checked_sum(result, *it);
+        }
+      }
+    }
+    return result;
   }
 }
 
-bocharov::list bocharov::createList(std::istream & input)
+std::size_t bocharov::get_max_pairs_list_size(const pairs_list_t & list) noexcept
 {
-  std::string name;
-  list list;
-  while (input >> name)
+  std::size_t maximum = list.cbegin()->second.size();
+  for (auto i = ++list.cbegin(); i != list.cend(); ++i)
   {
-    numberList numbers;
-    unsigned long long number;
-    while (input >> number)
-    {
-      if (!input)
-      {
-        throw std::logic_error("Incorrect number");
-      }
-      numbers.push_back(number);
-    }
-    input.clear();
-    list.push_back(pair(name, numbers));
+    maximum = std::max(maximum, i->second.size());
   }
-  return list;
+  return maximum;
 }
 
-std::ostream & bocharov::output(std::ostream & output, list & list)
+void bocharov::get_lists_sums(list_t & sums, const pairs_list_t & pairs_list)
 {
-  if (list.empty())
+  std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
+  for (std::size_t i = 0; i != max_pairs_list_size; ++i)
   {
-    return output << "0\n";
+    std::size_t cur_sum = get_cur_sum(pairs_list, i);
+    sums.push_back(cur_sum);
   }
-  outputName(output, list) << "\n";
-  if (list.front().second.empty())
-  {
-    return output << "0\n";
-  }
-  outputNumbers(output, list);
-  numberList sum = calcucationSum(list);
-  outputSum(output, sum) << "\n";
-  return output;
 }
 
+void bocharov::print_lists_info(std::ostream & out, const pairs_list_t & pairs_list)
+{
+  std::size_t max_pairs_list_size = get_max_pairs_list_size(pairs_list);
+  for (std::size_t i = 0; i != max_pairs_list_size; ++i)
+  {
+    list_t column_elements;
+    get_column_elements(column_elements, pairs_list, i);
+    if (!column_elements.empty())
+    {
+      print_list_elements(out, column_elements);
+      out << '\n';
+    }
+  }
+  list_t sums;
+  get_lists_sums(sums, pairs_list);
+  if (sums.empty())
+  {
+    out << 0;
+    return;
+  }
+  print_list_elements(out, sums);
+}
