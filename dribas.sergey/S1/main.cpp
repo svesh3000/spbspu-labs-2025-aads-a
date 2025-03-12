@@ -11,8 +11,10 @@ int main()
     std::cerr << e.what() << '\n';
     return 1;
   }
-  dribas::getSequanceName(std::cout, sequance);
-  std::cout << '\n';
+  if (!sequance.empty()) {
+    dribas::getSequanceName(std::cout, sequance);
+    std::cout << '\n';
+  }
   dribas::getSequanceNameSum(std::cout, sequance);
   std::cout << '\n';
   return 0;
