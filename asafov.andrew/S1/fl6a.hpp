@@ -72,6 +72,7 @@ namespace asafov
         return *this;
       }
 
+
       bool operator==(const const_iterator& rhs) const
       {
         return current_ == rhs.current_;
@@ -122,32 +123,45 @@ namespace asafov
     void pop_front()
     {
       if (!head_) return;
-      else if (head_ != tail_)
-      {
-        auto temp = head_;
-        head_ = head_->next_;
-        delete temp;
-      }
-      else
+      if (head_ == tail_)
       {
         delete head_;
         head_ = nullptr;
         tail_ = nullptr;
       }
+      else
+      {
+        Node* temp = head_;
+        head_ = head_->next_;
+        tail_->next_ = head_;
+        delete temp;
+      }
       --size_;
     }
 
+
     void clear()
     {
-      while (!empty())
+      if (!head_) return;
+
+      while (head_ != tail_)
       {
-        pop_front();
+        Node* temp = head_;
+        head_ = head_->next_;
+        delete temp;
       }
+
+      delete tail_;
+      head_ = nullptr;
+      tail_ = nullptr;
+      size_ = 0;
     }
+
 
     void push_back(const T& value)
     {
       Node* new_node = new Node(value);
+  
       if (!head_)
       {
         head_ = new_node;
@@ -162,6 +176,7 @@ namespace asafov
       }
       ++size_;
     }
+
   private:
     Node* head_;
     Node* tail_;
