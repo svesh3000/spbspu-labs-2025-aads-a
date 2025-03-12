@@ -7,6 +7,7 @@
 int main() {
   using namespace gavrilova;
   using ULL = unsigned long long;
+
   FwdList< std::pair< std::string, FwdList< ULL > > > listOfPairs{};
   size_t numOfPairs = 0;
   std::string name;
@@ -19,7 +20,10 @@ int main() {
     ++numOfPairs;
   }
   listOfPairs.reverse();
+
   outNames(std::cout, listOfPairs);
+  std::cout << "\n";
+  
   FwdList< ULL > sums {};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);

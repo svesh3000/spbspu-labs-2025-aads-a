@@ -93,8 +93,7 @@ template< class T >
 gavrilova::FwdList< T >::FwdList(const FwdList &other) :
   FwdList()
 {
-  for (auto it = other.begin(); it != other.end(); ++it)
-  {
+  for (auto it = other.begin(); it != other.end(); ++it) {
     push_front(*it);
   }
   reverse();
@@ -119,13 +118,11 @@ gavrilova::FwdList< T >::FwdList(std::initializer_list< T > init) :
 template< class T >
 gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(const FwdList &other)
 {
-  if (this == &other)
-  {
+  if (this == &other) {
     return *this;
   }
   clear();
-  for (auto it = other.begin(); it != other.end(); ++it)
-  {
+  for (auto it = other.begin(); it != other.end(); ++it) {
     push_front(*it);
   }
   reverse();
@@ -135,8 +132,7 @@ gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(const FwdList &other
 template< class T >
 gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(FwdList &&other) noexcept
 {
-  if (this == &other)
-  {
+  if (this == &other) {
     return *this;
   }
   clear();
@@ -154,8 +150,7 @@ template< class T >
 gavrilova::FwdList< T >& gavrilova::FwdList< T >::operator=(std::initializer_list< T > init)
 {
   clear();
-  for (const T& value : init)
-  {
+  for (const T& value : init) {
     push_front(value);
   }
   reverse();
@@ -184,8 +179,7 @@ gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::end() const noexcept
 template< class T >
 T & gavrilova::FwdList< T >::front()
 {
-  if (empty())
-  {
+  if (empty()) {
     throw std::out_of_range("List is empty");
   }
   return fake_->next->data;
@@ -222,8 +216,7 @@ void gavrilova::FwdList< T >::push_front(T&& value)
 template< class T >
 void gavrilova::FwdList< T >::pop_front()
 {
-  if (empty())
-  {
+  if (empty()) {
     throw std::out_of_range("List is empty");
   }
   NodeFwdList<T> *temp = fake_->next;
@@ -235,8 +228,7 @@ void gavrilova::FwdList< T >::pop_front()
 template< class T >
 void gavrilova::FwdList< T >::clear()
 {
-  while (!empty())
-  {
+  while (!empty()) {
     pop_front();
   }
 }
@@ -245,17 +237,13 @@ template< class T >
 void gavrilova::FwdList< T >::remove(const T &value)
 {
   NodeFwdList<T> *current = fake_;
-  while (current->next != fake_)
-  {
-    if (current->next->data == value)
-    {
+  while (current->next != fake_) {
+    if (current->next->data == value) {
       NodeFwdList<T> *temp = current->next;
       current->next = current->next->next;
       delete temp;
       --nodeCount_;
-    }
-    else
-    {
+    } else {
       current = current->next;
     }
   }
@@ -361,14 +349,12 @@ void gavrilova::FwdList< T >::splice(ConstIteratorFwd< T > pos, FwdList< T >&& o
 template< class T >
 void gavrilova::FwdList< T >::reverse()
 {
-  if (fake_->next == fake_)
-  {
+  if (empty()) {
     return;
   }
   NodeFwdList< T >* next = fake_->next;
   NodeFwdList< T >* last = fake_;
-  while (next->next != fake_)
-  {
+  while (next->next != fake_) {
     NodeFwdList< T >* remember = next->next;
     next->next = last;
     last = next;
@@ -381,15 +367,13 @@ void gavrilova::FwdList< T >::reverse()
 template< class T >
 bool gavrilova::FwdList< T >::operator==(const FwdList<T> &other) const
 {
-  if (nodeCount_ != other.nodeCount_)
-  {
+  if (nodeCount_ != other.nodeCount_) {
     return false;
   }
 
   IteratorFwd< T > it1 = begin();
   IteratorFwd< T > it2 = other.begin();
-  while (it1 != end())
-  {
+  while (it1 != end()) {
     if (*it1 != *it2)
       return false;
     ++it1;
@@ -409,14 +393,11 @@ bool gavrilova::FwdList< T >::operator<(const FwdList<T> &other) const
 {
   IteratorFwd< T > it1 = begin();
   IteratorFwd< T > it2 = other.begin();
-  while (it1 != end() && it2 != other.end())
-  {
-    if (*it1 < *it2)
-    {
+  while (it1 != end() && it2 != other.end()) {
+    if (*it1 < *it2) {
       return true;
     }
-    if (*it1 > *it2)
-    {
+    if (*it1 > *it2) {
       return false;
     }
     ++it1;
@@ -454,8 +435,7 @@ template< class T>
 void gavrilova::FwdList< T >::assign(size_t count, const T& value)
 {
   FwdList< T > temporary;
-  for (size_t i = 0; i < count; ++i)
-  {
+  for (size_t i = 0; i < count; ++i) {
     temporary.push_front(value);
   }
   temporary.reverse();
@@ -467,8 +447,7 @@ template< class InputIt >
 void gavrilova::FwdList< T >::assign(InputIt first, InputIt last)
 {
   FwdList< T > temporary;
-  for (auto it = first; it != last; ++it)
-  {
+  for (auto it = first; it != last; ++it) {
     temporary.push_front(*it);
   }
   temporary.reverse();
@@ -479,8 +458,7 @@ template< class T>
 void gavrilova::FwdList< T >::assign(std::initializer_list< T > init)
 {
   FwdList< T > temporary;
-  for (const T& value : init)
-  {
+  for (const T& value : init) {
     temporary.push_front(value);
   }
   temporary.reverse();

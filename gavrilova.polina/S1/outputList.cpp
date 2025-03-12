@@ -23,7 +23,6 @@ std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
     out << " " << ptr->first;
     ++ptr;
   }
-  out << "\n";
   return out;
 }
 gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n)
