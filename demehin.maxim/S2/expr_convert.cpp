@@ -126,13 +126,14 @@ void demehin::convertStack(ExprsStack& infStack, ExprsStack& postStack)
   }
 }
 
-int demehin::calculateExpr(ExprQueue expr)
+int demehin::calculateExpr(const ExprQueue& expr)
 {
   Stack<int> stack;
-  while (!expr.empty())
+  ExprQueue exprCpy(expr);
+  while (!exprCpy.empty())
   {
-    std::string token = expr.front();
-    expr.pop();
+    std::string token = exprCpy.front();
+    exprCpy.pop();
 
     if (isNumber(token))
     {

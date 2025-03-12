@@ -10,7 +10,7 @@ namespace demehin
   using ExprsStack = demehin::Stack< ExprQueue >;
   void convertStack(ExprsStack& infExprs, ExprsStack& postExprs);
   ExprQueue convertQueue(ExprQueue& infExpr);
-  int calculateExpr(ExprQueue expr);
+  int calculateExpr(const ExprQueue& expr);
   void getExprsValues(ExprsStack postStack, Stack< int >& values);
 }
 
