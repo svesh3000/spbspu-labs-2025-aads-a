@@ -635,26 +635,38 @@ gavrilova::IteratorFwd< T > gavrilova::FwdList< T >::insert(ConstIteratorFwd<T> 
   return IteratorFwd< T >(last_one);
 }
 
-// template <class T>
-// gavrilova::IteratorFwd<T> gavrilova::FwdList< T >::erase(ConstIteratorFwd< T > pos) {
-//   if (empty()) {
-//     throw std::out_of_range("List is empty");
-//   }
+template <class T>
+gavrilova::IteratorFwd<T> gavrilova::FwdList< T >::erase(ConstIteratorFwd< T > pos)
+{
+  if (empty()) {
+    return pos;
+  }
+  NodeFwdList<T>* prevNode = pos.node_;
+  NodeFwdList<T>* nodeToDelete = prevNode->next;
+  prevNode->next = nodeToDelete->next;
+  delete nodeToDelete;
+  --nodeCount_;
+  return IteratorFwd< T >{prevNode->next};
+}
 
-//   if (pos == begin()) {
-//     pop_front();
-//     return;
-//   }
+template <class T>
+gavrilova::IteratorFwd<T> gavrilova::FwdList< T >::erase(ConstIteratorFwd< T > first, ConstIteratorFwd< T > last)
+{
+  if (first == last) {
+    return IteratorFwd<T>(last.node_);
+  }
 
-//   NodeFwdList<T>* prevNode = fake_;
-//   while (prevNode->next != pos.node_) {
-//     prevNode = prevNode->next;
-//   }
+  NodeFwdList<T>* prev = first.node_;
+  NodeFwdList<T>* current = first.node_->next;
+  while (current != last.node_) {
+    NodeFwdList<T>* nodeToDelete = current;
+    current = current->next;
+    delete nodeToDelete;
+    --nodeCount_;
+  }
 
-//   NodeFwdList<T>* nodeToDelete = prevNode->next;
-//   prevNode->next = nodeToDelete->next;
-//   delete nodeToDelete;
-//   --nodeCount_;
-// }
+  prev->next = last.node_;
+  return IteratorFwd<T>(last.node_);
+}
 
 #endif
