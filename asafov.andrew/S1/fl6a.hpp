@@ -14,9 +14,6 @@ class forward_list
     next_(ptr)
     {}
   };
-  Node* head_;
-  Node* tail_;
-  size_t size_;
 public:
   forward_list() noexcept:
   head_(nullptr),
@@ -45,7 +42,7 @@ public:
     {
       return current_->data_;
     }
-      
+
     T* operator->() const
     {
       return std::addressof(current_->data_);
@@ -91,6 +88,7 @@ public:
   {
     return !head_;
   }
+
   size_t size() const
   {
     return size_;
@@ -134,5 +132,9 @@ public:
     }
     size_++;
   }
+private:
+  Node* head_;
+  Node* tail_;
+  size_t size_;
 };
 #endif
