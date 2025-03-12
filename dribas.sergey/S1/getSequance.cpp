@@ -10,12 +10,13 @@ dribas::List< std::pair< std::string, dribas::List< int > > > dribas::getSequanc
   std::string sequance;
   while (input >> sequance) {
     List< int > numbers{};
-    long long int number = 0;
+    
+   unsigned long long number = 0;
     while (input >> number) {
-      if (number > std::numeric_limits< int >::max()) {
+      if (number > static_cast< unsigned long long >(std::numeric_limits< int >::max())) {
         throw std::overflow_error("OverFlow!");
       }
-      if (number < std::numeric_limits< int >::min()) {
+      if (number < static_cast< unsigned long long >(std::numeric_limits< int >::min())) {
         throw std::overflow_error("OverFlow!");
       }
       numbers.push_back(number);
