@@ -1,6 +1,7 @@
 #include "expr_convert.hpp"
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
 
 namespace
 {
@@ -39,12 +40,22 @@ namespace
 
   lli performOperation(lli op1, lli op2, const std::string& operation)
   {
+    lli max = std::numeric_limits< lli >::max();
+    lli min = std::numeric_limits< lli >::min();
     if (operation == "+")
     {
+      if (op1 > max - op2)
+      {
+        throw std::logic_error("overflow");
+      }
       return op1 + op2;
     }
     if (operation == "-")
     {
+      if (op1 < min + op2 )
+      {
+        throw std::logic_error("underflow");
+      }
       return op1 - op2;
     }
     if (operation == "*")
