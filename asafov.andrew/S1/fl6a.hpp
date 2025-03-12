@@ -126,7 +126,7 @@ namespace asafov
         auto temp = head_;
         head_ = head_->next_;
         tail_->next_ = head_;
-        delete head_;
+        delete temp;
       }
       else
       {
