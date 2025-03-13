@@ -56,6 +56,10 @@ namespace abramov
     void insert(ConstIterator< T > pos, const T &val);
     void insert(ConstIterator< T > pos, T &&val);
     void insert(ConstIterator< T > pos, size_t count, const T &val);
+    Iterator< T > erase(Iterator< T > pos) noexcept;
+    Iterator< T > erase(Iterator< T > first, Iterator< T > last) noexcept;
+    void assign(Iterator< T > first, Iterator< T > last);
+    void assign(std::initializer_list< T > il);
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -494,6 +498,59 @@ namespace abramov
     {
       insert(pos, val);
     }
+  }
+
+  template< class T >
+  Iterator< T > List< T >::erase(Iterator< T > pos) noexcept
+  {
+    Node< T > *node = nullptr;
+    if (pos.node_ == head_)
+    {
+      head_ = head_->next;
+      head_->prev = nullptr;
+      node = head_;
+    }
+    else if (pos.node_ == tail_)
+    {
+      tail_ = tail_->prev;
+      tail_->next = nullptr;
+      node = tail_;
+    }
+    else
+    {
+      pos.node_->prev_->next_ = pos.node_->next_;
+      pos.node_->next_->prev_ = pos.node_->prev_;
+      node = pos.node_->next_;
+    }
+    delete pos.node_;
+    --size_;
+    return Iterator< T >{ node, this };
+  }
+
+  template< class T >
+  Iterator< T > List< T >::erase(Iterator< T > first, Iterator< T > last) noexcept
+  {
+    for (auto it = first; first != last; ++it)
+    {
+      erase(it);
+    }
+  }
+
+  template< class T >
+  void List< T >::assign(Iterator< T > first, Iterator< T > last)
+  {
+    clear();
+    for (auto it = first; first != last; ++it)
+    {
+      pushBack(it.node_->data);
+    }
+  }
+
+  template< class T >
+  void List< T >::assign(std::initializer_list< T > il)
+  {
+    List< T > copy{ il };
+    swap(copy);
   }
 }
 #endif
