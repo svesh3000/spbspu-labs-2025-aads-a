@@ -88,8 +88,8 @@ namespace
   void printListsInfo(std::ostream& out, const ListOfPairs& pairsList)
   {
     ListOfPairs lstCpy(pairsList);
-    size_t max_size = defineMaxSize(lstCpy);
 
+    size_t max_size = defineMaxSize(lstCpy);
     if (max_size == 0)
     {
       if (!pairsList.empty())
@@ -100,6 +100,9 @@ namespace
       out << "0";
       return;
     }
+
+    printLstNames(out, lstCpy);
+    out << "\n";
 
     ListOfUll sumList;
     for (size_t i = 0; i < max_size; i++)
