@@ -133,7 +133,6 @@ int main()
   try
   {
     inputLists(std::cin, pairsList);
-    //printLstNames(std::cout, ;
     printListsInfo(std::cout, pairsList);
     std::cout << "\n";
   }
