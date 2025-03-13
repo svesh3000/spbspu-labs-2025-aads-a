@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_CASE(copy_test)
   list1.pushBack(10);
   List< size_t > list2;
   list2.pushBack(20);
+  BOOST_TEST(list1 != list2);
   list2 = list1;
   BOOST_TEST(list2.front() == 10);
 }
@@ -27,6 +28,7 @@ BOOST_AUTO_TEST_CASE(move_test)
   List< size_t > list1;
   list1.pushBack(10);
   List< size_t > list2;
+  BOOST_TEST(list1 != list2);
   list2 = std::move(list1);
   BOOST_TEST(list2.front() == 10);
   BOOST_TEST(list1.isEmpty());
