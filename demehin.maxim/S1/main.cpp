@@ -64,27 +64,35 @@ namespace
     }
   }
 
-  void printValues(std::ostream& out, const ListOfPairs& pairsList)
+  void formAndPrintLine(std::ostream& out, ListOfPairs& lst, ListOfUll& sumList)
   {
-    ListOfPairs lstCpy(pairsList);
-    size_t max_size = defineMaxSize(lstCpy);
-    if (max_size == 0)
+    ListOfUll numsList = formNumLst(lst);
+    if (!numsList.empty())
+    {
+      printNums(out, numsList);
+      out << "\n";
+      sumList.push_back(calculateSum(numsList));
+    }
+  }
+
+  void printListsInfo(std::ostream& out, const ListOfPairs& pairsList)
+  {
+    if (pairsList.empty())
     {
       out << "0";
       return;
     }
 
+    ListOfPairs lstCpy(pairsList);
+    printLstNames(out, lstCpy);
+    out << "\n";
+
+    size_t max_size = defineMaxSize(lstCpy);
     ListOfUll sumList;
 
     for (size_t i = 0; i < max_size; i++)
     {
-      ListOfUll numsList = formNumLst(lstCpy);
-      if (!numsList.empty())
-      {
-        printNums(out, numsList);
-        out << "\n";
-        sumList.push_back(calculateSum(numsList));
-      }
+      formAndPrintLine(out, lstCpy, sumList);
     }
     printNums(out, sumList);
   }
@@ -113,36 +121,18 @@ int main()
   try
   {
     inputLists(std::cin, pairsList);
+    printListsInfo(std::cout, pairsList);
+    std::cout << "\n";
   }
   catch(const std::bad_alloc&)
   {
-    std::cout << "error: bad_alloc\n";
+    std::cerr << "error: bad_alloc\n";
     return 1;
-  }
-
-  if (pairsList.size() == 0)
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-
-  printLstNames(std::cout, pairsList);
-  std::cout << "\n";
-
-  try
-  {
-    printValues(std::cout, pairsList);
   }
   catch (const std::overflow_error& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
   }
-  catch (const std::bad_alloc&)
-  {
-    std::cerr << "error: bad_alloc\n";
-    return 1;
-  }
 
-  std::cout << "\n";
 }
