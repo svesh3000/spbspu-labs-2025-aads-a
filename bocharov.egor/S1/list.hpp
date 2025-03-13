@@ -7,36 +7,37 @@
 #include "node.hpp"
 #include "iterator.hpp"
 
-namespace maslevtsov {
+namespace bocharov
+{
   template< typename T >
-  class FwdList
+  class List
   {
   public:
-    using iterator = FwdIterator< T, false >;
-    using const_iterator = FwdIterator< T, true >;
+    using iterator = Iterator< T, false >;
+    using const_iterator = Iterator< T, true >;
 
-    FwdList() noexcept;
-    FwdList(const FwdList& rhs);
-    FwdList(FwdList&& rhs) noexcept;
-    FwdList(T value, std::size_t count);
+    List() noexcept;
+    List(const List & rhs);
+    List(List && rhs) noexcept;
+    List(T value, std::size_t count);
     template< class InputIt >
-    FwdList(InputIt first, InputIt last);
-    FwdList(std::initializer_list< T > init);
-    ~FwdList();
+    List(InputIt first, InputIt last);
+    List(std::initializer_list< T > init);
+    ~List();
 
-    FwdList& operator=(const FwdList& rhs) noexcept;
-    FwdList& operator=(FwdList&& rhs) noexcept;
-    FwdList& operator=(std::initializer_list< T > ilist);
+    List & operator=(const List & rhs) noexcept;
+    List & operator=(List && rhs) noexcept;
+    List & operator=(std::initializer_list< T > ilist);
 
-    void assign(std::size_t count, const T& value);
+    void assign(std::size_t count, const T & value);
     template< class InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > ilist);
 
-    T& front();
-    const T& front() const;
-    T& back();
-    const T& back() const;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -49,9 +50,9 @@ namespace maslevtsov {
     std::size_t size() const noexcept;
 
     void clear() noexcept;
-    iterator insert_after(const_iterator pos, const T& value);
-    iterator insert_after(const_iterator pos, T&& value);
-    iterator insert_after(const_iterator pos, std::size_t count, const T& value);
+    iterator insert_after(const_iterator pos, const T & value);
+    iterator insert_after(const_iterator pos, T && value);
+    iterator insert_after(const_iterator pos, std::size_t count, const T & value);
     template< class InputIt >
     iterator insert_after(const_iterator pos, InputIt first, InputIt last);
     iterator insert_after(const_iterator pos, std::initializer_list< T > ilist);
@@ -60,156 +61,162 @@ namespace maslevtsov {
     void push_front(T value);
     void push_back(T value);
     void pop_front() noexcept;
-    void swap(FwdList& other) noexcept;
+    void swap(List & other) noexcept;
 
-    void splice_after(const_iterator pos, FwdList& other);
-    void splice_after(const_iterator pos, FwdList&& other);
-    void splice_after(const_iterator pos, FwdList& other, const_iterator it);
-    void splice_after(const_iterator pos, FwdList& other, const_iterator first, const_iterator last);
-    void remove(const T& value);
+    void splice_after(const_iterator pos, List & other);
+    void splice_after(const_iterator pos, List && other);
+    void splice_after(const_iterator pos, List & other, const_iterator it);
+    void splice_after(const_iterator pos, List & other, const_iterator first, const_iterator last);
+    void remove(const T & value);
     template< class UnaryPredicate >
     void remove_if(UnaryPredicate condition);
 
   private:
-    FwdListNode< T >* tail_;
+    Node< T > * tail_;
     std::size_t size_;
   };
 }
 
 template< typename T >
-maslevtsov::FwdList< T >::FwdList() noexcept:
+bocharov::List< T >::List() noexcept:
   tail_(nullptr),
   size_(0)
 {}
 
 template< typename T >
-maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
-  FwdList()
+bocharov::List< T >::List(const List & rhs):
+  List()
 {
-  if (!rhs.empty()) {
+  if (!rhs.empty())
+  {
     push_back(*(rhs.cbegin()));
-    for (auto i = ++rhs.cbegin(); i != rhs.cend(); ++i) {
+    for (auto i = ++rhs.cbegin(); i != rhs.cend(); ++i)
+    {
       push_back(*i);
     }
   }
 }
 
 template< typename T >
-maslevtsov::FwdList< T >::FwdList(FwdList&& rhs) noexcept:
+bocharov::List< T >::List(List && rhs) noexcept:
   tail_(std::exchange(rhs.tail_, nullptr)),
   size_(std::exchange(rhs.size_, 0))
 {}
 
 template< typename T >
-maslevtsov::FwdList< T >::~FwdList()
+bocharov::List< T >::~List()
 {
   clear();
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs) noexcept
+typename bocharov::List< T >::List & bocharov::List< T >::operator=(const List & rhs) noexcept
 {
-  FwdList< T > copied_rhs(rhs);
+  List< T > copied_rhs(rhs);
   swap(copied_rhs);
   return *this;
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs) noexcept
+typename bocharov::List< T >::List & bocharov::List< T >::operator=(List && rhs) noexcept
 {
-  FwdList< T > copied_rhs(rhs);
+  List< T > copied_rhs(rhs);
   swap(copied_rhs);
   return *this;
 }
 
 template< typename T >
-T& maslevtsov::FwdList< T >::front()
+T & bocharov::List< T >::front()
 {
   return tail_->next_->data_;
 }
 
 template< typename T >
-const T& maslevtsov::FwdList< T >::front() const
+const T & bocharov::List< T >::front() const
 {
   return tail_->next_->data_;
 }
 
 template< typename T >
-T& maslevtsov::FwdList< T >::back()
+T & bocharov::List< T >::back()
 {
   return tail_->data_;
 }
 
 template< typename T >
-const T& maslevtsov::FwdList< T >::back() const
+const T & bocharov::List< T >::back() const
 {
   return tail_->data_;
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::begin() noexcept
+typename bocharov::List< T >::iterator bocharov::List< T >::begin() noexcept
 {
   return iterator(tail_->next_);
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::begin() const noexcept
+typename bocharov::List< T >::const_iterator bocharov::List< T >::begin() const noexcept
 {
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cbegin() const noexcept
+typename bocharov::List< T >::const_iterator bocharov::List< T >::cbegin() const noexcept
 {
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::end() noexcept
+typename bocharov::List< T >::iterator bocharov::List< T >::end() noexcept
 {
   return iterator(tail_->next_);
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::end() const noexcept
+typename bocharov::List< T >::const_iterator bocharov::List< T >::end() const noexcept
 {
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cend() const noexcept
+typename bocharov::List< T >::const_iterator bocharov::List< T >::cend() const noexcept
 {
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
-bool maslevtsov::FwdList< T >::empty() const noexcept
+bool bocharov::List< T >::empty() const noexcept
 {
   return size_ == 0;
 }
 
 template< typename T >
-std::size_t maslevtsov::FwdList< T >::size() const noexcept
+std::size_t bocharov::List< T >::size() const noexcept
 {
   return size_;
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::clear() noexcept
+void bocharov::List< T >::clear() noexcept
 {
-  while (!empty()) {
+  while (!empty())
+  {
     pop_front();
   }
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::push_front(T value)
+void bocharov::List< T >::push_front(T value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
-  if (empty()) {
+  Node< T > * new_node = new Node< T >{value, nullptr};
+  if (empty())
+  {
     tail_ = new_node;
     tail_->next_ = tail_;
-  } else {
+  }
+  else
+  {
     new_node->next_ = tail_->next_;
     tail_->next_ = new_node;
   }
@@ -217,13 +224,16 @@ void maslevtsov::FwdList< T >::push_front(T value)
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::push_back(T value)
+void bocharov::List< T >::push_back(T value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
-  if (empty()) {
+  Node< T > * new_node = new Node< T >{value, nullptr};
+  if (empty())
+  {
     tail_ = new_node;
     tail_->next_ = tail_;
-  } else {
+  }
+  else
+  {
     new_node->next_ = tail_->next_;
     tail_->next_ = new_node;
     tail_ = new_node;
@@ -232,19 +242,20 @@ void maslevtsov::FwdList< T >::push_back(T value)
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::pop_front() noexcept
+void bocharov::List< T >::pop_front() noexcept
 {
-  if (empty()) {
+  if (empty())
+  {
     return;
   }
-  FwdListNode< T >* to_delete = tail_->next_;
+  Node< T > * to_delete = tail_->next_;
   tail_->next_ = to_delete->next_;
   delete to_delete;
   --size_;
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
+void bocharov::List< T >::swap(List & other) noexcept
 {
   std::swap(tail_, other.tail_);
   std::swap(size_, other.size_);

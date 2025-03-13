@@ -5,58 +5,57 @@
 #include <type_traits>
 #include "node.hpp"
 
-namespace maslevtsov {
+namespace bocharov
+{
   template< typename T >
-  class FwdList;
+  class List;
 
   template< typename T, bool is_const >
-  class FwdIterator final: public std::iterator< std::forward_iterator_tag, int >
+  class Iterator final: public std::iterator< std::forward_iterator_tag, int >
   {
   public:
-    FwdIterator() noexcept = default;
-    FwdIterator(const FwdIterator& rhs) noexcept = default;
-    ~FwdIterator() = default;
-    FwdIterator& operator=(const FwdIterator& rhs) noexcept = default;
+    Iterator() noexcept = default;
+    Iterator(const Iterator & rhs) noexcept = default;
+    ~Iterator() = default;
+    Iterator & operator=(const Iterator & rhs) noexcept = default;
 
-    FwdIterator& operator++() noexcept
+    Iterator & operator++() noexcept
     {
       node_ = node_->next_;
       return *this;
     }
 
-    FwdIterator& operator++(int) noexcept
+    Iterator & operator++(int) noexcept
     {
-      FwdIterator< T, is_const > result(*this);
+      Iterator< T, is_const > result(*this);
       ++(*this);
       return result;
     }
 
-    typename std::conditional< is_const, const T&, T& >::type operator*() const noexcept
+    typename std::conditional< is_const, const T &, T & >::type operator*() const noexcept
     {
       return node_->data_;
     }
 
-    typename std::conditional< is_const, const T*, T* >::type operator->() const noexcept
+    typename std::conditional< is_const, const T *, T * >::type operator->() const noexcept
     {
       return std::addressof(node_->data_);
     }
 
-    bool operator==(const FwdIterator& rhs) const noexcept
+    bool operator==(const Iterator & rhs) const noexcept
     {
       return node_ == rhs.node_;
     }
 
-    bool operator!=(const FwdIterator& rhs) const noexcept
+    bool operator!=(const Iterator & rhs) const noexcept
     {
       return !(*this == rhs);
     }
 
   private:
-    friend class FwdList< T >;
-
-    FwdListNode< T >* node_;
-
-    FwdIterator(FwdListNode< T >* node) noexcept:
+    friend class List< T >;
+    Node< T > * node_;
+    Iterator(Node< T > * node) noexcept:
       node_(node)
     {}
   };
