@@ -74,7 +74,7 @@ namespace
     }
   }
 
-  void formAndPrintLine(std::ostream& out, ListOfPairs& lst, ListOfUll& sumList)
+  void formAndPrintLine(std::ostream& out, const ListOfPairs& lst, ListOfUll& sumList)
   {
     ListOfUll numsList = formNumLst(lst);
     if (!numsList.empty())
