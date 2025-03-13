@@ -1,22 +1,20 @@
 #include <iostream>
-#include <string>
-#include <list>
-#include <cctype>
+#include "list.hpp"
 #include "actionsWithList.hpp"
 
 int main()
 {
-  std::list< std::pair<std::string, std::list<size_t>>> List;
+  finaev::List< std::pair<std::string, finaev::List<size_t>>> List;
   std::string str = "";
   while (std::cin >> str)
   {
-    std::list< size_t > list;
+    finaev::List< size_t > list;
     size_t num = 0;
     while (std::cin >> num)
     {
-      list.push_back(num);
+      list.pushBack(num);
     }
-    List.push_back({ str, list });
+    List.pushBack(std::make_pair(str, list));
     if (std::cin.eof())
     {
       break;
@@ -28,13 +26,13 @@ int main()
     std::cout << 0 << "\n";
     return 0;
   }
-  std::list<std::string> listOfHeads;
+  finaev::List<std::string> listOfHeads;
   for (auto i = List.begin(); i != List.end(); ++i)
   {
-    listOfHeads.push_back((*i).first);
+    listOfHeads.pushBack((*i).first);
   }
-  std::list<std::list<size_t>> listOfLists = finaev::createRightList(List);
   finaev::printList(listOfHeads, std::cout);
+  finaev::List<finaev::List<size_t>> listOfLists = finaev::createRightList(List);
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
   {
     finaev::printList(*i, std::cout);
@@ -44,6 +42,6 @@ int main()
     std::cerr << "is overflow!\n";
     return 1;
   }
-  std::list<size_t> listOfSum = finaev::createListOfSum(listOfLists);
+  finaev::List<size_t> listOfSum = finaev::createListOfSum(listOfLists);
   finaev::printList(listOfSum, std::cout);
 }
