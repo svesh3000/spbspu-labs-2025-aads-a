@@ -16,8 +16,7 @@ namespace smirnov
     {
       if (next != this)
       {
-        T * object = static_cast< T* >(static_cast< void* >(data));
-        object->~T();
+        static_cast< T* >(static_cast< void* >(data))->~T();
       }
     }
   }; 
