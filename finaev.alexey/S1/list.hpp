@@ -186,10 +186,14 @@ namespace finaev
   template < class T >
   void List< T >::clear()
   {
-    while (!isEmpty())
+    while(head_)
     {
-      popFront();
+      Node< T >* temp = head_;
+      head_ = head_->next;
+      delete temp;
     }
+    tail_ = nullptr;
+    size_ = 0;
   }
 
   template < class T >
