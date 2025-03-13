@@ -1,7 +1,6 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
 #include <memory>
-#include <cassert>
 #include "node.hpp"
 #include "iterator.hpp"
 
@@ -19,8 +18,10 @@ namespace finaev
     const T* operator->() const;
     this_t& operator++();
     this_t operator++(int);
-    bool operator==(const constListIterator< T >& i) const;
-    bool operator!=(const constListIterator< T >& i) const;
+    this_t& operator--();
+    this_t operator--(int);
+    bool operator==(const this_t& i) const;
+    bool operator!=(const this_t& i) const;
   private:
     const Node< T >* node_;
   };
@@ -38,21 +39,18 @@ namespace finaev
   template < class T >
   const T&  constListIterator< T >::operator*() const
   {
-    assert(node_ != nullptr);
     return node_->data;
   }
 
   template < class T >
   const T* constListIterator< T >::operator->() const
   {
-    assert(node_ != nullptr);
     return std::addressof(node_->data);
   }
 
   template < class T >
   constListIterator< T >& constListIterator< T >::operator++()
   {
-    assert(node_ != nullptr);
     node_ = node_->next;
     return *this;
   }
@@ -60,9 +58,23 @@ namespace finaev
   template < class T >
   constListIterator< T > constListIterator< T >::operator++(int)
   {
-    assert(node_ != nullptr);
     constListIterator< T > res(*this);
     ++(*this);
+    return res;
+  }
+
+  template < class T >
+  constListIterator< T >& constListIterator< T >::operator--()
+  {
+    node_ = node_->prev;
+    return *this;
+  }
+
+  template < class T >
+  constListIterator< T > constListIterator< T >::operator--(int)
+  {
+    constListIterator< T > res(*this);
+    --(*this);
     return res;
   }
 

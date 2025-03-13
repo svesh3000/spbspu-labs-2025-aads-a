@@ -17,15 +17,17 @@ namespace finaev
     List(List&&) noexcept;
     List< T >& operator=(List<T>&&);
     void swap(List& other) noexcept;
-    bool isEmpty() noexcept;
+    bool isEmpty() const noexcept;
     void pushBack(const T& data);
-    listIterator< T > begin();
-    listIterator< T > end();
+    void pushFront(const T& data);
+    listIterator< T > begin() const;
+    listIterator< T > end() const;
     constListIterator< T > constBegin() const;
     constListIterator< T > constEnd() const;
-    T& front();
-    T& back();
-    size_t size() noexcept;
+    T& front() const;
+    T& back() const;
+    size_t size() const noexcept;
+    void popBack();
     void popFront();
     void clear();
     ~List();
@@ -112,14 +114,32 @@ namespace finaev
   }
 
   template < class T >
-  listIterator< T > List < T >::begin()
+  void List< T >::pushFront(const T& data)
+  {
+    Node< T >* elem = new Node< T >(data);
+    if (isEmpty())
+    {
+      head_ = elem;
+      tail_ = elem;
+    }
+    else
+    {
+      head_->prev = elem;
+      elem->next = head_;
+      head_ = elem;
+    }
+    ++size_;
+  }
+
+  template < class T >
+  listIterator< T > List < T >::begin() const 
   {
     listIterator< T > res(head_);
     return res;
   }
 
   template < class T >
-  listIterator< T > List < T >::end()
+  listIterator< T > List < T >::end() const
   {
     if (tail_ == nullptr)
     {
@@ -147,40 +167,62 @@ namespace finaev
     constListIterator< T > res(tail_->next);
     return res;
   }
+  
+  template < class T >
+  T& List< T >::front() const
+  {
+    return head_->data;
+  }
 
   template < class T >
-  bool List< T >::isEmpty() noexcept
+  T& List< T >::back() const
+  {
+    return tail_->data;
+  }
+
+  template < class T >
+  bool List< T >::isEmpty() const noexcept
   {
     return size_ == 0;
   }
 
   template < class T >
-  size_t List< T >::size() noexcept
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
-
-  template <typename T>
-  void List<T>::popFront()
+  
+  template < class T >
+  void List < T >::popBack()
   {
-    if (!isEmpty())
+    Node< T >* toDelete = tail_;
+    if (tail_ != head_)
     {
-      Node< T >* toDelete = head_;
-      if (head_ != nullptr)
-      {
-        head_ = head_->next;
-      }
-      if (head_ != nullptr)
-      {
-        head_->prev = nullptr;
-      }
-      else
-      {
-        tail_ = nullptr;
-      }
-      delete toDelete;
-      --size_;
+      tail_ = tail_->prev;
     }
+    tail_->next = nullptr;
+    delete toDelete;
+    --size_;
+  }
+   
+  template <typename T>
+  void List< T >::popFront()
+  {
+    Node< T >* toDelete = head_;
+    if (head_ != nullptr)
+    {
+      head_ = head_->next;
+    }
+    if (head_ != nullptr)
+    {
+      head_->prev = nullptr;
+    }
+    else
+    {
+      tail_ = nullptr;
+    }
+    delete toDelete;
+    --size_;
   }
 
   template < class T >
