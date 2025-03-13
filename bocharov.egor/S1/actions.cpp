@@ -32,10 +32,8 @@ namespace
     if (cur_list.size() > border)
     {
       auto it = cur_list.cbegin();
-      for (std::size_t k = 0; k != border; ++k, ++it)
-      {
-        list.push_back(*it);
-      }
+      for (std::size_t k = 0; k != border; ++k, ++it);
+      list.push_back(*it);
     }
     for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j)
     {
@@ -43,10 +41,8 @@ namespace
       if (cur_list.size() > border)
       {
         auto it = cur_list.cbegin();
-        for (std::size_t k = 0; k != border; ++k, ++it)
-        {
-          list.push_back(*it);
-        }
+        for (std::size_t k = 0; k != border; ++k, ++it);
+        list.push_back(*it);
       }
     }
   }
@@ -58,10 +54,8 @@ namespace
     if (cur_list.size() > border)
     {
       auto it = cur_list.cbegin();
-      for (std::size_t k = 0; k != border; ++k, ++it)
-      {
-        result = checked_sum(result, *it);
-      }
+      for (std::size_t k = 0; k != border; ++k, ++it);
+      result = checked_sum(result, *it);
     }
     for (auto j = ++pairs_list.cbegin(); j != pairs_list.cend(); ++j)
     {
@@ -69,10 +63,8 @@ namespace
       if (cur_list.size() > border)
       {
         auto it = cur_list.cbegin();
-        for (std::size_t k = 0; k != border; ++k, ++it)
-        {
-          result = checked_sum(result, *it);
-        }
+        for (std::size_t k = 0; k != border; ++k, ++it);
+        result = checked_sum(result, *it);
       }
     }
     return result;
