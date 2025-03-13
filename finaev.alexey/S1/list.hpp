@@ -132,7 +132,7 @@ namespace finaev
   }
 
   template < class T >
-  listIterator< T > List < T >::begin() const 
+  listIterator< T > List < T >::begin() const
   {
     listIterator< T > res(head_);
     return res;
@@ -167,7 +167,7 @@ namespace finaev
     constListIterator< T > res(tail_->next);
     return res;
   }
-  
+
   template < class T >
   T& List< T >::front() const
   {
@@ -191,7 +191,7 @@ namespace finaev
   {
     return size_;
   }
-  
+
   template < class T >
   void List < T >::popBack()
   {
@@ -204,7 +204,7 @@ namespace finaev
     delete toDelete;
     --size_;
   }
-   
+
   template <typename T>
   void List< T >::popFront()
   {
