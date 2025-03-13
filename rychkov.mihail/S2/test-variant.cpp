@@ -37,6 +37,8 @@ struct A
   }
   int constr = 0;
 };
+/*struct A
+{};*/
 
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
 
@@ -62,7 +64,10 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   rychkov::Variant< int32_t, A, char > variant7(variant6);
   std::cout << rychkov::get< int >(variant7) << '\n';
   rychkov::Variant< char, std::string > variant8 = "works";
+  variant8 = "works twice";
   std::cout << rychkov::get< std::string >(variant8) << '\n';
+  std::cout << (size_t)(rychkov::get_if< char >(&variant8)) << '\n';
+  //std::cout << rychkov::get< char >(variant8) << '\n';*/
 }
 
 BOOST_AUTO_TEST_SUITE_END()

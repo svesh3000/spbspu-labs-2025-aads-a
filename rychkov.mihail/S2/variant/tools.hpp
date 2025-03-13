@@ -25,24 +25,23 @@ namespace rychkov
 
   namespace details
   {
-    template< class U, class T >
-    constexpr size_t find_unique()
+    template< class T, class U, class... Types >
+    struct find_unique
     {
-      return !std::is_same< U, T >::value;
-    }
-    template< class U, class T1, class T2, class... Types >
-    constexpr size_t find_unique()
+      static constexpr bool is_same = std::is_same< T, U >::value;
+      static constexpr size_t value = is_same ? 0 : 1 + find_unique< T, Types... >::value;
+      static_assert(!is_same || (find_unique< T, Types... >::value == sizeof...(Types)));
+    };
+    template< class T, class U >
+    struct find_unique< T, U >
     {
-      constexpr bool found = std::is_same< U, T1 >::value;
-      constexpr size_t resultAfterThis = find_unique< U, T2, Types... >();
-      static_assert(!found || (resultAfterThis == 1 + sizeof...(Types)));
-      return found ? 0 : 1 + resultAfterThis;
-    }
+      static constexpr size_t value = !std::is_same< T, U >::value;
+    };
   }
   template< class U, class... Types >
   constexpr size_t find_uniq_type_in_pack()
   {
-    constexpr size_t result = details::find_unique< U, Types... >();
+    constexpr size_t result = details::find_unique< U, Types... >::value;
     static_assert(result != sizeof...(Types));
     return result;
   }
@@ -94,7 +93,8 @@ namespace rychkov
     struct is_inarray_constructible: std::false_type
     {};
     template< class Src, class Dest >
-    struct is_inarray_constructible< Src, Dest, void_t< decltype(ArrConvertChecker< Dest >{{std::declval< Src >()}}) > >: std::true_type
+    struct is_inarray_constructible< Src, Dest,
+          void_t< decltype(ArrConvertChecker< Dest >{{std::declval< Src >()}}) > >: std::true_type
     {};
     template< class Src, class Dest >
     constexpr bool is_inarray_constructible_v = is_inarray_constructible< Src, Dest >::value;

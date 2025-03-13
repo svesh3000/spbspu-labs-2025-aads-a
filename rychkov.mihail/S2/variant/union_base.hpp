@@ -13,8 +13,9 @@ namespace rychkov
     struct UnionStorage
     {
       static constexpr size_t size = std::max({sizeof(Types)...});
+      static constexpr size_t alignment = std::max({alignof(Types)...});
       using size_type = select_size_type_t< size, byte, unsigned short, size_t >;
-      byte storage[size];
+      alignas(alignment) byte storage[size];
       size_type active = static_cast< size_type >(variant_npos);
 
       bool valueless() const noexcept
@@ -183,7 +184,6 @@ namespace rychkov
           else
           {
             copy_assigns[this->active](this->storage, rhs.storage);
-            this->active = rhs.active;
           }
         }
         return *this;
@@ -232,7 +232,6 @@ namespace rychkov
           else
           {
             move_assigns[this->active](this->storage, rhs.storage);
-            this->active = rhs.active;
           }
         }
         return *this;

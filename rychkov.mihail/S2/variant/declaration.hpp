@@ -39,6 +39,13 @@ namespace rychkov
 
     Variant& operator=(const Variant& rhs) = default;
     Variant& operator=(Variant&& rhs) = default;
+    template< class T,
+          size_t RealTypeId = find_convertible< T, Types... >::value,
+          class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
+          class RealType = variant_alternative_t< RealTypeId, Types... >,
+          class = std::enable_if_t< exactly_once< RealType, Types... > > >
+    Variant& operator=(T&& rhs) noexcept(std::is_nothrow_constructible< RealType, T >::value
+          && std::is_nothrow_assignable< RealType, T >::value);
 
     template< class T, class... Args >
     T& emplace(Args&&... args);
@@ -48,17 +55,11 @@ namespace rychkov
     size_t index() const noexcept;
     bool valueless_by_exception() const noexcept;
   private:
-    template< class T, class... Ts >
-    friend T* rychkov::get_if(Variant< Ts... >* variant) noexcept;
-    template< class T, class... Ts >
-    friend const T* rychkov::get_if(const Variant* variant) noexcept;
     template< size_t N, class... Ts >
     friend variant_alternative_t< N, Ts... >* rychkov::get_if(Variant< Ts... >* variant) noexcept;
     template< size_t N, class... Ts >
     friend const variant_alternative_t< N, Ts... >* rychkov::get_if(const Variant* variant) noexcept;
   };
-
-  class bad_variant_access;
 
   template< class T, class... Types >
   T& get(Variant< Types... >& variant);
@@ -80,6 +81,13 @@ namespace rychkov
 
   template< class T, class... Types >
   bool holds_alternative(const Variant< Types... >& variant) noexcept;
+
+  class bad_variant_access;
+  namespace details
+  {
+    void throw_bad_variant_access(const char* message);
+    void throw_bad_variant_access(bool valueless);
+  }
 }
 
 #endif

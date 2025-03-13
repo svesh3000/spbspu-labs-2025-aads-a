@@ -44,6 +44,10 @@ BOOST_AUTO_TEST_CASE(pop_test)
   rychkov::Stack< int > stack;
   stack.push(3);
   stack.push(9);
+  stack.push(27);
+  stack.pop();
+  BOOST_TEST(stack.top() == 9);
+  BOOST_TEST(stack.size() == 2);
   stack.pop();
   BOOST_TEST(stack.top() == 3);
   BOOST_TEST(stack.size() == 1);

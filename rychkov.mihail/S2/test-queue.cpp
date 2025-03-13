@@ -47,9 +47,14 @@ BOOST_AUTO_TEST_CASE(pop_test)
   rychkov::Queue< int > queue;
   queue.push(3);
   queue.push(9);
+  queue.push(27);
   queue.pop();
-  BOOST_TEST(queue.front() == 3);
-  BOOST_TEST(queue.back() == 3);
+  BOOST_TEST(queue.front() == 9);
+  BOOST_TEST(queue.back() == 27);
+  BOOST_TEST(queue.size() == 2);
+  queue.pop();
+  BOOST_TEST(queue.front() == 27);
+  BOOST_TEST(queue.back() == 27);
   BOOST_TEST(queue.size() == 1);
   queue.pop();
   BOOST_TEST(queue.empty());

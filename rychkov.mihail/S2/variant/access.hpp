@@ -6,7 +6,39 @@
 #include <exception>
 
 class rychkov::bad_variant_access: public std::exception
-{};
+{
+public:
+  bad_variant_access() noexcept:
+    data_("bad variant access")
+  {}
+
+  virtual const char* what() const noexcept override
+  {
+    return data_;
+  }
+private:
+  const char* data_;
+  bad_variant_access(const char* message) noexcept:
+    data_(message)
+  {}
+  friend void rychkov::details::throw_bad_variant_access(const char* message);
+};
+
+void rychkov::details::throw_bad_variant_access(const char* message)
+{
+  throw bad_variant_access(message);
+}
+void rychkov::details::throw_bad_variant_access(bool valueless)
+{
+  if (valueless)
+  {
+    throw_bad_variant_access("get(): variant is valueless");
+  }
+  else
+  {
+    throw_bad_variant_access("get(): variant active index don't matches requested type");
+  }
+}
 
 template< class T, class... Types >
 T* rychkov::get_if(Variant< Types... >* variant) noexcept
@@ -61,11 +93,11 @@ template< size_t N, class... Types >
 rychkov::variant_alternative_t< N, Types... >& rychkov::get(Variant< Types... >& variant)
 {
   rychkov::variant_alternative_t< N, Types... >* resultPtr = get_if< N, Types... >(&variant);
-  if (resultPtr != nullptr)
+  if (resultPtr == nullptr)
   {
-    return *resultPtr;
+    details::throw_bad_variant_access(variant.valueless_by_exception());
   }
-  throw bad_variant_access();
+  return *resultPtr;
 }
 template< size_t N, class... Types >
 const rychkov::variant_alternative_t< N, Types... >& rychkov::get(const Variant< Types... >& variant)
@@ -73,9 +105,9 @@ const rychkov::variant_alternative_t< N, Types... >& rychkov::get(const Variant<
   rychkov::variant_alternative_t< N, Types... >* resultPtr = get_if< N >(&variant);
   if (resultPtr != nullptr)
   {
-    return *resultPtr;
+    details::throw_bad_variant_access(variant.valueless_by_exception());
   }
-  throw bad_variant_access();
+  return *resultPtr;
 }
 template< size_t N, class... Types >
 rychkov::variant_alternative_t< N, Types... >&& rychkov::get(Variant< Types... >&& variant)
