@@ -21,11 +21,6 @@ int main()
     }
     std::cin.clear();
   }
-  if (List.size() == 0)
-  {
-    std::cout << 0 << "\n";
-    return 0;
-  }
   finaev::List<std::string> listOfHeads;
   for (auto i = List.begin(); i != List.end(); ++i)
   {
@@ -33,6 +28,11 @@ int main()
   }
   finaev::printList(listOfHeads, std::cout);
   finaev::List<finaev::List<size_t>> listOfLists = finaev::createRightList(List);
+  if (listOfLists.size() == 0)
+  {
+    std::cout << 0 << "\n";
+    return 0;
+  }
   for (auto i = listOfLists.begin(); i != listOfLists.end(); ++i)
   {
     finaev::printList(*i, std::cout);
