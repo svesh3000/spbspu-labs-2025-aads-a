@@ -57,6 +57,10 @@ finaev::List < finaev::List < size_t > > finaev::createRightList(finaev::List< s
 
 void finaev::printList(finaev::List< size_t > list, std::ostream& out)
 {
+  if (list.begin() == nullptr)
+  {
+    return;
+  }
   out << *list.begin();
   for (auto i = ++list.begin(); i != list.end(); ++i)
   {
