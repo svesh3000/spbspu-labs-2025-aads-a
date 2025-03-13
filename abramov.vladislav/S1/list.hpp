@@ -492,7 +492,7 @@ namespace abramov
   {
     for (size_t i = 0; i < count; ++i)
     {
-      insert(pos, val)l
+      insert(pos, val);
     }
   }
 }
