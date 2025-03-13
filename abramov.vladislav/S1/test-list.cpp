@@ -133,3 +133,14 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   auto it = list.remove_if(list.begin(), list.end(), [](int a) { return a % 2 == 0; });
   BOOST_TEST(*it == 4);
 }
+
+BOOST_AUTO_TEST_CASE(assign_fill)
+{
+  abramov::List< int > list;
+  list.assign(5, 1);
+  auto it = list.begin();
+  for (size_t i = 0; i < 5; ++i)
+  {
+    BOOST_TEST(*(it++) == 1);
+  }
+}

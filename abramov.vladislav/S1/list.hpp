@@ -52,6 +52,7 @@ namespace abramov
     void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > it) noexcept;
     void splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
     void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void assign(size_t count, const T &val);
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -427,6 +428,23 @@ namespace abramov
   void List< T >::splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     splice(pos, other, first, last);
+  }
+
+  template< class T >
+  void List< T >::assign(size_t count, const T &val)
+  {
+    clear();
+    try
+    {
+      for (size_t i = 0; i < count; ++i)
+      {
+        pushBack(val);
+      }
+    }
+    catch (const std::bad_alloc &)
+    {
+      clear();
+    }
   }
 }
 #endif
