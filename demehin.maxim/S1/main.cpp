@@ -12,6 +12,11 @@ namespace
 
   size_t defineMaxSize(const ListOfPairs& pairsList)
   {
+    if (pairsList.empty())
+    {
+      return 0;
+    }
+
     size_t max_size = 0;
     for (auto it = pairsList.begin(); it != pairsList.end(); ++it)
     {
@@ -77,19 +82,18 @@ namespace
 
   void printListsInfo(std::ostream& out, const ListOfPairs& pairsList)
   {
-    if (pairsList.empty())
+    ListOfPairs lstCpy(pairsList);
+    size_t max_size = defineMaxSize(lstCpy);
+    if (max_size == 0)
     {
       out << "0";
       return;
     }
 
-    ListOfPairs lstCpy(pairsList);
     printLstNames(out, lstCpy);
     out << "\n";
 
-    size_t max_size = defineMaxSize(lstCpy);
     ListOfUll sumList;
-
     for (size_t i = 0; i < max_size; i++)
     {
       formAndPrintLine(out, lstCpy, sumList);
