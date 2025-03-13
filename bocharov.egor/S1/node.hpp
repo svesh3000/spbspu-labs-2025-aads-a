@@ -1,14 +1,13 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-namespace bocharov
-{
+namespace maslevtsov {
   template< typename T >
-  class Node
+  class FwdListNode
   {
   public:
     T data_;
-    Node< T > * next_;
+    FwdListNode< T >* next_;
   };
 }
 

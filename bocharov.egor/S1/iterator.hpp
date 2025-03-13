@@ -5,54 +5,58 @@
 #include <type_traits>
 #include "node.hpp"
 
-namespace bocharov
-{
+namespace maslevtsov {
   template< typename T >
-  class List;
+  class FwdList;
 
   template< typename T, bool is_const >
-  class Iterator final: public std::iterator< std::forward_iterator_tag, T >
+  class FwdIterator final: public std::iterator< std::forward_iterator_tag, int >
   {
   public:
-    Iterator & operator++() noexcept
+    FwdIterator() noexcept = default;
+    FwdIterator(const FwdIterator& rhs) noexcept = default;
+    ~FwdIterator() = default;
+    FwdIterator& operator=(const FwdIterator& rhs) noexcept = default;
+
+    FwdIterator& operator++() noexcept
     {
       node_ = node_->next_;
       return *this;
     }
 
-    Iterator & operator++(int) noexcept
+    FwdIterator& operator++(int) noexcept
     {
-      Iterator< T, is_const > result(*this);
+      FwdIterator< T, is_const > result(*this);
       ++(*this);
       return result;
     }
 
-    typename std::conditional< is_const, const T &, T & >::type operator*() const noexcept
+    typename std::conditional< is_const, const T&, T& >::type operator*() const noexcept
     {
       return node_->data_;
     }
 
-    typename std::conditional< is_const, const T *, T * >::type operator->() const noexcept
+    typename std::conditional< is_const, const T*, T* >::type operator->() const noexcept
     {
       return std::addressof(node_->data_);
     }
 
-    bool operator==(const Iterator & rhs) const noexcept
+    bool operator==(const FwdIterator& rhs) const noexcept
     {
       return node_ == rhs.node_;
     }
 
-    bool operator!=(const Iterator & rhs) const noexcept
+    bool operator!=(const FwdIterator& rhs) const noexcept
     {
       return !(*this == rhs);
     }
 
   private:
-    friend class List< T >;
+    friend class FwdList< T >;
 
-    Node< T > * node_;
+    FwdListNode< T >* node_;
 
-    Iterator(Node< T > * node) noexcept:
+    FwdIterator(FwdListNode< T >* node) noexcept:
       node_(node)
     {}
   };
