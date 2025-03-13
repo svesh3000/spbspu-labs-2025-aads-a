@@ -53,6 +53,9 @@ namespace abramov
     void splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
     void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
     void assign(size_t count, const T &val);
+    void insert(ConstIterator< T > pos, const T &val);
+    void insert(ConstIterator< T > pos, T &&val);
+    void insert(ConstIterator< T > pos, size_t count, const T &val);
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -407,6 +410,7 @@ namespace abramov
     }
     next->prev_ = prev;
     prev->next_ = next;
+    ++size_;
   }
 
   template< class T >
@@ -444,6 +448,51 @@ namespace abramov
     catch (const std::bad_alloc &)
     {
       clear();
+    }
+  }
+
+  template< class T >
+  void List< T >::insert(ConstIterator< T > pos, const T &val)
+  {
+    if (pos.node_ == head_)
+    {
+      pushFront(val);
+    }
+    else if ((--pos).node_ == tail_)
+    {
+      pushBack(val);
+    }
+    else
+    {
+      ++pos;
+      Node< T > *node = new Node< T >{ val };
+      if (empty())
+      {
+        head_ = node;
+        tail_ = node;
+      }
+      else
+      {
+        (--pos).node_->next_ = node;
+        (++pos).node_->prev_ = node;
+        node->next_ = pos.node_;
+      }
+      ++size_;
+    }
+  }
+
+  template< class T >
+  void List< T >::insert(ConstIterator< T > pos, T &&val)
+  {
+    insert(pos, val);
+  }
+
+  template< class T >
+  void List< T >::insert(ConstIterator< T > pos, size_t count, const T &val)
+  {
+    for (size_t i = 0; i < count; ++i)
+    {
+      insert(pos, val)l
     }
   }
 }
