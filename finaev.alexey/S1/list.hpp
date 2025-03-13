@@ -65,11 +65,12 @@ namespace finaev
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (*this != other)
+    if (this == &other)
     {
-      List< T > temp(other);
-      swap(temp);
+      return *this;
     }
+    List< T > temp(other);
+    swap(temp);
     return *this;
   }
 
@@ -87,11 +88,14 @@ namespace finaev
   template < class T >
   List< T >& List<T>::operator=(List< T >&& other)
   {
-    if (*this != other)
+    if (this == &other)
     {
-      List< T > temp = std::move(other);
-      swap(temp);
+      return *this;
     }
+    swap(other);
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
     return *this;
   }
 

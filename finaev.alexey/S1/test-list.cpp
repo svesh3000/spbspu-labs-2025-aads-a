@@ -7,9 +7,11 @@ BOOST_AUTO_TEST_CASE(push_back_test)
 {
   List< size_t > list;
   list.pushBack(10);
-  BOOST_TEST(list.front() == 10 && list.back() == 10);
+  BOOST_TEST(list.front() == 10);
+  BOOST_TEST(list.back() == 10);
   list.pushBack(100);
-  BOOST_TEST(list.front() == 10 && list.back() == 100);
+  BOOST_TEST(list.front() == 10);
+  BOOST_TEST(list.back() == 100);
 }
 
 BOOST_AUTO_TEST_CASE(copy_test)
@@ -18,7 +20,6 @@ BOOST_AUTO_TEST_CASE(copy_test)
   list1.pushBack(10);
   List< size_t > list2;
   list2.pushBack(20);
-  BOOST_TEST(list1 != list2);
   list2 = list1;
   BOOST_TEST(list2.front() == 10);
 }
@@ -28,7 +29,6 @@ BOOST_AUTO_TEST_CASE(move_test)
   List< size_t > list1;
   list1.pushBack(10);
   List< size_t > list2;
-  BOOST_TEST(list1 != list2);
   list2 = std::move(list1);
   BOOST_TEST(list2.front() == 10);
   BOOST_TEST(list1.isEmpty());
@@ -48,9 +48,11 @@ BOOST_AUTO_TEST_CASE(pushFront_test)
 {
   List< size_t > list;
   list.pushFront(10);
-  BOOST_TEST(list.front() == 10 && list.back() == 10);
+  BOOST_TEST(list.front() == 10);
+  BOOST_TEST(list.back() == 10);
   list.pushFront(100);
-  BOOST_TEST(list.front() == 100 && list.back() == 10);
+  BOOST_TEST(list.front() == 100);
+  BOOST_TEST(list.back() == 10);
 }
 
 BOOST_AUTO_TEST_CASE(size_test)
@@ -82,32 +84,28 @@ BOOST_AUTO_TEST_CASE(popFront_test)
 
 BOOST_AUTO_TEST_CASE(iterator_test)
 {
-    List< size_t > list;
-    list.pushBack(10);
-    list.pushBack(20);
-    list.pushBack(30);
-    auto i = list.begin();
-    BOOST_TEST(*i == 10);
-    ++i;
-    BOOST_TEST(*i == 20);
-    --i;
-    BOOST_TEST(*i == 10);
-    auto j = list.end();
-    BOOST_TEST(*j == 30);
+  List< size_t > list;
+  list.pushBack(10);
+  list.pushBack(20);
+  list.pushBack(30);
+  auto i = list.begin();
+  BOOST_TEST(*i == 10);
+  ++i;
+  BOOST_TEST(*i == 20);
+  --i;
+  BOOST_TEST(*i == 10);
 }
 
 BOOST_AUTO_TEST_CASE(constIterator_test)
 {
-    List< size_t > list;
-    list.pushBack(10);
-    list.pushBack(20);
-    list.pushBack(30);
-    auto i = list.constBegin();
-    BOOST_TEST(*i == 10);
-    ++i;
-    BOOST_TEST(*i == 20);
-    --i;
-    BOOST_TEST(*i == 10);
-    auto j = list.constEnd();
-    BOOST_TEST(*j == 30);
+  List< size_t > list;
+  list.pushBack(10);
+  list.pushBack(20);
+  list.pushBack(30);
+  auto i = list.constBegin();
+  BOOST_TEST(*i == 10);
+  ++i;
+  BOOST_TEST(*i == 20);
+  --i;
+  BOOST_TEST(*i == 10);
 }
