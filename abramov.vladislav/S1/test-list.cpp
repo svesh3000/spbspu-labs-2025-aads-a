@@ -127,22 +127,9 @@ BOOST_AUTO_TEST_CASE(remove_test)
   BOOST_TEST(*it == 1);
 }
 
-BOOST_AUTO_TEST_CASE(splice)
+BOOST_AUTO_TEST_CASE(remove_if_test)
 {
-  abramov::List< int > list1{ 3, 4, 5 };
-  abramov::List< int > list2{ 1, 2 };
-  auto it = list1.cbegin();
-  list1.splice(it, list2);
-  it = list1.cbegin();
-  for (size_t i = 1; i < 6; ++i)
-  {
-    BOOST_TEST(*(it++) == i);
-  }
-  abramov::List< int > list3{ 6, 7 };
-  list1.splice(++list1.cbegin(), list3);
-  it = ++list1.cbegin();
-  for (size_t i = 6; i < 8; ++i)
-  {
-    BOOST_TEST(*(it++) == i);
-  }
+  abramov::List< int > list{ 1, 2, 3, 4, 5 };
+  auto it = list.remove_if(list.begin(), list.end(), [](int a) { return a % 2 == 0; });
+  BOOST_TEST(*it == 4);
 }

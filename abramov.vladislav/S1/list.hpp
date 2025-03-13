@@ -40,9 +40,9 @@ namespace abramov
     Iterator< T > end() const;
     ConstIterator< T > cbegin() const;
     ConstIterator< T > cend() const;
-    Iterator< T > find(Iterator< T > begin, Iterator< T > end, const T &val);
+    Iterator< T > find(Iterator< T > begin, Iterator< T > end, const T &val) const noexcept;
     template< class C >
-    Iterator< T > find_if(Iterator< T > begin, Iterator< T > end, C condition);
+    Iterator< T > find_if(Iterator< T > begin, Iterator< T > end, C condition) const noexcept;
     Iterator< T > remove(Iterator< T > begin, Iterator< T > end, const T &val);
     template< class C >
     Iterator< T > remove_if(Iterator< T > begin, Iterator< T > end, C condition);
@@ -50,6 +50,8 @@ namespace abramov
     void splice(ConstIterator< T > pos, List< T > &&other) noexcept;
     void splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > it) noexcept;
     void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > it) noexcept;
+    void splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
   private:
     Node< T > *head_;
     Node< T > *tail_;
@@ -283,7 +285,7 @@ namespace abramov
   }
 
   template< class T >
-  Iterator< T > List< T >::find(Iterator< T > begin, Iterator< T > end, const T &val)
+  Iterator< T > List< T >::find(Iterator< T > begin, Iterator< T > end, const T &val) const noexcept
   {
     for (auto iter = begin; iter != end; ++iter)
     {
@@ -297,7 +299,7 @@ namespace abramov
 
   template< class T >
   template< class C >
-  Iterator< T > List< T >::find_if(Iterator< T > begin, Iterator< T > end, C condition)
+  Iterator< T > List< T >::find_if(Iterator< T > begin, Iterator< T > end, C condition) const noexcept
   {
     for (auto iter = begin; iter != end; ++iter)
     {
@@ -347,11 +349,17 @@ namespace abramov
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &other) noexcept
   {
-    if (pos.node_ == begin().node_)
+    if (pos.node_ == head_)
     {
       other.tail_->next_ = head_;
       head_->prev_ = other.tail_;
       head_ = other.head_;
+    }
+    if ((--pos).node_ == tail_)
+    {
+      other.head_->prev_ = tail_;
+      tail_->next_ = other.head_;
+      tail_ = other.tail_;
     }
     pos.node_->prev_->next_ = other.head_;
     other.head_->prev_ = pos.node_->prev_;
@@ -372,11 +380,53 @@ namespace abramov
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > it) noexcept
   {
+    auto next = it->node_->next_;
+    auto prev = it->node_->prev_;
+    if (pos.node_ == head_)
+    {
+      it->node_->next_ = head_;
+      head_->prev_ = it->node_;
+      head_ = it->node_;
+    }
+    if ((--pos).node_ == tail_)
+    {
+      it->node_->prev_ = tail_;
+      tail_->next_ = it->node_;
+      tail_ = it->node_;
+    }
+    if (it.node_ == other.head_)
+    {
+      next->prev_ = nullptr;
+      other.head_ = next;
+    }
+    if (it.node_ == other.tail_)
+    {
+      prev->next_ = nullptr;
+      other.tail_ = prev;
+    }
+    next->prev_ = prev;
+    prev->next_ = next;
   }
 
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > it) noexcept
   {
+    splice(pos, other, it);
+  }
+
+  template< class T >
+  void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept
+  {
+    for (auto iter = first; first != last; ++iter)
+    {
+      splice(pos, other, iter);
+    }
+  }
+
+  template< class T >
+  void List< T >::splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept
+  {
+    splice(pos, other, first, last);
   }
 }
 #endif
