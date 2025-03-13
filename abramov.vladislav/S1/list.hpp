@@ -46,12 +46,16 @@ namespace abramov
     Iterator< T > remove(Iterator< T > begin, Iterator< T > end, const T &val);
     template< class C >
     Iterator< T > remove_if(Iterator< T > begin, Iterator< T > end, C condition);
-    void splice(ConstIterator< T > pos, List< T > &other);
-    void splice(ConstIterator< T > pos, List< T > &&other);
+    void splice(ConstIterator< T > pos, List< T > &other) noexcept;
+    void splice(ConstIterator< T > pos, List< T > &&other) noexcept;
+    void splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > it) noexcept;
+    void splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > it) noexcept;
   private:
     Node< T > *head_;
     Node< T > *tail_;
     size_t size_;
+    friend struct Iterator< T >;
+    friend struct ConstIterator< T >;
   };
 
   template< class T >
@@ -257,25 +261,25 @@ namespace abramov
   template< class T >
   Iterator< T > List< T >::begin() const
   {
-    return Iterator< T >(head_);
+    return Iterator< T >(head_, this);
   }
 
   template< class T >
   Iterator< T > List< T >::end() const
   {
-    return Iterator< T >(nullptr);
+    return Iterator< T >(nullptr, this);
   }
 
   template< class T >
   ConstIterator< T > List< T >::cbegin() const
   {
-    return ConstIterator< T >(head_);
+    return ConstIterator< T >(head_, this);
   }
 
   template< class T >
   ConstIterator< T > List< T >::cend() const
   {
-    return ConstIterator< T >(nullptr);
+    return ConstIterator< T >(nullptr, this);
   }
 
   template< class T >
@@ -341,7 +345,7 @@ namespace abramov
   }
 
   template< class T >
-  void List< T >::splice(ConstIterator< T > pos, List< T > &other)
+  void List< T >::splice(ConstIterator< T > pos, List< T > &other) noexcept
   {
     if (pos.node_ == begin().node_)
     {
@@ -360,9 +364,19 @@ namespace abramov
   }
 
   template< class T >
-  void List< T >::splice(ConstIterator< T > pos, List< T > &&other)
+  void List< T >::splice(ConstIterator< T > pos, List< T > &&other) noexcept
   {
     splice(pos, other);
+  }
+
+  template< class T >
+  void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > it) noexcept
+  {
+  }
+
+  template< class T >
+  void List< T >::splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > it) noexcept
+  {
   }
 }
 #endif

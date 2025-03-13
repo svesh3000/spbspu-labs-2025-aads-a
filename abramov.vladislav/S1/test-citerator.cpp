@@ -27,8 +27,9 @@ BOOST_AUTO_TEST_CASE(pre_decrement_const)
   abramov::List< int > list;
   list.pushBack(0);
   list.pushBack(1);
-  auto iter = list.cbegin();
-  ++iter;
+  auto iter = list.cend();
+  --iter;
+  BOOST_TEST(*iter == 1);
   --iter;
   BOOST_TEST(*iter == 0);
 }
@@ -38,8 +39,8 @@ BOOST_AUTO_TEST_CASE(post_decrement_const)
   abramov::List< int > list;
   list.pushBack(0);
   list.pushBack(1);
-  auto iter = list.cbegin();
-  ++iter;
+  auto iter = list.cend();
+  iter--;
   BOOST_TEST(*(iter--) == 1);
   BOOST_TEST(*iter == 0);
 }

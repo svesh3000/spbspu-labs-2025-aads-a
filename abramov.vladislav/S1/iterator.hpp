@@ -10,10 +10,8 @@ namespace abramov
   template< class T >
   struct Iterator: std::iterator< std::bidirectional_iterator_tag, T >
   {
-    friend struct List< T >;
-
     Iterator();
-    Iterator(Node< T > *node);
+    Iterator(Node< T > *node, const List< T > *list);
     Iterator(const Iterator &iter) = default;
     ~Iterator() = default;
     Iterator &operator=(const Iterator &iter) = default;
@@ -27,16 +25,20 @@ namespace abramov
     T *operator->();
   private:
     Node< T > *node_;
+    const List< T > *list_;
+    friend struct List< T >;
   };
 
   template< class T >
   Iterator< T >::Iterator():
-    node_(nullptr)
+    node_(nullptr),
+    list_(nullptr)
   {}
 
   template< class T >
-  Iterator< T >::Iterator(Node< T > *node):
-    node_(node)
+  Iterator< T >::Iterator(Node< T > *node, const List< T > *list):
+    node_(node),
+    list_(list)
   {}
 
   template< class T >
@@ -57,7 +59,14 @@ namespace abramov
   template< class T >
   Iterator< T > &Iterator< T >::operator--()
   {
-    node_ = node_->prev_;
+    if (node_)
+    {
+      node_ = node_->prev_;
+    }
+    else
+    {
+      node_ = list_->tail_;
+    }
     return *this;
   }
 
