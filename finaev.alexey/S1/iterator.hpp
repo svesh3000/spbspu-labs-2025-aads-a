@@ -9,18 +9,18 @@ namespace finaev
   struct listIterator
   {
   public:
-	  using this_t = listIterator< T >;
-	  listIterator();
-	  listIterator(Node<T>* node);
-	  ~listIterator() = default;
-	  T& operator*();
-	  Node< T > operator->();
-	  this_t& operator++();
-	  this_t operator++(int);
-	  bool operator==(const listIterator& i);
-	  bool operator!=(const listIterator& i);
+    using this_t = listIterator< T >;
+    listIterator();
+    listIterator(Node<T>* node);
+    ~listIterator() = default;
+    T& operator*();
+    Node< T > operator->();
+    this_t& operator++();
+    this_t operator++(int);
+    bool operator==(const listIterator& i);
+    bool operator!=(const listIterator& i);
   private:
-	  Node< T >* node_;
+    Node< T >* node_;
   };
 }
 

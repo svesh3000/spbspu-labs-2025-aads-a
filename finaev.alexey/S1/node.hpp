@@ -7,9 +7,9 @@ namespace finaev
   struct Node
   {
     Node(const T& data);
-	  T data;
-	  Node < T >* next;
-	  Node< T >* prev;
+    T data;
+    Node < T >* next;
+    Node< T >* prev;
   };
 }
 
