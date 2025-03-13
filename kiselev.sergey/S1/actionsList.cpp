@@ -25,7 +25,7 @@ namespace
     return sum;
   }
 
-  kiselev::numberList calcucateSum(const kiselev::list& list)
+  kiselev::numberList calculateSum(const kiselev::list& list)
   {
     auto it = list.cbegin();
     kiselev::numberList listSum;
@@ -130,7 +130,7 @@ std::ostream& kiselev::output(std::ostream& output, const list& list)
     return output << "0\n";
   }
   outputNumbers(output, list);
-  numberList sum = calcucateSum(list);
+  numberList sum = calculateSum(list);
   outputSum(output, sum) << "\n";
   return output;
 }
