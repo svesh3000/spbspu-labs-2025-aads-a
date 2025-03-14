@@ -9,15 +9,18 @@ namespace savintsev
   class PostfixExpr
   {
   public:
+    PostfixExpr() = default;
+    PostfixExpr(PostfixExpr & rhs);
+
     void operator=(std::string & infix_expr);
 
     int get_result() const;
 
     PostfixExpr operator+(PostfixExpr rhs);
-    PostfixExpr operator-(PostfixExpr rhs);
-    PostfixExpr operator/(PostfixExpr rhs);
-    PostfixExpr operator*(PostfixExpr rhs);
-    PostfixExpr operator%(PostfixExpr rhs);
+    PostfixExpr operator-(PostfixExpr & rhs);
+    PostfixExpr operator/(PostfixExpr & rhs);
+    PostfixExpr operator*(PostfixExpr & rhs);
+    PostfixExpr operator%(PostfixExpr & rhs);
   private:
     std::queue< std::string > expr_;
     int result_ = 0;

@@ -2,6 +2,11 @@
 #include <stdexcept>
 #include <iostream>
 
+savintsev::PostfixExpr::PostfixExpr(PostfixExpr & rhs):
+  expr_(rhs.expr_),
+  result_(rhs.result_)
+{}
+
 void savintsev::PostfixExpr::operator=(std::string & infix_expr)
 {
   using str = std::string;
@@ -160,4 +165,17 @@ bool savintsev::PostfixExpr::is_token_number(std::string token)
 int savintsev::PostfixExpr::get_result() const
 {
   return result_;
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator+(PostfixExpr rhs)
+{
+  PostfixExpr lhs(*this);
+  while (rhs.expr_.size())
+  {
+    lhs.expr_.push(rhs.expr_.front());
+    rhs.expr_.pop();
+  }
+  lhs.expr_.push("+");
+  lhs.result_ += rhs.result_;
+  return lhs;
 }
