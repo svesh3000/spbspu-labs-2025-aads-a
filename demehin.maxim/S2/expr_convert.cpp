@@ -38,6 +38,44 @@ namespace
     return 0;
   }
 
+  lli modulate(lli a, lli b)
+  {
+    if (b < 0)
+    {
+      return -modulate(-a, -b);
+    }
+
+    lli res = a % b;
+    if (res < 0)
+    {
+      res += b;
+    }
+    return res;
+  }
+
+  bool isMultipOverflow(lli a, lli b)
+  {
+    lli max = std::numeric_limits< lli >::max();
+    lli min = std::numeric_limits< lli >::min();
+    if (a > 0 && b > 0 && a > max / b)
+    {
+      return true;
+    }
+    if (a < 0 && b < 0 && a < max / b)
+    {
+      return true;
+    }
+    if (a > 0 && b < 0 && b < min / a)
+    {
+      return true;
+    }
+    if (a < 0 && b > 0 && a < min / b)
+    {
+      return true;
+    }
+    return false;
+  }
+
   lli performOperation(lli op1, lli op2, const std::string& operation)
   {
     lli max = std::numeric_limits< lli >::max();
@@ -60,6 +98,10 @@ namespace
     }
     if (operation == "*")
     {
+      if (isMultipOverflow(op1, op2))
+      {
+        throw std::logic_error("overflow");
+      }
       return op1 * op2;
     }
     if (operation == "/")
@@ -76,7 +118,7 @@ namespace
       {
         throw std::logic_error("zero modulation");
       }
-      return op1 % op2;
+      return modulate(op1, op2);
     }
     throw std::logic_error("invalid operation");
   }
