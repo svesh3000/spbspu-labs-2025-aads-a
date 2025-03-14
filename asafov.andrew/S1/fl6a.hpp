@@ -24,16 +24,6 @@ public:
   size_(0)
   {}
 
-  ~forward_list()
-  {
-    while (head_ != nullptr)
-    {
-      Node* temp = head_;
-      head_ = head_->next_;
-      delete temp;
-    }
-  }
-
   class const_iterator
   {
     friend class forward_list;
