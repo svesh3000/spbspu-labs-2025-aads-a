@@ -77,7 +77,7 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
     }
     else
     {
-      throw std::invalid_argument("ERROR: invalid expression");
+      throw std::invalid_argument("ERROR: token unsupported");
     }
     begin = end + 1;
   }
@@ -101,7 +101,7 @@ void savintsev::PostfixExpr::calculate_result(std::string token, std::stack< int
 {
   if (calc.size() < 2)
   {
-    throw std::invalid_argument("ERROR: unsupported operand");
+    throw std::invalid_argument("ERROR: invalid expression");
   }
   if (token == "+")
   {
