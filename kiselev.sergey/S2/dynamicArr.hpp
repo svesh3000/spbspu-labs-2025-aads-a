@@ -1,5 +1,6 @@
 #ifndef DYNAMICARR_HPP
 #define DYNAMICARR_HPP
+#include <cstddef>
 #include <stdexcept>
 #include <utility>
 
@@ -23,7 +24,8 @@ namespace kiselev
     const T& front() const noexcept;
     void popBack() noexcept;
     void popFront() noexcept;
-    void push(T);
+    void push(T&) noexcept;
+    void push(T&&) noexcept;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -167,13 +169,23 @@ namespace kiselev
   }
 
   template< typename T >
-  void DynamicArr< T >::push(T data)
+  void DynamicArr< T >::push(T& data) noexcept
   {
     if (size_ >= capacity_)
     {
       reallocate();
     }
-    data_[size_] = data;
+    data_[size_++] = data;
+  }
+
+  template< typename T >
+  void DynamicArr< T >::push(T&& data) noexcept
+  {
+    if (size_ >= capacity_)
+    {
+      reallocate();
+    }
+    data_[size_++] = data;
   }
 
   template< typename T >

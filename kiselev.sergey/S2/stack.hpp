@@ -1,5 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
+#include <sys/types.h>
 #include "dynamicArr.hpp"
 namespace kiselev
 {
@@ -10,18 +11,20 @@ namespace kiselev
 
     Stack() = default;
     Stack(const Stack< T >&);
-    Stack(Stack< T >&&);
+    Stack(Stack< T >&&) noexcept;
     ~Stack() = default;
 
     Stack< T >& operator=(const Stack< T >&);
-    Stack< T >& operator=(Stack< T >&&);
+    Stack< T >& operator=(Stack< T >&&) noexcept;
 
-    T& back();
-    void pop();
-    void push(T);
+    T& back() noexcept;
+    const T& back() const noexcept;
+    void pop() noexcept;
+    void push(T&) noexcept;
+    void push(T&&) noexcept;
 
-    size_t size();
-    bool empty();
+    size_t size() const noexcept;
+    bool empty() const noexcept;
 
   private:
 
@@ -35,7 +38,7 @@ namespace kiselev
   {}
 
   template< typename T >
-  Stack< T >::Stack(Stack< T >&& stack):
+  Stack< T >::Stack(Stack< T >&& stack) noexcept:
     arr_(std::move(stack.arr_))
   {}
 
@@ -47,38 +50,50 @@ namespace kiselev
   }
 
   template< typename T >
-  Stack< T >& Stack< T >::operator=(Stack< T >&& stack)
+  Stack< T >& Stack< T >::operator=(Stack< T >&& stack) noexcept
   {
     arr_ = std::move(stack.arr_);
     return *this;
   }
 
   template< typename T >
-  T& Stack< T >::back()
+  T& Stack< T >::back() noexcept
   {
     return arr_.back();
   }
 
   template< typename T >
-  void Stack< T >::pop()
+  const T& Stack< T >::back() const noexcept
+  {
+    return arr_.back();
+  }
+
+  template< typename T >
+  void Stack< T >::pop() noexcept
   {
     return arr_.popBack();
   }
 
   template< typename T >
-  void Stack< T >::push(T data)
+  void Stack< T >::push(T& data) noexcept
   {
     arr_.push(data);
   }
 
   template< typename T >
-  size_t Stack< T >::size()
+  void Stack< T >::push(T&& data) noexcept
+  {
+    return arr_.push(data);
+  }
+
+  template< typename T >
+  size_t Stack< T >::size() const noexcept
   {
     return arr_.size();
   }
 
   template< typename T >
-  bool Stack< T >::empty()
+  bool Stack< T >::empty() const noexcept
   {
     return arr_.empty();
   }
