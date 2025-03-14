@@ -75,6 +75,7 @@ namespace asafov
           last_ = data.last_;
           data.current_ = nullptr;
           data.last_ = nullptr;
+          return *this;
         }
       }
       ~const_iterator() = default;
