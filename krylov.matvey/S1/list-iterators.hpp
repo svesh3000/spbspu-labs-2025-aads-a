@@ -7,7 +7,7 @@ namespace krylov
   template< typename T >
   class List;
 
-  template < typename T >
+  template< typename T >
   class Iterator
   {
   public:
@@ -17,48 +17,48 @@ namespace krylov
     using pointer = T*;
     using reference = T&;
     Iterator();
-    Iterator(Node< T >* node);
-    Iterator(Node< T >* node, const List< T >* list);
-    T& operator*();
-    T* operator->();
-    Iterator& operator++();
-    Iterator operator++(int);
-    Iterator& operator--();
-    Iterator operator--(int);
-    bool operator!=(const Iterator& other) const;
-    bool operator==(const Iterator& other) const;
+    Iterator(Node< T >* node) noexcept;
+    Iterator(Node< T >* node, const List< T >* list) noexcept;
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
+    Iterator& operator++() noexcept;
+    Iterator operator++(int) noexcept;
+    Iterator& operator--() noexcept;
+    Iterator operator--(int) noexcept;
+    bool operator!=(const Iterator& other) const noexcept;
+    bool operator==(const Iterator& other) const noexcept;
   private:
     Node< T >* current_;
     const List< T >* list_;
     friend class List< T >;
   };
 
-  template < typename T >
-  Iterator< T >::Iterator(Node< T >* node):
+  template< typename T >
+  Iterator< T >::Iterator(Node< T >* node) noexcept:
     current_(node),
     list_(nullptr)
   {}
 
-  template < typename T >
-  Iterator< T >::Iterator(Node< T >* node, const List< T >* list):
+  template< typename T >
+  Iterator< T >::Iterator(Node< T >* node, const List< T >* list) noexcept:
     current_(node),
     list_(list)
   {}
 
-  template < typename T >
-  T& Iterator< T >::operator*()
+  template< typename T >
+  T& Iterator< T >::operator*() const noexcept
   {
     return current_->data_;
   }
 
-  template < typename T >
-  T* Iterator< T >::operator->()
+  template< typename T >
+  T* Iterator< T >::operator->() const noexcept
   {
     return &(current_->data_);
   }
 
-  template < typename T >
-  Iterator< T >& Iterator< T >::operator++()
+  template< typename T >
+  Iterator< T >& Iterator< T >::operator++() noexcept
   {
     if (current_ && current_->next_)
     {
@@ -71,18 +71,18 @@ namespace krylov
     return *this;
   }
 
-  template < typename T >
-  Iterator< T > Iterator< T >::operator++(int)
+  template< typename T >
+  Iterator< T > Iterator< T >::operator++(int) noexcept
   {
     Iterator< T > temp = *this;
     ++(*this);
     return temp;
   }
 
-  template < typename T >
-  Iterator< T >& Iterator< T >::operator--()
+  template< typename T >
+  Iterator< T >& Iterator< T >::operator--() noexcept
   {
-    if (!current_)
+    if (!current_ && list_->head_)
     {
       current_ = list_->tail_;
     }
@@ -93,22 +93,22 @@ namespace krylov
     return *this;
   }
 
-  template < typename T >
-  Iterator< T > Iterator< T >::operator--(int)
+  template< typename T >
+  Iterator< T > Iterator< T >::operator--(int) noexcept
   {
     Iterator< T > temp = *this;
     --(*this);
     return temp;
   }
 
-  template < typename T >
-  bool Iterator< T >::operator!=(const Iterator& other) const
+  template< typename T >
+  bool Iterator< T >::operator!=(const Iterator& other) const noexcept
   {
     return current_ != other.current_;
   }
 
-  template < typename T >
-  bool Iterator < T >::operator==(const Iterator& other) const
+  template< typename T >
+  bool Iterator < T >::operator==(const Iterator& other) const noexcept
   {
     return current_ == other.current_;
   }

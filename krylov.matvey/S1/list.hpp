@@ -12,7 +12,7 @@ namespace krylov
   template< typename T >
   class Iterator;
 
-  template < typename T >
+  template< typename T >
   class List
   {
   public:
@@ -24,8 +24,10 @@ namespace krylov
     List< T >& operator=(List< T >&& other) noexcept;
     List(size_t n, const T& value);
     ~List();
-    Iterator< T > begin() const;
-    Iterator< T > end() const;
+    Iterator< T > begin() noexcept;
+    Iterator< T > end() noexcept;
+    Iterator< T > cbegin() const noexcept;
+    Iterator< T > cend() const noexcept;
     void push_back(const T& value);
     void push_front(const T& value);
     void pop_back() noexcept;
@@ -37,20 +39,21 @@ namespace krylov
     void clear() noexcept;
     void swap(List< T >& other) noexcept;
     void assign(size_t n, const T& value) noexcept;
+    void remove(const T& value) noexcept;
   private:
     Node< T >* head_;
     Node< T >* tail_;
     size_t size_;
   };
 
-  template < typename T >
+  template< typename T >
   List< T >::List():
     head_(nullptr),
     tail_(nullptr),
     size_(0)
   {}
 
-  template < typename T >
+  template< typename T >
   List< T >::List(const size_t n, const T& value):
     head_(nullptr),
     tail_(nullptr),
@@ -69,13 +72,13 @@ namespace krylov
     }
   }
 
-  template < typename T >
+  template< typename T >
   List< T >::~List()
   {
     clear();
   }
 
-  template < typename T >
+  template< typename T >
   List< T >::List(const List< T >& other):
     head_(nullptr),
     tail_(nullptr),
@@ -110,7 +113,42 @@ namespace krylov
     }
   }
 
-  template < typename T >
+  template< typename T >
+  void List< T >::remove(const T& value) noexcept
+  {
+    for (auto it = begin(); it != end(); )
+    {
+      if (*it == value)
+      {
+        Node< T >* nodeToDelete = it.current_;
+        if (nodeToDelete->prev_)
+        {
+          nodeToDelete->prev_->next_ = nodeToDelete->next_;
+        }
+        else
+        {
+          head_ = nodeToDelete->next_;
+        }
+        if (nodeToDelete->next_)
+        {
+          nodeToDelete->next_->prev_ = nodeToDelete->prev_;
+        }
+        else
+        {
+          tail_ = nodeToDelete->prev_;
+        }
+        it = Iterator< T >(nodeToDelete->next_);
+        delete nodeToDelete;
+        --size_;
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
+
+  template< typename T >
   List< T >& List< T >::operator=(const List< T >& other)
   {
     if (this == &other)
@@ -128,7 +166,7 @@ namespace krylov
     return *this;
   }
 
-  template < typename T >
+  template< typename T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
     if (this == &other)
@@ -145,7 +183,7 @@ namespace krylov
     return *this;
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::push_back(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
@@ -163,7 +201,7 @@ namespace krylov
     ++size_;
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::push_front(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
@@ -181,7 +219,7 @@ namespace krylov
     ++size_;
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::pop_back() noexcept
   {
     if (!tail_)
@@ -202,7 +240,7 @@ namespace krylov
     --size_;
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::pop_front() noexcept
   {
     if (!head_)
@@ -223,7 +261,7 @@ namespace krylov
     --size_;
   }
 
-  template < typename T >
+  template< typename T >
   T& List< T >::front()
   {
     if (!head_)
@@ -233,7 +271,7 @@ namespace krylov
     return head_->data_;
   }
 
-  template < typename T >
+  template< typename T >
   T& List< T >::back()
   {
     if (!tail_)
@@ -243,31 +281,43 @@ namespace krylov
     return tail_->data_;
   }
 
-  template < typename T >
-  Iterator< T > List< T >::begin() const
+  template< typename T >
+  Iterator< T > List< T >::begin() noexcept
   {
     return Iterator< T >(head_);
   }
 
-  template < typename T >
-  Iterator< T > List< T >::end() const
+  template< typename T >
+  Iterator< T > List< T >::end() noexcept
   {
     return Iterator< T >(nullptr, this);
   }
 
-  template < typename T >
+  template< typename T >
+  Iterator< T > List< T >::cbegin() const noexcept
+  {
+    return Iterator< T >(head_);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::cend() const noexcept
+  {
+    return Iterator< T >(nullptr, this);
+  }
+
+  template< typename T >
   bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
-  template < typename T >
+  template< typename T >
   size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::clear() noexcept
   {
     while (!empty())
@@ -276,7 +326,7 @@ namespace krylov
     }
   }
 
-  template < typename T >
+  template< typename T >
   void List< T >::swap(List< T >& other) noexcept
   {
     std::swap(head_, other.head_);

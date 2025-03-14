@@ -14,6 +14,18 @@ BOOST_AUTO_TEST_CASE(test_push_back)
   BOOST_TEST(list.back() == 20);
 }
 
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  List< int > list;
+  list.push_back(5);
+  list.push_back(2);
+  list.push_back(5);
+  list.remove(5);
+  BOOST_TEST(list.size() == 1);
+  BOOST_TEST(list.front() == 2);
+  BOOST_TEST(list.back() == 2);
+}
+
 BOOST_AUTO_TEST_CASE(test_copy_operator)
 {
   List< int > list1;
