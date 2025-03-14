@@ -1,22 +1,27 @@
 #include "postfix-expression.h"
 #include <stdexcept>
+#include <iostream>
 
-savintsev::PostfixExpr::PostfixExpr(std::string infix_expr)
+void savintsev::PostfixExpr::operator=(std::string & infix_expr)
 {
-  infix_expr += " ";
-  std::string token;
-  size_t searching_pos = 0;
-  size_t end_pos = 0;
-  size_t was_bracket = 0;
-  std::stack< std::string > stack;
+  using str = std::string;
+
+  std::stack< str > stack;
   std::stack< int > calculations;
-  while (end_pos != infix_expr.size() - 1)
+
+  size_t was_bracket = 0;
+
+  size_t back = infix_expr.size() - 1;
+  size_t begin = 0;
+  size_t end = 0;
+
+  while (end != back)
   {
-    end_pos = infix_expr.find(' ', searching_pos);
-    token = infix_expr.substr(searching_pos, end_pos - searching_pos);
-    if (token == " ")
+    end = infix_expr.find(' ', begin);
+    str token = infix_expr.substr(begin, end != str::npos ? end - begin : end = back);
+    if (token == "")
     {
-      searching_pos = end_pos + 1;
+      begin = end + 1;
       continue;
     }
     else if (token == "(")
@@ -74,7 +79,7 @@ savintsev::PostfixExpr::PostfixExpr(std::string infix_expr)
     {
       throw std::invalid_argument("ERROR: invalid expression");
     }
-    searching_pos = end_pos + 1;
+    begin = end + 1;
   }
   while (!stack.empty())
   {

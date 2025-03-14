@@ -9,7 +9,7 @@ namespace savintsev
   class PostfixExpr
   {
   public:
-    PostfixExpr(std::string infix_expr);
+    void operator=(std::string & infix_expr);
 
     int get_result() const;
 
@@ -23,7 +23,6 @@ namespace savintsev
     int result_ = 0;
     void calculate_result(std::string token, std::stack< int > & calc) const;
     bool is_token_number(std::string token);
-    //std::stack< std::string > pstack_;
   };
 }
 
