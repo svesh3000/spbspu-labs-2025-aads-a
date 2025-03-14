@@ -39,6 +39,9 @@ namespace dribas
     bool empty() const noexcept;
     size_t size() const noexcept;
 
+    template< class Predicate >
+    void remove_if(Predicate) noexcept;
+    void remove(const T&) noexcept;
     void push_front(const T& value);
     void push_front(T&& value);
     void push_back(const T& value);
@@ -54,6 +57,19 @@ namespace dribas
     size_t size_;
   };
 }
+
+
+
+// template< class T >
+// template< class Predicate >
+// void dribas::List< T >::remove_if(Predicate predicator) noexcept
+// {
+//   for (Node< T >* current = head_; current != nullptr; current = current->next_ ) {
+//     if (predicator(current->data_)) {
+//       current->next_;
+//     }
+//   }
+// }
 
 template< class T >
 void dribas::List< T >::push_back(T&& value) {
@@ -147,9 +163,18 @@ void dribas::List< T >::push_front(T&& value)
 template< class T >
 const dribas::Node< T >* dribas::List< T >::operator[](size_t id) const
 {
-  Node< T >* returned = head_;
-  for (size_t i = 0; i < id; i++ ) {
+  float diffence = id / size_;
+  Node< T >* returned = nullptr;
+  if (diffence < 0.5) {
+    returned = head_;
+    for (size_t i = 0; i < id; i++ ) {
     returned = returned->next_;
+    }
+  } else {
+    returned = tail_;
+    for (size_t i = size_; i > id; i--) {
+      returned = returned->prev_;
+    }
   }
   return returned;
 }

@@ -72,7 +72,16 @@ BOOST_AUTO_TEST_SUITE(noAssignmentOperator)
 BOOST_AUTO_TEST_CASE(operatorScob) {
   List< int > list;
   list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
   BOOST_CHECK(list[0]->data_ == 1);
+
+  list.clear();
+  for (int i = 0; i < 100; i++) {
+    list.push_back(i);
+    BOOST_CHECK(list[i]->data_ == i);
+  }
 }
 BOOST_AUTO_TEST_CASE(operatorAt) {
   List< int > list;
