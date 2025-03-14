@@ -20,10 +20,10 @@ namespace krylov
     List();
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
-    List< T >& operator=(const List< T >& other);
-    List< T >& operator=(List< T >&& other) noexcept;
     List(size_t n, const T& value);
     ~List();
+    List< T >& operator=(const List< T >& other);
+    List< T >& operator=(List< T >&& other) noexcept;
     Iterator< T > begin() noexcept;
     Iterator< T > end() noexcept;
     Iterator< T > cbegin() const noexcept;
@@ -32,14 +32,18 @@ namespace krylov
     void push_front(const T& value);
     void pop_back() noexcept;
     void pop_front() noexcept;
-    T& front();
-    T& back();
+    T& front() noexcept;
+    T& back() noexcept;
+    const T& front() const noexcept;
+    const T& back() const noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear() noexcept;
     void swap(List< T >& other) noexcept;
     void assign(size_t n, const T& value) noexcept;
     void remove(const T& value) noexcept;
+    template <class Predicate>
+    void remove_if (Predicate pred);
   private:
     Node< T >* head_;
     Node< T >* tail_;
@@ -262,22 +266,26 @@ namespace krylov
   }
 
   template< typename T >
-  T& List< T >::front()
+  T& List< T >::front() noexcept
   {
-    if (!head_)
-    {
-      throw std::out_of_range("List is empty");
-    }
     return head_->data_;
   }
 
   template< typename T >
-  T& List< T >::back()
+  T& List< T >::back() noexcept
   {
-    if (!tail_)
-    {
-      throw std::out_of_range("List is empty");
-    }
+    return tail_->data_;
+  }
+
+  template< typename T >
+  const T& List< T >::front() const noexcept
+  {
+    return head_->data_;
+  }
+
+  template< typename T >
+  const T& List< T >::back() const noexcept
+  {
     return tail_->data_;
   }
 
