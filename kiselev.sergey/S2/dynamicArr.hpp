@@ -46,7 +46,7 @@ namespace kiselev
     T* newData = new T[newCapacity];
     for (size_t i = 0; i < size_; ++i)
     {
-      newData[i] = data_[i];
+      newData[i] = std::move(data_[i]);
     }
     delete[] data_;
     capacity_ = newCapacity;
@@ -100,7 +100,7 @@ namespace kiselev
   DynamicArr< T >& DynamicArr< T >::operator=(const DynamicArr< T >& arr)
   {
     DynamicArr< T > copy(arr);
-    swap(arr);
+    swap(copy);
     return *this;
   }
 
@@ -163,7 +163,7 @@ namespace kiselev
     }
     for (size_t i = 1; i < size_; ++i)
     {
-      data_[i - 1] = data_[i];
+      data_[i - 1] = std::move(data_[i]);
     }
     --size_;
   }
