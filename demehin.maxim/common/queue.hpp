@@ -61,14 +61,10 @@ namespace demehin
 
   template< typename T >
   Queue< T >::Queue(Queue&& rhs) noexcept:
-    data_(rhs.data_),
-    size_(rhs.size_),
-    capacity_(rhs.capacity_)
-  {
-    std::exchange(rhs.data_, nullptr);
-    std::exchange(rhs.size_, 0);
-    std::exchange(rhs.capacity_, 0);
-  }
+    data_(std::exchange(rhs.data_, nullptr)),
+    size_(std::exchange(rhs.size_, 0)),
+    capacity_(std::exchange(rhs.capacity_, 0))
+  {}
 
   template< typename T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
