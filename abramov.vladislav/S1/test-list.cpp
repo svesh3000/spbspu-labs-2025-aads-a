@@ -1,6 +1,16 @@
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
+BOOST_AUTO_TEST_CASE(fill_constructor)
+{
+  abramov::List< int > list(10, 1);
+  auto it = list.begin();
+  for (size_t i = 0; i < 10; ++i)
+  {
+    BOOST_TEST(*(it) == 1);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(init_list)
 {
   abramov::List< int > list{ 1, 2, 3 };
@@ -96,8 +106,6 @@ BOOST_AUTO_TEST_CASE(clear)
 BOOST_AUTO_TEST_CASE(begin)
 {
   abramov::List< int > list{ 1, 0 };
-  list.pushFront(0);
-  list.pushFront(1);
   auto iter = list.begin();
   BOOST_TEST(*iter == 1);
 }
@@ -113,11 +121,33 @@ BOOST_AUTO_TEST_CASE(end)
   BOOST_TEST(b);
 }
 
+BOOST_AUTO_TEST_CASE(cbegin)
+{
+  abramov::List< int > list{ 1, 2 };
+  auto iter = list.cbegin();
+  BOOST_TEST(*iter == 1);
+}
+
+BOOST_AUTO_TEST_CASE(cend)
+{
+  abramov::List< int > list{ 1, 2 };
+  auto iter = list.cend();
+  --iter;
+  BOOST_TEST(*iter == 2);
+}
+
 BOOST_AUTO_TEST_CASE(find)
 {
   abramov::List< int > list{ 0, 1, 2, 1};
   auto it = list.find(list.begin(), list.end(), 1);
   BOOST_TEST(*it == 1);
+}
+
+BOOST_AUTO_TEST_CASE(find_if)
+{
+  abramov::List< int > list{ 1, 2, 3, 4 };
+  auto it = list.find_if(list.begin(), list.end(), [](int a) { return a % 2 == 0; });
+  BOOST_TEST(*it == 2);
 }
 
 BOOST_AUTO_TEST_CASE(remove_test)
@@ -142,5 +172,16 @@ BOOST_AUTO_TEST_CASE(assign_fill)
   for (size_t i = 0; i < 5; ++i)
   {
     BOOST_TEST(*(it++) == 1);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(assign_il)
+{
+  abramov::List< int > list;
+  list.assign({ 1, 2, 3 });
+  auto it = list.begin();
+  for (size_t i = 1; i < 4; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
   }
 }

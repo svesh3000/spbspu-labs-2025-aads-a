@@ -79,7 +79,7 @@ namespace abramov
   List< T >::List(size_t n, T val):
     head_(nullptr),
     tail_(nullptr),
-    size_(n)
+    size_(0)
   {
     try
     {
@@ -90,7 +90,7 @@ namespace abramov
     }
     catch (const std::bad_alloc &)
     {
-      clear(head_);
+      clear();
     }
   }
 
