@@ -23,18 +23,10 @@ namespace averenkov
     bool operator==(const ConstListIterator< T >&) const;
     bool operator!=(const ConstListIterator< T >&) const;
 
-    Node< T >* getNode();
-
   private:
     Node< T >* node_;
 
   };
-
-  template< class T >
-  Node< T >*  ConstListIterator< T >::getNode()
-  {
-    return node_;
-  }
 
   template< class T >
   ConstListIterator< T >::ConstListIterator(Node< T >* node) noexcept:

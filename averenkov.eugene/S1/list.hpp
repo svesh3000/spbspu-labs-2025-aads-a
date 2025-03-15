@@ -57,17 +57,15 @@ namespace averenkov
 
   private:
 
-    Node< T >* fake_;
-    Node< T >* tail_;
     size_t size_;
+    Node< T >* fake_;
 
   };
 
   template < class T >
   List< T >::List():
-    size_(0)
+    size_(0), fake_(new Node< T >(T()))
   {
-    fake_ = new Node< T >(T());
     fake_->next_ = fake_;
   }
 
@@ -273,24 +271,24 @@ namespace averenkov
     {
       return;
     }
-    Node< T >* posNode = pos.getNode();
-    Node< T >* firstNode = first.getNode();
+    Node< T >* posNode = pos.operator->();
+    Node< T >* firstNode = first.operator->();
     Node< T >* lastNode = firstNode;
+    while (lastNode->next_ != last.operator->())
+    {
+      lastNode = lastNode->next_;
+    }
     Node< T >* prevNode = rhs.fake_;
     while (prevNode->next_ != firstNode)
     {
       prevNode = prevNode->next_;
-    }
-    while (lastNode->next_ != last.getNode())
-    {
-      lastNode = lastNode->next_;
     }
     prevNode->next_ = lastNode->next_;
     lastNode->next_ = posNode->next_;
     posNode->next_ = firstNode;
     size_t count = 0;
     Node< T >* temp = firstNode;
-    while (temp != last.getNode())
+    while (temp != last.operator->())
     {
       count++;
       temp = temp->next_;
@@ -334,7 +332,7 @@ namespace averenkov
   template < class T >
   void List< T >::assign(size_t count, const T& value)
   {
-    List< T > copy = this;
+    List< T >* copy = this;
     try
     {
       while (count--)
