@@ -2,28 +2,42 @@
 #include <stdexcept>
 #include <iostream>
 
-savintsev::PostfixExpr::PostfixExpr(PostfixExpr & rhs):
-  expr_(rhs.expr_),
-  result_(rhs.result_)
+namespace
+{
+  bool is_token_number(std::string token)
+  {
+    for (size_t i = 0; i < token.size(); ++i)
+    {
+      if (!std::isdigit(token[i]))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+savintsev::PostfixExpr::PostfixExpr(const PostfixExpr & rhs):
+  expr_(rhs.expr_)
 {}
 
-void savintsev::PostfixExpr::operator=(std::string & infix_expr)
+savintsev::PostfixExpr savintsev::convert(const std::string & infix)
 {
+  PostfixExpr postfix;
   using str = std::string;
 
   std::stack< str > stack;
-  std::stack< int > calculations;
 
   size_t was_bracket = 0;
 
-  size_t back = infix_expr.size() - 1;
+  size_t back = infix.size() - 1;
   size_t begin = 0;
   size_t end = 0;
 
   while (end != back)
   {
-    end = infix_expr.find(' ', begin);
-    str token = infix_expr.substr(begin, end != str::npos ? end - begin : end = back);
+    end = infix.find(' ', begin);
+    str token = infix.substr(begin, end != str::npos ? end - begin : end = back);
     if (token == "")
     {
       begin = end + 1;
@@ -40,8 +54,7 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
       {
         if (stack.top() != "(")
         {
-          expr_.push(stack.top());
-          calculate_result(stack.top(), calculations);
+          postfix.expr_.push(stack.top());
           stack.pop();
         }
       }
@@ -53,8 +66,7 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
       {
         if (stack.top() == "*" || stack.top() == "*" || stack.top() == "%")
         {
-          expr_.push(stack.top());
-          calculate_result(stack.top(), calculations);
+          postfix.expr_.push(stack.top());
           stack.pop();
         }
       }
@@ -68,8 +80,7 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
       }
       while (stack.top() != "(")
       {
-        expr_.push(stack.top());
-        calculate_result(stack.top(), calculations);
+        postfix.expr_.push(stack.top());
         stack.pop();
       }
       stack.pop();
@@ -77,8 +88,7 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
     }
     else if (is_token_number(token))
     {
-      calculations.push(std::stoi(token));
-      expr_.push(token);
+      postfix.expr_.push(token);
     }
     else
     {
@@ -88,83 +98,83 @@ void savintsev::PostfixExpr::operator=(std::string & infix_expr)
   }
   while (!stack.empty())
   {
-    expr_.push(stack.top());
-    calculate_result(stack.top(), calculations);
+    postfix.expr_.push(stack.top());
     stack.pop();
   }
-  if (calculations.size() == 1)
-  {
-    result_ = calculations.top();
-  }
-  else
+  if (was_bracket)
   {
     throw std::invalid_argument("ERROR: invalid expression");
   }
+  postfix.calculate_result(true);
+  return postfix;
 }
 
-void savintsev::PostfixExpr::calculate_result(std::string token, std::stack< int > & calc) const
+int savintsev::PostfixExpr::calculate_result(bool is_excepting) const
 {
-  if (calc.size() < 2)
-  {
-    throw std::invalid_argument("ERROR: invalid expression");
-  }
-  if (token == "+")
-  {
-    int r = calc.top();
-    calc.pop();
-    int l = calc.top();
-    calc.pop();
-    calc.push(l + r);
-  }
-  else if (token == "-")
-  {
-    int r = calc.top();
-    calc.pop();
-    int l = calc.top();
-    calc.pop();
-    calc.push(l - r);
-  }
-  else if (token == "*")
-  {
-    int r = calc.top();
-    calc.pop();
-    int l = calc.top();
-    calc.pop();
-    calc.push(l * r);
-  }
-  else if (token == "/")
-  {
-    int r = calc.top();
-    calc.pop();
-    int l = calc.top();
-    calc.pop();
-    calc.push(l / r);
-  }
-  else if (token == "%")
-  {
-    int r = calc.top();
-    calc.pop();
-    int l = calc.top();
-    calc.pop();
-    calc.push(l % r);
-  }
-}
+  std::queue< std::string > expr(expr_);
+  std::stack< int > calc;
 
-bool savintsev::PostfixExpr::is_token_number(std::string token)
-{
-  for (size_t i = 0; i < token.size(); ++i)
+  while (expr.size())
   {
-    if (!std::isdigit(token[i]))
+    std::string token = expr.front();
+    expr.pop();
+    if (is_token_number(token))
     {
-      return false;
+      calc.push(std::stoi(token));
+    }
+    else
+    {
+      if (calc.size() < 2 && is_excepting)
+      {
+        throw std::invalid_argument("ERROR: invalid expression");
+      }
+      int r = calc.top();
+      calc.pop();
+      int l = calc.top();
+      calc.pop();
+      switch (*(token.data()))
+      {
+      case '+':
+        calc.push(l + r);
+        break;
+      case '-':
+        calc.push(l - r);
+        break;
+      case '*':
+        calc.push(l * r);
+        break;
+      case '/':
+        calc.push(l / r);
+        break;
+      case '%':
+        calc.push(l % r);
+        break;
+      }
     }
   }
-  return true;
+  if (calc.size() == 1)
+  {
+    return calc.top();
+  }
+  if (is_excepting)
+  {
+    throw std::invalid_argument("ERROR: invalid expression");
+  }
+  return 0;
 }
 
-int savintsev::PostfixExpr::get_result() const
+int savintsev::PostfixExpr::operator()() const noexcept
 {
-  return result_;
+  return calculate_result(false);
+}
+
+savintsev::PostfixExpr & savintsev::PostfixExpr::operator=(const PostfixExpr & rhs)
+{
+  if (std::addressof(rhs) != this)
+  {
+    expr_ = rhs.expr_;
+  }
+  return *this;
 }
 
 savintsev::PostfixExpr savintsev::PostfixExpr::operator+(PostfixExpr rhs)
@@ -176,6 +186,6 @@ savintsev::PostfixExpr savintsev::PostfixExpr::operator+(PostfixExpr rhs)
     rhs.expr_.pop();
   }
   lhs.expr_.push("+");
-  lhs.result_ += rhs.result_;
+  //lhs.result_ += rhs.result_;
   return lhs;
 }
