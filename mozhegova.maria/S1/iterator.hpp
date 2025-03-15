@@ -21,19 +21,19 @@ namespace mozhegova
     ~Iterator() = default;
     Iterator< T > & operator=(const Iterator< T > &) = default;
 
-    Iterator< T > & operator++();
-    Iterator< T > operator++(int);
+    Iterator< T > & operator++() noexcept;
+    Iterator< T > operator++(int) noexcept;
 
-    Iterator< T > & operator--();
-    Iterator< T > operator--(int);
+    Iterator< T > & operator--() noexcept;
+    Iterator< T > operator--(int) noexcept;
 
-    T & operator*();
-    T * operator->();
-    const T & operator*() const;
-    const T * operator->() const;
+    T & operator*() noexcept;
+    T * operator->() noexcept;
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
 
-    bool operator==(const Iterator< T > &) const;
-    bool operator!=(const Iterator< T > &) const;
+    bool operator==(const Iterator< T > &) const noexcept;
+    bool operator!=(const Iterator< T > &) const noexcept;
   private:
     detail::Node< T > * node_;
 
@@ -51,7 +51,7 @@ namespace mozhegova
   {}
 
   template< typename T >
-  Iterator< T > & Iterator< T >::operator++()
+  Iterator< T > & Iterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_->next_;
@@ -59,7 +59,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > Iterator< T >::operator++(int)
+  Iterator< T > Iterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
     Iterator< T > result(*this);
@@ -68,7 +68,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > & Iterator< T >::operator--()
+  Iterator< T > & Iterator< T >::operator--() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_->prev_;
@@ -76,7 +76,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Iterator< T > Iterator< T >::operator--(int)
+  Iterator< T > Iterator< T >::operator--(int) noexcept
   {
     assert(node_ != nullptr);
     Iterator< T > result(*this);
@@ -85,41 +85,41 @@ namespace mozhegova
   }
 
   template< typename T >
-  T & Iterator< T >::operator*()
+  T & Iterator< T >::operator*() noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< typename T >
-  T * Iterator< T >::operator->()
+  T * Iterator< T >::operator->() noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
   template< typename T >
-  const T & Iterator< T >::operator*() const
+  const T & Iterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< typename T >
-  const T * Iterator< T >::operator->() const
+  const T * Iterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
   template< typename T >
-  bool Iterator< T >::operator==(const Iterator< T > & rhs) const
+  bool Iterator< T >::operator==(const Iterator< T > & rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template< typename T >
-  bool Iterator< T >::operator!=(const Iterator< T > & rhs) const
+  bool Iterator< T >::operator!=(const Iterator< T > & rhs) const noexcept
   {
     return !(rhs == *this);
   }

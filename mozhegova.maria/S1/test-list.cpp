@@ -187,13 +187,13 @@ BOOST_AUTO_TEST_CASE(insert)
   mozhegova::List< int > list2({1, 2, 3, 4, 5, 6});
   it = list.cbegin();
   std::advance(it, 3);
-  auto it2 = list2.begin();
-  list.insert(it, it2, list2.begin());
+  mozhegova::ConstIterator< int > it2 = list2.cbegin();
+  list.insert(it, it2, list2.cbegin());
   std::ostringstream out4;
   printList(out4, list);
   BOOST_TEST(out4.str() == "59992");
   std::advance(it2, 3);
-  list.insert(it, it2, list2.end());
+  list.insert(it, it2, list2.cend());
   std::ostringstream out5;
   printList(out5, list);
   BOOST_TEST(out5.str() == "59945692");

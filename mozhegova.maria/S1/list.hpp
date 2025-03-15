@@ -408,12 +408,19 @@ namespace mozhegova
     {
       return Iterator< T >(pos.node_);
     }
-    Iterator< T > temp = insert(pos, val);
-    for (size_t i = 1; i < n; i++)
-    {
-      insert(pos, val);
-    }
-    return temp;
+    List< T > tempList(n, val);
+    detail::Node< T > * head = tempList.fake_->next_;
+    delete head->prev_;
+    detail::Node< T > * tempNode = pos.node_;
+    tempNode->prev_->next_ = head;
+    head->prev_ = tempNode->prev_;
+    tempList.tail_->next_ = tempNode;
+    tempNode->prev_ = tempList.tail_;
+    size_ += n;
+    tempList.fake_ = nullptr;
+    tempList.tail_ = nullptr;
+    tempList.size_ = 0;
+    return Iterator< T >(head);
   }
 
   template< typename T >
@@ -424,12 +431,19 @@ namespace mozhegova
     {
       return Iterator< T >(pos.node_);
     }
-    Iterator< T > temp = insert(pos, *first);
-    for (auto it = ++first; it != last; ++it)
-    {
-      insert(pos, *it);
-    }
-    return temp;
+    List< T > tempList(first, last);
+    detail::Node< T > * head = tempList.fake_->next_;
+    delete head->prev_;
+    detail::Node< T > * tempNode = pos.node_;
+    tempNode->prev_->next_ = head;
+    head->prev_ = tempNode->prev_;
+    tempList.tail_->next_ = tempNode;
+    tempNode->prev_ = tempList.tail_;
+    size_ += tempList.size_;
+    tempList.fake_ = nullptr;
+    tempList.tail_ = nullptr;
+    tempList.size_ = 0;
+    return Iterator< T >(head);
   }
 
   template< typename T >
@@ -441,7 +455,23 @@ namespace mozhegova
   template< typename T >
   Iterator< T > List< T >::insert(ConstIterator< T > pos, std::initializer_list< T > il)
   {
-    return insert(pos, il.begin(), il.end());
+    if (il.size() == 0)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    List< T > tempList(il);
+    detail::Node< T > * head = tempList.fake_->next_;
+    delete head->prev_;
+    detail::Node< T > * tempNode = pos.node_;
+    tempNode->prev_->next_ = head;
+    head->prev_ = tempNode->prev_;
+    tempList.tail_->next_ = tempNode;
+    tempNode->prev_ = tempList.tail_;
+    size_ += tempList.size_;
+    tempList.fake_ = nullptr;
+    tempList.tail_ = nullptr;
+    tempList.size_ = 0;
+    return Iterator< T >(head);
   }
 
   template< typename T >
