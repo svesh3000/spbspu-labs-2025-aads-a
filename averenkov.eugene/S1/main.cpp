@@ -4,10 +4,11 @@
 #include <limits>
 #include "list.hpp"
 
-int main()
+using namespace averenkov;
+using mainList = List< std::pair< std::string, List< unsigned long long > > >;
+mainList readInput()
 {
-  using namespace averenkov;
-  List< std::pair< std::string, List< unsigned long long > > > list;
+  mainList list;
   std::string name;
   while (std::cin >> name)
   {
@@ -20,10 +21,15 @@ int main()
     list.push_back(std::make_pair(name, numbersList));
     std::cin.clear();
   }
+  return list;
+}
+
+void printNames(const mainList& list)
+{
   if (list.empty())
   {
     std::cout << "0\n";
-    return 0;
+    return;
   }
   std::cout << list.begin()->first;
   for (auto it = ++(list.begin()); it != list.end(); it++)
@@ -31,6 +37,10 @@ int main()
     std::cout << " " << it->first;
   }
   std::cout << "\n";
+}
+
+List< List< unsigned long long > > createResultList(const mainList& list)
+{
   List< List< unsigned long long > > result;
   size_t maxLen = 0;
   for (auto it = list.begin(); it != list.end(); it++)
@@ -57,6 +67,11 @@ int main()
     }
     result.push_back(sublist);
   }
+  return result;
+}
+
+void printResult(const List< List< unsigned long long > >& result)
+{
   for (auto it = result.begin(); it != result.end(); it++)
   {
     std::cout << *(it->begin());
@@ -66,6 +81,10 @@ int main()
     }
     std::cout << "\n";
   }
+}
+
+void calcPrintSum(const List< List< unsigned long long > >& result)
+{
   List< unsigned long long > sums;
   for (auto it = result.begin(); it != result.end(); it++)
   {
@@ -75,7 +94,7 @@ int main()
       if (sum > std::numeric_limits< unsigned long long >::max() - *numIt)
       {
         std::cerr << "Error\n";
-        return 1;
+        return;
       }
       sum += *numIt;
     }
@@ -87,5 +106,14 @@ int main()
     std::cout << " " << *it;
   }
   std::cout << "\n";
+}
+
+int main()
+{
+  auto list = readInput();
+  printNames(list);
+  auto result = createResult(list);
+  printResultList(result);
+  calcPrintSum(result);
   return 0;
 }
