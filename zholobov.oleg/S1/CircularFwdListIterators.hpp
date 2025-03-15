@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <forward_list>
 #include "FwdListNode.hpp"
 
 namespace zholobov {
@@ -17,7 +18,7 @@ namespace zholobov {
     using reference = T&;
 
     CircularFwdListIterator();
-    explicit CircularFwdListIterator(FwdListNode< value_type >** node);
+    explicit CircularFwdListIterator(FwdListNodeBase** node);
     CircularFwdListIterator& operator++() noexcept;
     CircularFwdListIterator operator++(int) noexcept;
     reference operator*() const noexcept;
@@ -26,7 +27,7 @@ namespace zholobov {
     bool operator!=(const CircularFwdListIterator& other) const noexcept;
 
   private:
-    FwdListNode< value_type >** node_;
+    FwdListNodeBase** node_;
   };
 
   template < typename T >
@@ -39,7 +40,7 @@ namespace zholobov {
     using reference = const T&;
 
     CircularFwdListConstIterator();
-    explicit CircularFwdListConstIterator(FwdListNode< T >* const* node);
+    explicit CircularFwdListConstIterator(FwdListNodeBase* const* node);
     CircularFwdListConstIterator& operator++() noexcept;
     CircularFwdListConstIterator operator++(int) noexcept;
     reference operator*() const noexcept;
@@ -48,7 +49,7 @@ namespace zholobov {
     bool operator!=(const CircularFwdListConstIterator& other) const noexcept;
 
   private:
-    FwdListNode< T >* const* node_;
+    FwdListNodeBase* const* node_;
   };
 
 }
@@ -59,7 +60,7 @@ zholobov::CircularFwdListIterator< T >::CircularFwdListIterator():
 {}
 
 template < typename T >
-zholobov::CircularFwdListIterator< T >::CircularFwdListIterator(FwdListNode< value_type >** node):
+zholobov::CircularFwdListIterator< T >::CircularFwdListIterator(FwdListNodeBase** node):
   node_(node)
 {}
 
@@ -82,14 +83,14 @@ template < typename T >
 typename zholobov::CircularFwdListIterator< T >::reference
 zholobov::CircularFwdListIterator< T >::operator*() const noexcept
 {
-  return (*node_)->value;
+  return static_cast< FwdListNode< value_type >* >(*node_)->value;
 }
 
 template < typename T >
 typename zholobov::CircularFwdListIterator< T >::pointer
 zholobov::CircularFwdListIterator< T >::operator->() const noexcept
 {
-  return std::addressof((*node_)->value);
+  return std::addressof(static_cast< FwdListNode< value_type >* >(*node_)->value);
 }
 
 template < typename T >
@@ -112,7 +113,7 @@ zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator():
 {}
 
 template < typename T >
-zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNode< T >* const* node):
+zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNodeBase* const* node):
   node_(node)
 {}
 
@@ -135,14 +136,14 @@ template < typename T >
 typename zholobov::CircularFwdListConstIterator< T >::reference
 zholobov::CircularFwdListConstIterator< T >::operator*() const noexcept
 {
-  return (*node_)->value;
+  return static_cast< FwdListNode< value_type >* >(*node_)->value;
 }
 
 template < typename T >
 typename zholobov::CircularFwdListConstIterator< T >::pointer
 zholobov::CircularFwdListConstIterator< T >::operator->() const noexcept
 {
-  return std::addressof((*node_)->value);
+  return std::addressof(static_cast< FwdListNode< value_type >* >(*node_)->value);
 }
 
 template < typename T >
