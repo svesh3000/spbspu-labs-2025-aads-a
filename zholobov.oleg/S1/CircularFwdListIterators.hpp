@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include <forward_list>
 #include "FwdListNode.hpp"
 
 namespace zholobov {

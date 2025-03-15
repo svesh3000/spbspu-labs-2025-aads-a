@@ -48,7 +48,7 @@ namespace zholobov {
     template < typename InputIter, typename = details::IsInputIterator< InputIter > >
     void assign(InputIter first, InputIter last);
     void assign(size_t n, const T& val);
-    void assign(std::initializer_list< T >);
+    void assign(std::initializer_list< T > init);
 
     iterator before_begin() noexcept;
     const_iterator before_begin() const noexcept;
@@ -122,8 +122,13 @@ template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(size_t n, const value_type& val):
   CircularFwdList()
 {
-  for (size_t i = 0; i < n; ++i) {
-    push_front(val);
+  try {
+    for (size_t i = 0; i < n; ++i) {
+      push_front(val);
+    }
+  } catch (const std::bad_alloc&) {
+    clear();
+    throw;
   }
 }
 
@@ -131,34 +136,20 @@ template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(std::initializer_list< value_type > init):
   CircularFwdList()
 {
-  for (auto it = init.begin(); it != init.end(); ++it) {
-    push_back(*it);
-  }
+  assign(init);
 }
 
 template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(const CircularFwdList& other):
   CircularFwdList()
 {
-  FwdListNodeBase* other_p = other.head_;
-  if (other_p != nullptr) {
-    try {
-      head_ = new FwdListNode< value_type >(static_cast< FwdListNode< value_type >* >(other_p)->value, head_);
-      ++size_;
-      other_p = other_p->next;
-      FwdListNodeBase* prev = head_;
-      while (other_p != other.head_) {
-        auto curr = new FwdListNode< value_type >(static_cast< FwdListNode< value_type >* >(other_p)->value, head_);
-        ++size_;
-        prev->next = curr;
-        other_p = other_p->next;
-        prev = prev->next;
-      };
-      tail_ = prev;
-    } catch (const std::bad_alloc&) {
-      clear();
-      throw;
+  try {
+    for (const auto& elem : other) {
+      push_back(elem);
     }
+  } catch (const std::bad_alloc&) {
+    clear();
+    throw;
   }
 }
 
@@ -171,8 +162,10 @@ zholobov::CircularFwdList< T >::CircularFwdList(CircularFwdList&& other) noexcep
 
 template < typename T >
 template < typename InputIter, typename SFINAE >
-zholobov::CircularFwdList< T >::CircularFwdList(InputIter first, InputIter last)
+zholobov::CircularFwdList< T >::CircularFwdList(InputIter first, InputIter last):
+  CircularFwdList()
 {
+  assign(first, last);
 }
 
 template < typename T >
@@ -204,6 +197,7 @@ zholobov::CircularFwdList< T >& zholobov::CircularFwdList< T >::operator=(Circul
 template < typename T >
 zholobov::CircularFwdList< T >& zholobov::CircularFwdList< T >::operator=(std::initializer_list< value_type > init)
 {
+  assign(init);
   return *this;
 }
 
@@ -211,6 +205,11 @@ template < typename T >
 template < typename InputIter, typename SFINAE >
 void zholobov::CircularFwdList< T >::assign(InputIter first, InputIter last)
 {
+  CircularFwdList< T > temp;
+  for (; first != last; ++first) {
+    temp.push_back(*first);
+  }
+  swap(temp);
 }
 
 template < typename T >
@@ -221,8 +220,13 @@ void zholobov::CircularFwdList< T >::assign(size_t n, const T& val)
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::assign(std::initializer_list< T >)
+void zholobov::CircularFwdList< T >::assign(std::initializer_list< T > init)
 {
+  CircularFwdList< T > temp;
+  for (const auto& elem : init) {
+    temp.push_back(elem);
+  }
+  swap(temp);
 }
 
 template < typename T >
@@ -403,44 +407,69 @@ void zholobov::CircularFwdList< T >::pop_back()
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::insert_after(const_iterator position, const T& x)
 {
-  return iterator();
+  CircularFwdList< T > list(1, x);
+  splice_after(position, list);
+  return begin();
 }
 
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::insert_after(const_iterator position, T&& x)
 {
-  return iterator();
+  CircularFwdList< T > list;
+  list.push_back(std::move(x));
+  splice_after(position, list);
+  return begin();
 }
 
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::insert_after(const_iterator position, size_t n, const T& x)
 {
-  return iterator();
+  CircularFwdList< T > list(n, x);
+  splice_after(position, list);
+  return begin();
 }
 
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::insert_after(const_iterator position, std::initializer_list< T > il)
 {
-  return iterator();
+  CircularFwdList< T > list(il);
+  splice_after(position, list);
+  return begin();
 }
 
 template < typename T >
 template < class InputIter, typename SFINAE >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::insert_after(const_iterator position, InputIter first, InputIter last)
 {
-  return iterator();
+  CircularFwdList< T > list(first, last);
+  splice_after(position, list);
+  return begin();
 }
 
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::erase_after(const_iterator position)
 {
-  return iterator();
+  auto last = position;
+  ++last;
+  if (++last == cend()) {
+    return end();
+  }
+  ++last;
+  return erase_after(position, last);
 }
 
 template < typename T >
 typename zholobov::CircularFwdList< T >::iterator zholobov::CircularFwdList< T >::erase_after(const_iterator position, const_iterator last)
 {
-  return iterator();
+  auto it = begin();
+  auto cit = cbegin();
+  while (cit != last) {
+    ++cit;
+    ++it;
+  }
+  CircularFwdList< T > tmp;
+  tmp.splice_after(tmp.cbegin(), *this, position, last);
+  return it;
 }
 
 template < typename T >

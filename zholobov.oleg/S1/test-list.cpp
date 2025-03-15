@@ -283,6 +283,11 @@ BOOST_AUTO_TEST_CASE(opeartor_assign)
     BOOST_TEST(to_string(list) == "10 20 30 40");
     BOOST_TEST(to_string(list2) == "10 20 30 40");
   }
+  {
+    zholobov::CircularFwdList< int > list{1, 2, 3};
+    list = {10, 20, 30, 40};
+    BOOST_TEST(to_string(list) == "10 20 30 40");
+  }
 }
 
 BOOST_AUTO_TEST_CASE(opeartor_move_assign)
@@ -320,13 +325,16 @@ BOOST_AUTO_TEST_CASE(insert_after)
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbegin();
     std::advance(pos, 3);
-    list.insert_after(pos, 42);
+    int value = 42;
+    list.insert_after(pos, value);
     BOOST_TEST(to_string(list) == "1 2 3 10 42 11 12");
   }
   {
+    //!!!
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
-    list.insert_after(pos, 42);
+    int value = 42;
+    list.insert_after(pos, value);
     BOOST_TEST(to_string(list) == "42 1 2 3 10 11 12");
   }
 
@@ -340,6 +348,7 @@ BOOST_AUTO_TEST_CASE(insert_after)
     BOOST_TEST(value == "");
   }
   {
+    //!!!
     zholobov::CircularFwdList< std::string > list{"1", "2", "3", "10", "11", "12"};
     auto pos = list.cbefore_begin();
     std::string value = "value";
