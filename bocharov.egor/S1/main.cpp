@@ -3,32 +3,13 @@
 
 int main()
 {
-  bocharov::pairs_list_t pairs_list;
-  std::string list_name = "";
-
-  while (std::cin >> list_name)
-  {
-    bocharov::list_t list;
-    unsigned long long num = 0;
-    while (std::cin >> num)
-    {
-      list.push_back(num);
-    }
-    pairs_list.push_back(std::make_pair(list_name, list));
-    std::cin.clear();
-  }
-
+  bocharov::pairs_list_t pairs_list = bocharov::createList(std::cin);
   if (pairs_list.empty())
   {
     std::cout << 0 << '\n';
     return 0;
   }
-  std::cout << pairs_list.cbegin()->first;
-  for (auto i = ++pairs_list.cbegin(); i != pairs_list.cend(); ++i)
-  {
-    std::cout << ' ' << i->first;
-  }
-  std::cout << '\n';
+  bocharov::outputList(std::cout, pairs_list);
   try
   {
     bocharov::print_lists_info(std::cout, pairs_list);

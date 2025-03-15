@@ -1,6 +1,6 @@
 #include "actions.hpp"
 #include <limits>
-#include <ostream>
+#include <stdexcept>
 
 namespace
 {
@@ -114,3 +114,35 @@ void bocharov::print_lists_info(std::ostream & out, const pairs_list_t & pairs_l
   print_list_elements(out, sums);
 }
 
+bocharov::pairs_list_t bocharov::createList(std::istream & input)
+{
+  std::string name;
+  pairs_list_t pairs_list;
+  while (input >> name)
+  {
+    list_t list;
+    unsigned long long number;
+    while (input >> number)
+    {
+      if (!input)
+      {
+        throw std::logic_error("Incorrect number");
+      }
+      list.push_back(number);
+    }
+    input.clear();
+    pairs_list.push_back(pair(name, list));
+  }
+  return pairs_list;
+}
+
+std::ostream & bocharov::outputList(std::ostream & output, const pairs_list_t & pairs_list)
+{
+  output << pairs_list.cbegin()->first;
+  for (auto i = ++pairs_list.cbegin(); i != pairs_list.cend(); ++i)
+  {
+    output << ' ' << i->first;
+  }
+  output << '\n';
+  return output;
+}
