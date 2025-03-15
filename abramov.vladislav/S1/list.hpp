@@ -365,16 +365,20 @@ namespace abramov
       head_->prev_ = other.tail_;
       head_ = other.head_;
     }
-    if ((--pos).node_ == tail_)
+    else if ((--pos).node_ == tail_)
     {
       other.head_->prev_ = tail_;
       tail_->next_ = other.head_;
       tail_ = other.tail_;
     }
-    pos.node_->prev_->next_ = other.head_;
-    other.head_->prev_ = pos.node_->prev_;
-    pos.node_->prev_ = other.tail_;
-    other.tail_->next_ = pos.node_;
+    else
+    {
+      ++pos;
+      pos.node_->prev_->next_ = other.head_;
+      other.head_->prev_ = pos.node_->prev_;
+      pos.node_->prev_ = other.tail_;
+      other.tail_->next_ = pos.node_;
+    }
     other.head_ = nullptr;
     other.tail_ = nullptr;
     size_ += other.size_;
