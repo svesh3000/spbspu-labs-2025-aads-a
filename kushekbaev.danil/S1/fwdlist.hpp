@@ -135,7 +135,7 @@ namespace kushekbaev
   void FwdList< T >::push_front(const T value)
   {
     assert(!empty());
-    Node< T >* newNode = new Node(value);
+    Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_ -> next;
     fake_ -> next_ = newNode;
     ++size_;
@@ -145,7 +145,7 @@ namespace kushekbaev
   void FwdList< T >::push_back(const T value)
   {
     assert(!empty());
-    Node< T >* newNode = new Node(value);
+    Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_;
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
