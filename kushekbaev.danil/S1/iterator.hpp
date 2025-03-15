@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <iterator>
-#include "fwdlist.hpp"
 #include "node.hpp"
 
 namespace kushekbaev
@@ -49,7 +48,7 @@ namespace kushekbaev
   typename Iterator< T >::this_t & Iterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    node_ = node_ -> next;
+    node_ = node_ -> next_;
     return *this;
   }
 
