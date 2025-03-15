@@ -15,14 +15,14 @@ namespace abramov
     ConstIterator(const ConstIterator &c_iter) = default;
     ~ConstIterator() = default;
     ConstIterator &operator=(const ConstIterator &c_iter) = default;
-    ConstIterator &operator++();
-    ConstIterator operator++(int);
-    ConstIterator &operator--();
-    ConstIterator operator--(int);
-    bool operator==(const ConstIterator &c_iter) const;
-    bool operator!=(const ConstIterator &c_iter) const;
-    const T &operator*() const;
-    const T *operator->() const;
+    ConstIterator &operator++() noexcept;
+    ConstIterator operator++(int) noexcept;
+    ConstIterator &operator--() noexcept;
+    ConstIterator operator--(int) noexcept;
+    bool operator==(const ConstIterator &c_iter) const noexcept;
+    bool operator!=(const ConstIterator &c_iter) const noexcept;
+    const T &operator*() const noexcept;
+    const T *operator->() const noexcept;
   private:
     Node< T > *node_;
     const List< T > *list_;
@@ -41,14 +41,14 @@ namespace abramov
   {}
 
   template< class T >
-  ConstIterator< T > &ConstIterator< T >::operator++()
+  ConstIterator< T > &ConstIterator< T >::operator++() noexcept
   {
     node_ = node_->next_;
     return *this;
   }
 
   template< class T >
-  ConstIterator< T > ConstIterator< T >::operator++(int)
+  ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
     ConstIterator< T > c_iter(*this);
     ++(*this);
@@ -56,7 +56,7 @@ namespace abramov
   }
 
   template< class T >
-  ConstIterator< T > &ConstIterator< T >::operator--()
+  ConstIterator< T > &ConstIterator< T >::operator--() noexcept
   {
     if (node_)
     {
@@ -70,7 +70,7 @@ namespace abramov
   }
 
   template< class T >
-  ConstIterator< T > ConstIterator< T >::operator--(int)
+  ConstIterator< T > ConstIterator< T >::operator--(int) noexcept
   {
     ConstIterator< T > c_iter(*this);
     --(*this);
@@ -78,25 +78,25 @@ namespace abramov
   }
 
   template< class T >
-  bool ConstIterator< T >::operator==(const ConstIterator &c_iter) const
+  bool ConstIterator< T >::operator==(const ConstIterator &c_iter) const noexcept
   {
     return node_ == c_iter.node_;
   }
 
   template< class T >
-  bool ConstIterator< T >::operator!=(const ConstIterator &c_iter) const
+  bool ConstIterator< T >::operator!=(const ConstIterator &c_iter) const noexcept
   {
     return !(c_iter == *this);
   }
 
   template< class T >
-  const T &ConstIterator< T >::operator*() const
+  const T &ConstIterator< T >::operator*() const noexcept
   {
     return node_->data_;
   }
 
   template< class T >
-  const T *ConstIterator< T >::operator->() const
+  const T *ConstIterator< T >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }

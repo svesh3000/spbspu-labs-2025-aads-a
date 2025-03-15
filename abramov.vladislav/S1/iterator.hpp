@@ -15,14 +15,14 @@ namespace abramov
     Iterator(const Iterator &iter) = default;
     ~Iterator() = default;
     Iterator &operator=(const Iterator &iter) = default;
-    Iterator &operator++();
-    Iterator operator++(int);
-    Iterator &operator--();
-    Iterator operator--(int);
-    bool operator==(const Iterator &iter) const;
-    bool operator!=(const Iterator &iter) const;
-    T &operator*();
-    T *operator->();
+    Iterator &operator++() noexcept;
+    Iterator operator++(int) noexcept;
+    Iterator &operator--() noexcept;
+    Iterator operator--(int) noexcept;
+    bool operator==(const Iterator &iter) const noexcept;
+    bool operator!=(const Iterator &iter) const noexcept;
+    T &operator*() noexcept;
+    T *operator->() noexcept;
   private:
     Node< T > *node_;
     const List< T > *list_;
@@ -42,14 +42,14 @@ namespace abramov
   {}
 
   template< class T >
-  Iterator< T > &Iterator< T >::operator++()
+  Iterator< T > &Iterator< T >::operator++() noexcept
   {
     node_ = node_->next_;
     return *this;
   }
 
   template< class T >
-  Iterator< T > Iterator< T >::operator++(int)
+  Iterator< T > Iterator< T >::operator++(int) noexcept
   {
     Iterator< T > iter(*this);
     ++(*this);
@@ -57,7 +57,7 @@ namespace abramov
   }
 
   template< class T >
-  Iterator< T > &Iterator< T >::operator--()
+  Iterator< T > &Iterator< T >::operator--() noexcept
   {
     if (node_)
     {
@@ -71,7 +71,7 @@ namespace abramov
   }
 
   template< class T >
-  Iterator< T > Iterator< T >::operator--(int)
+  Iterator< T > Iterator< T >::operator--(int) noexcept
   {
     Iterator< T > iter(*this);
     --(*this);
@@ -79,25 +79,25 @@ namespace abramov
   }
 
   template< class T >
-  bool Iterator< T >::operator==(const Iterator< T > &iter) const
+  bool Iterator< T >::operator==(const Iterator< T > &iter) const noexcept
   {
     return node_ == iter.node_;
   }
 
   template< class T >
-  bool Iterator< T >::operator!=(const Iterator< T > &iter) const
+  bool Iterator< T >::operator!=(const Iterator< T > &iter) const noexcept
   {
     return !(iter == *this);
   }
 
   template< class T >
-  T &Iterator< T >::operator*()
+  T &Iterator< T >::operator*() noexcept
   {
     return node_->data_;
   }
 
   template< class T >
-  T *Iterator< T >::operator->()
+  T *Iterator< T >::operator->() noexcept
   {
     return std::addressof(node_->data_);
   }
