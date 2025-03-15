@@ -14,6 +14,8 @@ namespace demehin
     Stack();
     Stack(const Stack&);
     Stack(Stack&&);
+
+    Stack< T >& operator=(const Stack< T >&);
     ~Stack();
 
     void push(T rhs);
@@ -59,6 +61,19 @@ namespace demehin
     size_(std::exchange(rhs.size_, 0)),
     capacity_(std::exchange(rhs.capacity_, 0))
   {}
+
+  template< typename T >
+  Stack< T >& Stack< T >::operator=(const Stack< T >& rhs)
+  {
+    if (this != &rhs)
+    {
+      Stack< T > temp(rhs);
+      std::swap(data_, temp.data_);
+      std::swap(size_, temp.size_);
+      std::swap(capacity_, temp.capacity_);
+    }
+    return *this;
+  }
 
   template< typename T >
   Stack< T >::~Stack()
