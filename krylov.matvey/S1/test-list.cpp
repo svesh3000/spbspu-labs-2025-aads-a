@@ -26,6 +26,18 @@ BOOST_AUTO_TEST_CASE(test_remove)
   BOOST_TEST(list.back() == 2);
 }
 
+BOOST_AUTO_TEST_CASE(test_remove_if)
+{
+  List< int > list;
+  list.push_back(5);
+  list.push_back(3);
+  list.push_back(2);
+  list.remove_if([](int x) { return x % 2 == 0; });
+  BOOST_TEST(list.size() == 2);
+  BOOST_TEST(list.front() == 5);
+  BOOST_TEST(list.back() == 3);
+}
+
 BOOST_AUTO_TEST_CASE(test_copy_operator)
 {
   List< int > list1;
