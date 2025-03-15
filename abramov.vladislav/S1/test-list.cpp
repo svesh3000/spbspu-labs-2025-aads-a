@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(range_constructor)
   }
 }
 
-BOOST_AUTO_TEST_CASE(operator_test)
+BOOST_AUTO_TEST_CASE(operator_il_test)
 {
   abramov::List< int > list1 = { 1, 2, 3 };
   auto it = list1.begin();
@@ -164,6 +164,18 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   BOOST_TEST(*it == 4);
 }
 
+BOOST_AUTO_TEST_CASE(splice_other_list)
+{
+  abramov::List< int > list_tmp{ 2, 3, 4 };
+  abramov::List< int > list{ 1, 5 };
+  list.splice(++list.cbegin(), list_tmp);
+  auto it = list.begin();
+  for (size_t i = 0; i < 6; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(assign_fill)
 {
   abramov::List< int > list;
@@ -181,6 +193,18 @@ BOOST_AUTO_TEST_CASE(assign_il)
   list.assign({ 1, 2, 3 });
   auto it = list.begin();
   for (size_t i = 1; i < 4; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(assign_iters)
+{
+  abramov::List< int > tmp_list{ 2, 3, 4 };
+  abramov::List< int > list;
+  list.assign(tmp_list.begin(), tmp_list.end());
+  auto it = list.begin();
+  for (size_t i = 2; i < 5; ++i)
   {
     BOOST_TEST(*(it++) == i);
   }

@@ -254,6 +254,8 @@ namespace abramov
       delete temp;
     }
     size_ = 0;
+    head_ = nullptr;
+    tail_ = nullptr;
   }
 
   template< class T >
@@ -325,7 +327,7 @@ namespace abramov
     auto iter = find(begin, end, val);
     if (iter != end)
     {
-      for (auto it = iter; ++it != end;)
+      for (auto it = iter; it != end; ++it)
       {
         if (*it != val)
         {
@@ -343,7 +345,7 @@ namespace abramov
     auto iter = find_if(begin, end, condition);
     if (iter != end)
     {
-      for (auto it = iter; ++it != end;)
+      for (auto it = iter; it != end; ++it)
       {
         if (!condition(*it))
         {
@@ -426,7 +428,7 @@ namespace abramov
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
-    for (auto iter = first; first != last; ++iter)
+    for (auto iter = first; iter != last; ++iter)
     {
       splice(pos, other, iter);
     }
@@ -530,7 +532,7 @@ namespace abramov
   template< class T >
   Iterator< T > List< T >::erase(Iterator< T > first, Iterator< T > last) noexcept
   {
-    for (auto it = first; first != last; ++it)
+    for (auto it = first; it != last; ++it)
     {
       erase(it);
     }
@@ -540,9 +542,9 @@ namespace abramov
   void List< T >::assign(Iterator< T > first, Iterator< T > last)
   {
     clear();
-    for (auto it = first; first != last; ++it)
+    for (auto it = first; it != last; ++it)
     {
-      pushBack(it.node_->data);
+      pushBack(*it);
     }
   }
 
