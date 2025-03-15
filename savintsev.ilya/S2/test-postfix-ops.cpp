@@ -71,3 +71,47 @@ BOOST_AUTO_TEST_CASE(test_operator_mult)
   BOOST_TEST(expr1() * expr2() + expr3() == expr_full());
   BOOST_TEST((expr3 * expr2 * expr1 - expr4)() == (expr1 * expr2 + expr3)());
 }
+
+BOOST_AUTO_TEST_CASE(test_operator_div)
+{
+  savintsev::PostfixExpr expr1;
+  savintsev::PostfixExpr expr2;
+
+  expr1 = savintsev::convert("4 * 2");
+  expr2 = savintsev::convert("12 / 3");
+
+  BOOST_TEST(expr1() == 8);
+  BOOST_TEST(expr2() == 4);
+
+  savintsev::PostfixExpr expr_div(expr1 / expr2);
+
+  BOOST_TEST(expr1() / expr2() == 2);
+
+  BOOST_TEST(expr1() == 8);
+  BOOST_TEST(expr2() == 4);
+
+  BOOST_TEST(expr1() / expr2() == expr_div());
+  BOOST_TEST(expr1() / expr2() == (expr1 / expr2)());
+}
+
+BOOST_AUTO_TEST_CASE(test_operator_rem)
+{
+  savintsev::PostfixExpr expr1;
+  savintsev::PostfixExpr expr2;
+
+  expr1 = savintsev::convert("3 * 3");
+  expr2 = savintsev::convert("12 / 3");
+
+  BOOST_TEST(expr1() == 9);
+  BOOST_TEST(expr2() == 4);
+
+  savintsev::PostfixExpr expr_div(expr1 % expr2);
+
+  BOOST_TEST(expr1() % expr2() == 1);
+
+  BOOST_TEST(expr1() == 9);
+  BOOST_TEST(expr2() == 4);
+
+  BOOST_TEST(expr1() % expr2() == expr_div());
+  BOOST_TEST(expr1() % expr2() == (expr1 % expr2)());
+}
