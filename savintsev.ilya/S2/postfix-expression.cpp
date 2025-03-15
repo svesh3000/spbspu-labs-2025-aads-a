@@ -21,6 +21,11 @@ savintsev::PostfixExpr::PostfixExpr(const PostfixExpr & rhs):
   expr_(rhs.expr_)
 {}
 
+savintsev::PostfixExpr::PostfixExpr(PostfixExpr && rhs)
+{
+  std::swap(expr_, rhs.expr_);
+}
+
 savintsev::PostfixExpr savintsev::convert(const std::string & infix)
 {
   PostfixExpr postfix;
@@ -177,15 +182,43 @@ savintsev::PostfixExpr & savintsev::PostfixExpr::operator=(const PostfixExpr & r
   return *this;
 }
 
-savintsev::PostfixExpr savintsev::PostfixExpr::operator+(PostfixExpr rhs)
+savintsev::PostfixExpr & savintsev::PostfixExpr::use_operator(const std::string & op, PostfixExpr rhs)
 {
-  PostfixExpr lhs(*this);
   while (rhs.expr_.size())
   {
-    lhs.expr_.push(rhs.expr_.front());
+    this->expr_.push(rhs.expr_.front());
     rhs.expr_.pop();
   }
-  lhs.expr_.push("+");
-  //lhs.result_ += rhs.result_;
-  return lhs;
+  this->expr_.push(op);
+  return *this;
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator+(const PostfixExpr & rhs)
+{
+  PostfixExpr new_lhs(*this);
+  return new_lhs.use_operator("+", rhs);
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator-(const PostfixExpr & rhs)
+{
+  PostfixExpr new_lhs(*this);
+  return new_lhs.use_operator("-", rhs);
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator*(const PostfixExpr & rhs)
+{
+  PostfixExpr new_lhs(*this);
+  return new_lhs.use_operator("*", rhs);
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator/(const PostfixExpr & rhs)
+{
+  PostfixExpr new_lhs(*this);
+  return new_lhs.use_operator("/", rhs);
+}
+
+savintsev::PostfixExpr savintsev::PostfixExpr::operator%(const PostfixExpr & rhs)
+{
+  PostfixExpr new_lhs(*this);
+  return new_lhs.use_operator("%", rhs);
 }
