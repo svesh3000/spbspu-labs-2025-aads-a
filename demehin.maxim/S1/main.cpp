@@ -139,12 +139,7 @@ int main()
     printListsInfo(std::cout, pairsList);
     std::cout << "\n";
   }
-  catch(const std::bad_alloc&)
-  {
-    std::cerr << "error: bad_alloc\n";
-    return 1;
-  }
-  catch (const std::overflow_error& e)
+  catch(const std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
