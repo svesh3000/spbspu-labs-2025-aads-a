@@ -39,7 +39,7 @@ void printNames(const mainList& list)
   std::cout << "\n";
 }
 
-List< List< unsigned long long > > createResultList(const mainList& list)
+List< List< unsigned long long > > createResult(const mainList& list)
 {
   List< List< unsigned long long > > result;
   size_t maxLen = 0;
@@ -113,7 +113,7 @@ int main()
   auto list = readInput();
   printNames(list);
   auto result = createResult(list);
-  printResultList(result);
+  printResult(result);
   calcPrintSum(result);
   return 0;
 }
