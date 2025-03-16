@@ -8,12 +8,27 @@ int main()
   using namespace aleksandrov;
 
   List< std::pair< std::string, List< unsigned long long > > > list;
-  getPairsList(std::cin, list);
+  try
+  {
+    getPairsList(std::cin, list);
+  }
+  catch (const std::bad_alloc& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 
   List< std::string > nameList;
-  for (auto it = list.begin(); it != list.end(); ++it)
+  try
   {
-    nameList.pushBack(it->first);
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+      nameList.pushBack(it->first);
+    }
+  }
+  catch (const std::bad_alloc&)
+  {
+    nameList.clear();
   }
   if (nameList.empty())
   {
@@ -28,7 +43,15 @@ int main()
   std::cout << "\n";
 
   List< List< unsigned long long > > transposedList;
-  getTransposedList(list, transposedList);
+  try
+  {
+    getTransposedList(list, transposedList);
+  }
+  catch (const std::bad_alloc& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   if (transposedList.empty())
   {
     std::cout << "0" << "\n";
@@ -48,7 +71,7 @@ int main()
       unsigned long long sum = calcSum(*it);
       sumList.pushBack(sum);
     }
-    catch (const std::overflow_error& e)
+    catch (const std::exception& e)
     {
       std::cerr << e.what() << "\n";
       return 1;

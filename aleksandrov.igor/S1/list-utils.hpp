@@ -7,6 +7,7 @@
 namespace aleksandrov
 {
   unsigned long long calcSum(const List< unsigned long long >&);
+  unsigned long long calcSum(unsigned long long, unsigned long long);
   void outputList(const List< unsigned long long >&, std::ostream&);
   using PairsList = List< std::pair< std::string, List< unsigned long long > > >;
   void getPairsList(std::istream&, PairsList&);
@@ -29,6 +30,22 @@ namespace aleksandrov
     }
     return (first1 == last1) && (first2 != last2);
   }
+
+  template< typename T >
+  class Equalizer
+  {
+  public:
+    Equalizer(const T& value):
+      value_(value)
+    {}
+
+    bool operator()(const T& rhs)
+    {
+      return rhs == value_;
+    }
+  private:
+    const T& value_;
+  };
 }
 
 #endif
