@@ -19,6 +19,6 @@ namespace smirnov
         static_cast< T* >(static_cast< void* >(data))->~T();
       }
     }
-  }; 
+  };
 }
 #endif

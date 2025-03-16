@@ -36,18 +36,18 @@ int main()
       name = input;
     }
   }
-  
+
   if (!name.empty())
   {
     sequences.emplace_back(name, list);
   }
-  
+
   if (sequences.empty())
   {
     std::cout << 0 << std::endl;
     return 0;
   }
-  
+
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
     const std::pair< std::string, List< unsigned long long > > & sequence = *it;
@@ -58,7 +58,7 @@ int main()
     std::cout << sequence.first;
   }
   std::cout << "\n";
-  
+
   bool hasNum = false;
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
@@ -69,13 +69,13 @@ int main()
       break;
     }
   }
-  
+
   if (!hasNum)
   {
     std::cout << 0 << std::endl;
     return 0;
   }
-  
+
   std::list< List< unsigned long long > > resultSequences;
   bool hasNumbers = true;
   while (hasNumbers)
@@ -97,7 +97,7 @@ int main()
       resultSequences.push_back(currentSequence);
     }
   }
-  
+
   for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
   {
     const List< unsigned long long > & sequence = *it;
@@ -111,7 +111,7 @@ int main()
     }
     std::cout << "\n";
   }
-  
+
   List< unsigned long long > sums;
   for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
   {
