@@ -138,6 +138,10 @@ namespace kushekbaev
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_ -> next;
     fake_ -> next_ = newNode;
+    if (size_ == 0)
+    {
+      tail_ = newNode;
+    }
     ++size_;
   }
 
@@ -146,12 +150,16 @@ namespace kushekbaev
   {
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_;
-    Node< T >* current = fake_;
-    while (current -> next_ != fake_)
+    if (size_ == 0)
     {
-      current = current -> next_;
+      fake_->next_ = newNode;
+      tail_ = newNode;
     }
-    current -> next_ = newNode;
+    else
+    {
+      tail_->next_ = newNode;
+      tail_ = newNode;
+    }
     ++size_;
   }
 
