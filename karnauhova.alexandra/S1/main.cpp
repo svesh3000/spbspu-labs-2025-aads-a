@@ -1,13 +1,13 @@
 #include <iostream>
 #include "output.hpp"
 #include "input.hpp"
-#include "list.hpp"
+#include "fwd_list.hpp"
 #include "count_sum.hpp"
 
 int main()
 {
   std::string name = "kekw";
-  karnauhova::List<std::pair<std::string, karnauhova::List<unsigned long long>>> lists;
+  karnauhova::Fwd_list<std::pair<std::string, karnauhova::Fwd_list<unsigned long long>>> lists;
   try
   {
     while (std::cin >> name && !std::cin.eof())

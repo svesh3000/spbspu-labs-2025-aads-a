@@ -1,5 +1,5 @@
-#ifndef LIST_HPP
-#define LIST_HPP
+#ifndef FWD_LIST_HPP
+#define FWD_LIST_HPP
 #include <cstddef>
 #include <algorithm>
 #include "iterator.hpp"
@@ -9,20 +9,20 @@
 namespace karnauhova
 {
   template< typename T >
-  class List
+  class Fwd_list
   {
   public:
     using Node = NodeList< T >;
     using Iterator = ListIterator< T >;
     using CIterator = ConstListIterator< T >;
-    List();
-    List(Iterator first, Iterator last);
-    List(size_t size, const T& value);
-    List(std::initializer_list<T> list);
-    List(const List< T >& other);
-    ~List();
+    Fwd_list();
+    Fwd_list(Iterator first, Iterator last);
+    Fwd_list(size_t size, const T& value);
+    Fwd_list(std::initializer_list<T> Fwd_list);
+    Fwd_list(const Fwd_list< T >& other);
+    ~Fwd_list();
 
-    List< T >& operator=(std::initializer_list<T> list);
+    Fwd_list< T >& operator=(std::initializer_list<T> Fwd_list);
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -34,7 +34,7 @@ namespace karnauhova
     T& front();
     T& back();
     void clear();
-    void swap(List< T >& other);
+    void swap(Fwd_list< T >& other);
     void push_front(const T& data);
     void pop_front();
     void reverse();
@@ -45,14 +45,17 @@ namespace karnauhova
 
     void assign(size_t size, const T& value);
     void assign(Iterator first, Iterator last);
-    void assign(std::initializer_list< T > list);
+    void assign(std::initializer_list< T > Fwd_list);
+
+    Iterator erase(CIterator pos) noexcept;
+    Iterator erase(CIterator first, CIterator last) noexcept;
   private:
     Node* fake_;
     size_t size_;
   };
 
   template< class T >
-  void List< T >::reverse()
+  void Fwd_list< T >::reverse()
   {
     if (fake_->next == fake_)
     {
@@ -72,7 +75,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  List< T >::List():
+  Fwd_list< T >::Fwd_list():
     fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
     size_(0)
   {
@@ -80,39 +83,39 @@ namespace karnauhova
   }
 
   template< typename T >
-  List< T >::List(size_t size, const T& value)
+  Fwd_list< T >::Fwd_list(size_t size, const T& value)
   {
     assign(size, value);
   }
 
   template< typename T >
-  List< T >::List(std::initializer_list<T> list)
+  Fwd_list< T >::Fwd_list(std::initializer_list<T> Fwd_list)
   {
-    assign(list);
+    assign(Fwd_list);
   }
 
   template< typename T >
-  List< T >::List(Iterator first, Iterator last)
+  Fwd_list< T >::Fwd_list(Iterator first, Iterator last)
   {
     assign(first, last);
   }
 
   template< typename T >
-  List< T >& List< T >::operator=(std::initializer_list<T> list)
+  Fwd_list< T >& Fwd_list< T >::operator=(std::initializer_list<T> Fwd_list)
   {
-    assign(list);
+    assign(Fwd_list);
     return *this;
   }
 
   template< typename T >
-  void List< T >::swap(List< T >& other)
+  void Fwd_list< T >::swap(Fwd_list< T >& other)
   {
     std::swap(fake_, other.fake_);
     std::swap(size_, other.size_);
   }
 
   template< typename T >
-  void List< T >::pop_front()
+  void Fwd_list< T >::pop_front()
   {
     fake_->next = fake_->next->next;
     if (fake_->next == fake_)
@@ -124,7 +127,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  void List< T >::push_front(const T& data)
+  void Fwd_list< T >::push_front(const T& data)
   {
     Node* new_element = new Node{data, fake_->next};
     fake_->next = new_element;
@@ -132,8 +135,8 @@ namespace karnauhova
   }
 
   template< typename T >
-  List< T >::List(const List< T >& other):
-    List()
+  Fwd_list< T >::Fwd_list(const Fwd_list< T >& other):
+    Fwd_list()
   {
     auto it = other.begin();
     for (size_t i = other.size(); i > 0; i--)
@@ -145,7 +148,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  void List< T >::clear()
+  void Fwd_list< T >::clear()
   {
     NodeList< T >* last = fake_->next;
     while (size_)
@@ -158,20 +161,20 @@ namespace karnauhova
   }
 
   template< typename T >
-  List< T >::~List()
+  Fwd_list< T >::~Fwd_list()
   {
     clear();
     delete[] reinterpret_cast< char* >(fake_);
   }
 
   template< typename T >
-  T& List< T >::front()
+  T& Fwd_list< T >::front()
   {
     return fake_->next->data;
   }
 
   template< typename T >
-  T& List< T >::back()
+  T& Fwd_list< T >::back()
   {
     NodeList< T >* now = fake_;
     while (now->next != fake_)
@@ -182,43 +185,43 @@ namespace karnauhova
   }
 
   template< typename T >
-  ListIterator< T > List< T >::begin() const
+  typename Fwd_list<T>::Iterator Fwd_list< T >::begin() const
   {
-    return ListIterator< T >(fake_->next);
+    return Iterator(fake_->next);
   }
 
   template< typename T >
-  ConstListIterator< T > List< T >::cbegin() const
+  typename Fwd_list<T>::CIterator Fwd_list< T >::cbegin() const
   {
     return CIterator(fake_->next);
   }
 
   template< typename T >
-  ConstListIterator< T > List< T >::cend() const
+  typename Fwd_list<T>::CIterator Fwd_list< T >::cend() const
   {
     return CIterator(fake_);
   }
 
   template< typename T >
-  ListIterator< T > List< T >::end() const
+  typename Fwd_list<T>::Iterator Fwd_list< T >::end() const
   {
-    return ListIterator< T >(fake_);
+    return Iterator(fake_);
   }
 
   template< typename T >
-  bool List< T >::empty() const noexcept
+  bool Fwd_list< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< typename T >
-  size_t List< T >::size() const noexcept
+  size_t Fwd_list< T >::size() const noexcept
   {
     return size_;
   }
 
   template< typename T >
-  void List< T >::assign(size_t size, const T& value )
+  void Fwd_list< T >::assign(size_t size, const T& value )
   {
     clear();
     for (size_t i = 0; i < size; i++)
@@ -229,7 +232,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  void List< T >::assign(Iterator first, Iterator last)
+  void Fwd_list< T >::assign(Iterator first, Iterator last)
   {
     clear();
     size_ = 0;
@@ -241,7 +244,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  void List< T >::remove(const T& value)
+  void Fwd_list< T >::remove(const T& value)
   {
     Node* now = fake_->next;
     Node* last = fake_;
@@ -265,7 +268,7 @@ namespace karnauhova
 
   template< typename T >
   template< typename UnaryPredicate >
-  void List< T >::remove_if(UnaryPredicate c) noexcept//aaaaaaa плиз кил ми
+  void Fwd_list< T >::remove_if(UnaryPredicate c) noexcept
   {
     Node* now = fake_->next;
     Node* last = fake_;
@@ -288,17 +291,46 @@ namespace karnauhova
   }
 
   template< typename T >
-  void List< T >::assign(std::initializer_list< T > list)
+  void Fwd_list< T >::assign(std::initializer_list< T > Fwd_list)
   {
     clear();
     size_ = 0;
-    for (const T& data : list)
+    for (const T& data : Fwd_list)
     {
       push_back(data);
       size_++;
     }
   }
 
+  template<typename T>
+  typename Fwd_list<T>::Iterator Fwd_list<T>::erase(Fwd_list<T>::CIterator pos) noexcept 
+  {
+    Node* todelete = const_cast<Node*>(pos.node);
+    if (pos == cend())
+    {
+      return end();
+    }
+    Node* prevNode = fake_;
+    while (prevNode->next != todelete) {
+        prevNode = prevNode->next;
+    }
+    prevNode->next = todelete->next;
+    delete todelete;
+    size_--;
+    return Iterator(prevNode->next);
+  }
+
+  template< typename T >
+  typename Fwd_list< T >::Iterator Fwd_list< T >::erase(CIterator first, CIterator last) noexcept
+  {
+    Iterator now;
+    for (auto it = first; it != last; it++)
+    {
+      now = erase(it);
+      size_--;
+    }
+    return now;
+  }
 }
 
 #endif

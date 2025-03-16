@@ -6,7 +6,7 @@
 namespace karnauhova
 {
   template< typename T >
-  struct ConstListIterator : public std::iterator<std::forward_iterator_tag, const T>
+  struct ConstListIterator : public std::iterator<std::forward_iterator_tag, T>
   {
     const NodeList<T>* node;
     using this_t = ConstListIterator< T >;
