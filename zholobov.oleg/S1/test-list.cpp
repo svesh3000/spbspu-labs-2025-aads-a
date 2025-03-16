@@ -326,16 +326,17 @@ BOOST_AUTO_TEST_CASE(insert_after)
     auto pos = list.cbegin();
     std::advance(pos, 3);
     int value = 42;
-    list.insert_after(pos, value);
+    auto result_it = list.insert_after(pos, value);
     BOOST_TEST(to_string(list) == "1 2 3 10 42 11 12");
+    BOOST_TEST(*result_it == 42);
   }
   {
-    //!!!
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
     int value = 42;
-    list.insert_after(pos, value);
+    auto result_it = list.insert_after(pos, value);
     BOOST_TEST(to_string(list) == "42 1 2 3 10 11 12");
+    BOOST_TEST(*result_it == 42);
   }
 
   {
@@ -343,46 +344,51 @@ BOOST_AUTO_TEST_CASE(insert_after)
     auto pos = list.cbegin();
     std::advance(pos, 3);
     std::string value = "value";
-    list.insert_after(pos, std::move(value));
+    auto result_it = list.insert_after(pos, std::move(value));
     BOOST_TEST(to_string(list) == "1 2 3 10 value 11 12");
     BOOST_TEST(value == "");
+    BOOST_TEST(*result_it == "value");
   }
   {
-    //!!!
     zholobov::CircularFwdList< std::string > list{"1", "2", "3", "10", "11", "12"};
     auto pos = list.cbefore_begin();
     std::string value = "value";
-    list.insert_after(pos, std::move(value));
+    auto result_it = list.insert_after(pos, std::move(value));
     BOOST_TEST(to_string(list) == "value 1 2 3 10 11 12");
     BOOST_TEST(value == "");
+    BOOST_TEST(*result_it == "value");
   }
 
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbegin();
     std::advance(pos, 3);
-    list.insert_after(pos, 5, 42);
+    auto result_it = list.insert_after(pos, 5, 42);
     BOOST_TEST(to_string(list) == "1 2 3 10 42 42 42 42 42 11 12");
+    BOOST_TEST(*result_it == 42);
   }
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
-    list.insert_after(pos, 5, 42);
+    auto result_it = list.insert_after(pos, 5, 42);
     BOOST_TEST(to_string(list) == "42 42 42 42 42 1 2 3 10 11 12");
+    BOOST_TEST(*result_it == 42);
   }
 
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbegin();
     std::advance(pos, 3);
-    list.insert_after(pos, {50, 60, 70});
+    auto result_it = list.insert_after(pos, {50, 60, 70});
     BOOST_TEST(to_string(list) == "1 2 3 10 50 60 70 11 12");
+    BOOST_TEST(*result_it == 70);
   }
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
-    list.insert_after(pos, {50, 60, 70});
+    auto result_it = list.insert_after(pos, {50, 60, 70});
     BOOST_TEST(to_string(list) == "50 60 70 1 2 3 10 11 12");
+    BOOST_TEST(*result_it == 70);
   }
 
   {
@@ -392,8 +398,9 @@ BOOST_AUTO_TEST_CASE(insert_after)
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbegin();
     std::advance(pos, 3);
-    list.insert_after(pos, it1, it2);
+    auto result_it = list.insert_after(pos, it1, it2);
     BOOST_TEST(to_string(list) == "1 2 3 10 22 23 24 11 12");
+    BOOST_TEST(*result_it == 24);
   }
   {
     std::vector< int > vec{20, 21, 22, 23, 24, 25, 26};
@@ -401,8 +408,9 @@ BOOST_AUTO_TEST_CASE(insert_after)
     auto it2 = vec.end() - 2;
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
-    list.insert_after(pos, it1, it2);
+    auto result_it = list.insert_after(pos, it1, it2);
     BOOST_TEST(to_string(list) == "22 23 24 1 2 3 10 11 12");
+    BOOST_TEST(*result_it == 24);
   }
 }
 
@@ -412,14 +420,16 @@ BOOST_AUTO_TEST_CASE(erase_after)
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbegin();
     std::advance(pos, 3);
-    list.erase_after(pos);
+    auto result_it = list.erase_after(pos);
     BOOST_TEST(to_string(list) == "1 2 3 10 12");
+    BOOST_TEST(*result_it == 12);
   }
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
-    list.erase_after(pos);
+    auto result_it = list.erase_after(pos);
     BOOST_TEST(to_string(list) == "2 3 10 11 12");
+    BOOST_TEST(*result_it == 2);
   }
 
   {
@@ -428,16 +438,18 @@ BOOST_AUTO_TEST_CASE(erase_after)
     std::advance(pos, 2);
     auto last = list.cbegin();
     std::advance(last, 5);
-    list.erase_after(pos, last);
+    auto result_it = list.erase_after(pos, last);
     BOOST_TEST(to_string(list) == "1 2 3 12");
+    BOOST_TEST(*result_it == 12);
   }
   {
     zholobov::CircularFwdList< int > list{1, 2, 3, 10, 11, 12};
     auto pos = list.cbefore_begin();
     auto last = list.cbegin();
     std::advance(last, 5);
-    list.erase_after(pos, last);
+    auto result_it = list.erase_after(pos, last);
     BOOST_TEST(to_string(list) == "12");
+    BOOST_TEST(*result_it == 12);
   }
 }
 
