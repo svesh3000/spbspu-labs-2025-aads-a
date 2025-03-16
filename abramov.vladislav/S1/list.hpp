@@ -487,12 +487,7 @@ namespace abramov
 
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > first, ConstIterator< T > last) noexcept
-  {
-    for (auto iter = first; iter != last; ++iter)
-    {
-      splice(pos, other, iter);
-    }
-  }
+  {}
 
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &&other, ConstIterator< T > first, ConstIterator< T > last) noexcept
@@ -587,12 +582,7 @@ namespace abramov
 
   template< class T >
   void List< T >::erase(Iterator< T > first, Iterator< T > last) noexcept
-  {
-    for (auto it = first; it != last; ++it)
-    {
-      erase(it);
-    }
-  }
+  {}
 
   template< class T >
   void List< T >::assign(Iterator< T > first, Iterator< T > last)
