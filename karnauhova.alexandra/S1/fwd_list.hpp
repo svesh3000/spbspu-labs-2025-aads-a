@@ -172,7 +172,7 @@ namespace karnauhova
   Fwd_list< T >::Fwd_list(const Fwd_list< T >& other):
     Fwd_list()
   {
-    auto it = other.begin();
+    auto it = other.cbegin();
     for (size_t i = other.size(); i > 0; i--)
     {
       push_front(*it);
@@ -262,7 +262,7 @@ namespace karnauhova
     {
       push_front(value);
     }
-    reverse()
+    reverse();
     size_ = size;
   }
 
@@ -276,7 +276,7 @@ namespace karnauhova
       push_front(it.node);
       size_++;
     }
-    reverse()
+    reverse();
   }
 
   template< typename T >
@@ -336,7 +336,7 @@ namespace karnauhova
       push_back(data);
       size_++;
     }
-    reverse()
+    reverse();
   }
 
   template<typename T>
