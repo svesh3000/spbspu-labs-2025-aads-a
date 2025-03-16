@@ -253,12 +253,18 @@ template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_after(const_iterator pos) noexcept
 {
   assert(!empty() && "empty list erasing");
-  FwdListNode< T > to_delete = pos.node_->next_;
-  pos.node_->next_ = to_delete->next_;
-  delete to_delete;
-  if (pos.node_->next_ == nullptr) {
+  if (size_ == 1) {
+    delete tail_;
+    --size_;
     return iterator();
   }
+  if (pos.node_->next_ == tail_) {
+    tail_ = pos.node_;
+  }
+  FwdListNode< T >* to_delete = pos.node_->next_;
+  pos.node_->next_ = to_delete->next_;
+  delete to_delete;
+  --size_;
   return iterator(pos.node_->next_);
 }
 
@@ -267,10 +273,10 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_afte
   const_iterator last) noexcept
 {
   assert(!empty() && "empty list erasing");
-  for (; first != last; ++first) {
+  while (first.node_->next_ != last.node_) {
     erase_after(first);
   }
-  return iterator(last);
+  return iterator(last.node_);
 }
 
 template< typename T >
@@ -346,7 +352,7 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList&& other)
 template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator it) noexcept
 {
-  splice_after(pos, other, it, ++(++const_iterator(it)));
+  splice_after(pos, other, it, ++(++const_iterator(it.node_)));
 }
 
 template< typename T >
@@ -380,6 +386,7 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
 template< typename T >
 void maslevtsov::FwdList< T >::remove(const T& value) noexcept
 {
+  assert(!empty() && "removing from empty list");
   remove_if([&](const T& list_value)
   {
     return list_value == value;
@@ -390,19 +397,17 @@ template< typename T >
 template< class UnaryPredicate >
 void maslevtsov::FwdList< T >::remove_if(UnaryPredicate condition)
 {
-  if (empty()) {
-    return;
-  }
-  auto it = cbegin();
-  while (it != const_iterator(tail_)) {
-    const_iterator next = ++const_iterator(it);
-    if (condition(*next)) {
+  assert(!empty() && "removing from empty list");
+  auto it = ++cbegin();
+  while (it != cend()) {
+    if (condition(it.node_->next_->data_)) {
       erase_after(it);
+    } else {
+      ++it;
     }
-    ++it;
   }
-  if (condition(tail_->next_)) {
-    erase_after(tail_);
+  if (condition(*++it)) {
+    erase_after(const_iterator(tail_->next_));
   }
 }
 

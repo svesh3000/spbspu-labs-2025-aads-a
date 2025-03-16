@@ -3,7 +3,7 @@
 
 namespace {
   template< typename T >
-  void compare_list_values(maslevtsov::FwdList< T > first, maslevtsov::FwdList< T > second) noexcept
+  void compare_list_values(const maslevtsov::FwdList< T >& first, const maslevtsov::FwdList< T >& second) noexcept
   {
     BOOST_TEST(first.size() == second.size());
     BOOST_TEST(first.front() == second.front());
@@ -211,7 +211,19 @@ BOOST_AUTO_TEST_CASE(insert_after_test)
 }
 
 BOOST_AUTO_TEST_CASE(erase_after_test)
-{}
+{
+  maslevtsov::FwdList< int > list1 = {0, 1, 2};
+  list1.erase_after(list1.cbegin());
+  compare_list_values(list1, {0, 2});
+  list1.erase_after(list1.cbegin());
+  compare_list_values(list1, {0});
+  list1.erase_after(list1.cbegin());
+  BOOST_TEST(list1.empty());
+
+  maslevtsov::FwdList< int > list2 = {0, 1, 2, 3, 4, 5};
+  list2.erase_after(++list2.cbegin(), list2.cend());
+  compare_list_values(list2, {0, 1});
+}
 
 BOOST_AUTO_TEST_CASE(push_front_test)
 {
@@ -261,8 +273,19 @@ BOOST_AUTO_TEST_CASE(splice_after_test)
 {}
 
 BOOST_AUTO_TEST_CASE(remove_test)
-{}
+{
+  maslevtsov::FwdList< char > list = {'_', 'k', 'e', 'k', '_', 'w', '_'};
+  list.remove('_');
+  compare_list_values(list, {'k', 'e', 'k', 'w'});
+}
 
 BOOST_AUTO_TEST_CASE(remove_if_test)
-{}
+{
+  maslevtsov::FwdList< int > list = {1, 2, 3, 4, 5, 6};
+  list.remove_if([&](const int& list_value)
+  {
+    return list_value % 2 == 0;
+  });
+  compare_list_values(list, {1, 3, 5});
+}
 BOOST_AUTO_TEST_SUITE_END()
