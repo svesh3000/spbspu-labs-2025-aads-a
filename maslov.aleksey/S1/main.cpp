@@ -12,7 +12,7 @@ int main()
   while (std::cin >> name && !std::cin.eof())
   {
     maslov::FwdList< size_t > numbers;
-    while (std::cin >> number && !std::cin.eof())
+    while ((std::cin >> number) && !std::cin.eof())
     {
       numbers.pushFront(number);
     }

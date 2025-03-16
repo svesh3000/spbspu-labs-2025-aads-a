@@ -8,12 +8,16 @@
 namespace maslov
 {
   template< typename T >
+  class FwdList;
+
+  template< typename T >
   struct FwdListIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
+    friend struct FwdList< T >;
+   public:
     using thisT = FwdListIterator< T >;
 
     FwdListIterator();
-    FwdListIterator(FwdListNode< T > *);
     FwdListIterator(const thisT &) = default;
     ~FwdListIterator() = default;
 
@@ -24,10 +28,9 @@ namespace maslov
     thisT operator++(int);
     bool operator!=(const thisT &) const;
     bool operator==(const thisT &) const;
-
-    FwdListNode< T > * getNode() const;
    private:
     FwdListNode< T > * node_;
+    explicit FwdListIterator(FwdListNode< T > * node);
   };
 
   template< typename T >
@@ -82,20 +85,15 @@ namespace maslov
   {
     return node_ != rhs.node_;
   }
-  template< typename T >
-  FwdListNode< T > * FwdListIterator< T >::getNode() const
-  {
-    return node_;
-  }
-
   template < typename T >
   struct FwdListConstIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
+    friend struct FwdList< T >;
+   public:
     using thisT = FwdListConstIterator< T >;
 
     FwdListConstIterator();
     FwdListConstIterator(const thisT &) = default;
-    FwdListConstIterator(FwdListNode< T > * node);
     ~FwdListConstIterator() = default;
 
     thisT & operator=(const thisT &) = default;
@@ -105,10 +103,9 @@ namespace maslov
     const T * operator->() const;
     bool operator==(const thisT &) const;
     bool operator!=(const thisT &) const;
-
-    FwdListNode< T > * getNode() const;
    private:
     FwdListNode< T > * node_;
+    explicit FwdListConstIterator(FwdListNode< T > * node);
   };
 
   template< typename T >
@@ -162,12 +159,6 @@ namespace maslov
   bool FwdListConstIterator< T >::operator!=(const thisT & rhs) const
   {
     return node_ != rhs.node_;
-  }
-
-  template< typename T >
-  FwdListNode< T > * FwdListConstIterator< T >::getNode() const
-  {
-    return node_;
   }
 }
 #endif
