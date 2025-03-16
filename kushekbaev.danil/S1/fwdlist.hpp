@@ -104,14 +104,12 @@ namespace kushekbaev
   template< typename T >
   T& FwdList< T >::front() const noexcept
   {
-    assert(!empty());
     return fake_ -> next_ -> data;
   }
 
   template< typename T >
   T& FwdList< T >::back() const noexcept
   {
-    assert(!empty());
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
     {
@@ -135,7 +133,6 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::push_front(const T value)
   {
-    assert(!empty());
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_ -> next;
     fake_ -> next_ = newNode;
@@ -145,7 +142,6 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::push_back(const T value)
   {
-    assert(!empty());
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_;
     Node< T >* current = fake_;
@@ -160,7 +156,6 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::pop_front() noexcept
   {
-    assert(!empty());
     Node< T >* todelete = fake_ -> next_;
     fake_ -> next_ = todelete -> next_;
     delete todelete;
@@ -170,7 +165,6 @@ namespace kushekbaev
   template < class T >
   void FwdList< T >::pop_back() noexcept
   {
-    assert(!empty());
     Node< T >* todelete = fake_;
     while (todelete -> next_ -> next_ != fake_)
     {
