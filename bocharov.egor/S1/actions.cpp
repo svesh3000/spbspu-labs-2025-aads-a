@@ -138,6 +138,11 @@ bocharov::pairs_list_t bocharov::createList(std::istream & input)
 
 std::ostream & bocharov::outputList(std::ostream & output, const pairs_list_t & pairs_list)
 {
+  if (pairs_list.empty())
+  {
+    std::cout << 0 << '\n';
+    return 0;
+  }
   output << pairs_list.cbegin()->first;
   for (auto i = ++pairs_list.cbegin(); i != pairs_list.cend(); ++i)
   {

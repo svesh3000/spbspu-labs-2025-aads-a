@@ -10,8 +10,8 @@
 namespace bocharov
 {
   using list_t = List< unsigned long long >;
-  using pairs_list_t = List< std::pair< std::string, list_t > >;
   using pair = std::pair< std::string, list_t >;
+  using pairs_list_t = List< pair >;
 
   std::size_t get_max_pairs_list_size(const pairs_list_t & list) noexcept;
   void get_lists_sums(list_t & sums, const pairs_list_t & pairs_list);

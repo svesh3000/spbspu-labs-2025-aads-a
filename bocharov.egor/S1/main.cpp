@@ -4,11 +4,6 @@
 int main()
 {
   bocharov::pairs_list_t pairs_list = bocharov::createList(std::cin);
-  if (pairs_list.empty())
-  {
-    std::cout << 0 << '\n';
-    return 0;
-  }
   bocharov::outputList(std::cout, pairs_list);
   try
   {
