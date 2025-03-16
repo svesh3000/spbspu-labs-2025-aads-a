@@ -15,6 +15,8 @@ namespace aleksandrov
   class Iterator;
   template< typename T >
   class ConstIterator;
+  template< typename T >
+  class Equalizer;
 
   template< typename T>
   class List
@@ -346,28 +348,10 @@ namespace aleksandrov
     }
   }
 
-  namespace detail
-  {
-    template< typename T >
-    class Equalizer
-    {
-    public:
-      Equalizer(const T& value):
-        value_(value)
-      {}
-      bool operator()(const T& rhs)
-      {
-        return rhs == value_;
-      }
-    private:
-      const T& value_;
-    };
-  }
-
   template< typename T >
   void List< T >::remove(const T& value) noexcept
   {
-    removeIf(detail::Equalizer< T >(value));
+    removeIf(Equalizer< T >(value));
   }
 
   template< typename T >
@@ -533,6 +517,7 @@ namespace aleksandrov
   template< typename T >
   Iterator< T > List< T >::eraseAfter(ConstIterator< T > first, ConstIterator< T > last)
   {
+    assert(first != last);
     ConstIterator< T > it = first;
     for (; it != last; ++it)
     {
