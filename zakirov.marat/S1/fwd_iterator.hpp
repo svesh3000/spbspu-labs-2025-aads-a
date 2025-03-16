@@ -1,5 +1,6 @@
 #ifndef FWD_ITERATOR_HPP
 #define FWD_ITERATOR_HPP
+#include <iterator>
 #include "fwd_list_node.hpp"
 
 namespace zakirov
@@ -9,22 +10,18 @@ namespace zakirov
   {
     FwdListNode< T > * node_;
 
-    FwdIterator();
-    FwdIterator(FwdListNode< T > * node);
+    FwdIterator():
+      node_(nullptr)
+    {};
+
+    FwdIterator(FwdListNode< T > * node):
+      node_(node)
+    {};
+
     ~FwdIterator() = default;
     FwdIterator(const FwdIterator< T > &) = default;
     FwdIterator< T > & operator=(const FwdIterator< T > &) = default;
 
-    template< typename T >
-    FwdIterator< T >::FwdIterator():
-      node_(nullptr)
-    {}
-
-    template< typename T >
-    FwdIterator< T >::FwdIterator(FwdListNode< T > * node)
-    {
-      node_(node)
-    };
   };
 }
 
