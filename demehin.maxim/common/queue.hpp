@@ -19,7 +19,7 @@ namespace demehin
 
     ~Queue();
 
-    void push(const T& rhs) noexcept;
+    void push(const T& rhs);
     void pop();
     T& front() const;
     T& back() const;
@@ -86,7 +86,7 @@ namespace demehin
   }
 
   template< typename T >
-  void Queue< T >::push(const T& rhs) noexcept
+  void Queue< T >::push(const T& rhs)
   {
     if (size_ == capacity_)
     {

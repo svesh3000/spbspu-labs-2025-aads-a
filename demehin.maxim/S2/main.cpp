@@ -3,7 +3,7 @@
 #include <string>
 #include <stack.hpp>
 #include <queue.hpp>
-#include "expr_convert.hpp"
+#include "exprs_manip.hpp"
 
 namespace
 {
@@ -22,7 +22,6 @@ namespace
         {
           stack.push(exprQueue);
         }
-        //break;
       }
 
       std::string token;
@@ -72,58 +71,35 @@ namespace
       stack.pop();
     }
   }
-
-  /*void printExprs(ExprsStack stack)
-  {
-    while (!stack.empty())
-    {
-      while (!stack.top().empty())
-      {
-        std::cout << stack.top().front();
-        stack.top().pop();
-      }
-      stack.pop();
-      std::cout << "\n";
-    }
-  }*/
 }
 
 int main(int argc, char* argv[])
 {
   ExprsStack infExprsStack;
-  if (argc > 1)
-  {
-    std::ifstream file(argv[1]);
-    inputExprs(file, infExprsStack);
-  }
-  else
-  {
-    inputExprs(std::cin, infExprsStack);
-  }
-
-  //printExprs(infExprsStack);
-  ExprsStack postExprsStack;
   try
   {
+    if (argc > 1)
+    {
+      std::ifstream file(argv[1]);
+      inputExprs(file, infExprsStack);
+    }
+    else
+    {
+      inputExprs(std::cin, infExprsStack);
+    }
+
+    ExprsStack postExprsStack;
     demehin::convertStack(infExprsStack, postExprsStack);
-  }
-  catch (std::logic_error& e)
-  {
-    std::cerr << e.what() << "\n";
-    return 1;
-  }
 
-  demehin::Stack< long long int > res;
-  try
-  {
+    demehin::Stack< long long int > res;
     demehin::getExprsValues(postExprsStack, res);
+    printValues(std::cout, res);
+    std::cout << "\n";
   }
-  catch (std::logic_error& e)
+  catch (std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
   }
-  printValues(std::cout, res);
-  std::cout << "\n";
 }
 
