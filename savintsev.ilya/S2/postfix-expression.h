@@ -13,7 +13,7 @@ namespace savintsev
     PostfixExpr(const PostfixExpr & rhs);
     PostfixExpr(PostfixExpr && rhs);
 
-    int operator()() const noexcept;
+    long long operator()() const;
 
     PostfixExpr & operator=(const PostfixExpr & rhs);
 
@@ -27,7 +27,6 @@ namespace savintsev
   private:
     std::queue< std::string > expr_;
 
-    int calculate_result(bool is_excepting) const;
     PostfixExpr & use_operator(const std::string & op, PostfixExpr rhs);
   };
 

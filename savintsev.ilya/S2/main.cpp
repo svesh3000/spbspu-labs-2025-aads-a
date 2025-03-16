@@ -11,33 +11,29 @@ int main(int argc, char ** argv)
     return 1;
   }
 
-  std::ifstream in;
+  std::istream * input = &std::cin;
+  std::ifstream file;
 
   if (argc == 2)
   {
-    in.open(argv[1]);
-    try
+    file.open(argv[1]);
+    if (!file)
     {
-      savintsev::io_postfix_results(in);
+      std::cerr << "ERROR: invalid file\n";
+      return 1;
     }
-    catch (const std::invalid_argument & e)
-    {
-      std::cerr << e.what() << '\n';
-      in.close();
-      return 2;
-    }
-    in.close();
+    input = &file;
   }
-  else
+
+  try
   {
-    try
-    {
-      savintsev::io_postfix_results(std::cin);
-    }
-    catch (const std::invalid_argument & e)
-    {
-      std::cerr << e.what() << '\n';
-      return 2;
-    }
+    savintsev::io_postfix_results(*input);
   }
+  catch (const std::exception & e)
+  {
+    std::cerr << e.what() << '\n';
+    return 2;
+  }
+
+  return 0;
 }

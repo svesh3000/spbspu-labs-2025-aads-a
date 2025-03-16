@@ -1,9 +1,13 @@
 #include "postfix-expression.h"
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 
 namespace
 {
+  const long long MAX_LL = std::numeric_limits< long long >::max();
+  const long long MIN_LL = std::numeric_limits< long long >::min();
+
   bool is_token_number(std::string token)
   {
     for (size_t i = 0; i < token.size(); ++i)
@@ -14,6 +18,128 @@ namespace
       }
     }
     return true;
+  }
+
+  int sign(long long val)
+  {
+    return (val > 0) ? 1 : ((val < 0) ? -1 : 0);
+  }
+
+  bool same_sign(long long a, long long b)
+  {
+    return sign(a) * sign(b) > 0;
+  }
+
+  long long sum(long long a, long long b)
+  {
+    if (same_sign(a, b) && (a > 0))
+    {
+      if (MAX_LL - a > b)
+      {
+        return a + b;
+      }
+    }
+    else if (same_sign(a, b) && (a < 0))
+    {
+      if (MIN_LL - a < b)
+      {
+        return a + b;
+      }
+    }
+    else if (!same_sign(a, b))
+    {
+      return a + b;
+    }
+    throw std::overflow_error("ERROR: Addition overflow");
+  }
+
+  long long diff(long long a, long long b)
+  {
+    if (same_sign(a, b))
+    {
+      return a - b;
+    }
+    else if (!same_sign(a, b) && a <= 0)
+    {
+      if (MIN_LL - a < b)
+      {
+        return a - b;
+      }
+    }
+    else if (!same_sign(a, b) && a >= 0)
+    {
+      if (MAX_LL - a > b)
+      {
+        return a - b;
+      }
+    }
+    throw std::overflow_error("ERROR: Subtraction overflow");
+  }
+
+  long long prod(long long a, long long b)
+  {
+    if (a == 0 || b == 0)
+    {
+      return 0ll;
+    }
+    else if (same_sign(a, b) && (a > 0))
+    {
+      if (MAX_LL / a >= b)
+      {
+        return a * b;
+      }
+    }
+    else if (same_sign(a, b) && (a < 0))
+    {
+      if (MIN_LL / a <= b)
+      {
+        return a * b;
+      }
+    }
+    else if (!same_sign(a, b) && (a > 0))
+    {
+      if (MIN_LL / a >= b)
+      {
+        return a * b;
+      }
+    }
+    else if (!same_sign(a, b) && (a < 0))
+    {
+      if (MAX_LL / a <= b)
+      {
+        return a * b;
+      }
+    }
+    throw std::overflow_error("ERROR: Multiplication overflow");
+  }
+
+  long long quot(long long a, long long b)
+  {
+    if (b == 0)
+    {
+      throw std::invalid_argument("ERROR: Division by zero");
+    }
+    else if (a == 0)
+    {
+      return 0ll;
+    }
+    else if (same_sign(a, b) && (a < 0))
+    {
+      if (a != MIN_LL && b != -1ll)
+      {
+        return a / b;
+      }
+    }
+    else
+    {
+      return a / b;
+    }
+    throw std::overflow_error("ERROR: Division overflow");
+  }
+
+  long long rem(long long a, long long b)
+  {
+    return (a % b + b) % b;
   }
 }
 
@@ -43,6 +169,7 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
   {
     end = infix.find(' ', begin);
     str token = infix.substr(begin, end != str::npos ? end - begin : end = back);
+    //std::cout << "b: " << begin << "; e: " << end << "; t:" << token << '\n';
     if (token == "")
     {
       begin = end + 1;
@@ -110,14 +237,14 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
   {
     throw std::invalid_argument("ERROR: invalid expression");
   }
-  postfix.calculate_result(true);
+  postfix();
   return postfix;
 }
 
-int savintsev::PostfixExpr::calculate_result(bool is_excepting) const
+long long savintsev::PostfixExpr::operator()() const
 {
   std::queue< std::string > expr(expr_);
-  std::stack< int > calc;
+  std::stack< long long > calc;
 
   while (expr.size())
   {
@@ -125,34 +252,41 @@ int savintsev::PostfixExpr::calculate_result(bool is_excepting) const
     expr.pop();
     if (is_token_number(token))
     {
-      calc.push(std::stoi(token));
+      long long num = std::stoll(token);
+      calc.push(num);
     }
     else
     {
-      if (calc.size() < 2 && is_excepting)
+      if (calc.size() < 2)
       {
         throw std::invalid_argument("ERROR: invalid expression");
       }
-      int r = calc.top();
+      long long r = calc.top();
       calc.pop();
-      int l = calc.top();
+      long long l = calc.top();
       calc.pop();
+      long long result = 0;
       switch (*(token.data()))
       {
       case '+':
-        calc.push(l + r);
+        result = sum(l, r);
+        calc.push(result);
         break;
       case '-':
-        calc.push(l - r);
+        result = diff(l, r);
+        calc.push(result);
         break;
       case '*':
-        calc.push(l * r);
+        result = prod(l, r);
+        calc.push(result);
         break;
       case '/':
-        calc.push(l / r);
+        result = quot(l, r);
+        calc.push(result);
         break;
       case '%':
-        calc.push(l % r);
+        result = rem(l, r);
+        calc.push(result);
         break;
       }
     }
@@ -161,16 +295,7 @@ int savintsev::PostfixExpr::calculate_result(bool is_excepting) const
   {
     return calc.top();
   }
-  if (is_excepting)
-  {
-    throw std::invalid_argument("ERROR: invalid expression");
-  }
-  return 0;
-}
-
-int savintsev::PostfixExpr::operator()() const noexcept
-{
-  return calculate_result(false);
+  throw std::invalid_argument("ERROR: invalid expression");
 }
 
 savintsev::PostfixExpr & savintsev::PostfixExpr::operator=(const PostfixExpr & rhs)

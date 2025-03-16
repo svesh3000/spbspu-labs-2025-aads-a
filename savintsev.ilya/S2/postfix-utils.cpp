@@ -7,7 +7,7 @@ void savintsev::io_postfix_results(std::istream & in)
   using namespace std;
 
   string text;
-  stack< int > results;
+  stack< long long > results;
 
   while (in)
   {
@@ -23,6 +23,7 @@ void savintsev::io_postfix_results(std::istream & in)
 
   if (results.empty())
   {
+    cout << '\n';
     return;
   }
 
