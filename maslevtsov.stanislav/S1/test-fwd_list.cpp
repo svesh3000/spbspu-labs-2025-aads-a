@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "fwd_list.hpp"
+#include "fwd_list/declaration.hpp"
 
 BOOST_AUTO_TEST_SUITE(constructors_tests)
 BOOST_AUTO_TEST_CASE(default_constructor_test)
