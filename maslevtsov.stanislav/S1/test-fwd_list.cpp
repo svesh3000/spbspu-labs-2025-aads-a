@@ -1,6 +1,19 @@
 #include <boost/test/unit_test.hpp>
 #include "fwd_list/definition.hpp"
 
+namespace {
+  template< typename T >
+  void compare_list_values(maslevtsov::FwdList< T > first, maslevtsov::FwdList< T > second) noexcept
+  {
+    BOOST_TEST(first.size() == second.size());
+    BOOST_TEST(first.front() == second.front());
+    auto it1 = ++first.cbegin(), it2 = ++second.cbegin();
+    for (; it1 != first.cend() && it2 != second.cend(); ++it1, ++it2) {
+      BOOST_TEST(*it1 == *it2);
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE(constructors_tests)
 BOOST_AUTO_TEST_CASE(default_constructor_test)
 {
@@ -177,6 +190,29 @@ BOOST_AUTO_TEST_CASE(empty_test)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(modifiers_tests)
+BOOST_AUTO_TEST_CASE(clear_test)
+{
+  maslevtsov::FwdList< int > list;
+  list.clear();
+  BOOST_TEST(list.empty());
+  list.push_front(0);
+  list.clear();
+  BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(insert_after_test)
+{
+  maslevtsov::FwdList< int > list1 = {0, 1};
+  auto it1 = list1.cbegin();
+  list1.insert_after(it1, 2);
+  ++(++it1);
+  list1.insert_after(it1, 3);
+  compare_list_values(list1, {0, 2, 1, 3});
+}
+
+BOOST_AUTO_TEST_CASE(erase_after_test)
+{}
+
 BOOST_AUTO_TEST_CASE(push_front_test)
 {
   maslevtsov::FwdList< int > list;
@@ -218,14 +254,15 @@ BOOST_AUTO_TEST_CASE(swap_test)
   BOOST_TEST(list2.front() == 0);
   BOOST_TEST(list2.size() == 1);
 }
+BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(clear_test)
-{
-  maslevtsov::FwdList< int > list;
-  list.clear();
-  BOOST_TEST(list.empty());
-  list.push_front(0);
-  list.clear();
-  BOOST_TEST(list.empty());
-}
+BOOST_AUTO_TEST_SUITE(operations_tests)
+BOOST_AUTO_TEST_CASE(splice_after_test)
+{}
+
+BOOST_AUTO_TEST_CASE(remove_test)
+{}
+
+BOOST_AUTO_TEST_CASE(remove_if_test)
+{}
 BOOST_AUTO_TEST_SUITE_END()

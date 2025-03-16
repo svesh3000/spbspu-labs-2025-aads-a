@@ -201,20 +201,30 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
   FwdListNode< T >* new_node = new FwdListNode< T >{value, pos.node_->next_};
   pos.node_->next_ = new_node;
   ++size_;
+  if (pos == cend()) {
+    tail_ = new_node;
+  }
   return iterator(new_node);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, T&& value)
 {
-  insert_after(pos, value);
+  return insert_after(pos, value);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
   std::size_t count, const T& value) noexcept
 {
+  if (count == 0) {
+    return iterator(pos.node_);
+  }
   splice_after(pos, FwdList< T >(count, value));
+  iterator result(pos.node_);
+  for (std::size_t i = 0; i != count; ++i, ++result)
+  {}
+  return result;
 }
 
 template< typename T >
@@ -222,14 +232,21 @@ template< class InputIt >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, InputIt first,
   InputIt last) noexcept
 {
+  if (first == last) {
+    return iterator(pos.node_);
+  }
+  iterator result(pos.node_);
   splice_after(pos, FwdList< T >(first, last));
+  for (auto it = ++first; it != last; ++it, ++result)
+  {}
+  return result;
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
   std::initializer_list< T > ilist) noexcept
 {
-  insert_after(pos, ilist.begin(), ilist.end());
+  return insert_after(pos, ilist.begin(), ilist.end());
 }
 
 template< typename T >
@@ -317,7 +334,7 @@ void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
 template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other) noexcept
 {
-  splice_after(pos, other, other.begin(), other.end());
+  splice_after(pos, other, other.cbegin(), other.cend());
 }
 
 template< typename T >
@@ -336,11 +353,11 @@ template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator first,
   const_iterator last) noexcept
 {
-  if (last == const_iterator(first->node_->next_) || other.empty()) {
+  if (last == const_iterator(first.node_->next_) || other.empty()) {
     return;
   }
   std::size_t size_increase = 0;
-  if (other.begin() == first && other.end() == last) {
+  if (other.cbegin() == first && other.cend() == last) {
     size_increase = other.size_;
   } else {
     for (auto it = ++first; it != last; ++it, ++size_increase)
