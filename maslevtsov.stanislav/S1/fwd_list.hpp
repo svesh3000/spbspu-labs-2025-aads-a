@@ -51,7 +51,7 @@ namespace maslevtsov {
     void clear() noexcept;
     iterator insert_after(const_iterator pos, const T& value);
     iterator insert_after(const_iterator pos, T&& value);
-    iterator insert_after(const_iterator pos, std::size_t count, const T& value);
+    iterator insert_after(const_iterator pos, std::size_t count, const T& value) noexcept;
     template< class InputIt >
     iterator insert_after(const_iterator pos, InputIt first, InputIt last) noexcept;
     iterator insert_after(const_iterator pos, std::initializer_list< T > ilist) noexcept;
@@ -281,21 +281,21 @@ void maslevtsov::FwdList< T >::clear() noexcept
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, const T& value)
 {
-  insert_after(pos, value);
-}
-
-template< typename T >
-typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, T&& value)
-{
-  FwdListNode< T >* new_node = new FwdListNode< T >{std::move(value), pos.node_->next_};
+  FwdListNode< T >* new_node = new FwdListNode< T >{value, pos.node_->next_};
   pos.node_->next_ = new_node;
   ++size_;
   return iterator(new_node);
 }
 
 template< typename T >
+typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, T&& value)
+{
+  insert_after(pos, value);
+}
+
+template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
-  std::size_t count, const T& value)
+  std::size_t count, const T& value) noexcept
 {
   splice_after(pos, FwdList< T >(count, value));
 }
@@ -362,7 +362,7 @@ void maslevtsov::FwdList< T >::push_front(T&& value)
 template< typename T >
 void maslevtsov::FwdList< T >::push_back(const T& value)
 {
-  FwdListNode< T >* new_node = new FwdListNode< T >{std::move(value), nullptr};
+  FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
   if (empty()) {
     tail_ = new_node;
     tail_->next_ = tail_;
