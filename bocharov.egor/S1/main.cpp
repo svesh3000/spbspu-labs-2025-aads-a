@@ -3,10 +3,10 @@
 
 int main()
 {
-  bocharov::pairs_list_t pairs_list = bocharov::createList(std::cin);
-  bocharov::outputList(std::cout, pairs_list);
   try
   {
+    bocharov::pairs_list_t pairs_list = bocharov::createList(std::cin);
+    bocharov::outputList(std::cout, pairs_list);
     bocharov::print_lists_info(std::cout, pairs_list);
   }
   catch (const std::bad_alloc &)
