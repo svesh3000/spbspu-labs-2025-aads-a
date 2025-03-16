@@ -8,18 +8,21 @@ namespace kushekbaev
   {
     T data_;
     Node< T >* next_;
+    Node(const T& data);
+    Node();
+  }
 
-    Node(const T& data):
-      data_(data),
-      next_(nullptr)
-    {}
+  template< typename T >
+  Node< T >::Node(const T& data):
+    data_(data),
+    next_(nullptr)
+  {}
 
-    Node():
-      data_(T()),
-      next_(nullptr)
-    {}
-
-  };
+  template< typename T >
+  Node< T >::Node():
+    data_(T()),
+    next_(nullptr)
+  {}
 }
 
 #endif

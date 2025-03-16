@@ -138,21 +138,21 @@ namespace kushekbaev
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_ -> next_;
     fake_ -> next_ = newNode;
-    size_++;
+    ++size_;
   }
 
   template< typename T >
   void FwdList< T >::push_back(const T value)
   {
     Node< T >* newNode = new Node< T >(value);
-    newNode -> next_ = fake_;
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
     {
-      current = current->next_;
+      current = current -> next_;
     }
     current -> next_ = newNode;
-    size_++;
+    newNode -> next_ = fake_;
+    ++size_;
   }
 
   template< typename T >
