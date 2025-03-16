@@ -4,16 +4,13 @@
 
 namespace
 {
-  bool checkOverflow(size_t & sum, size_t itNum, bool & flagOverflow)
+  void checkOverflow(size_t sum, size_t itNum, bool & flagOverflow)
   {
     const size_t max = std::numeric_limits< size_t >::max();
     if (sum > max - itNum)
     {
       flagOverflow = true;
-      return true;
     }
-    sum += itNum;
-    return false;
   }
 }
 
@@ -44,10 +41,8 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
     {
       auto itNum = it->second.begin();
       std::advance(itNum, i);
-      if (checkOverflow(sum, *itNum, flagOverflow))
-      {
-        continue;
-      }
+      checkOverflow(sum, *itNum, flagOverflow);
+      sum += *itNum;
       out << *itNum;
       ++it;
     }
@@ -57,10 +52,8 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
       {
         auto itNum = it->second.begin();
         std::advance(itNum, i);
-        if (checkOverflow(sum, *itNum, flagOverflow))
-        {
-          continue;
-        }
+        checkOverflow(sum, *itNum, flagOverflow);
+        sum += *itNum;
         out << " " << *itNum;
       }
     }
