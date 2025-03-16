@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(splice_other_list)
 
 BOOST_AUTO_TEST_CASE(splice_iter)
 {
-  abramov::List< int > tmp_list{ 1, 0, 2, 3, 4, 5 };
+  abramov::List< int > tmp_list{ 1, 0, -1, 3, 4, 5 };
   abramov::List< int > list{ 1, 2 };
   list.splice(list.cbegin(), tmp_list, ++tmp_list.cbegin());
   auto it = list.begin();
@@ -206,7 +206,51 @@ BOOST_AUTO_TEST_CASE(splice_iter)
   {
     BOOST_TEST(*(it++) == i);
   }
+  BOOST_TEST(*(++tmp_list.cbegin()) == -1);
+  list.splice(++list.cbegin(), tmp_list, ++tmp_list.cbegin());
+  BOOST_TEST(*(++list.cbegin()) == -1);
+  list.splice(list.cbegin(), tmp_list, tmp_list.cbegin());
+  list.splice(++list.cbegin(), tmp_list, --tmp_list.cend());
+  BOOST_TEST(*(list.begin()) == 1);
+  BOOST_TEST(*(++list.begin()) == 5);
+}
 
+BOOST_AUTO_TEST_CASE(insert)
+{
+  abramov::List< int > list{ 1, 3 };
+  list.insert(++list.cbegin(), 2);
+  list.insert(list.cbegin(), 0);
+  list.insert(list.cend(), 4);
+  auto it = list.begin();
+  for (size_t i = 0; i < 5; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(insert_range)
+{
+  abramov::List< int > list{ 1 };
+  list.insert(++list.cbegin(), 5, 2);
+  auto it = list.begin();
+  BOOST_TEST(*(it++) == 1);
+  for (size_t i = 0; i < 5; ++i)
+  {
+    BOOST_TEST(*(it++) == 2);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(erase)
+{
+  abramov::List< int > list{ 1, 3, 2, 3, 4 };
+  list.erase(++list.begin());
+  list.erase(list.begin());
+  list.erase(--list.end());
+  auto it = list.begin();
+  for (size_t i = 2; i < 4; ++i)
+  {
+    BOOST_TEST(*(it++) == i);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(assign_fill)

@@ -56,8 +56,8 @@ namespace abramov
     void insert(ConstIterator< T > pos, const T &val);
     void insert(ConstIterator< T > pos, T &&val);
     void insert(ConstIterator< T > pos, size_t count, const T &val);
-    Iterator< T > erase(Iterator< T > pos) noexcept;
-    Iterator< T > erase(Iterator< T > first, Iterator< T > last) noexcept;
+    void erase(Iterator< T > pos) noexcept;
+    void erase(Iterator< T > first, Iterator< T > last) noexcept;
     void assign(Iterator< T > first, Iterator< T > last);
     void assign(std::initializer_list< T > il);
   private:
@@ -394,32 +394,43 @@ namespace abramov
   template< class T >
   void List< T >::splice(ConstIterator< T > pos, List< T > &other, ConstIterator< T > it) noexcept
   {
-    auto next = it->node_->next_;
-    auto prev = it->node_->prev_;
+    auto next = it.node_->next_;
+    auto prev = it.node_->prev_;
     if (pos.node_ == head_)
     {
-      it->node_->next_ = head_;
-      head_->prev_ = it->node_;
-      head_ = it->node_;
+      it.node_->next_ = head_;
+      head_->prev_ = it.node_;
+      head_ = it.node_;
     }
-    if ((--pos).node_ == tail_)
+    else if ((--pos).node_ == tail_)
     {
-      it->node_->prev_ = tail_;
-      tail_->next_ = it->node_;
-      tail_ = it->node_;
+      it.node_->prev_ = tail_;
+      tail_->next_ = it.node_;
+      tail_ = it.node_;
+    }
+    else
+    {
+      ++pos;
+      it.node_->prev_ = pos.node_->prev_;
+      pos.node_->prev_->next_ = it.node_;
+      pos.node_->prev_ = it.node_;
+      it.node_->next_ = pos.node_;
     }
     if (it.node_ == other.head_)
     {
       next->prev_ = nullptr;
       other.head_ = next;
     }
-    if (it.node_ == other.tail_)
+    else if (it.node_ == other.tail_)
     {
       prev->next_ = nullptr;
       other.tail_ = prev;
     }
-    next->prev_ = prev;
-    prev->next_ = next;
+    else
+    {
+      next->prev_ = prev;
+      prev->next_ = next;
+    }
     ++size_;
   }
 
@@ -483,12 +494,13 @@ namespace abramov
       }
       else
       {
-        (--pos).node_->next_ = node;
-        (++pos).node_->prev_ = node;
+        node->prev_ = pos.node_->prev_;
+        pos.node_->prev_->next_ = node;
+        pos.node_->prev_ = node;
         node->next_ = pos.node_;
       }
-      ++size_;
     }
+    ++size_;
   }
 
   template< class T >
@@ -507,34 +519,29 @@ namespace abramov
   }
 
   template< class T >
-  Iterator< T > List< T >::erase(Iterator< T > pos) noexcept
+  void List< T >::erase(Iterator< T > pos) noexcept
   {
-    Node< T > *node = nullptr;
     if (pos.node_ == head_)
     {
-      head_ = head_->next;
-      head_->prev = nullptr;
-      node = head_;
+      head_ = head_->next_;
+      head_->prev_ = nullptr;
     }
     else if (pos.node_ == tail_)
     {
-      tail_ = tail_->prev;
-      tail_->next = nullptr;
-      node = tail_;
+      tail_ = tail_->prev_;
+      tail_->next_ = nullptr;
     }
     else
     {
       pos.node_->prev_->next_ = pos.node_->next_;
       pos.node_->next_->prev_ = pos.node_->prev_;
-      node = pos.node_->next_;
     }
     delete pos.node_;
     --size_;
-    return Iterator< T >{ node, this };
   }
 
   template< class T >
-  Iterator< T > List< T >::erase(Iterator< T > first, Iterator< T > last) noexcept
+  void List< T >::erase(Iterator< T > first, Iterator< T > last) noexcept
   {
     for (auto it = first; it != last; ++it)
     {
