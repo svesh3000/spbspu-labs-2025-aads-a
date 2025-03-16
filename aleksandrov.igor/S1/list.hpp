@@ -90,7 +90,9 @@ namespace aleksandrov
     fake_(static_cast< Node* >(malloc(sizeof(Node)))),
     tail_(nullptr),
     size_(0)
-  {}
+  {
+    fake_->next = nullptr;
+  }
 
   template< typename T >
   List< T >::List(const List< T >& rhs):
@@ -307,6 +309,10 @@ namespace aleksandrov
   void List< T >::popBack() noexcept
   {
     auto beforeTail = fake_->next;
+    if (!beforeTail)
+    {
+      return;
+    }
     while (beforeTail->next != tail_)
     {
       beforeTail = beforeTail->next;
@@ -488,6 +494,7 @@ namespace aleksandrov
   template< typename T >
   Iterator< T > List< T >::insertAfter(ConstIterator< T > pos, const T& value)
   {
+    assert(pos != nullptr);
     Node* newNode = new Node(value);
     newNode->next = pos.node_->next;
     pos.node_->next = newNode;
@@ -498,6 +505,7 @@ namespace aleksandrov
   template< typename T >
   Iterator< T > List< T >::insertAfter(ConstIterator< T > pos, T&& value)
   {
+    assert(pos != nullptr);
     Node* newNode = new Node(std::move(value));
     newNode->next = pos.node_->next;
     pos.node_->next = newNode;
@@ -508,6 +516,8 @@ namespace aleksandrov
   template< typename T >
   Iterator< T > List< T >::eraseAfter(ConstIterator< T > pos)
   {
+    assert(pos != nullptr);
+    assert(pos != tail_);
     Node* posPtr = pos.node_;
     Node* toErase = posPtr->next;
     posPtr->next = toErase->next;
