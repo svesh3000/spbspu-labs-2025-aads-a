@@ -42,8 +42,8 @@ namespace kushekbaev
   template< typename T >
   FwdList< T >::FwdList():
     fake_(new Node< T >(T())),
-    size_(0),
-    tail_(fake_)
+    tail_(fake_),
+    size_(0)
   {
     fake_ -> next_ = fake_;
   }
