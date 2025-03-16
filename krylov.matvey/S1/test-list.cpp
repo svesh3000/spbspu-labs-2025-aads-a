@@ -106,11 +106,10 @@ BOOST_AUTO_TEST_CASE(test_splice_range_lvalue)
   auto first = list2.cbegin();
   ++first;
   auto last = list2.cend();
-  --last;
   list1.splice(it1, list2, first, last);
-  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(list1.size() == 7);
   BOOST_TEST(*it1 == 3);
-  BOOST_TEST(list2.size() == 2);
+  BOOST_TEST(list2.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_move_operator)

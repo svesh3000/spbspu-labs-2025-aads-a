@@ -49,12 +49,12 @@ namespace krylov
     void remove(const T& value) noexcept;
     template < typename Predicate >
     void remove_if(Predicate pred);
-    void splice(ConstIterator< T > position, List< T >& other);
-    void splice(ConstIterator< T > position, List< T >&& other);
-    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it);
-    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it);
-    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last);
-    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last);
+    void splice(ConstIterator< T > position, List< T >& other) noexcept;
+    void splice(ConstIterator< T > position, List< T >&& other) noexcept;
+    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it) noexcept;
+    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it) noexcept;
+    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last) noexcept;
   private:
     Node< T >* head_;
     Node< T >* tail_;
@@ -128,7 +128,7 @@ namespace krylov
     }
   }
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& other)
+  void List< T >::splice(ConstIterator< T > position, List< T >& other) noexcept
   {
     if (this == &other || other.empty())
     {
@@ -152,13 +152,13 @@ namespace krylov
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >&& other)
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other) noexcept
   {
     splice(position, other);
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it)
+  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it) noexcept
   {
     if (this == &other || it.current_ == nullptr)
     {
@@ -196,20 +196,20 @@ namespace krylov
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it)
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it) noexcept
   {
     splice(position, other, it);
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     if (this == &other || first == last)
     {
       return;
     }
     Node< T >* firstNode = first.current_;
-    Node< T >* lastNode = last.current_->prev_;
+    Node< T >* lastNode = last.current_ ? last.current_->prev_ : other.tail_;
     size_t count = 0;
     for (auto it = first; it != last; ++it)
     {
@@ -247,7 +247,7 @@ namespace krylov
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     splice(position, other, first, last);
   }
@@ -255,36 +255,7 @@ namespace krylov
   template< typename T >
   void List< T >::remove(const T& value) noexcept
   {
-    for (auto it = begin(); it != end(); )
-    {
-      if (*it == value)
-      {
-        Node< T >* nodeToDelete = it.current_;
-        if (nodeToDelete->prev_)
-        {
-          nodeToDelete->prev_->next_ = nodeToDelete->next_;
-        }
-        else
-        {
-          head_ = nodeToDelete->next_;
-        }
-        if (nodeToDelete->next_)
-        {
-          nodeToDelete->next_->prev_ = nodeToDelete->prev_;
-        }
-        else
-        {
-          tail_ = nodeToDelete->prev_;
-        }
-        it = Iterator< T >(nodeToDelete->next_);
-        delete nodeToDelete;
-        --size_;
-      }
-      else
-      {
-        ++it;
-      }
-    }
+    remove_if([&](const T& x) { return value == x; });
   }
 
   template< typename T >
