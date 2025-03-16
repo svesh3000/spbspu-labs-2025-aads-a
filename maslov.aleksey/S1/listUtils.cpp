@@ -2,6 +2,21 @@
 #include <iostream>
 #include <limits>
 
+namespace
+{
+  bool checkOverflow(size_t & sum, size_t itNum, bool & flagOverflow)
+  {
+    const size_t max = std::numeric_limits< size_t >::max();
+    if (sum > max - itNum)
+    {
+      flagOverflow = true;
+      return true;
+    }
+    sum += itNum;
+    return false;
+  }
+}
+
 void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxSize)
 {
   out << listOfPairs.begin()->first;
@@ -15,42 +30,38 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
     out << "0";
     return;
   }
-  const size_t max = std::numeric_limits< size_t >::max();
   maslov::FwdList< size_t > sums;
   bool flagOverflow = false;
   for (size_t i = 0; i < maxSize; ++i)
   {
     size_t sum = 0;
-    bool flagPrint = false;
-    for (auto it = listOfPairs.begin(); it != listOfPairs.end(); ++it)
+    auto it = listOfPairs.begin();
+    while (it != listOfPairs.end() && it->second.size() <= i)
     {
-      if (!it->second.empty())
+      ++it;
+    }
+    if (it != listOfPairs.end())
+    {
+      auto itNum = it->second.begin();
+      std::advance(itNum, i);
+      if (checkOverflow(sum, *itNum, flagOverflow))
       {
-        bool flagEnd = true;
+        continue;
+      }
+      out << *itNum;
+      ++it;
+    }
+    for (; it != listOfPairs.end(); ++it)
+    {
+      if (!it->second.empty() && it->second.size() > i)
+      {
         auto itNum = it->second.begin();
-        for (size_t j = 0; j < i; ++j)
+        std::advance(itNum, i);
+        if (checkOverflow(sum, *itNum, flagOverflow))
         {
-          itNum++;
-          if (itNum == it->second.end())
-          {
-            flagEnd = false;
-            break;
-          }
+          continue; 
         }
-        if (flagEnd)
-        {
-          if (flagPrint)
-          {
-            out << " ";
-          }
-          if (sum > max - *itNum)
-          {
-            flagOverflow = true;
-          }
-          sum += *itNum;
-          out << *itNum;
-          flagPrint = true;
-        }
+        out << " " << *itNum;
       }
     }
     sums.pushFront(sum);

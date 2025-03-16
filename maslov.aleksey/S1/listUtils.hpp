@@ -5,8 +5,6 @@
 #include <string>
 #include "list.hpp"
 
-
-
 namespace maslov
 {
   using list = maslov::FwdList< std::pair< std::string, maslov::FwdList< size_t > > >;
