@@ -71,7 +71,7 @@ namespace aleksandrov
     Iterator< T > eraseAfter(ConstIterator< T >, ConstIterator< T >);
 
     void reverse() noexcept;
-    
+
     bool operator==(const List< T >&) const noexcept;
     bool operator!=(const List< T >&) const noexcept;
     bool operator<(const List< T >&) const noexcept;
@@ -183,7 +183,7 @@ namespace aleksandrov
     assert(fake_);
     return ConstIterator< T >(fake_->next);
   }
-  
+
   template< typename T >
   Iterator< T > List< T >::end() const noexcept
   {
@@ -195,7 +195,7 @@ namespace aleksandrov
   {
     return empty() ? ConstIterator< T >(nullptr) : ConstIterator< T >(tail_->next);
   }
-  
+
   template< typename T >
   T& List< T >::front() noexcept
   {
@@ -221,7 +221,7 @@ namespace aleksandrov
   {
     return size_;
   }
-  
+
   template< typename T >
   void List< T >::pushFront(const T& value)
   {
@@ -253,7 +253,7 @@ namespace aleksandrov
     }
     ++size_;
   }
-  
+
   template< typename T >
   void List< T >::pushBack(const T& value)
   {
@@ -289,7 +289,7 @@ namespace aleksandrov
     tail_ = newNode;
     ++size_;
   }
-  
+
   template< typename T >
   void List< T >::popFront() noexcept
   {
@@ -357,7 +357,7 @@ namespace aleksandrov
       const T& value_;
     };
   }
-  
+
   template< typename T >
   void List< T >::remove(const T& value) noexcept
   {
@@ -404,7 +404,7 @@ namespace aleksandrov
   {
     splice(pos, other, it);
   }
-  
+
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T >& other, ConstIterator< T > first, ConstIterator< T > last)
   {
@@ -430,7 +430,7 @@ namespace aleksandrov
       beforeLast = beforeLast->next;
       ++pieceSize;
     }
-    
+
     beforePos->next = first.node_;
     if (beforeFirst == fake_ && beforeLast == tail_)
     {
@@ -462,7 +462,7 @@ namespace aleksandrov
   {
     splice(pos, other, first, last);
   }
-  
+
   template< typename T >
   void List< T >::assign(size_t count, const T& value)
   {
@@ -504,7 +504,7 @@ namespace aleksandrov
     ++size_;
     return Iterator< T >(newNode);
   }
-  
+
   template< typename T >
   Iterator< T > List< T >::eraseAfter(ConstIterator< T > pos)
   {
