@@ -23,11 +23,15 @@ namespace zakirov
     void pop_front();
     void push_front(const T & data);
     void push_front(const T && data);
+    void erase_after(FwdIterator< T > element);
     void insert_after(FwdIterator< T > element, const T & data);
     bool empty();
     size_t size();
     void swap(FwdList & other);
     void clear();
+    void remove(T data);
+    template< typename P>
+    void remove_if(P predicate);
   private:
     FwdListNode< T > * fake_node_;
   };
@@ -46,7 +50,7 @@ namespace zakirov
     for (size_t i = 0; i < node_quantity; ++i)
     {
       push_front(data);
-  
+
     }
   }
 
@@ -125,6 +129,14 @@ namespace zakirov
   }
 
   template< typename T >
+  void FwdList< T >::erase_after(FwdIterator< T > element)
+  {
+    FwdListNode< T > * temp_element = element.node_->next_->next_;
+    delete element.node_->next_;
+    element.node_->next_ = temp_element;
+  }
+
+  template< typename T >
   void FwdList< T >::insert_after(FwdIterator< T > element, const T & data)
   {
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
@@ -172,6 +184,47 @@ namespace zakirov
     while (!empty())
     {
       pop_front();
+    }
+  }
+
+  template< typename T >
+  void FwdList< T >::remove(T data)
+  {
+    FwdIterator< T > prev = end();
+    FwdIterator< T > real = begin();
+    for (FwdIterator< T > i = begin(); i != end(); ++i)
+    {
+      if (i.node_->data_ == data)
+      {
+        erase_after(prev);
+        ++real;
+      }
+      else
+      {
+        ++prev;
+        ++real;
+      }
+    }
+  }
+
+  template< typename T >
+  template< typename P >
+  void FwdList< T >::remove_if(P predicate)
+  {
+    FwdIterator< T > prev = end();
+    FwdIterator< T > real = begin();
+    for (FwdIterator< T > i = begin(); i != end(); ++i)
+    {
+      if (predicate(*real))
+      {
+        erase_after(prev);
+        ++real;
+      }
+      else
+      {
+        ++prev;
+        ++real;
+      }
     }
   }
 }

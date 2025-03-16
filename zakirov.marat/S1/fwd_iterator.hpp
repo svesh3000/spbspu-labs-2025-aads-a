@@ -41,7 +41,7 @@ namespace zakirov
   FwdIterator< T > & FwdIterator< T >::operator++()
   {
     node_ = node_->next_;
-    return *this; 
+    return *this;
   }
 
   template< typename T >
