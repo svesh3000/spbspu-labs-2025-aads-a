@@ -136,13 +136,9 @@ namespace kushekbaev
   void FwdList< T >::push_front(const T value)
   {
     Node< T >* newNode = new Node< T >(value);
-    newNode -> next_ = fake_ -> next;
+    newNode -> next_ = fake_ -> next_;
     fake_ -> next_ = newNode;
-    if (size_ == 0)
-    {
-      tail_ = newNode;
-    }
-    ++size_;
+    size_++;
   }
 
   template< typename T >
@@ -150,17 +146,13 @@ namespace kushekbaev
   {
     Node< T >* newNode = new Node< T >(value);
     newNode -> next_ = fake_;
-    if (size_ == 0)
+    Node< T >* current = fake_;
+    while (current -> next_ != fake_)
     {
-      fake_->next_ = newNode;
-      tail_ = newNode;
+      current = current->next_;
     }
-    else
-    {
-      tail_->next_ = newNode;
-      tail_ = newNode;
-    }
-    ++size_;
+    current -> next_ = newNode;
+    size_++;
   }
 
   template< typename T >
