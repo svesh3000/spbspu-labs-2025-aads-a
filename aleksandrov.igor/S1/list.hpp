@@ -351,7 +351,7 @@ namespace aleksandrov
       {}
       bool operator()(const T& rhs)
       {
-	return rhs == value_;
+        return rhs == value_;
       }
     private:
       const T& value_;
