@@ -14,13 +14,13 @@ namespace finaev
     listIterator(Node<T>* node);
     ~listIterator() = default;
     T& operator*() const;
-    Node< T > operator->();
+    Node< T > operator->() const;
     this_t& operator++();
     this_t operator++(int);
     this_t& operator--();
     this_t operator--(int);
-    bool operator==(const listIterator& i);
-    bool operator!=(const listIterator& i);
+    bool operator==(const listIterator& i) const;
+    bool operator!=(const listIterator& i) const;
   private:
     Node< T >* node_;
   };
@@ -42,7 +42,7 @@ namespace finaev
   }
 
   template < class T >
-  Node< T > listIterator< T >::operator->()
+  Node< T > listIterator< T >::operator->() const
   {
     return std::addressof(this->node_);
   }
@@ -78,13 +78,13 @@ namespace finaev
   }
 
   template < class T >
-  bool listIterator< T > ::operator==(const listIterator& i)
+  bool listIterator< T > ::operator==(const listIterator& i) const
   {
     return node_ == i.node_;
   }
 
   template < class T >
-  bool listIterator< T > ::operator!=(const listIterator& i)
+  bool listIterator< T > ::operator!=(const listIterator& i) const
   {
     return !(*this == i);
   }

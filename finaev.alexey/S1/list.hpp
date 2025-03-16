@@ -15,7 +15,7 @@ namespace finaev
     List(const List<T>&);
     List< T >& operator=(const List<T>&);
     List(List&&) noexcept;
-    List< T >& operator=(List<T>&&);
+    List< T >& operator=(List<T>&&) noexcept;
     void swap(List& other) noexcept;
     bool isEmpty() const noexcept;
     void pushBack(const T& data);
@@ -86,7 +86,7 @@ namespace finaev
   }
 
   template < class T >
-  List< T >& List<T>::operator=(List< T >&& other)
+  List< T >& List<T>::operator=(List< T >&& other) noexcept
   {
     if (this == &other)
     {
@@ -138,20 +138,13 @@ namespace finaev
   template < class T >
   listIterator< T > List < T >::begin() const
   {
-    listIterator< T > res(head_);
-    return res;
+    return listIterator< T >(head_);
   }
 
   template < class T >
   listIterator< T > List < T >::end() const
   {
-    if (tail_ == nullptr)
-    {
-      listIterator< T > res;
-      return res;
-    }
-    listIterator< T > res(tail_->next);
-    return res;
+    return listIterator< T >(tail_->next);
   }
 
   template < class T >
@@ -163,13 +156,7 @@ namespace finaev
   template < class T >
   constListIterator< T > List< T >::constEnd() const
   {
-    if (tail_ == nullptr)
-    {
-      constListIterator< T > res;
-      return res;
-    }
-    constListIterator< T > res(tail_->next);
-    return res;
+    return constListIterator< T >(tail_->next);
   }
 
   template < class T >
