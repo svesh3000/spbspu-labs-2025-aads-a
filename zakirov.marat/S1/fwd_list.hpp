@@ -68,7 +68,7 @@ namespace zakirov
     FwdList()
   {
     FwdIterator< T > last_node = end();
-    for (auto i = il.begin(); i != il.end(); ++i)
+    for (auto i = init_list.begin(); i != init_list.end(); ++i)
     {
       insert_after(last_node, *i);
       ++last_node;
