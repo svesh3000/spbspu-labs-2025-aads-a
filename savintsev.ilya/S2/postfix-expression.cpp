@@ -34,14 +34,14 @@ namespace
   {
     if (same_sign(a, b) && (a > 0))
     {
-      if (MAX_LL - a > b)
+      if (MAX_LL - a >= b)
       {
         return a + b;
       }
     }
     else if (same_sign(a, b) && (a < 0))
     {
-      if (MIN_LL - a < b)
+      if (MIN_LL - a <= b)
       {
         return a + b;
       }
@@ -61,14 +61,14 @@ namespace
     }
     else if (!same_sign(a, b) && a <= 0)
     {
-      if (MIN_LL - a < b)
+      if (MIN_LL - a <= b)
       {
         return a - b;
       }
     }
     else if (!same_sign(a, b) && a >= 0)
     {
-      if (MAX_LL - a > b)
+      if (MAX_LL - a >= b)
       {
         return a - b;
       }
@@ -96,16 +96,9 @@ namespace
         return a * b;
       }
     }
-    else if (!same_sign(a, b) && (a > 0))
+    else if (!same_sign(a, b))
     {
-      if (MIN_LL / a >= b)
-      {
-        return a * b;
-      }
-    }
-    else if (!same_sign(a, b) && (a < 0))
-    {
-      if (MAX_LL / a <= b)
+      if (std::abs(MIN_LL / a) >= std::abs(b))
       {
         return a * b;
       }
@@ -161,7 +154,7 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
 
   size_t was_bracket = 0;
 
-  size_t back = infix.size() - 1;
+  size_t back = infix.size();
   size_t begin = 0;
   size_t end = 0;
 
@@ -169,10 +162,9 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
   {
     end = infix.find(' ', begin);
     str token = infix.substr(begin, end != str::npos ? end - begin : end = back);
-    //std::cout << "b: " << begin << "; e: " << end << "; t:" << token << '\n';
-    if (token == "")
+    begin = end + 1;
+    if (token.empty())
     {
-      begin = end + 1;
       continue;
     }
     else if (token == "(")
@@ -226,7 +218,6 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
     {
       throw std::invalid_argument("ERROR: token unsupported");
     }
-    begin = end + 1;
   }
   while (!stack.empty())
   {
