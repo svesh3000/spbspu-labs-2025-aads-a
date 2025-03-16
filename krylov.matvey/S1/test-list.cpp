@@ -51,6 +51,24 @@ BOOST_AUTO_TEST_CASE(test_copy_operator)
   BOOST_TEST(list1.back() == list2.back());
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_entire_list_lvalue)
+{
+  List< int > list1;
+  list1.push_back(1);
+  list1.push_back(3);
+  list1.push_back(2);
+  auto it = list1.cbegin();
+  ++it;
+  List< int > list2;
+  list1.push_back(23);
+  list1.push_back(24);
+  list1.push_back(25);
+  list1.splice(it, list2);
+  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(*it == 3);
+  BOOST_TEST(list2.size() == 0);
+}
+
 BOOST_AUTO_TEST_CASE(test_move_operator)
 {
   List< int > list1;

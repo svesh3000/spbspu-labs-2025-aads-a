@@ -17,8 +17,8 @@ namespace krylov
     using pointer = const T*;
     using reference = const T&;
     ConstIterator();
-    ConstIterator(const Node< T >* node) noexcept;
-    ConstIterator(const Node< T >* node, const List< T >* list) noexcept;
+    ConstIterator(Node< T >* node) noexcept;
+    ConstIterator(Node< T >* node, const List< T >* list) noexcept;
     const T& operator*() const noexcept;
     const T* operator->() const noexcept;
     ConstIterator& operator++() noexcept;
@@ -28,19 +28,19 @@ namespace krylov
     bool operator!=(const ConstIterator& other) const noexcept;
     bool operator==(const ConstIterator& other) const noexcept;
   private:
-    const Node< T >* current_;
+    Node< T >* current_;
     const List< T >* list_;
     friend class List< T >;
   };
 
   template< typename T >
-  ConstIterator< T >::ConstIterator(const Node< T >* node) noexcept:
+  ConstIterator< T >::ConstIterator(Node< T >* node) noexcept:
     current_(node),
     list_(nullptr)
   {}
 
   template< typename T >
-  ConstIterator< T >::ConstIterator(const Node< T >* node, const List< T >* list) noexcept:
+  ConstIterator< T >::ConstIterator(Node< T >* node, const List< T >* list) noexcept:
     current_(node),
     list_(list)
   {}
