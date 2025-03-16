@@ -60,13 +60,57 @@ BOOST_AUTO_TEST_CASE(test_splice_entire_list_lvalue)
   auto it = list1.cbegin();
   ++it;
   List< int > list2;
-  list1.push_back(23);
-  list1.push_back(24);
-  list1.push_back(25);
+  list2.push_back(23);
+  list2.push_back(24);
+  list2.push_back(25);
   list1.splice(it, list2);
   BOOST_TEST(list1.size() == 6);
   BOOST_TEST(*it == 3);
   BOOST_TEST(list2.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_element_lvalue)
+{
+  List< int > list1;
+  list1.push_back(1);
+  list1.push_back(3);
+  list1.push_back(2);
+  auto it1 = list1.cbegin();
+  ++it1;
+  List< int > list2;
+  list2.push_back(23);
+  list2.push_back(24);
+  list2.push_back(25);
+  auto it2 = list2.cbegin();
+  ++it2;
+  list1.splice(it1, list2, it2);
+  BOOST_TEST(list1.size() == 4);
+  BOOST_TEST(*it1 == 3);
+  BOOST_TEST(list2.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_range_lvalue)
+{
+  List< int > list1;
+  list1.push_back(1);
+  list1.push_back(3);
+  list1.push_back(2);
+  auto it1 = list1.cbegin();
+  ++it1;
+  List< int > list2;
+  list2.push_back(23);
+  list2.push_back(24);
+  list2.push_back(25);
+  list2.push_back(26);
+  list2.push_back(27);
+  auto first = list2.cbegin();
+  ++first;
+  auto last = list2.cend();
+  --last;
+  list1.splice(it1, list2, first, last);
+  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(*it1 == 3);
+  BOOST_TEST(list2.size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_move_operator)

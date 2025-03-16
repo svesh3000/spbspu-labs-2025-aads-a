@@ -21,6 +21,7 @@ namespace krylov
   {
   public:
     friend class Iterator< T >;
+    friend class ConstIterator< T >;
     List();
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
@@ -48,12 +49,12 @@ namespace krylov
     void remove(const T& value) noexcept;
     template < typename Predicate >
     void remove_if(Predicate pred);
-    void splice(ConstIterator< T > position, List< T >& x);
-    void splice(ConstIterator< T > position, List< T >&& x);
-    void splice(ConstIterator< T > position, List< T >& x, ConstIterator< T > it);
-    void splice(ConstIterator< T > position, List< T >&& x, ConstIterator< T > it);
-    void splice(ConstIterator< T > position, List< T >& x, ConstIterator< T > first, ConstIterator< T > last);
-    void splice(ConstIterator< T > position, List< T >&& x, ConstIterator< T > first, ConstIterator< T > last);
+    void splice(ConstIterator< T > position, List< T >& other);
+    void splice(ConstIterator< T > position, List< T >&& other);
+    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it);
+    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it);
+    void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last);
+    void splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last);
   private:
     Node< T >* head_;
     Node< T >* tail_;
@@ -127,48 +128,129 @@ namespace krylov
     }
   }
   template< typename T >
-  void List< T >::splice(ConstIterator< T > position, List< T >& x)
+  void List< T >::splice(ConstIterator< T > position, List< T >& other)
   {
-    if (this == &x || x.empty())
+    if (this == &other || other.empty())
     {
       return;
     }
     if (position.current_->prev_)
     {
-      position.current_->prev_->next_ = x.head_;
+      position.current_->prev_->next_ = other.head_;
     }
     else
     {
-      head_ = x.head_;
+      head_ = other.head_;
     }
-    x.tail_->next_ = position.current_;
-    x.head_->prev_ = position.current_->prev_;
-    position.current_->prev_ = x.tail_;
-    size_ += x.size();
-    x.size_ = 0;
-    x.head_ = nullptr;
-    x.tail_ = nullptr;
+    other.tail_->next_ = position.current_;
+    other.head_->prev_ = position.current_->prev_;
+    position.current_->prev_ = other.tail_;
+    size_ += other.size();
+    other.size_ = 0;
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
   }
 
   template< typename T >
-  void splice(ConstIterator< T > position, List< T >&& x)
-  {}
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other)
+  {
+    splice(position, other);
+  }
 
   template< typename T >
-  void splice(ConstIterator< T > position, List< T >& x, ConstIterator< T > it)
-  {}
+  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it)
+  {
+    if (this == &other || it.current_ == nullptr)
+    {
+      return;
+    }
+    if (it.current_->prev_)
+    {
+      it.current_->prev_->next_ = it.current_->next_;
+    }
+    else
+    {
+      other.head_ = it.current_->next_;
+    }
+    if (it.current_->next_)
+    {
+      it.current_->next_->prev_ = it.current_->prev_;
+    }
+    else
+    {
+      other.tail_ = it.current_->prev_;
+    }
+    it.current_->prev_ = position.current_->prev_;
+    it.current_->next_ = position.current_;
+    if (position.current_->prev_)
+    {
+      position.current_->prev_->next_ = it.current_;
+    }
+    else
+    {
+      head_ = it.current_;
+    }
+    position.current_->prev_ = it.current_;
+    --other.size_;
+    ++size_;
+  }
 
   template< typename T >
-  void splice(ConstIterator< T > position, List< T >&& x, ConstIterator< T > it)
-  {}
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > it)
+  {
+    splice(position, other, it);
+  }
 
   template< typename T >
-  void splice(ConstIterator< T > position, List< T >& x, ConstIterator< T > first, ConstIterator< T > last)
-  {}
+  void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last)
+  {
+    if (this == &other || first == last)
+    {
+      return;
+    }
+    Node< T >* firstNode = first.current_;
+    Node< T >* lastNode = last.current_->prev_;
+    size_t count = 0;
+    for (auto it = first; it != last; ++it)
+    {
+      ++count;
+    }
+    if (firstNode->prev_)
+    {
+      firstNode->prev_->next_ = last.current_;
+    }
+    else
+    {
+      other.head_ = last.current_;
+    }
+    if (last.current_)
+    {
+      last.current_->prev_ = firstNode->prev_;
+    }
+    else
+    {
+      other.tail_ = firstNode->prev_;
+    }
+    firstNode->prev_ = position.current_->prev_;
+    lastNode->next_ = position.current_;
+    if (position.current_->prev_)
+    {
+      position.current_->prev_->next_ = firstNode;
+    }
+    else
+    {
+      head_ = firstNode;
+    }
+    position.current_->prev_ = lastNode;
+    size_ += count;
+    other.size_ -= count;
+  }
 
   template< typename T >
-  void splice(ConstIterator< T > position, List< T >&& x, ConstIterator< T > first, ConstIterator< T > last)
-  {}
+  void List< T >::splice(ConstIterator< T > position, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last)
+  {
+    splice(position, other, first, last);
+  }
 
   template< typename T >
   void List< T >::remove(const T& value) noexcept
