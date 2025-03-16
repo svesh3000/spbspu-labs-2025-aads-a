@@ -35,14 +35,12 @@ namespace kushekbaev
 
     private:
       Node< T >* fake_;
-      Node< T >* tail_;
       size_t size_;
   };
 
   template< typename T >
   FwdList< T >::FwdList():
     fake_(new Node< T >(T())),
-    tail_(fake_),
     size_(0)
   {
     fake_ -> next_ = fake_;
@@ -52,17 +50,15 @@ namespace kushekbaev
   FwdList< T >::FwdList(const FwdList& other):
     FwdList()
   {
-    Node< T >* current = other.fake_->next_;
-    while (current != other.fake_)
+    for (Iterator< T > it = other.begin(); it != other.end(); ++it)
     {
-      push_back(current->data_);
-      current = current->next_;
+      push_back(*it);
     }
   }
 
   template< typename T >
   FwdList< T >::FwdList(FwdList&& other) noexcept:
-    tail_(std::exchange(other.tail_, nullptr)),
+    fake_(std::exchange(other.fake_, nullptr)),
     size_(std::exchange(other.size_, 0))
   {}
 
@@ -135,8 +131,7 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::push_front(const T value)
   {
-    Node< T >* newNode = new Node< T >(value);
-    newNode -> next_ = fake_ -> next_;
+    Node< T >* newNode = new Node< T >(value, fake_ -> next_);
     fake_ -> next_ = newNode;
     ++size_;
   }
