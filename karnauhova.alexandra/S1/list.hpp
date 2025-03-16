@@ -16,8 +16,13 @@ namespace karnauhova
     using Iterator = ListIterator< T >;
     using CIterator = ConstListIterator< T >;
     List();
+    List(Iterator first, Iterator last);
+    List(size_t size, const T& value);
+    List(std::initializer_list<T> list);
     List(const List< T >& other);
     ~List();
+
+    List< T >& operator=(std::initializer_list<T> list);
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -33,6 +38,14 @@ namespace karnauhova
     void push_front(const T& data);
     void pop_front();
     void reverse();
+
+    void remove(const T& value);
+    template< typename UnaryPredicate >
+    void remove_if(UnaryPredicate c) noexcept;
+
+    void assign(size_t size, const T& value);
+    void assign(Iterator first, Iterator last);
+    void assign(std::initializer_list< T > list);
   private:
     Node* fake_;
     size_t size_;
@@ -64,6 +77,31 @@ namespace karnauhova
     size_(0)
   {
     fake_->next = fake_;
+  }
+  
+  template< typename T >
+  List< T >::List(size_t size, const T& value)
+  {
+    assign(size, value);
+  }
+
+  template< typename T >
+  List< T >::List(std::initializer_list<T> list)
+  {
+    assign(list);
+  }
+
+  template< typename T >
+  List< T >::List(Iterator first, Iterator last)
+  {
+    assign(first, last);
+  }
+
+  template< typename T >
+  List< T >& List< T >::operator=(std::initializer_list<T> list)
+  {
+    assign(list);
+    return *this;
   }
 
   template< typename T >
@@ -178,6 +216,89 @@ namespace karnauhova
   {
     return size_;
   }
+
+  template< typename T >
+  void List< T >::assign(size_t size, const T& value )
+  {
+    clear();
+    for (size_t i = 0; i < size; i++)
+    {
+      push_front(value);
+    }
+    size_ = size;
+  }
+
+  template< typename T >
+  void List< T >::assign(Iterator first, Iterator last)
+  {
+    clear();
+    size_ = 0;
+    for (auto it = first; it != last; it++)
+    {
+      push_front(it.node);
+      size_++;
+    }
+  }
+
+  template< typename T >
+  void List< T >::remove(const T& value)
+  {
+    Node* now = fake_->next;
+    Node* last = fake_;
+    while(now != fake_)
+    {
+      if (now->data == value)
+      {
+        Node* temp = now;
+        last->next = now->next;
+        now = now->next;
+        delete temp;
+        size_--;
+      }
+      else
+      {
+        last = now;
+        now = now->next;
+      }
+    }
+  }
+
+  template< typename T >
+  template< typename UnaryPredicate >
+  void List< T >::remove_if(UnaryPredicate c) noexcept//aaaaaaa плиз кил ми
+  {
+    Node* now = fake_->next;
+    Node* last = fake_;
+    while(now != fake_)
+    {
+      if (c(now->data))
+      {
+        Node* temp = now;
+        last->next = now->next;
+        now = now->next;
+        delete temp;
+        size_--;
+      }
+      else
+      {
+        last = now;
+        now = now->next;
+      }
+    }
+  }
+
+  template< typename T >
+  void List< T >::assign(std::initializer_list< T > list)
+  {
+    clear();
+    size_ = 0;
+    for (const T& data : list)
+    {
+      push_back(data);
+      size_++;
+    }
+  }
+
 }
 
 #endif

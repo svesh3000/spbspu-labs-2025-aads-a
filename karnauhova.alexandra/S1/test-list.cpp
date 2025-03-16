@@ -42,3 +42,16 @@ BOOST_AUTO_TEST_CASE(test_reverse_list)
   BOOST_TEST(list.back() == 2);
 }
 
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  karnauhova::List< int > list;
+  list.push_front(0);
+  list.push_front(1);
+  list.push_front(1);
+  list.push_front(2);
+  list.reverse();
+  list.remove(1);
+  BOOST_TEST(list.front() == 0);
+  BOOST_TEST(list.back() == 2);
+}
+
