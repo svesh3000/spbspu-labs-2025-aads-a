@@ -646,9 +646,9 @@ void zholobov::CircularFwdList< T >::clear() noexcept
     while (curr != head_) {
       FwdListNodeBase* temp = curr;
       curr = curr->next;
-      delete temp;
+      delete static_cast< FwdListNode< T >* >(temp);
     }
-    delete head_;
+    delete static_cast< FwdListNode< T >* >(head_);
   }
   head_ = nullptr;
   tail_ = nullptr;
