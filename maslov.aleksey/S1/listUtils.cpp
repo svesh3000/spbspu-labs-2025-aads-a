@@ -59,7 +59,7 @@ void maslov::printData(std::ostream & out, const list & listOfPairs, size_t maxS
         std::advance(itNum, i);
         if (checkOverflow(sum, *itNum, flagOverflow))
         {
-          continue; 
+          continue;
         }
         out << " " << *itNum;
       }
