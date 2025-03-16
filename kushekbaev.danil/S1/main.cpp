@@ -31,9 +31,9 @@ int main()
     unsigned long long value = 0;
     while (std::cin >> value)
     {
-      inputValueList.push_back(value);
+      inputValueList.push_front(value);
     }
-    pairsList.push_back(std::make_pair(listNumber, inputValueList));
+    pairsList.push_front(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
   }
 
@@ -65,10 +65,10 @@ int main()
         {
           ++valueIt;
         }
-        rowList.push_back(*valueIt);
+        rowList.push_front(*valueIt);
       }
     }
-    valueList.push_back(rowList);
+    valueList.push_front(rowList);
   }
 
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
@@ -95,7 +95,7 @@ int main()
       }
       sum += *valueIt;
     }
-    sumList.push_back(sum);
+    sumList.push_front(sum);
   }
 
   std::cout << *(sumList.begin());
