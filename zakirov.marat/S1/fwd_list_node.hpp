@@ -16,7 +16,7 @@ namespace zakirov
 
   template< typename T >
   FwdListNode< T >::FwdListNode():
-    data_(),
+    data_(new T),
     next_(nullptr)
   {}
 
