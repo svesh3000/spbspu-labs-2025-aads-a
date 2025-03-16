@@ -196,7 +196,7 @@ namespace kushekbaev
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
     {
-      if (current -> next_ -> data_ = value)
+      if (current -> next_ -> data_ == value)
       {
         Node< T >* todelete = current -> next;
         current -> next = current -> next -> next;

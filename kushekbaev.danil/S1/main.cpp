@@ -35,6 +35,7 @@ int main()
     }
     pairsList.push_front(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 
   if (pairsList.empty())
