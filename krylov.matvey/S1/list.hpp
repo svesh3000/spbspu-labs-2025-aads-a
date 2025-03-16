@@ -48,7 +48,7 @@ namespace krylov
     void assign(size_t n, const T& value) noexcept;
     void remove(const T& value) noexcept;
     template < typename Predicate >
-    void remove_if(Predicate pred);
+    void remove_if(Predicate pred) noexcept;
     void splice(ConstIterator< T > position, List< T >& other) noexcept;
     void splice(ConstIterator< T > position, List< T >&& other) noexcept;
     void splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it) noexcept;
@@ -260,7 +260,7 @@ namespace krylov
 
   template< typename T >
   template< typename Predicate >
-  void List< T >::remove_if(Predicate pred)
+  void List< T >::remove_if(Predicate pred) noexcept
   {
     for (auto it = begin(); it != end(); )
     {
