@@ -23,7 +23,9 @@ namespace karnauhova
     Fwd_list(Fwd_list< T > &&other) noexcept;
     ~Fwd_list();
 
-    Fwd_list< T >& operator=(std::initializer_list<T> Fwd_list);
+    Fwd_list< T >& operator=(std::initializer_list<T> list);
+    Fwd_list< T >& operator=(const Fwd_list< T >& other);
+    Fwd_list< T >& operator=(Fwd_list &&other) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -102,9 +104,9 @@ namespace karnauhova
   }
 
   template< typename T >
-  Fwd_list< T >& Fwd_list< T >::operator=(std::initializer_list<T> Fwd_list)
+  Fwd_list< T >& Fwd_list< T >::operator=(std::initializer_list<T> list)
   {
-    assign(Fwd_list);
+    assign(list);
     return *this;
   }
 
@@ -122,6 +124,28 @@ namespace karnauhova
   {
     other.fake_ = nullptr;
     other.size_ = 0;
+  }
+
+  template< typename T >
+  Fwd_list< T >& Fwd_list< T >::operator=(const Fwd_list< T >& other)
+  {
+    assign(other.begin(), other.end());
+    return *this;
+  }
+
+  template< class T >
+  Fwd_list< T >& Fwd_list< T >::operator=(Fwd_list &&other) noexcept
+  {
+    if (this != std::addressof(other))
+    {
+      clear();
+      delete[] reinterpret_cast< char* >(fake_);
+      fake_ = other.fake_;
+      size_ = other.size_;
+      other.fake_ = nullptr;
+      other.size_ = 0;
+    }
+    return *this;
   }
 
   template< typename T >
@@ -238,6 +262,7 @@ namespace karnauhova
     {
       push_front(value);
     }
+    reverse()
     size_ = size;
   }
 
@@ -251,6 +276,7 @@ namespace karnauhova
       push_front(it.node);
       size_++;
     }
+    reverse()
   }
 
   template< typename T >
@@ -310,10 +336,11 @@ namespace karnauhova
       push_back(data);
       size_++;
     }
+    reverse()
   }
 
   template<typename T>
-  typename Fwd_list<T>::Iterator Fwd_list<T>::erase(Fwd_list<T>::CIterator pos) noexcept 
+  typename Fwd_list<T>::Iterator Fwd_list<T>::erase(Fwd_list<T>::CIterator pos) noexcept
   {
     Node* todelete = const_cast<Node*>(pos.node);
     if (pos == cend())
