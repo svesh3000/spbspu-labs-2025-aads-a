@@ -5,10 +5,11 @@
 #include <string>
 #include "list.hpp"
 
-using list = maslov::FwdList< std::pair< std::string, maslov::FwdList< size_t > > >;
+
 
 namespace maslov
 {
+  using list = maslov::FwdList< std::pair< std::string, maslov::FwdList< size_t > > >;
   void printData(std::ostream & out, const list & listOfPairs, size_t maxSize);
 }
 #endif
