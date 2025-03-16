@@ -8,6 +8,29 @@
 #include "node.hpp"
 #include "iterator.hpp"
 
+namespace
+{
+  template< typename T >
+  struct IsEqual
+  {
+    IsEqual(const T & value);
+    bool operator()(const T & element) const;
+   private:
+    const T & value_;
+  };
+
+  template< typename T >
+  IsEqual< T >::IsEqual(const T & value):
+    value_(value)
+  {}
+
+  template< typename T >
+  bool IsEqual< T >::operator()(const T & element) const
+  {
+    return element == value_;
+  }
+}
+
 namespace maslov
 {
   template< typename T >
@@ -57,7 +80,7 @@ namespace maslov
     void pushFront(const T & value);
     void popFront();
     void swap(FwdList< T > & rhs) noexcept;
-    void clear();
+    void clear() noexcept;
     template< typename InputIterator, typename = enableIf< InputIterator > >
     void assign(InputIterator first, InputIterator last);
     void assign(size_t n, const T & val);
@@ -246,7 +269,7 @@ namespace maslov
   }
 
   template< typename T >
-  void FwdList< T >::clear()
+  void FwdList< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -310,6 +333,7 @@ namespace maslov
   template< typename T >
   void FwdList< T >::remove(const T & value)
   {
+    removeIf(IsEqual< T >(value));
   }
 
   template< typename T >
@@ -572,4 +596,5 @@ namespace maslov
     return insertAfter(position, il.begin(), il.end());
   }
 }
+
 #endif

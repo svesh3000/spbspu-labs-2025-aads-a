@@ -8,7 +8,7 @@
 namespace maslov
 {
   template< typename T >
-  class FwdList;
+  struct FwdList;
 
   template< typename T >
   struct FwdListIterator final: public std::iterator< std::forward_iterator_tag, T >
