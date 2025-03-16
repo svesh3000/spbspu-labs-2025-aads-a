@@ -19,10 +19,14 @@ namespace abramov
   struct List
   {
     List();
+    List(const List< T > &list);
+    List(List< T > &&list) noexcept;
     List(size_t n, T val);
     List(std::initializer_list< T > il);
     List(Iterator< T > begin, Iterator< T > end);
     ~List();
+    List< T > &operator=(const List< T > &list);
+    List< T > &operator=(List< T > &&list);
     List< T > &operator=(std::initializer_list< T > il);
     T &front() noexcept;
     const T &front() const noexcept;
@@ -74,6 +78,47 @@ namespace abramov
     tail_(nullptr),
     size_(0)
   {}
+
+  template< class T >
+  List< T >::List(const List< T > &list):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {
+    Node< T > *otherhead = list.head_;
+    while(otherhead)
+    {
+      pushBack(otherhead->data_);
+      otherhead = otherhead->next_;
+    }
+  }
+
+  template< class T >
+  List< T > &List< T >::operator=(const List< T > &list)
+  {
+    List< T > copy(list);
+    swap(copy);
+    return *this;
+  }
+
+  template< class T >
+  List< T >::List(List< T > &&list) noexcept:
+    head_(list.head_),
+    tail_(list.tail_),
+    size_(list.size_)
+  {
+    list.head_ = nullptr;
+    list.tail_ = nullptr;
+  }
+
+  template< class T >
+  List< T > &List< T >::operator=(List< T > &&list)
+  {
+    List< T > copy(list);
+    clear();
+    swap(copy);
+    return *this;
+  }
 
   template< class T >
   List< T >::List(size_t n, T val):

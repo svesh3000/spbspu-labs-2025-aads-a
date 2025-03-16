@@ -6,10 +6,11 @@ namespace abramov
   template< class T >
   struct Node
   {
-    Node(const T &data);
     T data_;
     Node *prev_;
     Node *next_;
+
+    Node(const T &data);
   };
 
   template< class T >
