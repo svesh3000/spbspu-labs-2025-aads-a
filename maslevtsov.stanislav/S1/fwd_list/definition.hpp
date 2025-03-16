@@ -56,7 +56,7 @@ maslevtsov::FwdList< T >::FwdList(InputIt first, InputIt last):
 
 template< typename T >
 maslevtsov::FwdList< T >::FwdList(std::initializer_list< T > init):
-  FwdList(init.cbegin(), init.cend())
+  FwdList(init.begin(), init.end())
 {}
 
 template< typename T >
@@ -92,13 +92,7 @@ typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(
 template< typename T >
 void maslevtsov::FwdList< T >::assign(std::size_t count, const T& value)
 {
-  if (count == 0) {
-    return;
-  }
-  FwdList< T > assigned;
-  for (std::size_t i = 0; i != count; ++i) {
-    assigned.push_back(value);
-  }
+  FwdList< T > assigned(count, value);
   swap(assigned);
 }
 
@@ -106,10 +100,7 @@ template< typename T >
 template< class InputIt >
 void maslevtsov::FwdList< T >::assign(InputIt first, InputIt last)
 {
-  FwdList< T > assigned;
-  for (; first != last; ++first) {
-    assigned.push_back(*first);
-  }
+  FwdList< T > assigned(first, last);
   swap(assigned);
 }
 
@@ -338,7 +329,7 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList&& other)
 template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator it) noexcept
 {
-  splice_after(pos, other, it, ++const_iterator(it));
+  splice_after(pos, other, it, ++(++const_iterator(it)));
 }
 
 template< typename T >
