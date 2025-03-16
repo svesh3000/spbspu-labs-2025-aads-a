@@ -6,12 +6,12 @@
 
 namespace aleksandrov
 {
-  unsigned long long calcSum(List< unsigned long long >& list)
+  unsigned long long calcSum(const List< unsigned long long >& list)
   {
     const unsigned long long maxValue = std::numeric_limits< unsigned long long >::max();
     unsigned long long sum = 0;
 
-    for (auto it = list.begin(); it != list.end(); ++it)
+    for (auto it = list.cbegin(); it != list.cend(); ++it)
     {
       unsigned long long value = *it;
       if (maxValue - sum > value)
@@ -26,10 +26,10 @@ namespace aleksandrov
     return sum;
   }
 
-  void outputList(List< unsigned long long >& list, std::ostream& output)
+  void outputList(const List< unsigned long long >& list, std::ostream& output)
   {
-    output << list.front();
-    for (auto it = ++list.begin(); it != list.end(); ++it)
+    output << *list.cbegin();
+    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
     {
       output << " " << *it;
     }
@@ -51,7 +51,7 @@ namespace aleksandrov
     }
   }
 
-  size_t calcMaxSubListSize(PairsList& list)
+  size_t calcMaxSubListSize(const PairsList& list)
   {
     size_t maxSize = 0;
     for (auto it = list.begin(); it != list.end(); ++it)
@@ -61,7 +61,7 @@ namespace aleksandrov
     return maxSize;
   }
 
-  void getTransposedList(PairsList& list, List< List< unsigned long long > >& toTranspose)
+  void getTransposedList(const PairsList& list, List< List< unsigned long long > >& toTranspose)
   {
     size_t shift = 0;
     size_t maxSubListSize = calcMaxSubListSize(list);

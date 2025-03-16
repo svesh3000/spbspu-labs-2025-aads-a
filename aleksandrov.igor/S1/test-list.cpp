@@ -45,9 +45,7 @@ BOOST_AUTO_TEST_CASE(front_back)
   list.pushFront('b');
   list.pushFront('c');
   BOOST_TEST(list.front() == 'c');
-  BOOST_TEST(list.cfront() == list.front());
   BOOST_TEST(list.back() == 'a');
-  BOOST_TEST(list.cback() == list.back());
 }
 
 BOOST_AUTO_TEST_CASE(empty)
@@ -134,16 +132,16 @@ BOOST_AUTO_TEST_CASE(remove_if)
 
 BOOST_AUTO_TEST_CASE(splice)
 {
-  aleksandrov::List< int > list1(7ull, 0);
-  aleksandrov::List< int > list2(3ull, 1);
-  auto itBefore = list1.cbegin();
-  auto itAfter = list1.cbegin();
-  std::advance(itBefore, 2);
-  list1.splice(itBefore, list2);
-  std::advance(itAfter, 2);
+  aleksandrov::List< int > list1{1, 2, 3, 4, 5};
+  aleksandrov::List< int > list2{10, 20, 30, 40, 50};
+  auto it = list1.cbegin();
+  std::advance(it, 2);
+  list1.splice(it, std::move(list2));
+  BOOST_TEST(list2.empty());
   BOOST_TEST(list1.size() == 10);
-  BOOST_TEST(*itBefore == 0);
-  BOOST_TEST(*itAfter == 1);
+  list2.splice(list2.cbegin(), list1, it, list1.cend());
+  BOOST_TEST(list1.size() == 7);
+  BOOST_TEST(list2.size() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(assign)
@@ -204,6 +202,6 @@ BOOST_AUTO_TEST_CASE(reverse)
 {
   aleksandrov::List< float > list{1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
   list.reverse();
-  BOOST_TEST(list.cfront() == 5.0f);
+  BOOST_TEST(list.front() == 5.0f);
 }
 
