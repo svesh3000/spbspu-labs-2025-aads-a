@@ -9,10 +9,15 @@ int main()
   while (std::cin >> list_name) {
     maslevtsov::list_t list;
     unsigned long long num = 0;
-    while (std::cin >> num) {
-      list.push_back(num);
+    try {
+      while (std::cin >> num) {
+        list.push_back(num);
+      }
+      pairs_list.push_back(std::make_pair(list_name, list));
+    } catch (const std::bad_alloc&) {
+      std::cerr << "Memory allocation error\n";
+      return 1;
     }
-    pairs_list.push_back(std::make_pair(list_name, list));
     std::cin.clear();
   }
 

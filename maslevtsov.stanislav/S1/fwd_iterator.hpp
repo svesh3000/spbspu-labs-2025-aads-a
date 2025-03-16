@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <type_traits>
+#include <cassert>
 #include "fwd_list_node.hpp"
 
 namespace maslevtsov {
@@ -20,6 +21,7 @@ namespace maslevtsov {
 
     FwdIterator& operator++() noexcept
     {
+      assert(node_ && "incrementing empty iterator");
       node_ = node_->next_;
       return *this;
     }
@@ -33,11 +35,13 @@ namespace maslevtsov {
 
     typename std::conditional< is_const, const T&, T& >::type operator*() const noexcept
     {
+      assert(node_ && "dereferencing empty iterator");
       return node_->data_;
     }
 
     typename std::conditional< is_const, const T*, T* >::type operator->() const noexcept
     {
+      assert(node_ && "dereferencing empty iterator");
       return std::addressof(node_->data_);
     }
 

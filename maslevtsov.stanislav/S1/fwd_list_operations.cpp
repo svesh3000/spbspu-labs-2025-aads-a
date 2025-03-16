@@ -35,7 +35,7 @@ namespace {
       if (cur_list.size() > border) {
         auto it = cur_list.cbegin();
         for (std::size_t k = 0; k != border; ++k, ++it)
-          ;
+        {}
         list.push_back(*it);
       }
     }
@@ -55,7 +55,7 @@ namespace {
       if (cur_list.size() > border) {
         auto it = cur_list.cbegin();
         for (std::size_t k = 0; k != border; ++k, ++it)
-          ;
+        {}
         result = checked_sum(result, *it);
       }
     }
