@@ -10,7 +10,7 @@ namespace kushekbaev
     Node< T >* next_;
     Node(const T& data);
     Node();
-  }
+  };
 
   template< typename T >
   Node< T >::Node(const T& data):
