@@ -1,26 +1,27 @@
 #include <iostream>
-#include <list>
 #include <string>
 #include <limits>
+#include "list.hpp"
 
 int main()
 {
-  std::list< std::pair< std::string, std::list < unsigned long long int > > > lists;
+  using namespace abramov;
+  List< std::pair< std::string, List< unsigned long long int > > > lists;
   std::string s;
   std::cin >> s;
   size_t count = 0;
   size_t lists_count = 0;
   while (std::cin)
   {
-    std::pair< std::string, std::list< unsigned long long int > > bidir;
+    std::pair< std::string, List< unsigned long long int > > bidir;
     bidir.first = s;
     std::cin >> s;
     while(std::cin && std::isdigit(s[0]))
     {
-      bidir.second.push_back(std::strtoull(s.c_str(), nullptr, 10));
+      bidir.second.pushBack(std::strtoull(s.c_str(), nullptr, 10));
       std::cin >> s;
     }
-    lists.push_back(bidir);
+    lists.pushBack(bidir);
     count = std::max(count, bidir.second.size());
     ++lists_count;
   }
@@ -37,7 +38,7 @@ int main()
   for (size_t i = 0; i < count; ++i)
   {
     bool flag = false;
-    for (auto iter = lists.begin(); iter != --(lists.end()); ++iter)
+    for (auto iter = lists.begin(); iter != --lists.end(); ++iter)
     {
       if (iter->second.size() > i)
       {
@@ -56,7 +57,7 @@ int main()
     }
     else
     {
-      std::cout << " " << *(std::next((--(lists.end()))->second.begin(), i)) << "\n";
+      std::cout << " " << *(std::next((--lists.end())->second.begin(), i)) << "\n";
     }
   }
   unsigned long long int *sums = new unsigned long long int[count];
@@ -86,6 +87,7 @@ int main()
     if (sums[i] != 0)
     {
       empty = false;
+      break;
     }
   }
   if (empty)
