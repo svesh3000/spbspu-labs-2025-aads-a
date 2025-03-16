@@ -47,21 +47,21 @@ namespace aleksandrov
       while (input >> listName)
       {
         List< unsigned long long > numList;
-	try
-	{
-	  unsigned long long num = 0;
+        try
+        {
+          unsigned long long num = 0;
           while (input >> num)
           {
             numList.pushBack(num);
           }
           input.clear();
           list.pushBack(std::make_pair(listName, numList));
-	}
-	catch (const std::bad_alloc&)
-	{
-	  numList.clear();
-	  throw;
-	}
+        }
+        catch (const std::bad_alloc&)
+        {
+          numList.clear();
+          throw;
+        }
       }
     }
     catch (const std::bad_alloc&)
@@ -113,7 +113,7 @@ namespace aleksandrov
         catch (const std::bad_alloc&)
         {
           numList.clear();
-	  throw;
+          throw;
         }
         ++shift;
         toTranspose.pushBack(numList);
