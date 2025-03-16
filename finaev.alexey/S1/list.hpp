@@ -144,6 +144,10 @@ namespace finaev
   template < class T >
   listIterator< T > List < T >::end() const
   {
+    if (!tail_)
+    {
+      return listIterator< T >();
+    }
     return listIterator< T >(tail_->next);
   }
 
@@ -156,6 +160,10 @@ namespace finaev
   template < class T >
   constListIterator< T > List< T >::constEnd() const
   {
+    if (!tail_)
+    {
+      return constListIterator< T >();
+    }
     return constListIterator< T >(tail_->next);
   }
 
@@ -187,7 +195,7 @@ namespace finaev
   void List < T >::popBack()
   {
     Node< T >* toDelete = tail_;
-    if (tail_ != head_)
+    if (tail_)
     {
       tail_ = tail_->prev;
     }
@@ -200,11 +208,11 @@ namespace finaev
   void List< T >::popFront()
   {
     Node< T >* toDelete = head_;
-    if (head_ != nullptr)
+    if (head_)
     {
       head_ = head_->next;
     }
-    if (head_ != nullptr)
+    if (head_)
     {
       head_->prev = nullptr;
     }
