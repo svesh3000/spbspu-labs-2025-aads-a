@@ -78,7 +78,7 @@ namespace karnauhova
   {
     fake_->next = fake_;
   }
-  
+
   template< typename T >
   List< T >::List(size_t size, const T& value)
   {
