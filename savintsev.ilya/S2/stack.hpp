@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include <list>
+#include "dynamic-array.hpp"
 
 namespace savintsev
 {
@@ -13,7 +13,7 @@ namespace savintsev
     T top();
     const T top() const;
   private:
-    std::list< T > stack_;
+    Array< T > stack_;
   };
 
   template <typename T>
@@ -31,15 +31,13 @@ namespace savintsev
   template <typename T>
   const T Stack< T >::top() const
   {
-    if (!stack_.empty())
-      return stack_.back();
+    return stack_.back();
   }
 
   template <typename T>
   T Stack< T >::top()
   {
-    if (!stack_.empty())
-      return stack_.back();
+    return stack_.back();
   }
 }
 

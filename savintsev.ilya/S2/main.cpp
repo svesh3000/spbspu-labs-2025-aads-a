@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <stack>
 #include "postfix-utils.h"
 
 int main(int argc, char ** argv)
