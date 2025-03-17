@@ -33,10 +33,10 @@ namespace tkach
     T& front();
     const T& front() const;
     size_t size() const;
-    template< class Q>
-    void pushFront(Q&& data);
-    template< class Q>
-    void pushBack(Q&& data);
+    void pushFront(T&& data);
+    void pushFront(const T& data);
+    void pushBack(T&& data);
+    void pushBack(const T& data);
     void popFront();
     void spliceAfter(Citerator< T > pos, List< T >& other);
     void spliceAfter(Citerator< T > pos, List< T >&& other);
@@ -66,6 +66,10 @@ namespace tkach
     size_t size_;
     List< T > getList(const List< T >& other) const;
     List< T > getList(size_t count, const T & data) const;
+    template< class Q>
+    void pushFt(Q&& data);
+    template< class Q>
+    void pushBk(Q&& data);
   };
 
   template< typename T >
@@ -206,6 +210,30 @@ namespace tkach
   }
 
   template< typename T >
+  void List< T >::pushFront(T&& data)
+  {
+    pushFt(std::move(data));
+  }
+
+  template< typename T >
+  void List< T >::pushFront(const T& data)
+  {
+    pushFt(data);
+  }
+
+  template< typename T >
+  void List< T >::pushBack(T&& data)
+  {
+    pushBk(std::move(data));
+  }
+
+  template< typename T >
+  void List< T >::pushBack(const T& data)
+  {
+    pushBk(data);
+  }
+
+  template< typename T >
   List< T >::List(const List< T >& other):
     List(getList(other))
   {}
@@ -244,7 +272,7 @@ namespace tkach
 
   template< class T >
   template< class Q>
-  void List< T >::pushFront(Q&& data)
+  void List< T >::pushFt(Q&& data)
   {
     Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
     if (empty())
@@ -262,7 +290,7 @@ namespace tkach
 
   template< class T >
   template< class Q>
-  void List< T >::pushBack(Q&& data)
+  void List< T >::pushBk(Q&& data)
   {
     Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
     if (empty())
