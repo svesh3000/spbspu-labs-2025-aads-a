@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
 {
   list_t list1(3, 3);
   list_t list2(3, 4);
-  auto pos = list1.begin();
+  auto pos = list1.cbegin();
   ++pos;
   list1.splice(pos, list2);
   BOOST_TEST(list1.size() == 6);
@@ -152,9 +152,10 @@ BOOST_AUTO_TEST_CASE(test_splice)
 
   list_t list5(2, 2);
   list_t list6(4, 4);
-  auto pos1 = list5.begin();
-  auto it = list6.begin();
-  list5.splice(++pos, list6, ++it);
+  auto pos1 = list5.cbegin();
+  +pos1;
+  auto it = list6.cbegin();
+  list5.splice(pos1, list6, ++it);
   BOOST_TEST(list5.size() == 3);
   list_t list7(3, 3);
   list_t cop1 = list7;
@@ -164,9 +165,9 @@ BOOST_AUTO_TEST_CASE(test_splice)
 
   list_t list9(6, 6);
   list_t list10(7, 7);
-  auto pos2 = ++list1.begin();
-  auto first = list1.begin();
-  auto last = ++list1.begin();
+  auto pos2 = ++list1.cbegin();
+  auto first = list1.cbegin();
+  auto last = ++list1.cbegin();
   list9.splice(pos2, list10, first, ++last);
   BOOST_TEST(list9.size() == 9);
   list_t list11(3, 3);
