@@ -7,6 +7,11 @@
 
 namespace duhanina
 {
+  template< typename T >
+  class Iterator;
+  template< typename T >
+  class constIterator;
+
   template < typename T >
   class List
   {
@@ -289,7 +294,7 @@ namespace duhanina
     {
       lastOther = lastOther->next_;
     }
-    Node< T >* prev = *pos;
+    Node< T >* prev = pos.node_;
     Node< T >* next = prev->next_;
     prev->next_ = other.fake_->next_;
     lastOther->next_ = next;
@@ -306,20 +311,20 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
   {
-    if (*it == other.fake_)
+    if (it.node_ == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next_ != *it)
+    while (prevOther->next_ != it.node_)
     {
       prevOther = prevOther->next_;
     }
-    prevOther->next_ = *it->next_;
-    Node< T >* prevPos = *pos;
+    prevOther->next_ = it.node_->next_;
+    Node< T >* prevPos = pos.node_;
     Node< T >* nextPos = prevPos->next_;
-    prevPos->next_ = *it;
-    *it->next_ = nextPos;
+    prevPos->next_ = it.node_;
+    it.node_->next_ = nextPos;
   }
 
   template < typename T >
@@ -332,24 +337,24 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
   {
-    if (first == last || *first == other.fake_)
+    if (first == last || first.node_ == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next_ != *first)
+    while (prevOther->next_ != first.node_)
     {
       prevOther = prevOther->next_;
     }
-    Node< T >* lastOther = *first;
-    while (lastOther->next_ != *last)
+    Node< T >* lastOther = first.node_;
+    while (lastOther->next_ != last.node_)
     {
       lastOther = lastOther->next_;
     }
-    prevOther->next_ = *last;
-    Node< T >* prevPos = *pos;
+    prevOther->next_ = last.node_;
+    Node< T >* prevPos = pos.node_;
     Node< T >* nextPos = prevPos->next_;
-    prevPos->next_ = *first;
+    prevPos->next_ = first.node_;
     lastOther->next_ = nextPos;
   }
 

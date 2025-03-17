@@ -4,9 +4,13 @@
 #include <cassert>
 #include <iterator>
 #include "node.hpp"
+#include "list.hpp"
 
 namespace duhanina
 {
+  template< typename T >
+  class List;
+
   template < typename T >
   struct Iterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
@@ -25,6 +29,7 @@ namespace duhanina
     bool operator!=(const Iterator< T >&) const noexcept;
 
   private:
+    friend List< T >;
     Node< T >* node_;
   };
 
