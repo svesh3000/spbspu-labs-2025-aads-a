@@ -17,6 +17,7 @@ namespace abramov
   private:
     T *data_;
     size_t size_;
+    size_t capacity_;
   };
 }
 #endif
