@@ -1,4 +1,5 @@
 #include "actionsList.hpp"
+#include <iterator>
 #include <limits>
 #include <stdexcept>
 
@@ -48,7 +49,7 @@ namespace
     return listSum;
   }
 
-  std::ostream& outputSum(std::ostream& output, const kiselev::numberList& list)
+  std::ostream& outputNumber(std::ostream& output, const kiselev::numberList& list)
   {
     output << list.front();
     for (auto it = ++list.cbegin(); it != list.cend(); ++it)
@@ -74,6 +75,7 @@ namespace
     for (size_t i = 0; i < searchMax(list); ++i)
     {
       it = list.cbegin();
+      kiselev::numberList numbers;
       for (; it != list.cend(); ++it)
       {
         auto nit = it->second.cbegin();
@@ -82,13 +84,9 @@ namespace
           continue;
         }
         std::advance(nit, i);
-        if (it != list.cbegin())
-        {
-          output << " ";
-        }
-        output << *nit;
+        numbers.pushBack(*nit);
       }
-      output << "\n";
+      outputNumber(output, numbers) << "\n";
     }
     return output;
   }
@@ -129,7 +127,7 @@ std::ostream& kiselev::output(std::ostream& output, const list& list)
   }
   outputNumbers(output, list);
   numberList sum = calculateSum(list);
-  outputSum(output, sum) << "\n";
+  outputNumber(output, sum) << "\n";
   return output;
 }
 
