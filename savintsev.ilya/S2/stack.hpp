@@ -8,34 +8,77 @@ namespace savintsev
   class Stack
   {
   public:
-    void push(T rhs);
+    Stack();
+    Stack(const Stack & rhs);
+    Stack(Stack && rhs) noexcept;
+
+    bool empty() const noexcept;
+
     void pop();
-    T top();
-    const T top() const;
+    void push(const T & rhs);
+    void push(T && rhs);
+
+    size_t size() const noexcept;
+
+    T & top() noexcept;
+    const T & top() const noexcept;
   private:
     Array< T > stack_;
   };
 
-  template <typename T>
-  void Stack< T >::push(T rhs)
+  template< typename T >
+  Stack< T >::Stack():
+    stack_{2}
+  {}
+
+  template< typename T >
+  Stack< T >::Stack(const Stack & rhs):
+    stack_(rhs.stack_)
+  {}
+
+  template< typename T >
+  Stack< T >::Stack(Stack && rhs) noexcept:
+    stack_(std::move(rhs.stack_))
+  {}
+
+  template< typename T >
+  bool Stack< T >::empty() const noexcept
   {
-    stack_.push_back(rhs);
+    return stack_.empty();
   }
 
-  template <typename T>
+  template< typename T >
   void Stack< T >::pop()
   {
     stack_.pop_back();
   }
 
-  template <typename T>
-  const T Stack< T >::top() const
+  template< typename T >
+  void Stack< T >::push(const T & rhs)
+  {
+    stack_.push_back(rhs);
+  }
+
+  template< typename T >
+  void Stack< T >::push(T && rhs)
+  {
+    stack_.push_back(rhs);
+  }
+
+  template< typename T >
+  size_t Stack< T >::size() const noexcept
+  {
+    return stack_.size();
+  }
+
+  template< typename T >
+  T & Stack< T >::top() noexcept
   {
     return stack_.back();
   }
 
-  template <typename T>
-  T Stack< T >::top()
+  template< typename T >
+  const T & Stack< T >::top() const noexcept
   {
     return stack_.back();
   }

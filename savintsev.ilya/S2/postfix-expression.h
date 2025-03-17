@@ -1,8 +1,7 @@
 #ifndef POSTFIX_EXPRESSION_H
 #define POSTFIX_EXPRESSION_H
 #include <string>
-#include <queue>
-#include <stack>
+#include "queue.hpp"
 
 namespace savintsev
 {
@@ -25,7 +24,7 @@ namespace savintsev
 
     friend PostfixExpr convert(const std::string & infix);
   private:
-    std::queue< std::string > expr_;
+    Queue< std::string > expr_;
 
     PostfixExpr & use_operator(const std::string & op, PostfixExpr rhs);
   };

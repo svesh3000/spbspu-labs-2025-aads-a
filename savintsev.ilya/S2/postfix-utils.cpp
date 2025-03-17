@@ -1,5 +1,5 @@
 #include "postfix-utils.h"
-#include <stack>
+#include "stack.hpp"
 #include "postfix-expression.h"
 
 void savintsev::io_postfix_results(std::istream & in)
@@ -7,7 +7,7 @@ void savintsev::io_postfix_results(std::istream & in)
   using namespace std;
 
   string text;
-  stack< long long > results;
+  Stack< long long > results;
 
   while (in)
   {

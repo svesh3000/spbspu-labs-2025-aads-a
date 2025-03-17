@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <limits>
+#include "stack.hpp"
 
 namespace
 {
@@ -142,7 +143,7 @@ savintsev::PostfixExpr::PostfixExpr(const PostfixExpr & rhs):
 
 savintsev::PostfixExpr::PostfixExpr(PostfixExpr && rhs)
 {
-  std::swap(expr_, rhs.expr_);
+  swap(expr_, rhs.expr_);
 }
 
 savintsev::PostfixExpr savintsev::convert(const std::string & infix)
@@ -150,7 +151,7 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
   PostfixExpr postfix;
   using str = std::string;
 
-  std::stack< str > stack;
+  Stack< str > stack;
 
   size_t was_bracket = 0;
 
@@ -234,8 +235,8 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
 
 long long savintsev::PostfixExpr::operator()() const
 {
-  std::queue< std::string > expr(expr_);
-  std::stack< long long > calc;
+  Queue< std::string > expr(expr_);
+  Stack< long long > calc;
 
   while (expr.size())
   {
@@ -293,7 +294,8 @@ savintsev::PostfixExpr & savintsev::PostfixExpr::operator=(const PostfixExpr & r
 {
   if (std::addressof(rhs) != this)
   {
-    expr_ = rhs.expr_;
+    auto tmp(rhs);
+    swap(expr_, tmp.expr_);
   }
   return *this;
 }

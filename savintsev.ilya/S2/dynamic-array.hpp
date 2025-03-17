@@ -25,11 +25,22 @@ namespace savintsev
     void push_back(T rhs);
     void pop_front();
     void pop_back() noexcept;
+
+    template< typename U >
+    friend void swap(Array< U > & x, Array< U > & y) noexcept;
   private:
     T * data_ = nullptr;
     size_t size_ = 0;
     size_t capacity_ = 0;
   };
+
+  template< typename T >
+  void swap(Array< T > & x, Array< T > & y) noexcept
+  {
+    std::swap(x.data_, y.data_);
+    std::swap(x.size_, y.size_);
+    std::swap(x.capacity_, y.capacity_);
+  }
 
   template< typename T >
   Array< T >::Array(size_t n):
@@ -82,7 +93,7 @@ namespace savintsev
   template< typename T >
   bool Array< T >::empty() const noexcept
   {
-    return size_;
+    return !size_;
   }
 
   template< typename T >
