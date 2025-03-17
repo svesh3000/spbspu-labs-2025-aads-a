@@ -31,7 +31,6 @@ namespace kushekbaev
     void pop_back() noexcept;
     void swap(FwdList& other) noexcept;
     void clear() noexcept;
-    void remove(const T& value);
 
     private:
       Node< T >* fake_;
@@ -58,9 +57,13 @@ namespace kushekbaev
 
   template< typename T >
   FwdList< T >::FwdList(FwdList&& other) noexcept:
-    fake_(std::exchange(other.fake_, nullptr)),
-    size_(std::exchange(other.size_, 0))
-  {}
+    fake_(other.fake_),
+    listSize_(other.listSize_)
+  {
+    other.fake_ = new Node< T >();
+    other.fake_->next_ = other.fake_;
+    other.listSize_ = 0;
+  }
 
   template< typename T >
   FwdList< T >::~FwdList()
@@ -72,17 +75,28 @@ namespace kushekbaev
   template< typename T >
   typename FwdList< T >::FwdList& FwdList< T >::operator=(const FwdList& other) noexcept
   {
-    FwdList< T > copy(other);
-    swap(copy);
-    return *this;
+    if (size() != other.size())
+    {
+      return false;
+    }
+    auto it1 = begin();
+    auto it2 = other.begin();
+    while (it1 != end())
+    {
+      if (*it1 != *it2)
+      {
+        return false;
+      }
+      ++it1;
+      ++it2;
+    }
+    return true;
   }
 
   template< typename T >
   typename FwdList< T >::FwdList& FwdList< T >::operator=(FwdList&& other) noexcept
   {
-    FwdList< T > copy(other);
-    swap(copy);
-    return *this;
+    return !(*this == other);
   }
 
   template< typename T >
@@ -101,7 +115,7 @@ namespace kushekbaev
   T& FwdList< T >::front() const noexcept
   {
     assert(!empty());
-    return fake_ -> next_ -> data;
+    return fake_ -> next_ -> data_;
   }
 
   template< typename T >
@@ -131,7 +145,8 @@ namespace kushekbaev
   template< typename T >
   void FwdList< T >::push_front(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value, fake_ -> next_);
+    Node< T >* newNode = new Node< T >(value);
+    newNode -> next_ = fake_ -> next_;
     fake_ -> next_ = newNode;
     ++size_;
   }
@@ -187,26 +202,6 @@ namespace kushekbaev
     while (!empty())
     {
       pop_front();
-    }
-  }
-
-  template< typename T >
-  void FwdList< T >::remove(const T& value)
-  {
-    Node< T >* current = fake_;
-    while (current -> next_ != fake_)
-    {
-      if (current -> next_ -> data_ == value)
-      {
-        Node< T >* todelete = current -> next;
-        current -> next = current -> next -> next;
-        delete todelete;
-        --size;
-      }
-      else
-      {
-        current = current -> next_;
-      }
     }
   }
 }
