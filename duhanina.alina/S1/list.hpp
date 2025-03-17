@@ -285,15 +285,15 @@ namespace duhanina
       return;
     }
     Node< T >* lastOther = other.fake_->next;
-    while (lastOther->next != other.fake_)
+    while (lastOther->next_ != other.fake_)
     {
-      lastOther = lastOther->next;
+      lastOther = lastOther->next_;
     }
-    Node< T >* prev = pos.node_;
-    Node< T >* next = prev->next;
-    prev->next = other.fake_->next;
-    lastOther->next = next;
-    other.fake_->next = other.fake_;
+    Node< T >* prev = pos.operator->();
+    Node< T >* next = prev->next_;
+    prev->next_ = other.fake_->next_;
+    lastOther->next_ = next;
+    other.fake_->next_ = other.fake_;
   }
 
   template < typename T >
@@ -306,20 +306,20 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
   {
-    if (it.node_ == other.fake_)
+    if (it.operator->() == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next != it.node_)
+    while (prevOther->next_ != it.operator->())
     {
-      prevOther = prevOther->next;
+      prevOther = prevOther->next_;
     }
-    prevOther->next = it.node_->next;
-    Node< T >* prevPos = pos.node_;
-    Node< T >* nextPos = prevPos->next;
-    prevPos->next = it.node_;
-    it.node_->next = nextPos;
+    prevOther->next_ = it.operator->()->next_;
+    Node< T >* prevPos = pos.operator->();
+    Node< T >* nextPos = prevPos->next_;
+    prevPos->next_ = it.operator->();
+    it.operator->()->next_ = nextPos;
   }
 
   template < typename T >
@@ -332,25 +332,25 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
   {
-    if (first == last || first.node_ == other.fake_)
+    if (first == last || first.operator->() == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next != first.node_)
+    while (prevOther->next_ != first.operator->())
     {
-      prevOther = prevOther->next;
+      prevOther = prevOther->next_;
     }
-    Node< T >* lastOther = first.node_;
-    while (lastOther->next != last.node_)
+    Node< T >* lastOther = first.operator->();
+    while (lastOther->next_ != last.operator->())
     {
-      lastOther = lastOther->next;
+      lastOther = lastOther->next_;
     }
-    prevOther->next = last.node_;
-    Node< T >* prevPos = pos.node_;
-    Node< T >* nextPos = prevPos->next;
-    prevPos->next = first.node_;
-    lastOther->next = nextPos;
+    prevOther->next_ = last.operator->();
+    Node< T >* prevPos = pos.operator->();
+    Node< T >* nextPos = prevPos->next_;
+    prevPos->next_ = first.operator->();
+    lastOther->next_ = nextPos;
   }
 
   template < typename T >
