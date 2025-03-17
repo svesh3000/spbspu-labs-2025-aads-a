@@ -289,7 +289,7 @@ namespace duhanina
     {
       lastOther = lastOther->next_;
     }
-    Node< T >* prev = pos.();
+    Node< T >* prev = *pos;
     Node< T >* next = prev->next_;
     prev->next_ = other.fake_->next_;
     lastOther->next_ = next;
@@ -306,7 +306,7 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
   {
-    if (it.() == other.fake_)
+    if (*it == other.fake_)
     {
       return;
     }
@@ -332,7 +332,7 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
   {
-    if (first == last || first.() == other.fake_)
+    if (first == last || *first == other.fake_)
     {
       return;
     }
