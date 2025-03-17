@@ -66,10 +66,10 @@ int main()
         {
           ++valueIt;
         }
-        rowList.push_front(*valueIt);
+        rowList.push_back(*valueIt);
       }
     }
-    valueList.push_front(rowList);
+    valueList.push_back(rowList);
   }
 
   for (auto it = valueList.begin(); it != valueList.end(); ++it)
@@ -96,7 +96,7 @@ int main()
       }
       sum += *valueIt;
     }
-    sumList.push_front(sum);
+    sumList.push_back(sum);
   }
 
   std::cout << *(sumList.begin());
