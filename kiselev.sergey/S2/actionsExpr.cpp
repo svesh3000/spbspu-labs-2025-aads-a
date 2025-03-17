@@ -2,6 +2,7 @@
 #include <limits>
 #include <cctype>
 #include <new>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <pthread.h>
@@ -212,4 +213,32 @@ kiselev::stackNumber kiselev::calculationExpr(queue& postfix)
     results.push(numbers.back());
   }
   return results;
+}
+
+void kiselev::inputExprs(std::istream& input, queue& exprs)
+{
+  std::string line;
+  while (std::getline(input, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+    exprs.push(line);
+  }
+}
+
+std::ostream& kiselev::outputResults(std::ostream &output, stackNumber& results)
+{
+  if (!results.empty())
+  {
+    output << results.back();
+    results.pop();
+    while (!results.empty())
+    {
+      output << " " << results.back();
+      results.pop();
+    }
+  }
+  return output;
 }
