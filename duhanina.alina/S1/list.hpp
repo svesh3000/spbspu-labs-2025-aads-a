@@ -299,6 +299,8 @@ namespace duhanina
     prev->next_ = other.fake_->next_;
     lastOther->next_ = next;
     other.fake_->next_ = other.fake_;
+    listSize_ += other.listSize_;
+    other.listSize_ = 0;
   }
 
   template < typename T >
@@ -325,6 +327,8 @@ namespace duhanina
     Node< T >* nextPos = prevPos->next_;
     prevPos->next_ = it.node_;
     it.node_->next_ = nextPos;
+    listSize_++;
+    other.listSize_--;
   }
 
   template < typename T >
@@ -341,6 +345,11 @@ namespace duhanina
     {
       return;
     }
+    size_t count = 0;
+    for (auto it = first; it != last; ++it)
+    {
+      ++count;
+    }
     Node< T >* prevOther = other.fake_;
     while (prevOther->next_ != first.node_)
     {
@@ -356,6 +365,8 @@ namespace duhanina
     Node< T >* nextPos = prevPos->next_;
     prevPos->next_ = first.node_;
     lastOther->next_ = nextPos;
+    listSize_ += count;
+    other.listSize_ -= count;
   }
 
   template < typename T >

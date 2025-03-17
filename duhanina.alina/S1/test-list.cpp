@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
   auto first = list1.begin();
   auto last = ++list1.begin();
   list9.splice(pos2, list10, first, ++last);
-  BOOST_TEST(list9.size() == 9);
+  BOOST_TEST(list9.size() == 8);
   list_t list11(3, 3);
   list_t cop2 = list11;
   list_t list12(1, 1);
