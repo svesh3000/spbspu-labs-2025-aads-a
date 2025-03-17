@@ -40,6 +40,13 @@ namespace duhanina
     void remove_if(Predicate pred) noexcept;
     void assign(size_t count, const T& value);
 
+    void splice(constIterator< T > pos, List< T >&) noexcept;
+    void splice(constIterator< T > pos, List< T >&&) noexcept;
+    void splice(constIterator< T > pos, List< T >&, constIterator< T > it) noexcept;
+    void splice(constIterator< T > pos, List< T >&&, constIterator< T > it) noexcept;
+    void splice(constIterator< T > pos, List< T >&, constIterator< T > first, constIterator< T > last) noexcept;
+    void splice(constIterator< T > pos, List< T >&&, constIterator< T > first, constIterator< T > last) noexcept;
+
     bool operator==(const List< T >&) const noexcept;
     bool operator!=(const List< T >&) const noexcept;
 
@@ -268,6 +275,89 @@ namespace duhanina
       temp.clear();
     }
     swap(temp);
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >& other) noexcept
+  {
+    if (other.empty())
+    {
+      return;
+    }
+    Node< T >* lastOther = other.fake_->next;
+    while (lastOther->next != other.fake_)
+    {
+      lastOther = lastOther->next;
+    }
+    Node< T >* prev = pos.node_;
+    Node< T >* next = prev->next;
+    prev->next = other.fake_->next;
+    lastOther->next = next;
+    other.fake_->next = other.fake_;
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >&& other) noexcept
+  {
+    List< T > spliceList(std::move(other));
+    splice(pos, spliceList);
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
+  {
+    if (it.node_ == other.fake_)
+    {
+      return;
+    }
+    Node< T >* prevOther = other.fake_;
+    while (prevOther->next != it.node_)
+    {
+      prevOther = prevOther->next;
+    }
+    prevOther->next = it.node_->next;
+    Node< T >* prevPos = pos.node_;
+    Node< T >* nextPos = prevPos->next;
+    prevPos->next = it.node_;
+    it.node_->next = nextPos;
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >&& other, constIterator< T > it) noexcept
+  {
+    List< T > spliceList(std::move(other));
+    splice(pos, spliceList, it);
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
+  {
+    if (first == last || first.node_ == other.fake_)
+    {
+      return;
+    }
+    Node< T >* prevOther = other.fake_;
+    while (prevOther->next != first.node_)
+    {
+      prevOther = prevOther->next;
+    }
+    Node< T >* lastOther = first.node_;
+    while (lastOther->next != last.node_)
+    {
+      lastOther = lastOther->next;
+    }
+    prevOther->next = last.node_;
+    Node< T >* prevPos = pos.node_;
+    Node< T >* nextPos = prevPos->next;
+    prevPos->next = first.node_;
+    lastOther->next = nextPos;
+  }
+
+  template < typename T >
+  void List< T >::splice(constIterator< T > pos, List< T >&& other, constIterator< T > first, constIterator< T > last) noexcept
+  {
+    List< T > spliceList(std::move(other));
+    splice(pos, spliceList, first, last);
   }
 
   template< typename T >

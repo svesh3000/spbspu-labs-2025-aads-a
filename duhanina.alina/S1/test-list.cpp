@@ -86,6 +86,14 @@ BOOST_AUTO_TEST_CASE(test_remove)
   BOOST_TEST(list1.empty());
 }
 
+namespace
+{
+  bool even(int a)
+  {
+    return a % 2 == 0;
+  }
+}
+
 BOOST_AUTO_TEST_CASE(test_remove_if)
 {
   list_t list;
@@ -93,16 +101,10 @@ BOOST_AUTO_TEST_CASE(test_remove_if)
   list.push_back(2);
   list.push_back(3);
   list.push_back(4);
-  list.remove_if([](int value)
-  {
-    return value % 2 == 0;
-  });
+  list.remove_if(even);
   BOOST_TEST(list.size() == 2);
   list_t list1;
-  list.remove_if([](int value)
-  {
-    return value % 2 == 0;
-  });
+  list.remove_if(even);
   BOOST_TEST(list1.empty());
 }
 
@@ -132,4 +134,46 @@ BOOST_AUTO_TEST_CASE(test_swap)
   list1.swap(list2);
   BOOST_TEST(list1.size() == 2);
   BOOST_TEST(list2.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice)
+{
+  list_t list1(3, 3);
+  list_t list2(3, 4);
+  auto pos = list1.begin();
+  ++pos;
+  list1.splice(pos, list2);
+  BOOST_TEST(list1.size() == 6);
+  list_t list3(5, 5);
+  list_t cop = list3;
+  list_t list4;
+  list3(list3.begin(), list4);
+  BOOST_TEST(list3 == cop);
+
+  list_t list5(2, 2);
+  list_t list6(4, 4);
+  auto pos1 = list5.begin();
+  auto it = list6.begin();
+  list5.splice(++pos, list6, ++it);
+  BOOST_TEST(list5.size() == 3);
+  list_t list7(3, 3);
+  list_t cop1 = list7;
+  list_t list8(1, 1);
+  list7.splice(list7.begin(), list8, list8.end())
+  BOOST_TEST(list7 == cop1);
+
+  list_t list9(6, 6);
+  list_t list10(7, 7);
+  auto pos2 = ++list1.begin();
+  auto first = list1.begin();
+  auto last = ++list1.begin();
+  list9.splice(pos2, list10, first, ++last);
+  BOOST_TEST(list9.size() == 9);
+  list_t list11(3, 3);
+  list_t cop2 = list11;
+  list_t list12(1, 1);
+  list11.splice(list11.begin(), list12, list12.begin(), list12.begin());
+  BOOST_TEST(list11 == cop2);
+  list11.splice(list11.begin(), list12, list12.end(), list12.begin());
+  BOOST_TEST(list11 == cop2);
 }
