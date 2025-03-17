@@ -17,8 +17,8 @@ namespace kiselev
     Stack< T >& operator=(const Stack< T >&);
     Stack< T >& operator=(Stack< T >&&) noexcept;
 
-    T& back() noexcept;
-    const T& back() const noexcept;
+    T& back();
+    const T& back() const;
     void pop() noexcept;
     void push(T&) noexcept;
     void push(T&&) noexcept;
@@ -57,13 +57,13 @@ namespace kiselev
   }
 
   template< typename T >
-  T& Stack< T >::back() noexcept
+  T& Stack< T >::back()
   {
     return arr_.back();
   }
 
   template< typename T >
-  const T& Stack< T >::back() const noexcept
+  const T& Stack< T >::back() const
   {
     return arr_.back();
   }

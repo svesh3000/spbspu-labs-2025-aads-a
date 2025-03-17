@@ -21,12 +21,12 @@ namespace kiselev
     DynamicArr< T >& operator=(const DynamicArr< T >&);
     DynamicArr< T >& operator=(DynamicArr< T >&&) noexcept;
 
-    T& back() noexcept;
-    const T& back() const noexcept;
-    T& front() noexcept;
-    const T& front() const noexcept;
-    void popBack() noexcept;
-    void popFront() noexcept;
+    T& back();
+    const T& back() const;
+    T& front();
+    const T& front() const;
+    void popBack();
+    void popFront();
     void push(T&) noexcept;
     void push(T&&) noexcept;
     void clear() noexcept;
@@ -51,7 +51,7 @@ namespace kiselev
     DynamicArr< T > newArr(newCapacity);
     for (size_t i = 0; i < size_; ++i)
     {
-      newArr.data_[i] = new T(data_[i]);
+      newArr.data_[i] = new T(*data_[i]);
     }
     swap(newArr);
   }
@@ -81,7 +81,7 @@ namespace kiselev
     size_(0),
     begin(0)
   {
-    data_ = new T[capacity_];
+    data_ = new T*[capacity_];
   }
 
   template< typename T >
@@ -95,7 +95,7 @@ namespace kiselev
     {
       for (size_t i = 0; i < size_; ++i)
       {
-        data_[i] = new T(arr.data_[i]);
+        data_[i] = new T(*arr.data_[i]);
       }
     }
     catch (const std::bad_alloc&)
@@ -144,39 +144,39 @@ namespace kiselev
   }
 
   template< typename T >
-  T& DynamicArr< T >::back() noexcept
+  T& DynamicArr< T >::back()
   {
     return const_cast< T& >(static_cast< const DynamicArr< T >& >(*this).back());
   }
 
   template< typename T >
-  const T& DynamicArr< T >::back() const noexcept
+  const T& DynamicArr< T >::back() const
   {
     if (empty())
     {
       throw std::logic_error("Empty for back()");
     }
-    return data_[size_ - 1];
+    return *(data_[size_ - 1]);
   }
 
   template< typename T >
-  const T& DynamicArr< T >::front() const noexcept
+  const T& DynamicArr< T >::front() const
   {
     if (empty())
     {
       throw std::logic_error("Empty for front()");
     }
-    return data_[begin];
+    return *(data_[begin]);
   }
 
   template< typename T >
-  T& DynamicArr< T >::front() noexcept
+  T& DynamicArr< T >::front()
   {
     return const_cast< T& >(static_cast< const DynamicArr< T >& >(*this).front());
   }
 
   template< typename T >
-  void DynamicArr< T >::popBack() noexcept
+  void DynamicArr< T >::popBack()
   {
     if (empty())
     {
@@ -187,7 +187,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void DynamicArr< T >::popFront() noexcept
+  void DynamicArr< T >::popFront()
   {
     if (empty())
     {

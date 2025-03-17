@@ -17,14 +17,14 @@ namespace kiselev
     Queue< T >& operator=(const Queue< T >&);
     Queue< T >& operator=(Queue< T >&&) noexcept;
 
-    T& front() noexcept;
-    const T& front() const noexcept;
-    T& back() noexcept;
-    const T& back() const noexcept;
+    T& front();
+    const T& front() const;
+    T& back();
+    const T& back() const;
 
     void pop() noexcept;
-    void push(T&) noexcept;
-    void push(T&&) noexcept;
+    void push(T&);
+    void push(T&&);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -60,25 +60,25 @@ namespace kiselev
   }
 
   template< typename T >
-  T& Queue< T >::front() noexcept
+  T& Queue< T >::front()
   {
     return arr_.front();
   }
 
   template< typename T >
-  const T& Queue< T >::front() const noexcept
+  const T& Queue< T >::front() const
   {
     return arr_.front();
   }
 
   template< typename T >
-  T& Queue< T >::back() noexcept
+  T& Queue< T >::back()
   {
     return arr_.back();
   }
 
   template< typename T >
-  const T& Queue< T >::back() const noexcept
+  const T& Queue< T >::back() const
   {
     return arr_.back();
   }
@@ -90,13 +90,13 @@ namespace kiselev
   }
 
   template< typename T >
-  void Queue< T >::push(T& data) noexcept
+  void Queue< T >::push(T& data)
   {
     arr_.push(data);
   }
 
   template< typename T >
-  void Queue< T >::push(T&& data) noexcept
+  void Queue< T >::push(T&& data)
   {
     arr_.push(data);
   }
