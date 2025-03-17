@@ -142,36 +142,42 @@ const T& maslevtsov::FwdList< T >::back() const noexcept
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::begin() noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return iterator(tail_->next_);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::begin() const noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cbegin() const noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::end() noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return iterator(tail_->next_);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::end() const noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cend() const noexcept
 {
+  assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
@@ -340,7 +346,9 @@ void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
 template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other) noexcept
 {
+  other.push_front(T());
   splice_after(pos, other, other.cbegin(), other.cend());
+  other.clear();
 }
 
 template< typename T >
@@ -359,28 +367,32 @@ template< typename T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator first,
   const_iterator last) noexcept
 {
-  if (last == const_iterator(first.node_->next_) || other.empty()) {
+  if (last == const_iterator(first.node_->next_)) {
     return;
   }
   std::size_t size_increase = 0;
   if (other.cbegin() == first && other.cend() == last) {
-    size_increase = other.size_;
+    size_increase = other.size_ - 1;
   } else {
     for (auto it = ++first; it != last; ++it, ++size_increase)
     {}
   }
-  FwdListNode< T >* pos_tmp = pos.node_;
-  FwdListNode< T >* first_tmp = first.node_;
-  FwdListNode< T >* last_tmp = last.node_;
-  if (pos_tmp == tail_) {
-    tail_ = last_tmp;
+  size_ += size_increase;
+  other.size_ -= size_increase;
+  FwdListNode< T >* pos_move = pos.node_;
+  FwdListNode< T >* pos_next = pos.node_->next_;
+  if (pos.node_ == tail_) {
+    tail_ = last.node_;
   }
-  if (last_tmp == other.tail_->next_) {
-    other.tail_ = first_tmp;
+  if (last.node_ == other.tail_->next_) {
+    other.tail_ = first.node_;
   }
-  last.node_->next_ = pos.node_->next_;
-  pos_tmp->next_ = first.node_->next_;
-  first_tmp->next_ = last_tmp->next_;
+  pos_move->next_ = first.node_->next_;
+  while (pos_move->next_ != last.node_) {
+    pos_move = pos_move->next_;
+  }
+  pos_move->next_ = pos_next;
+  first.node_->next_ = last.node_;
 }
 
 template< typename T >

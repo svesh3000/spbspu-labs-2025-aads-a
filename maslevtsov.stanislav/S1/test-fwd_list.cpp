@@ -5,6 +5,9 @@ namespace {
   template< typename T >
   void compare_list_values(const maslevtsov::FwdList< T >& first, const maslevtsov::FwdList< T >& second) noexcept
   {
+    if (first.empty() && second.empty()) {
+      return;
+    }
     BOOST_TEST(first.size() == second.size());
     BOOST_TEST(first.front() == second.front());
     auto it1 = ++first.cbegin(), it2 = ++second.cbegin();
@@ -270,7 +273,22 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operations_tests)
 BOOST_AUTO_TEST_CASE(splice_after_test)
-{}
+{
+  maslevtsov::FwdList< int > list1 = {1, 2, 3, 4, 5};
+  maslevtsov::FwdList< int > list2 = {10, 11, 12};
+  list2.splice_after(list2.cbegin(), list1, list1.cbegin(), list1.cend());
+  compare_list_values(list1, {1});
+  compare_list_values(list2, {10, 2, 3, 4, 5, 11, 12});
+  list1.splice_after(list1.cbegin(), list2, list2.cbegin(), ++list2.cbegin());
+  compare_list_values(list1, {1});
+  compare_list_values(list2, {10, 2, 3, 4, 5, 11, 12});
+
+  list1 = {1, 2, 3, 4, 5};
+  list2 = {10, 11, 12};
+  list1.splice_after(list1.cbegin(), list2);
+  compare_list_values(list1, {1, 10, 11, 12, 2, 3, 4, 5});
+  compare_list_values(list2, {});
+}
 
 BOOST_AUTO_TEST_CASE(remove_test)
 {

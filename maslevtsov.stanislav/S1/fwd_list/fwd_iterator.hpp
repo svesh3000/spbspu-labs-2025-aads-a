@@ -14,7 +14,10 @@ namespace maslevtsov {
   class FwdIterator final: public std::iterator< std::forward_iterator_tag, int >
   {
   public:
-    FwdIterator() noexcept = default;
+    FwdIterator() noexcept:
+      node_(nullptr)
+    {}
+
     FwdIterator(const FwdIterator& rhs) noexcept = default;
     ~FwdIterator() = default;
     FwdIterator& operator=(const FwdIterator& rhs) noexcept = default;
