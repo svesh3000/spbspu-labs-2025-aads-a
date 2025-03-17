@@ -1,7 +1,9 @@
 #ifndef DYNAMICARR_HPP
 #define DYNAMICARR_HPP
 #include <cstddef>
+#include <new>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 namespace kiselev
@@ -13,6 +15,7 @@ namespace kiselev
     DynamicArr();
     DynamicArr(const DynamicArr< T >&);
     DynamicArr(DynamicArr< T >&&) noexcept;
+    DynamicArr(size_t capacity);
     ~DynamicArr();
 
     DynamicArr< T >& operator=(const DynamicArr< T >&);
@@ -26,14 +29,16 @@ namespace kiselev
     void popFront() noexcept;
     void push(T&) noexcept;
     void push(T&&) noexcept;
+    void clear() noexcept;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
 
   private:
-    T* data_;
+    T** data_;
     size_t capacity_;
     size_t size_;
+    size_t begin;
 
     void reallocate();
     void swap(DynamicArr< T >&) noexcept;
@@ -43,43 +48,60 @@ namespace kiselev
   void DynamicArr< T >::reallocate()
   {
     size_t newCapacity = capacity_ * 2;
-    T* newData = new T[newCapacity];
+    DynamicArr< T > newArr(newCapacity);
     for (size_t i = 0; i < size_; ++i)
     {
-      newData[i] = std::move(data_[i]);
+      newArr.data_[i] = new T(data_[i]);
     }
-    delete[] data_;
-    capacity_ = newCapacity;
-    data_ = newData;
+    swap(newArr);
   }
 
+  template< typename T >
+  void DynamicArr< T >::clear() noexcept
+  {
+    while(!empty())
+    {
+      popBack();
+    }
+    delete[] data_;
+  }
   template< typename T >
   void DynamicArr< T >::swap(DynamicArr< T >& arr) noexcept
   {
     std::swap(data_, arr.data_);
     std::swap(capacity_, arr.capacity_);
     std::swap(size_, arr.size_);
+    std::swap(begin, arr.begin);
   }
 
   template< typename T >
   DynamicArr< T >::DynamicArr():
     data_(nullptr),
     capacity_(5),
-    size_(0)
+    size_(0),
+    begin(0)
   {
     data_ = new T[capacity_];
   }
 
   template< typename T >
   DynamicArr< T >::DynamicArr(const DynamicArr< T >& arr):
-    data_(nullptr),
+    data_(new T*[arr.capacity_]),
     capacity_(arr.capacity_),
-    size_(arr.size_)
+    size_(arr.size_),
+    begin(arr.begin)
   {
-    data_ = new T[capacity_];
-    for (size_t i = 0; i < size_; ++i)
+    try
     {
-      data_[i] = arr.data_[i];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        data_[i] = new T(arr.data_[i]);
+      }
+    }
+    catch (const std::bad_alloc&)
+    {
+      clear();
+      throw;
     }
   }
 
@@ -87,13 +109,22 @@ namespace kiselev
   DynamicArr< T >::DynamicArr(DynamicArr< T >&& arr) noexcept:
     data_(std::exchange(arr.data_, nullptr)),
     capacity_(std::exchange(arr.capacity_, 0)),
-    size_(std::exchange(arr.size_, 0))
+    size_(std::exchange(arr.size_, 0)),
+    begin(std::exchange(arr.begin, 0))
+  {}
+
+  template< typename T >
+  DynamicArr< T >::DynamicArr(size_t capacity):
+    data_(new T*[capacity]),
+    capacity_(capacity),
+    size_(0),
+    begin(0)
   {}
 
   template< typename T >
   DynamicArr< T >::~DynamicArr()
   {
-    delete[] data_;
+    clear();
   }
 
   template< typename T >
@@ -135,7 +166,7 @@ namespace kiselev
     {
       throw std::logic_error("Empty for front()");
     }
-    return data_[0];
+    return data_[begin];
   }
 
   template< typename T >
@@ -151,6 +182,7 @@ namespace kiselev
     {
       throw std::logic_error("Empty for popBack()");
     }
+    delete data_[size_ - 1];
     --size_;
   }
 
@@ -161,10 +193,8 @@ namespace kiselev
     {
       throw std::logic_error("Empty for popFront()");
     }
-    for (size_t i = 1; i < size_; ++i)
-    {
-      data_[i - 1] = std::move(data_[i]);
-    }
+    delete data_[begin];
+    ++begin;
     --size_;
   }
 
@@ -175,7 +205,7 @@ namespace kiselev
     {
       reallocate();
     }
-    data_[size_++] = data;
+    data_[size_++] = new T(data);
   }
 
   template< typename T >
@@ -185,7 +215,7 @@ namespace kiselev
     {
       reallocate();
     }
-    data_[size_++] = data;
+    data_[size_++] = new T(data);
   }
 
   template< typename T >
