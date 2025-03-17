@@ -313,6 +313,10 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(Iterator< T > pos, List< T >& other, Iterator< T > it) noexcept
   {
+    if (other.empty())
+    {
+      return;
+    }
     if (it.node_ == other.fake_)
     {
       return;
@@ -341,6 +345,10 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(Iterator< T > pos, List< T >& other, Iterator< T > first, Iterator< T > last) noexcept
   {
+    if (other.empty())
+    {
+      return;
+    }
     if (first == last || first.node_ == other.fake_)
     {
       return;
