@@ -49,12 +49,14 @@ BOOST_AUTO_TEST_CASE(pop_and_push)
   BOOST_TEST(queue.front() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(empty_and_size)
+BOOST_AUTO_TEST_CASE(empty_and_size_and_clear)
 {
   kiselev::Queue< int > queue;
-  BOOST_TEST(queue.empty());
   queue.push(1);
-  BOOST_TEST(queue.size() == 1);
+  queue.push(3);
+  BOOST_TEST(queue.size() == 2);
+  queue.clear();
+  BOOST_TEST(queue.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

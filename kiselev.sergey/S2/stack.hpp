@@ -25,6 +25,7 @@ namespace kiselev
 
     size_t size() const noexcept;
     bool empty() const noexcept;
+    void clear() noexcept;
 
   private:
 
@@ -98,5 +99,12 @@ namespace kiselev
     return arr_.empty();
   }
 
+  template< typename T >
+  void Stack< T >::clear() noexcept
+  {
+    arr_.clear();
+  }
+
 }
+
 #endif
