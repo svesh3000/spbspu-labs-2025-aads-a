@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
   list_t list7(3, 3);
   list_t cop1 = list7;
   list_t list8(1, 1);
-  list7.splice(list7.begin(), list8, list8.end())
+  list7.splice(list7.cbegin(), list8, list8.cend())
   BOOST_TEST(list7 == cop1);
 
   list_t list9(6, 6);
@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(test_splice)
   list_t list11(3, 3);
   list_t cop2 = list11;
   list_t list12(1, 1);
-  list11.splice(list11.begin(), list12, list12.begin(), list12.begin());
+  list11.splice(list11.cbegin(), list12, list12.cbegin(), list12.cbegin());
   BOOST_TEST(list11 == cop2);
-  list11.splice(list11.begin(), list12, list12.end(), list12.begin());
+  list11.splice(list11.cbegin(), list12, list12.cend(), list12.cbegin());
   BOOST_TEST(list11 == cop2);
 }
