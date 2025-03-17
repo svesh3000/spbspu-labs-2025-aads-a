@@ -15,8 +15,8 @@ namespace abramov
     Stack< T > &operator=(const Stack< T > &stack);
     Stack< T > &operator=(Stack< T > &&stack);
     void push(const T &rhs);
-    T &top();
-    const T &top() const;
+    T *top();
+    const T *top() const;
     void pop();
     size_t size() const;
     bool empty() const;
@@ -32,14 +32,15 @@ namespace abramov
   namespace
   {
     template< class T >
-    T** expandArray(T *data, size_t capacity)
+    T** expandArray(T **data, size_t &capacity)
     {
       constexpr size_t k = 100;
-      T *array = new T[capacity + k];
+      T **array = new T*[capacity + k];
       for (size_t i = 0; i < capacity; ++i)
       {
-        array[i] = data[i];
+        array[i + k] = data[i];
       }
+      capacity += k;
       return array;
     }
   }
@@ -63,7 +64,7 @@ namespace abramov
     {
       for (size_t i = stack.capacity_ - 1; i >= stack.capacity_ - stack.size_; --i)
       {
-        data[i] = new T(stack.data_[i]);
+        data[i] = new T(*stack.data_[i]);
       }
     }
     catch (const std::bad_alloc &)
@@ -115,7 +116,7 @@ namespace abramov
   {
     if (size_ == capacity_)
     {
-      T *new_data = expandArray(data_, capacity_);
+      T **new_data = expandArray(data_, capacity_);
       delete[] data_;
       data_ = new_data;
     }
@@ -124,15 +125,15 @@ namespace abramov
   }
 
   template< class T >
-  const T &Stack < T >::top() const
+  const T *Stack < T >::top() const
   {
-    return data_[capacity_ - size_ + 1];
+    return data_[capacity_ - size_];
   }
 
   template< class T >
-  T &Stack< T >::top()
+  T *Stack< T >::top()
   {
-    return const_cast< T& >(const_cast< const Stack< T >* >(this)->top());
+    return const_cast< T* >(const_cast< const Stack< T >* >(this)->top());
   }
 
   template< class T >
@@ -165,6 +166,10 @@ namespace abramov
   template< class T >
   void Stack< T >::clear()
   {
+    if (!data_)
+    {
+      return;
+    }
     for (size_t i = capacity_ - 1; i >= capacity_ - size_; --i)
     {
       delete data_[i];
