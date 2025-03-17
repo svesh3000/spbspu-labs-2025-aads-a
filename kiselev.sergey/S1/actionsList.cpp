@@ -73,7 +73,6 @@ namespace
     auto it = list.cbegin();
     for (size_t i = 0; i < searchMax(list); ++i)
     {
-      bool first = true;
       it = list.cbegin();
       for (; it != list.cend(); ++it)
       {
@@ -83,11 +82,10 @@ namespace
           continue;
         }
         std::advance(nit, i);
-        if (!first)
+        if (it != list.cbegin())
         {
           output << " ";
         }
-        first = false;
         output << *nit;
       }
       output << "\n";
