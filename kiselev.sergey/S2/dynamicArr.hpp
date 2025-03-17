@@ -38,7 +38,7 @@ namespace kiselev
     T** data_;
     size_t capacity_;
     size_t size_;
-    size_t begin;
+    size_t begin_;
 
     void reallocate();
     void swap(DynamicArr< T >&) noexcept;
@@ -51,7 +51,7 @@ namespace kiselev
     DynamicArr< T > newArr(newCapacity);
     for (size_t i = 0; i < size_; ++i)
     {
-      newArr.data_[i] = new T(*data_[i]);
+      newArr.push(*data_[i + begin_]);
     }
     swap(newArr);
   }
@@ -61,9 +61,10 @@ namespace kiselev
   {
     while(!empty())
     {
-      popBack();
+      popFront();
     }
-    delete[] data_;
+    size_ = 0;
+    begin_ = 0;
   }
   template< typename T >
   void DynamicArr< T >::swap(DynamicArr< T >& arr) noexcept
@@ -71,7 +72,7 @@ namespace kiselev
     std::swap(data_, arr.data_);
     std::swap(capacity_, arr.capacity_);
     std::swap(size_, arr.size_);
-    std::swap(begin, arr.begin);
+    std::swap(begin_, arr.begin_);
   }
 
   template< typename T >
@@ -79,7 +80,7 @@ namespace kiselev
     data_(nullptr),
     capacity_(5),
     size_(0),
-    begin(0)
+    begin_(0)
   {
     data_ = new T*[capacity_];
   }
@@ -89,13 +90,13 @@ namespace kiselev
     data_(new T*[arr.capacity_]),
     capacity_(arr.capacity_),
     size_(arr.size_),
-    begin(arr.begin)
+    begin_(arr.begin_)
   {
     try
     {
       for (size_t i = 0; i < size_; ++i)
       {
-        data_[i] = new T(*arr.data_[i]);
+        data_[i] = new T(*arr.data_[i + begin_]);
       }
     }
     catch (const std::bad_alloc&)
@@ -110,7 +111,7 @@ namespace kiselev
     data_(std::exchange(arr.data_, nullptr)),
     capacity_(std::exchange(arr.capacity_, 0)),
     size_(std::exchange(arr.size_, 0)),
-    begin(std::exchange(arr.begin, 0))
+    begin_(std::exchange(arr.begin_, 0))
   {}
 
   template< typename T >
@@ -118,13 +119,15 @@ namespace kiselev
     data_(new T*[capacity]),
     capacity_(capacity),
     size_(0),
-    begin(0)
+    begin_(0)
   {}
 
   template< typename T >
   DynamicArr< T >::~DynamicArr()
   {
     clear();
+    delete[] data_;
+    capacity_ = 0;
   }
 
   template< typename T >
@@ -156,7 +159,7 @@ namespace kiselev
     {
       throw std::logic_error("Empty for back()");
     }
-    return *(data_[size_ - 1]);
+    return *(data_[begin_ + size_ - 1]);
   }
 
   template< typename T >
@@ -166,7 +169,7 @@ namespace kiselev
     {
       throw std::logic_error("Empty for front()");
     }
-    return *(data_[begin]);
+    return *(data_[begin_]);
   }
 
   template< typename T >
@@ -182,7 +185,7 @@ namespace kiselev
     {
       throw std::logic_error("Empty for popBack()");
     }
-    delete data_[size_ - 1];
+    delete data_[begin_ + size_ - 1];
     --size_;
   }
 
@@ -193,8 +196,8 @@ namespace kiselev
     {
       throw std::logic_error("Empty for popFront()");
     }
-    delete data_[begin];
-    ++begin;
+    delete data_[begin_];
+    ++begin_;
     --size_;
   }
 
@@ -205,7 +208,8 @@ namespace kiselev
     {
       reallocate();
     }
-    data_[size_++] = new T(data);
+    data_[begin_ + size_] = new T(data);
+    ++size_;
   }
 
   template< typename T >
@@ -215,7 +219,8 @@ namespace kiselev
     {
       reallocate();
     }
-    data_[size_++] = new T(data);
+    data_[begin_ + size_] = new T(std::move(data));
+    ++size_;
   }
 
   template< typename T >
