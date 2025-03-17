@@ -289,7 +289,7 @@ namespace duhanina
     {
       lastOther = lastOther->next_;
     }
-    Node< T >* prev = pos.operator->();
+    Node< T >* prev = pos.();
     Node< T >* next = prev->next_;
     prev->next_ = other.fake_->next_;
     lastOther->next_ = next;
@@ -306,20 +306,20 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
   {
-    if (it.operator->() == other.fake_)
+    if (it.() == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next_ != it.operator->())
+    while (prevOther->next_ != *it)
     {
       prevOther = prevOther->next_;
     }
-    prevOther->next_ = it.operator->()->next_;
-    Node< T >* prevPos = pos.operator->();
+    prevOther->next_ = *it->next_;
+    Node< T >* prevPos = *pos;
     Node< T >* nextPos = prevPos->next_;
-    prevPos->next_ = it.operator->();
-    it.operator->()->next_ = nextPos;
+    prevPos->next_ = *it;
+    *it->next_ = nextPos;
   }
 
   template < typename T >
@@ -332,24 +332,24 @@ namespace duhanina
   template < typename T >
   void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
   {
-    if (first == last || first.operator->() == other.fake_)
+    if (first == last || first.() == other.fake_)
     {
       return;
     }
     Node< T >* prevOther = other.fake_;
-    while (prevOther->next_ != first.operator->())
+    while (prevOther->next_ != *first)
     {
       prevOther = prevOther->next_;
     }
-    Node< T >* lastOther = first.operator->();
-    while (lastOther->next_ != last.operator->())
+    Node< T >* lastOther = *first;
+    while (lastOther->next_ != *last)
     {
       lastOther = lastOther->next_;
     }
-    prevOther->next_ = last.operator->();
-    Node< T >* prevPos = pos.operator->();
+    prevOther->next_ = *last;
+    Node< T >* prevPos = *pos;
     Node< T >* nextPos = prevPos->next_;
-    prevPos->next_ = first.operator->();
+    prevPos->next_ = *first;
     lastOther->next_ = nextPos;
   }
 

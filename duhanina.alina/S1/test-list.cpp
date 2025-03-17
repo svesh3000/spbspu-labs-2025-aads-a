@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
   list_t list5(2, 2);
   list_t list6(4, 4);
   auto pos1 = list5.cbegin();
-  +pos1;
+  ++pos1;
   auto it = list6.cbegin();
   list5.splice(pos1, list6, ++it);
   BOOST_TEST(list5.size() == 3);
