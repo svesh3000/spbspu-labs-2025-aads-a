@@ -36,7 +36,7 @@ namespace abramov
     void pushFront(const T &data);
     void popBack() noexcept;
     void popFront() noexcept;
-    void swap(List &rhs) noexcept;
+    void swap(List< T > &rhs) noexcept;
     void clear();
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -282,7 +282,7 @@ namespace abramov
   }
 
   template< class T >
-  void List< T >::swap(List &rhs) noexcept
+  void List< T >::swap(List< T > &rhs) noexcept
   {
     std::swap(head_, rhs.head_);
     std::swap(tail_, rhs.tail_);
