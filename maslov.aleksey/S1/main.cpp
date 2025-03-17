@@ -9,7 +9,7 @@ int main()
   std::string name;
   size_t number = 0;
   size_t maxSize = 0;
-  while (std::cin >> name && !std::cin.eof())
+  while ((std::cin >> name) && !std::cin.eof())
   {
     maslov::FwdList< size_t > numbers;
     while ((std::cin >> number) && !std::cin.eof())
