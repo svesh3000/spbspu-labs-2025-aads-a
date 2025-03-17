@@ -25,13 +25,13 @@ namespace kushekbaev
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    void push_front(const T value);
-    void push_back(const T value);
+    void push_front(const T& value);
+    void push_back(const T& value);
     void pop_front() noexcept;
     void pop_back() noexcept;
     void swap(FwdList& other) noexcept;
     void clear() noexcept;
-    void remove(const T value);
+    void remove(const T& value);
 
     private:
       Node< T >* fake_;
@@ -129,7 +129,7 @@ namespace kushekbaev
   }
 
   template< typename T >
-  void FwdList< T >::push_front(const T value)
+  void FwdList< T >::push_front(const T& value)
   {
     Node< T >* newNode = new Node< T >(value, fake_ -> next_);
     fake_ -> next_ = newNode;
@@ -137,7 +137,7 @@ namespace kushekbaev
   }
 
   template< typename T >
-  void FwdList< T >::push_back(const T value)
+  void FwdList< T >::push_back(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
     Node< T >* current = fake_;
@@ -191,7 +191,7 @@ namespace kushekbaev
   }
 
   template< typename T >
-  void FwdList< T >::remove(const T value)
+  void FwdList< T >::remove(const T& value)
   {
     Node< T >* current = fake_;
     while (current -> next_ != fake_)
