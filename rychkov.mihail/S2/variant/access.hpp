@@ -8,37 +8,13 @@
 class rychkov::bad_variant_access: public std::exception
 {
 public:
-  bad_variant_access() noexcept:
-    data_("bad variant access")
-  {}
-
-  virtual const char* what() const noexcept override
-  {
-    return data_;
-  }
+  bad_variant_access() noexcept;
+  virtual const char* what() const noexcept override;
 private:
   const char* data_;
-  bad_variant_access(const char* message) noexcept:
-    data_(message)
-  {}
+  bad_variant_access(const char* message) noexcept;
   friend void rychkov::details::throw_bad_variant_access(const char* message);
 };
-
-void rychkov::details::throw_bad_variant_access(const char* message)
-{
-  throw bad_variant_access(message);
-}
-void rychkov::details::throw_bad_variant_access(bool valueless)
-{
-  if (valueless)
-  {
-    throw_bad_variant_access("get(): variant is valueless");
-  }
-  else
-  {
-    throw_bad_variant_access("get(): variant active index don't matches requested type");
-  }
-}
 
 template< class T, class... Types >
 T* rychkov::get_if(Variant< Types... >* variant) noexcept

@@ -9,7 +9,7 @@ namespace rychkov
   namespace details
   {
     template< class T, bool PopFromTail >
-    class queue_base
+    class QueueBase
     {
     public:
       using value_type = T;
@@ -17,13 +17,13 @@ namespace rychkov
       using reference = value_type&;
       using const_reference = const value_type&;
 
-      queue_base() noexcept;
-      queue_base(const queue_base& rhs);
-      queue_base(queue_base&& rhs) noexcept;
-      ~queue_base();
+      QueueBase() noexcept;
+      QueueBase(const QueueBase& rhs);
+      QueueBase(QueueBase&& rhs) noexcept;
+      ~QueueBase();
 
-      queue_base& operator=(const queue_base& rhs);
-      queue_base& operator=(queue_base&& rhs) noexcept;
+      QueueBase& operator=(const QueueBase& rhs);
+      QueueBase& operator=(QueueBase&& rhs) noexcept;
 
       reference operator[](size_type i);
       const_reference operator[](size_type i) const;
@@ -39,7 +39,7 @@ namespace rychkov
       reference emplace(Args&&... args);
 
       void reserve(size_type newCapacity);
-      void swap(queue_base& rhs) noexcept;
+      void swap(QueueBase& rhs) noexcept;
     private:
       size_type size_, capacity_, head_;
       value_type* data_;
@@ -49,14 +49,14 @@ namespace rychkov
 }
 
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >::queue_base() noexcept:
+rychkov::details::QueueBase< T, PopFromTail >::QueueBase() noexcept:
   size_(0),
   capacity_(0),
   head_(0),
   data_(nullptr)
 {}
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >::queue_base(const queue_base& rhs):
+rychkov::details::QueueBase< T, PopFromTail >::QueueBase(const QueueBase& rhs):
   size_(0),
   capacity_(rhs.capacity_),
   head_(0),
@@ -68,14 +68,14 @@ rychkov::details::queue_base< T, PopFromTail >::queue_base(const queue_base& rhs
   }
 }
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >::queue_base(queue_base&& rhs) noexcept:
+rychkov::details::QueueBase< T, PopFromTail >::QueueBase(QueueBase&& rhs) noexcept:
   size_(std::exchange(rhs.size_, 0)),
   capacity_(std::exchange(rhs.capacity_, 0)),
   head_(rhs.head_),
   data_(std::exchange(rhs.data_, nullptr))
 {}
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >::~queue_base()
+rychkov::details::QueueBase< T, PopFromTail >::~QueueBase()
 {
   while (!empty())
   {
@@ -84,41 +84,41 @@ rychkov::details::queue_base< T, PopFromTail >::~queue_base()
   delete[] data_;
 }
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >&
-    rychkov::details::queue_base< T, PopFromTail >::operator=(const queue_base& rhs)
+rychkov::details::QueueBase< T, PopFromTail >&
+    rychkov::details::QueueBase< T, PopFromTail >::operator=(const QueueBase& rhs)
 {
-  queue_base temp(rhs);
+  QueueBase temp(rhs);
   swap(temp);
   return *this;
 }
 template< class T, bool PopFromTail >
-rychkov::details::queue_base< T, PopFromTail >&
-    rychkov::details::queue_base< T, PopFromTail >::operator=(queue_base&& rhs) noexcept
+rychkov::details::QueueBase< T, PopFromTail >&
+    rychkov::details::QueueBase< T, PopFromTail >::operator=(QueueBase&& rhs) noexcept
 {
-  queue_base temp(std::move(*this));
+  QueueBase temp(std::move(*this));
   swap(rhs);
   return *this;
 }
 
 template< class T, bool PopFromTail >
-bool rychkov::details::queue_base< T, PopFromTail >::empty() const noexcept
+bool rychkov::details::QueueBase< T, PopFromTail >::empty() const noexcept
 {
   return size_ == 0;
 }
 template< class T, bool PopFromTail >
-typename rychkov::details::queue_base< T, PopFromTail >::size_type
-    rychkov::details::queue_base< T, PopFromTail >::size() const noexcept
+typename rychkov::details::QueueBase< T, PopFromTail >::size_type
+    rychkov::details::QueueBase< T, PopFromTail >::size() const noexcept
 {
   return size_;
 }
 template< class T, bool PopFromTail >
-typename rychkov::details::queue_base< T, PopFromTail >::size_type
-    rychkov::details::queue_base< T, PopFromTail >::capacity() const noexcept
+typename rychkov::details::QueueBase< T, PopFromTail >::size_type
+    rychkov::details::QueueBase< T, PopFromTail >::capacity() const noexcept
 {
   return capacity_;
 }
 template< class T, bool PopFromTail >
-void rychkov::details::queue_base< T, PopFromTail >::pop()
+void rychkov::details::QueueBase< T, PopFromTail >::pop()
 {
   if (PopFromTail)
   {
@@ -132,19 +132,19 @@ void rychkov::details::queue_base< T, PopFromTail >::pop()
   }
 }
 template< class T, bool PopFromTail >
-void rychkov::details::queue_base< T, PopFromTail >::push(const value_type& value)
+void rychkov::details::QueueBase< T, PopFromTail >::push(const value_type& value)
 {
   emplace(value);
 }
 template< class T, bool PopFromTail >
-void rychkov::details::queue_base< T, PopFromTail >::push(value_type&& value)
+void rychkov::details::QueueBase< T, PopFromTail >::push(value_type&& value)
 {
   emplace(std::move(value));
 }
 template< class T, bool PopFromTail >
 template< class... Args >
-typename rychkov::details::queue_base< T, PopFromTail >::reference
-    rychkov::details::queue_base< T, PopFromTail >::emplace(Args&&... args)
+typename rychkov::details::QueueBase< T, PopFromTail >::reference
+    rychkov::details::QueueBase< T, PopFromTail >::emplace(Args&&... args)
 {
   if (size_ >= capacity_)
   {
@@ -154,7 +154,7 @@ typename rychkov::details::queue_base< T, PopFromTail >::reference
   return operator[](size_++);
 }
 template< class T, bool PopFromTail >
-void rychkov::details::queue_base< T, PopFromTail >::swap(queue_base& rhs) noexcept
+void rychkov::details::QueueBase< T, PopFromTail >::swap(QueueBase& rhs) noexcept
 {
   std::swap(size_, rhs.size_);
   std::swap(capacity_, rhs.capacity_);
@@ -162,13 +162,13 @@ void rychkov::details::queue_base< T, PopFromTail >::swap(queue_base& rhs) noexc
   std::swap(data_, rhs.data_);
 }
 template< class T, bool PopFromTail >
-void rychkov::details::queue_base< T, PopFromTail >::reserve(size_type newCapacity)
+void rychkov::details::QueueBase< T, PopFromTail >::reserve(size_type newCapacity)
 {
   if (capacity_ >= newCapacity)
   {
     return;
   }
-  queue_base temp;
+  QueueBase temp;
   temp.capacity_ = newCapacity;
   temp.data_ = new value_type[newCapacity];
   for (size_type i = 0; i < size_; i++)
@@ -178,21 +178,21 @@ void rychkov::details::queue_base< T, PopFromTail >::reserve(size_type newCapaci
   swap(temp);
 }
 template< class T, bool PopFromTail >
-typename rychkov::details::queue_base< T, PopFromTail >::size_type
-    rychkov::details::queue_base< T, PopFromTail >::getLocalId(size_type globalId) const noexcept
+typename rychkov::details::QueueBase< T, PopFromTail >::size_type
+    rychkov::details::QueueBase< T, PopFromTail >::getLocalId(size_type globalId) const noexcept
 {
   globalId += head_;
   return (globalId < capacity_ ? globalId : globalId - capacity_);
 }
 template< class T, bool PopFromTail >
-typename rychkov::details::queue_base< T, PopFromTail >::reference
-    rychkov::details::queue_base< T, PopFromTail >::operator[](size_type i)
+typename rychkov::details::QueueBase< T, PopFromTail >::reference
+    rychkov::details::QueueBase< T, PopFromTail >::operator[](size_type i)
 {
   return data_[getLocalId(i)];
 }
 template< class T, bool PopFromTail >
-typename rychkov::details::queue_base< T, PopFromTail >::const_reference
-    rychkov::details::queue_base< T, PopFromTail >::operator[](size_type i) const
+typename rychkov::details::QueueBase< T, PopFromTail >::const_reference
+    rychkov::details::QueueBase< T, PopFromTail >::operator[](size_type i) const
 {
   return data_[getLocalId(i)];
 }

@@ -6,13 +6,13 @@
 namespace rychkov
 {
   template< class T >
-  class Queue: public details::queue_base< T, false >
+  class Queue: public details::QueueBase< T, false >
   {
   public:
-    using value_type = typename details::queue_base< T, false >::value_type;
-    using size_type = typename details::queue_base< T, false >::size_type;
-    using reference = typename details::queue_base< T, false >::reference;
-    using const_reference = typename details::queue_base< T, false >::const_reference;
+    using value_type = typename details::QueueBase< T, false >::value_type;
+    using size_type = typename details::QueueBase< T, false >::size_type;
+    using reference = typename details::QueueBase< T, false >::reference;
+    using const_reference = typename details::QueueBase< T, false >::const_reference;
 
     reference front();
     const_reference front() const;
