@@ -58,11 +58,11 @@ namespace kushekbaev
   template< typename T >
   FwdList< T >::FwdList(FwdList&& other) noexcept:
     fake_(other.fake_),
-    listSize_(other.listSize_)
+    listSize_(other.size_)
   {
     other.fake_ = new Node< T >();
     other.fake_->next_ = other.fake_;
-    other.listSize_ = 0;
+    other.size_ = 0;
   }
 
   template< typename T >
