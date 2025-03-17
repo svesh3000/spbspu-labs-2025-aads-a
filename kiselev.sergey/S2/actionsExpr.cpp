@@ -5,13 +5,12 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
-#include <pthread.h>
 
 namespace
 {
   int getPriority(const char& operation)
   {
-    if (operation == '+' || '-')
+    if (operation == '+' || operation == '-')
     {
       return 1;
     }
@@ -26,7 +25,7 @@ namespace
   {
     return c == '+' || c == '-' || c == '/' || c == '*' || c == '%';
   }
-  void addNumber(std::string& line, std::string& number)
+  void addNumberInLine(std::string& line, std::string& number)
   {
     if (!number.empty())
     {
@@ -35,6 +34,15 @@ namespace
         line += ' ';
       }
       line += number;
+      number.clear();
+    }
+  }
+
+  void addNumberInStack(std::string& number, kiselev::stackNumber& stack)
+  {
+    if (!number.empty())
+    {
+      stack.push(std::stoll(number));
       number.clear();
     }
   }
@@ -76,7 +84,7 @@ namespace
     case '-':
       if (a < min + b)
       {
-        throw std::logic_error("underflow");
+        throw std::logic_error("Underflow");
       }
       return a - b;
     case '*':
@@ -96,7 +104,7 @@ namespace
       {
         throw std::logic_error("Dividing by 0");
       }
-      return a % b;
+      return a >= 0 ? a % b : (b - std::abs(a % b)) % b;
     default:
       throw std::logic_error("Invalid operation");
     }
@@ -118,7 +126,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
     {
       if (isspace(s))
       {
-        addNumber(postfixLine, number);
+        addNumberInLine(postfixLine, number);
         continue;
       }
       if (isdigit(s))
@@ -127,7 +135,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
       }
       else
       {
-        addNumber(postfixLine, number);
+        addNumberInLine(postfixLine, number);
         if (s == '(')
         {
           operators.push(s);
@@ -154,7 +162,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
         }
       }
     }
-    addNumber(postfixLine, number);
+    addNumberInLine(postfixLine, number);
     while (!operators.empty())
     {
       postfixLine += ' ';
@@ -174,44 +182,41 @@ kiselev::stackNumber kiselev::calculationExpr(queue& postfix)
     stackNumber numbers;
     std::string line = postfix.front();
     postfix.pop();
-    for (size_t i = 0; i < line.size(); ++i)
+    std::string number;
+    for (char s : line)
     {
-      char s = line[i];
-      if (std::isspace(s))
+      if (isspace(s))
       {
+        addNumberInStack(number, numbers);
         continue;
       }
-      if (std::isdigit(s))
+      if (isdigit(s))
       {
-        std::string number;
-        while (i < line.size() && std::isdigit(s))
-        {
-          number += line[i];
-          ++i;
-        }
-        --i;
-        numbers.push(std::stoll(number));
+        number += s;
       }
       else if (isOperator(s))
       {
+        addNumberInStack(number, numbers);
         if (numbers.size() < 2)
         {
-          throw std::logic_error("There are not enough operands");
+          throw std::logic_error("Not enough operands");
         }
-        long long int left = numbers.back();
-        numbers.pop();
         long long int right = numbers.back();
+        numbers.pop();
+        long long int left = numbers.back();
         numbers.pop();
         long long int result = calculatingOperation(left, right, s);
         numbers.push(result);
       }
     }
+    addNumberInStack(number, numbers);
     if (numbers.size() != 1)
     {
       throw std::logic_error("Too many operands");
     }
     results.push(numbers.back());
   }
+
   return results;
 }
 

@@ -1,8 +1,6 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include <istream>
-#include <pthread.h>
 #include "actionsExpr.hpp"
 
 int main(int argc, char* argv[])
@@ -10,10 +8,6 @@ int main(int argc, char* argv[])
   try
   {
     kiselev::queue infixExprs;
-    //if (argc < 1)
-    //{
-    //  kiselev::inputExprs(std::cin, infixExprs);
-    //}
     if (argc > 1)
     {
       std::ifstream file(argv[1]);
