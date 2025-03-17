@@ -26,11 +26,6 @@ mainList readInput()
 
 void printNames(const mainList& list)
 {
-  if (list.empty())
-  {
-    std::cout << "0\n";
-    return;
-  }
   std::cout << list.begin()->first;
   for (auto it = ++(list.begin()); it != list.end(); it++)
   {
@@ -93,8 +88,7 @@ void calcPrintSum(const List< List< unsigned long long > >& result)
     {
       if (sum > std::numeric_limits< unsigned long long >::max() - *numIt)
       {
-        std::cerr << "Error\n";
-        return;
+        throw std::overflow_error("Overflow");
       }
       sum += *numIt;
     }
@@ -110,10 +104,23 @@ void calcPrintSum(const List< List< unsigned long long > >& result)
 
 int main()
 {
-  auto list = readInput();
-  printNames(list);
-  auto result = createResult(list);
-  printResult(result);
-  calcPrintSum(result);
+  try
+  {
+    auto list = readInput();
+    if (list.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+    printNames(list);
+    auto result = createResult(list);
+    printResult(result);
+    calcPrintSum(result);
+  }
+  catch (...)
+  {
+    std::cerr << "Error\n";
+    return 1;
+  }
   return 0;
 }
