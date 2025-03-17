@@ -1,7 +1,10 @@
 #include "actionsExpr.hpp"
 #include <limits>
 #include <cctype>
+#include <new>
+#include <stdexcept>
 #include <string>
+#include <pthread.h>
 
 namespace
 {
@@ -35,7 +38,7 @@ namespace
     }
   }
 
-  bool isOverflow(long long int a, long long int b)
+  bool isMultiplicateOverflow(long long int a, long long int b)
   {
     long long int max = std::numeric_limits< long long int >::max();
     long long int min = std::numeric_limits< long long int >::min();
@@ -56,6 +59,46 @@ namespace
       return true;
     }
     return false;
+  }
+  long long int calculatingOperation(long long int a, long long b, const char& operation)
+  {
+    long long int max = std::numeric_limits< long long int >::max();
+    long long int min = std::numeric_limits< long long int >::min();
+    switch (operation)
+    {
+    case '+':
+      if (a > max - b)
+      {
+        throw std::logic_error("Overflow");
+      }
+      return a + b;
+    case '-':
+      if (a < min + b)
+      {
+        throw std::logic_error("underflow");
+      }
+      return a - b;
+    case '*':
+      if (isMultiplicateOverflow(a, b))
+      {
+        throw std::logic_error("Overflow");
+      }
+      return a * b;
+    case '/':
+      if (b == 0)
+      {
+        throw std::logic_error("Dividing by 0");
+      }
+      return a / b;
+    case '%':
+      if (b == 0)
+      {
+        throw std::logic_error("Dividing by 0");
+      }
+      return a % b;
+    default:
+      throw std::logic_error("Invalid operation");
+    }
   }
 
 }
@@ -146,11 +189,27 @@ kiselev::stackNumber kiselev::calculationExpr(queue& postfix)
           ++i;
         }
         --i;
-        result.push(std::stoll(number));
+        numbers.push(std::stoll(number));
       }
       else if (isOperator(s))
       {
+        if (numbers.size() < 2)
+        {
+          throw std::logic_error("There are not enough operands");
+        }
+        long long int left = numbers.back();
+        numbers.pop();
+        long long int right = numbers.back();
+        numbers.pop();
+        long long int result = calculatingOperation(left, right, s);
+        numbers.push(result);
       }
     }
+    if (numbers.size() != 1)
+    {
+      throw std::logic_error("Too many operands");
+    }
+    results.push(numbers.back());
   }
+  return results;
 }
