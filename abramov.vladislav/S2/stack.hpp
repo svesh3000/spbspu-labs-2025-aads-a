@@ -10,7 +10,7 @@ namespace abramov
   {
     Stack();
     Stack(const Stack< T > &stack);
-    Stack(Stack< T > &&stack);
+    Stack(Stack< T > &&stack) noexcept;
     ~Stack();
     Stack< T > &operator=(const Stack< T > &stack);
     Stack< T > &operator=(Stack< T > &&stack);
@@ -22,7 +22,7 @@ namespace abramov
     bool empty() const;
     void swap(Stack< T > &stack) noexcept;
   private:
-    T *data_;
+    T **data_;
     size_t size_;
     size_t capacity_;
 
@@ -32,7 +32,7 @@ namespace abramov
   namespace
   {
     template< class T >
-    void expandArray(T *data, size_t capacity)
+    T** expandArray(T *data, size_t capacity)
     {
       constexpr size_t k = 100;
       T *array = new T[capacity + k];
@@ -49,6 +49,7 @@ namespace abramov
     data_(nullptr),
     size_(0),
     capacity_(0)
+  {}
 
   template< class T >
   Stack< T >::Stack(const Stack< T > &stack):
@@ -56,7 +57,7 @@ namespace abramov
     size_(0),
     capacity_(0)
   {
-    T *data = new T[stack.capacity_];
+    T **data = new T*[stack.capacity_];
     size_t count = 0;
     try
     {
@@ -125,7 +126,6 @@ namespace abramov
   template< class T >
   const T &Stack < T >::top() const
   {
-    --size_
     return data_[capacity_ - size_ + 1];
   }
 
