@@ -30,7 +30,7 @@ namespace duhanina
 
   private:
     friend List< T >;
-    Node< T >* node_;
+    const Node< T >* node_;
   };
 
   template< typename T >

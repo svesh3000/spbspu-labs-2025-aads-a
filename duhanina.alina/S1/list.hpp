@@ -45,12 +45,12 @@ namespace duhanina
     void remove_if(Predicate pred) noexcept;
     void assign(size_t count, const T& value);
 
-    void splice(constIterator< T > pos, List< T >&) noexcept;
-    void splice(constIterator< T > pos, List< T >&&) noexcept;
-    void splice(constIterator< T > pos, List< T >&, constIterator< T > it) noexcept;
-    void splice(constIterator< T > pos, List< T >&&, constIterator< T > it) noexcept;
-    void splice(constIterator< T > pos, List< T >&, constIterator< T > first, constIterator< T > last) noexcept;
-    void splice(constIterator< T > pos, List< T >&&, constIterator< T > first, constIterator< T > last) noexcept;
+    void splice(Iterator< T > pos, List< T >&) noexcept;
+    void splice(Iterator< T > pos, List< T >&&) noexcept;
+    void splice(Iterator< T > pos, List< T >&, Iterator< T > it) noexcept;
+    void splice(Iterator< T > pos, List< T >&&, Iterator< T > it) noexcept;
+    void splice(Iterator< T > pos, List< T >&, Iterator< T > first, Iterator< T > last) noexcept;
+    void splice(Iterator< T > pos, List< T >&&, Iterator< T > first, Iterator< T > last) noexcept;
 
     bool operator==(const List< T >&) const noexcept;
     bool operator!=(const List< T >&) const noexcept;
@@ -283,7 +283,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >& other) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >& other) noexcept
   {
     if (other.empty())
     {
@@ -309,7 +309,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > it) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >& other, Iterator< T > it) noexcept
   {
     if (it.node_ == other.fake_)
     {
@@ -328,14 +328,14 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >&& other, constIterator< T > it) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >&& other, Iterator< T > it) noexcept
   {
     List< T > spliceList(std::move(other));
     splice(pos, spliceList, it);
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >& other, constIterator< T > first, constIterator< T > last) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >& other, Iterator< T > first, Iterator< T > last) noexcept
   {
     if (first == last || first.node_ == other.fake_)
     {
@@ -359,7 +359,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >&& other, constIterator< T > first, constIterator< T > last) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >&& other, Iterator< T > first, Iterator< T > last) noexcept
   {
     List< T > spliceList(std::move(other));
     splice(pos, spliceList, first, last);
