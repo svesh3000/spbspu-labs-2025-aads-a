@@ -289,7 +289,7 @@ namespace duhanina
     {
       return;
     }
-    Node< T >* lastOther = other.fake_->next;
+    Node< T >* lastOther = other.fake_->next_;
     while (lastOther->next_ != other.fake_)
     {
       lastOther = lastOther->next_;

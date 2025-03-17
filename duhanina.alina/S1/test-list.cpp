@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
   list_t list7(3, 3);
   list_t cop1 = list7;
   list_t list8(1, 1);
-  list7.splice(list7.cbegin(), list8, list8.cend())
+  list7.splice(list7.cbegin(), list8, list8.cend());
   BOOST_TEST(list7 == cop1);
 
   list_t list9(6, 6);
