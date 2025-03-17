@@ -18,7 +18,7 @@ int main()
       try
       {
         unsigned long long number = std::stoull(input);
-        list.pushBack(number);
+        list.push_back(number);
       }
       catch (const std::out_of_range & e)
       {
@@ -63,7 +63,7 @@ int main()
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
     const std::pair< std::string, List< unsigned long long > > & seq = *it;
-    if (!seq.second.isEmpty())
+    if (!seq.second.empty())
     {
       hasNum = true;
       break;
@@ -85,14 +85,14 @@ int main()
     for (auto it = sequences.begin(); it != sequences.end(); ++it)
     {
       std::pair< std::string, List< unsigned long long > > & seq = *it;
-      if (!seq.second.isEmpty())
+      if (!seq.second.empty())
       {
-        currentSequence.pushBack(*seq.second.begin());
-        seq.second.popFront();
+        currentSequence.push_back(*seq.second.begin());
+        seq.second.pop_front();
         hasNumbers = true;
       }
     }
-    if (!currentSequence.isEmpty())
+    if (!currentSequence.empty())
     {
       resultSequences.push_back(currentSequence);
     }
@@ -126,7 +126,7 @@ int main()
       }
       sum += *numIt;
     }
-    sums.pushBack(sum);
+    sums.push_back(sum);
   }
   for (auto it = sums.begin(); it != sums.end(); ++it)
   {

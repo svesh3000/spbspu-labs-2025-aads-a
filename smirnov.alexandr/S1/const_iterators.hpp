@@ -45,7 +45,7 @@ namespace smirnov
   const T * ConstIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
-    return std::adressof(node_->data);
+    return std::addressof(node_->data);
   }
 
   template < typename T >
