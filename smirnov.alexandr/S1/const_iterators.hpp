@@ -1,6 +1,7 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
 #include <cassert>
+#include <memory>
 #include "node.hpp"
 
 namespace smirnov
@@ -58,7 +59,7 @@ namespace smirnov
   template < typename T >
   ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
-    assert(node != nullptr);
+    assert(node_ != nullptr);
     this_t result(*this);
     ++(*this);
     return result;
