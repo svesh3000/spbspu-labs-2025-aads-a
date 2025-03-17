@@ -16,7 +16,7 @@ namespace duhanina
   {
   public:
     constIterator() noexcept;
-    explicit constIterator(const Node< T >* node) noexcept;
+    explicit constIterator(Node< T >* node) noexcept;
     ~constIterator() = default;
 
     constIterator< T >& operator++() noexcept;
@@ -39,7 +39,7 @@ namespace duhanina
   {}
 
   template< typename T >
-  constIterator< T >::constIterator(const Node< T >* node) noexcept:
+  constIterator< T >::constIterator(Node< T >* node) noexcept:
     node_(node)
   {}
 
