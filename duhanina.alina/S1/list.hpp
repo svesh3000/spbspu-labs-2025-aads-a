@@ -302,7 +302,7 @@ namespace duhanina
   }
 
   template < typename T >
-  void List< T >::splice(constIterator< T > pos, List< T >&& other) noexcept
+  void List< T >::splice(Iterator< T > pos, List< T >&& other) noexcept
   {
     List< T > spliceList(std::move(other));
     splice(pos, spliceList);
