@@ -10,26 +10,42 @@ namespace tkach
   {
     T data_;
     Node< T >* next_;
-    Node() = default;
-    template< typename Q >
-    Node(Q&& data);
-    template< typename Q >
-    Node(Q&& data, Node< T >* next);
+    Node();
+    Node(T&& data);
+    Node(const T& data);
+    Node(const T& data, Node< T >* next);
+    Node(T&& data, Node< T >* next);
     ~Node() =  default;
   };
 
   template< typename T >
-  template< typename Q >
-  Node< T >::Node(Q&& data):
-    data_(std::forward< Q >(data)),
+  Node< T >::Node(T&& data):
+    data_(std::move(data)),
     next_(nullptr)
   {}
 
   template< typename T >
-  template< typename Q >
-  Node< T >::Node(Q&& data, Node< T > * next):
-    data_(std::forward< Q >(data)),
+  Node< T >::Node(T&& data, Node< T > * next):
+    data_(std::move(data)),
     next_(next)
+  {}
+
+  template< typename T >
+  Node< T >::Node(const T& data, Node< T > * next):
+    data_(data),
+    next_(next)
+  {}
+
+  template< typename T >
+  Node< T >::Node(const T& data):
+    data_(data),
+    next_(nullptr)
+  {}
+
+  template< typename T >
+  Node< T >::Node():
+    data_(),
+    next_(nullptr)
   {}
 }
 

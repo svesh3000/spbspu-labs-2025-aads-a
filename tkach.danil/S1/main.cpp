@@ -12,7 +12,7 @@ namespace
   {
     tkach::List< pairs > fd_pair_list;
     std::string list_name = "";
-    while(in >> list_name)
+    while (in >> list_name)
     {
       if (list_name.empty())
       {
@@ -20,7 +20,7 @@ namespace
       }
       tkach::List < size_t > temp_list;
       size_t num = 0;
-      while(in >> num)
+      while (in >> num)
       {
         temp_list.pushBack(num);
       }
@@ -68,7 +68,7 @@ namespace
         new_list.pushBack(pair_second_front);
         it->second.popFront();
         it++;
-      } while(it != fd_pair_list.begin());
+      } while (it != fd_pair_list.begin());
       if (!new_list.empty())
       {
         out << new_list.front();
@@ -111,7 +111,6 @@ namespace
 int main()
 {
   using namespace tkach;
-  List< size_t > list = {1, 3, 5};
   try
   {
     List< std::pair< std::string, List < size_t > > > fd_pair_list = inputLists(std::cin);
