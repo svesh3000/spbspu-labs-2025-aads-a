@@ -90,10 +90,7 @@ void calcPrintSum(const List< List< unsigned long long > >& result)
       {
         throw std::overflow_error("Overflow");
       }
-      if (numIt != it->end())
-      {
-        sum += *numIt;
-      }
+      sum += *numIt;
     }
     sums.push_back(sum);
   }

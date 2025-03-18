@@ -67,7 +67,8 @@ namespace averenkov
 
   template < class T >
   List< T >::List():
-    size_(0),  fake_(reinterpret_cast< Node< T >* >(new char[sizeof(Node< T >)]))
+    size_(0),
+    fake_(reinterpret_cast< Node< T >* >(new char[sizeof(Node< T >)]))
   {
     fake_->next_ = fake_;
   }
