@@ -24,6 +24,14 @@ public:
   size_(0)
   {}
 
+  ~forward_list() noexcept
+  {
+    wile (!empty)
+    {
+      pop_front();
+    }
+  }
+
   class const_iterator
   {
     friend class forward_list;
