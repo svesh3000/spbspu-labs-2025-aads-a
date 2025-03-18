@@ -67,26 +67,15 @@ namespace rychkov
   }
 }
 
-int main(int argc, char** argv)
+int main()
 {
-  if (argc != 2)
-  {
-    std::cerr << "console arguments count doesn't match requirenment\n";
-    return 1;
-  }
-  std::ifstream in(argv[1]);
-  if (!in)
-  {
-    std::cerr << "failed to open file \"" << argv[1] << "\"\n";
-    return 1;
-  }
-  in >> std::noskipws;
+  std::cin >> std::noskipws;
   rychkov::Queue< rychkov::Variant< int, char > > expression;
   rychkov::Stack< char > operators;
   bool isNumber = false;
   int number = 0;
   char c = 0;
-  while (in >> c)
+  while (std::cin >> c)
   {
     if (std::isdigit(c))
     {
