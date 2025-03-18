@@ -30,7 +30,6 @@ public:
     while (size_ != 0)
     {
       pop_front();
-      size_--;
     }
   }
 
@@ -118,21 +117,19 @@ public:
 
   void pop_front()
   {
+    size_--;
     if (head_ == nullptr || size_ == 0)
     {
-      std::cout<<"\n\nz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       return;
     }
     Node* temp = head_;
     if (head_ == tail_)
     {
-      std::cout<<"\n\nzz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       head_ = nullptr;
       tail_ = nullptr;
     }
     else
     {
-      std::cout<<"\n\nzzz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       head_ = head_->next_;//
       tail_->next_ = head_;//
     }
