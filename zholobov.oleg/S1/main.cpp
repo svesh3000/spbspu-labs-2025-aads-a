@@ -5,64 +5,85 @@
 
 #include "CircularFwdList.hpp"
 
-int main()
-{
-  using list_elem_type = unsigned long;
-  using IntList = zholobov::CircularFwdList< list_elem_type >;
-  using ListElem = std::pair< std::string, IntList >;
-  zholobov::CircularFwdList< ListElem > list;
-  zholobov::CircularFwdList< list_elem_type > sum_list;
-  bool is_overflow = false;
-  try {
-    while (std::cin.good()) {
+namespace {
+
+  template < typename T >
+  class SequencePrinter {
+  public:
+    explicit SequencePrinter(std::ostream& out, std::string delimiter = " ") noexcept:
+      out_(out), delimiter_(std::move(delimiter)), first_(true) {}
+
+    SequencePrinter(const SequencePrinter&) = delete;
+    SequencePrinter& operator=(const SequencePrinter&) = delete;
+
+    SequencePrinter& operator<<(const T& value)
+    {
+      if (!first_) {
+        out_ << delimiter_;
+      }
+      first_ = false;
+      out_ << value;
+      return *this;
+    }
+
+  private:
+    std::ostream& out_;
+    std::string delimiter_;
+    bool first_;
+  };
+
+  using ElemType = unsigned long;
+  using ElemList = zholobov::CircularFwdList< ElemType >;
+  using NamedElemList = std::pair< std::string, ElemList >;
+  using ListOfNamedElemList = zholobov::CircularFwdList< NamedElemList >;
+
+  ListOfNamedElemList read_list_of_elems_list(std::istream& input)
+  {
+    ListOfNamedElemList list;
+    while (input.good()) {
       std::string line;
-      std::getline(std::cin, line);
+      std::getline(input, line);
       std::stringstream ss(line);
       std::string name;
-      IntList int_list;
+      ElemList int_list;
       if (!(ss >> name)) {
-        break;
+        continue;
       }
-      list_elem_type elem = 0;
+      ElemType elem = 0;
       while (ss >> elem) {
         int_list.push_back(elem);
       }
-      ListElem list_elem(std::move(name), std::move(int_list));
+      NamedElemList list_elem(std::move(name), std::move(int_list));
       list.push_back(std::move(list_elem));
     }
+    return list;
+  }
 
-    zholobov::CircularFwdList< std::pair< IntList::const_iterator, IntList::const_iterator > > iter_list;
+  int calc_and_print_result(std::ostream& out, const ListOfNamedElemList& list)
+  {
+    ElemList sum_list;
+    bool is_overflow = false;
+    zholobov::CircularFwdList< std::pair< ElemList::const_iterator, ElemList::const_iterator > > iter_list;
     if (!list.empty()) {
-      bool first = true;
+      SequencePrinter< std::string > printer(out);
       for (const auto& elem : list) {
-        if (first) {
-          first = false;
-        } else {
-          std::cout << " ";
-        }
-        std::cout << elem.first;
+        printer << elem.first;
         iter_list.push_back(std::make_pair(elem.second.cbegin(), elem.second.cend()));
       }
-      std::cout << "\n";
+      out << "\n";
     }
-
     bool is_done_printing = true;
     do {
       is_done_printing = true;
-      list_elem_type sum = 0;
-      bool first = true;
+      ElemType sum = 0;
+      SequencePrinter< ElemType > printer(out);
       for (auto& elem : iter_list) {
         if (elem.first != elem.second) {
-          list_elem_type val = *(elem.first);
-          if (first) {
-            first = false;
-          } else {
-            std::cout << " ";
-          }
-          std::cout << val;
+          ElemType val = *(elem.first);
+          printer << val;
           ++elem.first;
           is_done_printing = false;
-          if (sum <= std::numeric_limits< list_elem_type >::max() - val) {
+          if (sum <= std::numeric_limits< ElemType >::max() - val) {
             sum += val;
           } else {
             is_overflow = true;
@@ -70,30 +91,39 @@ int main()
         }
       }
       if (!is_done_printing) {
-        std::cout << "\n";
+        out << "\n";
         sum_list.push_back(sum);
       }
     } while (!is_done_printing);
+
+    if (is_overflow) {
+      std::cerr << "Overflow error\n";
+      return 1;
+    }
+
+    if (sum_list.empty()) {
+      out << "0\n";
+    } else {
+      SequencePrinter< ElemType > printer(out);
+      for (const auto& elem : sum_list) {
+        printer << elem;
+      }
+      out << "\n";
+    }
+    return 0;
+  }
+
+}
+
+int main()
+{
+  int exit_code = 0;
+  try {
+    ListOfNamedElemList list = read_list_of_elems_list(std::cin);
+    exit_code = calc_and_print_result(std::cout, list);
   } catch (const std::bad_alloc& e) {
     std::cerr << e.what() << '\n';
     return 1;
   }
-
-  if (is_overflow) {
-    std::cerr << "Overflow error\n";
-    return 1;
-  }
-
-  if (sum_list.empty()) {
-    std::cout << "0\n";
-  } else {
-    auto it = sum_list.begin();
-    std::cout << *it++;
-    for (; it != sum_list.end(); ++it) {
-      std::cout << " " << *it;
-    }
-    std::cout << "\n";
-  }
-
-  return 0;
+  return exit_code;
 }

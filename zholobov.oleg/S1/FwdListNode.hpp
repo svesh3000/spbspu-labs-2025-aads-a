@@ -1,7 +1,6 @@
 #ifndef FWDLISTNODE_HPP
 #define FWDLISTNODE_HPP
 
-#include <forward_list>
 #include <utility>
 
 namespace zholobov {

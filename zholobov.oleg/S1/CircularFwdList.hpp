@@ -104,7 +104,7 @@ namespace zholobov {
     FwdListNodeBase* before_head_;
     FwdListNodeBase* head_;
     FwdListNodeBase* tail_;
-    size_t size_ = 0;
+    size_t size_;
   };
 }
 
@@ -316,13 +316,7 @@ bool zholobov::CircularFwdList< T >::empty() const noexcept
 template < typename T >
 void zholobov::CircularFwdList< T >::push_front(const value_type& val)
 {
-  auto new_node = new FwdListNode< value_type >(val, head_);
-  head_ = new_node;
-  if (size_ == 0) {
-    tail_ = head_;
-  }
-  tail_->next = head_;
-  ++size_;
+  push_front(value_type(val));
 }
 
 template < typename T >
@@ -340,15 +334,7 @@ void zholobov::CircularFwdList< T >::push_front(value_type&& val)
 template < typename T >
 void zholobov::CircularFwdList< T >::push_back(const value_type& val)
 {
-  auto new_node = new FwdListNode< value_type >(val, head_);
-  if (size_ == 0) {
-    head_ = new_node;
-    head_->next = head_;
-  } else {
-    tail_->next = new_node;
-  }
-  tail_ = new_node;
-  ++size_;
+  push_back(value_type(val));
 }
 
 template < typename T >
@@ -368,28 +354,27 @@ void zholobov::CircularFwdList< T >::push_back(value_type&& val)
 template < typename T >
 void zholobov::CircularFwdList< T >::pop_front()
 {
+  FwdListNodeBase* temp = head_;
   if (size_ == 0) {
     return;
   } else if (size_ == 1) {
-    delete head_;
     head_ = nullptr;
     tail_ = nullptr;
   } else {
-    FwdListNodeBase* temp = head_;
     head_ = head_->next;
     tail_->next = head_;
-    delete temp;
   }
+  delete temp;
   --size_;
 }
 
 template < typename T >
 void zholobov::CircularFwdList< T >::pop_back()
 {
+  FwdListNodeBase* temp = tail_;
   if (size_ == 0) {
     return;
   } else if (size_ == 1) {
-    delete tail_;
     head_ = nullptr;
     tail_ = nullptr;
   } else {
@@ -397,10 +382,10 @@ void zholobov::CircularFwdList< T >::pop_back()
     while (cur->next != tail_) {
       ++cur;
     }
-    delete tail_;
     tail_ = cur;
     tail_->next = head_;
   }
+  delete temp;
   --size_;
 }
 
@@ -628,13 +613,12 @@ template < typename T >
 void zholobov::CircularFwdList< T >::clear() noexcept
 {
   if (size_ != 0) {
-    FwdListNodeBase* curr = head_->next;
-    while (curr != head_) {
+    FwdListNodeBase* curr = head_;
+    do {
       FwdListNodeBase* temp = curr;
       curr = curr->next;
       delete static_cast< FwdListNode< T >* >(temp);
-    }
-    delete static_cast< FwdListNode< T >* >(head_);
+    } while (curr != head_);
   }
   head_ = nullptr;
   tail_ = nullptr;
