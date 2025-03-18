@@ -24,7 +24,7 @@ namespace smirnov
     size_t size() const noexcept;
     void push_front(const T &);
     void push_back(const T &);
-    void pop_front() noexcept;
+    void pop_front() const noexcept;
     void pop_back() noexcept;
     void clear() noexcept;
     void swap(List &) noexcept;

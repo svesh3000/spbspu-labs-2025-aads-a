@@ -1,5 +1,4 @@
 #include <iostream>
-#include <list>
 #include <string>
 #include <limits>
 #include "list.hpp"
@@ -7,7 +6,7 @@
 int main()
 {
   using namespace smirnov;
-  std::list< std::pair< std::string, List< unsigned long long > > > sequences;
+  List< std::pair< std::string, List< unsigned long long > > > sequences;
   std::string input;
   std::string name;
   List< unsigned long long > list;
@@ -30,8 +29,8 @@ int main()
     {
       if (!name.empty())
       {
-        sequences.emplace_back(name, list);
-        list = List< unsigned long long >();
+        sequences.push_back(std::make_pair(name, list));
+        list.clear();
       }
       name = input;
     }
@@ -39,7 +38,7 @@ int main()
 
   if (!name.empty())
   {
-    sequences.emplace_back(name, list);
+    sequences.push_back(std::make_pair(name, list));
   }
 
   if (sequences.empty())
@@ -76,7 +75,7 @@ int main()
     return 0;
   }
 
-  std::list< List< unsigned long long > > resultSequences;
+  List< List< unsigned long long > > resultSequences;
   bool hasNumbers = true;
   while (hasNumbers)
   {
@@ -84,7 +83,7 @@ int main()
     hasNumbers = false;
     for (auto it = sequences.begin(); it != sequences.end(); ++it)
     {
-      std::pair< std::string, List< unsigned long long > > & seq = *it;
+      const std::pair< std::string, List< unsigned long long > > & seq = *it;
       if (!seq.second.empty())
       {
         currentSequence.push_back(*seq.second.begin());
