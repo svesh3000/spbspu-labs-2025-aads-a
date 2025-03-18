@@ -80,7 +80,7 @@ void printResult(const List< List< unsigned long long > >& result)
 
 void calcPrintSum(const List< List< unsigned long long > >& result)
 {
-  List< unsigned long long > sums;
+  List< unsigned long long > sums {};
   for (auto it = result.begin(); it != result.end(); it++)
   {
     unsigned long long sum = 0;
