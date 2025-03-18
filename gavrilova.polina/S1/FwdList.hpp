@@ -512,7 +512,7 @@ namespace gavrilova {
   {
     if (count == 0) {
       return Iterator(pos.node_);
-    }    
+    }
 
     NodeFwdList< T >* new_head = nullptr;
     new_head = new NodeFwdList< T >{value, nullptr};
