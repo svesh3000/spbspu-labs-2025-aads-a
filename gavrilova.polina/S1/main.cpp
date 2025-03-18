@@ -1,5 +1,5 @@
 #include <string>
-#include "iostream"
+#include <iostream>
 #include "inputList.hpp"
 #include "outputList.hpp"
 #include "FwdList.hpp"
@@ -12,10 +12,9 @@ int main() {
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
-  size_t curLen = 0;
   while (std::cin >> name && !std::cin.eof()) {
-    FwdList< ULL > numbers = inputNumbers(std::cin, curLen);
-    maxLen = (maxLen < curLen) ? curLen : maxLen;
+    FwdList< ULL > numbers = inputNumbers(std::cin);
+    maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
     listOfPairs.push_front({name, numbers});
     ++numOfPairs;
   }

@@ -47,14 +47,14 @@ gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out
     if (ind == n) {
       break;
     }
-    out << ptr_arr[ind].node_->data;
+    out << *ptr_arr[ind];
     curSum = addition(curSum, *ptr_arr[ind]);
     ++ptr_arr[ind];
     for (size_t j = ind + 1; j < n; ++j) {
       if (ptr_arr[j] == ptr_end_arr[j]) {
         continue;
       }
-      out << " " << ptr_arr[j].node_->data;
+      out << " " << *ptr_arr[j];
       curSum = addition(curSum, *ptr_arr[j]);
       ++ptr_arr[j];
     }
@@ -64,9 +64,12 @@ gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out
   sums.reverse();
   return sums;
 }
-std::ostream& gavrilova::outFwdListULL(std::ostream& out, FwdList< ULL > list) {
+std::ostream& gavrilova::outFwdListULL(std::ostream& out, const FwdList< ULL >& list) {
   auto ptr = list.begin();
   auto end = list.end();
+  if (ptr == end) {
+    return out;
+  }
   out << *ptr;
   ++ptr;
   while (ptr != end) {

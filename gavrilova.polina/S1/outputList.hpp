@@ -3,6 +3,8 @@
 
 #include <istream>
 #include "FwdList.hpp"
+#include "IteratorFwd.hpp"
+#include "ConstIteratorFwd.hpp"
 
 namespace gavrilova
 {
@@ -10,7 +12,7 @@ namespace gavrilova
   using FLPairs = FwdList< std::pair< std::string, FwdList< ULL > > >;
   std::ostream& outNames(std::ostream& out, FLPairs list);
   FwdList< ULL > outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n);
-  std::ostream& outFwdListULL(std::ostream& out, FwdList< ULL > list);
+  std::ostream& outFwdListULL(std::ostream& out, const FwdList< ULL >& list);
 }
 
 #endif

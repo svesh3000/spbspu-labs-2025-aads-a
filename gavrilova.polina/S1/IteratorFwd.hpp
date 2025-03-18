@@ -3,17 +3,15 @@
 
 #include <iterator>
 #include <cassert>
-#include "NodeFwdList.hpp"
+#include "FwdList.hpp"
 
 namespace gavrilova {
   template< class T >
   struct IteratorFwd: public std::iterator< std::forward_iterator_tag, T >
   {
-    NodeFwdList< T >* node_;
     using this_t = IteratorFwd< T >;
 
     IteratorFwd(): node_(nullptr) {};
-    IteratorFwd(NodeFwdList< T >* node): node_(node) {};
     ~IteratorFwd() = default;
     IteratorFwd(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
@@ -24,6 +22,12 @@ namespace gavrilova {
     T* operator->();
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
+
+  private:
+    NodeFwdList< T >* node_;
+    friend class FwdList< T >;
+    friend class ConstIteratorFwd < T >;
+    explicit IteratorFwd(NodeFwdList< T >* node): node_(node) {};
   };
 }
 
@@ -67,4 +71,5 @@ T* gavrilova::IteratorFwd<T>::operator->()
   assert(node_!=nullptr);
   return std::addressof(node_->data);
 }
+
 #endif
