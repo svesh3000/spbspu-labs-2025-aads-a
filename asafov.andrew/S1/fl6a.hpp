@@ -25,13 +25,14 @@ public:
   size_(0)
   {}
 
-  /*~forward_list() noexcept
+  ~forward_list() noexcept
   {
-    for (size_t i = 0; i < 70 || size_ != 0; i++)
+    while (size_ != 0)
     {
       pop_front();
+      size_--;
     }
-  }*/
+  }
 
   class const_iterator
   {
@@ -117,8 +118,7 @@ public:
 
   void pop_front()
   {
-    --size_;
-    if (head_ == nullptr)
+    if (head_ == nullptr || size_ == 0)
     {
       std::cout<<"\n\nz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       return;
