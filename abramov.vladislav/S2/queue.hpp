@@ -15,19 +15,35 @@ namespace abramov
     Queue< T > &operator=(const Queue< T > &queue);
     Queue< T > &operator=(Queue< T > &&queue);
     void push(const T &rhs);
-    T &front();
-    const T &front() const;
+    T *front();
+    const T *front() const;
     void pop();
     size_t size() const;
     bool empty() const;
     void swap(Queue< T > &queue) noexcept;
   private:
-    T *data_;
+    T **data_;
     size_t size_;
     size_t capacity_;
 
     void clear();
   };
+
+  namespace
+  {
+    template< class T >
+    T **expandArray(T **data, size_t &capacity)
+    {
+      constexpr size_t k = 100;
+      T **array = new T*[capacity + k];
+      for (size_t i = 0; i < capacity; ++i)
+      {
+        array[i] = data[i];
+      }
+      capacity += k;
+      return array;
+    }
+  }
 
   template< class T >
   Queue< T >::Queue():
@@ -48,7 +64,7 @@ namespace abramov
     {
       for (size_t i = 0; i < queue.size_; ++i)
       {
-        data[i] = new T(queue.data_[i]);
+        data[i] = new T(*queue.data_[i]);
       }
     }
     catch (const std::bad_alloc &)
@@ -101,8 +117,8 @@ namespace abramov
   {
     if (capacity_ == size_)
     {
-      T *new_data = expandArray(data_, capacity_);
-      delete data_;
+      T **new_data = expandArray(data_, capacity_);
+      delete[] data_;
       data_ = new_data;
     }
     data_[size_] = new T(rhs);
@@ -110,25 +126,26 @@ namespace abramov
   }
 
   template< class T >
-  const T &Queue< T >::front() const
+  const T *Queue< T >::front() const
   {
     return data_[0];
   }
 
   template< class T >
-  T &Queue< T >::front()
+  T *Queue< T >::front()
   {
-    return const_cast< T& >(const_cast< const Queue< T >* >(this)->front());
+    return const_cast< T* >(const_cast< const Queue< T >* >(this)->front());
   }
 
   template< class T >
   void Queue< T >::pop()
   {
     delete data_[0];
-    for (size_t i = 0; i < --size_; ++i)
+    for (size_t i = 0; i < size_; ++i)
     {
       data_[i] = data_[i + 1];
     }
+    --size_;
   }
 
   template< class T >
@@ -158,7 +175,7 @@ namespace abramov
     {
       delete data_[i];
     }
-    delete data_;
+    delete[] data_;
     size_ = 0;
     capacity_ = 0;
   }
