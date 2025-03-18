@@ -27,7 +27,11 @@ public:
 
   ~forward_list() noexcept
   {
-    clear();
+    while (size_ != 0)
+    {
+      pop_front();
+      size_--;
+    }
   }
 
 
@@ -35,8 +39,8 @@ public:
   {
     while (size_ != 0)
     {
-      size_--;
       pop_front();
+      size_--;
     }
   }
 
