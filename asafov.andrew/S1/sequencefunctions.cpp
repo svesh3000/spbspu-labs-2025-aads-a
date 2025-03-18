@@ -13,9 +13,8 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
   return true;
 }
 
-sequence_list_t asafov::getSequences(std::istream& in)
+void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
 {
-  sequence_list_t data;
   do
   {
     std::string name;
@@ -35,9 +34,8 @@ sequence_list_t asafov::getSequences(std::istream& in)
     {
       in.clear();
     }
-    data.push_back(sequence_t(name, list));
+    sequences.push_back(sequence_t(name, list));
   } while (!in.eof());
-  return data;
 }
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)

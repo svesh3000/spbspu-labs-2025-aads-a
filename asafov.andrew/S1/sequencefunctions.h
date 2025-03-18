@@ -4,7 +4,7 @@
 #include <iostream>
 namespace asafov
 {
-  sequence_list_t getSequences(std::istream& in);
+  void getSequences(sequence_list_t& sequences, std::istream& in);
   void outputSequences(sequence_list_t& sequences, std::ostream& out);
 }
 #endif
