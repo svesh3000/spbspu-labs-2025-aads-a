@@ -27,7 +27,7 @@ public:
 
   ~forward_list() noexcept
   {
-    while (!empty())
+    while (size_ != 0)
     {
       pop_front();
     }
@@ -117,6 +117,7 @@ public:
 
   void pop_front()
   {
+    --size_;
     if (head_ == nullptr)
     {
       std::cout<<"\n\nz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
@@ -137,7 +138,6 @@ public:
     }
     delete temp;//
     std::cout<<"\n\ndel\n\n";
-    size_--;
   }
 
   void push_back(const T& value)
