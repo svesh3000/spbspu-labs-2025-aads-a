@@ -156,7 +156,8 @@ namespace duhanina
     return current->data_;
   }
 
-  const T& back() const noexcept
+  template < typename T >
+  const T& List< T >::back() const noexcept
   {
     Node< T >* current = fake_->next_;
     while (current->next_ != fake_)
