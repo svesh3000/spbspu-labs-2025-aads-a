@@ -67,7 +67,7 @@ namespace duhanina
 
   template < typename T >
   List< T >::List():
-    fake_(reinterpret_cast< Node< T >* >(new char[sizeof(Node< T >)])),
+    fake_(new Node< T >{ T(), nullptr }),
     listSize_(0)
   {
     fake_->next_ = fake_;
@@ -87,7 +87,7 @@ namespace duhanina
   List< T >::~List()
   {
     clear();
-    delete[] reinterpret_cast< char* >(fake_);
+    delete fake_;
   }
 
   template< typename T >
