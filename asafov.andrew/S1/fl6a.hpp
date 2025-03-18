@@ -26,7 +26,7 @@ public:
 
   ~forward_list() noexcept
   {
-    wile (!empty)
+    while (!empty)
     {
       pop_front();
     }
