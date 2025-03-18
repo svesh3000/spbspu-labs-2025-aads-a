@@ -57,21 +57,13 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   while (!allItersEnds(begins, ends, sequences.size()))
   {
     data_t sum = 0;
-    for (size_t i = 0; i < sequences.size(); i++)
+    for (size_t i = 0; i < sequences.size();)
     {
       if (begins[i] != ends[i])
       {
-        try
-        {
-          sum += *begins[i];
-        }
-        catch (std::overflow_error&)
-        {
-          std::cerr << "owerflow!";
-          return;
-        }
-        out << *begins[i] << ' ' << std::flush;
-        ++begins[i];
+        sum += *begins[i];////////////////////////
+        out << *begins[i] << ' ' << std::flush;////////////
+        ++begins[i++];
       }
     }
     sums.push_back(sum);

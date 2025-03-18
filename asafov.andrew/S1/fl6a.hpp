@@ -84,7 +84,7 @@ public:
 
     bool operator==(const const_iterator& rhs) const
     {
-      return current_ == rhs.current_;
+      return current_ == rhs.current_ && last_ == rhs.last_;
     }
 
     bool operator!=(const const_iterator& rhs) const
@@ -118,20 +118,24 @@ public:
   {
     if (head_ == nullptr)
     {
+      std::cout<<"\n\nz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       return;
     }
     Node* temp = head_;
     if (head_ == tail_)
     {
+      std::cout<<"\n\nzz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
       head_ = nullptr;
       tail_ = nullptr;
     }
     else
     {
-      head_ = head_->next_;
-      tail_->next_ = head_;
+      std::cout<<"\n\nzzz\n" << head_ << ' ' << tail_ << ' ' << size_ << "\n\n";
+      head_ = head_->next_;//
+      tail_->next_ = head_;//
     }
-    delete temp;
+    delete temp;//
+    std::cout<<"\n\ndel\n\n";
     size_--;
   }
 
