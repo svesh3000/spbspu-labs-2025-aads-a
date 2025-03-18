@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_SUITE(push_front_method)
 BOOST_AUTO_TEST_CASE(push_front_one_element)
 {
   std::ostringstream out;
-  petrov::ForwardRingList< int > fwd_list;  
+  petrov::ForwardRingList< int > fwd_list;
   fwd_list.push_front(1);
   out << *fwd_list.begin();
   BOOST_TEST(out.str() == "1");
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(push_front_one_element)
 BOOST_AUTO_TEST_CASE(push_front_two_elements)
 {
   std::ostringstream out;
-  petrov::ForwardRingList< int > fwd_list;  
+  petrov::ForwardRingList< int > fwd_list;
   fwd_list.push_front(1);
   fwd_list.push_front(2);
   out << *fwd_list.begin() << " " << *fwd_list.end();
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(push_front_two_elements)
 BOOST_AUTO_TEST_CASE(push_front_many_elements)
 {
   std::ostringstream out;
-  petrov::ForwardRingList< int > fwd_list;  
+  petrov::ForwardRingList< int > fwd_list;
   for (size_t i = 1; i <= 10; i++)
   {
     fwd_list.push_front(i);
