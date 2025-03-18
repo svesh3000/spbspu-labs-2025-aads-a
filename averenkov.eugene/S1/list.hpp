@@ -15,7 +15,7 @@ namespace averenkov
     List(const List< T >&);
     List(List< T >&&);
     List(size_t, const T&);
-    List(std::initializer_list< T > init);
+//    List(std::initializer_list< T > init);
     ~List();
 
     using Iter_t = ListIterator< T >;
@@ -91,7 +91,7 @@ namespace averenkov
     swap(rhs);
   }
 
-  template< typename T >
+/*  template< typename T >
   List< T >::List(std::initializer_list< T > init):
     List()
   {
@@ -99,7 +99,7 @@ namespace averenkov
     {
       push_back(value);
     }
-  }
+  }*/
 
   template < class T >
   List< T >::List(size_t count, const T& value):
