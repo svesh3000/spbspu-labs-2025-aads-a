@@ -65,10 +65,10 @@ namespace
   void printSums(const duhanina::List< duhanina::List< unsigned long long > >& listPair)
   {
     duhanina::List< unsigned long long > sums;
-    for (auto it = listPair.begin(); it != listPair.end(); ++it)
+    for (auto it = listPair.begin(); it != nullptr; ++it)
     {
       unsigned long long sum = 0;
-      for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+      for (auto numIt = it->begin(); numIt != nullptr; ++numIt)
       {
         if (sum > std::numeric_limits< unsigned long long >::max() - *numIt)
         {
@@ -79,7 +79,7 @@ namespace
       sums.push_back(sum);
     }
     std::cout << *sums.begin();
-    for (auto it = ++sums.begin(); it != sums.end(); ++it)
+    for (auto it = ++sums.begin(); it != nullptr; ++it)
     {
       std::cout << " " << *it;
     }
