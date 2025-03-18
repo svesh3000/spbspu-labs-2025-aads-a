@@ -31,7 +31,7 @@ public:
   }
 
 
-  clear() noexcept
+  void clear() noexcept
   {
     while (size_ != 0)
     {
