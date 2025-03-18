@@ -62,7 +62,7 @@ namespace petrov
   };
 
   template< typename T >
-  typename ForwardRingList< T >::ForwardRingListIterator::this_t & ForwardRingList< T >::ForwardRingListIterator::operator++()
+  typename ForwardRingList< T >::ForwardRingListIterator::this_t & ForwardRingList< T >::iterator_this_t::operator++()
   {
     assert(node_ != nullptr);
     this->node_ = node_->next_;
@@ -70,7 +70,7 @@ namespace petrov
   }
 
   template< typename T >
-  typename ForwardRingList< T >::ForwardRingListIterator::this_t ForwardRingList< T >::ForwardRingListIterator::operator++(int)
+  typename ForwardRingList< T >::ForwardRingListIterator::this_t ForwardRingList< T >::iterator_this_t::operator++(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
