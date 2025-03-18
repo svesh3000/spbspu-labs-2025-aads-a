@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "FwdList.hpp"
+#include "IteratorFwd.hpp"
+#include "ConstIteratorFwd.hpp"
 
 BOOST_AUTO_TEST_CASE(test_element_access)
 {
