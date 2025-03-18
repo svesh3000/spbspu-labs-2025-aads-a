@@ -2,6 +2,7 @@
 #include "FwdList.hpp"
 #include "IteratorFwd.hpp"
 #include "ConstIteratorFwd.hpp"
+#include <iostream>
 
 BOOST_AUTO_TEST_CASE(test_element_access)
 {
