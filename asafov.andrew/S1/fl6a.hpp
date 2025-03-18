@@ -27,7 +27,7 @@ public:
 
   ~forward_list() noexcept
   {
-    while (size_ != 0)
+    for (size_t i = 70; i > 0 || size_ != 0; i--)
     {
       pop_front();
     }
