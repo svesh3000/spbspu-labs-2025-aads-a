@@ -70,10 +70,9 @@ namespace zakirov
     FwdList()
   {
     FwdIterator< T > inserter = begin();
-    for (; first != second; ++first)
+    for (; first != second; ++first, ++inserter)
     {
-      insert_after(last_node, * first);
-      ++last_node;
+      insert_after(inserter, * first);
     }
   }
 
@@ -82,10 +81,9 @@ namespace zakirov
     FwdList()
   {
     FwdIterator< T > inserter = begin();
-    for (auto i = init_list.begin(); i != init_list.end(); ++i)
+    for (auto i = init_list.begin(); i != init_list.end(); ++i, ++inserter)
     {
-      insert_after(last_node, *i);
-      ++last_node;
+      insert_after(inserter, *i);
     }
   }
 
@@ -103,7 +101,7 @@ namespace zakirov
     FwdIterator<T> inserter = begin();
     FwdIterator<T> left = fwdlst.begin();
     FwdIterator<T> right = fwdlst.end();
-    for (; left != right, ++left, ++inserter)
+    for (; left != right; ++left, ++inserter)
     {
       insert_after(inserter, *left);
     }
@@ -218,7 +216,7 @@ namespace zakirov
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst)
   {
-    splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end())
+    splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end());
   }
 
   template< typename T >
@@ -238,7 +236,7 @@ namespace zakirov
     ++after_first;
     for (; after_first != last; ++after_first, ++first)
     {
-      splice_after(pos, fwd_list, first);
+      splice_after(pos, fwdlst, first);
     }
   }
 
