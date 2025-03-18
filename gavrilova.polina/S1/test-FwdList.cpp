@@ -31,5 +31,5 @@ BOOST_AUTO_TEST_CASE(test_assignment_operator)
   gavrilova::FwdList< int > list2;
   list2 = list1;
   BOOST_TEST(list1.size() == list2.size());
-  BOOST_TEST(list2.front() == list1.front());
+  BOOST_TEST(list2.front() == list1.front())ж
 }

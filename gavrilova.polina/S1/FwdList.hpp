@@ -466,13 +466,10 @@ namespace gavrilova {
   void FwdList< T >::assign(InputIt first, InputIt last)
   {
     FwdList< T > temporary;
-    NodeFwdList< T >* cur_node = temporary.begin().node_;
     for (auto it = first; it != last; ++it) {
-      cur_node->next = it.node_;
-      cur_node = cur_node->next;
-      ++temporary.nodeCount_;
+      temporary.push_front(*it);
     }
-    cur_node->next = temporary.fake_;
+    temporary.reverse();
     swap(temporary);
   }
 
