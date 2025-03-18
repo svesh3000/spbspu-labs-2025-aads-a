@@ -7,6 +7,11 @@
 namespace kizhin {
   NumbersT::value_type safeAccumulate(const NumbersT&, NumbersT::value_type = {});
   ForwardList< NumbersT > transpose(const ForwardList< NumbersT >&);
+  struct is_empty_list
+  {
+    bool operator()(const NumbersT& nums) { return nums.empty(); }
+  };
+
 }
 
 #endif

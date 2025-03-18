@@ -17,11 +17,7 @@ int main()
     if (!names.empty()) {
       std::cout << '\n';
     }
-    struct
-    {
-      bool operator()(const NumbersT& nums) { return nums.empty(); }
-    } isEmptyList;
-    if (names.empty() || std::all_of(numbers.begin(), numbers.end(), isEmptyList)) {
+    if (names.empty() || std::all_of(numbers.begin(), numbers.end(), is_empty_list{})) {
       std::cout << "0\n";
       return 0;
     }
