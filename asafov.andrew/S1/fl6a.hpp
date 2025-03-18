@@ -1,6 +1,7 @@
 #ifndef FL6A_HPP
 #define FL6A_HPP
 #include <memory>
+#include <iostream>
 
 template <typename T>
 class forward_list
