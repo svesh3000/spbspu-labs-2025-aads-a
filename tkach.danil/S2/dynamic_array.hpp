@@ -1,6 +1,8 @@
 #ifndef DYNAMIC_ARRAY_HPP
 #define DYNAMIC_ARRAY_HPP
 
+#include <utility>
+
 namespace
 {
   template< typename T >
@@ -9,7 +11,7 @@ namespace
     T* new_data = new T[size];
     try
     {
-      for (size_t i = 0; i < size_; ++i)
+      for (size_t i = 0; i < size; ++i)
       {
         new_data[i] = data[i];
       }
@@ -37,7 +39,6 @@ namespace tkach
     void pushBack(const T& data);
     void popBack();
     void popFront();
-    void empty() const noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     T& back();
@@ -61,7 +62,7 @@ namespace tkach
   template< typename T >
   DynArray< T >::DynArray(const DynArray& other):
     size_(other.size_),
-    data_(getDataFromOther(other.data_, othe.size_))
+    data_(getDataFromOther(other.data_, other.size_))
   {}
 
   template< typename T >
@@ -142,7 +143,7 @@ namespace tkach
   template< typename T >
   const T& DynArray< T >::back() const
   {
-    return data[size_ - 1];
+    return data_[size_ - 1];
   }
 
   template< typename T >
@@ -196,7 +197,7 @@ namespace tkach
   template< typename T >
   const T& DynArray< T >::front() const
   {
-    return data[0];
+    return data_[0];
   }
   
 }

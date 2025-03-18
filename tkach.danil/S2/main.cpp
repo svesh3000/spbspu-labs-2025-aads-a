@@ -9,6 +9,6 @@ int main(const int argc, const char* const* const argv)
   Stack< long long > results;
   if (argc == 1)
   {
-
+    return 1;
   }
 }
