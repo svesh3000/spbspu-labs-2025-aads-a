@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "stack.hpp"
 
-BOOST_AUTO_TEST_CASE(copy_constructor)
+BOOST_AUTO_TEST_CASE(copy_constructor_stack)
 {
   abramov::Stack< int > stack1;
   stack1.push(1);
@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(copy_constructor)
   BOOST_TEST(*stack2.top() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(operator_test)
+BOOST_AUTO_TEST_CASE(operator_test_stack)
 {
   abramov::Stack< int > stack1;
   stack1.push(1);
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(operator_test)
   BOOST_TEST(*stack2.top() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(push)
+BOOST_AUTO_TEST_CASE(push_stack)
 {
   abramov::Stack< int > stack;
   stack.push(1);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(push)
   BOOST_TEST(*stack.top() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(top)
+BOOST_AUTO_TEST_CASE(top_stack)
 {
   abramov::Stack< std::string > stack;
   stack.push("a");
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(top)
   BOOST_TEST(*stack.top() == "b");
 }
 
-BOOST_AUTO_TEST_CASE(pop)
+BOOST_AUTO_TEST_CASE(pop_stack)
 {
   abramov::Stack< int > stack;
   stack.push(1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(pop)
   BOOST_TEST(*stack.top() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(size)
+BOOST_AUTO_TEST_CASE(size_stack)
 {
   abramov::Stack< int > stack;
   for (size_t i = 0; i < 202; ++i)
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(size)
   BOOST_TEST(stack.size() == 202);
 }
 
-BOOST_AUTO_TEST_CASE(empty)
+BOOST_AUTO_TEST_CASE(empty_stack)
 {
   abramov::Stack< int > stack;
   BOOST_TEST(stack.empty());
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(empty)
   BOOST_TEST(stack.empty());
 }
 
-BOOST_AUTO_TEST_CASE(swap)
+BOOST_AUTO_TEST_CASE(swap_stack)
 {
   abramov::Stack< int > stack1;
   stack1.push(1);
