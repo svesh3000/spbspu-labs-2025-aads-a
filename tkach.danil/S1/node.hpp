@@ -11,9 +11,9 @@ namespace tkach
     T data_;
     Node< T >* next_;
     Node();
-    Node(T&& data);
     Node(const T& data);
     Node(const T& data, Node< T >* next);
+    Node(T&& data);
     Node(T&& data, Node< T >* next);
     ~Node() = default;
   };
