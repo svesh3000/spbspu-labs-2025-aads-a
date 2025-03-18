@@ -8,16 +8,6 @@ namespace averenkov
   {
     T data_;
     Node* next_;
-
-    Node(const T& data):
-      data_(data),
-      next_(nullptr)
-    {}
-
-      Node():
-      data_(T()),
-      next_(nullptr)
-    {}
   };
 }
 

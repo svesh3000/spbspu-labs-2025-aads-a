@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include "node.hpp"
-#include "iteratorc.hpp"
+#include "constiterator.hpp"
 #include "iterator.hpp"
 
 namespace averenkov
@@ -15,6 +15,7 @@ namespace averenkov
     List(const List< T >&);
     List(List< T >&&);
     List(size_t, const T&);
+    List(std::initializer_list< T > init);
     ~List();
 
     using Iter_t = ListIterator< T >;
@@ -26,8 +27,10 @@ namespace averenkov
     Iterc_t cbegin() const noexcept;
     Iterc_t cend() const noexcept;
 
-    T& front() const noexcept;
-    T& back() const noexcept;
+    T& front() noexcept;
+    const T& front() const noexcept;
+    T& back() noexcept;
+    const T& back() const noexcept;
 
     bool empty() const noexcept;
 
@@ -64,7 +67,7 @@ namespace averenkov
 
   template < class T >
   List< T >::List():
-    size_(0), fake_(new Node< T >(T()))
+    size_(0),  fake_(reinterpret_cast< Node< T >* >(new char[sizeof(Node< T >)]))
   {
     fake_->next_ = fake_;
   }
@@ -88,6 +91,16 @@ namespace averenkov
     swap(rhs);
   }
 
+  template< typename T >
+  List< T >::List(std::initializer_list< T > init):
+    List()
+  {
+    for (const T& value: init)
+    {
+      push_back(value);
+    }
+  }
+
   template < class T >
   List< T >::List(size_t count, const T& value):
     List()
@@ -102,7 +115,7 @@ namespace averenkov
   List< T >::~List()
   {
     clear();
-    delete fake_;
+    delete[] reinterpret_cast< char* >(fake_);
   }
 
   template < class T >
@@ -142,14 +155,33 @@ namespace averenkov
   }
 
   template < class T >
-  T& List< T >::front() const noexcept
+  T& List< T >::front() noexcept
   {
     assert(!empty());
     return fake_->next_->data_;
   }
 
   template < class T >
-  T& List< T >::back() const noexcept
+  const T& List< T >::front() const noexcept
+  {
+    assert(!empty());
+    return fake_->next_->data_;
+  }
+
+  template < class T >
+  T& List< T >::back() noexcept
+  {
+    assert(!empty());
+    Node< T >* current = fake_;
+    while (current->next_ != fake_)
+    {
+      current = current->next_;
+    }
+    return current->data_;
+  }
+
+  template < class T >
+  const T& List< T >::back() const noexcept
   {
     assert(!empty());
     Node< T >* current = fake_;
@@ -163,7 +195,7 @@ namespace averenkov
   template < class T >
   void List< T >::push_front(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value);
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     newNode->next_ = fake_->next_;
     fake_->next_ = newNode;
     size_++;
@@ -172,7 +204,7 @@ namespace averenkov
   template < class T >
   void List< T >::push_back(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value);
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     newNode->next_ = fake_;
     Node< T >* current = fake_;
     while (current->next_ != fake_)
@@ -227,6 +259,7 @@ namespace averenkov
   void List< T >::remove(const T& value)
   {
     Node< T >* current = fake_;
+
     while (current->next_ != fake_)
     {
       if (current->next_->data_ == value)
@@ -332,19 +365,7 @@ namespace averenkov
   template < class T >
   void List< T >::assign(size_t count, const T& value)
   {
-    List< T >* copy = this;
-    try
-    {
-      while (count--)
-      {
-        push_back(value);
-      }
-    }
-    catch (...)
-    {
-      copy.clear();
-      return;
-    }
+    List< T > copy(count, value);
     swap(copy);
   }
 };
