@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
 #include "citerator.hpp"
@@ -18,6 +19,7 @@ namespace duhanina
   public:
     List();
     List(size_t count, const T& value);
+    List(std::initializer_list< T > init);
     ~List();
 
     List(const List< T >& list);
@@ -280,6 +282,16 @@ namespace duhanina
       temp.clear();
     }
     swap(temp);
+  }
+
+  template< typename T >
+  List< T >::List(std::initializer_list< T > init):
+    List()
+  {
+    for (const T& value: init)
+    {
+      push_back(value);
+    }
   }
 
   template < typename T >
