@@ -15,7 +15,7 @@ namespace tkach
     Node(const T& data);
     Node(const T& data, Node< T >* next);
     Node(T&& data, Node< T >* next);
-    ~Node() =  default;
+    ~Node() = default;
   };
 
   template< typename T >
