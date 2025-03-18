@@ -125,7 +125,6 @@ BOOST_AUTO_TEST_CASE(list_mods_test)
   std::ostringstream out8;
   printList(out8, list3);
   BOOST_TEST(out8.str() == "3210");
-
 }
 
 BOOST_AUTO_TEST_CASE(list_operations_test)

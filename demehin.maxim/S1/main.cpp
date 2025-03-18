@@ -139,7 +139,7 @@ int main()
     printListsInfo(std::cout, pairsList);
     std::cout << "\n";
   }
-  catch(const std::exception& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;

@@ -81,7 +81,7 @@ namespace demehin
     Iter insert(cIter, InputIt, InputIt);
     Iter insert(cIter, std::initializer_list< T >);
 
-    void reverse();
+    void reverse() noexcept;
 
   private:
     using Node = demehin::Node< T >;
@@ -205,7 +205,7 @@ namespace demehin
   template< typename T >
   bool List< T >::operator>=(const List< T >& rhs) const noexcept
   {
-    return *this > rhs || *this == rhs;
+    return !(*this < rhs);
   }
 
   template< typename T >
@@ -506,11 +506,15 @@ namespace demehin
   template< typename T >
   void List< T >::remove(const T& value) noexcept
   {
-    for (auto it = cbegin(); it != cend(); it++)
+    for (auto it = cbegin(); it != cend();)
     {
       if (*it == value)
       {
-        erase(it);
+        it = erase(it);
+      }
+      else
+      {
+        it++;
       }
     }
   }
@@ -519,11 +523,15 @@ namespace demehin
   template< typename UnaryPredicate >
   void List< T >::removeIf(UnaryPredicate p) noexcept
   {
-    for (auto it = cbegin(); it != cend(); it++)
+    for (auto it = cbegin(); it != cend();)
     {
       if (p(*it))
       {
-        erase(it);
+        it = erase(it);
+      }
+      else
+      {
+        it++;
       }
     }
   }
@@ -608,10 +616,8 @@ namespace demehin
       return begin();
     }
 
-    Node* newNode = new Node(value);
     Node* posNode = pos.getNode();
-    newNode->next = posNode;
-    newNode->prev = posNode->prev;
+    Node* newNode = new Node(value, posNode->prev, posNode);
     posNode->prev->next = newNode;
     posNode->prev = newNode;
     size_++;
@@ -633,25 +639,10 @@ namespace demehin
       return Iter(pos.getNode());
     }
 
-    Iter result = insert(pos, value);
-    size_t inserted = 0;
-    try
-    {
-      for (size_t i = 1; i < count; i++)
-      {
-        insert(pos, value);
-        inserted++;
-      }
-    }
-    catch (const std::bad_alloc&)
-    {
-      while (inserted-- > 0)
-      {
-        erase(--pos);
-      }
-      throw;
-    }
-    return result;
+    Iter toreturn = insert(pos, value);
+    List < T > values(--count, value);
+    splice(pos, values);
+    return toreturn;
   }
 
   template< typename T >
@@ -696,15 +687,29 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::reverse()
+  void List< T >::reverse() noexcept
   {
-    List < T > temp;
-    for (auto it = begin(); it != end(); it++)
+    if (size() <= 1)
     {
-      temp.push_front(*it);
+      return;
     }
-    *this = temp;
+
+    Node* current = fake_->next;
+    Node* next = nullptr;
+    Node* prev = nullptr;
+    while (current != nullptr)
+    {
+      next = current->next;
+      current->next = prev;
+      current->prev = next;
+      prev = current;
+      current = next;
+    }
+    std::swap(fake_->next, tail_);
+    tail_->next = nullptr;
+    fake_->next->prev = fake_;
   }
 }
 
 #endif
+
