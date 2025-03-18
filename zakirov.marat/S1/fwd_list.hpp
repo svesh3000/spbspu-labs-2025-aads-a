@@ -28,6 +28,13 @@ namespace zakirov
     bool empty();
     size_t size();
     void swap(FwdList & other);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
+    void assign(size_t n, const T & val);
+    template< typename InputIterator >
+    void assign(InputIterator first, InputIterator last);
+    void assign(std::initializer_list< T > init_list);
     void clear();
     void remove(T data);
     template< typename P>
@@ -59,7 +66,7 @@ namespace zakirov
   FwdList< T >::FwdList(InputIterator first, InputIterator second):
     FwdList()
   {
-    FwdIterator< T > last_node = end();
+    FwdIterator< T > inserter = begin();
     for (; first != second; ++first)
     {
       insert_after(last_node, * first);
@@ -71,7 +78,7 @@ namespace zakirov
   FwdList< T >::FwdList(std::initializer_list< T > init_list):
     FwdList()
   {
-    FwdIterator< T > last_node = end();
+    FwdIterator< T > inserter = begin();
     for (auto i = init_list.begin(); i != init_list.end(); ++i)
     {
       insert_after(last_node, *i);
@@ -179,12 +186,67 @@ namespace zakirov
   }
 
   template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst)
+  {
+    splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end())
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i)
+  {
+    FwdList< T > * next_base = pos.node_->next_;
+    FwdList< T > * next_new = i.node_->next_->next_;
+    pos.node_->next_ = i.node_->next_;
+    pos.node_->next_->next_ = next_base;
+    i.node_->next_ = next_new;
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  {
+    FwdIterator< T > after_first = first;
+    ++after_first;
+    for (; after_first != last; ++after_first, ++first)
+    {
+      splice_after(pos, fwd_list, first);
+    }
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(size_t n, const T & val)
+  {
+    clear();
+    for (size_t i = 0; i < n; ++i)
+    {
+      push_front(val);
+    }
+  }
+
+  template< typename T >
+  template< typename InputIterator >
+  void FwdList< T >::assign(InputIterator first, InputIterator last)
+  {
+    clear();
+    FwdIterator< T > inserter = begin();
+    for (; first != last; ++first)
+    {
+      insert_after(inserter, *first);
+    }
+  }
+
+  template< typename T >
   void FwdList< T >::clear()
   {
     while (!empty())
     {
       pop_front();
     }
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(std::initializer_list< T > init_list)
+  {
+
   }
 
   template< typename T >
