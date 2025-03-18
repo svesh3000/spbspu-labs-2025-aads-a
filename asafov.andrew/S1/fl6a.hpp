@@ -25,13 +25,13 @@ public:
   size_(0)
   {}
 
-  ~forward_list() noexcept
+  /*~forward_list() noexcept
   {
-    for (size_t i = 70; i > 0 || size_ != 0; i--)
+    for (size_t i = 0; i < 70 || size_ != 0; i++)
     {
       pop_front();
     }
-  }
+  }*/
 
   class const_iterator
   {
