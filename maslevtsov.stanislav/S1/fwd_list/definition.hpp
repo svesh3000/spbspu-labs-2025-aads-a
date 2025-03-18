@@ -30,7 +30,7 @@ maslevtsov::FwdList< T >::FwdList(FwdList&& rhs) noexcept:
 {}
 
 template< typename T >
-maslevtsov::FwdList< T >::FwdList(std::size_t count, T value):
+maslevtsov::FwdList< T >::FwdList(std::size_t count, const T& value):
   FwdList()
 {
   if (count == 0) {
@@ -42,7 +42,7 @@ maslevtsov::FwdList< T >::FwdList(std::size_t count, T value):
 }
 
 template< typename T >
-template< class InputIt >
+template< typename InputIt >
 maslevtsov::FwdList< T >::FwdList(InputIt first, InputIt last):
   FwdList()
 {
@@ -66,7 +66,7 @@ maslevtsov::FwdList< T >::~FwdList()
 }
 
 template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs) noexcept
+typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs)
 {
   FwdList< T > copied_rhs(rhs);
   swap(copied_rhs);
@@ -97,7 +97,7 @@ void maslevtsov::FwdList< T >::assign(std::size_t count, const T& value)
 }
 
 template< typename T >
-template< class InputIt >
+template< typename InputIt >
 void maslevtsov::FwdList< T >::assign(InputIt first, InputIt last)
 {
   FwdList< T > assigned(first, last);
@@ -206,10 +206,10 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
 {
   FwdListNode< T >* new_node = new FwdListNode< T >{value, pos.node_->next_};
   pos.node_->next_ = new_node;
-  ++size_;
-  if (pos == cend()) {
+  if (tail_ == pos.node_) {
     tail_ = new_node;
   }
+  ++size_;
   return iterator(new_node);
 }
 
@@ -221,36 +221,30 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
-  std::size_t count, const T& value) noexcept
+  std::size_t count, const T& value)
 {
   if (count == 0) {
     return iterator(pos.node_);
   }
   splice_after(pos, FwdList< T >(count, value));
-  iterator result(pos.node_);
-  for (std::size_t i = 0; i != count; ++i, ++result)
-  {}
-  return result;
+  return pos;
 }
 
 template< typename T >
-template< class InputIt >
+template< typename InputIt >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, InputIt first,
-  InputIt last) noexcept
+  InputIt last)
 {
   if (first == last) {
     return iterator(pos.node_);
   }
-  iterator result(pos.node_);
   splice_after(pos, FwdList< T >(first, last));
-  for (auto it = ++first; it != last; ++it, ++result)
-  {}
-  return result;
+  return pos;
 }
 
 template< typename T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
-  std::initializer_list< T > ilist) noexcept
+  std::initializer_list< T > ilist)
 {
   return insert_after(pos, ilist.begin(), ilist.end());
 }
@@ -344,7 +338,7 @@ void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
 }
 
 template< typename T >
-void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other) noexcept
+void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other)
 {
   other.push_front(T());
   splice_after(pos, other, other.cbegin(), other.cend());
@@ -379,7 +373,6 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
   }
   size_ += size_increase;
   other.size_ -= size_increase;
-  FwdListNode< T >* pos_move = pos.node_;
   FwdListNode< T >* pos_next = pos.node_->next_;
   if (pos.node_ == tail_) {
     tail_ = last.node_;
@@ -387,11 +380,11 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
   if (last.node_ == other.tail_->next_) {
     other.tail_ = first.node_;
   }
-  pos_move->next_ = first.node_->next_;
-  while (pos_move->next_ != last.node_) {
-    pos_move = pos_move->next_;
+  pos.node_->next_ = first.node_->next_;
+  while (pos.node_->next_ != last.node_) {
+    ++pos;
   }
-  pos_move->next_ = pos_next;
+  pos.node_->next_ = pos_next;
   first.node_->next_ = last.node_;
 }
 
@@ -406,7 +399,7 @@ void maslevtsov::FwdList< T >::remove(const T& value) noexcept
 }
 
 template< typename T >
-template< class UnaryPredicate >
+template< typename UnaryPredicate >
 void maslevtsov::FwdList< T >::remove_if(UnaryPredicate condition)
 {
   assert(!empty() && "removing from empty list");

@@ -11,7 +11,7 @@ namespace maslevtsov {
   class FwdList;
 
   template< typename T, bool is_const >
-  class FwdIterator final: public std::iterator< std::forward_iterator_tag, int >
+  class FwdIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     FwdIterator() noexcept:
@@ -63,7 +63,7 @@ namespace maslevtsov {
 
     FwdListNode< T >* node_;
 
-    FwdIterator(FwdListNode< T >* node) noexcept:
+    explicit FwdIterator(FwdListNode< T >* node) noexcept:
       node_(node)
     {}
   };

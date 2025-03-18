@@ -3,9 +3,8 @@
 
 namespace maslevtsov {
   template< typename T >
-  class FwdListNode
+  struct FwdListNode
   {
-  public:
     T data_;
     FwdListNode< T >* next_;
   };

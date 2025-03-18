@@ -17,18 +17,18 @@ namespace maslevtsov {
     FwdList() noexcept;
     FwdList(const FwdList& rhs);
     FwdList(FwdList&& rhs) noexcept;
-    FwdList(std::size_t count, T value);
-    template< class InputIt >
+    FwdList(std::size_t count, const T& value);
+    template< typename InputIt >
     FwdList(InputIt first, InputIt last);
     FwdList(std::initializer_list< T > init);
     ~FwdList();
 
-    FwdList& operator=(const FwdList& rhs) noexcept;
+    FwdList& operator=(const FwdList& rhs);
     FwdList& operator=(FwdList&& rhs) noexcept;
     FwdList& operator=(std::initializer_list< T > ilist);
 
     void assign(std::size_t count, const T& value);
-    template< class InputIt >
+    template< typename InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > ilist);
 
@@ -50,10 +50,10 @@ namespace maslevtsov {
     void clear() noexcept;
     iterator insert_after(const_iterator pos, const T& value);
     iterator insert_after(const_iterator pos, T&& value);
-    iterator insert_after(const_iterator pos, std::size_t count, const T& value) noexcept;
-    template< class InputIt >
-    iterator insert_after(const_iterator pos, InputIt first, InputIt last) noexcept;
-    iterator insert_after(const_iterator pos, std::initializer_list< T > ilist) noexcept;
+    iterator insert_after(const_iterator pos, std::size_t count, const T& value);
+    template< typename InputIt >
+    iterator insert_after(const_iterator pos, InputIt first, InputIt last);
+    iterator insert_after(const_iterator pos, std::initializer_list< T > ilist);
     iterator erase_after(const_iterator pos) noexcept;
     iterator erase_after(const_iterator first, const_iterator last) noexcept;
     void push_front(const T& value);
@@ -63,12 +63,12 @@ namespace maslevtsov {
     void pop_front() noexcept;
     void swap(FwdList& other) noexcept;
 
-    void splice_after(const_iterator pos, FwdList& other) noexcept;
+    void splice_after(const_iterator pos, FwdList& other);
     void splice_after(const_iterator pos, FwdList&& other) noexcept;
     void splice_after(const_iterator pos, FwdList& other, const_iterator it) noexcept;
     void splice_after(const_iterator pos, FwdList& other, const_iterator first, const_iterator last) noexcept;
     void remove(const T& value) noexcept;
-    template< class UnaryPredicate >
+    template< typename UnaryPredicate >
     void remove_if(UnaryPredicate condition);
 
   private:
