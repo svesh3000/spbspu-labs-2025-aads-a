@@ -30,7 +30,7 @@ namespace rychkov
     template< size_t N, class... Args >
     explicit Variant(in_place_index_t< N >, Args&&... args);
     template< class T,
-          size_t RealTypeId = find_convertible< T, Types... >::value,
+          size_t RealTypeId = resolve_overloaded_construct_v< T, Types... >,
           class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
           class RealType = variant_alternative_t< RealTypeId, Types... >,
           class = std::enable_if_t< exactly_once< RealType, Types... > > >
@@ -40,7 +40,7 @@ namespace rychkov
     Variant& operator=(const Variant& rhs) = default;
     Variant& operator=(Variant&& rhs) = default;
     template< class T,
-          size_t RealTypeId = find_convertible< T, Types... >::value,
+          size_t RealTypeId = resolve_overloaded_construct_v< T, Types... >,
           class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
           class RealType = variant_alternative_t< RealTypeId, Types... >,
           class = std::enable_if_t< exactly_once< RealType, Types... > > >

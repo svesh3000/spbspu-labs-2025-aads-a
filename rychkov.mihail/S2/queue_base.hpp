@@ -32,11 +32,12 @@ namespace rychkov
       size_type size() const noexcept;
       size_type capacity() const noexcept;
 
+      template< class... Args >
+      reference emplace(Args&&... args);
       void push(const value_type& value);
       void push(value_type&& value);
       void pop();
-      template< class... Args >
-      reference emplace(Args&&... args);
+      void clear();
 
       void reserve(size_type newCapacity);
       void swap(QueueBase& rhs) noexcept;
@@ -77,11 +78,7 @@ rychkov::details::QueueBase< T, PopFromTail >::QueueBase(QueueBase&& rhs) noexce
 template< class T, bool PopFromTail >
 rychkov::details::QueueBase< T, PopFromTail >::~QueueBase()
 {
-  while (!empty())
-  {
-    pop();
-  }
-  delete[] data_;
+  clear();
 }
 template< class T, bool PopFromTail >
 rychkov::details::QueueBase< T, PopFromTail >&
@@ -130,6 +127,18 @@ void rychkov::details::QueueBase< T, PopFromTail >::pop()
     size_--;
     head_ = (++head_ < capacity_ ? head_ : head_ - capacity_);
   }
+}
+template< class T, bool PopFromTail >
+void rychkov::details::QueueBase< T, PopFromTail >::clear()
+{
+  while (!empty())
+  {
+    pop();
+  }
+  delete[] data_;
+  capacity_ = 0;
+  head_ = 0;
+  data_ = nullptr;
 }
 template< class T, bool PopFromTail >
 void rychkov::details::QueueBase< T, PopFromTail >::push(const value_type& value)

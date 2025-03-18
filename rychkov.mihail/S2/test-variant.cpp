@@ -37,60 +37,9 @@
   }
   int constr = 0;
 };
-/*struct A
-{};*/
-template< size_t Index... >
-struct index_sequence
+// */
+struct A
 {};
-template<>
-struct index_sequence< 0 >
-{};
-
-template< size_t N >
-using make_index_sequence = make_index_sequence< N - 1 >;
-
-
-namespace details
-{
-  template< class T >
-  struct ArrConvertChecker
-  {
-    T value[1];
-  };
-  template< class Src, class Dest, class = void >
-  struct is_inarray_constructible: std::false_type
-  {};
-  template< class Src, class Dest >
-  struct is_inarray_constructible< Src, Dest,
-        void_t< decltype(ArrConvertChecker< Dest >{{std::declval< Src >()}}) > >: std::true_type
-  {};
-  template< class Src, class Dest >
-  constexpr bool is_inarray_constructible_v = is_inarray_constructible< Src, Dest >::value;
-
-  template< size_t N, class T, class Type, bool = is_inarray_constructible_v< T, Type > >
-  struct builds_correct
-  {
-    void resolve_overload() = delete;
-  };
-  template< size_t N, class T, class Type >
-  struct builds_correct< N, T, Type, true >
-  {
-    std::integral_constant< size_t, N > resolve_overload(Type);
-  };
-  template< class T, class Type >
-}
-template< class T, class U, class... Types >
-struct find_convertible
-{
-  static constexpr bool is_convertible = details::is_inarray_constructible_v< T, U >;
-  static constexpr size_t value = is_convertible ? 0 : 1 + find_convertible< T, Types... >::value;
-  static_assert(!is_convertible || (find_convertible< T, Types... >::value == sizeof...(Types)));
-};
-template< class T, class U >
-struct find_convertible< T, U >
-{
-  static constexpr size_t value = !details::is_inarray_constructible_v< T, U >;
-};
 
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
 
@@ -120,7 +69,6 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   std::cout << rychkov::get< std::string >(variant8) << '\n';
   std::cout << (size_t)(rychkov::get_if< char >(&variant8)) << '\n';
   //std::cout << rychkov::get< char >(variant8) << '\n';*/
-  //
 }
 
 BOOST_AUTO_TEST_SUITE_END()

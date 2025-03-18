@@ -85,32 +85,52 @@ namespace rychkov
     }
 
     template< class T >
-    struct ArrConvertChecker
+    struct ArrConvertHelper
     {
       T value[1];
     };
-    template< class Src, class Dest, class = void >
+    template< class Dest, class Src, class = void >
     struct is_inarray_constructible: std::false_type
     {};
-    template< class Src, class Dest >
-    struct is_inarray_constructible< Src, Dest,
-          void_t< decltype(ArrConvertChecker< Dest >{{std::declval< Src >()}}) > >: std::true_type
+    template< class Dest, class Src >
+    struct is_inarray_constructible< Dest, Src,
+          void_t< decltype(ArrConvertHelper< Dest >{{std::declval< Src >()}}) > >: std::true_type
     {};
     template< class Src, class Dest >
-    constexpr bool is_inarray_constructible_v = is_inarray_constructible< Src, Dest >::value;
+    constexpr bool is_inarray_constructible_v = is_inarray_constructible< Dest, Src >::value;
+
+    template< size_t N, class Dest, class Src, class = void >
+    struct overload
+    {
+      void resolve() = delete;
+    };
+    template< size_t N, class Dest, class Src >
+    struct overload< N, Dest, Src, std::enable_if_t< is_inarray_constructible< Dest, Src >::value > >
+    {
+      static std::integral_constant< size_t, N > resolve(Dest);
+    };
+    template< class T, class U, class... Types >
+    struct resolve_overload: overload< 1 + sizeof...(Types), U, T >, resolve_overload< T, Types... >
+    {
+      using overload< 1 + sizeof...(Types), U, T >::resolve;
+      using resolve_overload< T, Types... >::resolve;
+    };
+    template< class T, class U >
+    struct resolve_overload< T, U >: overload< 1, U, T >
+    {
+      using overload< 1, U, T >::resolve;
+    };
+    template< class T, class = void, class... Types >
+    struct resolve_overloaded_construct: std::integral_constant< size_t, 0 >
+    {};
+    template< class T, class... Types >
+    struct resolve_overloaded_construct< T,
+          void_t< decltype(resolve_overload< T, Types... >::resolve(std::declval< T >())) >, Types... >:
+      decltype(resolve_overload< T, Types... >::resolve(std::declval< T >()))
+    {};
   }
-  template< class T, class U, class... Types >
-  struct find_convertible
-  {
-    static constexpr bool is_convertible = details::is_inarray_constructible_v< T, U >;
-    static constexpr size_t value = is_convertible ? 0 : 1 + find_convertible< T, Types... >::value;
-    static_assert(!is_convertible || (find_convertible< T, Types... >::value == sizeof...(Types)));
-  };
-  template< class T, class U >
-  struct find_convertible< T, U >
-  {
-    static constexpr size_t value = !details::is_inarray_constructible_v< T, U >;
-  };
+  template< class T, class... Types >
+  constexpr size_t resolve_overloaded_construct_v = sizeof...(Types) - details::resolve_overloaded_construct< T, void, Types... >::value;
 }
 
 #endif
