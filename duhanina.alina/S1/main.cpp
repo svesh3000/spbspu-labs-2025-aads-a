@@ -6,19 +6,19 @@
 
 namespace
 {
-  using pair = duhanina::List< std::pair< std::string, duhanina::List< unsigned long long > > >;
+  using pair_t = duhanina::List< std::pair< std::string, duhanina::List< unsigned long long > > >;
 
-  void printNames(const pair& ListPair)
+  void printNames(const pair_t& listPair)
   {
-    std::cout << ListPair.begin()->first;
-    for (auto it = ++ListPair.begin(); it != ListPair.end(); ++it)
+    std::cout << listPair.begin()->first;
+    for (auto it = ++listPair.begin(); it != listPair.end(); ++it)
     {
       std::cout << " " << it->first;
     }
     std::cout << "\n";
   }
 
-  duhanina::List< duhanina::List< unsigned long long > > generateSequences(const pair sequences)
+  duhanina::List< duhanina::List< unsigned long long > > generateSequences(const pair_t sequences)
   {
     duhanina::List< duhanina::List< unsigned long long > > result;
     size_t maxLen = 0;
@@ -49,9 +49,9 @@ namespace
     return result;
   }
 
-  void printListPair(const duhanina::List< duhanina::List< unsigned long long > >& ListPair)
+  void printListPair(const duhanina::List< duhanina::List< unsigned long long > >& listPair)
   {
-    for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
+    for (auto it = listPair.begin(); it != listPair.end(); ++it)
     {
       std::cout << *it->begin();
       for (auto numIt = ++it->begin(); numIt != it->end(); ++numIt)
@@ -62,10 +62,10 @@ namespace
     }
   }
 
-  void printSums(const duhanina::List< duhanina::List< unsigned long long > >& ListPair)
+  void printSums(const duhanina::List< duhanina::List< unsigned long long > >& listPair)
   {
     duhanina::List< unsigned long long > sums;
-    for (auto it = ListPair.begin(); it != ListPair.end(); ++it)
+    for (auto it = listPair.begin(); it != listPair.end(); ++it)
     {
       unsigned long long sum = 0;
       for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
@@ -89,26 +89,27 @@ namespace
 
 int main()
 {
-  duhanina::List< std::pair< std::string, duhanina::List< unsigned long long > > > ListPair;
+  using namespace duhanina;
+  List< std::pair< std::string, List< unsigned long long > > > listPair;
   std::string name;
   while (std::cin >> name)
   {
-    duhanina::List< unsigned long long > numbersList;
+    List< unsigned long long > numbersList;
     unsigned long long number = 0;
     while (std::cin >> number)
     {
       numbersList.push_back(number);
     }
-    ListPair.push_back(std::make_pair(name, numbersList));
+    listPair.push_back(std::make_pair(name, numbersList));
     std::cin.clear();
   }
-  if (ListPair.empty())
+  if (listPair.empty())
   {
     std::cout << "0\n";
     return 0;
   }
-  printNames(ListPair);
-  auto resultListPair = generateSequences(ListPair);
+  printNames(listPair);
+  auto resultListPair = generateSequences(listPair);
   printListPair(resultListPair);
   try
   {

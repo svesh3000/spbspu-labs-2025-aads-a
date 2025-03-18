@@ -12,39 +12,39 @@ namespace duhanina
   class List;
 
   template < typename T >
-  struct constIterator: public std::iterator< std::bidirectional_iterator_tag, T >
+  struct ConstIterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    constIterator() noexcept;
-    explicit constIterator(Node< T >* node) noexcept;
-    ~constIterator() = default;
+    ConstIterator() noexcept;
+    ~ConstIterator() = default;
 
-    constIterator< T >& operator++() noexcept;
-    constIterator< T > operator++(int) noexcept;
+    ConstIterator< T >& operator++() noexcept;
+    ConstIterator< T > operator++(int) noexcept;
 
     const T& operator*() const noexcept;
     const T* operator->() const noexcept;
 
-    bool operator==(const constIterator< T >&) const noexcept;
-    bool operator!=(const constIterator< T >&) const noexcept;
+    bool operator==(const ConstIterator< T >&) const noexcept;
+    bool operator!=(const ConstIterator< T >&) const noexcept;
 
   private:
     friend List< T >;
     const Node< T >* node_;
+    explicit ConstIterator(Node< T >* node) noexcept;
   };
 
   template< typename T >
-  constIterator< T >::constIterator() noexcept:
+  ConstIterator< T >::ConstIterator() noexcept:
     node_(nullptr)
   {}
 
   template< typename T >
-  constIterator< T >::constIterator(Node< T >* node) noexcept:
+  ConstIterator< T >::ConstIterator(Node< T >* node) noexcept:
     node_(node)
   {}
 
   template< typename T >
-  constIterator< T >& constIterator< T >::operator++() noexcept
+  ConstIterator< T >& ConstIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_->next_;
@@ -52,36 +52,36 @@ namespace duhanina
   }
 
   template< typename T >
-  constIterator< T > constIterator< T >::operator++(int) noexcept
+  ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    constIterator< T > result(*this);
+    ConstIterator< T > result(*this);
     ++(*this);
     return result;
   }
 
   template< typename T >
-  const T& constIterator< T >::operator*() const noexcept
+  const T& ConstIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< typename T >
-  const T* constIterator< T >::operator->() const noexcept
+  const T* ConstIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
   template< typename T >
-  bool constIterator< T >::operator==(const constIterator< T >& it) const noexcept
+  bool ConstIterator< T >::operator==(const ConstIterator< T >& it) const noexcept
   {
     return node_ == it.node_;
   }
 
   template< typename T >
-  bool constIterator< T >::operator!=(const constIterator< T >& it) const noexcept
+  bool ConstIterator< T >::operator!=(const ConstIterator< T >& it) const noexcept
   {
     return !(it == *this);
   }

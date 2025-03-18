@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <functional>
 #include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
@@ -11,7 +12,7 @@ namespace duhanina
   template< typename T >
   class Iterator;
   template< typename T >
-  class constIterator;
+  class ConstIterator;
 
   template < typename T >
   class List
@@ -27,11 +28,13 @@ namespace duhanina
 
     Iterator< T > begin() const noexcept;
     Iterator< T > end() const noexcept;
-    constIterator< T > cbegin() const noexcept;
-    constIterator< T > cend() const noexcept;
+    ConstIterator< T > cbegin() const noexcept;
+    ConstIterator< T > cend() const noexcept;
 
     T& front() noexcept;
     T& back() noexcept;
+    const T& front() const noexcept;
+    const T& back() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -64,7 +67,7 @@ namespace duhanina
 
   template < typename T >
   List< T >::List():
-    fake_(new Node< T >()),
+    fake_(reinterpret_cast< Node< T >* >(new char[sizeof(Node< T >)])),
     listSize_(0)
   {
     fake_->next_ = fake_;
@@ -84,14 +87,14 @@ namespace duhanina
   List< T >::~List()
   {
     clear();
-    delete fake_;
+    delete[] reinterpret_cast< char* >(fake_);
   }
 
   template< typename T >
   List< T >::List(const List< T >& list):
     List()
   {
-    for (constIterator< T > it = list.cbegin(); it != list.cend(); ++it)
+    for (ConstIterator< T > it = list.cbegin(); it != list.cend(); ++it)
     {
       push_back(*it);
     }
@@ -102,8 +105,7 @@ namespace duhanina
     fake_(other.fake_),
     listSize_(other.listSize_)
   {
-    other.fake_ = new Node< T >();
-    other.fake_->next_ = other.fake_;
+    other.fake_ = nullptr;
     other.listSize_ = 0;
   }
 
@@ -120,15 +122,15 @@ namespace duhanina
   }
 
   template < typename T >
-  constIterator< T > List< T >::cbegin() const noexcept
+  ConstIterator< T > List< T >::cbegin() const noexcept
   {
-    return constIterator< T >(fake_->next_);
+    return ConstIterator< T >(fake_->next_);
   }
 
   template < typename T >
-  constIterator< T > List< T >::cend() const noexcept
+  ConstIterator< T > List< T >::cend() const noexcept
   {
-    return constIterator< T >(fake_);
+    return ConstIterator< T >(fake_);
   }
 
   template < typename T >
@@ -138,7 +140,23 @@ namespace duhanina
   }
 
   template < typename T >
+  const T& List< T >::front() const noexcept
+  {
+    return fake_->next_->data_;
+  }
+
+  template < typename T >
   T& List< T >::back() noexcept
+  {
+    Node< T >* current = fake_->next_;
+    while (current->next_ != fake_)
+    {
+      current = current->next_;
+    }
+    return current->data_;
+  }
+
+  const T& back() const noexcept
   {
     Node< T >* current = fake_->next_;
     while (current->next_ != fake_)
@@ -163,7 +181,7 @@ namespace duhanina
   template < typename T >
   void List< T >::push_front(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value);
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     newNode->next_ = fake_->next_;
     fake_->next_ = newNode;
     ++listSize_;
@@ -172,7 +190,7 @@ namespace duhanina
   template < typename T >
   void List< T >::push_back(const T& value)
   {
-    Node< T >* newNode = new Node< T >(value);
+    Node< T >* newNode = new Node< T >{ value, nullptr };
     Node< T >* current = fake_;
     while (current->next_ != fake_)
     {
@@ -224,23 +242,7 @@ namespace duhanina
   template < typename T >
   void List< T >::remove(const T& value) noexcept
   {
-    Node< T >* current = fake_->next_;
-    Node< T >* prev = fake_;
-    while (current != fake_)
-    {
-      if (current->data_ == value)
-      {
-        prev->next_ = current->next_;
-        delete current;
-        current = prev->next_;
-        --listSize_;
-      }
-      else
-      {
-        prev = current;
-        current = current->next_;
-      }
-    }
+    remove_if(std::bind(std::equal_to< T >(), std::placeholders::_1, value));
   }
 
   template < typename T >
@@ -280,6 +282,7 @@ namespace duhanina
     catch (...)
     {
       temp.clear();
+      return;
     }
     swap(temp);
   }
