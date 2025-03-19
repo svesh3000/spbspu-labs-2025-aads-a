@@ -110,6 +110,10 @@ namespace
       {
         throw std::logic_error("division by zero");
       }
+      if ((op1 == min && op2 == -1) || (op2 == min && op1 == -1))
+      {
+        throw std::logic_error("overflow");
+      }
       return op1 / op2;
     }
     if (operation == "%")
@@ -127,7 +131,7 @@ namespace
 demehin::ExprQueue demehin::convertQueue(ExprQueue& infExpr)
 {
   ExprQueue postExpr;
-  Stack<std::string> stack;
+  Stack< std::string > stack;
   while (!infExpr.empty())
   {
     std::string front = infExpr.front();
