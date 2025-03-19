@@ -26,7 +26,7 @@ public:
   {}
 
 
-  forward_list& forward_list::operator=(forward_list&& other) noexcept
+  forward_list& operator=(forward_list&& other) noexcept
   {
     if (this != &other)
     {
@@ -46,7 +46,7 @@ public:
     return *this;
   }
 
-  forward_list& forward_list::operator=(const forward_list& other)
+  forward_list& operator=(const forward_list& other)
   {
     if (this != &other)
     {
