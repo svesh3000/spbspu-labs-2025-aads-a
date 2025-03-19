@@ -25,59 +25,6 @@ public:
   size_(0)
   {}
 
-
-  forward_list& operator=(forward_list&& other) noexcept
-  {
-    if (this != &other)
-    {
-        while (head_)
-        {
-            Node* temp = head_;
-            head_ = head_->next;
-            delete temp;
-        }
-        head_ = other.head_;
-        tail_ = other.tail_;
-        size_ = other.size_;
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
-        other.size_ = 0;
-    }
-    return *this;
-  }
-
-  forward_list& operator=(const forward_list& other)
-  {
-    if (this != &other)
-    {
-        while (head_)
-        {
-            Node* temp = head_;
-            head_ = head_->next;
-            delete temp;
-        }
-        tail_ = nullptr;
-        size_ = 0;
-        Node* current = other.head_;
-        while (current)
-        {
-            push_back(current->data);
-            current = current->next;
-        }
-    }
-    return *this;
-  }
-
-  ~forward_list() noexcept
-  {
-    while (size_ != 0)
-    {
-      pop_front();
-      size_--;
-    }
-  }
-
-
   void clear() noexcept
   {
     while (size_ != 0)
