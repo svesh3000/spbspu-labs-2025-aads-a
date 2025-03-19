@@ -248,14 +248,14 @@ namespace sveshnikov
   void FwdList< T >::pop_back()
   {
     assert(!empty());
-    FwdIterator< T > current = before_begin();
+    node_t< T > *current = tail_;
     for (ConstFwdIterator< T > it = cbegin(); it != cbefore_begin(); it++)
     {
-      current++;
+      current = current->next_;
     }
     delete tail_;
-    current.node_->next_ = head_;
     tail_ = current;
+    tail_->next_ = head_;
     size_--;
   }
 
