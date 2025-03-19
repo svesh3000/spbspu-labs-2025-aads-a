@@ -15,11 +15,10 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
 
 void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
 {
-  std::cout << "getSequences(begin)" << std::endl;
   do
   {
     std::string name;
-    data_list_t* list = new data_list_t;
+    data_list_t list;
     data_t temp = 0;
     in >> name;
     while (!in.fail())
@@ -29,15 +28,14 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
       {
         break;
       }
-      list->push_back(temp);
+      list.push_back(temp);
     }
     if (!in.eof())
     {
       in.clear();
     }
-    sequences.push_back(sequence_t(name, list));
+    sequences.push_back(std::make_pair(name, list));
   } while (!in.eof());
-  std::cout << "getSequences(end)" << std::endl;
 }
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
@@ -50,8 +48,8 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
     out << iter->first << ' ' << std::flush;
-    begins[size] = iter->second->cbegin();
-    ends[size] = iter->second->cend();
+    begins[size] = iter->second.cbegin();
+    ends[size] = iter->second.cend();
     ++size;
   }
   if (sequences.size() != 0)
