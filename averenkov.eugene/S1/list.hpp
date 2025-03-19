@@ -116,7 +116,7 @@ namespace averenkov
   List< T >::~List()
   {
     clear();
-    delete[] reinterpret_cast< char* >(fake_);
+    delete fake_;
   }
 
   template < class T >
