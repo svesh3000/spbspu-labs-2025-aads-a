@@ -3,13 +3,13 @@
 
 namespace savintsev
 {
-  bool divisible_by_five(const int & value)
+  bool divisible_by_five(const int value)
   {
     return (value % 2);
   }
   struct is_even
   {
-    bool operator()(const int & value)
+    bool operator()(const int value)
     {
       return (value % 2) == 0;
     }
