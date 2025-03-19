@@ -1,5 +1,6 @@
 #ifndef FWD_ITERATOR_HPP
 #define FWD_ITERATOR_HPP
+#include <memory>
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov
@@ -23,7 +24,6 @@ namespace sveshnikov
     bool operator==(const FwdIterator< T > &) const noexcept;
 
   private:
-    using this_t = FwdIterator< T >;
     node_t< T > *node_;
   };
 
@@ -38,30 +38,30 @@ namespace sveshnikov
   {}
 
   template < typename T >
-  FwdIterator< T >::this_t &FwdIterator< T >::operator++() noexcept
+  FwdIterator< T > &FwdIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    node_ = node_->node;
+    node_ = node_->next_;
     return *this;
   }
 
   template < typename T >
-  FwdIterator< T >::this_t FwdIterator< T >::operator++(int) noexcept
+  FwdIterator< T > FwdIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    this_t result(*this);
+    FwdIterator< T > result(*this);
     ++(*this);
     return result;
   }
 
   template < typename T >
-  bool FwdIterator< T >::operator==(const this_t &rhs) const noexcept
+  bool FwdIterator< T >::operator==(const FwdIterator< T > &rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template < typename T >
-  bool FwdIterator< T >::operator!=(const this_t &rhs) const noexcept
+  bool FwdIterator< T >::operator!=(const FwdIterator< T > &rhs) const noexcept
   {
     return !(rhs == *this);
   }
@@ -69,27 +69,27 @@ namespace sveshnikov
   template < typename T >
   T &FwdIterator< T >::operator*() noexcept
   {
-    return const_cast< T & >(static_cast< const this_t & >(*this).operator*());
+    return const_cast< T & >(static_cast< const FwdIterator< T > & >(*this).operator*());
   }
 
   template < typename T >
   const T &FwdIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
-    return node_->data;
+    return node_->data_;
   }
 
   template < typename T >
   T *FwdIterator< T >::operator->() noexcept
   {
-    return const_cast< T * >(static_cast< const this_t * >(this)->operator->());
+    return const_cast< T * >(static_cast< const FwdIterator< T > * >(this)->operator->());
   }
 
   template < typename T >
   const T *FwdIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data);
+    return std::addressof(node_->data_);
   }
 }
 

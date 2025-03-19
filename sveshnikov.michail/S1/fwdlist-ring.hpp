@@ -60,10 +60,7 @@ namespace sveshnikov
   {
     if (!fwdlst.empty())
     {
-      head_ = new node_t{fwdlst.front(), nullptr};
-      head_->next_ = head_;
-      tail_ = head_;
-      size = 1;
+      push_back(fwdlst.front());
     }
     for (ConstFwdIterator< T > it = ++fwdlst.cbegin(); it != fwdlst.cend(); it++)
     {

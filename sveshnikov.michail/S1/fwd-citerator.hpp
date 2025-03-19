@@ -1,5 +1,6 @@
-#ifndef FWD_СITERATOR_HPP
-#define FWD_СITERATOR_HPP
+#ifndef FWD_CITERATOR_HPP
+#define FWD_CITERATOR_HPP
+#include <memory>
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov
@@ -21,8 +22,7 @@ namespace sveshnikov
     bool operator==(const ConstFwdIterator< T > &) const noexcept;
 
   private:
-    using this_t = ConstFwdIterator< T >;
-    node_t< T > *node_;
+    const node_t< T > *node_;
   };
 
   template < typename T >
@@ -36,30 +36,30 @@ namespace sveshnikov
   {}
 
   template < typename T >
-  ConstFwdIterator< T >::this_t &ConstFwdIterator< T >::operator++() noexcept
+  ConstFwdIterator< T > &ConstFwdIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    node_ = node_->node;
+    node_ = node_->next_;
     return *this;
   }
 
   template < typename T >
-  ConstFwdIterator< T >::this_t ConstFwdIterator< T >::operator++(int) noexcept
+  ConstFwdIterator< T > ConstFwdIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    this_t result(*this);
+    ConstFwdIterator< T > result(*this);
     ++(*this);
     return result;
   }
 
   template < typename T >
-  bool ConstFwdIterator< T >::operator==(const this_t &rhs) const noexcept
+  bool ConstFwdIterator< T >::operator==(const ConstFwdIterator< T > &rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template < typename T >
-  bool ConstFwdIterator< T >::operator!=(const this_t &rhs) const noexcept
+  bool ConstFwdIterator< T >::operator!=(const ConstFwdIterator< T > &rhs) const noexcept
   {
     return !(rhs == *this);
   }
@@ -68,14 +68,14 @@ namespace sveshnikov
   const T &ConstFwdIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
-    return node_->data;
+    return node_->data_;
   }
 
   template < typename T >
   const T *ConstFwdIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data);
+    return std::addressof(node_->data_);
   }
 }
 
