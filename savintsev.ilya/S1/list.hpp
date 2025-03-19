@@ -436,10 +436,7 @@ namespace savintsev
   template< class T >
   void List< T >::swap(List & rhs) noexcept
   {
-    std::swap(dummy->next->prev, rhs.dummy->next->prev);
-    std::swap(dummy->prev->next, rhs.dummy->prev->next);
-    std::swap(dummy->next, rhs.dummy->next);
-    std::swap(dummy->prev, rhs.dummy->prev);
+    std::swap(dummy, rhs.dummy);
     std::swap(list_size, rhs.list_size);
   }
 
