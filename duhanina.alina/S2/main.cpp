@@ -183,7 +183,7 @@ namespace
       long long result = calcPostfix(postfix);
       results.push(result);
     }
-    if (!results.empty)
+    if (!results.empty())
     {
       std::cout << results.top();
       results.pop();
