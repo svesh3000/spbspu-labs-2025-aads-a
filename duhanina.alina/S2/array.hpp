@@ -1,6 +1,9 @@
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
 
+#include <stdexcept>
+#include <cstddef>
+
 namespace duhanina
 {
   template < typename T >
@@ -16,6 +19,7 @@ namespace duhanina
 
     void push_back(const T& value);
     void pop_back();
+    void pop_front();
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -35,7 +39,7 @@ namespace duhanina
 
   template < typename T >
   DynamicArray< T >::DynamicArray() noexcept:
-    data_(new T[capacity_])
+    data_(new T[capacity_]),
     capacity_(50),
     length_(0)
   {}
@@ -127,6 +131,20 @@ namespace duhanina
       throw std::out_of_range("Array is empty");
     }
     --length_;
+  }
+
+  template< typename T >
+  void DynamicArray< T >::pop_front()
+  {
+    if (empty())
+    {
+      throw std::out_of_range("Array is empty");
+    }
+    for (size_t i = 0; i < length_ - 1; ++i)
+    {
+      data_[i] = data_[i + 1];
+    }
+    length_--;
   }
 
   template < typename T >
