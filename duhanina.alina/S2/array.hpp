@@ -39,10 +39,12 @@ namespace duhanina
 
   template < typename T >
   DynamicArray< T >::DynamicArray() noexcept:
-    data_(new T[capacity_]),
+    data_(nullptr),
     capacity_(50),
     length_(0)
-  {}
+  {
+    data_ = new T[capacity_];
+  }
 
   template < typename T >
   DynamicArray< T >::~DynamicArray()
