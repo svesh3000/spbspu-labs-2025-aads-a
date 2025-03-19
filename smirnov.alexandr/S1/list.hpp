@@ -19,11 +19,13 @@ namespace smirnov
     ConstIterator< T > begin() const noexcept;
     ConstIterator< T > end() const noexcept;
     T & front() noexcept;
+    const T & front() const noexcept;
     T & back() noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T &);
     void push_back(const T &);
+    void pop_front() noexcept;
     void pop_front() const noexcept;
     void pop_back() noexcept;
     void clear() noexcept;
@@ -114,6 +116,12 @@ namespace smirnov
   }
 
   template < typename T >
+  const T & List< T >::front() const noexcept
+  {
+    return fake_->next->data;
+  }
+
+  template < typename T >
   T & List< T >::back() noexcept
   {
     Node< T > * current = fake_->next;
@@ -162,10 +170,7 @@ namespace smirnov
   template < typename T >
   void List< T >::pop_front() noexcept
   {
-    if (empty())
-    {
-      return;
-    }
+    assert(!empty());
     Node< T >* temp = fake_->next;
     fake_->next = temp->next;
     delete temp;
@@ -173,12 +178,18 @@ namespace smirnov
   }
 
   template < typename T >
+  void List< T >::pop_front() const noexcept
+  {
+    assert(!empty());
+    Node< T >* temp = fake_->next;
+    fake_->next = temp->next;
+    delete temp;
+  }
+
+  template < typename T >
   void List< T >::pop_back() noexcept
   {
-    if (empty())
-    {
-      return;
-    }
+    assert(!empty());
     Node< T >* current = fake_;
     while (current->next->next != fake_)
     {

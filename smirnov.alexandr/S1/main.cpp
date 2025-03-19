@@ -1,22 +1,35 @@
 #include <iostream>
 #include <string>
+#include <cctype>
 #include <limits>
+#include <cstddef>
 #include "list.hpp"
 
 int main()
 {
   using namespace smirnov;
-  List< std::pair< std::string, List< unsigned long long > > > sequences;
+  List< std::pair< std::string, List< size_t > > > sequences;
   std::string input;
   std::string name;
-  List< unsigned long long > list;
+  List< size_t > list;
   while (std::cin >> input)
   {
-    if (isdigit(input[0]))
+    bool isNumber = true;
+    for (size_t i = 0; i < input.length(); ++i)
+    {
+      char c = input[i];
+      if (!std::isdigit(c))
+      {
+        isNumber = false;
+        break;
+      }
+    }
+
+    if (isNumber)
     {
       try
       {
-        unsigned long long number = std::stoull(input);
+        size_t number = std::stoull(input);
         list.push_back(number);
       }
       catch (const std::out_of_range & e)
@@ -43,26 +56,24 @@ int main()
 
   if (sequences.empty())
   {
-    std::cout << 0 << std::endl;
+    std::cout << 0 << "\n";
     return 0;
   }
 
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
-    const std::pair< std::string, List< unsigned long long > > & sequence = *it;
     if (it != sequences.begin())
     {
       std::cout << " ";
     }
-    std::cout << sequence.first;
+    std::cout << it->first;
   }
   std::cout << "\n";
 
   bool hasNum = false;
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
-    const std::pair< std::string, List< unsigned long long > > & seq = *it;
-    if (!seq.second.empty())
+    if (!it->second.empty())
     {
       hasNum = true;
       break;
@@ -75,34 +86,32 @@ int main()
     return 0;
   }
 
-  List< List< unsigned long long > > resultSequences;
+  List< List< size_t > > resultSequences;
   bool hasNumbers = true;
   while (hasNumbers)
   {
-    List< unsigned long long > currentSequence;
     hasNumbers = false;
+    List< size_t > resultSequence;
     for (auto it = sequences.begin(); it != sequences.end(); ++it)
     {
-      const std::pair< std::string, List< unsigned long long > > & seq = *it;
-      if (!seq.second.empty())
+      if (!it->second.empty())
       {
-        currentSequence.push_back(*seq.second.begin());
-        seq.second.pop_front();
+        resultSequence.push_back(it->second.front());
+        it->second.pop_front();
         hasNumbers = true;
       }
     }
-    if (!currentSequence.empty())
+    if (!resultSequence.empty())
     {
-      resultSequences.push_back(currentSequence);
+      resultSequences.push_back(resultSequence);
     }
   }
 
   for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
   {
-    const List< unsigned long long > & sequence = *it;
-    for (auto numIt = sequence.begin(); numIt != sequence.end(); ++numIt)
+    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
     {
-      if (numIt != sequence.begin())
+      if (numIt != it->begin())
       {
         std::cout << " ";
       }
@@ -111,14 +120,13 @@ int main()
     std::cout << "\n";
   }
 
-  List< unsigned long long > sums;
+  List< size_t > sums;
   for (auto it = resultSequences.begin(); it != resultSequences.end(); ++it)
   {
-    const List< unsigned long long > & sequence = *it;
-    unsigned long long sum = 0;
-    for (auto numIt = sequence.begin(); numIt != sequence.end(); ++numIt)
+    size_t sum = 0;
+    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
     {
-      if (sum > std::numeric_limits< unsigned long long >::max() - *numIt)
+      if (sum > std::numeric_limits< size_t >::max() - *numIt)
       {
         std::cerr << "Overflow\n";
         return 1;
@@ -127,6 +135,7 @@ int main()
     }
     sums.push_back(sum);
   }
+
   for (auto it = sums.begin(); it != sums.end(); ++it)
   {
     if (it != sums.begin())
