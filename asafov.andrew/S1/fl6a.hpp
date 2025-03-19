@@ -143,6 +143,7 @@ public:
       head_ = head_->next_;//
       tail_->next_ = head_;//
     }
+    std::cout << "pop_front(): " << temp << std::endl;
     delete temp;//
   }
 
@@ -162,6 +163,7 @@ public:
       tail_ = new_node;
     }
     size_++;
+    std::cout << "push_back(): " << new_node << std::endl;
   }
 };
 #endif
