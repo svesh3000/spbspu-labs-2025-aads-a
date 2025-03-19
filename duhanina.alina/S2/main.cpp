@@ -93,7 +93,7 @@ namespace
       postfix.pop();
       if (std::isdigit(token[0]))
       {
-        operands.push(std::stoi(token));
+        operands.push(std::stoll(token));
       }
       else if (isOperator(token[0]))
       {
