@@ -9,16 +9,16 @@ namespace zholobov {
   template < typename T >
   class Stack {
   public:
-    Stack();
-    Stack(const Stack& other);
-    Stack(Stack&& other) noexcept;
-    Stack& operator=(const Stack& other);
-    Stack& operator=(Stack&& other) noexcept;
-    void push(const T& rhs);
-    void push(T&& rhs);
-    T top() const;
-    void pop();
-    bool empty() const;
+    Stack() {}
+    Stack(const Stack& other) {}
+    Stack(Stack&& other) noexcept {}
+    Stack& operator=(const Stack& other) { return *this; }
+    Stack& operator=(Stack&& other) noexcept { return *this; }
+    void push(const T& rhs) {}
+    void push(T&& rhs) {}
+    T top() const { return T(); }
+    void pop() {}
+    bool empty() const { return true; }
   };
 }
 
