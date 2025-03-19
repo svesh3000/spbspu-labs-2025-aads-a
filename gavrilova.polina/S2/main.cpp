@@ -10,7 +10,7 @@
 int main(int argc, char* argv[])
 {
   using namespace gavrilova;
-  
+
   std::ifstream inputFile;
   if (argc > 1) {
     inputFile.open(argv[1]);

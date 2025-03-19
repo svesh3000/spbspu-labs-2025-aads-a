@@ -13,7 +13,7 @@ namespace gavrilova {
     Stack(const Stack< T >& other);
     Stack(Stack< T >&& other);
     ~Stack();
-    
+
     Stack< T >& operator=(const Stack& other);
     Stack< T >& operator=(Stack&& other);
 
@@ -68,7 +68,7 @@ namespace gavrilova {
   {
     delete[] stack_;
   }
-  
+
   template < class T >
   Stack< T >& Stack< T >::operator=(const Stack& other)
   {
@@ -97,7 +97,7 @@ namespace gavrilova {
     }
     stack_[size_++] = value;
   }
-  
+
   template < class T >
   void Stack< T >::push(T&& value)
   {
@@ -112,7 +112,7 @@ namespace gavrilova {
   {
     return stack_[size_ - 1];
   }
-  
+
   template < class T >
   void Stack< T >::pop()
   {
@@ -121,13 +121,13 @@ namespace gavrilova {
     }
     --size_;
   }
-  
+
   template < class T >
   bool Stack< T >::empty() const
   {
     return !size_;
   }
-  
+
   template < class T >
   size_t Stack< T >::size() const
   {

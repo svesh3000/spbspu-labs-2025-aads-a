@@ -13,7 +13,7 @@ namespace gavrilova {
     Queue(const Queue< T >& other);
     Queue(Queue< T >&& other);
     ~Queue();
-    
+
     Queue& operator=(const Queue& other);
     Queue& operator=(Queue&& other);
 
@@ -69,7 +69,7 @@ namespace gavrilova {
   {
     delete[] queue_;
   }
-  
+
   template < class T >
   Queue< T >& Queue< T >::operator=(const Queue& other)
   {
@@ -98,7 +98,7 @@ namespace gavrilova {
     }
     queue_[size_++] = value;
   }
-  
+
   template < class T >
   void Queue< T >::push(T&& value)
   {
@@ -119,7 +119,7 @@ namespace gavrilova {
   {
     return queue_[size_ - 1];
   }
-  
+
   template < class T >
   void Queue< T >::pop()
   {
@@ -131,13 +131,13 @@ namespace gavrilova {
     }
     --size_;
   }
-  
+
   template < class T >
   bool Queue< T >::empty() const
   {
     return !size_;
   }
-  
+
   template < class T >
   size_t Queue< T >::size() const
   {
