@@ -6,12 +6,12 @@ namespace kiselev
   template < typename T >
   struct Node
   {
-    T data_;
-    Node< T >* next_;
-    Node< T >* prev_;
+    T data;
+    Node< T >* next;
+    Node< T >* prev;
 
-    explicit Node(const T& data): data_(data), next_(nullptr), prev_(nullptr) {}
-    Node(): data_(T()), next_(nullptr), prev_(nullptr) {}
+    //explicit Node(const T& data): data_(data), next_(nullptr), prev_(nullptr) {}
+    //Node(): data_(T()), next_(nullptr), prev_(nullptr) {}
   };
 }
 #endif

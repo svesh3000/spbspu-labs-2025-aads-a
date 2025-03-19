@@ -1,7 +1,6 @@
 #ifndef ACTIONSLIST_HPP
 #define ACTIONSLIST_HPP
 #include <iostream>
-#include <ostream>
 #include "list.hpp"
 
 namespace kiselev
@@ -10,6 +9,9 @@ namespace kiselev
   using pair = std::pair< std::string, numberList >;
   using list = List< pair >;
   list createList(std::istream& input);
-  std::ostream& output(std::ostream& output, const list& list_);
+  numberList calculateSum(const list& list);
+  std::ostream& outputNumber(std::ostream& output, const numberList& list);
+  std::ostream& outputName(std::ostream& output, const list& list);
+  std::ostream& outputNumbers(std::ostream& output, const list& list);
 }
 #endif

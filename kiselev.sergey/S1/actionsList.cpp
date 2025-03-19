@@ -25,71 +25,70 @@ namespace
     sum += number;
     return sum;
   }
-
-  kiselev::numberList calculateSum(const kiselev::list& list)
+}
+kiselev::numberList kiselev::calculateSum(const list& list)
+{
+  auto it = list.cbegin();
+  kiselev::numberList listSum;
+  for (size_t i = 0; i < searchMax(list); ++i)
   {
-    auto it = list.cbegin();
-    kiselev::numberList listSum;
-    for (size_t i = 0; i < searchMax(list); ++i)
+    unsigned long long sum = 0;
+    it = list.cbegin();
+    for (; it != list.cend(); ++it)
     {
-      unsigned long long sum = 0;
-      it = list.cbegin();
-      for (; it != list.cend(); ++it)
+      auto nit = it->second.cbegin();
+      if (i >= it->second.size())
       {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
-        {
-          continue;
-        }
-        std::advance(nit, i);
-        sum = checkedSum(sum, *nit);
+        continue;
       }
-      listSum.pushBack(sum);
+      std::advance(nit, i);
+      sum = checkedSum(sum, *nit);
     }
-    return listSum;
+    listSum.pushBack(sum);
   }
+  return listSum;
+}
 
-  std::ostream& outputNumber(std::ostream& output, const kiselev::numberList& list)
+std::ostream& kiselev::outputNumber(std::ostream& output, const numberList& list)
+{
+  output << list.front();
+  for (auto it = ++list.cbegin(); it != list.cend(); ++it)
   {
-    output << list.front();
-    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
-    {
-      output << " " << *it;
-    }
-    return output;
+    output << " " << *it;
   }
+  return output;
+}
 
-  std::ostream& outputName(std::ostream& output, const kiselev::list& list)
+std::ostream& kiselev::outputName(std::ostream& output, const list& list)
+{
+  output << list.front().first;
+  for (auto it = ++list.cbegin(); it != list.cend(); ++it)
   {
-    output << list.front().first;
-    for (auto it = ++list.cbegin(); it != list.cend(); ++it)
-    {
-      output << " " << it->first;
-    }
-    return output;
+    output << " " << it->first;
   }
+  return output;
+}
 
-  std::ostream& outputNumbers(std::ostream& output, const kiselev::list& list)
+std::ostream& kiselev::outputNumbers(std::ostream& output, const list& list)
+{
+  auto it = list.cbegin();
+  for (size_t i = 0; i < searchMax(list); ++i)
   {
-    auto it = list.cbegin();
-    for (size_t i = 0; i < searchMax(list); ++i)
+    it = list.cbegin();
+    kiselev::numberList numbers;
+    for (; it != list.cend(); ++it)
     {
-      it = list.cbegin();
-      kiselev::numberList numbers;
-      for (; it != list.cend(); ++it)
+      auto nit = it->second.cbegin();
+      if (i >= it->second.size())
       {
-        auto nit = it->second.cbegin();
-        if (i >= it->second.size())
-        {
-          continue;
-        }
-        std::advance(nit, i);
-        numbers.pushBack(*nit);
+        continue;
       }
-      outputNumber(output, numbers) << "\n";
+      std::advance(nit, i);
+      numbers.pushBack(*nit);
     }
-    return output;
+    outputNumber(output, numbers) << "\n";
   }
+  return output;
 }
 
 kiselev::list kiselev::createList(std::istream& input)
@@ -112,22 +111,5 @@ kiselev::list kiselev::createList(std::istream& input)
     list.pushBack(pair(name, numbers));
   }
   return list;
-}
-
-std::ostream& kiselev::output(std::ostream& output, const list& list)
-{
-  if (list.empty())
-  {
-    return output << "0\n";
-  }
-  outputName(output, list) << "\n";
-  if (list.front().second.empty())
-  {
-    return output << "0\n";
-  }
-  outputNumbers(output, list);
-  numberList sum = calculateSum(list);
-  outputNumber(output, sum) << "\n";
-  return output;
 }
 

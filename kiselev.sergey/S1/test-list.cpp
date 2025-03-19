@@ -8,8 +8,6 @@
 using namespace kiselev;
 namespace
 {
-  using Iterator = ListIterator< int, false >;
-  using ConstIterator = ListIterator< int, true >;
   void createList(List< int >& list, int count)
   {
     for (int i = 0; i < count; ++i)
@@ -19,7 +17,7 @@ namespace
   }
   std::ostream& outputList(std::ostream& out, List< int >& list)
   {
-    for (ConstIterator it = list.cbegin(); it != list.cend(); ++it)
+    for (List< int >::ConstIterator it = list.cbegin(); it != list.cend(); ++it)
     {
       out << *it;
     }
@@ -168,13 +166,13 @@ BOOST_AUTO_TEST_CASE(erase_pos)
 {
   List< int > list;
   createList(list, 20);
-  ConstIterator begin = list.cbegin();
-  Iterator it = list.erase(begin);
+  List< int >::ConstIterator begin = list.cbegin();
+  List< int >::Iterator it = list.erase(begin);
   BOOST_CHECK(it == list.begin());
-  ConstIterator end = --list.cend();
+  List< int>::ConstIterator end = --list.cend();
   it = list.erase(end);
   BOOST_CHECK(it == list.end());
-  ConstIterator iter = ++list.cbegin();
+  List< int >::ConstIterator iter = ++list.cbegin();
   it = list.erase(iter);
   BOOST_CHECK(*it == 3);
   begin = ++list.cbegin();
@@ -202,7 +200,7 @@ BOOST_AUTO_TEST_CASE(splice_list)
   createList(list1, 5);
   List< int > list2;
   createList(list2, 3);
-  ConstIterator it = ++list1.cbegin();
+  List< int >::ConstIterator it = ++list1.cbegin();
   list1.splice(it, list2);
   std::ostringstream out;
   outputList(out, list1);
@@ -225,8 +223,8 @@ BOOST_AUTO_TEST_CASE(splice_element)
   List< int > list2;
   createList(list2, 3);
   std::ostringstream out1;
-  ConstIterator it = list.cbegin();
-  ConstIterator element = ++list2.cbegin();
+  List< int >::ConstIterator it = list.cbegin();
+  List< int >::ConstIterator element = ++list2.cbegin();
   list.splice(it, list2, element);
   std::ostringstream out;
   outputList(out, list);
@@ -245,9 +243,9 @@ BOOST_AUTO_TEST_CASE(splice_range)
   createList(list, 4);
   List< int > list2;
   createList(list2, 3);
-  ConstIterator pos = list.cend();
-  ConstIterator first = ++list2.cbegin();
-  ConstIterator last = list2.cend();
+  List< int >::ConstIterator pos = list.cend();
+  List< int >::ConstIterator first = ++list2.cbegin();
+  List< int >::ConstIterator last = list2.cend();
   list.splice(pos, list2, first, last);
   std::ostringstream out;
   outputList(out, list);
@@ -282,7 +280,7 @@ BOOST_AUTO_TEST_CASE(insert_fill)
   List< int > list;
   createList(list, 5);
   size_t i = 0;
-  Iterator res = list.insert(list.cbegin(), i, 3);
+  List< int >::Iterator res = list.insert(list.cbegin(), i, 3);
   BOOST_TEST((res == list.begin()));
   i = 2;
   res = list.insert(list.cbegin(), i, 7);
@@ -294,7 +292,7 @@ BOOST_AUTO_TEST_CASE(insert_range)
   List< int > list;
   createList(list, 5);
   List< int > list2;
-  Iterator res = list.insert(list.cbegin(), list2.cbegin(), list2.cend());
+  List< int >::Iterator res = list.insert(list.cbegin(), list2.cbegin(), list2.cend());
   BOOST_TEST((res == list.begin()));
   createList(list2, 4);
   res = list.insert(list.cbegin(), ++list2.cbegin(), list2.cend());
@@ -306,7 +304,7 @@ BOOST_AUTO_TEST_CASE(insert_initializer)
   List< int > list;
   createList(list, 5);
   std::initializer_list< int > il = { 1, 2, 3 };
-  Iterator it = list.insert(list.cbegin(), il.begin(), il.end());
+  List< int >::Iterator it = list.insert(list.cbegin(), il.begin(), il.end());
   BOOST_TEST((it == list.begin()));
 }
 

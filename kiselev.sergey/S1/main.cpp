@@ -5,7 +5,20 @@ int main()
   try
   {
     kiselev::list listPairs = kiselev::createList(std::cin);
-    kiselev::output(std::cout, listPairs);
+    if (listPairs.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+    outputName(std::cout, listPairs) << "\n";
+    if (listPairs.front().second.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+    outputNumbers(std::cout, listPairs);
+    kiselev::numberList sum = calculateSum(listPairs);
+    outputNumber(std::cout, sum) << "\n";
     return 0;
   }
   catch (const std::exception& e)
