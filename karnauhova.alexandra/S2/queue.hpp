@@ -2,40 +2,42 @@
 #include <stdexcept>
 
 template< typename T >
-class Stack
+class Queue
 {
 public:
-  Stack();
-  Stack(const Stack& rhs);
-  Stack(Stack&& rhs);
-  Stack< T >& operator=(const Stack< T >& rhs);
-  ~Stack();
+  Queue();
+  Queue(const Queue& rhs);
+  Queue(Queue&& rhs);
+  Queue< T >& operator=(const Queue< T >& rhs);
+  ~Queue();
 
   bool empty() const;
   size_t size() const;
 
   void pop();
   void push(const T& val);
-  T& top();
-  const T& top() const;
+  T& back();//+const
+  T& front();
 
-  void swap(Stack< T >& other) noexcept;
+  void swap(Queue< T >& other) noexcept;
 private:
   size_t size_;
   size_t count_element_;
   T* data_;
+
   void resize(size_t add_size);
 };
 
 template< typename T >
-Stack< T >::Stack():
+Queue< T >::Queue():
   size_(5),
   count_element_(0),
   data_(new T[5])
 {}
 
+
 template< typename T >
-Stack< T >::Stack(const Stack& rhs):
+Queue< T >::Queue(const Queue& rhs):
   size_(rhs.size_),
   count_element_(rhs.count_element_),
   data_(new T[rhs.size_])
@@ -47,7 +49,7 @@ Stack< T >::Stack(const Stack& rhs):
 }
 
 template< typename T >
-Stack< T >::Stack(Stack&& rhs):
+Queue< T >::Queue(Queue&& rhs):
   size_(rhs.size_),
   count_element_(rhs.count_element_),
   data_(rhs.data_)
@@ -58,36 +60,90 @@ Stack< T >::Stack(Stack&& rhs):
 }
 
 template< typename T >
-Stack< T >& Stack< T >::operator=(const Stack< T >& rhs)
+Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
 {
   if (this != &rhs)
   {
-    Stack< T > temp(rhs);
+    Queue< T > temp(rhs);
     swap(rhs);
   }
   return *this;
 }
 
 template< typename T >
-Stack< T >::~Stack()
+Queue< T >::~Queue()
 {
-  delete data_;
+  delete[] data_;
 }
 
 template< typename T >
-bool Stack< T >::empty() const
+bool Queue< T >::empty() const
 {
   return count_element_ == 0; 
 }
 
 template< typename T >
-size_t Stack< T >::size() const
+size_t Queue< T >::size() const
 {
   return count_element_;
 }
 
 template< typename T >
-void Stack< T >::resize(size_t add_size)
+void Queue< T >::pop()
+{
+  if (empty())
+  {
+    throw std::logic_error("empty queue");
+  }
+
+  for (size_t i = 1; i < count_element_; i++)
+  {
+    data_[i - 1] = data_[i];
+  }
+  count_element_--;
+}
+
+template< typename T >
+void Queue< T >::push(const T& val)
+{
+  if (count_element_ == size_)
+  {
+    resize(1);
+  }
+
+    data_[count_element_++] = val;
+  }
+
+template< typename T >
+T& Queue< T >::back()
+{
+  if (empty())
+  {
+    throw std::logic_error("empty queue");
+  }
+  return data_[count_element_ - 1];
+}
+
+template< typename T >
+T& Queue< T >::front()
+{
+  if (empty())
+  {
+    throw std::logic_error("empty queue");
+  }
+  return data_[0];
+}
+
+template< typename T >
+void Queue< T >::swap(Queue< T >& other) noexcept
+{
+  std::swap(size_, other.size_);
+  std::swap(count_element_, other.count_element_);
+  std::swap(data_, other.data_);
+}
+
+template< typename T >
+void Queue< T >::resize(size_t add_size)
 {
   T* new_data = new T[size_ + add_size];
   for (size_t i = 0; i < size_; i++)
@@ -96,52 +152,4 @@ void Stack< T >::resize(size_t add_size)
   }
   delete[] data_;
   data_ = new_data;
-}
-
-template< typename T >
-void Stack< T >::pop()
-{
-  if (empty())
-  {
-    throw std::logic_error("empty stack");
-  }
-  count_element_--;
-}
-
-template< typename T >
-void Stack< T >::push(const T& val)
-{
-  if (size_ == count_element_)
-  {
-    resize(1);
-  }
-  data_[count_element_++] = val;
-}
-
-template< typename T >
-const T& Stack< T >::top() const
-{
-  if (empty())
-  {
-    throw std::logic_error("empty stack");
-  }
-  return data_[count_element_ - 1];
-}
-
-template< typename T >
-T& Stack< T >::top()
-{
-  if (empty())
-  {
-    throw std::logic_error("empty stack");
-  }
-  return data_[count_element_ - 1];
-}
-
-template< typename T >
-void Stack< T >::swap(Stack< T >& other) noexcept
-{
-  std::swap(size_, other.size_);
-  std::swap(count_element_, other.count_element_);
-  std::swap(data_, other.data_);
 }
