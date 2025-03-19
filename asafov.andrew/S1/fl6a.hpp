@@ -25,6 +25,24 @@ public:
   size_(0)
   {}
 
+  ~forward_list()
+  {
+    while (size_ != 0)
+    {
+      pop_front();
+      size_--;
+    }
+  }
+
+
+  forward_list& operator=(forward_list&& list)
+  {
+    head_ = list.head_;
+    tail_ = list.tail_;
+    size_ = list.size_;
+    list = forward_List();
+  }
+
   void clear() noexcept
   {
     while (size_ != 0)
