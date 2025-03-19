@@ -61,17 +61,17 @@ namespace sveshnikov
     if (!fwdlst.empty())
     {
       push_back(fwdlst.front());
-    }
-    for (ConstFwdIterator< T > it = ++fwdlst.cbegin(); it != fwdlst.cend(); it++)
-    {
-      try
+      for (ConstFwdIterator< T > it = ++fwdlst.cbegin(); it != fwdlst.cend(); it++)
       {
-        push_back(*it);
-      }
-      catch (std::bad_alloc &e)
-      {
-        clear();
-        throw;
+        try
+        {
+          push_back(*it);
+        }
+        catch (std::bad_alloc &e)
+        {
+          clear();
+          throw;
+        }
       }
     }
   }
