@@ -338,25 +338,25 @@ namespace savintsev
   template< class T >
   T & List< T >::front()
   {
-    return *(dummy->next->data);
+    return dummy->next->data;
   }
 
   template< class T >
   const T & List< T >::front() const
   {
-    return *(dummy->next->data);
+    return dummy->next->data;
   }
 
   template< class T >
   T & List< T >::back()
   {
-    return *(dummy->prev->data);
+    return dummy->prev->data;
   }
 
   template< class T >
   const T & List< T >::back() const
   {
-    return *(dummy->prev->data);
+    return dummy->prev->data;
   }
 
   template< class T >
