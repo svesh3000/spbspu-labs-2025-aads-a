@@ -35,6 +35,7 @@ namespace kiselev
     bool empty() const noexcept;
 
   private:
+
     T** data_;
     size_t capacity_;
     size_t size_;
@@ -42,6 +43,7 @@ namespace kiselev
 
     void reallocate();
     void swap(DynamicArr< T >&) noexcept;
+
   };
 
   template< typename T >

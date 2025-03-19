@@ -122,7 +122,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
     std::string line = infix.front();
     infix.pop();
     std::string postfixLine;
-    for (char s : line)
+    for (char s: line)
     {
       if (isspace(s))
       {
@@ -183,7 +183,7 @@ kiselev::stackNumber kiselev::calculationExpr(queue& postfix)
     std::string line = postfix.front();
     postfix.pop();
     std::string number;
-    for (char s : line)
+    for (char s: line)
     {
       if (isspace(s))
       {
