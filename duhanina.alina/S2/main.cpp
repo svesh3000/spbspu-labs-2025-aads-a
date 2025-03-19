@@ -151,6 +151,11 @@ namespace
           {
             throw std::runtime_error("Modulus by zero");
           }
+          if (operand1 % operand2 < 0)
+          {
+            operands.push(operand1 % operand2 + operand2);
+            break;
+          }
           operands.push(operand1 % operand2);
           break;
         default:
