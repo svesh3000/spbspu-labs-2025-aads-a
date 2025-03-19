@@ -235,24 +235,37 @@ namespace sveshnikov
     assert(!empty());
     node_t< T > *node = head_->next_;
     delete head_;
-    head_ = node;
-    tail_->next_ = node;
     size_--;
+    if (empty())
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
+    else
+    {
+      head_ = node;
+      tail_->next_ = head_;
+    }
   }
 
   template < typename T >
   void FwdList< T >::pop_back()
   {
     assert(!empty());
+    if (size_ == 1)
+    {
+      pop_front();
+      return;
+    }
     node_t< T > *current = tail_;
     for (ConstFwdIterator< T > it = cbegin(); it != cbefore_begin(); it++)
     {
       current = current->next_;
     }
     delete tail_;
+    size_--;
     tail_ = current;
     tail_->next_ = head_;
-    size_--;
   }
 
   template < typename T >
