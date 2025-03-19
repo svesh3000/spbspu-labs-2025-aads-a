@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cctype>
+#include <climits>
 #include "stack.hpp"
 #include "queue.hpp"
 
@@ -104,12 +105,38 @@ namespace
         switch (token[0])
         {
         case '+':
+          if ((operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX - operand2) ||
+              (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MIN - operand2))
+          {
+            throw std::runtime_error("Overflow in addition");
+          }
           operands.push(operand1 + operand2);
           break;
         case '-':
+          if ((operand2 > 0 && operand1 < LLONG_MIN + operand2) ||
+              (operand2 < 0 && operand1 > LLONG_MAX + operand2))
+          {
+            throw std::runtime_error("Overflow in subtraction");
+          }
           operands.push(operand1 - operand2);
           break;
         case '*':
+          if (operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX / operand2)
+          {
+            throw std::runtime_error("Overflow in multiplication");
+          }
+          if (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MAX / operand2)
+          {
+            throw std::runtime_error("Overflow in multiplication");
+          }
+          if (operand1 > 0 && operand2 < 0 && operand2 < LLONG_MIN / operand1)
+          {
+            throw std::runtime_error("Overflow in multiplication");
+          }
+          if (operand1 < 0 && operand2 > 0 && operand1 < LLONG_MIN / operand2)
+          {
+            throw std::runtime_error("Overflow in multiplication");
+          }
           operands.push(operand1 * operand2);
           break;
         case '/':
@@ -156,12 +183,15 @@ namespace
       long long result = calcPostfix(postfix);
       results.push(result);
     }
-    std::cout << results.top();
-    results.pop();
-    while (!results.empty())
+    if (!results.empty)
     {
-      std::cout << " " << results.top();
+      std::cout << results.top();
       results.pop();
+      while (!results.empty())
+      {
+        std::cout << " " << results.top();
+        results.pop();
+      }
     }
   }
 }
