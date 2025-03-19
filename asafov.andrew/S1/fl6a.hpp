@@ -3,6 +3,9 @@
 #include <memory>
 #include <iostream>
 
+#define RED "\033[31m"
+#define RESET   "\033[0m"
+
 template <typename T>
 class forward_list
 {
@@ -36,7 +39,7 @@ public:
   }
 
 
-  forward_list& operator=(forward_list&& list)
+  /*forward_list& operator=(forward_list&& list)
   {
     head_ = list.head_;
     tail_ = list.tail_;
@@ -44,7 +47,7 @@ public:
     list.head_ = nullptr;
     list.tail_ = nullptr;
     list.size_ = 0;
-  }
+  }*/
 
   void clear() noexcept
   {
@@ -154,7 +157,7 @@ public:
       head_ = head_->next_;//
       tail_->next_ = head_;//
     }
-    std::cout << "pop_front(): " << temp << std::endl;
+    std::cout << RED << "pop_front(" << temp << ')' << RESET << std::endl;
     delete temp;//
   }
 
@@ -174,7 +177,7 @@ public:
       tail_ = new_node;
     }
     size_++;
-    std::cout << "push_back(): " << new_node << std::endl;
+    std::cout << RED << "push_back(" << &new_node->data_ << ')' << RESET << std::endl;
   }
 };
 #endif
