@@ -19,9 +19,10 @@ namespace savintsev
     friend class ConstIterator< T >;
   public:
     Iterator();
-    Iterator(ListNode< T > * rhs);
     T & operator*();
     T * operator->();
+    const T & operator*() const;
+    const T * operator->() const;
     Iterator & operator++();
     Iterator operator++(int);
     Iterator & operator--();
@@ -30,6 +31,7 @@ namespace savintsev
     bool operator==(const Iterator & rhs) const;
   private:
     ListNode< T > * node;
+    Iterator(ListNode< T > * rhs);
   };
 
   template< typename T >
@@ -40,10 +42,9 @@ namespace savintsev
     friend class List;
   public:
     ConstIterator();
-    ConstIterator(ListNode< T > * rhs);
     ConstIterator(Iterator< T > rhs);
-    const T & operator*();
-    const T * operator->();
+    const T & operator*() const;
+    const T * operator->() const;
     ConstIterator & operator++();
     ConstIterator operator++(int);
     ConstIterator & operator--();
@@ -52,6 +53,7 @@ namespace savintsev
     bool operator==(const ConstIterator & rhs) const;
   private:
     ListNode< T > * node;
+    ConstIterator(ListNode< T > * rhs);
   };
 }
 
@@ -68,13 +70,25 @@ savintsev::Iterator< T >::Iterator(ListNode< T > * rhs):
 template< typename T >
 T & savintsev::Iterator< T >::operator*()
 {
-  return *(node->data);
+  return node->data;
 }
 
 template< typename T >
 T * savintsev::Iterator< T >::operator->()
 {
-  return std::addressof(*(node->data));
+  return std::addressof(node->data);
+}
+
+template< typename T >
+const T & savintsev::Iterator< T >::operator*() const
+{
+  return node->data;
+}
+
+template< typename T >
+const T * savintsev::Iterator< T >::operator->() const
+{
+  return std::addressof(node->data);
 }
 
 template< typename T >
@@ -135,15 +149,15 @@ savintsev::ConstIterator< T >::ConstIterator(Iterator< T > rhs):
 {}
 
 template< typename T >
-const T & savintsev::ConstIterator< T >::operator*()
+const T & savintsev::ConstIterator< T >::operator*() const
 {
-  return *(node->data);
+  return node->data;
 }
 
 template< typename T >
-const T * savintsev::ConstIterator< T >::operator->()
+const T * savintsev::ConstIterator< T >::operator->() const
 {
-  return std::addressof(*(node->data));
+  return std::addressof(node->data);
 }
 
 template< typename T >

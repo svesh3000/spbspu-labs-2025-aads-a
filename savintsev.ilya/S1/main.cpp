@@ -7,8 +7,8 @@ int main()
   using pair_t = std::pair< std::string, savintsev::List< size_t > >;
   using storage_t = savintsev::List< pair_t >;
   storage_t storage;
+
   std::string buffer = "";
-  bool was_input = false;
   size_t max_size = 0;
   std::cin >> buffer;
   while (!std::cin.eof())
@@ -25,27 +25,28 @@ int main()
     }
     max_size = std::max(max_size, temp_max_size);
     storage.push_back(temp_pair);
-    was_input = true;
   }
-  if (!was_input)
+
+  if (buffer.empty())
   {
     std::cout << "0\n";
     return 0;
   }
-  for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
+
   {
+    storage_t::iterator it = storage.begin();
     std::cout << it->first;
-    if (std::next(it) != storage.end())
+    for (++it; it != storage.end(); ++it)
     {
-      std::cout << " ";
+      std::cout << " " << it->first;
     }
+    std::cout << "\n";
   }
-  std::cout << "\n";
+
   savintsev::List< size_t > sums;
   bool was_overflow = false;
   for (size_t i = 0; i < max_size; ++i)
   {
-    size_t printed = 0;
     size_t sum = 0;
     for (storage_t::iterator it = storage.begin(); it != storage.end(); ++it)
     {
@@ -53,17 +54,12 @@ int main()
       if (it->second.size() > i)
       {
         std::advance(temp_it, i);
-        if (printed != 0)
-        {
-          std::cout << " ";
-        }
-        std::cout << *(temp_it);
+        std::cout << (sum == 0 ? "" : " ") << *(temp_it);
         if (!((sum + *(temp_it) >= sum) && (sum + *(temp_it) >= *(temp_it))))
         {
           was_overflow = true;
         }
         sum += *(temp_it);
-        printed++;
       }
     }
     sums.push_back(sum);
@@ -71,20 +67,22 @@ int main()
   }
   if (errno == ERANGE || was_overflow)
   {
-    std::cerr << "WARNING: some numbers are too big, overflow\n";
+    std::cerr << "ERROR: some numbers are too big, overflow\n";
     return 1;
   }
   if (sums.empty())
   {
     sums.push_back(0);
   }
-  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
+
   {
+    savintsev::List< size_t >::const_iterator it;
+    it = sums.cbegin();
     std::cout << *it;
-    if (std::next(it) != sums.cend())
+    for (++it; it != sums.cend(); ++it)
     {
-      std::cout << " ";
+      std::cout << " " << *it;
     }
+    std::cout << "\n";
   }
-  std::cout << "\n";
 }
