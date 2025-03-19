@@ -4,7 +4,7 @@
 #include <queue>
 #include <string>
 #include <cctype>
-#include <limits>
+#include "checked_operations.hpp"
 
 namespace {
   using expression_queue = std::queue< std::string >;
@@ -41,7 +41,7 @@ namespace {
 
   void output_results(std::ostream& out, results_stack& results) noexcept
   {
-    std::cout << results.top();
+    out << results.top();
     results.pop();
     while (!results.empty()) {
       out << " " << results.top();
@@ -133,94 +133,6 @@ namespace {
     exp_stack = converted;
   }
 
-  int sign(int val)
-  {
-    return (val > 0) ? 1 : ((val < 0) ? -1 : 0);
-  }
-
-  bool same_sign(int a, int b)
-  {
-    return sign(a) * sign(b) > 0;
-  }
-
-  long long checked_addition(long long left, long long right)
-  {
-    const long long max_ll = std::numeric_limits< long long >::max();
-    if (right < max_ll - left) {
-      return right + left;
-    }
-    throw std::overflow_error("addition overflow");
-  }
-
-  long long checked_subtraction(long long left, long long right)
-  {
-    const long long min_ll = std::numeric_limits< long long >::min();
-    if (right > min_ll + left) {
-      return right - left;
-    }
-    throw std::overflow_error("subtraction overflow");
-  }
-
-  long long checked_multiplication(long long left, long long right)
-  {
-    const long long max_ll = std::numeric_limits< long long >::max();
-    const long long min_ll = std::numeric_limits< long long >::min();
-    if (same_sign(left, right) && left > 0) {
-      if (max_ll / left > right) {
-        return left * right;
-      }
-    } else if (same_sign(left, right) && left < 0) {
-      if (min_ll / left < right) {
-        return left * right;
-      }
-    } else if (!same_sign(left, right)) {
-      if (std::abs(max_ll / left) > std::abs(right)) {
-        return left * right;
-      }
-    }
-    throw std::overflow_error("multiplication overflow");
-  }
-
-  long long checked_division(long long left, long long right)
-  {
-    const long long min_ll = std::numeric_limits< long long >::min();
-    if (right == 0) {
-      throw std::logic_error("division by zero");
-    }
-    if ((left == -1 && right == min_ll) || (left == min_ll && right == -1)) {
-      throw std::overflow_error("division overflow");
-    }
-    return left / right;
-  }
-
-  long long checked_remainder(long long left, long long right)
-  {
-    if (right == 0) {
-      throw std::logic_error("division by zero");
-    }
-    return left % right;
-  }
-
-  long long checked_operation(long long left, long long right, const std::string& op)
-  {
-    if (op == "*") {
-      return checked_multiplication(left, right);
-    }
-    if (op == "/") {
-      return checked_division(left, right);
-    }
-    if (op == "%") {
-      return checked_remainder(left, right);
-    }
-    if (op == "+") {
-      return checked_addition(left, right);
-    }
-    if (op == "-") {
-      return checked_subtraction(left, right);
-    }
-    throw std::logic_error("invalid operation");
-  }
-
   long long calculate_expression(const expression_queue& exp_queue)
   {
     std::stack< long long > dump;
@@ -236,7 +148,7 @@ namespace {
         dump.pop();
         long long operand1 = dump.top();
         dump.pop();
-        dump.push(checked_operation(operand1, operand2, exp.front()));
+        dump.push(maslevtsov::checked_operation(operand1, operand2, exp.front()));
       }
     }
     if (dump.empty() || dump.size() > 1) {
