@@ -34,7 +34,7 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
     {
       in.clear();
     }
-    sequences.push_back(sequence_t(name, list));
+    sequences.push_back(sequence_t(name, &list));
   } while (!in.eof());
 }
 
@@ -47,8 +47,8 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
   {
     out << iter->first << ' ' << std::flush;
-    begins[size] = iter->second.cbegin();
-    ends[size] = iter->second.cend();
+    begins[size] = iter->second->cbegin();
+    ends[size] = iter->second->cend();
     ++size;
   }
   if (sequences.size() != 0)
