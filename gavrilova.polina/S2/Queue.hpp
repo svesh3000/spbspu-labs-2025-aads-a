@@ -28,9 +28,9 @@ namespace gavrilova {
     void swap(Queue& other) noexcept;
 
   private:
-    T* queue_;
     size_t size_;
     size_t capacity_;
+    T* queue_;
 
     void resize();
   };
