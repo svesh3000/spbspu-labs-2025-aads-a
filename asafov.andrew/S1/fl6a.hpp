@@ -27,10 +27,11 @@ public:
 
   ~forward_list()
   {
-    while (size_ != 0)
+    size_t s = size();
+    while (s != 0)
     {
       pop_front();
-      size_--;
+      s--;
     }
   }
 
@@ -40,7 +41,9 @@ public:
     head_ = list.head_;
     tail_ = list.tail_;
     size_ = list.size_;
-    list = forward_List();
+    list.head_ = nullptr;
+    list.tail_ = nullptr;
+    list.size_ = 0;
   }
 
   void clear() noexcept
