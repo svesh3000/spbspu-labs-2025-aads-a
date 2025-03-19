@@ -1,6 +1,7 @@
 #ifndef FWD_CITERATOR_HPP
 #define FWD_CITERATOR_HPP
 #include <memory>
+#include <cassert>
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov

@@ -1,6 +1,6 @@
 #ifndef FWDLIST_RING_HPP
 #define FWDLIST_RING_HPP
-#include "fwdlist-node.hpp"
+#include <cassert>
 #include "fwd-iterator.hpp"
 #include "fwd-citerator.hpp"
 
@@ -212,9 +212,7 @@ namespace sveshnikov
   template < typename T >
   void FwdList< T >::push_front(T &&val)
   {
-    node_t< T > *node = new node_t< T >{std::move(val), head_};
-    push_impl(node);
-    head_ = node;
+    push_front(val);
   }
 
   template < typename T >
@@ -228,9 +226,7 @@ namespace sveshnikov
   template < typename T >
   void FwdList< T >::push_back(T &&val)
   {
-    node_t< T > *node = new node_t< T >{std::move(val), head_};
-    push_impl(node);
-    tail_ = node;
+    push_back(val);
   }
 
   template < typename T >

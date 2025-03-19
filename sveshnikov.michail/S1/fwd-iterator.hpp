@@ -1,6 +1,7 @@
 #ifndef FWD_ITERATOR_HPP
 #define FWD_ITERATOR_HPP
 #include <memory>
+#include <cassert>
 #include "fwdlist-node.hpp"
 
 namespace sveshnikov

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "io-sequences.hpp"
-#include "list-manip.hpp"
 
 int main()
 {
@@ -13,7 +12,7 @@ int main()
     return 0;
   }
   outputNamesLists(std::cout, list) << '\n';
-  if (sveshnikov::getMaxSizeLists(list) != 0)
+  if (getMaxSizeLists(list) != 0)
   {
     outputNewLists(std::cout, list) << '\n';
   }
