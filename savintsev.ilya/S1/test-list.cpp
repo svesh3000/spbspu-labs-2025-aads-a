@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(test_default_constructor)
 
 BOOST_AUTO_TEST_CASE(test_fill_constructor)
 {
-  lt< int > list1(8, 0);
+  lt< int > list1(8ull, 0);
   auto it = list1.cbegin();
   for (size_t i = 0; i < 8; ++i)
   {
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_begin_and_end)
     *it = 18;
   }
 
-  lt< int > eighteens(5, 18);
+  lt< int > eighteens(5ull, 18);
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), eighteens.begin(), eighteens.end());
 }
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(test_insert)
   it = mylist.begin();
   ++it;
   mylist.insert(it, 10);
-  mylist.insert (it, 2, 20);
+  mylist.insert(it, 2ull, 20);
   --it;
   std::list< int > newlist(2,30);
   mylist.insert(it, newlist.begin(), newlist.end());
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(test_insert)
 
 BOOST_AUTO_TEST_CASE(test_operator_equal)
 {
-  lt< int > mylist(4, 20);
+  lt< int > mylist(4ull, 20);
   mylist = {19, 19, 19};
   int test[] = {19, 19, 19};
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 3);
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_CASE(test_size)
     myints.push_back(i);
   }
   BOOST_TEST(myints.size() == 10);
-  myints.insert(myints.begin(), 10, 100);
+  myints.insert(myints.begin(), 10ull, 100);
   BOOST_TEST(myints.size() == 20);
   myints.pop_back();
   BOOST_TEST(myints.size() == 19);
@@ -404,8 +404,8 @@ BOOST_AUTO_TEST_CASE(test_splice)
 
 BOOST_AUTO_TEST_CASE(test_swap)
 {
-  lt< int > first(3, 100);
-  lt< int > second(5, 200);
+  lt< int > first(3ull, 100);
+  lt< int > second(5ull, 200);
 
   first.swap(second);
 

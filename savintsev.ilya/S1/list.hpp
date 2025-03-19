@@ -19,7 +19,6 @@ namespace savintsev
     List(const List & rhs);
     List(List && rhs);
     List(size_t n, const T & value);
-    List(int n, const T & value);
     template< class InputIterator >
     List(InputIterator first, InputIterator last);
     List(std::initializer_list< T > il);
@@ -70,7 +69,6 @@ namespace savintsev
 
     iterator insert(const_iterator pos, const T & value);
     iterator insert(const_iterator pos, size_t n, const T & value);
-    iterator insert(const_iterator pos, int n, const T & value);
     template< class InputIterator >
     iterator insert(const_iterator pos, InputIterator first, InputIterator last);
     iterator insert(const_iterator pos, T && value);
@@ -252,11 +250,6 @@ namespace savintsev
       throw;
     }
   }
-
-  template< class T >
-  List< T >::List(int n, const T & value):
-    List(static_cast< size_t >(n), value)
-  {}
 
   template< class T >
   List< T >::List(std::initializer_list< T > il):
@@ -678,12 +671,6 @@ namespace savintsev
       throw;
     }
     return ++first;
-  }
-
-  template< class T >
-  typename List< T >::iterator List< T >::insert(const_iterator pos, int n, const T & value)
-  {
-    return insert(pos, static_cast< size_t >(n), value);
   }
 
   template< class T >
