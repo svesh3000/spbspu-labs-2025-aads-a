@@ -177,36 +177,4 @@ public:
     std::cout << "push_back(): " << new_node << std::endl;
   }
 };
-
-template <typename A, typename B>
-class pair
-{
-public:
-  pair(const A& data1, const B& data2):
-  first(data1),
-  second(data2)
-  {
-  }
-  pair(A&& data1, const B& data2):
-  second(data2)
-  {
-    first = data1;
-  }
-  pair(const A& data1, B&& data2):
-  first(data1)
-  {
-    second = data2;
-  }
-  pair(A&& data1, B&& data2)
-  {
-    first = data1;
-    second = data2;
-  }
-  ~pair() = default;
-  A first;
-  B second;
-};
-
-
-
 #endif
