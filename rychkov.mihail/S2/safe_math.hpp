@@ -109,7 +109,19 @@ namespace rychkov
     {
       throw std::invalid_argument("invalid mod");
     }
-    return num1 % num2;
+    T result = num1 % num2;
+    if (result < 0)
+    {
+      if (num2 > 0)
+      {
+        result += num2;
+      }
+      else
+      {
+        result -= num2;
+      }
+    }
+    return result;
   }
   template< class T >
   T executeOperation(T leftOperand, char operation, T rightOperand)

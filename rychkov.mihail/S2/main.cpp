@@ -183,14 +183,11 @@ int main(int argc, char** argv)
   }
 
   char space[2] = "\0";
-  if (!results.empty())
+  while (!results.empty())
   {
-    while (!results.empty())
-    {
-      std::cout << space << results.top();
-      space[0] = ' ';
-      results.pop();
-    }
-    std::cout << '\n';
+    std::cout << space << results.top();
+    space[0] = ' ';
+    results.pop();
   }
+  std::cout << '\n';
 }
