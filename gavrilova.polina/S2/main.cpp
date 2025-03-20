@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   while (!results.empty()) {
     std::cout << " ";
     std::cout << results.top();
-    std::cout << "\n";
     results.pop();
   }
+  std::cout << "\n";
 }
