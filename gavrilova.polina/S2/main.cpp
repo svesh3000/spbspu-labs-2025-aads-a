@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   }
   std::istream& in = (argc > 1) ? inputFile : std::cin;
   std::string line;
-  Stack< unsigned long long > results;
+  Stack< long long > results;
   while (getline(in, line)) {
     if (line.empty()) {
       continue;

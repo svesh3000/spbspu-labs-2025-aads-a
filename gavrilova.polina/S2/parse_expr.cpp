@@ -36,7 +36,7 @@ namespace {
     return is_number(str);
   }
 
-  unsigned long long do_operation(unsigned long long first, unsigned long long second, std::string oper)
+  long long do_operation(long long first, long long second, std::string oper)
   {
     if (oper == "+") {
       return first + second;
@@ -123,9 +123,9 @@ gavrilova::Queue< std::string > gavrilova::infix_to_postfix(Queue< std::string >
   return postfix_q;
 }
 
-unsigned long long gavrilova::calculate(Queue< std::string >& postfix_q)
+long long gavrilova::calculate(Queue< std::string >& postfix_q)
 {
-  Stack< unsigned long long > stack;
+  Stack< long long > stack;
   while (!postfix_q.empty()) {
     std::string token = postfix_q.front();
     postfix_q.pop();
@@ -136,9 +136,9 @@ unsigned long long gavrilova::calculate(Queue< std::string >& postfix_q)
       if (stack.size() < 2) {
         throw std::invalid_argument("Invalid expression: not enough operands");
       }
-      unsigned long long second = stack.top();
+      long long second = stack.top();
       stack.pop();
-      unsigned long long first = stack.top();
+      long long first = stack.top();
       stack.pop();
       stack.push(do_operation(first, second, token));
     } else {
@@ -150,7 +150,7 @@ unsigned long long gavrilova::calculate(Queue< std::string >& postfix_q)
     throw std::invalid_argument("Invalid expression: incorrect number of operands");
   }
 
-  unsigned long long result = stack.top();
+  long long result = stack.top();
   stack.pop();
   return result;
 }
