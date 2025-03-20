@@ -10,6 +10,8 @@ namespace kushekbaev
   struct FwdList
   {
     FwdList();
+    FwdList(size_t count, const T& value);
+    FwdList(std::initializer_list< T > init);
     FwdList(const FwdList& other);
     FwdList(FwdList&& other) noexcept;
     ~FwdList();
@@ -43,6 +45,26 @@ namespace kushekbaev
     size_(0)
   {
     fake_ -> next_ = fake_;
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(size_t count, const T& value):
+    FwdList()
+  {
+    while (count--)
+    {
+      push_back(value);
+    }
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(std::initializer_list< T > init):
+    FwdList()
+  {
+    for (const T& value: init)
+    {
+      push_back(value);
+    }
   }
 
   template< typename T >
