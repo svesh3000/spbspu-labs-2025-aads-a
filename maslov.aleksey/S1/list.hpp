@@ -8,7 +8,7 @@
 #include "node.hpp"
 #include "iterator.hpp"
 
-namespace
+namespace maslov::detail
 {
   template< typename T >
   struct IsEqual
@@ -333,7 +333,7 @@ namespace maslov
   template< typename T >
   void FwdList< T >::remove(const T & value)
   {
-    removeIf(IsEqual< T >(value));
+    removeIf(detail::IsEqual< T >(value));
   }
 
   template< typename T >
