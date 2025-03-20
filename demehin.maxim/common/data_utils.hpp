@@ -1,5 +1,6 @@
 #ifndef DATA_UTILS_HPP
 #define DATA_UTILS_HPP
+#include <cstddef>
 
 namespace demehin::details
 {
