@@ -82,6 +82,9 @@ namespace {
       if (second == 0) {
         throw std::invalid_argument("Modulo by zero is not allowed.");
       }
+      if (first < 0) {
+        return second - (first * (-1)) % second;
+      }
       return first % second;
 
     } else {
