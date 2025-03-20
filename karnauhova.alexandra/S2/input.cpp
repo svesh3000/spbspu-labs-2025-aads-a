@@ -5,12 +5,12 @@ karnauhova::Queue< std::string > karnauhova::split_str(std::string str)
   karnauhova::Queue< std::string > inf;
   std::string element;
   char separator = ' ';
-  int i = 0; 
+  int i = 0;
   while (str[i] != '\0')
   {
     if (str[i] != separator)
     {
-    element += str[i]; 
+    element += str[i];
     }
     else
     {

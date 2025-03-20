@@ -43,7 +43,7 @@ long long int proc_post(karnauhova::Queue< std::string > post)
   long long int second = 0;
   while (!post.empty())
   {
-    std::string element = post.front(); 
+    std::string element = post.front();
     first = std::stoll(element);
     post.pop();
     if (post.empty() && sum == 0)
@@ -98,13 +98,11 @@ karnauhova::Stack< long long int > input_str(std::istream& in)
     {
       continue;
     }
-    
     karnauhova::Queue< std::string > inf = karnauhova::split_str(str);
     karnauhova::Queue< std::string > post = to_post(inf);
     long long int sum = proc_post(post);
     calc.push(sum);
   }
-   
   in.clear();
   return calc;
 }
@@ -115,7 +113,7 @@ int main(int argc, char** argv)
   try
   {
     if (argc > 1)
-    { 
+    {
       std::ifstream file(argv[1]);
       if (file.is_open())
       {

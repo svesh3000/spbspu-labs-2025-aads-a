@@ -82,7 +82,7 @@ namespace karnauhova
   template< typename T >
   bool Stack< T >::empty() const
   {
-    return count_element_ == 0; 
+    return count_element_ == 0;
   }
 
   template< typename T >

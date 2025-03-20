@@ -84,7 +84,7 @@ namespace karnauhova
   template< typename T >
   bool Queue< T >::empty() const
   {
-    return count_element_ == 0; 
+    return count_element_ == 0;
   }
 
   template< typename T >
