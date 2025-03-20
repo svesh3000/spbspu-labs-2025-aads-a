@@ -17,25 +17,25 @@ namespace asafov
       Node* next_;
     };
   public:
-    forward_list() noexcept:
+    Forward_list() noexcept:
     head_(nullptr),
     tail_(nullptr),
     size_(0)
     {}
-    forward_list(const forward_list& list):
-    forward_list()
+    Forward_list(const Forward_list& list):
+    Forward_list()
     {
       for (auto i = list.cbegin(); i != list.cend(); ++i)
       {
-        push_back();
+        push_back(*i);
       }
     }
-    ~forward_list() noexcept
+    ~Forward_list() noexcept
     {
       clear();
     }
 
-    forward_list& operator=(const forward_list& list)
+    Forward_list& operator=(const Forward_list& list)
     {
       clear();
       for (auto data : list)
@@ -47,7 +47,7 @@ namespace asafov
 
     class const_iterator
     {
-      friend class forward_list;
+      friend class Forward_list;
     public:
       const_iterator():
       current_(nullptr),
@@ -144,7 +144,7 @@ namespace asafov
         if (head_ == tail_)
         {
           delete head_;
-          *this = forward_list();
+          *this = Forward_list();
         }
         else
         {

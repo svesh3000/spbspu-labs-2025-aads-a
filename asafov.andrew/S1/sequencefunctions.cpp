@@ -7,11 +7,9 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
   {
     if(begins[i]!=ends[i])
     {
-      //std::cout << RED << "allitersend(false)\n"  << RESET<< std::flush;
       return false;
     }
   }
-  //std::cout << RED << "allitersend(true)\n"  << RESET<< std::flush;
   return true;
 }
 
@@ -43,7 +41,6 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
 {
-  //std::cout << RED << "outputSequences(begin)" << RESET << std::endl;
   if (sequences.cbegin()->second.empty())
   {
     std::cout << sequences.cbegin()->first << "\n0\n";
@@ -53,29 +50,41 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
   size_t size = 0;
-  for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
+  auto ii = sequences.cbegin();
+  out << ii->first << ' ';
+  begins[size] = ii->second.cbegin();
+  ends[size] = ii->second.cend();
+  ++size;
+  for (; ii != sequences.cend(); ++ii)
   {
-    out << iter->first << ' ' << std::flush;
-    begins[size] = iter->second.cbegin();
-    ends[size] = iter->second.cend();
+    out << ' ' << ii->first;
+    begins[size] = ii->second.cbegin();
+    ends[size] = ii->second.cend();
     ++size;
   }
   if (sequences.size() != 0)
   {
-    out << '\n' << std::flush;
+    out << '\n';
   }
   seqiter = sequences.cbegin();
   data_list_t sums;
   while (!allItersEnds(begins, ends, size))
   {
     data_t sum = 0;
-    for (size_t i = 0; i < sequences.size();)
+    if (begins[0] != ends[0])
+    {
+      sum += *begins[0];
+      if (sum < *begins[0]) throw std::overflow_error("owerflow!");
+      out << *begins[0] << ' ';
+      ++begins[0];
+    }
+    for (size_t i = 1; i < sequences.size();)
     {
       if (begins[i] != ends[i])
       {
         sum += *begins[i];
         if (sum < *begins[i]) throw std::overflow_error("owerflow!");
-        out << *begins[i] << ' ' << std::flush;
+        out << *begins[i] << ' ';
         ++begins[i++];
       }
       else
@@ -86,14 +95,14 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     std::cout << '\n';
     sums.push_back(sum);
   }
-  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
-  {
-    out << *it << ' ' << std::flush;
-  }
-  if (sequences.size() != 0)
-  {
-    out << '\n' << std::flush;
-  }
+
+  auto it = sums.cbegin();
+  out << *it;
+  ++it;
+  for (; it != sums.cend(); ++it) out << ' ' << *it;
+
+  if (sequences.size() != 0) out << '\n';
+
   delete[] begins;
   delete[] ends;
 }
