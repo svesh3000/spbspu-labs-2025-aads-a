@@ -38,9 +38,7 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
-  if (!in) {
-    std::cerr << "Invalid input" << "\n";
-  }
+
   while (!results.empty()) {
     std::cout << results.top();
     results.pop();
