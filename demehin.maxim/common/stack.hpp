@@ -19,7 +19,8 @@ namespace demehin
     ~Stack();
 
     void push(T rhs);
-    T& top() const;
+    const T& top() const;
+    T& top();
     void pop();
 
     bool empty() const noexcept;
@@ -92,11 +93,17 @@ namespace demehin
   }
 
   template< typename T >
-  T& Stack< T >::top() const
+  const T& Stack< T >::top() const
+  {
+    return top();
+  }
+
+  template< typename T >
+  T& Stack< T >::top()
   {
     if (empty())
     {
-      throw std::logic_error("empty1");
+      throw std::logic_error("empty");
     }
     return data_[size_ - 1];
   }

@@ -21,8 +21,10 @@ namespace demehin
 
     void push(const T& rhs);
     void pop();
-    T& front() const;
-    T& back() const;
+    const T& front() const;
+    T& front();
+    const T& back() const;
+    T& back();
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -112,7 +114,13 @@ namespace demehin
   }
 
   template< typename T >
-  T& Queue< T >::back() const
+  const T& Queue< T >::back() const
+  {
+    return back();
+  }
+
+  template< typename T >
+  T& Queue< T >::back()
   {
     if (empty())
     {
@@ -122,7 +130,13 @@ namespace demehin
   }
 
   template< typename T >
-  T& Queue< T >::front() const
+  const T& Queue< T >::front() const
+  {
+    return front();
+  }
+
+  template< typename T >
+  T& Queue< T >::front()
   {
     if (empty())
     {
