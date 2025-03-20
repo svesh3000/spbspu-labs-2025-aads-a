@@ -1,5 +1,5 @@
 #include "sequencefunctions.h"
-
+#include <limits>
 namespace
 {
   bool allItersEnds(asafov::data_list_t::const_iterator* begins, asafov::data_list_t::const_iterator* ends, size_t size)
@@ -47,13 +47,16 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     {
       if (begins[i] != ends[i])
       {
-        sum += *begins[i];
-        if (sum < *begins[i])
+        if (sum < std::numeric_limits<data_t>::max() - *begins[i])
         {
           sums.clear();
           delete[] begins;
           delete[] ends;
           throw std::overflow_error("owerflow!");
+        }
+        else
+        {
+          sum += *begins[i];
         }
         out << *begins[i] << ' ';
         ++begins[i++];
