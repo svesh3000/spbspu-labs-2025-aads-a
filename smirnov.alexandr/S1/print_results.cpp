@@ -1,4 +1,5 @@
 #include "print_results.hpp"
+#include <limits>
 
 void smirnov::printName(std::ostream & out, const std::list< std::pair< std::string, std::list< size_t > > > & sequences)
 {
@@ -37,6 +38,10 @@ void smirnov::printSums(std::ostream & out, const std::list< std::list< size_t >
     size_t sum = 0;
     for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
     {
+      if (sum > std::numeric_limits< size_t >::max() - *numIt)
+      {
+        throw std::overflow_error("Overflow!");
+      }
       sum += *numIt;
     }
     sums.push_back(sum);
