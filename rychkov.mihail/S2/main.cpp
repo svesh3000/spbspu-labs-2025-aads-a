@@ -2,30 +2,15 @@
 #include <fstream>
 #include <cctype>
 #include <iomanip>
+#include <stdexcept>
 
 #include "queue.hpp"
 #include "stack.hpp"
 #include "variant.hpp"
+#include "safe_math.hpp"
 
 namespace rychkov
 {
-  int executeOperation(int leftOperand, char operation, int rightOperand)
-  {
-    switch (operation)
-    {
-    case '*':
-      return leftOperand * rightOperand;
-    case '/':
-      return leftOperand / rightOperand;
-    case '+':
-      return leftOperand + rightOperand;
-    case '-':
-      return leftOperand - rightOperand;
-    case '%':
-      return leftOperand % rightOperand;
-    }
-    return 0;
-  }
   int getPriority(char operatorChar)
   {
     switch (operatorChar)
@@ -45,7 +30,7 @@ namespace rychkov
       return -1;
     }
   }
-  char pushLowPrioritized(rychkov::Queue< rychkov::Variant< int, char > >& expression,
+  char pushLowPrioritized(rychkov::Queue< rychkov::Variant< long long, char > >& expression,
       rychkov::Stack< char >& operators, int referencePriority = 0)
   {
     while (!operators.empty() && (rychkov::getPriority(operators.top()) > referencePriority))
@@ -67,101 +52,145 @@ namespace rychkov
   }
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  std::cin >> std::noskipws;
-  rychkov::Queue< rychkov::Variant< int, char > > expression;
-  rychkov::Stack< char > operators;
-  bool isNumber = false;
-  int number = 0;
-  char c = 0;
-  while (std::cin >> c)
+  std::istream* inPtr = &std::cin;
+  std::ifstream inFile;
+  if (argc == 2)
   {
-    if (std::isdigit(c))
+    inFile.open(argv[1]);
+    if (!inFile)
     {
-      isNumber = true;
-      number = number * 10 + (c - '0');
+      std::cerr << "failed to open file \"" << argv[1] << "\"\n";
+      return 1;
     }
-    else
+    inPtr = &inFile;
+  }
+  std::istream& in = *inPtr;
+
+  in >> std::noskipws;
+  rychkov::Stack< long long > results;
+  while (!in.eof())
+  {
+    rychkov::Queue< rychkov::Variant< long long, char > > expression;
+    rychkov::Stack< char > operators;
+    bool isNumber = false;
+    long long number = 0;
+    char c = 0;
+    while (in >> c)
     {
-      if (isNumber)
+      if (std::isdigit(c))
       {
-        expression.push(number);
-      }
-      isNumber = false;
-      number = 0;
-      if (!std::isspace(c))
-      {
-        int priority = rychkov::getPriority(c);
-        if (priority == -1)
+        isNumber = true;
+        try
         {
-          std::cerr << "found unknown symbol - '" << c << "'\n";
+          rychkov::safeMul< long long >(number, 10);
+          rychkov::safeAdd< long long >(number, (c - '0'));
+        }
+        catch (...)
+        {
+          std::cerr << "input overflow\n";
           return 1;
         }
-        if (c == '(')
+        number = number * 10 + (c - '0');
+      }
+      else
+      {
+        if (isNumber)
         {
-          operators.push(c);
-          continue;
+          expression.push(number);
         }
-        char equalPrioritized = rychkov::pushLowPrioritized(expression, operators, priority);
-        if ((equalPrioritized != '(') && (c == ')'))
+        isNumber = false;
+        number = 0;
+        if (c == '\n')
         {
-          std::cerr << "wrong parentheses order\n";
+          break;
+        }
+        if (!std::isspace(c))
+        {
+          int priority = rychkov::getPriority(c);
+          if (priority == -1)
+          {
+            std::cerr << "found unknown symbol - '" << c << "'\n";
+            return 1;
+          }
+          if (c == '(')
+          {
+            operators.push(c);
+            continue;
+          }
+          char equalPrioritized = rychkov::pushLowPrioritized(expression, operators, priority);
+          if ((equalPrioritized != '(') && (c == ')'))
+          {
+            std::cerr << "wrong parentheses order\n";
+            return 1;
+          }
+          if (c != ')')
+          {
+            operators.push(c);
+          }
+        }
+      }
+    }
+    rychkov::pushLowPrioritized(expression, operators, 0);
+    operators.clear();
+    if (expression.empty())
+    {
+      continue;
+    }
+
+    rychkov::Stack< long long > operands;
+    if (!rychkov::holds_alternative< long long >(expression.front()))
+    {
+      std::cerr << "expression don't starts with number\n";
+      return 1;
+    }
+    operands.push(rychkov::get< long long >(expression.front()));
+    expression.pop();
+    for (; !expression.empty(); expression.pop())
+    {
+      if (rychkov::holds_alternative< char >(expression.front()))
+      {
+        if (operands.size() < 2)
+        {
+          std::cerr << "missing operand (number)\n";
           return 1;
         }
-        if (c != ')')
+        long long rightOperand = operands.top();
+        operands.pop();
+        try
         {
-          operators.push(c);
+          operands.top() = rychkov::executeOperation(operands.top(),
+                rychkov::get< char >(expression.front()), rightOperand);
+        }
+        catch (const std::invalid_argument& e)
+        {
+          std::cerr << e.what() << '\n';
+          return 1;
         }
       }
-    }
-  }
-  rychkov::pushLowPrioritized(expression, operators, 0);
-  operators.clear();
-
-  /*for (; !expression.empty(); expression.pop())
-  {
-    if (rychkov::holds_alternative< char >(expression.front()))
-    {
-      std::cout << rychkov::get< char >(expression.front());
-    }
-    else
-    {
-      std::cout << rychkov::get< int >(expression.front());
-    }
-  }
-  return 0;*/
-
-  rychkov::Stack< int > operands;
-  if (expression.empty() || !rychkov::holds_alternative< int >(expression.front()))
-  {
-    std::cerr << "expression don't starts with number\n";
-    return 1;
-  }
-  operands.push(rychkov::get< int >(expression.front()));
-  expression.pop();
-  for (; !expression.empty(); expression.pop())
-  {
-    if (rychkov::holds_alternative< char >(expression.front()))
-    {
-      if (operands.size() < 2)
+      else
       {
-        std::cerr << "missing operand (number)\n";
-        return 1;
+        operands.push(rychkov::get< long long >(expression.front()));
       }
-      int rightOperand = operands.top();
-      operands.pop();
-      operands.top() = rychkov::executeOperation(operands.top(), rychkov::get< char >(expression.front()), rightOperand);
     }
-    else
+    if (operands.size() != 1)
     {
-      operands.push(rychkov::get< int >(expression.front()));
+      std::cerr << "missing operator\n";
+      return 1;
     }
+    results.push(operands.top());
   }
-  if (operands.size() != 1)
+
+  char space[2] = "\0";
+  if (!results.empty())
   {
-    std::cerr << "missing operator\n";
-    return 1;
+    while (!results.empty())
+    {
+      std::cout << space << results.top();
+      space[0] = ' ';
+      results.pop();
+    }
+    std::cout << '\n';
   }
-  std::cout << operands.top() << '\n';
 }
