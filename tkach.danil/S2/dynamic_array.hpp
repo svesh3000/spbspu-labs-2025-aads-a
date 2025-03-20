@@ -2,6 +2,7 @@
 #define DYNAMIC_ARRAY_HPP
 
 #include <utility>
+#include <cstddef>
 
 namespace
 {
@@ -96,7 +97,7 @@ namespace tkach
   template< class Q>
   void DynArray< T >::push(Q&& data)
   {
-    T* new_data = new T[size_ + 1];;
+    T* new_data = new T[size_ + 1];
     try
     {
       for (size_t i = 0; i < size_; ++i)
