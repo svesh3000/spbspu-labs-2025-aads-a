@@ -268,6 +268,7 @@ namespace
         long long val1 = stack.top();
         stack.pop();
         long long val2 = stack.top();
+        stack.pop();
         if (isOverflowed(temp, val2, val1))
         {
           throw std::overflow_error("overflow");
@@ -286,7 +287,7 @@ namespace
         }
         else if (temp == "/")
         {
-          stack.push(val2 / val1 - 1 * (val2 % val1 != 0) * (!isSameSign(val1, val2)));
+          stack.push(val2 / val1);
         }
         else if (temp == "%")
         {
