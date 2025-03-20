@@ -1,3 +1,6 @@
+#ifndef STACK_HPP
+#define STACK_HPP
+
 #include <cstddef>
 #include <stdexcept>
 
@@ -73,7 +76,7 @@ namespace karnauhova
   template< typename T >
   Stack< T >::~Stack()
   {
-    delete data_;
+    delete[] data_;
   }
 
   template< typename T >
@@ -96,6 +99,7 @@ namespace karnauhova
     {
       new_data[i] = data_[i];
     }
+    size_ += add_size;
     delete[] data_;
     data_ = new_data;
   }
@@ -105,7 +109,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty stack for pop");
     }
     count_element_--;
   }
@@ -125,7 +129,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty stack for top");
     }
     return data_[count_element_ - 1];
   }
@@ -135,7 +139,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty stack for top");
     }
     return data_[count_element_ - 1];
   }
@@ -148,3 +152,5 @@ namespace karnauhova
     std::swap(data_, other.data_);
   }
 }
+
+#endif

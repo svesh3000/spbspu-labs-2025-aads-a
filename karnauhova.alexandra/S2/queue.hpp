@@ -1,3 +1,6 @@
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
+
 #include <cstddef>
 #include <stdexcept>
 
@@ -150,7 +153,10 @@ namespace karnauhova
     {
       new_data[i] = data_[i];
     }
+    size_ += add_size;
     delete[] data_;
     data_ = new_data;
   }
 }
+
+#endif
