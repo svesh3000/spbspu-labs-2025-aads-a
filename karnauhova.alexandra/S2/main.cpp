@@ -31,7 +31,7 @@ long long int calculator(long long int first, long long int second, std::string 
     {
       throw std::logic_error("Dividing by zero!");
     }
-    return first % second;
+    return std::abs(first) % second;
   }
   return first - second;
 }
@@ -43,6 +43,7 @@ long long int proc_post(karnauhova::Queue< std::string > post)
   long long int second = 0;
   while (!post.empty())
   {
+    
     std::string element = post.front();
     first = std::stoll(element);
     post.pop();
@@ -60,13 +61,39 @@ long long int proc_post(karnauhova::Queue< std::string > post)
       second = std::stoll(element);
       post.pop();
       element = post.front();
-      sum += calculator(first, second, element);
+      try
+      {
+        std::stoll(element);
+        post.pop();
+        std::string oper = post.front();
+        post.pop();
+        second = calculator(second, std::stoll(element), oper);
+        element = post.front();
+        sum += calculator(first, second, element);
+        post.pop();
+      }
+      catch(const std::exception& e)
+      {
+        post.pop();
+        std::string it = post.front();
+        try
+        {
+          std::stoll(it);
+          sum += calculator(first, second, element);
+        }
+        catch(const std::exception& e)
+        {
+          post.pop();
+          second = calculator(first, second, element);
+          sum = calculator(sum, second, it);
+        }
+      }
     }
     else
     {
-      sum += calculator(sum, first, element);
+      sum = calculator(sum, first, element);
+      post.pop();
     }
-    post.pop();
   }
   return sum;
 }
@@ -130,13 +157,13 @@ int main(int argc, char** argv)
     {
       calc = input_str(std::cin);
     }
+    output_sums(std::cout, calc);
   }
   catch(const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;
   }
-  output_sums(std::cout, calc);
   return 0;
 }
 

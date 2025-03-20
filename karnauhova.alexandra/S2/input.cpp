@@ -68,7 +68,7 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
         post.push(last);
         symbols.pop();
       }
-      symbols.push(element);
+      symbols.pop();
       inf.pop();
       continue;
     }
@@ -85,7 +85,7 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
   }
   if (symbols.empty())
   {
-    throw std::logic_error("Incorrect 3");
+    return post;
   }
   post.push(symbols.top());
   symbols.pop();
