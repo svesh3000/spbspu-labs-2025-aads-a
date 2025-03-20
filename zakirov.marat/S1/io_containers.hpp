@@ -4,11 +4,17 @@
 #include <cstring>
 #include <utility>
 #include <iostream>
+#include "fwd_list.hpp"
+#include "fwd_iterator.hpp"
 
-using pair_strlist = std::pair< std::string, std::forward_list< unsigned long long > >;
-using list_ull = std::forward_list< unsigned long long >;
-using list_pair = std::forward_list< std::pair< std::string, std::forward_list< unsigned long long> > >;
-using list_iter = std::forward_list< list_ull::iterator >;
+using list_ull = zakirov::FwdList< unsigned long long >;
+using list_ull_it = zakirov::FwdIterator< unsigned long long >;
+using it_to_it = zakirov::FwdIterator<list_ull_it>;
+using pair_strlist = std::pair< std::string, list_ull >;
+using list_pair = zakirov::FwdList< pair_strlist >;
+using list_pair_it = zakirov::FwdIterator< pair_strlist >;
+using list_iter = zakirov::FwdList< list_ull_it >;
+using list_iter_it = zakirov::FwdIterator< zakirov::FwdIterator< list_ull > >;
 
 namespace zakirov
 {

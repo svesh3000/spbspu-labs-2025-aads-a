@@ -5,7 +5,7 @@
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list< unsigned long long > > > forward_list;
+  zakirov::FwdList< std::pair< std::string, zakirov::FwdList< unsigned long long > > > forward_list;
   zakirov::get_list_pair(std::cin, forward_list);
   try
   {

@@ -16,13 +16,17 @@ namespace zakirov
     template< typename InputIterator >
     FwdList(InputIterator first, InputIterator second);
     FwdList(std::initializer_list< T > init_list);
+    FwdList(const FwdList & other);
     ~FwdList();
     FwdList< T > & operator=(const FwdList< T > &);
-    FwdList< T > & operator=(const FwdList< T > &&);
+    FwdList< T > & operator=(FwdList< T > &&);
     FwdList< T > & operator=(std::initializer_list< T > init_list); 
     FwdListNode< T > * front();
     FwdIterator< T > begin();
+    FwdIterator< T > cbegin() const;
+    FwdIterator< T > before_begin();
     FwdIterator< T > end();
+    FwdIterator< T > cend() const;
     void pop_front();
     void push_front(const T & data);
     void push_front(const T && data);
@@ -54,13 +58,12 @@ namespace zakirov
   }
 
   template< typename T >
-  FwdList< T >::FwdList(size_t node_quantity, const T & data)
+  FwdList< T >::FwdList(size_t node_quantity, const T & data):
+    FwdList()
   {
-    FwdList();
     for (size_t i = 0; i < node_quantity; ++i)
     {
       push_front(data);
-
     }
   }
 
@@ -88,6 +91,17 @@ namespace zakirov
   }
 
   template< typename T >
+  FwdList< T >::FwdList(const FwdList & other): 
+    FwdList()
+  {
+    FwdIterator< T > inserter = before_begin();
+    for (FwdIterator< T > i = other.cbegin(); i != other.cend(); ++i, ++inserter)
+    {
+      insert_after(inserter, *i);
+    }
+  }
+
+  template< typename T >
   FwdList< T >::~FwdList()
   {
     clear();
@@ -108,11 +122,16 @@ namespace zakirov
   }
 
   template< typename T >
-  FwdList< T > & FwdList< T >::operator=(const FwdList< T > && fwdlst)
+  FwdList< T > & FwdList< T >::operator=(FwdList< T > && fwdlst)
   {
-    FwdList< T > * temporary_node = fake_node_;
-    fake_node_ = fwdlst.fake_node_;
-    fwdlst.fake_node_ = temporary_node;
+    if (this != &fwdlst)
+    {
+      FwdList< T > * temporary_node = fake_node_;
+      fake_node_ = fwdlst.fake_node_;
+      fwdlst.fake_node_ = temporary_node;
+    }
+
+    return *this;
   }
 
   template< typename T >
@@ -134,7 +153,25 @@ namespace zakirov
   }
 
   template< typename T >
+  FwdIterator< T > FwdList< T >::cbegin() const
+  {
+    return FwdIterator< T >(fake_node_->next_);
+  }
+
+  template< typename T >
+  FwdIterator< T > FwdList< T >::before_begin()
+  {
+    return FwdIterator< T >(fake_node_);
+  }
+
+  template< typename T >
   FwdIterator< T > FwdList< T >::end()
+  {
+    return FwdIterator< T >(fake_node_);
+  }
+
+  template< typename T >
+  FwdIterator< T > FwdList< T >::cend() const
   {
     return FwdIterator< T >(fake_node_);
   }
@@ -199,7 +236,7 @@ namespace zakirov
     while (nailed_ptr != fillable_ptr)
     {
       ++counter;
-      fillable_ptr->next_;
+      fillable_ptr = fillable_ptr->next_;
     }
 
     return counter;

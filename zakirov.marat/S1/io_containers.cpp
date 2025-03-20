@@ -3,11 +3,14 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include "fwd_iterator.hpp"
+#include "fwd_list_node.hpp"
+#include "fwd_list.hpp"
 
 void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 {
   std::string sequence_name;
-  list_pair::iterator fillable_iterator = forward_list.before_begin();
+  list_pair_it fillable_iterator = forward_list.before_begin();
   while (in >> sequence_name && !in.eof())
   {
     list_ull sequence_num;
@@ -21,7 +24,7 @@ void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 void zakirov::get_list_ull(std::istream & in, list_ull & forward_list)
 {
   unsigned long long int sequence_element = 0;
-  list_ull::iterator fillable_iterator = forward_list.before_begin();
+  list_ull_it fillable_iterator = forward_list.before_begin();
   while (in >> sequence_element)
   {
     forward_list.insert_after(fillable_iterator, sequence_element);
@@ -38,20 +41,19 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   }
 
   list_iter list_iterators;
-  list_iter::iterator iter_list = list_iterators.before_begin();
-  list_pair::iterator pair_iter = forward_list.begin();
-  unsigned long long int number_sum = 0;
+  it_to_it iter_list = list_iterators.before_begin();
+  list_pair_it pair_iter = forward_list.begin();
+  unsigned long long number_sum = 0;
   size_t list_size = 0;
   size_t deleted = 0;
-  while (pair_iter != forward_list.end())
+
+  for (list_pair_it i = forward_list.begin(); i != forward_list.end(); ++i, ++iter_list)
   {
-    list_iterators.insert_after(iter_list, (* pair_iter).second.begin());
-    ++iter_list;
-    ++pair_iter;
+    list_iterators.insert_after(iter_list, (*i).second.begin());
     ++list_size;
   }
 
-  list_pair::iterator output_iter = forward_list.begin();
+  list_pair_it output_iter = forward_list.begin();
   out << (* output_iter).first;
   ++output_iter;
   for (; output_iter != forward_list.end(); ++output_iter)
@@ -61,7 +63,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
   out << '\n';
   list_ull list_added;
-  list_ull::iterator iter_added = list_added.before_begin();
+  list_ull_it iter_added = list_added.before_begin();
   bool flag_overflow = false;
 
   while (deleted != list_size)

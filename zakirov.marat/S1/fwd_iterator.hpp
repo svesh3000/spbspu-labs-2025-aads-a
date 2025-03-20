@@ -40,7 +40,7 @@ namespace zakirov
   template< typename T >
   T * FwdIterator< T >::operator->()
   {
-    return std::addressof(node_->data);
+    return std::addressof(node_->data_);
   }
 
   template< typename T >
@@ -98,7 +98,7 @@ namespace zakirov
   template< typename T >
   T * CFwdIterator< T >::operator->()
   {
-    return std::addressof(node_->data);
+    return std::addressof(node_->data_);
   }
 
   template< typename T >
