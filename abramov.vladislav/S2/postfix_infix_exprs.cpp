@@ -1,15 +1,22 @@
-#include "postfix_infix_exprs.cpp"
+//#include "postfix_infix_exprs.cpp"
+#include <iostream>
 #include <string>
 #include <sstream>
+#include <limits>
 #include "stack.hpp"
 #include "queue.hpp"
+
+namespace abramov
+{
+  std::istream &calcInfix(std::istream &in);
+}
 
 namespace
 {
   constexpr long long int max = std::numeric_limits< long long int >::max();
   constexpr long long int min = std::numeric_limits< long long int >::min();
 
-  long long int *expandArray(long long int *data, size_t &k)
+  long long int *expArray(long long int *data, size_t &k)
   {
     long long int *array = new long long int[k * 2];
     for (size_t i = 0; i < k; ++i)
@@ -25,11 +32,12 @@ namespace
     std::stoll(s);
     for (auto it = s.begin(); it != s.end(); ++it)
     {
-      if (!std::isdigit(*it)
+      if (!std::isdigit(*it))
       {
         throw std::logic_error("Not a number\n");
       }
     }
+    return true;
   }
 
   abramov::Queue< std::string > *getPostfix(const std::string &s)
@@ -43,9 +51,9 @@ namespace
     }
     abramov::Stack< std::string > stack;
     abramov::Queue< std::string > *queue_postfix = new abramov::Queue< std::string >;
+    bool bracket = false;
     while(!queue_infix.empty())
     {
-      bool bracket = false;
       std::string temp = *queue_infix.front();
       queue_infix.pop();
       if (temp == "(")
@@ -61,7 +69,7 @@ namespace
         }
         while (*stack.top() != "(")
         {
-          queue_postfix.push(*stack.top());
+          queue_postfix->push(*stack.top());
           stack.pop();
         }
         stack.pop();
@@ -69,7 +77,7 @@ namespace
       }
       else if (isNumber(temp))
       {
-        queue_postfix.push(temp);
+        queue_postfix->push(temp);
       }
       else if (temp == "+" || temp == "-")
       {
@@ -77,7 +85,7 @@ namespace
         {
           if (*stack.top() != "(")
           {
-            queue_postfix.push(*stack.top());
+            queue_postfix->push(*stack.top());
             stack.pop();
           }
         }
@@ -89,7 +97,7 @@ namespace
         {
           if (*stack.top() == "*" || *stack.top() == "/" || *stack.top() == "%")
           {
-            queue_postfix.push(*stack.top());
+            queue_postfix->push(*stack.top());
             stack.pop();
           }
         }
@@ -102,7 +110,7 @@ namespace
     }
     while (!stack.empty())
     {
-      queue_postfix.push(*stack.top())
+      queue_postfix->push(*stack.top());
     }
     if (bracket)
     {
@@ -113,11 +121,11 @@ namespace
 
   int sign(long long int a)
   {
-    if (val > 0)
+    if (a > 0)
     {
       return 1;
     }
-    else if (val < 0)
+    else if (a < 0)
     {
       return -1;
     }
@@ -167,7 +175,7 @@ namespace
     {
       return a - b;
     }
-    else if (!same_sign(a, b)
+    else if (!same_sign(a, b))
     {
       return a - b;
     }
@@ -207,7 +215,7 @@ namespace
     }
     else if (same_sign(a, b) && a < 0 && a != min && b != -1ll)
     {
-      return a / b
+      return a / b;
     }
     else
     {
@@ -234,51 +242,50 @@ namespace
     {
       return quot(a, b);
     }
-    else if (op == "%")
+    else
     {
       return a % b;
     }
-    throw std::logic_error("Not supported operation\n");
   }
 
-  long long int caclPostfix(abramov::Queue< std::string > *queue)
+  long long int calcPostfix(abramov::Queue< std::string > *queue)
   {
     abramov::Stack< long long int > stack;
     std::string temp;
-    while(!queue.empty())
+    while(!queue->empty())
     {
-      temp = *queue.front();
-      queue.pop();
+      temp = *queue->front();
+      queue->pop();
       if (isNumber(temp))
       {
-        stack.push(std::stoll(s));
+        stack.push(std::stoll(temp));
       }
       else
       {
         long long int num_r = *stack.top();
         stack.pop();
         long long int num_l = *stack.top();
-        stack.pop()
-        stack.push(doOperation(num_l, num_r, temp);
+        stack.pop();
+        stack.push(doOperation(num_l, num_r, temp));
       }
     }
     if (stack.size() != 1)
     {
-      throw std::logic_error("Wrong expression);
+      throw std::logic_error("Wrong expression\n");
     }
     return *stack.top();
   }
 
   long long int calcExpr(const std::string &s)
   {
-    abramov::Queue< std::string > postfix = getPostfix(s);
+    abramov::Queue< std::string > *postfix = getPostfix(s);
     return calcPostfix(postfix);
   }
 }
 
 std::istream &abramov::calcInfix(std::istream &in)
 {
-  constexpr size_t k = 10;
+  size_t k = 10;
   size_t count = 0;
   long long int *results = new long long int[k];
   std::string s;
@@ -291,7 +298,7 @@ std::istream &abramov::calcInfix(std::istream &in)
     }
     if (count == k)
     {
-      long long int *new_results = expandArray(results, k);
+      long long int *new_results = expArray(results, k);
       delete[] results;
       results = new_results;
     }
@@ -315,4 +322,5 @@ std::istream &abramov::calcInfix(std::istream &in)
   }
   std::cout << results[0] << "\n";
   delete[] results;
+  return in;
 }

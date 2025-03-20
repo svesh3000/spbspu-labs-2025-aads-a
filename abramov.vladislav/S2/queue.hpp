@@ -32,7 +32,7 @@ namespace abramov
   namespace
   {
     template< class T >
-    T **expandArray(T **data, size_t &capacity)
+    T **expandArr(T **data, size_t &capacity)
     {
       constexpr size_t k = 100;
       T **array = new T*[capacity + k];
@@ -117,7 +117,7 @@ namespace abramov
   {
     if (capacity_ == size_)
     {
-      T **new_data = expandArray(data_, capacity_);
+      T **new_data = expandArr(data_, capacity_);
       delete[] data_;
       data_ = new_data;
     }
