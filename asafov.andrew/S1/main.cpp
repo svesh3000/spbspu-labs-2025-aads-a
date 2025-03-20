@@ -14,7 +14,7 @@ int main()
     {
       asafov::outputSequences(sequences, std::cout);
     }
-    catch (const std::overflow_error)
+    catch (const std::overflow_error&)
     {
       std::cerr << "owerflow!";
       return 1;
