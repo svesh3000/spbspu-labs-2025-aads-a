@@ -469,13 +469,7 @@ namespace gavrilova {
   template< class T>
   void FwdList< T >::assign(std::initializer_list< T > init)
   {
-    FwdList< T > temporary;
-    auto it_temp = temporary.begin();
-    for (const T& value : init) {
-      temporary.insert(it_temp, value);
-      ++it_temp;
-    }
-    swap(temporary);
+    assign(init.begin(), init.end());
   }
 
   template< class T>
