@@ -42,6 +42,9 @@ int main(int argc, char* argv[])
     }
   }
 
+  if (results.empty()) {
+    std::cout << "\n";
+  }
   std::cout << results.top();
   results.pop();
   while (!results.empty()) {
