@@ -27,7 +27,8 @@ void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
   {
     return;
   }
-  for (; i < --max_size; ++i)
+  --max_size;
+  for (; i < max_size; ++i)
   {
     outputProcessOne(out, list, i);
     out << "\n";

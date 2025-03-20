@@ -94,7 +94,7 @@ namespace alymova
 
     void push_single(detail::ListNode< T >* node);
     detail::ListNode< T >* get_last_node();
-    void push_back_value(T value);
+    void push_back_value(T&& value);
   };
 
   template< typename T >
@@ -794,7 +794,7 @@ namespace alymova
   }
 
   template< typename T >
-  void List< T >::push_back_value(T value)
+  void List< T >::push_back_value(T&& value)
   {
     auto node = new detail::ListNode< T >{std::move(value), nullptr, nullptr};
     if (empty())
