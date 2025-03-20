@@ -48,6 +48,7 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
 {
   //std::cout << RED << "outputSequences(begin)" << RESET << std::endl;
+  if (sequences.cbegin()->second.empty()) std::cout << sequences.cbegin()->first << "\n0\n";
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();

@@ -10,7 +10,15 @@ int main()
   }
   else
   {
-    asafov::outputSequences(sequences, std::cout);
+    try
+    {
+      asafov::outputSequences(sequences, std::cout);
+    }
+    catch (const std::overflow_error)
+    {
+      std::cerr << "owerflow!";
+      return 1;
+    }
   }
   return 0;
 }
