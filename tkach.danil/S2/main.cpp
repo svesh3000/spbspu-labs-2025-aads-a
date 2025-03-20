@@ -150,7 +150,6 @@ namespace
           {
             post_queue.push(stack_temp);
             stack.pop();
-            stack_temp = stack.top();
           }
           else
           {
