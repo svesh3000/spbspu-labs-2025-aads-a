@@ -98,7 +98,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty queue");
+      throw std::logic_error("empty queue for pop");
     }
     for (size_t i = 1; i < count_element_; i++)
     {
@@ -122,7 +122,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty queue");
+      throw std::logic_error("empty queue for back");
     }
     return data_[count_element_ - 1];
   }
@@ -132,7 +132,7 @@ namespace karnauhova
   {
     if (empty())
     {
-      throw std::logic_error("empty queue");
+      throw std::logic_error("empty queue for front");
     }
     return data_[0];
   }

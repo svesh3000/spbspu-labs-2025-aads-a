@@ -75,17 +75,24 @@ long long int proc_post(karnauhova::Queue< std::string > post)
       catch(const std::exception& e)
       {
         post.pop();
-        std::string it = post.front();
-        try
+        if (!post.empty())
         {
-          std::stoll(it);
-          sum += calculator(first, second, element);
+          std::string it = post.front();
+          try
+          {
+            std::stoll(it);
+            sum += calculator(first, second, element);
+          }
+          catch(const std::exception& e)
+          {
+            post.pop();
+            second = calculator(first, second, element);
+            sum = calculator(sum, second, it);
+          }
         }
-        catch(const std::exception& e)
+        else
         {
-          post.pop();
-          second = calculator(first, second, element);
-          sum = calculator(sum, second, it);
+          sum += calculator(first, second, element);
         }
       }
     }
