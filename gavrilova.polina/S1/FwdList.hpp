@@ -240,17 +240,9 @@ namespace gavrilova {
   template< class T >
   void FwdList< T >::remove(const T &value) noexcept
   {
-    NodeFwdList<T> *current = fake_;
-    while (current->next != fake_) {
-      if (current->next->data == value) {
-        NodeFwdList<T> *temp = current->next;
-        current->next = current->next->next;
-        delete temp;
-        --nodeCount_;
-      } else {
-        current = current->next;
-      }
-    }
+    remove_if([&value](const T& data) {
+      return data == value;
+    });
   }
 
   template< class T >
@@ -466,10 +458,11 @@ namespace gavrilova {
   void FwdList< T >::assign(InputIt first, InputIt last)
   {
     FwdList< T > temporary;
+    auto it_temp = temporary.begin();
     for (auto it = first; it != last; ++it) {
-      temporary.push_front(*it);
+      temporary.insert(it_temp, *it);
+      ++it_temp;
     }
-    temporary.reverse();
     swap(temporary);
   }
 
@@ -477,10 +470,11 @@ namespace gavrilova {
   void FwdList< T >::assign(std::initializer_list< T > init)
   {
     FwdList< T > temporary;
+    auto it_temp = temporary.begin();
     for (const T& value : init) {
-      temporary.push_front(value);
+      temporary.insert(it_temp, value);
+      ++it_temp;
     }
-    temporary.reverse();
     swap(temporary);
   }
 
@@ -501,8 +495,7 @@ namespace gavrilova {
   template< class T>
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, T&& value)
   {
-    T value_for_move {std::move(value)};
-    return insert (pos, value_for_move);
+    return insert (pos, std::move(value));
   }
 
   template< class T>
