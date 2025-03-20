@@ -1,8 +1,6 @@
 #include "sequencefunctions.h"
 #include <stdexcept>
 
-#define var_name(var) #var
-
 static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const_iterator* ends, size_t size)
 {
   for (size_t i = 0; i < size; i++)
@@ -32,7 +30,6 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
       {
         break;
       }
-      //std::cout << RED << var_name(temp) << ' ' << RESET << std::flush;
       list.push_back(temp);
     }
     if (!in.eof())
@@ -40,7 +37,6 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
       in.clear();
     }
     sequence_t pair = std::make_pair(name, list);
-    //std::cout << RED << var_name(pair) << ' '  << RESET<< std::flush;
     sequences.push_back(pair);
   } while (!in.eof());
 }
@@ -77,9 +73,9 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     {
       if (begins[i] != ends[i])
       {
-        sum += *begins[i];////////////////////////
+        sum += *begins[i];
         if (sum < *begins[i]) throw std::overflow_error("owerflow!");
-        out << *begins[i] << ' ' << std::flush;////////////
+        out << *begins[i] << ' ' << std::flush;
         ++begins[i++];
       }
       else
@@ -88,7 +84,6 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
       }
     }
     std::cout << '\n';
-    //std::cout << RED << var_name(sum) << RESET  << ' '<< std::flush;
     sums.push_back(sum);
   }
   for (auto it = sums.cbegin(); it != sums.cend(); ++it)
@@ -101,5 +96,4 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   }
   delete[] begins;
   delete[] ends;
-  //std::cout << RED << "outputSequences(end)\n" << RESET << std::flush;
 }
