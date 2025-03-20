@@ -9,7 +9,7 @@ namespace
 {
   size_t calcOfSize(pairedList pairsList)
   {
-    size_t maxSize = 0; 
+    size_t maxSize = 0;
 
     for (const auto& pair : pairsList)
     {
