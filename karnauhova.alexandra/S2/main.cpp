@@ -43,7 +43,7 @@ long long int proc_post(karnauhova::Queue< std::string > post)
   long long int second = 0;
   while (!post.empty())
   {
-    
+
     std::string element = post.front();
     first = std::stoll(element);
     post.pop();
