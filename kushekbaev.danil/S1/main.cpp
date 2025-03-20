@@ -9,7 +9,7 @@ namespace
 {
   size_t calcOfSize(pairedList pairsList)
   {
-    size_t maxSize = 0;
+    size_t maxSize = 0; 
 
     for (const auto& pair : pairsList)
     {
@@ -31,10 +31,11 @@ int main()
     unsigned long long value = 0;
     while (std::cin >> value)
     {
-      inputValueList.push_front(value);
+      inputValueList.push_back(value);
     }
-    pairsList.push_front(std::make_pair(listNumber, inputValueList));
+    pairsList.push_back(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 
   if (pairsList.empty())
@@ -61,10 +62,7 @@ int main()
       if (i < it->second.size())
       {
         auto valueIt = it->second.begin();
-        for (size_t j = 0; j < i; j++)
-        {
-          ++valueIt;
-        }
+        std::advance(valueIt, i);
         rowList.push_back(*valueIt);
       }
     }
