@@ -16,7 +16,7 @@ namespace mozhegova
     List(const List< T > &);
     List(List< T > &&);
     List(size_t, const T &);
-    List(std::initializer_list< T >);
+    explicit List(std::initializer_list< T >);
     List(ConstIterator< T > first, ConstIterator< T > last);
     ~List();
 
@@ -309,8 +309,34 @@ namespace mozhegova
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x)
   {
-    insert(pos, x.cbegin(), x.cend());
-    x.clear();
+    if (x.empty())
+    {
+      return;
+    }
+    if (empty())
+    {
+      swap(x);
+      return;
+    }
+    detail::Node< T > * head = x.fake_->next_;
+    delete head->prev_;
+    detail::Node< T > * tempNode = pos.node_;
+    tempNode->prev_->next_ = head;
+    head->prev_ = tempNode->prev_;
+    x.tail_->next_ = tempNode;
+    tempNode->prev_ = x.tail_;
+    if (fake_->next_ == tempNode)
+    {
+      fake_->next_ = head;
+    }
+    if (tail_ == tempNode->prev_)
+    {
+      tail_ = x.tail_;
+    }
+    size_ += x.size_;
+    x.fake_ = nullptr;
+    x.tail_ = nullptr;
+    x.size_ = 0;
   }
 
   template< typename T >
@@ -322,8 +348,16 @@ namespace mozhegova
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > i)
   {
-    insert(pos, *i);
-    x.erase(i);
+    detail::Node< T > * newNode = i.node_;
+    detail::Node< T > * tempNode = pos.node_;
+    newNode->prev_->next_ = newNode->next_;
+    newNode->next_->prev_ = newNode->prev_;
+    tempNode->prev_->next_ = newNode;
+    newNode->prev_ = tempNode->prev_;
+    newNode->next_ = tempNode;
+    tempNode->prev_ = newNode;
+    size_++;
+    x.size_--;
   }
 
   template< typename T >
@@ -335,8 +369,32 @@ namespace mozhegova
   template< typename T >
   void List< T >::splice(ConstIterator< T > pos, List< T > & x, ConstIterator< T > first, ConstIterator< T > last)
   {
-    insert(pos, first, last);
-    x.erase(first, last);
+    size_t count = 0;
+    for (auto it = first; it != last; ++it)
+    {
+      count++;
+    }
+    detail::Node< T > * firstNode = first.node_;
+    detail::Node< T > * lastNode = last.node_;
+    detail::Node< T > * tempNode = pos.node_;
+    firstNode->prev_->next_ = lastNode;
+    if (lastNode != nullptr)
+    {
+      lastNode->prev_ = firstNode->prev_;
+    }
+    tempNode->prev_->next_ = firstNode;
+    firstNode->prev_ = tempNode->prev_;
+    if (lastNode != nullptr)
+    {
+      lastNode->next_ = tempNode;
+    }
+    else
+    {
+      x.tail_->next_ = tempNode;
+    }
+    tempNode->prev_ = lastNode;
+    size_ += count;
+    x.size_ -= count;
   }
 
   template< typename T >
@@ -410,16 +468,17 @@ namespace mozhegova
     }
     List< T > tempList(n, val);
     detail::Node< T > * head = tempList.fake_->next_;
-    delete head->prev_;
-    detail::Node< T > * tempNode = pos.node_;
-    tempNode->prev_->next_ = head;
-    head->prev_ = tempNode->prev_;
-    tempList.tail_->next_ = tempNode;
-    tempNode->prev_ = tempList.tail_;
-    size_ += n;
-    tempList.fake_ = nullptr;
-    tempList.tail_ = nullptr;
-    tempList.size_ = 0;
+    splice(pos, tempList);
+    // delete head->prev_;
+    // detail::Node< T > * tempNode = pos.node_;
+    // tempNode->prev_->next_ = head;
+    // head->prev_ = tempNode->prev_;
+    // tempList.tail_->next_ = tempNode;
+    // tempNode->prev_ = tempList.tail_;
+    // size_ += n;
+    // tempList.fake_ = nullptr;
+    // tempList.tail_ = nullptr;
+    // tempList.size_ = 0;
     return Iterator< T >(head);
   }
 
@@ -433,16 +492,17 @@ namespace mozhegova
     }
     List< T > tempList(first, last);
     detail::Node< T > * head = tempList.fake_->next_;
-    delete head->prev_;
-    detail::Node< T > * tempNode = pos.node_;
-    tempNode->prev_->next_ = head;
-    head->prev_ = tempNode->prev_;
-    tempList.tail_->next_ = tempNode;
-    tempNode->prev_ = tempList.tail_;
-    size_ += tempList.size_;
-    tempList.fake_ = nullptr;
-    tempList.tail_ = nullptr;
-    tempList.size_ = 0;
+    splice(pos, tempList);
+    // delete head->prev_;
+    // detail::Node< T > * tempNode = pos.node_;
+    // tempNode->prev_->next_ = head;
+    // head->prev_ = tempNode->prev_;
+    // tempList.tail_->next_ = tempNode;
+    // tempNode->prev_ = tempList.tail_;
+    // size_ += tempList.size_;
+    // tempList.fake_ = nullptr;
+    // tempList.tail_ = nullptr;
+    // tempList.size_ = 0;
     return Iterator< T >(head);
   }
 
@@ -461,16 +521,17 @@ namespace mozhegova
     }
     List< T > tempList(il);
     detail::Node< T > * head = tempList.fake_->next_;
-    delete head->prev_;
-    detail::Node< T > * tempNode = pos.node_;
-    tempNode->prev_->next_ = head;
-    head->prev_ = tempNode->prev_;
-    tempList.tail_->next_ = tempNode;
-    tempNode->prev_ = tempList.tail_;
-    size_ += tempList.size_;
-    tempList.fake_ = nullptr;
-    tempList.tail_ = nullptr;
-    tempList.size_ = 0;
+    splice(pos, tempList);
+    // delete head->prev_;
+    // detail::Node< T > * tempNode = pos.node_;
+    // tempNode->prev_->next_ = head;
+    // head->prev_ = tempNode->prev_;
+    // tempList.tail_->next_ = tempNode;
+    // tempNode->prev_ = tempList.tail_;
+    // size_ += tempList.size_;
+    // tempList.fake_ = nullptr;
+    // tempList.tail_ = nullptr;
+    // tempList.size_ = 0;
     return Iterator< T >(head);
   }
 
@@ -484,7 +545,7 @@ namespace mozhegova
       {
         temp.push_back(val);
       }
-      catch(const std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         temp.clear();
         throw;
@@ -503,7 +564,7 @@ namespace mozhegova
       {
         temp.push_back(*it);
       }
-      catch(const std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         temp.clear();
         throw;
@@ -522,7 +583,7 @@ namespace mozhegova
       {
         temp.push_back(*it);
       }
-      catch(const std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         temp.clear();
         throw;

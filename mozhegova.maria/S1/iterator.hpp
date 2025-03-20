@@ -37,7 +37,7 @@ namespace mozhegova
   private:
     detail::Node< T > * node_;
 
-    Iterator(detail::Node< T > * node);
+    explicit Iterator(detail::Node< T > * node);
   };
 
   template< typename T >
