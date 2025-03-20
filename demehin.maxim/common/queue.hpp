@@ -3,6 +3,7 @@
 #include <utility>
 #include <cstddef>
 #include <stdexcept>
+#include "data_utils.hpp"
 
 namespace demehin
 {
@@ -54,11 +55,7 @@ namespace demehin
   size_(rhs.size_),
   capacity_(rhs.capacity_)
   {
-    data_ = new T[capacity_];
-    for (size_t i = 0; i < size_; i++)
-    {
-      data_[i] = rhs.data_[i];
-    }
+    data_ = details::copyData(rhs.data_, rhs.size_);
   }
 
   template< typename T >
@@ -71,7 +68,7 @@ namespace demehin
   template< typename T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
   {
-    if (this != & rhs)
+    if (this != &rhs)
     {
       Queue< T > temp(rhs);
       std::swap(data_, temp.data_);
@@ -161,11 +158,7 @@ namespace demehin
   void Queue< T >::resize()
   {
     capacity_ *= 2;
-    T* newData = new T[capacity_];
-    for (size_t i = 0; i < size_; i++)
-    {
-      newData[i] = data_[i];
-    }
+    T* newData = details::copyData(data_, capacity_);
     delete[] data_;
     data_ = newData;
   }
