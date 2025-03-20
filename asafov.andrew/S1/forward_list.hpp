@@ -1,5 +1,5 @@
-#ifndef FL6A_HPP
-#define FL6A_HPP
+#ifndef FORWARD_LIST_6A_HPP
+#define FORWARD_LIST_6A_HPP
 #include <memory>
 
 namespace asafov

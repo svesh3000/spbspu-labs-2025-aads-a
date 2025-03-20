@@ -2,7 +2,7 @@
 
 int main()
 {
-  sequence_list_t sequences;
+  asafov::sequence_list_t sequences;
   asafov::getSequences(sequences, std::cin);
   if (sequences.empty())
   {
