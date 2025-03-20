@@ -47,7 +47,11 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
       if (begins[i] != ends[i])
       {
         sum += *begins[i];
-        if (sum < *begins[i]) throw std::overflow_error("owerflow!");
+        if (sum < *begins[i])
+        {
+          sums.clear();
+          throw std::overflow_error("owerflow!");
+        }
         out << *begins[i] << ' ';
         ++begins[i++];
       }
