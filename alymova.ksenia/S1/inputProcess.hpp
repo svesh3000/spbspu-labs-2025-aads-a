@@ -10,7 +10,6 @@ namespace alymova
   using list_int_t = alymova::List< size_t >;
 
   void inputProcess(std::istream& in, list_pair_t& list);
-  void outputProcess(std::ostream& out, const list_pair_t& list);
   void outputProcessOne(std::ostream& out, const list_pair_t& list, size_t i);
   void outputListInt(std::ostream& out, const list_int_t& list);
   void outputListString(std::ostream& out, const list_pair_t& list);

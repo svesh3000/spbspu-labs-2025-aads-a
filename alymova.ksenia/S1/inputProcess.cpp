@@ -19,40 +19,24 @@ void alymova::inputProcess(std::istream& in, list_pair_t& list)
   }
 }
 
-void alymova::outputProcess(std::ostream& out, const list_pair_t& list)
-{
-  size_t max_size = findMaxListSize(list);
-  size_t i = 0;
-  if (max_size == 0)
-  {
-    return;
-  }
-  --max_size;
-  for (; i < max_size; ++i)
-  {
-    outputProcessOne(out, list, i);
-    out << "\n";
-  }
-  outputProcessOne(out, list, i);
-}
-
 void alymova::outputProcessOne(std::ostream& out, const list_pair_t& list, size_t i)
 {
   auto it = list.cbegin();
-  const list_int_t list_now = (*it).second;
-  if (list_now.size() > i)
+  while ((*it).second.size() <= i)
   {
-    auto list_now_it = list_now.cbegin();
-    getIIterator(list_now_it, i);
-    out << *list_now_it;
+    ++it;
   }
+  const list_int_t list_now = (*it).second;
+  auto list_now_it = list_now.cbegin();
+  getIIterator(list_now_it, i);
+  out << *list_now_it;
   ++it;
   for (; it != list.cend(); ++it)
   {
     const list_int_t list_now = (*it).second;
     if (list_now.size() > i)
     {
-      auto list_now_it = list_now.cbegin();
+      auto list_now_it = (*it).second.cbegin();
       getIIterator(list_now_it, i);
       out << " ";
       out << *list_now_it;
