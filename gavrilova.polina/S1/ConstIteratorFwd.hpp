@@ -22,13 +22,13 @@ namespace gavrilova {
     const T* operator->() const;
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
-    
+
   private:
-    NodeFwdList< T >* node_; 
+    NodeFwdList< T >* node_;
     friend class FwdList< T >;
     friend class IteratorFwd< T >;
     explicit ConstIteratorFwd(NodeFwdList< T >* node): node_(node) {};
-    ConstIteratorFwd(IteratorFwd<T>& other): node_(other.node_) {}; 
+    ConstIteratorFwd(IteratorFwd<T>& other): node_(other.node_) {};
   };
 }
 
