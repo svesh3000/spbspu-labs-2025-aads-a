@@ -18,6 +18,6 @@ namespace alymova
   size_t findMaxListSize(const list_pair_t& list);
   bool isOverflowSumInt(size_t a, size_t b);
   template< typename T >
-  void getIIterator(ConstIterator< T >& it, size_t i); 
+  void getIIterator(ConstIterator< T >& it, size_t i);
 }
 #endif
