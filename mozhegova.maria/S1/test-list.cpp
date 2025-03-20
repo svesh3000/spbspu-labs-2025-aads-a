@@ -128,17 +128,19 @@ BOOST_AUTO_TEST_CASE(splice)
   printList(out1, list1);
   BOOST_TEST(out1.str() == "1102030234");
   BOOST_TEST(list2.empty());
-  list2.splice(list2.cbegin(), list1, it);
+  mozhegova::List< int > list3({1, 2});
+  list3.splice(list3.cbegin(), list1, it);
   std::ostringstream out2;
   printList(out2, list1);
   BOOST_TEST(out2.str() == "110203034");
-  BOOST_TEST(list2.front() == 2);
-  it = list1.cbegin();
-  std::advance(it, 3);
-  list1.splice(list1.cbegin(), list1, it, list1.cend());
+  BOOST_TEST(list3.front() == 2);
+  it = list3.cbegin();
+  ++it;
+  list1.splice(list1.cbegin(), list3, it, list3.cend());
   std::ostringstream out3;
   printList(out3, list1);
-  BOOST_TEST(out3.str() == "303411020");
+  BOOST_TEST(out3.str() == "12110203034");
+  BOOST_TEST(list3.front() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(assign)

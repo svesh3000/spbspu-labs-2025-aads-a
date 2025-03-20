@@ -96,11 +96,12 @@ namespace
 
 int main()
 {
-  mozhegova::List< std::pair< std::string, mozhegova::List< unsigned long long > > > listOfPairs;
+  using namespace mozhegova;
+  List< std::pair< std::string, List< unsigned long long > > > listOfPairs;
   std::string nameList;
   while (std::cin >> nameList)
   {
-    mozhegova::List< unsigned long long > numList;
+    List< unsigned long long > numList;
     unsigned long long num = 0;
     while (std::cin >> num)
     {
@@ -129,7 +130,7 @@ int main()
     return 0;
   }
   printNums(std::cout, listOfPairs);
-  mozhegova::List< unsigned long long > sumList;
+  List< unsigned long long > sumList;
   try
   {
     sumList = calculateSum(listOfPairs);

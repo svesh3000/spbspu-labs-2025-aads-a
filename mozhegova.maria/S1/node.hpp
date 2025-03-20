@@ -10,7 +10,7 @@ namespace mozhegova::detail
     Node< T > * prev_;
     Node< T > * next_;
 
-    Node(const T & data):
+    explicit Node(const T & data):
       data_(data),
       prev_(nullptr),
       next_(nullptr)
