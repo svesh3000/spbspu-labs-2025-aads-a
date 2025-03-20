@@ -314,7 +314,7 @@ namespace
   //   while (!stack.empty())
   //   {
   //     out << " " << stack.top();
-  //     stack.pop(); 
+  //     stack.pop();
   //   }
   // }
 }
@@ -362,7 +362,7 @@ int main(const int argc, const char* const* const argv)
     while (!results.empty())
     {
       std::cout << " " << results.top();
-      results.pop(); 
+      results.pop();
     }
   }
   std::cout << "\n";

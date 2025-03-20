@@ -200,6 +200,6 @@ namespace tkach
   {
     return data_[0];
   }
-  
+
 }
 #endif
