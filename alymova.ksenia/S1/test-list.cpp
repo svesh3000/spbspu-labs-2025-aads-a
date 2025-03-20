@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   list_t list2(list1);
   BOOST_TEST(list1 == list2);
 
-  list_t list3(std::move(list_t(static_cast< size_t >(3), 1)));
+  list_t list3(std::move(list_t(3ull, 1)));
   BOOST_TEST(list3.size() == 3);
   BOOST_TEST(list3.front() == 1);
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   list3 = list4;
   BOOST_TEST(list3 == list4);
 
-  list4 = list_t(static_cast< size_t >(3), 1);
+  list4 = list_t(3ull, 1);
   BOOST_TEST(list4 == list5);
 
   list4 = {2, 2, 2};
@@ -36,13 +36,13 @@ BOOST_AUTO_TEST_CASE(test_list_iterators)
 {
   using list_t = alymova::List< int >;
 
-  list_t list(static_cast< size_t >(3), 1);
+  list_t list(3ull, 1);
   auto iter_b = list.begin();
   auto iter_e = list.end();
   BOOST_TEST(*iter_b == 1);
   BOOST_TEST(*iter_e == 0);
 
-  const list_t list1(static_cast< size_t >(2), 3);
+  const list_t list1(2ull, 3);
   auto citer_b = list1.cbegin();
   auto citer_e = list1.cend();
   BOOST_TEST(*citer_b == 3);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_base_interface)
   list.pop_back();
   BOOST_TEST(list.back() == 20);
 
-  const list_t list1(static_cast< size_t >(3), 1);
+  const list_t list1(3ull, 1);
   BOOST_TEST(list1.front() == 1);
   BOOST_TEST(list1.back() == 1);
 }
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
   list2.remove("cat");
   BOOST_TEST(list2.size() == 2);
 
-  list_t list3(static_cast< size_t >(5), 10);
+  list_t list3(5ull, 10);
   list3.push_back(1);
   list3.remove_if(is_divided_10< int >);
   BOOST_TEST(list3.size() == 1);
@@ -148,11 +148,11 @@ BOOST_AUTO_TEST_CASE(test_assign)
   using list_t = alymova::List< int >;
 
   list_t list1;
-  list1.assign(static_cast< size_t >(0), 1);
+  list1.assign(0ull, 1);
   BOOST_TEST(list1.empty());
 
-  list1.assign(static_cast< size_t >(5), 1);
-  list_t list_comp(static_cast< size_t >(5), 1);
+  list1.assign(5ull, 1);
+  list_t list_comp(5ull, 1);
   BOOST_TEST(list1 == list_comp);
 
   list_t list2{1, 2, 3};

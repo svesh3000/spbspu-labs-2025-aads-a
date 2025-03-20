@@ -1,7 +1,5 @@
 #include <iostream>
-#include <list>
-#include <sstream>
-#include <cctype>
+#include <limits>
 #include "inputProcess.hpp"
 #include "list.hpp"
 #include "iterators.hpp"
@@ -21,6 +19,7 @@ int main()
     outputListString(std::cout, list);
     std::cout << "\n";
     outputProcess(std::cout, list);
+    std::cout << "\n";
     list_int_t sums = countSums(list);
     if (sums.empty())
     {

@@ -6,15 +6,12 @@
 
 namespace alymova
 {
-  using namespace detail;
-
   template< typename T >
   struct Iterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    Iterator();
-    Iterator(ListNode< T >* node);
+    Iterator(detail::ListNode< T >* node);
     Iterator< T >& operator++() noexcept;
     Iterator< T > operator++(int) noexcept;
     Iterator< T >& operator--() noexcept;
@@ -23,19 +20,17 @@ namespace alymova
     bool operator!=(const Iterator< T >& other) const noexcept;
     T& operator*() noexcept;
     T* operator->() noexcept;
-    Iterator< T > next() const noexcept;
-    Iterator< T > prev() const noexcept;
   private:
     friend class List< T >;
-    ListNode< T >* node_;
+    detail::ListNode< T >* node_;
+    Iterator();
   };
   template< typename T >
   struct ConstIterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    ConstIterator();
-    ConstIterator(ListNode< T >* node);
+    ConstIterator(detail::ListNode< T >* node);
     ConstIterator< T >& operator++() noexcept;
     ConstIterator< T > operator++(int) noexcept;
     ConstIterator< T >& operator--() noexcept;
@@ -44,12 +39,10 @@ namespace alymova
     bool operator!=(const ConstIterator< T >& other) const noexcept;
     const T& operator*() noexcept;
     const T* operator->() noexcept;
-
-    ConstIterator< T > next() const noexcept;
-    ConstIterator< T > prev() const noexcept;
   private:
     friend class List< T >;
-    const ListNode< T >* node_;
+    const detail::ListNode< T >* node_;
+    ConstIterator();
   };
 
   template< typename T >
@@ -58,7 +51,7 @@ namespace alymova
   {}
 
   template< typename T >
-  Iterator< T >::Iterator(ListNode< T >* node):
+  Iterator< T >::Iterator(detail::ListNode< T >* node):
     node_(node)
   {}
 
@@ -75,7 +68,7 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     Iterator< T > old = *this;
-    node_ = node_->next;
+    ++(*this);
     return old;
   }
 
@@ -92,7 +85,7 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     Iterator< T > old = *this;
-    node_ = node_->prev;
+    --(*this);
     return old;
   }
 
@@ -123,26 +116,12 @@ namespace alymova
   }
 
   template< typename T >
-  Iterator< T > Iterator< T >::next() const noexcept
-  {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
-    return {node_->next};
-  }
-
-  template< typename T >
-  Iterator< T > Iterator< T >::prev() const noexcept
-  {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
-    return {node_->prev};
-  }
-
-  template< typename T >
   ConstIterator< T >::ConstIterator():
     node_(nullptr)
   {}
 
   template< typename T >
-  ConstIterator< T >::ConstIterator(ListNode< T >* node):
+  ConstIterator< T >::ConstIterator(detail::ListNode< T >* node):
     node_(node)
   {}
 
@@ -159,7 +138,7 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     ConstIterator< T > old = *this;
-    node_ = node_->next;
+    ++(*this);
     return old;
   }
 
@@ -176,7 +155,7 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     ConstIterator< T > old = *this;
-    node_ = node_->prev;
+    --(*this);
     return old;
   }
 
@@ -204,20 +183,6 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     return std::addressof(node_->data);
-  }
-
-  template< typename T >
-  ConstIterator< T > ConstIterator< T >::next() const noexcept
-  {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
-    return {node_->next};
-  }
-
-  template< typename T >
-  ConstIterator< T > ConstIterator< T >::prev() const noexcept
-  {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
-    return {node_->prev};
   }
 }
 #endif

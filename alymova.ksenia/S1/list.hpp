@@ -10,8 +10,6 @@
 
 namespace alymova
 {
-  using namespace detail;
-
   template< typename T >
   struct Iterator;
   template< typename T >
@@ -91,11 +89,11 @@ namespace alymova
     void merge(List< T >& other, Predicate pred);
     void reverse() noexcept;
   private:
-    ListNode< T >* fake_;
-    ListNode< T >* head_;
+    detail::ListNode< T >* fake_;
+    detail::ListNode< T >* head_;
 
-    void push_single(ListNode< T >* node);
-    ListNode< T >* get_last_node();
+    void push_single(detail::ListNode< T >* node);
+    detail::ListNode< T >* get_last_node();
     void push_back_value(T value);
   };
 
@@ -174,7 +172,7 @@ namespace alymova
 
   template< typename T >
   List< T >::List():
-    fake_(new ListNode< T >{T(), nullptr, nullptr}),
+    fake_(new detail::ListNode< T >{T(), nullptr, nullptr}),
     head_(fake_)
   {}
 
@@ -374,14 +372,14 @@ namespace alymova
   template< typename T >
   void List< T >::push_front(const T& value)
   {
-    auto node = new ListNode< T >{value, nullptr, nullptr};
+    auto node = new detail::ListNode< T >{value, nullptr, nullptr};
     if (empty())
     {
       push_single(node);
     }
     else
     {
-      ListNode< T >* subhead = head_;
+      detail::ListNode< T >* subhead = head_;
       head_ = node;
       head_->next = subhead;
       subhead->prev = head_;
@@ -392,7 +390,7 @@ namespace alymova
   void List< T >::pop_front() noexcept
   {
     assert(!empty());
-    ListNode< T >* subhead = head_->next;
+    detail::ListNode< T >* subhead = head_->next;
     delete head_;
     head_ = subhead;
     head_->prev = nullptr;
@@ -401,14 +399,14 @@ namespace alymova
   template< typename T >
   void List< T >::push_back(const T& value)
   {
-    auto node = new ListNode< T >{value, nullptr, nullptr};
+    auto node = new detail::ListNode< T >{value, nullptr, nullptr};
     if (empty())
     {
       push_single(node);
     }
     else
     {
-      ListNode< T >* subhead = get_last_node();
+      detail::ListNode< T >* subhead = get_last_node();
       subhead->next = node;
       node->prev = subhead;
       node->next = fake_;
@@ -420,7 +418,7 @@ namespace alymova
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    ListNode< T >* subhead = get_last_node();
+    detail::ListNode< T >* subhead = get_last_node();
     if (size() == 1)
     {
       head_ = fake_;
@@ -448,8 +446,8 @@ namespace alymova
     }
     else
     {
-      auto node_new = new ListNode< T >{T(value), nullptr, nullptr};
-      ListNode< T >* node_now = position.node_;
+      auto node_new = new detail::ListNode< T >{T(value), nullptr, nullptr};
+      detail::ListNode< T >* node_now = position.node_;
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
@@ -471,8 +469,8 @@ namespace alymova
     }
     else
     {
-      auto node_new = new ListNode< T >{value, nullptr, nullptr};
-      ListNode< T >* node_now = position.node_;
+      auto node_new = new detail::ListNode< T >{value, nullptr, nullptr};
+      detail::ListNode< T >* node_now = position.node_;
       node_now->prev->next = node_new;
       node_new->prev = node_now->prev;
       node_now->prev = node_new;
@@ -516,7 +514,8 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::erase(Iterator< T > position)
   {
-    Iterator< T > return_it = position.next();
+    Iterator< T > return_it = ++position;
+    --position;
     if (position == begin())
     {
       pop_front();
@@ -527,7 +526,7 @@ namespace alymova
     }
     else
     {
-      ListNode< T >* node = position.node_;
+      detail::ListNode< T >* node = position.node_;
       node->prev->next = node->next;
       node->next->prev = node->prev;
       delete node;
@@ -540,7 +539,8 @@ namespace alymova
   {
     while (first != last)
     {
-      Iterator< T > next = first.next();
+      Iterator< T > next = ++first;
+      --first;
       Iterator< T > tmp_it = erase(first);
       tmp_it = last;
       first = next;
@@ -599,8 +599,8 @@ namespace alymova
     assert(other_it.node_ != nullptr && "Iterator is not valid");
     assert(other_it != other.end() && "Iterator is not valid");
 
-    ListNode< T >* node_now = position.node_;
-    ListNode< T >* other_node_now = other_it.node_;
+    detail::ListNode< T >* node_now = position.node_;
+    detail::ListNode< T >* other_node_now = other_it.node_;
     if (position == begin())
     {
       head_ = other_node_now;
@@ -629,7 +629,8 @@ namespace alymova
     auto other_it = first;
     while (other_it != last)
     {
-      Iterator< T > other_it_next = other_it.next();
+      Iterator< T > other_it_next = ++other_it;
+      --other_it;
       splice(position, other, other_it);
       other_it = other_it_next;
     }
@@ -638,7 +639,7 @@ namespace alymova
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {
-    remove_if(EqualNode< T >{value});
+    remove_if(detail::EqualNode< T >{value});
   }
 
   template< typename T >
@@ -649,7 +650,8 @@ namespace alymova
     auto it = begin();
     while (it != end())
     {
-      Iterator< T > it_next = it.next();
+      Iterator< T > it_next = ++it;
+      --it;
       if (pred(*it))
       {
         erase(it);
@@ -668,12 +670,13 @@ namespace alymova
   template< typename Predicate >
   void List< T >::unique(Predicate pred)
   {
-    ListNode< T >* subhead = head_;
+    detail::ListNode< T >* subhead = head_;
     auto it = begin();
     ++it;
     while (it != end() && it.node_ != nullptr)
     {
-      Iterator< T > it_next = it.next();
+      Iterator< T > it_next = ++it;
+      --it;
       if (pred(*it, subhead->data))
       {
         erase(it);
@@ -699,7 +702,8 @@ namespace alymova
     for (auto it1 = begin(); it1 != end(); ++it1)
     {
       auto min_it = it1;
-      auto it2 = it1.next();
+      auto it2 = ++it1;
+      --it1;
       for (; it2 != end(); ++it2)
       {
         if (pred(*it2, *min_it))
@@ -733,7 +737,8 @@ namespace alymova
     auto it = begin();
     while (!other.empty())
     {
-      auto it_other_next = it_other.next();
+      auto it_other_next = ++it_other;
+      --it_other;
       while (!pred(*it_other, *it) && it != end())
       {
         ++it;
@@ -755,12 +760,13 @@ namespace alymova
     head_->next = fake_;
     while (it != --end())
     {
-      auto it_next = it.next();
-      ListNode< T >* node = it.node_;
+      auto it_next = ++it;
+      --it;
+      detail::ListNode< T >* node = it.node_;
       std::swap(node->next, node->prev);
       it = it_next;
     }
-    ListNode< T >* tail = it.node_;
+    detail::ListNode< T >* tail = it.node_;
     std::swap(tail->next, tail->prev);
     tail->prev = nullptr;
     fake_->prev = head_;
@@ -768,7 +774,7 @@ namespace alymova
   }
 
   template< typename T >
-  void List< T >::push_single(ListNode< T >* node)
+  void List< T >::push_single(detail::ListNode< T >* node)
   {
     head_ = node;
     head_->next = fake_;
@@ -776,10 +782,10 @@ namespace alymova
   }
 
   template< typename T >
-  ListNode< T >* List< T >::get_last_node()
+  detail::ListNode< T >* List< T >::get_last_node()
   {
     assert(!empty());
-    ListNode< T >* subhead = head_;
+    detail::ListNode< T >* subhead = head_;
     for (auto it = ++begin(); it != end(); ++it)
     {
       subhead = subhead->next;
@@ -790,14 +796,14 @@ namespace alymova
   template< typename T >
   void List< T >::push_back_value(T value)
   {
-    auto node = new ListNode< T >{std::move(value), nullptr, nullptr};
+    auto node = new detail::ListNode< T >{std::move(value), nullptr, nullptr};
     if (empty())
     {
       push_single(node);
     }
     else
     {
-      ListNode< T >* subhead = get_last_node();
+      detail::ListNode< T >* subhead = get_last_node();
       subhead->next = node;
       node->prev = subhead;
       node->next = fake_;
