@@ -59,7 +59,7 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
         throw std::logic_error("Incorrect 1");
       }
       std::string last = symbols.top();
-      if (last != "(" || last != "+" || last != "/" || last != "-" || last != "*" || last != "%")
+      if (last != "(" && last != "+" && last != "/" && last != "-" && last != "*" && last != "%")
       {
         throw std::logic_error("Incorrect 2");
       }
