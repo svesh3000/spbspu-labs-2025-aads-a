@@ -7,7 +7,7 @@ using pairedList = kushekbaev::FwdList< std::pair<std::string, kushekbaev::FwdLi
 
 namespace
 {
-  size_t calcOfSize(pairedList pairsList)
+  size_t calcOfSize(const pairedList& pairsList)
   {
     size_t maxSize = 0;
 
@@ -25,17 +25,16 @@ int main()
   pairedList pairsList;
   std::string listNumber = "";
 
+  unsigned long long value = 0;
   while (std::cin >> listNumber)
   {
     kushekbaev::FwdList< unsigned long long > inputValueList;
-    unsigned long long value = 0;
     while (std::cin >> value)
     {
       inputValueList.push_back(value);
     }
     pairsList.push_back(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 
   if (pairsList.empty())
