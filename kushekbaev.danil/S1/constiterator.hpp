@@ -1,5 +1,5 @@
-#ifndef ITERATOR_HPP
-#define ITERATOR_HPP
+#ifndef CONSTITERATOR_HPP
+#define CONSTITERATOR_HPP
 
 #include <cassert>
 #include <iterator>
@@ -8,12 +8,12 @@
 namespace kushekbaev
 {
   template< typename T >
-  struct Iterator final: public std::iterator< std::forward_iterator_tag, T >
+  struct ConstIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
-    using this_t = Iterator< T >;
-    Iterator() noexcept;
-    explicit Iterator(Node< T >*) noexcept;
-    ~Iterator() = default;
+    using this_t = ConstIterator< T >;
+    ConstIterator() noexcept;
+    explicit ConstIterator(Node< T >* node) noexcept;
+    ~ConstIterator() = default;
 
     this_t& operator=(const this_t&) = default;
     this_t& operator++() noexcept;
@@ -30,17 +30,17 @@ namespace kushekbaev
   };
 
   template< typename T >
-  Iterator< T >::Iterator() noexcept:
+  ConstIterator< T >::ConstIterator() noexcept:
     node_(nullptr)
   {}
 
   template< typename T >
-  Iterator< T >::Iterator(Node< T >* node) noexcept:
+  ConstIterator< T >::ConstIterator(Node< T >* node) noexcept:
     node_(node)
   {}
 
   template< typename T >
-  Iterator< T >& Iterator< T >::operator++() noexcept
+  ConstIterator< T >& ConstIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_ -> next_;
@@ -48,36 +48,36 @@ namespace kushekbaev
   }
 
   template< typename T >
-  Iterator< T > Iterator< T >::operator++(int) noexcept
+  ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    Iterator< T > result(*this);
+    ConstIterator< T > result(*this);
     ++(*this);
     return result;
   }
 
   template< typename T >
-  T& Iterator< T >::operator*() const noexcept
+  T& ConstIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_ -> data_;
   }
 
   template< typename T >
-  T* Iterator< T >::operator->() const noexcept
+  T* ConstIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_ -> data_);
   }
 
   template< typename T >
-  bool Iterator< T >::operator!=(const this_t& other) const noexcept
+  bool ConstIterator< T >::operator!=(const this_t& other) const noexcept
   {
     return !(other == *this);
   }
 
   template< typename T >
-  bool Iterator< T >::operator==(const this_t& other) const noexcept
+  bool ConstIterator< T >::operator==(const this_t& other) const noexcept
   {
     return node_ == other.node_;
   }
