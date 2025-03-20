@@ -33,7 +33,7 @@ namespace
       return false;
     }
     size_t i = 0;
-    if (s[0] == '-')
+    if (s[0] == '-' && s.size() != 1)
     {
       ++i;
     }
@@ -103,7 +103,7 @@ namespace
     while (!in.eof())
     {
       tkach::Queue< std::string > temp_inf_expr;
-      inputInfix(std::cin, temp_inf_expr);
+      inputInfix(in, temp_inf_expr);
       if (!temp_inf_expr.empty())
       {
         queue.push(temp_inf_expr);
