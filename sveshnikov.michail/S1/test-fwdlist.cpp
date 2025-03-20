@@ -8,6 +8,14 @@ BOOST_AUTO_TEST_CASE(default_constructor)
   BOOST_TEST(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(fill_constructor)
+{
+  sveshnikov::FwdList< int > list1(10, 5);
+  BOOST_TEST(list1.getSize() == 10);
+  sveshnikov::FwdList< int > list2(0, 5);
+  BOOST_TEST(list2.getSize() == 0);
+}
+
 BOOST_AUTO_TEST_CASE(copy_constructor)
 {
   sveshnikov::FwdList< int > list;
@@ -119,5 +127,29 @@ BOOST_AUTO_TEST_CASE(clear)
   list.push_back(2);
   list.clear();
   BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(remove)
+{
+  sveshnikov::FwdList< int > list;
+  list.push_back(1);
+  list.remove(1);
+  BOOST_TEST(list.empty());
+  list.remove(1);
+  BOOST_TEST(list.empty());
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.remove(1);
+  BOOST_TEST(list.front() == 2);
+  list.remove(3);
+  BOOST_TEST(list.back() == 2);
+  list.remove(1);
+  BOOST_TEST(list.back() == 2);
+  sveshnikov::FwdList< int > list2(5, 6);
+  list2.push_back(1);
+  list2.push_back(2);
+  list2.remove(6);
+  BOOST_TEST(list2.getSize() == 2);
 }
 BOOST_AUTO_TEST_SUITE_END()
