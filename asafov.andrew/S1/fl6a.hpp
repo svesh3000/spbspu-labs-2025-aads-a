@@ -17,6 +17,7 @@ class forward_list
     data_(value),
     next_(ptr)
     {}
+    ~Node() = default;
   };
   Node* head_;
   Node* tail_;
@@ -30,31 +31,32 @@ public:
 
   ~forward_list()
   {
-    size_t s = size();
-    while (s != 0)
+    clear();
+  }
+
+  forward_list(const forward_list& list):
+  forward_list()
+  {
+    for (auto i = list.cbegin(); i != list.cend(); ++i)
     {
-      pop_front();
-      s--;
+      push_back(*i);
     }
   }
 
-
-  /*forward_list& operator=(forward_list&& list)
+  forward_list& operator=(const forward_list& list)
   {
-    head_ = list.head_;
-    tail_ = list.tail_;
-    size_ = list.size_;
-    list.head_ = nullptr;
-    list.tail_ = nullptr;
-    list.size_ = 0;
-  }*/
+    for (auto i = list.cbegin(); i != list.cend(); ++i)
+    {
+      push_back(*i);
+    }
+    return *this;
+  }
 
   void clear() noexcept
   {
     while (size_ != 0)
     {
       pop_front();
-      size_--;
     }
   }
 
@@ -142,23 +144,30 @@ public:
 
   void pop_front()
   {
-    if (head_ == nullptr || size_ == 0)
-    {
-      return;
-    }
+    size_--;
     Node* temp = head_;
-    if (head_ == tail_)
+    if (head_ == nullptr)
     {
-      head_ = nullptr;
-      tail_ = nullptr;
+      //std::cout << RED << "pop_front(head_ = nullptr" << ')' << RESET << std::endl;
     }
     else
     {
-      head_ = head_->next_;//
-      tail_->next_ = head_;//
+      if (head_ == tail_)
+      {
+        //std::cout << RED << "pop_front(head_ = tail_: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<')' << ')' << RESET << std::endl;
+        delete head_;
+        *this = forward_list();
+        Node* n = nullptr;
+        //std::cout << RED << n << "2pop_front(head_ = tail_: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<')' << ')' << RESET << std::endl;
+      }
+      else
+      {
+        //std::cout << RED << "pop_front(in: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<"))" << RESET << std::endl;
+        head_ = head_->next_;//
+        tail_->next_ = head_;//
+        delete temp;
+      }
     }
-    std::cout << RED << "pop_front(" << temp << ')' << RESET << std::endl;
-    delete temp;//
   }
 
   void push_back(const T& value)
@@ -177,7 +186,7 @@ public:
       tail_ = new_node;
     }
     size_++;
-    std::cout << RED << "push_back(" << &new_node->data_ << ')' << RESET << std::endl;
+    //std::cout << RED << "push_back(" << &new_node->data_ << ')' << RESET << std::endl;
   }
 };
 #endif

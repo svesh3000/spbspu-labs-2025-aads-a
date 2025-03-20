@@ -9,11 +9,11 @@ static bool allItersEnds(data_list_t::const_iterator* begins, data_list_t::const
   {
     if(begins[i]!=ends[i])
     {
-      std::cout << RED << "allitersend(false)\n"  << RESET<< std::flush;
+      //std::cout << RED << "allitersend(false)\n"  << RESET<< std::flush;
       return false;
     }
   }
-  std::cout << RED << "allitersend(true)\n"  << RESET<< std::flush;
+  //std::cout << RED << "allitersend(true)\n"  << RESET<< std::flush;
   return true;
 }
 
@@ -32,7 +32,7 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
       {
         break;
       }
-      std::cout << RED << var_name(temp) << ' ' << RESET << std::flush;
+      //std::cout << RED << var_name(temp) << ' ' << RESET << std::flush;
       list.push_back(temp);
     }
     if (!in.eof())
@@ -40,14 +40,14 @@ void asafov::getSequences(sequence_list_t& sequences, std::istream& in)
       in.clear();
     }
     sequence_t pair = std::make_pair(name, list);
-    std::cout << RED << var_name(pair) << ' '  << RESET<< std::flush;
+    //std::cout << RED << var_name(pair) << ' '  << RESET<< std::flush;
     sequences.push_back(pair);
   } while (!in.eof());
 }
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
 {
-  std::cout << RED << "outputSequences(begin)" << RESET << std::endl;
+  //std::cout << RED << "outputSequences(begin)" << RESET << std::endl;
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
@@ -81,7 +81,8 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
         i++;
       }
     }
-    std::cout << '\n' << RED << var_name(sum) << RESET  << ' '<< std::flush;
+    std::cout << '\n';
+    //std::cout << RED << var_name(sum) << RESET  << ' '<< std::flush;
     sums.push_back(sum);
   }
   for (auto it = sums.cbegin(); it != sums.cend(); ++it)
@@ -94,5 +95,5 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
   }
   delete[] begins;
   delete[] ends;
-  std::cout << RED << "outputSequences(end)\n" << RESET << std::flush;
+  //std::cout << RED << "outputSequences(end)\n" << RESET << std::flush;
 }
