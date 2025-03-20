@@ -20,7 +20,7 @@ namespace zakirov
     ~FwdList();
     FwdList< T > & operator=(const FwdList< T > &);
     FwdList< T > & operator=(FwdList< T > &&);
-    FwdList< T > & operator=(std::initializer_list< T > init_list); 
+    FwdList< T > & operator=(std::initializer_list< T > init_list);
     FwdListNode< T > * front();
     FwdIterator< T > begin();
     FwdIterator< T > cbegin() const;
@@ -91,7 +91,7 @@ namespace zakirov
   }
 
   template< typename T >
-  FwdList< T >::FwdList(const FwdList & other): 
+  FwdList< T >::FwdList(const FwdList & other):
     FwdList()
   {
     FwdIterator< T > inserter = before_begin();
