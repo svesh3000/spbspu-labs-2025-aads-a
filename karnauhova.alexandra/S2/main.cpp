@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <limits>
 #include "stack.hpp"
 #include "queue.hpp"
 #include "input.hpp"
@@ -11,10 +12,18 @@ long long int calculator(long long int first, long long int second, std::string 
 {
   if (operat == "+")
   {
+    if (std::numeric_limits<long long>::max() - first < second)
+    {
+      throw std::logic_error("Incorrect sum");
+    }
     return first + second;
   }
   if (operat == "*")
   {
+    if (std::numeric_limits<long long>::max() / first < second)
+    {
+      throw std::logic_error("Incorrect sum");
+    }
     return first * second;
   }
   if (operat == "/")
