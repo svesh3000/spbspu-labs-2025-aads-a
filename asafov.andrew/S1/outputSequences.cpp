@@ -47,7 +47,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     {
       if (begins[i] != ends[i])
       {
-        if (sum < std::numeric_limits<data_t>::max() - *begins[i])
+        if (sum > std::numeric_limits<data_t>::max() - *begins[i])
         {
           sums.clear();
           delete[] begins;
