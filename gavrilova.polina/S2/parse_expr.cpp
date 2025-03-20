@@ -1,5 +1,7 @@
 #include "parse_expr.hpp"
 #include <cctype>
+#include <stdexcept>
+#include <climits>
 #include "Stack.hpp"
 
 namespace {
@@ -39,26 +41,51 @@ namespace {
   long long do_operation(long long first, long long second, std::string oper)
   {
     if (oper == "+") {
+
+      if (first > std::LLONG_MAX - second) {
+        throw std::overflow_error("Overflow occurred during addition.");
+      }
       return first + second;
+
     } else if (oper == "-") {
+
+      if (first < std::LLONG_MIN + second) {
+        throw std::overflow_error("Overflow occurred during subtraction.");
+      }
       return first - second;
+
     } else if (oper == "*") {
+
+      if (first > 0 && second > 0 && first > std::LLONG_MAX / second) {
+        throw std::overflow_error("Overflow occurred during multiplication.");
+      } else if (first < 0 && second < 0 && first < std::LLONG_MAX / second) {
+          throw std::overflow_error("Overflow occurred during multiplication.");
+      } else if (first > 0 && second < 0 && second < std::LLONG_MIN / first) {
+          throw std::overflow_error("Overflow occurred during multiplication.");
+      } else if (first < 0 && second > 0 && first < std::LLONG_MIN / second) {
+          throw std::overflow_error("Overflow occurred during multiplication.");
+      }
       return first * second;
+
     } else if (oper == "/") {
+
       if (second == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
       }
+      if (first == std::LLONG_MIN && second == -1) {
+          throw std::overflow_error("Overflow occurred during division by -1.");
+      }
       return first / second;
+
     } else if (oper == "%") {
+
       if (second == 0) {
         throw std::invalid_argument("Modulo by zero is not allowed.");
       }
       return first % second;
-    } else {
-      throw std::invalid_argument("Unknown operation: " + oper);
+      
     }
   }
-}
 
 gavrilova::Queue< std::string > gavrilova::split(const std::string& line, const char& symb)
 {

@@ -36,10 +36,16 @@ int main(int argc, char* argv[])
     } catch(const std::invalid_argument& e) {
       std::cerr << e.what() << "\n";
       return 1;
+    } catch(const std::overflow_error& e) {
+      std::cerr << e.what() << "\n";
+      return 1;
     }
   }
 
+  std::cout << results.top();
+  results.pop();
   while (!results.empty()) {
+    std::cout << " ";
     std::cout << results.top();
     results.pop();
   }
