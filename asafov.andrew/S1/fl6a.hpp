@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define RED "\033[31m"
-#define RESET   "\033[0m"
+#define RESET "\033[0m"
 
 template <typename T>
 class forward_list
@@ -141,35 +141,28 @@ public:
   {
     return size_;
   }
-
   void pop_front()
   {
     size_--;
     Node* temp = head_;
     if (head_ == nullptr)
-    {
-      //std::cout << RED << "pop_front(head_ = nullptr" << ')' << RESET << std::endl;
-    }
+    {}
     else
     {
       if (head_ == tail_)
       {
-        //std::cout << RED << "pop_front(head_ = tail_: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<')' << ')' << RESET << std::endl;
         delete head_;
         *this = forward_list();
         Node* n = nullptr;
-        //std::cout << RED << n << "2pop_front(head_ = tail_: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<')' << ')' << RESET << std::endl;
       }
       else
       {
-        //std::cout << RED << "pop_front(in: " << temp << " (" << head_ << ", " << tail_ << ", " << size_ <<"))" << RESET << std::endl;
-        head_ = head_->next_;//
-        tail_->next_ = head_;//
+        head_ = head_->next_;
+        tail_->next_ = head_;
         delete temp;
       }
     }
   }
-
   void push_back(const T& value)
   {
     Node* new_node = new Node(value);
@@ -186,7 +179,6 @@ public:
       tail_ = new_node;
     }
     size_++;
-    //std::cout << RED << "push_back(" << &new_node->data_ << ')' << RESET << std::endl;
   }
 };
 #endif
