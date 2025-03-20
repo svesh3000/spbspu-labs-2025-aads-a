@@ -153,7 +153,6 @@ public:
       {
         delete head_;
         *this = forward_list();
-        Node* n = nullptr;
       }
       else
       {
