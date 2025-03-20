@@ -42,27 +42,27 @@ namespace {
   {
     if (oper == "+") {
 
-      if (first > std::LLONG_MAX - second) {
+      if (first > LLONG_MAX - second) {
         throw std::overflow_error("Overflow occurred during addition.");
       }
       return first + second;
 
     } else if (oper == "-") {
 
-      if (first < std::LLONG_MIN + second) {
+      if (first < LLONG_MIN + second) {
         throw std::overflow_error("Overflow occurred during subtraction.");
       }
       return first - second;
 
     } else if (oper == "*") {
 
-      if (first > 0 && second > 0 && first > std::LLONG_MAX / second) {
+      if (first > 0 && second > 0 && first > LLONG_MAX / second) {
         throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first < 0 && second < 0 && first < std::LLONG_MAX / second) {
+      } else if (first < 0 && second < 0 && first < LLONG_MAX / second) {
           throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first > 0 && second < 0 && second < std::LLONG_MIN / first) {
+      } else if (first > 0 && second < 0 && second < LLONG_MIN / first) {
           throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first < 0 && second > 0 && first < std::LLONG_MIN / second) {
+      } else if (first < 0 && second > 0 && first < LLONG_MIN / second) {
           throw std::overflow_error("Overflow occurred during multiplication.");
       }
       return first * second;
@@ -72,7 +72,7 @@ namespace {
       if (second == 0) {
         throw std::invalid_argument("Division by zero is not allowed.");
       }
-      if (first == std::LLONG_MIN && second == -1) {
+      if (first == LLONG_MIN && second == -1) {
           throw std::overflow_error("Overflow occurred during division by -1.");
       }
       return first / second;
@@ -83,9 +83,12 @@ namespace {
         throw std::invalid_argument("Modulo by zero is not allowed.");
       }
       return first % second;
-      
+
+    } else {
+      throw std::invalid_argument("Unknown operation");
     }
   }
+}
 
 gavrilova::Queue< std::string > gavrilova::split(const std::string& line, const char& symb)
 {
