@@ -40,7 +40,7 @@ long long int calculator(long long int first, long long int second, std::string 
     {
       throw std::logic_error("Dividing by zero!");
     }
-    return std::abs(first) % second;
+    return (first % second + second) % second;
   }
   return first - second;
 }
@@ -118,9 +118,12 @@ long long int proc_post(karnauhova::Queue< std::string > post)
 
 void output_sums(std::ostream& out, karnauhova::Stack< long long int > calc)
 {
+  if (!calc.empty())
+  {
   long long int sum = calc.top();
   out << sum;
   calc.pop();
+  }
   while (!calc.empty())
   {
     long long int sum = calc.top();
