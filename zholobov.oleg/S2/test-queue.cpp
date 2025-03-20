@@ -5,31 +5,17 @@
 #include "queue.hpp"
 
 template < typename T >
-std::ostream& operator<<(std::ostream& out, const zholobov::Queue< T >& queue)
-{
-  zholobov::Queue< T > temp(queue);
-  std::stack< T > medium;
-  while (!queue.empty()) {
-    medium.push(temp.front());
-    temp.pop();
-  }
-
-  if (!medium.empty()) {
-    out << medium.top();
-    medium.pop();
-    while (!medium.empty()) {
-      out << " " << medium.top();
-      medium.pop();
-    }
-  }
-  return out;
-}
-
-template < typename T >
 std::string to_string(const zholobov::Queue< T >& queue)
 {
   std::stringstream ss;
-  ss << queue;
+  if (!temp.empty()) {
+    ss << temp.top();
+    temp.pop();
+    while (!temp.empty()) {
+      ss << " " << temp.top();
+      temp.pop();
+    }
+  }
   return ss.str();
 }
 

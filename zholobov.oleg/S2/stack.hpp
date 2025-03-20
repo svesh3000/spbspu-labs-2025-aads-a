@@ -16,7 +16,8 @@ namespace zholobov {
     Stack& operator=(Stack&& other) noexcept { return *this; }
     void push(const T& rhs) {}
     void push(T&& rhs) {}
-    T top() const { return T(); }
+    const T& top() const { return T(); }
+    T& top() { return T(); }
     void pop() {}
     bool empty() const { return true; }
   };

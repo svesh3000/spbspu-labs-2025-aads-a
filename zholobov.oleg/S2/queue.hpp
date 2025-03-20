@@ -16,8 +16,10 @@ namespace zholobov {
     Queue& operator=(Queue&& other) noexcept { return *this; }
     void push(const T& rhs) {}
     void push(T&& rhs) {}
-    T front() const { return T(); }
-    T back() const { return T(); }
+    const T& front() const { return T(); }
+    T& front() { return T(); }
+    const T& back() const { return T(); }
+    T& back() { return T(); }
     void pop() {}
     bool empty() const { return true; }
   };

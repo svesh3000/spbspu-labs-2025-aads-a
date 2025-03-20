@@ -4,25 +4,18 @@
 #include "stack.hpp"
 
 template < typename T >
-std::ostream& operator<<(std::ostream& out, const zholobov::Stack< T >& stack)
-{
-  zholobov::Stack< T > temp(stack);
-  if (!temp.empty()) {
-    out << temp.top();
-    temp.pop();
-    while (!temp.empty()) {
-      out << " " << temp.top();
-      temp.pop();
-    }
-  }
-  return out;
-}
-
-template < typename T >
 std::string to_string(const zholobov::Stack< T >& stack)
 {
   std::stringstream ss;
-  ss << stack;
+  zholobov::Stack< T > temp(stack);
+  if (!temp.empty()) {
+    ss << temp.top();
+    temp.pop();
+    while (!temp.empty()) {
+      ss << " " << temp.top();
+      temp.pop();
+    }
+  }
   return ss.str();
 }
 
