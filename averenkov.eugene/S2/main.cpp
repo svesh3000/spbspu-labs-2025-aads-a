@@ -146,7 +146,7 @@ int evaluatePostfix(const std::string& postfix)
           }
           stack.push(a % b);
           break;
-        default:
+          default:
           throw std::runtime_error("invalid operator");
       }
     }
@@ -196,7 +196,15 @@ void processExpressions(std::istream& input)
     }
   }
 
-  std::cout << results.drop();
+  try
+  {
+    std::cout << results.drop();
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return;
+  }
   while (!results.empty())
   {
     std::cout << " " << results.drop();
