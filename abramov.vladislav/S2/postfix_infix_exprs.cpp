@@ -22,11 +22,11 @@ std::istream &abramov::calcInfix(std::istream &in)
   {
     return in;
   }
-  std::cout << *stack.top();
+  std::cout << stack.top();
   stack.pop();
   while (!stack.empty())
   {
-    std::cout << " " << *stack.top();
+    std::cout << " " << stack.top();
     stack.pop();
   }
   std::cout << "\n";

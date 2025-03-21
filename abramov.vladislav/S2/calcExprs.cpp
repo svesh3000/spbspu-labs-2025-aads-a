@@ -3,6 +3,7 @@
 #include <sstream>
 #include <limits>
 #include "stack.hpp"
+#include <iostream>
 
 namespace
 {
@@ -141,7 +142,14 @@ namespace
 
   bool isNumber(const std::string &s)
   {
-    std::stoll(s);
+    try
+    {
+      std::stoll(s);
+    }
+    catch (...)
+    {
+      return false;
+    }
     for (auto it = s.begin(); it != s.end(); ++it)
     {
       if (!std::isdigit(*it))
@@ -155,17 +163,28 @@ namespace
 
 long long int abramov::calcExpr(const std::string &s)
 {
-  abramov::Queue< std::string > *postfix = getPostfix(s);
-  return calcPostfix(postfix);
+  Queue< std::string > *postfix = getPostfix(s);
+  long long int res = 0ll;
+  try
+  {
+    res = calcPostfix(postfix);
+  }
+  catch (...)
+  {
+    delete postfix;
+    throw;
+  }
+  delete postfix;
+  return res;
 }
 
 long long int abramov::calcPostfix(abramov::Queue< std::string > *queue)
 {
-  abramov::Stack< long long int > stack;
+  Stack< long long int > stack;
   std::string temp;
   while(!queue->empty())
   {
-    temp = *queue->front();
+    temp = queue->front();
     queue->pop();
     if (isNumber(temp))
     {
@@ -173,9 +192,9 @@ long long int abramov::calcPostfix(abramov::Queue< std::string > *queue)
     }
     else
     {
-      long long int num_r = *stack.top();
+      long long int num_r = stack.top();
       stack.pop();
-      long long int num_l = *stack.top();
+      long long int num_l = stack.top();
       stack.pop();
       stack.push(doOperation(num_l, num_r, temp));
     }
@@ -184,24 +203,24 @@ long long int abramov::calcPostfix(abramov::Queue< std::string > *queue)
   {
     throw std::logic_error("Wrong expression\n");
   }
-  return *stack.top();
+  return stack.top();
 }
 
 abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
 {
-  abramov::Queue< std::string > queue_infix;
+  Queue< std::string > queue_infix;
   std::stringstream ss(s);
   std::string token;
   while (ss >> token)
   {
     queue_infix.push(token);
   }
-  abramov::Stack< std::string > stack;
-  abramov::Queue< std::string > *queue_postfix = new abramov::Queue< std::string >;
+  Stack< std::string > stack;
+  Queue< std::string > *queue_postfix = new Queue< std::string >;
   bool bracket = false;
   while(!queue_infix.empty())
   {
-    std::string temp = *queue_infix.front();
+    std::string temp = queue_infix.front();
     queue_infix.pop();
     if (temp == "(")
     {
@@ -214,9 +233,9 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
       {
         throw std::logic_error("Unbalanced brackets\n");
       }
-      while (*stack.top() != "(")
+      while (stack.top() != "(")
       {
-        queue_postfix->push(*stack.top());
+        queue_postfix->push(stack.top());
         stack.pop();
       }
       stack.pop();
@@ -230,9 +249,9 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
     {
       if (!stack.empty())
       {
-        if (*stack.top() != "(")
+        if (stack.top() != "(")
         {
-          queue_postfix->push(*stack.top());
+          queue_postfix->push(stack.top());
           stack.pop();
         }
       }
@@ -242,9 +261,9 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
     {
       if (!stack.empty())
       {
-        if (*stack.top() == "*" || *stack.top() == "/" || *stack.top() == "%")
+        if (stack.top() == "*" || stack.top() == "/" || stack.top() == "%")
         {
-          queue_postfix->push(*stack.top());
+          queue_postfix->push(stack.top());
           stack.pop();
         }
       }
@@ -257,7 +276,8 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
   }
   while (!stack.empty())
   {
-    queue_postfix->push(*stack.top());
+    queue_postfix->push(stack.top());
+    stack.pop();
   }
   if (bracket)
   {
