@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(array)
   array_t array3;
   array3.push_back(11);
   array3.push_back(33);
-  array_t moveArray1 = std::move(array2);
+  array_t moveArray1 = std::move(array3);
   BOOST_TEST(moveArray1.size() == 2);
   BOOST_TEST(moveArray1.back() == 33);
   BOOST_TEST(array3.size() == 0);
