@@ -29,6 +29,7 @@ int main(int argc, char** argv)
   }
 
   if (exp_stack.empty()) {
+    std::cout << '\n';
     return 0;
   }
 

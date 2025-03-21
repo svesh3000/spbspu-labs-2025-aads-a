@@ -3,6 +3,9 @@
 #include <stdexcept>
 
 namespace {
+  constexpr long long max_ll = std::numeric_limits< long long >::max();
+  constexpr long long min_ll = std::numeric_limits< long long >::min();
+
   int sign(long long value)
   {
     return (value > 0) ? 1 : ((value < 0) ? -1 : 0);
@@ -16,8 +19,6 @@ namespace {
 
 long long maslevtsov::checked_addition(long long left, long long right)
 {
-  const long long max_ll = std::numeric_limits< long long >::max();
-  const long long min_ll = std::numeric_limits< long long >::min();
   if (same_sign(left, right) && (left > 0)) {
     if (max_ll - left >= right) {
       return left + right;
@@ -34,17 +35,14 @@ long long maslevtsov::checked_addition(long long left, long long right)
 
 long long maslevtsov::checked_subtraction(long long left, long long right)
 {
-  const long long min_ll = std::numeric_limits< long long >::min();
-  if (right > min_ll + left) {
-    return left - right;
+  if ((right > 0 && left < min_ll + right) || (right < 0 && left > max_ll + right)) {
+    throw std::overflow_error("subtraction overflow");
   }
-  throw std::overflow_error("subtraction overflow");
+  return left - right;
 }
 
 long long maslevtsov::checked_multiplication(long long left, long long right)
 {
-  const long long max_ll = std::numeric_limits< long long >::max();
-  const long long min_ll = std::numeric_limits< long long >::min();
   if (same_sign(left, right) && left > 0) {
     if (max_ll / left > right) {
       return left * right;
@@ -63,7 +61,6 @@ long long maslevtsov::checked_multiplication(long long left, long long right)
 
 long long maslevtsov::checked_division(long long left, long long right)
 {
-  const long long min_ll = std::numeric_limits< long long >::min();
   if (right == 0) {
     throw std::logic_error("division by zero");
   }
@@ -78,7 +75,7 @@ long long maslevtsov::checked_remainder(long long left, long long right)
   if (right == 0) {
     throw std::logic_error("division by zero");
   }
-  return left % right;
+  return (right + (left % right)) % right;
 }
 
 long long maslevtsov::checked_operation(long long left, long long right, const std::string& operation)
