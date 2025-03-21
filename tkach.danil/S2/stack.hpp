@@ -61,7 +61,7 @@ namespace tkach
     swap(temp);
     return *this;
   }
-  
+
   template< typename T >
   void Stack< T >::pop()
   {
@@ -73,7 +73,7 @@ namespace tkach
   {
     array_.swap(other.array_);
   }
-  
+
   template< typename T >
   void Stack< T >::push(const T& data)
   {
