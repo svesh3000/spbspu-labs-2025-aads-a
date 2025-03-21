@@ -14,28 +14,26 @@ namespace abramov
     ~Queue();
     Queue< T > &operator=(const Queue< T > &queue);
     Queue< T > &operator=(Queue< T > &&queue);
-    void push(const T &rhs);
-    T *front();
-    const T *front() const;
+    void push(T rhs);
+    T &front();
+    const T &front() const;
     void pop();
     size_t size() const;
     bool empty() const;
     void swap(Queue< T > &queue) noexcept;
   private:
-    T **data_;
+    T *data_;
     size_t size_;
     size_t capacity_;
-
-    void clear();
   };
 
   namespace
   {
     template< class T >
-    T **expandArr(T **data, size_t &capacity)
+    T *expandArr(T *data, size_t &capacity)
     {
       constexpr size_t k = 100;
-      T **array = new T*[capacity + k];
+      T *array = new T[capacity + k];
       for (size_t i = 0; i < capacity; ++i)
       {
         array[i] = data[i];
@@ -58,21 +56,17 @@ namespace abramov
     size_(0),
     capacity_(0)
   {
-    T **data = new T*[queue.capacity_];
-    size_t count = 0;
+    T *data = new T[queue.capacity_];
     try
     {
       for (size_t i = 0; i < queue.size_; ++i)
       {
-        data[i] = new T(*queue.data_[i]);
+        data[i] = queue.data_[i];
       }
     }
     catch (const std::bad_alloc &)
     {
-      for (size_t i = 0; i < count; ++i)
-      {
-        delete data[i];
-      }
+        delete[] data;
     }
     data_ = data;
     size_ = queue.size_;
@@ -83,7 +77,7 @@ namespace abramov
   Queue< T > &Queue< T >::operator=(const Queue< T > &queue)
   {
     Queue< T > copy(queue);
-    clear();
+    delete[] data_;
     swap(copy);
     return *this;
   }
@@ -101,7 +95,7 @@ namespace abramov
   Queue< T > &Queue< T >::operator=(Queue< T > &&queue)
   {
     Queue< T > copy(queue);
-    clear();
+    delete[] data_;
     swap(copy);
     return *this;
   }
@@ -109,38 +103,37 @@ namespace abramov
   template< class T >
   Queue< T >::~Queue()
   {
-    clear();
+    delete[] data_;
   }
 
   template< class T >
-  void Queue< T >::push(const T &rhs)
+  void Queue< T >::push(T rhs)
   {
     if (capacity_ == size_)
     {
-      T **new_data = expandArr(data_, capacity_);
+      T *new_data = expandArr(data_, capacity_);
       delete[] data_;
       data_ = new_data;
     }
-    data_[size_] = new T(rhs);
+    data_[size_] = rhs;
     ++size_;
   }
 
   template< class T >
-  const T *Queue< T >::front() const
+  const T &Queue< T >::front() const
   {
     return data_[0];
   }
 
   template< class T >
-  T *Queue< T >::front()
+  T &Queue< T >::front()
   {
-    return const_cast< T* >(const_cast< const Queue< T >* >(this)->front());
+    return const_cast< T& >(const_cast< const Queue< T >* >(this)->front());
   }
 
   template< class T >
   void Queue< T >::pop()
   {
-    delete data_[0];
     for (size_t i = 0; i < size_; ++i)
     {
       data_[i] = data_[i + 1];
@@ -166,18 +159,6 @@ namespace abramov
     std::swap(data_, queue.data_);
     std::swap(size_, queue.size_);
     std::swap(capacity_, queue.capacity_);
-  }
-
-  template< class T >
-  void Queue< T >::clear()
-  {
-    for (size_t i = 0; i < size_; ++i)
-    {
-      delete data_[i];
-    }
-    delete[] data_;
-    size_ = 0;
-    capacity_ = 0;
   }
 }
 #endif
