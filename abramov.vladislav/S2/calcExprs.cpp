@@ -270,6 +270,7 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
     }
     else
     {
+      delete queue_postfix;
       throw std::logic_error("Not supported symbol\n");
     }
   }
@@ -280,6 +281,7 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
   }
   if (bracket)
   {
+    delete queue_postfix;
     throw std::logic_error("Unbalanced brackets\n");
   }
   return queue_postfix;
