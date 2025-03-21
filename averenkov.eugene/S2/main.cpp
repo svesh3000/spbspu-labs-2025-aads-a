@@ -196,9 +196,10 @@ void processExpressions(std::istream& input)
     }
   }
 
+  std::cout << results.drop();
   while (!results.empty())
   {
-    std::cout << results.drop() << " ";
+    std::cout << " " << results.drop();
   }
   std::cout << "\n";
 }
