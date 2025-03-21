@@ -33,7 +33,7 @@ namespace asafov
     Forward_list(Forward_list&& list):
     head_(list.head_),
     tail_(list.tail_),
-    size_(list.size_),
+    size_(list.size_)
     {
       list.head_ = nullptr;
       list.tail_ = nullptr;
@@ -153,7 +153,8 @@ namespace asafov
         if (head_ == tail_)
         {
           delete head_;
-          *this = Forward_list();
+          head_ = nullptr;
+          tail_ = nullptr;
         }
         else
         {
