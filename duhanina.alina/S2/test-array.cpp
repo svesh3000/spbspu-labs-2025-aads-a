@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 #include "array.hpp"
 
-using array_t = duhanina::Array< int >;
+using array_t = duhanina::DynamicArray< int >;
 
-BOOST_AUTO_TEST_CASE()
+BOOST_AUTO_TEST_CASE(array)
 {
   array_t array;
   BOOST_TEST(array.size() == 0);
