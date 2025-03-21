@@ -49,7 +49,7 @@ void maslevtsov::convert(expression_queue& exp)
       dump.push(exp.front());
       exp.pop();
     } else if (exp.front() == ")") {
-      while (!dump.empty() && dump.top() != ")") {
+      while (!dump.empty() && dump.top() != "(") {
         result.push(dump.top());
         dump.pop();
       }
@@ -92,7 +92,7 @@ long long maslevtsov::calculate_expression(const expression_queue& exp_queue)
       dump.push(std::stoll(exp.front()));
       exp.pop();
     } else {
-      if (dump.size() != 2) {
+      if (dump.size() < 2) {
         throw std::logic_error("invalid expression");
       }
       long long operand2 = dump.top();
@@ -102,9 +102,6 @@ long long maslevtsov::calculate_expression(const expression_queue& exp_queue)
       dump.push(maslevtsov::checked_operation(operand1, operand2, exp.front()));
       exp.pop();
     }
-  }
-  if (dump.empty() || dump.size() > 1) {
-    throw std::logic_error("invalid expression");
   }
   return dump.top();
 }

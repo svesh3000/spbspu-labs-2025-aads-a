@@ -3,14 +3,14 @@
 #include <stdexcept>
 
 namespace {
-  int sign(int val)
+  int sign(long long value)
   {
-    return (val > 0) ? 1 : ((val < 0) ? -1 : 0);
+    return (value > 0) ? 1 : ((value < 0) ? -1 : 0);
   }
 
-  bool same_sign(int a, int b)
+  bool same_sign(long long left, long long right)
   {
-    return sign(a) * sign(b) > 0;
+    return sign(left) * sign(right) > 0;
   }
 }
 
@@ -19,11 +19,11 @@ long long maslevtsov::checked_addition(long long left, long long right)
   const long long max_ll = std::numeric_limits< long long >::max();
   const long long min_ll = std::numeric_limits< long long >::min();
   if (same_sign(left, right) && (left > 0)) {
-    if (max_ll - left > right) {
+    if (max_ll - left >= right) {
       return left + right;
     }
   } else if (same_sign(left, right) && (left < 0)) {
-    if (min_ll - left < right) {
+    if (min_ll - left <= right) {
       return left + right;
     }
   } else if (!same_sign(left, right)) {
@@ -36,7 +36,7 @@ long long maslevtsov::checked_subtraction(long long left, long long right)
 {
   const long long min_ll = std::numeric_limits< long long >::min();
   if (right > min_ll + left) {
-    return right - left;
+    return left - right;
   }
   throw std::overflow_error("subtraction overflow");
 }
