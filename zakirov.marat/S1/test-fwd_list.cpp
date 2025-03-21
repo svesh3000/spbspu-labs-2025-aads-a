@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(fill_constructor)
 BOOST_AUTO_TEST_CASE(range_constructor)
 {
   int test_array[5] = {0, 1, 2, 3, 4};
-  zakirov::FwdList< int > test_list(test_array[0], test_array[5]);
+  zakirov::FwdList< int > test_list(test_array, test_array + 5);
   BOOST_TEST(test_list.empty() == false);
   BOOST_TEST(test_list.size() == 5);
   zakirov::FwdIterator< int > test_iter = test_list.begin();
