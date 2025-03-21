@@ -175,7 +175,7 @@ void processExpressions(std::istream& input)
         catch (const std::exception& e)
         {
           std::cerr << e.what() << "\n";
-          std::exit(1);
+          return;
         }
         line.clear();
       }

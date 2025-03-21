@@ -93,6 +93,10 @@ namespace averenkov
   template< class T >
   T Queue< T >::drop()
   {
+    if (arr_.empty())
+    {
+      throw std::underflow_error("error");
+    }
     T temp = front();
     arr_.pop_front();
     return temp;

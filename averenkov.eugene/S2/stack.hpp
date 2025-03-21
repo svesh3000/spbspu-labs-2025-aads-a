@@ -81,6 +81,10 @@ namespace averenkov
   template< class T >
   T Stack< T >::drop()
   {
+    if (arr_.empty())
+    {
+      throw std::underflow_error("empty");
+    }
     T temp = top();
     arr_.pop_back();
     return temp;
