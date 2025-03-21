@@ -22,46 +22,71 @@ int precedence(char op)
   return 0;
 }
 
+
 std::string infixToPostfix(const std::string& infix)
 {
   Stack< char > stack;
   Queue< char > queue;
+  std::string number;
+
   for (char ch : infix)
   {
     if (std::isspace(ch)) continue;
 
     if (std::isdigit(ch))
     {
-      queue.push(ch);
-    }
-    else if (ch == '(')
-    {
-      stack.push(ch);
-    }
-    else if (ch == ')')
-    {
-      while (!stack.empty() && stack.top() != '(')
-      {
-        queue.push(stack.drop());
-      }
-      if (stack.empty())
-      {
-        throw std::runtime_error("parentheses error");
-      }
-      stack.drop();
-    }
-    else if (isOperator(ch))
-    {
-      while (!stack.empty() && precedence(stack.top()) >= precedence(ch))
-      {
-        queue.push(stack.drop());
-      }
-      stack.push(ch);
+      number += ch;
     }
     else
     {
-      throw std::runtime_error("error character in expression");
+      if (!number.empty())
+      {
+        for (char digit : number)
+        {
+          queue.push(digit);
+        }
+        queue.push(' ');
+        number.clear();
+      }
+
+      if (ch == '(')
+      {
+        stack.push(ch);
+      }
+      else if (ch == ')')
+      {
+        while (!stack.empty() && stack.top() != '(')
+        {
+          queue.push(stack.drop());
+        }
+        if (stack.empty())
+        {
+          throw std::runtime_error("parentheses error");
+        }
+        stack.drop();
+      }
+      else if (isOperator(ch))
+      {
+        while (!stack.empty() && precedence(stack.top()) >= precedence(ch))
+        {
+          queue.push(stack.drop());
+        }
+        stack.push(ch);
+      }
+      else
+      {
+        throw std::runtime_error("error character in expression");
+      }
     }
+  }
+
+  if (!number.empty())
+  {
+    for (char digit : number)
+    {
+      queue.push(digit);
+    }
+    queue.push(' ');
   }
 
   while (!stack.empty())
@@ -77,12 +102,6 @@ std::string infixToPostfix(const std::string& infix)
   while (!queue.empty())
   {
     postfix += queue.drop();
-    postfix += ' ';
-  }
-
-  if (!postfix.empty() && postfix.back() == ' ')
-  {
-    postfix.pop_back();
   }
 
   return postfix;
@@ -135,11 +154,6 @@ int evaluatePostfix(const std::string& postfix)
     {
       throw std::runtime_error("invalid token");
     }
-  }
-
-  if (stack.size() != 1)
-  {
-    throw std::runtime_error("expression error");
   }
 
   return stack.drop();
