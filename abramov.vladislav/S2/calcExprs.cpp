@@ -134,7 +134,18 @@ namespace
     }
     else if (op == "%")
     {
-      return a % b;
+      if (a < 0)
+      {
+        return b - std::abs(a) % b;
+      }
+      else if (b == 0)
+      {
+        throw std::logic_error("Division by zero\n");
+      }
+      else
+      {
+        return a % b;
+      }
     }
     throw std::logic_error("Operation not supported\n");
   }
