@@ -1,4 +1,5 @@
 #include <iostream>
+#include <climits>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -107,9 +108,12 @@ std::string infixToPostfix(const std::string& infix)
   return postfix;
 }
 
-int evaluatePostfix(const std::string& postfix)
+
+
+
+long long evaluatePostfix(const std::string& postfix)
 {
-  Stack< int > stack;
+  Stack< long long > stack;
   std::istringstream iss(postfix);
   std::string token;
 
@@ -117,37 +121,62 @@ int evaluatePostfix(const std::string& postfix)
   {
     if (std::isdigit(token[0]))
     {
-      stack.push(std::stoi(token));
+      stack.push(std::stoll(token));
     }
     else if (isOperator(token[0]))
     {
-      if (stack.size() < 2)
+      try
+      {
+        long long b = stack.drop();
+        long long a = stack.drop();
+        long long result;
+
+        switch (token[0])
+        {
+          case '+':
+            if (a > 0 && b > 0 && a > LLONG_MAX - b)
+            {
+              throw std::runtime_error("overflow error");
+            }
+            result = a + b;
+            break;
+          case '-':
+            if (b > 0 && a < LLONG_MIN + b)
+            {
+              throw std::runtime_error("overflow error");
+            }
+            result = a - b;
+            break;
+          case '*':
+            if (a > 0 && b > 0 && a > LLONG_MAX / b)
+            {
+              throw std::runtime_error("overflow error");
+            }
+            result = a * b;
+            break;
+          case '/':
+            if (b == 0)
+            {
+              throw std::runtime_error("division zero");
+            }
+            result = a / b;
+            break;
+          case '%':
+            if (b == 0)
+            {
+              throw std::runtime_error("modul zero");
+            }
+            result = a % b;
+            break;
+          default:
+            throw std::runtime_error("invalid operator");
+        }
+
+        stack.push(result);
+      }
+      catch (const std::underflow_error& e)
       {
         throw std::runtime_error("expression error");
-      }
-      int b = stack.drop();
-      int a = stack.drop();
-      switch (token[0])
-      {
-        case '+': stack.push(a + b); break;
-        case '-': stack.push(a - b); break;
-        case '*': stack.push(a * b); break;
-        case '/':
-          if (b == 0)
-          {
-            throw std::runtime_error("division zero");
-          }
-          stack.push(a / b);
-          break;
-        case '%':
-          if (b == 0)
-          {
-            throw std::runtime_error("modul zero");
-          }
-          stack.push(a % b);
-          break;
-          default:
-          throw std::runtime_error("invalid operator");
       }
     }
     else
@@ -159,9 +188,10 @@ int evaluatePostfix(const std::string& postfix)
   return stack.drop();
 }
 
+
 void processExpressions(std::istream& input)
 {
-  Stack< int > results;
+  Stack< long long > results;
   std::string line;
   std::string token;
 
@@ -180,31 +210,16 @@ void processExpressions(std::istream& input)
     {
       if (!line.empty())
       {
-        try
-        {
-          std::string postfix = infixToPostfix(line);
-          int result = evaluatePostfix(postfix);
-          results.push(result);
-        }
-        catch (const std::exception& e)
-        {
-          std::cerr << e.what() << "\n";
-          return;
-        }
+        std::string postfix = infixToPostfix(line);
+        long long result = evaluatePostfix(postfix);
+        results.push(result);
         line.clear();
       }
     }
   }
 
-  try
-  {
-    std::cout << results.drop();
-  }
-  catch (const std::exception& e)
-  {
-    std::cerr << e.what() << "\n";
-    return;
-  }
+  std::cout << results.drop();
+
   while (!results.empty())
   {
     std::cout << " " << results.drop();
@@ -214,26 +229,34 @@ void processExpressions(std::istream& input)
 
 int main(int argc, char* argv[])
 {
-  if (argc > 2)
+  try
   {
-    std::cerr << "Error\n";
-    return 1;
-  }
-
-  if (argc == 2)
-  {
-    std::ifstream file(argv[1]);
-    if (!file)
+    if (argc > 2)
     {
       std::cerr << "Error\n";
       return 1;
     }
-    processExpressions(file);
-  }
-  else
-  {
-    processExpressions(std::cin);
+
+    if (argc == 2)
+    {
+      std::ifstream file(argv[1]);
+      if (!file)
+      {
+        std::cerr << "Error\n";
+        return 1;
+      }
+      processExpressions(file);
+    }
+    else
+    {
+      processExpressions(std::cin);
+    }
   }
 
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   return 0;
 }
