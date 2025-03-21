@@ -19,7 +19,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
 {
   if (sequences.cbegin()->first == "")
   {
-    out << '0\n';
+    out << "0\n";
     return;
   };
   if (sequences.cbegin()->second.empty())
@@ -34,7 +34,10 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
+  begins[0] = iter->second.cbegin();
+  ends[0] = iter->second.cend();
   ++iter;
+  ++size;
   for (; iter != sequences.cend(); ++iter)
   {
     out << ' ' << iter->first;
@@ -46,13 +49,13 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   {
     out << '\n';
   }
-  seqiter = sequences.cbegin();
+
   data_list_t sums;
   while (!allItersEnds(begins, ends, size))
   {
     data_t sum = 0;
-    size_t i = 0;
-    for (size_t d = 0; d != 1;)
+    bool flag = false;
+    for (size_t i = 0; i < size;)
     {
       if (begins[i] != ends[i])
       {
@@ -67,31 +70,15 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
         {
           sum += *begins[i];
         }
-        out << *begins[i];
-        ++begins[i++];
-        d++;
-      }
-      else
-      {
-        i++;
-      }
-    }
-    for (; i < sequences.size();)
-    {
-      if (begins[i] != ends[i])
-      {
-        if (sum > std::numeric_limits<data_t>::max() - *begins[i])
+        if (flag == true)
         {
-          sums.clear();
-          delete[] begins;
-          delete[] ends;
-          throw std::overflow_error("owerflow!");
+          out << ' ' << *begins[i];
         }
         else
         {
-          sum += *begins[i];
+          out << *begins[i];
+          flag = true;
         }
-        out << ' ' << *begins[i];
         ++begins[i++];
       }
       else
@@ -102,6 +89,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     out << '\n';
     sums.push_back(sum);
   }
+
   auto it = sums.cbegin();
   out << *it;
   ++it;
