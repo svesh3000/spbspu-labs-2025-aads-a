@@ -3,7 +3,6 @@
 #include <sstream>
 #include <limits>
 #include "stack.hpp"
-#include <iostream>
 
 namespace
 {
