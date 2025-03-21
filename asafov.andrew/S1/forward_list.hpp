@@ -30,6 +30,15 @@ namespace asafov
         push_back(*i);
       }
     }
+    Forward_list(Forward_list&& list):
+    head_(list.head_),
+    tail_(list.tail_),
+    size_(list.size_),
+    {
+      list.head_ = nullptr;
+      list.tail_ = nullptr;
+      list.size_ = 0;
+    }
     ~Forward_list() noexcept
     {
       clear();
