@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(initializer_list_constructor)
 {
   zakirov::FwdList< int > test_list({0, 1, 2, 3, 4});
   BOOST_TEST(test_list.empty() == false);
-  BOOST_TEST(test_list.size() == 2);
+  BOOST_TEST(test_list.size() == 5);
   zakirov::FwdIterator< int > test_iter = test_list.begin();
   for (size_t i = 0; i < 5; ++i, ++test_iter)
   {
@@ -22,12 +22,24 @@ BOOST_AUTO_TEST_CASE(initializer_list_constructor)
   }
 }
 
-BOOST_AUTO_TEST_CASE(input_iter_constructor)
+BOOST_AUTO_TEST_CASE(fill_constructor)
+{
+  zakirov::FwdList< int > test_list(5, 1);
+  BOOST_TEST(test_list.empty() == false);
+  BOOST_TEST(test_list.size() == 5);
+  zakirov::FwdIterator< int > test_iter = test_list.begin();
+  for (size_t i = 0; i < 5; ++i, ++test_iter)
+  {
+    BOOST_TEST(*test_iter == 1);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(range_constructor)
 {
   int test_array[5] = {0, 1, 2, 3, 4};
-  zakirov::FwdList test_list(test_array[0], test_array[5]);
+  zakirov::FwdList< int > test_list(test_array[0], test_array[5]);
   BOOST_TEST(test_list.empty() == false);
-  BOOST_TEST(test_list.size() == 4);
+  BOOST_TEST(test_list.size() == 5);
   zakirov::FwdIterator< int > test_iter = test_list.begin();
   for (size_t i = 0; i < 5; ++i, ++test_iter)
   {
@@ -39,6 +51,14 @@ BOOST_AUTO_TEST_CASE(size)
 {
   zakirov::FwdList< int > test_list;
   BOOST_TEST(test_list.size() == 0);
-  zakirov::FwdList< int > test_list({1, 2, 3, 4});
-  BOOST_TEST(test_list.size() != 0);
+  zakirov::FwdList< int > test_list_2({0, 1, 2, 3, 4});
+  BOOST_TEST(test_list_2.size() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(empty)
+{
+  zakirov::FwdList< int > test_list;
+  BOOST_TEST(test_list.empty() == true);
+  zakirov::FwdList< int > test_list_2({0, 1, 2, 3, 4});
+  BOOST_TEST(test_list_2.empty() == false);
 }
