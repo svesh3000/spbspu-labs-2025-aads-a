@@ -341,7 +341,7 @@ namespace demehin
   template< typename T >
   const T& List< T >::front() const noexcept
   {
-    return front();
+    return fake_->next->data;
   }
 
   template< typename T >
@@ -353,7 +353,7 @@ namespace demehin
   template< typename T >
   const T& List< T >::back() const noexcept
   {
-    return back();
+    return tail_->data;
   }
 
   template< typename T >
