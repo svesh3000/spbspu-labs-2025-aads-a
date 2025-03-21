@@ -15,6 +15,7 @@ namespace kushekbaev
     FwdList(const FwdList& other);
     FwdList(FwdList&& other) noexcept;
     ~FwdList();
+
     FwdList& operator=(const FwdList& other) noexcept;
     FwdList& operator=(FwdList&& other) noexcept;
 
@@ -33,12 +34,23 @@ namespace kushekbaev
     size_t size() const noexcept;
     bool empty() const noexcept;
 
+    void assign(size_t size, const T& value);
     void push_front(const T& value);
     void push_back(const T& value);
     void pop_front() noexcept;
     void pop_back() noexcept;
     void swap(FwdList& other) noexcept;
     void clear() noexcept;
+
+    void remove(const T& value);
+    template< typename Predicate >
+    void remove_if(Predicate predicate);
+    void splice_after(Iterator< T > position, FwdList& other);
+    void splice_after(Iterator< T > position, FwdList&& other);
+    void splice_after(Iterator< T > position, FwdList& other, Iterator< T > i);
+    void splice_after(Iterator< T > position, FwdList&& other, Iterator< T > i);
+    void splice_after(Iterator< T > position, FwdList& other, Iterator< T > first, Iterator< T > last);
+    void splice_after(Iterator< T > position, FwdList&& other, Iterator< T > first, Iterator< T > last);
 
     private:
       Node< T >* fake_;
@@ -195,6 +207,15 @@ namespace kushekbaev
   }
 
   template< typename T >
+  void FwdList< T >::assign(size_t size, const T& value)
+  {
+    for (size_t i = 0; i < size; ++i)
+    {
+      push_front(value);
+    }
+  }
+
+  template< typename T >
   void FwdList< T >::push_front(const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
@@ -227,7 +248,7 @@ namespace kushekbaev
     --size_;
   }
 
-  template < class T >
+  template < typename T >
   void FwdList< T >::pop_back() noexcept
   {
     assert(!empty());
@@ -254,6 +275,47 @@ namespace kushekbaev
     while (!empty())
     {
       pop_front();
+    }
+  }
+
+  template< typename T >
+  void FwdList< T >::remove(const T& value)
+  {
+    Node< T >* current = fake_;
+    while (current -> next_ != fake_)
+    {
+      if (current -> next_ -> data_ == value)
+      {
+        Node< T >* todelete = current -> next_;
+        current -> next_ = current -> next_ -> next_;
+        delete todelete;
+        --size_;
+      }
+      else
+      {
+        current = current -> next_;
+      }
+    }
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void FwdList< T >::remove_if(Predicate predicate)
+  {
+    Node< T >* current = fake_;
+    while (current -> next_ != fake_)
+    {
+      if (predicate(current -> next_ -> data_))
+      {
+        Node< T >* todelete = current -> next_;
+        current -> next_ = current -> next_ -> next_;
+        delete todelete;
+        --size_;
+      }
+      else
+      {
+        current = current -> next_;
+      }
     }
   }
 }

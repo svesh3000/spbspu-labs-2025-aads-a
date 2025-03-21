@@ -5,14 +5,22 @@
 
 using list_t = kushekbaev::FwdList< int >;
 
-std::string printList(list_t list)
+namespace
 {
-  std::ostringstream out;
-  for (auto it = list.begin(); it != list.end(); it++)
+  std::string printList(list_t list)
   {
-    out << *it;
+    std::ostringstream out;
+    for (auto it = list.begin(); it != list.end(); it++)
+    {
+      out << *it;
+    }
+    return out.str();
   }
-  return out.str();
+
+  bool isEven(int value)
+  {
+    return value % 2 == 0;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE(constructors)
@@ -113,6 +121,13 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(modifiers)
 
+BOOST_AUTO_TEST_CASE(assign)
+{
+  list_t list;
+  list.assign(3, 20);
+  BOOST_TEST(printList(list) == "202020");
+}
+
 BOOST_AUTO_TEST_CASE(pushfront)
 {
   list_t list({ 1, 2, 3 });
@@ -171,6 +186,24 @@ BOOST_AUTO_TEST_CASE(empty)
 {
   list_t list;
   BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(operations)
+
+BOOST_AUTO_TEST_CASE(remove)
+{
+  list_t list({ 1, 2, 1, 3 });
+  list.remove(1);
+  BOOST_TEST(printList(list) == "23");
+}
+
+BOOST_AUTO_TEST_CASE(removeIf)
+{
+  list_t list({ 1, 2, 3, 4 });
+  list.remove_if(isEven);
+  BOOST_TEST(printList(list) == "13");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

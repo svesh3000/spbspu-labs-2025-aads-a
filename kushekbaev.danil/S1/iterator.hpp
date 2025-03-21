@@ -7,6 +7,9 @@
 
 namespace kushekbaev
 {
+  template <typename T>
+  struct FwdList;
+
   template< typename T >
   struct Iterator final: public std::iterator< std::forward_iterator_tag, T >
   {
@@ -27,6 +30,7 @@ namespace kushekbaev
 
     private:
       Node< T >* node_;
+      friend struct FwdList< T >;
   };
 
   template< typename T >
