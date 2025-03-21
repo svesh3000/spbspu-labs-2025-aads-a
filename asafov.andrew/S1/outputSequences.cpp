@@ -19,6 +19,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
 {
   if (sequences.cbegin()->first == "")
   {
+    out << '\n';
     return;
   };
   if (sequences.cbegin()->second.empty())
@@ -33,6 +34,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
+  ++iter;
   for (; iter != sequences.cend(); ++iter)
   {
     out << ' ' << iter->first;
