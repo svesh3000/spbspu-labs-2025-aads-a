@@ -25,7 +25,7 @@ namespace tkach
     const T& back() const;
     T& front();
     const T& front() const;
-    void swap(Queue< T > other);
+    void swap(Queue< T >& other);
   private:
     DynArray< T > array_;
   };
@@ -89,7 +89,7 @@ namespace tkach
   }
 
   template< typename T >
-  void Queue< T >::swap(Queue< T > other)
+  void Queue< T >::swap(Queue< T >& other)
   {
     array_.swap(other.array_);
   }

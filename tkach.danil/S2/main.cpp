@@ -307,16 +307,20 @@ namespace
     return stack.top();
   }
 
-  // void print(std::ostream& out, tkach::Stack< std::string > stack)
-  // {
-  //   out << stack.top();
-  //   stack.pop();
-  //   while (!stack.empty())
-  //   {
-  //     out << " " << stack.top();
-  //     stack.pop();
-  //   }
-  // }
+  void print(std::ostream& out, tkach::Stack< long long > stack)
+  {
+    if (stack.empty())
+    {
+      return;
+    }
+    out << stack.top();
+    stack.pop();
+    while (!stack.empty())
+    {
+      out << " " << stack.top();
+      stack.pop();
+    }
+  }
 }
 int main(const int argc, const char* const* const argv)
 {
@@ -355,16 +359,7 @@ int main(const int argc, const char* const* const argv)
     std::cerr << e.what() << "\n";
     return 1;
   }
-  if (!results.empty())
-  {
-    std::cout << results.top();
-    results.pop();
-    while (!results.empty())
-    {
-      std::cout << " " << results.top();
-      results.pop();
-    }
-  }
+  print(std::cout, results);
   std::cout << "\n";
   return 0;
 }
