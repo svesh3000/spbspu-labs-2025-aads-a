@@ -88,7 +88,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     sums.push_back(sum);
   }
 
-  if (flag1 = false)
+  if (flag1 == false)
   {
     sums.clear();
     delete[] begins;
