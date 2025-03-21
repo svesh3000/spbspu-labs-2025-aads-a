@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 
 #include "queue.hpp"
@@ -104,22 +105,60 @@ namespace zholobov {
         long lhs = eval_stack.top();
         eval_stack.pop();
 
+        constexpr long max_value = std::numeric_limits< long >::max();
+        constexpr long min_value = std::numeric_limits< long >::min();
+
         if (token == "+") {
+          if (((rhs > 0) && (lhs > (max_value - rhs))) ||
+              ((rhs < 0) && (lhs < (min_value - rhs)))) {
+            throw std::runtime_error("Addition overflow");
+          }
           eval_stack.push(lhs + rhs);
         } else if (token == "-") {
+          if (((rhs > 0) && (lhs < (min_value + rhs))) ||
+              ((rhs < 0) && (lhs > (max_value + rhs)))) {
+            throw std::runtime_error("Subtraction overflow");
+          }
           eval_stack.push(lhs - rhs);
         } else if (token == "*") {
+          bool error = false;
+          if (lhs > 0) {
+            if (rhs > 0) {
+              error = (lhs > (max_value / rhs));
+            } else {
+              error = (rhs < (min_value / lhs));
+            }
+          } else {
+            if (rhs > 0) {
+              error = (lhs < (min_value / rhs));
+            } else {
+              error = ((lhs != 0) && (rhs < (max_value / lhs)));
+            }
+          }
+          if (error) {
+            throw std::runtime_error("Multiplication overflow");
+          }
           eval_stack.push(lhs * rhs);
         } else if (token == "/") {
           if (rhs == 0) {
             throw std::runtime_error("Division by zero");
+          }
+          if ((lhs == min_value) && (rhs == -1)) {
+            throw std::runtime_error("Division overflow");
           }
           eval_stack.push(lhs / rhs);
         } else if (token == "%") {
           if (rhs == 0) {
             throw std::runtime_error("Modulo by zero");
           }
-          eval_stack.push(lhs % rhs);
+          if ((lhs == min_value) && (rhs == -1)) {
+            throw std::runtime_error("Reminder overflow");
+          }
+          long res = lhs % rhs;
+          if (res < 0) {
+            res += std::abs(rhs);
+          }
+          eval_stack.push(res);
         } else {
           throw std::runtime_error("Invalid operator");
         }
@@ -203,8 +242,8 @@ int main(int argc, char* argv[])
     zholobov::Stack< long > results = zholobov::precessExpressions(std::move(expressions));
     if (!results.empty()) {
       zholobov::printResults(std::cout, std::move(results));
-      std::cout << "\n";
     }
+    std::cout << "\n";
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
     return 1;
