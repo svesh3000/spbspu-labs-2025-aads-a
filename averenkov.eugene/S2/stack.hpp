@@ -10,6 +10,7 @@ namespace averenkov
 
   public:
     Stack() = default;
+    ~Stack() = default;
     Stack(const Stack &rhs);
     Stack(Stack &&rhs) noexcept;
     Stack &operator=(const Stack &rhs);
@@ -46,7 +47,6 @@ namespace averenkov
     }
     return *this;
   }
-
 
   template< class T >
   bool Stack< T >::empty() const noexcept

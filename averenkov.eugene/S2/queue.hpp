@@ -9,6 +9,7 @@ namespace averenkov
   {
   public:
     Queue() = default;
+    ~Queue() = default;
     Queue(const Queue &rhs);
     Queue(Queue &&rhs) noexcept;
     Queue &operator=(const Queue &rhs);
@@ -28,17 +29,17 @@ namespace averenkov
   };
 
   template< class T >
-  Queue<T>::Queue(const Queue &rhs):
+  Queue< T >::Queue(const Queue &rhs):
     arr_(rhs.arr_)
   {}
 
   template< class T >
-  Queue<T>::Queue(Queue &&rhs) noexcept:
+  Queue< T >::Queue(Queue &&rhs) noexcept:
     arr_(std::move(rhs.arr_))
   {}
 
   template< class T >
-  Queue<T> &Queue<T>::operator=(const Queue &rhs)
+  Queue< T > &Queue< T >::operator=(const Queue &rhs)
   {
     if (this != &rhs)
     {
