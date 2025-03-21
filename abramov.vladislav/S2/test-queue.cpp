@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(copy_constructor_queue)
   queue1.push(3);
   abramov::Queue< int > queue2(queue1);
   BOOST_TEST(queue2.size() == 3);
-  BOOST_TEST(*queue2.front() == 1);
+  BOOST_TEST(queue2.front() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(operator_test_queue)
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(operator_test_queue)
   abramov::Queue< int > queue2;
   queue2 = queue1;
   BOOST_TEST(queue2.size() == 3);
-  BOOST_TEST(*queue2.front() == 1);
+  BOOST_TEST(queue2.front() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(push_queue)
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(push_queue)
   abramov::Queue< int > queue;
   queue.push(1);
   queue.push(2);
-  BOOST_TEST(*queue.front() == 1);
+  BOOST_TEST(queue.front() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(front_queue)
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(front_queue)
   abramov::Queue< std::string > queue;
   queue.push("b");
   queue.push("a");
-  BOOST_TEST(*queue.front() == "b");
+  BOOST_TEST(queue.front() == "b");
 }
 
 BOOST_AUTO_TEST_CASE(pop_queue)
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(pop_queue)
   queue.push(1);
   queue.push(2);
   queue.pop();
-  BOOST_TEST(*queue.front() == 1);
+  BOOST_TEST(queue.front() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(size_queue)
@@ -77,6 +77,6 @@ BOOST_AUTO_TEST_CASE(swap_queue)
   queue2.push(1);
   queue2.push(2);
   queue1.swap(queue2);
-  BOOST_TEST(*queue1.front() == 1);
-  BOOST_TEST(*queue2.front() == 2);
+  BOOST_TEST(queue1.front() == 1);
+  BOOST_TEST(queue2.front() == 2);
 }
