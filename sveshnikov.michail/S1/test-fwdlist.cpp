@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_CASE(splice_array)
   sveshnikov::FwdList< int > list1;
   sveshnikov::FwdList< int > list2;
   list1.splice(list1.cbegin(), list2);
-  
-  sveshnikov::FwdList< int > list3(3,1);
+
+  sveshnikov::FwdList< int > list3(3, 1);
   list1.splice(list1.cbegin(), list3);
   BOOST_TEST(list3.empty());
   BOOST_TEST(list1.getSize() == 3);
