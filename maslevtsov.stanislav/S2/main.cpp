@@ -28,6 +28,10 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  if (exp_stack.empty()) {
+    return 0;
+  }
+
   try {
     maslevtsov::convert_stack(exp_stack);
   } catch (const std::exception&) {
