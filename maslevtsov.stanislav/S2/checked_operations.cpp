@@ -17,8 +17,17 @@ namespace {
 long long maslevtsov::checked_addition(long long left, long long right)
 {
   const long long max_ll = std::numeric_limits< long long >::max();
-  if (right < max_ll - left) {
-    return right + left;
+  const long long min_ll = std::numeric_limits< long long >::min();
+  if (same_sign(left, right) && (left > 0)) {
+    if (max_ll - left > right) {
+      return left + right;
+    }
+  } else if (same_sign(left, right) && (left < 0)) {
+    if (min_ll - left < right) {
+      return left + right;
+    }
+  } else if (!same_sign(left, right)) {
+    return left + right;
   }
   throw std::overflow_error("addition overflow");
 }
@@ -72,22 +81,27 @@ long long maslevtsov::checked_remainder(long long left, long long right)
   return left % right;
 }
 
-long long maslevtsov::checked_operation(long long left, long long right, const std::string& op)
+long long maslevtsov::checked_operation(long long left, long long right, const std::string& operation)
 {
-  if (op == "*") {
+  if (operation.size() > 1) {
+    throw std::logic_error("invalid operation");
+  }
+  char op = operation[0];
+  switch (op) {
+  case '*':
     return checked_multiplication(left, right);
-  }
-  if (op == "/") {
+    break;
+  case '/':
     return checked_division(left, right);
-  }
-  if (op == "%") {
+  case '%':
     return checked_remainder(left, right);
-  }
-  if (op == "+") {
+    break;
+  case '+':
     return checked_addition(left, right);
-  }
-  if (op == "-") {
+  case '-':
     return checked_subtraction(left, right);
+    break;
+  default:
+    throw std::logic_error("invalid operation");
   }
-  throw std::logic_error("invalid operation");
 }
