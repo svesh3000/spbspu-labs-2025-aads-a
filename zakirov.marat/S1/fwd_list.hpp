@@ -300,7 +300,7 @@ namespace zakirov
     FwdList & l_value_fwdlst = fwdlst;
     splice_after(pos, l_value_fwdlst, first, last);
   }
-  
+
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
   {
