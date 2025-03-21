@@ -52,8 +52,10 @@ namespace alymova
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T > il);
     void push_front(const T& value);
+    void push_front(T&& value);
     void pop_front() noexcept;
     void push_back(const T& value);
+    void push_back(T&& value);
     void pop_back() noexcept;
     Iterator< T > insert(Iterator< T > position, const T& value);
     Iterator< T > insert(Iterator< T > position, T&& value);
@@ -94,7 +96,6 @@ namespace alymova
 
     void push_single(detail::ListNode< T >* node);
     detail::ListNode< T >* get_last_node();
-    void push_back_value(T&& value);
   };
 
   template< typename T >
@@ -182,7 +183,7 @@ namespace alymova
   {
     for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      push_back_value(T(*it));
+      push_back(*it);
     }
   }
 
@@ -198,7 +199,7 @@ namespace alymova
   {
     for (size_t i = 0; i < n; i++)
     {
-      push_back_value(T(value));
+      push_back(value);
     }
   }
 
@@ -209,7 +210,7 @@ namespace alymova
   {
     for(; first != last; ++first)
     {
-      push_back_value(T(*first));
+      push_back(*first);
     }
   }
 
@@ -219,7 +220,7 @@ namespace alymova
   {
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      push_back_value(T(*it));
+      push_back(*it);
     }
   }
 
@@ -344,7 +345,7 @@ namespace alymova
     clear();
     for (size_t i = 0; i < n; ++i)
     {
-      push_back_value(T(value));
+      push_back(value);
     }
   }
 
@@ -355,7 +356,7 @@ namespace alymova
     clear();
     for (; first != last; ++first)
     {
-      push_back_value(T(*first));
+      push_back(*first);
     }
   }
 
@@ -365,25 +366,20 @@ namespace alymova
     clear();
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      push_back_value(T(*it));
+      push_back(*it);
     }
   }
 
   template< typename T >
   void List< T >::push_front(const T& value)
   {
-    auto node = new detail::ListNode< T >{value, nullptr, nullptr};
-    if (empty())
-    {
-      push_single(node);
-    }
-    else
-    {
-      detail::ListNode< T >* subhead = head_;
-      head_ = node;
-      head_->next = subhead;
-      subhead->prev = head_;
-    }
+    emplace_front(value);
+  }
+
+  template< typename T >
+  void List< T >::push_front(T&& value)
+  {
+    emplace_front(std::forward< T >(value));
   }
 
   template< typename T >
@@ -399,19 +395,13 @@ namespace alymova
   template< typename T >
   void List< T >::push_back(const T& value)
   {
-    auto node = new detail::ListNode< T >{value, nullptr, nullptr};
-    if (empty())
-    {
-      push_single(node);
-    }
-    else
-    {
-      detail::ListNode< T >* subhead = get_last_node();
-      subhead->next = node;
-      node->prev = subhead;
-      node->next = fake_;
-      fake_->prev = node;
-    }
+    emplace_back(value);
+  }
+
+  template< typename T >
+  void List< T >::push_back(T&& value)
+  {
+    emplace_back(std::forward< T >(value));
   }
 
   template< typename T >
@@ -436,47 +426,15 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, const T& value)
   {
-    if (position == begin())
-    {
-      push_front(T(value));
-    }
-    else if(position == end())
-    {
-      push_back(T(value));
-    }
-    else
-    {
-      auto node_new = new detail::ListNode< T >{T(value), nullptr, nullptr};
-      detail::ListNode< T >* node_now = position.node_;
-      node_now->prev->next = node_new;
-      node_new->prev = node_now->prev;
-      node_now->prev = node_new;
-      node_new->next = node_now;
-    }
-    return --position;
+    auto res = emplace(position, value);
+    return res;
   }
 
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, T&& value)
   {
-    if (position == begin())
-    {
-      push_front(value);
-    }
-    else if(position == end())
-    {
-      push_back(value);
-    }
-    else
-    {
-      auto node_new = new detail::ListNode< T >{value, nullptr, nullptr};
-      detail::ListNode< T >* node_now = position.node_;
-      node_now->prev->next = node_new;
-      node_new->prev = node_now->prev;
-      node_now->prev = node_new;
-      node_new->next = node_now;
-    }
-    return --position;
+    auto res = emplace(position, std::forward< T >(value));
+    return res;
   }
 
   template< typename T >
@@ -552,21 +510,63 @@ namespace alymova
   template< typename... Args >
   Iterator< T > List< T >::emplace_front(Args&&... args)
   {
-    return insert(begin(), T{args...});
+    auto node = new detail::ListNode< T >{T{std::forward< Args >(args)...}, nullptr, nullptr};
+    if (empty())
+    {
+      push_single(node);
+    }
+    else
+    {
+      detail::ListNode< T >* subhead = head_;
+      head_ = node;
+      head_->next = subhead;
+      subhead->prev = head_;
+    }
+    return begin();
   }
 
   template< typename T >
   template< typename... Args >
   Iterator< T > List< T >::emplace_back(Args&&... args)
   {
-    return insert(end(), T{args...});
+    auto node = new detail::ListNode< T >{T{std::forward< Args >(args)...}, nullptr, nullptr};
+    if (empty())
+    {
+      push_single(node);
+    }
+    else
+    {
+      detail::ListNode< T >* subhead = get_last_node();
+      subhead->next = node;
+      node->prev = subhead;
+      node->next = fake_;
+      fake_->prev = node;
+    }
+    return (--end());
   }
 
   template< typename T >
   template< typename... Args >
   Iterator< T > List< T >::emplace(Iterator< T > position, Args&&... args)
   {
-    return insert(position, T{args...});
+    if (position == begin())
+    {
+      emplace_front(std::forward< Args >(args)...);
+    }
+    else if (position == end())
+    {
+      emplace_back(std::forward< Args >(args)...);
+    }
+    else
+    {
+      auto node_new = new detail::ListNode< T >{T{std::forward< Args >(args)...}, nullptr, nullptr};
+      detail::ListNode< T >* node_now = position.node_;
+      node_now->prev->next = node_new;
+      node_new->prev = node_now->prev;
+      node_now->prev = node_new;
+      node_new->next = node_now;
+    }
+    return --position;
   }
 
   template< typename T >
@@ -791,24 +791,6 @@ namespace alymova
       subhead = subhead->next;
     }
     return subhead;
-  }
-
-  template< typename T >
-  void List< T >::push_back_value(T&& value)
-  {
-    auto node = new detail::ListNode< T >{std::move(value), nullptr, nullptr};
-    if (empty())
-    {
-      push_single(node);
-    }
-    else
-    {
-      detail::ListNode< T >* subhead = get_last_node();
-      subhead->next = node;
-      node->prev = subhead;
-      node->next = fake_;
-      fake_->prev = node;
-    }
   }
 }
 #endif
