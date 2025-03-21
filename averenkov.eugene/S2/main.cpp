@@ -27,26 +27,34 @@ int precedence(char op)
 std::string infixToPostfix(const std::string& infix)
 {
   Stack< char > stack;
-  Queue< char > queue;
+  std::string postfix;
   std::string number;
+  bool isNegative = false;
 
-  for (char ch : infix)
+  for (size_t i = 0; i < infix.size(); ++i)
   {
+    char ch = infix[i];
+
     if (std::isspace(ch)) continue;
 
     if (std::isdigit(ch))
     {
       number += ch;
     }
+    else if (ch == '-' && (i == 0 || infix[i - 1] == '('))
+    {
+      isNegative = true;
+    }
     else
     {
       if (!number.empty())
       {
-        for (char digit : number)
+        if (isNegative)
         {
-          queue.push(digit);
+          postfix += '-';
+          isNegative = false;
         }
-        queue.push(' ');
+        postfix += number + " ";
         number.clear();
       }
 
@@ -58,7 +66,8 @@ std::string infixToPostfix(const std::string& infix)
       {
         while (!stack.empty() && stack.top() != '(')
         {
-          queue.push(stack.drop());
+          postfix += stack.drop();
+          postfix += ' ';
         }
         if (stack.empty())
         {
@@ -70,7 +79,8 @@ std::string infixToPostfix(const std::string& infix)
       {
         while (!stack.empty() && precedence(stack.top()) >= precedence(ch))
         {
-          queue.push(stack.drop());
+          postfix += stack.drop();
+          postfix += ' ';
         }
         stack.push(ch);
       }
@@ -83,11 +93,11 @@ std::string infixToPostfix(const std::string& infix)
 
   if (!number.empty())
   {
-    for (char digit : number)
+    if (isNegative)
     {
-      queue.push(digit);
+      postfix += '-';
     }
-    queue.push(' ');
+    postfix += number + " ";
   }
 
   while (!stack.empty())
@@ -96,20 +106,17 @@ std::string infixToPostfix(const std::string& infix)
     {
       throw std::runtime_error("parentheses error");
     }
-    queue.push(stack.drop());
+    postfix += stack.drop();
+    postfix += ' ';
   }
 
-  std::string postfix;
-  while (!queue.empty())
+  if (!postfix.empty() && postfix.back() == ' ')
   {
-    postfix += queue.drop();
+    postfix.pop_back();
   }
 
   return postfix;
 }
-
-
-
 
 long long evaluatePostfix(const std::string& postfix)
 {
