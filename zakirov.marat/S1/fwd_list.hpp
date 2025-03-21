@@ -17,6 +17,7 @@ namespace zakirov
     FwdList(InputIterator first, InputIterator second);
     FwdList(std::initializer_list< T > init_list);
     FwdList(const FwdList & other);
+    FwdList(FwdList && other) noexcept;
     ~FwdList();
     FwdList< T > & operator=(const FwdList< T > &);
     FwdList< T > & operator=(FwdList< T > &&);
@@ -75,10 +76,10 @@ namespace zakirov
   FwdList< T >::FwdList(InputIterator first, InputIterator second):
     FwdList()
   {
-    FwdIterator< T > inserter = begin();
+    FwdIterator< T > inserter = before_begin();
     for (; first != second; ++first, ++inserter)
     {
-      insert_after(inserter, * first);
+      insert_after(inserter, *first);
     }
   }
 
@@ -102,6 +103,14 @@ namespace zakirov
     {
       insert_after(inserter, *i);
     }
+  }
+
+  template< typename T >
+  FwdList< T >::FwdList(FwdList && other) noexcept:
+    FwdList()
+  {
+    fake_node_ = other.fake_node_;
+    other.fake_node_ = nullptr;
   }
 
   template< typename T >
