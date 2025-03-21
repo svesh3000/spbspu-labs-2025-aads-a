@@ -426,15 +426,13 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, const T& value)
   {
-    auto res = emplace(position, value);
-    return res;
+    return emplace(position, value);
   }
 
   template< typename T >
   Iterator< T > List< T >::insert(Iterator< T > position, T&& value)
   {
-    auto res = emplace(position, std::forward< T >(value));
-    return res;
+    return emplace(position, std::forward< T >(value));
   }
 
   template< typename T >
