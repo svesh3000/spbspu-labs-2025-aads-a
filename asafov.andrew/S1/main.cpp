@@ -13,7 +13,7 @@ int main()
     catch (const std::overflow_error&)
     {
       std::cerr << "owerlfow!\n";
-      return 1;
+      return 0;
     }
   }
   return 0;

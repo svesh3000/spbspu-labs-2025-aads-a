@@ -17,9 +17,13 @@ namespace
 
 void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std::cout)
 {
+  if (sequences.cbegin()->first == "")
+  {
+    return;
+  };
   if (sequences.cbegin()->second.empty())
   {
-    std::cout << sequences.cbegin()->first << "\n0\n";
+    out << sequences.cbegin()->first << "\n0\n";
     return;
   };
 
@@ -28,9 +32,10 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
   size_t size = 0;
   auto iter = sequences.cbegin();
+  out << iter->first;
   for (; iter != sequences.cend(); ++iter)
   {
-    out << iter->first << ' ';
+    out << ' ' << iter->first;
     begins[size] = iter->second.cbegin();
     ends[size] = iter->second.cend();
     ++size;
@@ -92,11 +97,11 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
         i++;
       }
     }
-    std::cout << '\n';
+    out << '\n';
     sums.push_back(sum);
   }
   auto it = sums.cbegin();
-  std::cout << *it;
+  out << *it;
   ++it;
   for (; it != sums.cend(); ++it)
   {
