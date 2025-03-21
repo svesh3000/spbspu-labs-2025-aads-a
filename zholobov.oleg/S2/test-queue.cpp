@@ -8,11 +8,12 @@ template < typename T >
 std::string to_string(const zholobov::Queue< T >& queue)
 {
   std::stringstream ss;
+  zholobov::Queue< T > temp(queue);
   if (!temp.empty()) {
-    ss << temp.top();
+    ss << temp.front();
     temp.pop();
     while (!temp.empty()) {
-      ss << " " << temp.top();
+      ss << " " << temp.front();
       temp.pop();
     }
   }
@@ -63,6 +64,14 @@ BOOST_AUTO_TEST_CASE(copy_assign_operator)
   zholobov::Queue< std::string > new_queue = queue;
   BOOST_TEST(to_string(queue) == "This is content");
   BOOST_TEST(to_string(new_queue) == "This is content");
+  queue.push("of");
+  queue.push("a");
+  queue.push("queue");
+  new_queue = queue;
+  BOOST_TEST(to_string(queue) == "This is content of a queue");
+  BOOST_TEST(to_string(new_queue) == "This is content of a queue");
+  new_queue = zholobov::Queue< std::string >();
+  BOOST_TEST(to_string(new_queue) == "");
 }
 
 BOOST_AUTO_TEST_CASE(move_assign_operator)
@@ -98,7 +107,7 @@ BOOST_AUTO_TEST_CASE(push_move)
   BOOST_TEST(val == "");
 }
 
-BOOST_AUTO_TEST_CASE(front__back_pop)
+BOOST_AUTO_TEST_CASE(front_back_pop)
 {
   zholobov::Queue< std::string > queue;
   queue.push("This");
@@ -116,9 +125,24 @@ BOOST_AUTO_TEST_CASE(front__back_pop)
   queue.pop();
   BOOST_TEST(queue.front() == "content");
   BOOST_TEST(queue.back() == "content");
-  queue.pop();
-  BOOST_TEST(queue.front() == "content");
-  BOOST_TEST(queue.back() == "content");
+}
+
+BOOST_AUTO_TEST_CASE(many_push_pop)
+{
+  zholobov::Queue< int > queue;
+  for (int i = 0; i < 20; ++i) {
+    queue.push(i);
+  }
+  for (int i = 0; i < 10; ++i) {
+    queue.pop();
+  }
+  for (int i = 0; i < 40; ++i) {
+    queue.push(i);
+  }
+  for (int i = 0; i < 48; ++i) {
+    queue.pop();
+  }
+  BOOST_TEST(to_string(queue) == "38 39");
 }
 
 BOOST_AUTO_TEST_CASE(empty)
