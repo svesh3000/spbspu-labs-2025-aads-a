@@ -66,10 +66,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
         }
         else
         {
-          if (flag1 = true)
-          {
-            sum += *begins[i];
-          }
+          sum += *begins[i];
         }
         if (flag == true)
         {
