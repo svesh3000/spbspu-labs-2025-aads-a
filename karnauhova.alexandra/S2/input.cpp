@@ -95,3 +95,22 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
   }
   return post;
 }
+
+karnauhova::Stack< long long int > karnauhova::input_str(std::istream& in)
+{
+  karnauhova::Stack< long long int > calc;
+  std::string str;
+  while (std::getline(in, str))
+  {
+    if (str.empty())
+    {
+      continue;
+    }
+    karnauhova::Queue< std::string > inf = karnauhova::split_str(str);
+    karnauhova::Queue< std::string > post = to_post(inf);
+    long long int sum = proc_post(post);
+    calc.push(sum);
+  }
+  in.clear();
+  return calc;
+}

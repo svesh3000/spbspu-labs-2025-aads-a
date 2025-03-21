@@ -21,8 +21,10 @@ namespace karnauhova
 
     void pop();
     void push(const T& val);
-    T& back();//+const
+    T& back();
+    const T& back() const;
     T& front();
+    const T& front() const;
 
     void swap(Queue< T >& other) noexcept;
   private:
@@ -128,6 +130,12 @@ namespace karnauhova
   }
 
   template< typename T >
+  const T& Queue< T >::back() const
+  {
+    return back();
+  }
+
+  template< typename T >
   T& Queue< T >::front()
   {
     if (empty())
@@ -135,6 +143,12 @@ namespace karnauhova
       throw std::logic_error("empty queue for front");
     }
     return data_[0];
+  }
+
+  template< typename T >
+  const T& Queue< T >::front() const
+  {
+    return front();
   }
 
   template< typename T >
