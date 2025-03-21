@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(push_test)
   q1.push(1);
   BOOST_TEST(q1.front() == 1);
   BOOST_TEST(q1.size() == 1);
-  q1.push(2);
+  int n = 2;
+  q1.push(n);
   BOOST_TEST(q1.back() == 2);
   BOOST_TEST(q1.size() == 2);
 }
