@@ -93,10 +93,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   {
     out << ' ' << *it;
   }
-  if (sequences.size() != 0)
-  {
-    out << '\n';
-  }
+  out << '\n';
   delete[] begins;
   delete[] ends;
 }
