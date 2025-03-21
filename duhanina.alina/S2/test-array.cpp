@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(array)
   BOOST_TEST(array.empty());
   array.push_back(1);
   array.push_back(4);
-  BOOST_TEST(array.top() == 4);
+  BOOST_TEST(array.back() == 4);
   BOOST_TEST(array.size() == 2);
   array.pop_back();
   BOOST_TEST(array.front() == 1);
@@ -39,8 +39,8 @@ BOOST_AUTO_TEST_CASE(array)
   array_t array3;
   array3.push_back(11);
   array3.push_back(33);
-  array_t moveArray = std::move(array2);
-  BOOST_TEST(moveArray.size() == 2);
-  BOOST_TEST(moveArray.back() == 33);
+  array_t moveArray1 = std::move(array2);
+  BOOST_TEST(moveArray1.size() == 2);
+  BOOST_TEST(moveArray1.back() == 33);
   BOOST_TEST(array3.size() == 0);
 }

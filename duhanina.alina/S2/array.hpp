@@ -55,8 +55,8 @@ namespace duhanina
   template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
     data_(new T[other.capacity_]),
-    length_(other.length_),
-    capacity_(other.capacity_)
+    capacity_(other.capacity_),
+    length_(other.length_)
   {
     try
     {
