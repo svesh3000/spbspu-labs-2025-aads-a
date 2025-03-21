@@ -38,6 +38,9 @@ namespace zakirov
     void splice_after(FwdIterator< T > pos, FwdList & fwdlst);
     void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i);
     void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst);
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i);
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last);
     void assign(size_t n, const T & val);
     template< typename InputIterator >
     void assign(InputIterator first, InputIterator last);
@@ -105,7 +108,7 @@ namespace zakirov
   FwdList< T >::~FwdList()
   {
     clear();
-    delete fake_node_;
+    delete[] reinterpret_cast< char* >(fake_node_);
   }
 
   template< typename T >
@@ -277,6 +280,27 @@ namespace zakirov
     }
   }
 
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst)
+  {
+    FwdList & l_value_fwdlst = fwdlst;
+    splice_after(pos, l_value_fwdlst);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i)
+  {
+    FwdList & l_value_fwdlst = fwdlst;
+    splice_after(pos, l_value_fwdlst, i);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  {
+    FwdList & l_value_fwdlst = fwdlst;
+    splice_after(pos, l_value_fwdlst, first, last);
+  }
+  
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
   {
