@@ -35,15 +35,16 @@ namespace sveshnikov
     FwdList(const FwdList< T > &fwdlst);
     FwdList(FwdList< T > &&fwdlst);
     ~FwdList();
-    FwdIterator< T > begin() noexcept;
-    ConstFwdIterator< T > begin() const noexcept;
-    ConstFwdIterator< T > cbegin() const noexcept;
-    FwdIterator< T > end() noexcept;
-    ConstFwdIterator< T > end() const noexcept;
-    ConstFwdIterator< T > cend() const noexcept;
-    FwdIterator< T > before_begin() noexcept;
-    ConstFwdIterator< T > before_begin() const noexcept;
-    ConstFwdIterator< T > cbefore_begin() const noexcept;
+
+    Iterator< T > begin() noexcept;
+    ConstIterator< T > begin() const noexcept;
+    ConstIterator< T > cbegin() const noexcept;
+    Iterator< T > end() noexcept;
+    ConstIterator< T > end() const noexcept;
+    ConstIterator< T > cend() const noexcept;
+    Iterator< T > before_begin() noexcept;
+    ConstIterator< T > before_begin() const noexcept;
+    ConstIterator< T > cbefore_begin() const noexcept;
     T &front() noexcept;
     const T &front() const noexcept;
     T &back() noexcept;
@@ -58,16 +59,27 @@ namespace sveshnikov
     void pop_back() noexcept;
     void swap(FwdList< T > &fwdlst) noexcept;
     void clear() noexcept;
+
     void remove(const T& val) noexcept;
     template <class Predicate>
-    void remove_if (Predicate pred) noexcept;
+    void remove_if(Predicate pred) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >& fwdlst) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >&& fwdlst) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >& fwdlst, ConstIterator< T > i) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >&& fwdlst, ConstIterator< T > i) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >& fwdlst, 
+        ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void splice(ConstIterator< T > pos, FwdList< T >&& fwdlst,
+        ConstIterator< T > first, ConstIterator< T > last) noexcept;
+    void assign(size_t n, const T& val);
 
   private:
     node_t< T > *head_;
     node_t< T > *tail_;
     size_t size_;
     void push_impl(node_t< T > *node);
-    void resetPointers();
+    void reset();
+    node_t< T > *shiftPointer(ConstIterator< T > pos, node_t< T > *start_node);
   };
 
   template < typename T >
@@ -81,17 +93,14 @@ namespace sveshnikov
   FwdList< T >::FwdList(size_t n, const T& val):
     FwdList()
   {
-    for (size_t size = 0; size < n; size++)
+    try
     {
-      try
-      {
-        push_back(val);
-      }
-      catch (std::bad_alloc &e)
-      {
-        clear();
-        throw;
-      }
+      assign(n, val);
+    }
+    catch (std::bad_alloc &e)
+    {
+      clear();
+      throw;
     }
   }
 
@@ -102,7 +111,7 @@ namespace sveshnikov
     if (!fwdlst.empty())
     {
       push_back(fwdlst.front());
-      for (ConstFwdIterator< T > it = ++fwdlst.cbegin(); it != fwdlst.cend(); it++)
+      for (ConstIterator< T > it = ++fwdlst.cbegin(); it != fwdlst.cend(); it++)
       {
         try
         {
@@ -135,57 +144,57 @@ namespace sveshnikov
   }
 
   template < typename T >
-  FwdIterator< T > FwdList< T >::begin() noexcept
+  Iterator< T > FwdList< T >::begin() noexcept
   {
-    return FwdIterator< T >(head_);
+    return Iterator< T >(head_);
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::begin() const noexcept
+  ConstIterator< T > FwdList< T >::begin() const noexcept
   {
     return cbegin();
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::cbegin() const noexcept
+  ConstIterator< T > FwdList< T >::cbegin() const noexcept
   {
-    return ConstFwdIterator< T >(head_);
+    return ConstIterator< T >(head_);
   }
 
   template < typename T >
-  FwdIterator< T > FwdList< T >::end() noexcept
+  Iterator< T > FwdList< T >::end() noexcept
   {
     return begin();
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::end() const noexcept
+  ConstIterator< T > FwdList< T >::end() const noexcept
   {
     return cbegin();
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::cend() const noexcept
+  ConstIterator< T > FwdList< T >::cend() const noexcept
   {
     return cbegin();
   }
 
   template < typename T >
-  FwdIterator< T > FwdList< T >::before_begin() noexcept
+  Iterator< T > FwdList< T >::before_begin() noexcept
   {
-    return FwdIterator< T >(tail_);
+    return Iterator< T >(tail_);
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::before_begin() const noexcept
+  ConstIterator< T > FwdList< T >::before_begin() const noexcept
   {
     return cbefore_begin();
   }
 
   template < typename T >
-  ConstFwdIterator< T > FwdList< T >::cbefore_begin() const noexcept
+  ConstIterator< T > FwdList< T >::cbefore_begin() const noexcept
   {
-    return ConstFwdIterator< T >(tail_);
+    return ConstIterator< T >(tail_);
   }
 
   template < typename T >
@@ -253,7 +262,9 @@ namespace sveshnikov
   template < typename T >
   void FwdList< T >::push_front(T &&val)
   {
-    push_front(val);
+    node_t< T > *node = new node_t< T >{std::move(val), head_};
+    push_impl(node);
+    head_ = node;
   }
 
   template < typename T >
@@ -267,14 +278,17 @@ namespace sveshnikov
   template < typename T >
   void FwdList< T >::push_back(T &&val)
   {
-    push_back(val);
+    node_t< T > *node = new node_t< T >{std::move(val), head_};
+    push_impl(node);
+    tail_ = node;
   }
 
   template < typename T >
-  void FwdList< T >::resetPointers()
+  void FwdList< T >::reset()
   {
     head_ = nullptr;
     tail_ = nullptr;
+    size_ = 0;
   }
 
   template < typename T >
@@ -286,7 +300,7 @@ namespace sveshnikov
     size_--;
     if (empty())
     {
-      resetPointers();
+      reset();
     }
     else
     {
@@ -300,7 +314,7 @@ namespace sveshnikov
   {
     assert(!empty());
     node_t< T > *current = tail_;
-    for (ConstFwdIterator< T > it = cbegin(); it != cbefore_begin(); it++)
+    for (ConstIterator< T > it = cbegin(); it != cbefore_begin(); it++)
     {
       current = current->next_;
     }
@@ -308,7 +322,7 @@ namespace sveshnikov
     size_--;
     if (empty())
     {
-      resetPointers();
+      reset();
     }
     else
     {
@@ -342,18 +356,18 @@ namespace sveshnikov
 
   template <typename T>
   template <class Predicate>
-  void FwdList<T>::remove_if(Predicate pred) noexcept
+  void FwdList< T >::remove_if(Predicate pred) noexcept
   {
     if (empty())
     {
       return;
     }
-    node_t<T>* prev = tail_;
-    node_t<T>* current = head_;
+    node_t< T >* prev = tail_;
+    node_t< T >* current = head_;
     size_t count = size_;
     while (count > 0)
     {
-      node_t<T>* next = current->next_;
+      node_t< T >* next = current->next_;
       if (pred(current->data_))
       {
         if (current == head_)
@@ -369,8 +383,7 @@ namespace sveshnikov
         size_--;
         if (size_ == 0)
         {
-          head_ = nullptr;
-          tail_ = nullptr;
+          reset();
         }
       }
       else
@@ -379,6 +392,164 @@ namespace sveshnikov
       }
       current = next;
       count--;
+    }
+  }
+
+  template <typename T>
+  node_t< T > *FwdList< T >::shiftPointer(ConstIterator< T > pos, node_t< T > *start_node)
+  {
+    ConstIterator< T > it = cbegin();
+    while (it != pos)
+    {
+      it++;
+      start_node = start_node->next_;
+    }
+    return start_node;
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >& fwdlst) noexcept
+  {
+    splice(pos, std::move(fwdlst));
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >&& fwdlst) noexcept
+  {
+    if (fwdlst.empty())
+    {
+      return;
+    }
+    if (empty())
+    {
+      swap(fwdlst);
+      return;
+    }
+    node_t< T > *current = shiftPointer(pos, head_);
+    fwdlst.tail_->next_ = current->next_;
+    current->next_ = fwdlst.head_;
+    if (pos == cbefore_begin())
+    {
+      tail_ = fwdlst.tail_;
+    }
+    size_ += fwdlst.size_;
+    fwdlst.reset();
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >& fwdlst, ConstIterator< T > i) noexcept
+  {
+    splice(pos, std::move(fwdlst), i);
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >&& fwdlst, ConstIterator< T > i) noexcept
+  {
+    if (fwdlst.empty())
+    {
+      return;
+    }
+    node_t< T > *prev_i = fwdlst.shiftPointer(i, fwdlst.tail_);
+    node_t< T > *node_i = prev_i->next_;
+    if (fwdlst.size_ == 1)
+    {
+      fwdlst.reset();
+    }
+    else
+    {
+      prev_i->next_ = node_i->next_;
+      fwdlst.size_--;
+      if (node_i == fwdlst.head_)
+      {
+        fwdlst.head_ = node_i->next_;
+      }
+      else if (node_i == fwdlst.tail_)
+      {
+        fwdlst.tail_ = prev_i;
+      }
+    }
+    
+    if (empty())
+    {
+      head_ = node_i;
+      tail_ = node_i;
+      tail_->next_ = head_;
+    }
+    else
+    {
+      node_t< T > *current = shiftPointer(pos, head_);
+      node_i->next_ = current->next_;
+      current->next_ = node_i;
+      if (pos == cbefore_begin())
+      {
+        tail_ = node_i;
+      }
+    }
+    size_++;
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >& fwdlst, 
+      ConstIterator< T > first, ConstIterator< T > last) noexcept
+  {
+    splice(pos, std::move(fwdlst), first, last);
+  }
+
+  template <typename T>
+  void FwdList< T >::splice(ConstIterator< T > pos, FwdList< T >&& fwdlst,
+      ConstIterator< T > first, ConstIterator< T > last) noexcept
+  {
+    ConstIterator< T > aft_first_it = first;
+    aft_first_it++;
+    if (fwdlst.empty() || first == last || last == aft_first_it)
+    {
+      return;
+    }
+    node_t< T > *curr_first = fwdlst.shiftPointer(first, fwdlst.head_);
+    node_t< T > *aft_first = curr_first->next_;
+    node_t< T > *prev_last = fwdlst.shiftPointer(last, fwdlst.tail_);
+    node_t< T > *curr_last = prev_last->next_;
+    size_t size_section = 0;
+    for (ConstIterator< T > it = aft_first_it; it != last ; it++)
+    {
+      size_section++;
+      if (it == fwdlst.cbegin())
+      {
+        fwdlst.head_ = curr_last;
+      }
+      else if (it == fwdlst.cbefore_begin())
+      {
+        fwdlst.tail_ = curr_first;
+      }
+    }
+    curr_first->next_ = curr_last;
+    fwdlst.size_ -= size_section;
+
+    if (empty())
+    {
+      prev_last->next_ = aft_first;
+      head_ = aft_first;
+    }
+    else
+    {
+      node_t< T > *curr = shiftPointer(pos, head_);
+      prev_last->next_ = curr->next_;
+      curr->next_ = aft_first;
+    }
+    if (empty() || getSize() == 1 || pos == cbefore_begin())
+    {
+      tail_ = prev_last;
+    }
+    size_ += size_section;
+  }
+
+  template <typename T>
+  void FwdList< T >::assign(size_t n, const T& val)
+  {
+    clear();
+    for (size_t size = 0; size < n; size++)
+    {
+      push_back(val);
     }
   }
 }

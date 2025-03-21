@@ -152,4 +152,112 @@ BOOST_AUTO_TEST_CASE(remove)
   list2.remove(6);
   BOOST_TEST(list2.getSize() == 2);
 }
+
+BOOST_AUTO_TEST_SUITE(splice)
+BOOST_AUTO_TEST_CASE(splice_array)
+{
+  sveshnikov::FwdList< int > list1;
+  sveshnikov::FwdList< int > list2;
+  list1.splice(list1.cbegin(), list2);
+  
+  sveshnikov::FwdList< int > list3(3,1);
+  list1.splice(list1.cbegin(), list3);
+  BOOST_TEST(list3.empty());
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list1.back() == 1);
+
+  list2.push_back(2);
+  list1.splice(list1.cbegin(), list2);
+  BOOST_TEST(list1.getSize() == 4);
+  BOOST_TEST(*(++list1.cbegin()) == 2);
+
+  list2.push_back(2);
+  list2.push_back(3);
+  list1.splice(list1.cbefore_begin(), list2);
+  BOOST_TEST(list1.getSize() == 6);
+  BOOST_TEST(list1.back() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(splice_element)
+{
+  sveshnikov::FwdList< int > list1;
+  sveshnikov::FwdList< int > list2;
+
+  list2.push_back(1);
+  list1.splice(list1.cbegin(), list2, list2.cbegin());
+  BOOST_TEST(list1.getSize() == 1);
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list2.empty());
+
+  list2.push_back(3);
+  list2.push_back(2);
+  list2.push_back(1);
+  list1.splice(list1.cbegin(), list2, list2.cbegin());
+  BOOST_TEST(list2.getSize() == 2);
+  BOOST_TEST(list2.front() == 2);
+  BOOST_TEST(list1.getSize() == 2);
+  BOOST_TEST(*(++list1.cbegin()) == 3);
+  list1.splice(list1.cbegin(), list2, list2.cbefore_begin());
+  BOOST_TEST(list2.back() == 2);
+
+  list2.push_back(1);
+  list1.splice(list1.cbefore_begin(), list2, list2.cbefore_begin());
+  BOOST_TEST(list1.back() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(splice_segment)
+{
+  sveshnikov::FwdList< int > list1;
+  sveshnikov::FwdList< int > list2;
+  list2.push_back(1);
+  list2.push_back(2);
+  list2.push_back(3);
+  list2.push_back(4);
+  list2.push_back(5);
+  sveshnikov::ConstIterator< int > it = ++list2.cbegin();
+  sveshnikov::ConstIterator< int > prev = list2.cbegin();
+  sveshnikov::ConstIterator< int > prev_prev = list2.cbefore_begin();
+  while (it != list2.cbefore_begin())
+  {
+    it++;
+    prev++;
+    prev_prev++;
+  }
+  list1.splice(list1.cbegin(), list2, prev, prev_prev);
+  BOOST_TEST(list2.getSize() == 2);
+  BOOST_TEST(list2.front() == 3);
+  BOOST_TEST(list2.back() == 4);
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 5);
+  BOOST_TEST(list1.back() == 2);
+
+  list2.push_front(2);
+  list2.push_front(1);
+  list2.push_back(5);
+  list1.splice(list1.cbegin(), list2, prev, prev_prev);
+  BOOST_TEST(list1.getSize() == 6);
+  BOOST_TEST(list1.back() == 2);
+
+  list2.push_front(2);
+  list2.push_front(1);
+  list2.push_back(5);
+  list1.clear();
+  list1.push_back(1);
+  list1.splice(list1.cbegin(), list2, prev, prev_prev);
+  BOOST_TEST(list1.getSize() == 4);
+  BOOST_TEST(list1.back() == 2);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(assign)
+{
+  sveshnikov::FwdList< int > list1;
+  list1.assign(0, 2);
+  BOOST_TEST(list1.empty());
+  list1.assign(5, 4);
+  BOOST_TEST(list1.getSize() == 5);
+  BOOST_TEST(list1.front() == 4);
+  BOOST_TEST(list1.back() == 4);
+}
 BOOST_AUTO_TEST_SUITE_END()

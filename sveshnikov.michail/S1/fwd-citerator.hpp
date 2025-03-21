@@ -7,37 +7,37 @@
 namespace sveshnikov
 {
   template < typename T >
-  class ConstFwdIterator
+  class ConstIterator
   {
   public:
-    ConstFwdIterator();
-    ConstFwdIterator(const node_t< T > *node);
-    ConstFwdIterator(const ConstFwdIterator< T > &) = default;
-    ~ConstFwdIterator() = default;
-    ConstFwdIterator< T > &operator=(const ConstFwdIterator< T > &) = default;
-    ConstFwdIterator< T > &operator++() noexcept;
-    ConstFwdIterator< T > operator++(int) noexcept;
+    ConstIterator();
+    ConstIterator(const node_t< T > *node);
+    ConstIterator(const ConstIterator< T > &) = default;
+    ~ConstIterator() = default;
+    ConstIterator< T > &operator=(const ConstIterator< T > &) = default;
+    ConstIterator< T > &operator++() noexcept;
+    ConstIterator< T > operator++(int) noexcept;
     const T &operator*() const noexcept;
     const T *operator->() const noexcept;
-    bool operator!=(const ConstFwdIterator< T > &) const noexcept;
-    bool operator==(const ConstFwdIterator< T > &) const noexcept;
+    bool operator!=(const ConstIterator< T > &) const noexcept;
+    bool operator==(const ConstIterator< T > &) const noexcept;
 
   private:
     const node_t< T > *node_;
   };
 
   template < typename T >
-  ConstFwdIterator< T >::ConstFwdIterator():
+  ConstIterator< T >::ConstIterator():
     node_(nullptr)
   {}
 
   template < typename T >
-  ConstFwdIterator< T >::ConstFwdIterator(const node_t< T > *node):
+  ConstIterator< T >::ConstIterator(const node_t< T > *node):
     node_(node)
   {}
 
   template < typename T >
-  ConstFwdIterator< T > &ConstFwdIterator< T >::operator++() noexcept
+  ConstIterator< T > &ConstIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_->next_;
@@ -45,35 +45,35 @@ namespace sveshnikov
   }
 
   template < typename T >
-  ConstFwdIterator< T > ConstFwdIterator< T >::operator++(int) noexcept
+  ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    ConstFwdIterator< T > result(*this);
+    ConstIterator< T > result(*this);
     ++(*this);
     return result;
   }
 
   template < typename T >
-  bool ConstFwdIterator< T >::operator==(const ConstFwdIterator< T > &rhs) const noexcept
+  bool ConstIterator< T >::operator==(const ConstIterator< T > &rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template < typename T >
-  bool ConstFwdIterator< T >::operator!=(const ConstFwdIterator< T > &rhs) const noexcept
+  bool ConstIterator< T >::operator!=(const ConstIterator< T > &rhs) const noexcept
   {
     return !(rhs == *this);
   }
 
   template < typename T >
-  const T &ConstFwdIterator< T >::operator*() const noexcept
+  const T &ConstIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template < typename T >
-  const T *ConstFwdIterator< T >::operator->() const noexcept
+  const T *ConstIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);

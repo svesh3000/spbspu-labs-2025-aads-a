@@ -6,8 +6,8 @@
 using list_ull_t = sveshnikov::FwdList< unsigned long long >;
 using pair_t = std::pair< std::string, list_ull_t >;
 using list_pair_t = sveshnikov::FwdList< pair_t >;
-using iter_list_ull_t = sveshnikov::ConstFwdIterator< unsigned long long >;
-using iter_t = sveshnikov::ConstFwdIterator< pair_t >;
+using iter_list_ull_t = sveshnikov::ConstIterator< unsigned long long >;
+using iter_t = sveshnikov::ConstIterator< pair_t >;
 
 namespace sveshnikov
 {
