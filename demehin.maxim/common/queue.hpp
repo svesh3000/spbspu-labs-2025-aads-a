@@ -100,7 +100,7 @@ namespace demehin
   {
     if (empty())
     {
-      throw std::logic_error("error: empty");
+      throw std::logic_error("empty");
     }
 
     for (size_t i = 1; i < size_; i++)
@@ -113,7 +113,11 @@ namespace demehin
   template< typename T >
   const T& Queue< T >::back() const
   {
-    return back();
+    if (empty())
+    {
+      throw std::logic_error("empty");
+    }
+    return data_[size_ - 1];
   }
 
   template< typename T >
@@ -121,7 +125,7 @@ namespace demehin
   {
     if (empty())
     {
-      throw std::logic_error("error: empty");
+      throw std::logic_error("empty");
     }
     return data_[size_ - 1];
   }
@@ -129,7 +133,11 @@ namespace demehin
   template< typename T >
   const T& Queue< T >::front() const
   {
-    return front();
+    if (empty())
+    {
+      throw std::logic_error("empty");
+    }
+    return data_[0];
   }
 
   template< typename T >
@@ -137,7 +145,7 @@ namespace demehin
   {
     if (empty())
     {
-      throw std::logic_error("error: empty");
+      throw std::logic_error("empty");
     }
     return data_[0];
   }

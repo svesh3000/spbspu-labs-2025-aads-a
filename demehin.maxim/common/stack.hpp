@@ -92,7 +92,11 @@ namespace demehin
   template< typename T >
   const T& Stack< T >::top() const
   {
-    return top();
+    if (empty())
+    {
+      throw std::logic_error("empty");
+    }
+    return data_[size_ - 1];
   }
 
   template< typename T >
