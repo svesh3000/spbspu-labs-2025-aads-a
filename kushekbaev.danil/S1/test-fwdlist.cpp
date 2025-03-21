@@ -15,7 +15,7 @@ std::string printList(list_t list)
   return out.str();
 }
 
-BOOST_AUTO_TEST_SUITE(list)
+BOOST_AUTO_TEST_SUITE(constructors)
 
 BOOST_AUTO_TEST_CASE(defaultConstructor)
 {
@@ -45,6 +45,10 @@ BOOST_AUTO_TEST_CASE(moveConstructor)
   BOOST_TEST(list1.empty());
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(iterators)
+
 BOOST_AUTO_TEST_CASE(beginEnd)
 {
   list_t list({ 1, 2, 3 });
@@ -59,6 +63,40 @@ BOOST_AUTO_TEST_CASE(beginEnd)
   BOOST_TEST(*it1 == *it2);
 }
 
+BOOST_AUTO_TEST_CASE(constBeginEnd)
+{
+  list_t list({ 1, 2, 3 });
+  auto it1 = list.cbegin();
+  BOOST_TEST(*it1 == 1);
+  ++it1;
+  BOOST_TEST(*it1 == 2);
+  ++it1;
+  BOOST_TEST(*it1 == 3);
+  ++it1;
+  auto it2 = list.cend();
+  BOOST_TEST(*it1 == *it2);
+}
+
+BOOST_AUTO_TEST_CASE(beforeBegin)
+{
+  list_t list({ 4, 5, 6 });
+  auto it = list.before_begin();
+  ++it;
+  BOOST_TEST(*it == 4);
+}
+
+BOOST_AUTO_TEST_CASE(constBeforeBegin)
+{
+  list_t list({ 4, 5, 6 });
+  auto it = list.cbefore_begin();
+  ++it;
+  BOOST_TEST(*it == 4);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(elementAccess)
+
 BOOST_AUTO_TEST_CASE(front)
 {
   list_t list({ 1, 2, 3 });
@@ -70,6 +108,10 @@ BOOST_AUTO_TEST_CASE(back)
   list_t list({ 1, 2, 3 });
   BOOST_TEST(list.back() == 3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(modifiers)
 
 BOOST_AUTO_TEST_CASE(pushfront)
 {
@@ -114,6 +156,10 @@ BOOST_AUTO_TEST_CASE(swap)
   BOOST_TEST(printList(list1) == "1984");
   BOOST_TEST(printList(list2) == "1337");
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(capacity)
 
 BOOST_AUTO_TEST_CASE(size)
 {

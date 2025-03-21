@@ -11,7 +11,7 @@ namespace
   {
     size_t maxSize = 0;
 
-    for (const auto& pair : pairsList)
+    for (const auto& pair: pairsList)
     {
       maxSize = std::max(maxSize, pair.second.size());
     }

@@ -21,6 +21,12 @@ namespace kushekbaev
     Iterator< T > begin() const noexcept;
     Iterator< T > end() const noexcept;
 
+    Iterator< T > cbegin() const noexcept;
+    Iterator< T > cend() const noexcept;
+
+    Iterator< T > before_begin() const noexcept;
+    Iterator< T > cbefore_begin() const noexcept;
+
     T& front() const noexcept;
     T& back() const noexcept;
 
@@ -71,7 +77,7 @@ namespace kushekbaev
   FwdList< T >::FwdList(const FwdList& other):
     FwdList()
   {
-    for (Iterator< T > it = other.begin(); it != other.end(); ++it)
+    for (Iterator< T > it = other.cbegin(); it != other.cend(); ++it)
     {
       push_back(*it);
     }
@@ -83,7 +89,7 @@ namespace kushekbaev
     size_(other.size_)
   {
     other.fake_ = new Node< T >();
-    other.fake_->next_ = other.fake_;
+    other.fake_ -> next_ = other.fake_;
     other.size_ = 0;
   }
 
@@ -101,9 +107,9 @@ namespace kushekbaev
     {
       return false;
     }
-    auto it1 = begin();
-    auto it2 = other.begin();
-    while (it1 != end())
+    auto it1 = cbegin();
+    auto it2 = other.cbegin();
+    while (it1 != cend())
     {
       if (*it1 != *it2)
       {
@@ -129,6 +135,30 @@ namespace kushekbaev
 
   template< typename T >
   Iterator< T > FwdList< T >::end() const noexcept
+  {
+    return Iterator< T >(fake_);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::cbegin() const noexcept
+  {
+    return Iterator< T >(fake_ -> next_);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::cend() const noexcept
+  {
+    return Iterator< T >(fake_);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList<T>::before_begin() const noexcept
+  {
+    return Iterator< T >(fake_);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList<T>::cbefore_begin() const noexcept
   {
     return Iterator< T >(fake_);
   }
