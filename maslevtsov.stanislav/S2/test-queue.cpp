@@ -1,14 +1,14 @@
 #include <boost/test/unit_test.hpp>
 #include "queue.hpp"
 
-BOOST_AUTO_TEST_SUITE(constructors_tests)
+BOOST_AUTO_TEST_SUITE(queue_constructors_tests)
 BOOST_AUTO_TEST_CASE(default_constructor_test)
 {
   maslevtsov::Queue< int > q;
   BOOST_TEST(q.empty());
 }
 
-BOOST_AUTO_TEST_CASE(copy_constructor_test)
+BOOST_AUTO_TEST_CASE(queue_copy_constructor_test)
 {
   maslevtsov::Queue< int > q1;
   q1.push(1);
@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(copy_constructor_test)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(operators_tests)
-BOOST_AUTO_TEST_CASE(copy_assignment_operator_test)
+BOOST_AUTO_TEST_SUITE(queue_operators_tests)
+BOOST_AUTO_TEST_CASE(queue_copy_assignment_operator_test)
 {
   maslevtsov::Queue< int > q1;
   q1.push(1);
@@ -34,63 +34,63 @@ BOOST_AUTO_TEST_CASE(copy_assignment_operator_test)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(elements_access_tests)
-BOOST_AUTO_TEST_CASE(front_test)
+BOOST_AUTO_TEST_SUITE(queue_elements_access_tests)
+BOOST_AUTO_TEST_CASE(queue_front_test)
 {
-  maslevtsov::Queue< int > q1;
-  q1.push(1);
-  q1.push(2);
-  BOOST_TEST(q1.front() == 1);
+  maslevtsov::Queue< int > q;
+  q.push(1);
+  q.push(2);
+  BOOST_TEST(q.front() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(back_test)
+BOOST_AUTO_TEST_CASE(queue_back_test)
 {
-  maslevtsov::Queue< int > q1;
-  q1.push(1);
-  q1.push(2);
-  BOOST_TEST(q1.back() == 2);
-}
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE(capacity_tests)
-BOOST_AUTO_TEST_CASE(empty_test)
-{
-  maslevtsov::Queue< int > q1;
-  BOOST_TEST(q1.empty());
-  q1.push(1);
-  BOOST_TEST(!q1.empty());
-}
-
-BOOST_AUTO_TEST_CASE(size_test)
-{
-  maslevtsov::Queue< int > q1;
-  q1.push(1);
-  BOOST_TEST(q1.size() == 1);
+  maslevtsov::Queue< int > q;
+  q.push(1);
+  q.push(2);
+  BOOST_TEST(q.back() == 2);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(modifiers_tests)
-BOOST_AUTO_TEST_CASE(push_test)
+BOOST_AUTO_TEST_SUITE(queue_capacity_tests)
+BOOST_AUTO_TEST_CASE(queue_empty_test)
 {
-  maslevtsov::Queue< int > q1;
-  q1.push(1);
-  BOOST_TEST(q1.front() == 1);
-  BOOST_TEST(q1.size() == 1);
+  maslevtsov::Queue< int > q;
+  BOOST_TEST(q.empty());
+  q.push(1);
+  BOOST_TEST(!q.empty());
+}
+
+BOOST_AUTO_TEST_CASE(queue_size_test)
+{
+  maslevtsov::Queue< int > q;
+  q.push(1);
+  BOOST_TEST(q.size() == 1);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(queue_modifiers_tests)
+BOOST_AUTO_TEST_CASE(queue_push_test)
+{
+  maslevtsov::Queue< int > q;
+  q.push(1);
+  BOOST_TEST(q.front() == 1);
+  BOOST_TEST(q.size() == 1);
   int n = 2;
-  q1.push(n);
-  BOOST_TEST(q1.back() == 2);
-  BOOST_TEST(q1.size() == 2);
+  q.push(n);
+  BOOST_TEST(q.back() == 2);
+  BOOST_TEST(q.size() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(pop_test)
+BOOST_AUTO_TEST_CASE(queue_pop_test)
 {
-  maslevtsov::Queue< int > q1;
-  q1.push(1);
-  q1.push(2);
-  q1.pop();
-  BOOST_TEST(q1.size() == 1);
-  BOOST_TEST(q1.front() == 2);
-  q1.pop();
-  BOOST_TEST(q1.empty());
+  maslevtsov::Queue< int > q;
+  q.push(1);
+  q.push(2);
+  q.pop();
+  BOOST_TEST(q.size() == 1);
+  BOOST_TEST(q.front() == 2);
+  q.pop();
+  BOOST_TEST(q.empty());
 }
 BOOST_AUTO_TEST_SUITE_END()
