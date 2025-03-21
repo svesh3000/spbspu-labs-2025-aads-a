@@ -13,9 +13,9 @@ namespace tkach
     Queue() = default;
     Queue(const Queue< T >&);
     Queue(Queue< T >&&);
+    ~Queue() = default;
     Queue< T >& operator=(Queue< T >&&) noexcept;
     Queue< T >& operator=(const Queue< T >&) noexcept;
-    ~Queue() = default;
     void pop();
     void push(const T& data);
     void push(T&& data);

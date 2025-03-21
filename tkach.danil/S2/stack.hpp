@@ -13,9 +13,9 @@ namespace tkach
     Stack() = default;
     Stack(const Stack< T >&);
     Stack(Stack< T >&&);
+    ~Stack() = default;
     Stack< T >& operator=(Stack< T >&&) noexcept;
     Stack< T >& operator=(const Stack< T >&) noexcept;
-    ~Stack() = default;
     void pop();
     void push(const T& data);
     void push(T&& data);
