@@ -19,7 +19,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
 {
   if (sequences.cbegin()->first == "")
   {
-    out << '\n';
+    out << '0\n';
     return;
   };
   if (sequences.cbegin()->second.empty())
