@@ -27,7 +27,8 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
   size_t size = 0;
-  for (auto iter = sequences.cbegin(); iter != sequences.cend(); ++iter)
+  auto iter = sequences.cbegin();
+  for (; iter != sequences.cend(); ++iter)
   {
     out << iter->first << ' ';
     begins[size] = iter->second.cbegin();
@@ -43,7 +44,23 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   while (!allItersEnds(begins, ends, size))
   {
     data_t sum = 0;
-    for (size_t i = 0; i < sequences.size();)
+    if (begins[0] != ends[0])
+    {
+      if (sum > std::numeric_limits<data_t>::max() - *begins[0])
+      {
+        sums.clear();
+        delete[] begins;
+        delete[] ends;
+        throw std::overflow_error("owerflow!");
+      }
+      else
+      {
+        sum += *begins[0];
+      }
+      out << *begins[0];
+      ++begins[0];
+    }
+    for (size_t i = 1; i < sequences.size();)
     {
       if (begins[i] != ends[i])
       {
@@ -58,7 +75,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
         {
           sum += *begins[i];
         }
-        out << *begins[i] << ' ';
+        out << ' ' << *begins[i];
         ++begins[i++];
       }
       else
@@ -69,9 +86,12 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     std::cout << '\n';
     sums.push_back(sum);
   }
-  for (auto it = sums.cbegin(); it != sums.cend(); ++it)
+  auto it = sums.cbegin();
+  std::cout << *it;
+  ++it;
+  for (; it != sums.cend(); ++it)
   {
-    out << *it << ' ';
+    out << ' ' << *it;
   }
   if (sequences.size() != 0)
   {
