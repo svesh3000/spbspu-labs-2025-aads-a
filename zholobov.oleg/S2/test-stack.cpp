@@ -149,4 +149,17 @@ BOOST_AUTO_TEST_CASE(empty)
   BOOST_TEST(stack.empty());
 }
 
+BOOST_AUTO_TEST_CASE(clear)
+{
+  zholobov::Stack< std::string > stack;
+  stack.push("One");
+  BOOST_TEST(!stack.empty());
+  stack.clear();
+  BOOST_TEST(stack.empty());
+  stack.push("Two");
+  BOOST_TEST(!stack.empty());
+  stack.clear();
+  BOOST_TEST(stack.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

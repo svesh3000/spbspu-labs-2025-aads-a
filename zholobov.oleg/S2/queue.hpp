@@ -189,6 +189,7 @@ void zholobov::Queue< T >::clear() noexcept
   if (data_ != nullptr) {
     delete[] data_;
     data_ = nullptr;
+    capacity_ = 0;
   }
 }
 
