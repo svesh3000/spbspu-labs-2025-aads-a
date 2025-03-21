@@ -20,6 +20,7 @@ std::istream &abramov::calcInfix(std::istream &in)
   }
   if (stack.empty())
   {
+    std::cout << "\n";
     return in;
   }
   std::cout << stack.top();
