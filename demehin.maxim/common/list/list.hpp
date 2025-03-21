@@ -45,8 +45,10 @@ namespace demehin
     void push_front(const T&);
     void push_back(const T&);
 
-    T& front() const noexcept;
-    T& back() const noexcept;
+    const T& front() const noexcept;
+    T& front() noexcept;
+    const T& back() const noexcept;
+    T& back() noexcept;
 
     bool empty() const noexcept;
 
@@ -337,13 +339,25 @@ namespace demehin
   }
 
   template< typename T >
-  T& List< T >::front() const noexcept
+  const T& List< T >::front() const noexcept
+  {
+    return front();
+  }
+
+  template< typename T >
+  T& List< T >::front() noexcept
   {
     return fake_->next->data;
   }
 
   template< typename T >
-  T& List< T >::back() const noexcept
+  const T& List< T >::back() const noexcept
+  {
+    return back();
+  }
+
+  template< typename T >
+  T& List< T >::back() noexcept
   {
     return tail_->data;
   }
