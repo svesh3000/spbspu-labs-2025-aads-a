@@ -51,6 +51,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   }
 
   data_list_t sums;
+  bool flag1 = true;
   while (!allItersEnds(begins, ends, size))
   {
     data_t sum = 0;
@@ -61,14 +62,14 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
       {
         if (sum > std::numeric_limits<data_t>::max() - *begins[i])
         {
-          sums.clear();
-          delete[] begins;
-          delete[] ends;
-          throw std::overflow_error("owerflow!");
+          flag1 = false;
         }
         else
         {
-          sum += *begins[i];
+          if (flag1 = true)
+          {
+            sum += *begins[i];
+          }
         }
         if (flag == true)
         {
@@ -88,6 +89,14 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     }
     out << '\n';
     sums.push_back(sum);
+  }
+
+  if (flag1 = false)
+  {
+    sums.clear();
+    delete[] begins;
+    delete[] ends;
+    throw std::overflow_error("owerflow!");
   }
 
   auto it = sums.cbegin();
