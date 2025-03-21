@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(copy_constructor_test)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operators_tests)
-BOOST_AUTO_TEST_CASE(copy_constructor_test)
+BOOST_AUTO_TEST_CASE(copy_assignment_operator_test)
 {
   maslevtsov::Queue< int > q1;
   q1.push(1);
