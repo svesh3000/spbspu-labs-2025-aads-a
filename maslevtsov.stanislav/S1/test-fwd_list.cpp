@@ -205,12 +205,22 @@ BOOST_AUTO_TEST_CASE(clear_test)
 
 BOOST_AUTO_TEST_CASE(insert_after_test)
 {
-  maslevtsov::FwdList< int > list1 = {0, 1};
-  auto it1 = list1.cbegin();
-  list1.insert_after(it1, 2);
-  ++(++it1);
-  list1.insert_after(it1, 3);
-  compare_list_values(list1, {0, 2, 1, 3});
+  maslevtsov::FwdList< char > list1 = {'0', '1'};
+  auto it = list1.cbegin();
+  list1.insert_after(it, '2');
+  ++(++it);
+  list1.insert_after(it, '3');
+  compare_list_values(list1, {'0', '2', '1', '3'});
+
+  list1.insert_after(list1.cbegin(), 2, '7');
+  compare_list_values(list1, {'0', '7', '7', '2', '1', '3'});
+
+  maslevtsov::FwdList< char > list2 = {'0', '1', '2'};
+  list1.insert_after(list1.cbegin(), ++list2.cbegin(), list2.cend());
+  compare_list_values(list1, {'0', '1', '2', '7', '7', '2', '1', '3'});
+
+  list2.insert_after(list2.cbegin(), {'1', '2', '3'});
+  compare_list_values(list2, {'0', '1', '2', '3', '1', '2'});
 }
 
 BOOST_AUTO_TEST_CASE(erase_after_test)
@@ -276,18 +286,24 @@ BOOST_AUTO_TEST_CASE(splice_after_test)
 {
   maslevtsov::FwdList< int > list1 = {1, 2, 3, 4, 5};
   maslevtsov::FwdList< int > list2 = {10, 11, 12};
+  list1.splice_after(list1.cbegin(), list2);
+  compare_list_values(list1, {1, 10, 11, 12, 2, 3, 4, 5});
+  compare_list_values(list2, {});
+
+  list1 = {1, 2, 3, 4, 5};
+  list2 = {10, 11, 12};
+  list1.splice_after(list1.cbegin(), list2, list2.cbegin());
+  compare_list_values(list1, {1, 11, 2, 3, 4, 5});
+  compare_list_values(list2, {10, 12});
+
+  list1 = {1, 2, 3, 4, 5};
+  list2 = {10, 11, 12};
   list2.splice_after(list2.cbegin(), list1, list1.cbegin(), list1.cend());
   compare_list_values(list1, {1});
   compare_list_values(list2, {10, 2, 3, 4, 5, 11, 12});
   list1.splice_after(list1.cbegin(), list2, list2.cbegin(), ++list2.cbegin());
   compare_list_values(list1, {1});
   compare_list_values(list2, {10, 2, 3, 4, 5, 11, 12});
-
-  list1 = {1, 2, 3, 4, 5};
-  list2 = {10, 11, 12};
-  list1.splice_after(list1.cbegin(), list2);
-  compare_list_values(list1, {1, 10, 11, 12, 2, 3, 4, 5});
-  compare_list_values(list2, {});
 }
 
 BOOST_AUTO_TEST_CASE(remove_test)

@@ -222,7 +222,7 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
     return iterator(pos.node_);
   }
   splice_after(pos, FwdList< T >(count, value));
-  return pos;
+  return iterator(pos.node_);
 }
 
 template< class T >
@@ -234,7 +234,7 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
     return iterator(pos.node_);
   }
   splice_after(pos, FwdList< T >(first, last));
-  return pos;
+  return iterator(pos.node_);
 }
 
 template< class T >
@@ -346,15 +346,17 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
   if (last == const_iterator(first.node_->next_)) {
     return;
   }
-  std::size_t size_increase = 0;
   if (other.cbegin() == first && other.cend() == last) {
-    size_increase = other.size_ - 1;
+    size_ += other.size_ - 1;
+    other.size_ = 1;
   } else {
-    for (auto it = ++first; it != last; ++it, ++size_increase) {
-    }
+    std::size_t size_increase = 0;
+    for (auto it = first; it != last; ++it, ++size_increase)
+    {}
+    size_ += size_increase - 1;
+    other.size_ -= size_increase - 1;
   }
-  size_ += size_increase;
-  other.size_ -= size_increase;
+
   FwdListNode< T >* pos_next = pos.node_->next_;
   if (pos.node_ == tail_) {
     tail_ = last.node_;
