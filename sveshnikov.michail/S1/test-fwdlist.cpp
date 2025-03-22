@@ -48,6 +48,29 @@ BOOST_AUTO_TEST_CASE(range_constructor)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(operators)
+BOOST_AUTO_TEST_CASE(copy_operator)
+{
+  sveshnikov::FwdList< char > list1({'u', 'w', 'u'});
+  sveshnikov::FwdList< char > list2({'k', 'e', 'k'});
+  list1 = list2;
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 'k');
+  BOOST_TEST(list1.back() == 'k');
+  BOOST_TEST(list2.front() == 'k');
+}
+
+BOOST_AUTO_TEST_CASE(move_operator)
+{
+  sveshnikov::FwdList< char > list1({'u', 'w', 'u'});
+  sveshnikov::FwdList< char > list2({'k', 'e', 'k'});
+  list1 = std::move(list2);
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 'k');
+  BOOST_TEST(list1.back() == 'k');
+  BOOST_TEST(list2.getSize() == 0);
+}
+
 BOOST_AUTO_TEST_CASE(initializer_operator)
 {
   sveshnikov::FwdList< char > list({'u', 'w', 'u'});
@@ -56,6 +79,7 @@ BOOST_AUTO_TEST_CASE(initializer_operator)
   BOOST_TEST(list.front() == 'k');
   BOOST_TEST(list.back() == 'k');
 }
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(interface)
 BOOST_AUTO_TEST_CASE(iterators)
@@ -244,14 +268,46 @@ BOOST_AUTO_TEST_CASE(splice_interval)
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(assign)
+BOOST_AUTO_TEST_CASE(assign_range)
+{
+  sveshnikov::FwdList< int > list1 = {1, 2, 3};
+  sveshnikov::FwdList< int > list2 = {4, 5, 6, 7};
+  list1.assign(++list2.cbegin(), list2.cend());
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 5);
+  BOOST_TEST(list1.back() == 7);
+}
+
+BOOST_AUTO_TEST_CASE(assign_fill)
 {
   sveshnikov::FwdList< int > list1;
-  list1.assign(0, 2);
-  BOOST_TEST(list1.empty());
   list1.assign(5, 4);
   BOOST_TEST(list1.getSize() == 5);
   BOOST_TEST(list1.front() == 4);
   BOOST_TEST(list1.back() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(assign_initializer)
+{
+  sveshnikov::FwdList< int > list1 = {3, 2, 1};
+  list1.assign({1, 2, 3});
+  BOOST_TEST(list1.getSize() == 3);
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list1.back() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(insert)
+{
+  sveshnikov::FwdList< int > list1 = {3, 2, 1};
+  BOOST_TEST(*(list1.insert(list1.cbegin(), 5)) == 5);
+  int a = 3;
+  BOOST_TEST(*(list1.insert(list1.cbegin(), a)) == 3);
+  BOOST_TEST(*(list1.insert(list1.cbefore_begin(), 4, 4)) == 4);
+
+  BOOST_TEST(*(list1.insert(list1.cbefore_begin(), {1, 2, 3})) == 3);
+  BOOST_TEST(list1.getSize() == 12);
+  sveshnikov::FwdList< int > list2 = {6, 7, 8, 9};
+  BOOST_TEST(*(list1.insert(list1.cbefore_begin(), ++list2.cbegin(), list2.cend())) == 9);
+  BOOST_TEST(list1.getSize() == 15);
 }
 BOOST_AUTO_TEST_SUITE_END()
