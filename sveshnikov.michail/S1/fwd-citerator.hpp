@@ -6,7 +6,7 @@
 
 namespace sveshnikov
 {
-  template < typename T > 
+  template < typename T >
   class FwdList;
 
   template < typename T >
