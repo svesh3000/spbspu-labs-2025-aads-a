@@ -135,7 +135,11 @@ namespace abramov
   template< class T >
   void Stack< T >::pop()
   {
-    --size_;
+    if (!empty())
+    {
+      --size_;
+    }
+    throw std::logic_error("Stack is empty\n");
   }
 
   template< class T >
