@@ -2,6 +2,7 @@
 #define STACK_HPP
 #include <cstddef>
 #include <algorithm>
+#include <stdexcept>
 
 namespace abramov
 {
@@ -64,9 +65,10 @@ namespace abramov
         data[i] = stack.data_[i];
       }
     }
-    catch (const std::bad_alloc &)
+    catch (const std::exception &)
     {
       delete[] data;
+      throw;
     }
     data_ = data;
     capacity_ = stack.capacity_;
