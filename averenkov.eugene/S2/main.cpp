@@ -264,6 +264,7 @@ int main(int argc, char* argv[])
 
   catch (const std::underflow_error& e)
   {
+    std::cout << "\n";
     return 0;
   }
 
