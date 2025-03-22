@@ -637,7 +637,18 @@ namespace alymova
   template< typename T >
   void List < T >::remove(const T& value) noexcept
   {
-    remove_if(detail::EqualNode< T >{value});
+    struct EqualNode
+    {
+      const T& value;
+      EqualNode(const T& new_value):
+        value(new_value)
+      {}
+      bool operator()(const T& data)
+      {
+        return value == data;
+      }
+    };
+    remove_if(EqualNode{value});
   }
 
   template< typename T >
