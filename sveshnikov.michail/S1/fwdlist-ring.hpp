@@ -33,19 +33,19 @@ namespace sveshnikov
   public:
     template < typename InputIterator >
     using not_int = std::enable_if_t< !std::is_arithmetic<
-        typename std::remove_cv< InputIterator >::type>::value >;
+        typename std::remove_cv< InputIterator >::type >::value >;
 
     explicit FwdList();
     FwdList(const FwdList< T > &fwdlst);
     FwdList(FwdList< T > &&fwdlst);
     explicit FwdList(size_t n, const T &val);
-    template < typename InputIterator,  typename = not_int< InputIterator > >
+    template < typename InputIterator, typename = not_int< InputIterator > >
     FwdList(InputIterator first, InputIterator last);
     FwdList(std::initializer_list< T > il);
     ~FwdList();
-    FwdList< T > &operator=(const FwdList< T >& fwdlst);
-    FwdList< T > &operator=(FwdList< T >&& fwdlst) noexcept;
-    FwdList< T > &operator=(std::initializer_list<T> il);
+    FwdList< T > &operator=(const FwdList< T > &fwdlst);
+    FwdList< T > &operator=(FwdList< T > &&fwdlst) noexcept;
+    FwdList< T > &operator=(std::initializer_list< T > il);
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > begin() const noexcept;
@@ -72,7 +72,7 @@ namespace sveshnikov
     void clear() noexcept;
 
     void remove(const T &val) noexcept;
-    template <class Predicate>
+    template < class Predicate >
     void remove_if(Predicate pred) noexcept;
 
     void splice(ConstIterator< T > pos, FwdList< T > &fwdlst) noexcept;
@@ -89,9 +89,9 @@ namespace sveshnikov
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T > il);
 
-    Iterator< T > insert(ConstIterator< T > pos, const T& val);
-    Iterator< T > insert(ConstIterator< T > pos, T&& val);
-    Iterator< T > insert(ConstIterator< T > pos, size_t n, const T& val);
+    Iterator< T > insert(ConstIterator< T > pos, const T &val);
+    Iterator< T > insert(ConstIterator< T > pos, T &&val);
+    Iterator< T > insert(ConstIterator< T > pos, size_t n, const T &val);
     template < class InputIterator, typename = not_int< InputIterator > >
     Iterator< T > insert(ConstIterator< T > pos, InputIterator first, InputIterator last);
     Iterator< T > insert(ConstIterator< T > pos, std::initializer_list< T > il);
@@ -199,7 +199,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  FwdList< T > &FwdList< T >::operator=(const FwdList< T >& fwdlst)
+  FwdList< T > &FwdList< T >::operator=(const FwdList< T > &fwdlst)
   {
     FwdList new_list(fwdlst);
     swap(new_list);
@@ -207,7 +207,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  FwdList< T > &FwdList< T >::operator=(FwdList< T >&& fwdlst) noexcept
+  FwdList< T > &FwdList< T >::operator=(FwdList< T > &&fwdlst) noexcept
   {
     clear();
     swap(fwdlst);
@@ -215,7 +215,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  FwdList< T > &FwdList< T >::operator=(std::initializer_list<T> il)
+  FwdList< T > &FwdList< T >::operator=(std::initializer_list< T > il)
   {
     FwdList new_list(il);
     swap(new_list);
@@ -430,7 +430,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  template <class Predicate>
+  template < class Predicate >
   void FwdList< T >::remove_if(Predicate pred) noexcept
   {
     if (empty())
@@ -653,7 +653,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, const T& val)
+  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, const T &val)
   {
     try
     {
@@ -668,7 +668,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, T&& val)
+  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, T &&val)
   {
     try
     {
@@ -683,7 +683,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, size_t n, const T& val)
+  Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, size_t n, const T &val)
   {
     try
     {

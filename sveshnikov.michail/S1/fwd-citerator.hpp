@@ -8,7 +8,7 @@ namespace sveshnikov
 {
   template < typename T > 
   class FwdList;
-  
+
   template < typename T >
   class ConstIterator: public std::iterator< std::forward_iterator_tag, T >
   {
