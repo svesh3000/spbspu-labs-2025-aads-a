@@ -155,11 +155,13 @@ long long evaluatePostfix(const std::string& postfix)
             result = a - b;
             break;
           case '*':
-            if (a > 0 && b > 0 && a > LLONG_MAX / b)
+            if ((a > 0 && b > 0 && a > LLONG_MAX / b) ||
+                (a > 0 && b < 0 && b < LLONG_MIN / a) ||
+                (a < 0 && b > 0 && a < LLONG_MIN / b) ||
+                (a < 0 && b < 0 && a < LLONG_MAX / b))
             {
               throw std::runtime_error("overflow error");
-            }
-            result = a * b;
+            }            result = a * b;
             break;
           case '/':
             if (b == 0)
@@ -173,7 +175,7 @@ long long evaluatePostfix(const std::string& postfix)
             {
               throw std::runtime_error("modul zero");
             }
-            result = a % b;
+            result = (a % b + b) % b;
             break;
           default:
             throw std::runtime_error("invalid operator");
@@ -258,6 +260,11 @@ int main(int argc, char* argv[])
     {
       processExpressions(std::cin);
     }
+  }
+
+  catch (const std::underflow_error& e)
+  {
+    return 0;
   }
 
   catch (const std::exception& e)
