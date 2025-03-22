@@ -1,6 +1,7 @@
 #ifndef FWDLIST_RING_HPP
 #define FWDLIST_RING_HPP
 #include <cassert>
+#include <initializer_list>
 #include "fwd-iterator.hpp"
 #include "fwd-citerator.hpp"
 
@@ -30,10 +31,17 @@ namespace sveshnikov
   class FwdList
   {
   public:
+    template < typename InputIterator >
+    using not_int = std::enable_if_t< !std::is_arithmetic<
+        typename std::remove_cv< InputIterator >::type>::value >;
+
     explicit FwdList();
-    explicit FwdList(size_t n, const T &val);
     FwdList(const FwdList< T > &fwdlst);
     FwdList(FwdList< T > &&fwdlst);
+    explicit FwdList(size_t n, const T &val);
+    template < typename InputIterator, typename = not_int< InputIterator > >
+    FwdList(InputIterator first, InputIterator last);
+    FwdList(std::initializer_list< T > il);
     ~FwdList();
 
     Iterator< T > begin() noexcept;
@@ -90,21 +98,6 @@ namespace sveshnikov
   {}
 
   template < typename T >
-  FwdList< T >::FwdList(size_t n, const T &val):
-    FwdList()
-  {
-    try
-    {
-      assign(n, val);
-    }
-    catch (std::bad_alloc &e)
-    {
-      clear();
-      throw;
-    }
-  }
-
-  template < typename T >
   FwdList< T >::FwdList(const FwdList< T > &fwdlst):
     FwdList()
   {
@@ -136,6 +129,49 @@ namespace sveshnikov
     fwdlst.tail_ = nullptr;
     fwdlst.size_ = 0;
   }
+
+  template < typename T >
+  FwdList< T >::FwdList(size_t n, const T &val):
+    FwdList()
+  {
+    try
+    {
+      for (size_t size = 0; size < n; size++)
+      {
+        push_back(val);
+      }
+    }
+    catch (std::bad_alloc &e)
+    {
+      clear();
+      throw;
+    }
+  }
+
+  template < typename T >
+  template < typename InputIterator, typename >
+  FwdList< T >::FwdList(InputIterator first, InputIterator last):
+    FwdList()
+  {
+    while (first != last)
+    {
+      try
+      {
+        push_back(*first);
+      }
+      catch (std::bad_alloc &e)
+      {
+        clear();
+        throw;
+      }
+      first++;
+    }
+  }
+
+  template < typename T >
+  FwdList< T >::FwdList(std::initializer_list< T > il):
+    FwdList(il.begin(), il.end())
+  {}
 
   template < typename T >
   FwdList< T >::~FwdList()
@@ -313,11 +349,7 @@ namespace sveshnikov
   void FwdList< T >::pop_back() noexcept
   {
     assert(!empty());
-    node_t< T > *current = tail_;
-    for (ConstIterator< T > it = cbegin(); it != cbefore_begin(); it++)
-    {
-      current = current->next_;
-    }
+    node_t< T > *current = shiftPointer(cbefore_begin(), tail_);
     delete tail_;
     size_--;
     if (empty())
@@ -547,10 +579,8 @@ namespace sveshnikov
   void FwdList< T >::assign(size_t n, const T &val)
   {
     clear();
-    for (size_t size = 0; size < n; size++)
-    {
-      push_back(val);
-    }
+    FwdList< T > new_list(n, val);
+    swap(new_list);
   }
 }
 
