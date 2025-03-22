@@ -136,6 +136,10 @@ namespace abramov
   template< class T >
   void Queue< T >::pop()
   {
+    if (empty())
+    {
+      throw std::logic_error("Queue is empty\n");
+    }
     for (size_t i = 0; i < size_; ++i)
     {
       data_[i] = data_[i + 1];
