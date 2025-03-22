@@ -7,10 +7,10 @@
 #include "fwd_list_node.hpp"
 
 namespace maslevtsov {
-  template< typename T >
+  template< class T >
   class FwdList;
 
-  template< typename T, bool is_const >
+  template< class T, bool is_const >
   class FwdIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
   public:

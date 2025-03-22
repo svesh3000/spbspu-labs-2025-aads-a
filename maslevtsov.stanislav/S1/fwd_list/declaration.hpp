@@ -7,7 +7,7 @@
 #include "fwd_iterator.hpp"
 
 namespace maslevtsov {
-  template< typename T >
+  template< class T >
   class FwdList
   {
   public:
@@ -18,7 +18,7 @@ namespace maslevtsov {
     FwdList(const FwdList& rhs);
     FwdList(FwdList&& rhs) noexcept;
     FwdList(std::size_t count, const T& value);
-    template< typename InputIt >
+    template< class InputIt >
     FwdList(InputIt first, InputIt last);
     FwdList(std::initializer_list< T > init);
     ~FwdList();
@@ -28,7 +28,7 @@ namespace maslevtsov {
     FwdList& operator=(std::initializer_list< T > ilist);
 
     void assign(std::size_t count, const T& value);
-    template< typename InputIt >
+    template< class InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > ilist);
 
@@ -51,7 +51,7 @@ namespace maslevtsov {
     iterator insert_after(const_iterator pos, const T& value);
     iterator insert_after(const_iterator pos, T&& value);
     iterator insert_after(const_iterator pos, std::size_t count, const T& value);
-    template< typename InputIt >
+    template< class InputIt >
     iterator insert_after(const_iterator pos, InputIt first, InputIt last);
     iterator insert_after(const_iterator pos, std::initializer_list< T > ilist);
     iterator erase_after(const_iterator pos) noexcept;
@@ -68,12 +68,17 @@ namespace maslevtsov {
     void splice_after(const_iterator pos, FwdList& other, const_iterator it) noexcept;
     void splice_after(const_iterator pos, FwdList& other, const_iterator first, const_iterator last) noexcept;
     void remove(const T& value) noexcept;
-    template< typename UnaryPredicate >
+    template< class UnaryPredicate >
     void remove_if(UnaryPredicate condition);
 
   private:
     FwdListNode< T >* tail_;
     std::size_t size_;
+
+    template< class InputIt >
+    void copy(InputIt first, InputIt last);
+    void emplace_front(FwdListNode< T >* node) noexcept;
+    void emplace_back(FwdListNode< T >* node) noexcept;
   };
 }
 

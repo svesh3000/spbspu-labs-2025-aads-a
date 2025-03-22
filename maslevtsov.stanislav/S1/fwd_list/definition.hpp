@@ -4,32 +4,29 @@
 #include "declaration.hpp"
 #include <utility>
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::FwdList() noexcept:
   tail_(nullptr),
   size_(0)
 {}
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::FwdList(const FwdList& rhs):
   FwdList()
 {
   if (rhs.empty()) {
     return;
   }
-  push_back(*(rhs.cbegin()));
-  for (auto i = ++rhs.cbegin(); i != rhs.cend(); ++i) {
-    push_back(*i);
-  }
+  copy(rhs.begin(), rhs.end());
 }
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::FwdList(FwdList&& rhs) noexcept:
   tail_(std::exchange(rhs.tail_, nullptr)),
   size_(std::exchange(rhs.size_, 0))
 {}
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::FwdList(std::size_t count, const T& value):
   FwdList()
 {
@@ -41,159 +38,157 @@ maslevtsov::FwdList< T >::FwdList(std::size_t count, const T& value):
   }
 }
 
-template< typename T >
-template< typename InputIt >
+template< class T >
+template< class InputIt >
 maslevtsov::FwdList< T >::FwdList(InputIt first, InputIt last):
   FwdList()
 {
   if (first == last) {
     return;
   }
-  for (; first != last; ++first) {
-    push_back(*first);
-  }
+  copy(first, last);
 }
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::FwdList(std::initializer_list< T > init):
   FwdList(init.begin(), init.end())
 {}
 
-template< typename T >
+template< class T >
 maslevtsov::FwdList< T >::~FwdList()
 {
   clear();
 }
 
-template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs)
+template< class T >
+class maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(const FwdList& rhs)
 {
   FwdList< T > copied_rhs(rhs);
   swap(copied_rhs);
   return *this;
 }
 
-template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs) noexcept
+template< class T >
+class maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(FwdList&& rhs) noexcept
 {
   FwdList< T > copied_rhs(std::move(rhs));
   swap(copied_rhs);
   return *this;
 }
 
-template< typename T >
-typename maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(std::initializer_list< T > ilist)
+template< class T >
+class maslevtsov::FwdList< T >::FwdList& maslevtsov::FwdList< T >::operator=(std::initializer_list< T > ilist)
 {
   FwdList< T > copied_rhs(std::move(ilist));
   swap(copied_rhs);
   return *this;
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::assign(std::size_t count, const T& value)
 {
   FwdList< T > assigned(count, value);
   swap(assigned);
 }
 
-template< typename T >
-template< typename InputIt >
+template< class T >
+template< class InputIt >
 void maslevtsov::FwdList< T >::assign(InputIt first, InputIt last)
 {
   FwdList< T > assigned(first, last);
   swap(assigned);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::assign(std::initializer_list< T > ilist)
 {
   FwdList< T > assigned(std::move(ilist));
   swap(assigned);
 }
 
-template< typename T >
+template< class T >
 T& maslevtsov::FwdList< T >::front() noexcept
 {
   assert(!empty() && "element access to empty list");
   return tail_->next_->data_;
 }
 
-template< typename T >
+template< class T >
 const T& maslevtsov::FwdList< T >::front() const noexcept
 {
   assert(!empty() && "element access to empty list");
   return tail_->next_->data_;
 }
 
-template< typename T >
+template< class T >
 T& maslevtsov::FwdList< T >::back() noexcept
 {
   assert(!empty() && "element access to empty list");
   return tail_->data_;
 }
 
-template< typename T >
+template< class T >
 const T& maslevtsov::FwdList< T >::back() const noexcept
 {
   assert(!empty() && "element access to empty list");
   return tail_->data_;
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::begin() noexcept
 {
   assert(tail_ && "iterator to empty list");
   return iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::begin() const noexcept
 {
   assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cbegin() const noexcept
 {
   assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::end() noexcept
 {
   assert(tail_ && "iterator to empty list");
   return iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::end() const noexcept
 {
   assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::const_iterator maslevtsov::FwdList< T >::cend() const noexcept
 {
   assert(tail_ && "iterator to empty list");
   return const_iterator(tail_->next_);
 }
 
-template< typename T >
+template< class T >
 bool maslevtsov::FwdList< T >::empty() const noexcept
 {
   return size_ == 0;
 }
 
-template< typename T >
+template< class T >
 std::size_t maslevtsov::FwdList< T >::size() const noexcept
 {
   return size_;
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::clear() noexcept
 {
   while (!empty()) {
@@ -201,7 +196,7 @@ void maslevtsov::FwdList< T >::clear() noexcept
   }
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, const T& value)
 {
   FwdListNode< T >* new_node = new FwdListNode< T >{value, pos.node_->next_};
@@ -213,13 +208,13 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
   return iterator(new_node);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, T&& value)
 {
   return insert_after(pos, value);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
   std::size_t count, const T& value)
 {
@@ -230,8 +225,8 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
   return pos;
 }
 
-template< typename T >
-template< typename InputIt >
+template< class T >
+template< class InputIt >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos, InputIt first,
   InputIt last)
 {
@@ -242,14 +237,14 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_aft
   return pos;
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::insert_after(const_iterator pos,
   std::initializer_list< T > ilist)
 {
   return insert_after(pos, ilist.begin(), ilist.end());
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_after(const_iterator pos) noexcept
 {
   assert(!empty() && "empty list erasing");
@@ -268,7 +263,7 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_afte
   return iterator(pos.node_->next_);
 }
 
-template< typename T >
+template< class T >
 typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_after(const_iterator first,
   const_iterator last) noexcept
 {
@@ -279,48 +274,35 @@ typename maslevtsov::FwdList< T >::iterator maslevtsov::FwdList< T >::erase_afte
   return iterator(last.node_);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::push_front(const T& value)
 {
   FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
-  if (empty()) {
-    tail_ = new_node;
-    tail_->next_ = tail_;
-  } else {
-    new_node->next_ = tail_->next_;
-    tail_->next_ = new_node;
-  }
-  ++size_;
+  emplace_front(new_node);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::push_front(T&& value)
 {
-  push_front(value);
+  FwdListNode< T >* new_node = new FwdListNode< T >{std::move(value), nullptr};
+  emplace_front(new_node);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::push_back(const T& value)
 {
   FwdListNode< T >* new_node = new FwdListNode< T >{value, nullptr};
-  if (empty()) {
-    tail_ = new_node;
-    tail_->next_ = tail_;
-  } else {
-    new_node->next_ = tail_->next_;
-    tail_->next_ = new_node;
-    tail_ = new_node;
-  }
-  ++size_;
+  emplace_back(new_node);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::push_back(T&& value)
 {
-  push_back(value);
+  FwdListNode< T >* new_node = new FwdListNode< T >{std::move(value), nullptr};
+  emplace_back(new_node);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::pop_front() noexcept
 {
   assert(!empty() && "pop_front() to empty list");
@@ -330,14 +312,14 @@ void maslevtsov::FwdList< T >::pop_front() noexcept
   --size_;
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::swap(FwdList& other) noexcept
 {
   std::swap(tail_, other.tail_);
   std::swap(size_, other.size_);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other)
 {
   other.push_front(T());
@@ -345,19 +327,19 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other)
   other.clear();
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList&& other) noexcept
 {
   splice_after(pos, other);
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator it) noexcept
 {
   splice_after(pos, other, it, ++(++const_iterator(it.node_)));
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, const_iterator first,
   const_iterator last) noexcept
 {
@@ -368,8 +350,8 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
   if (other.cbegin() == first && other.cend() == last) {
     size_increase = other.size_ - 1;
   } else {
-    for (auto it = ++first; it != last; ++it, ++size_increase)
-    {}
+    for (auto it = ++first; it != last; ++it, ++size_increase) {
+    }
   }
   size_ += size_increase;
   other.size_ -= size_increase;
@@ -388,7 +370,7 @@ void maslevtsov::FwdList< T >::splice_after(const_iterator pos, FwdList& other, 
   first.node_->next_ = last.node_;
 }
 
-template< typename T >
+template< class T >
 void maslevtsov::FwdList< T >::remove(const T& value) noexcept
 {
   assert(!empty() && "removing from empty list");
@@ -398,8 +380,8 @@ void maslevtsov::FwdList< T >::remove(const T& value) noexcept
   });
 }
 
-template< typename T >
-template< typename UnaryPredicate >
+template< class T >
+template< class UnaryPredicate >
 void maslevtsov::FwdList< T >::remove_if(UnaryPredicate condition)
 {
   assert(!empty() && "removing from empty list");
@@ -414,6 +396,44 @@ void maslevtsov::FwdList< T >::remove_if(UnaryPredicate condition)
   if (condition(*++it)) {
     erase_after(const_iterator(tail_->next_));
   }
+}
+
+template< class T >
+template< class InputIt >
+void maslevtsov::FwdList< T >::copy(InputIt first, InputIt last)
+{
+  push_back(*first);
+  ++first;
+  for (; first != last; ++first) {
+    push_back(*first);
+  }
+}
+
+template< class T >
+void maslevtsov::FwdList< T >::emplace_front(FwdListNode< T >* node) noexcept
+{
+  if (empty()) {
+    tail_ = node;
+    tail_->next_ = tail_;
+  } else {
+    node->next_ = tail_->next_;
+    tail_->next_ = node;
+  }
+  ++size_;
+}
+
+template< class T >
+void maslevtsov::FwdList< T >::emplace_back(FwdListNode< T >* node) noexcept
+{
+  if (empty()) {
+    tail_ = node;
+    tail_->next_ = tail_;
+  } else {
+    node->next_ = tail_->next_;
+    tail_->next_ = node;
+    tail_ = node;
+  }
+  ++size_;
 }
 
 #endif
