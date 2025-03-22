@@ -43,6 +43,7 @@ namespace sveshnikov
     FwdList(InputIterator first, InputIterator last);
     FwdList(std::initializer_list< T > il);
     ~FwdList();
+    FwdList< T > &operator=(std::initializer_list<T> il);
 
     Iterator< T > begin() noexcept;
     ConstIterator< T > begin() const noexcept;
@@ -177,6 +178,15 @@ namespace sveshnikov
   FwdList< T >::~FwdList()
   {
     clear();
+  }
+
+  template < typename T >
+  FwdList< T > &FwdList< T >::operator=(std::initializer_list<T> il)
+  {
+    clear();
+    FwdList new_list(il);
+    swap(new_list);
+    return *this;
   }
 
   template < typename T >
