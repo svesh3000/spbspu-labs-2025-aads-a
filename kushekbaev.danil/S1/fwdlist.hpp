@@ -2,6 +2,8 @@
 #define FWDLIST_HPP
 
 #include <utility>
+#include <initializer_list>
+#include <type_traits>
 #include "iterator.hpp"
 
 namespace kushekbaev
@@ -9,6 +11,9 @@ namespace kushekbaev
   template< typename T >
   struct FwdList
   {
+    template< typename InputIterator >
+    using enableIf = std::enable_if_t< std::is_convertible< decltype(*std::declval< InputIterator >()), T >::value >;
+
     FwdList();
     FwdList(size_t count, const T& value);
     FwdList(std::initializer_list< T > init);
@@ -41,6 +46,14 @@ namespace kushekbaev
     void pop_back() noexcept;
     void swap(FwdList& other) noexcept;
     void clear() noexcept;
+    Iterator< T > insert_after(Iterator< T > position, const T& value);
+    Iterator< T > insert_after(Iterator< T > position, T&& value);
+    Iterator< T > insert_after(Iterator< T > position, size_t size, const T& value);
+    template< typename InputIterator, typename = enableIf< InputIterator > >
+    Iterator< T > insert_after(Iterator< T > position, InputIterator first, InputIterator last);
+    Iterator< T > insert_after(Iterator< T > position, std::initializer_list< T > il);
+    Iterator< T > erase_after(Iterator< T > position);
+    Iterator< T > erase_after(Iterator< T > position, Iterator< T > last);
 
     void remove(const T& value);
     template< typename Predicate >
@@ -279,6 +292,91 @@ namespace kushekbaev
   }
 
   template< typename T >
+  Iterator< T > FwdList< T >::insert_after(Iterator< T > position, const T& value)
+  {
+    Node< T >* newNode = new Node< T >(value);
+    Node< T >* posNode = position.node_;
+    newNode -> next_ = posNode -> next_;
+    posNode -> next_ = newNode;
+    ++size_;
+    return Iterator< T >(newNode);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::insert_after(Iterator< T > position, T&& value)
+  {
+    return insert_after(position, value);
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::insert_after(Iterator< T > position, size_t size, const T& value)
+  {
+    for (size_t i = 0; i < size - 1; ++i)
+    {
+      insert_after(position, value);
+    }
+    Iterator< T > tmp = insert_after(position, value);
+    return Iterator< T >(tmp);
+  }
+
+  template< typename T >
+  template< typename InputIterator, typename >
+  Iterator< T > FwdList< T >::insert_after(Iterator< T > position, InputIterator first, InputIterator last)
+  {
+    Iterator< T > tmp = Iterator< T >(position.node_);
+    for (auto it = first; it != last; ++it)
+    {
+      tmp = insert_after(position, *it);
+      ++position;
+    }
+    return tmp;
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::insert_after(Iterator< T > position, std::initializer_list< T > il)
+  {
+    return insert_after(position, il.begin(), il.end());
+  }
+
+  template< typename T >
+  Iterator< T > FwdList< T >::erase_after(Iterator< T > position)
+  {
+    assert(!empty());
+    Node< T >* todelete = position.node_ -> next;
+    if (todelete == fake_)
+    {
+      return end();
+    }
+    Node< T >* next = todelete -> next_;
+    position.node_ -> next_ = next;
+    delete todelete;
+    --size_;
+    return Iterator< T >(next);
+  }
+
+  template < typename T >
+  Iterator< T > FwdList< T >::erase_after(Iterator< T > position, Iterator< T > last)
+  {
+    assert(!empty());
+    Node< T >* todelete = position.node_ -> next;
+    if (todelete == fake_)
+    {
+      return end();
+    }
+    todelete = position.node_ -> next_;
+    Node< T >* tmp = nullptr;
+    while (todelete != last.node_ && todelete != fake_)
+    {
+      tmp = todelete -> next;
+      delete todelete;
+      todelete = tmp;
+      --size_;
+    }
+    position.node_ -> next = last.node_;
+    return Iterator< T >(last.node_);
+  }
+
+  template< typename T >
   void FwdList< T >::remove(const T& value)
   {
     Node< T >* current = fake_;
@@ -317,6 +415,48 @@ namespace kushekbaev
         current = current -> next_;
       }
     }
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList& other)
+  {
+    insert_after(position, other.cbegin(), other.cend());
+    other.clear();
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList&& other)
+  {
+    splice_after(position, other);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList& other, Iterator< T > it)
+  {
+    ++it;
+    auto value = *it;
+    insert_after(position, value);
+    other.erase_after(it);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList&& other, Iterator< T > it)
+  {
+    splice_after(position, other);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList& other, Iterator< T > first, Iterator< T > last)
+  {
+    auto tmp = first;
+    insert_after(position, ++tmp, last);
+    other.erase_after(first, last);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(Iterator< T > position, FwdList&& other, Iterator< T > first, Iterator< T > last)
+  {
+    splice_after(position, other, first, last);
   }
 }
 
