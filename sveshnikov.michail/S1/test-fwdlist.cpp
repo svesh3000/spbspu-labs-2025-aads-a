@@ -310,4 +310,25 @@ BOOST_AUTO_TEST_CASE(insert)
   BOOST_TEST(*(list1.insert(list1.cbefore_begin(), ++list2.cbegin(), list2.cend())) == 9);
   BOOST_TEST(list1.getSize() == 15);
 }
+
+BOOST_AUTO_TEST_CASE(erase)
+{
+  sveshnikov::FwdList< int > list1 = {3, 2, 1};
+  BOOST_TEST(*(list1.erase(list1.cbefore_begin())) == 2);
+
+  list1 = {1, 2, 3, 4, 5};
+  BOOST_TEST(*(list1.erase(list1.cbegin(), ++list1.cbegin())) == 1);
+  BOOST_TEST(*(list1.erase(++list1.cbegin(), list1.cend())) == 1);
+  BOOST_TEST(list1.getSize() == 2);
+  BOOST_TEST(list1.front() == 1);
+  BOOST_TEST(list1.back() == 2);
+
+  list1 = {1, 2, 3, 4, 5};
+  list1.erase(list1.cbefore_begin(), ++(++list1.cbegin()));
+  BOOST_TEST(list1.front() == 3);
+
+  list1 = {1, 2, 3, 4, 5};
+  list1.erase(++(++list1.cbegin()), list1.cbegin());
+  BOOST_TEST(list1.back() == 3);
+}
 BOOST_AUTO_TEST_SUITE_END()

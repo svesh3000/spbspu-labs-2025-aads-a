@@ -6,8 +6,11 @@
 
 namespace sveshnikov
 {
+  template < typename T > 
+  class FwdList;
+  
   template < typename T >
-  class Iterator
+  class Iterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     Iterator();
@@ -26,6 +29,7 @@ namespace sveshnikov
 
   private:
     node_t< T > *node_;
+    friend class FwdList< T >;
   };
 
   template < typename T >

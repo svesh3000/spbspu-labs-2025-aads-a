@@ -39,7 +39,7 @@ namespace sveshnikov
     FwdList(const FwdList< T > &fwdlst);
     FwdList(FwdList< T > &&fwdlst);
     explicit FwdList(size_t n, const T &val);
-    template < typename InputIterator, typename = not_int< InputIterator > >
+    template < typename InputIterator,  typename = not_int< InputIterator > >
     FwdList(InputIterator first, InputIterator last);
     FwdList(std::initializer_list< T > il);
     ~FwdList();
@@ -92,9 +92,12 @@ namespace sveshnikov
     Iterator< T > insert(ConstIterator< T > pos, const T& val);
     Iterator< T > insert(ConstIterator< T > pos, T&& val);
     Iterator< T > insert(ConstIterator< T > pos, size_t n, const T& val);
-    template < class InputIterator >
+    template < class InputIterator, typename = not_int< InputIterator > >
     Iterator< T > insert(ConstIterator< T > pos, InputIterator first, InputIterator last);
     Iterator< T > insert(ConstIterator< T > pos, std::initializer_list< T > il);
+
+    Iterator< T > erase(ConstIterator< T > pos);
+    Iterator< T > erase(ConstIterator< T > pos, ConstIterator< T > last);
 
   private:
     node_t< T > *head_;
@@ -695,7 +698,7 @@ namespace sveshnikov
   }
 
   template < typename T >
-  template < class InputIterator >
+  template < class InputIterator, typename >
   Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, InputIterator first, InputIterator last)
   {
     try
@@ -713,16 +716,43 @@ namespace sveshnikov
   template < typename T >
   Iterator< T > FwdList< T >::insert(ConstIterator< T > pos, std::initializer_list< T > il)
   {
-    try
+    return insert(pos, il.begin(), il.end());
+  }
+
+  template < typename T >
+  Iterator< T > FwdList< T >::erase(ConstIterator< T > pos)
+  {
+    node_t< T > *current = shiftPointer(pos, head_);
+    node_t< T > *aft_curr = current->next_;
+    current->next_ = aft_curr->next_;
+    if (head_ == aft_curr)
     {
-      FwdList temp(il);
-      return insert_impl(pos, std::move(temp));
+      head_ = aft_curr->next_;
     }
-    catch (std::bad_alloc &e)
+    if (tail_ == aft_curr)
     {
-      Iterator< T > it(shiftPointer(pos, head_));
-      return it;
+      tail_ = current;
     }
+    delete aft_curr;
+    size_--;
+    if (empty())
+    {
+      reset();
+      return begin();
+    }
+    Iterator< T > aft_pos(shiftPointer(pos, head_->next_));
+    return aft_pos;
+  }
+
+  template < typename T >
+  Iterator< T > FwdList< T >::erase(ConstIterator< T > pos, ConstIterator< T > last)
+  {
+    Iterator< T > it_last = head_;
+    while (pos.node_->next_ != last.node_)
+    {
+      it_last = erase(pos);
+    }
+    return it_last;
   }
 }
 
