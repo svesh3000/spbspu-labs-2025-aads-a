@@ -21,10 +21,14 @@ int main(int argc, char** argv)
     }
     if (argc == 2) {
       std::ifstream fin(argv[1]);
+      if (!fin) {
+        std::cerr << "Invalid input file\n";
+        return 1;
+      }
       maslevtsov::input_expressions(fin, exp_stack);
     }
-  } catch (const std::bad_alloc&) {
-    std::cerr << "Memory allocation error\n";
+  } catch (const std::exception&) {
+    std::cerr << "Input error\n";
     return 1;
   }
 

@@ -3,7 +3,7 @@
 void maslevtsov::input_expressions(std::istream& in, expression_stack& exp_stack)
 {
   std::string str;
-  while (!in.eof()) {
+  while (in) {
     std::getline(in, str);
     if (str.empty()) {
       continue;

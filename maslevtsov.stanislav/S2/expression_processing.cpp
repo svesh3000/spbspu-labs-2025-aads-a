@@ -42,7 +42,7 @@ void maslevtsov::convert(expression_queue& exp)
       result.push(exp.front());
       exp.pop();
     } else if (is_operation(exp.front())) {
-      while (!dump.empty() && (get_precedence(dump.top()) >= get_precedence(exp.front()))) {
+      while (!dump.empty() && (get_precedence(dump.top()) <= get_precedence(exp.front()))) {
         result.push(dump.top());
         dump.pop();
       }
