@@ -63,7 +63,6 @@ namespace asafov
     class const_iterator
     {
       friend class Forward_list;
-      friend class iterator;
     public:
       const_iterator():
       current_(nullptr),
@@ -74,10 +73,6 @@ namespace asafov
       last_(last)
       {}
       const_iterator(const const_iterator& data) noexcept:
-      current_(data.current_),
-      last_(data.last_)
-      {}
-      const_iterator(const iterator& data) noexcept:
       current_(data.current_),
       last_(data.last_)
       {}
@@ -130,7 +125,6 @@ namespace asafov
     class iterator
     {
       friend class Forward_list;
-      friend class const_iterator;
     public:
       iterator():
       current_(nullptr),
@@ -141,10 +135,6 @@ namespace asafov
       last_(last)
       {}
       iterator(const iterator& data) noexcept:
-      current_(data.current_),
-      last_(data.last_)
-      {}
-      iterator(const const_iterator& data) noexcept:
       current_(data.current_),
       last_(data.last_)
       {}
