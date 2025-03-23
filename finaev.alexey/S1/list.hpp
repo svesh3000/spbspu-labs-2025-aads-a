@@ -81,8 +81,8 @@ namespace finaev
     tail_ = other.tail_;
     size_ = other.size_;
     other.head_ = nullptr;
-    tail_ = nullptr;
-    size_ = 0;
+    other.tail_ = nullptr;
+    other.size_ = 0;
   }
 
   template < class T >
