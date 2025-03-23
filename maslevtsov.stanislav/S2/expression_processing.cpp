@@ -1,5 +1,6 @@
 #include "expression_processing.hpp"
 #include <stdexcept>
+#include <iostream>
 #include "checked_operations.hpp"
 
 namespace {
@@ -26,7 +27,7 @@ namespace {
     if (operation == "+" || operation == "-") {
       return 2;
     }
-    return -1;
+    return 3;
   }
 }
 
