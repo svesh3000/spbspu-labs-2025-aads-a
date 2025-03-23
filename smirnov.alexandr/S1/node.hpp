@@ -9,14 +9,14 @@ namespace smirnov
     Node * next;
     T data;
     Node():
-      next(nullptr),
-      data(T())
-    {}
-    Node(const T & value):
-      next(nullptr),
-      data(value)
-    {}
-    ~Node() = default;
+    next(nullptr),
+    data(T())
+  {}
+  Node(const T & value):
+    next(nullptr),
+    data(value)
+  {}
+  ~Node() = default;
   };
 }
 #endif

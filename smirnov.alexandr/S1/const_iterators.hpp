@@ -7,7 +7,7 @@
 namespace smirnov
 {
   template < typename T >
-  class ConstIterator
+  class ConstIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     using this_t = ConstIterator< T >;

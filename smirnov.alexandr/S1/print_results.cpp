@@ -1,7 +1,7 @@
 #include "print_results.hpp"
 #include <limits>
 
-void smirnov::printName(std::ostream & out, const std::list< std::pair< std::string, std::list< size_t > > > & sequences)
+void smirnov::printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences)
 {
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
@@ -14,7 +14,7 @@ void smirnov::printName(std::ostream & out, const std::list< std::pair< std::str
   out << "\n";
 }
 
-void smirnov::printSequences(std::ostream & out, const std::list< std::list< size_t > > & sequences)
+void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & sequences)
 {
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
@@ -30,9 +30,9 @@ void smirnov::printSequences(std::ostream & out, const std::list< std::list< siz
   }
 }
 
-void smirnov::printSums(std::ostream & out, const std::list< std::list< size_t > > & sequences)
+void smirnov::printSums(std::ostream & out, const List< List< size_t > > & sequences)
 {
-  std::list< size_t > sums;
+  List< size_t > sums;
   for (auto it = sequences.begin(); it != sequences.end(); ++it)
   {
     size_t sum = 0;

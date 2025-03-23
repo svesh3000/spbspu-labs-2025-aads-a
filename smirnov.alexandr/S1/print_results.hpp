@@ -2,12 +2,12 @@
 #define PRINT_RESULTS_HPP
 #include <iostream>
 #include <string>
-#include <list>
+#include "list.hpp"
 
 namespace smirnov
 {
-  void printName(std::ostream & out, const std::list< std::pair< std::string, std::list< size_t > > > & sequences);
-  void printSequences(std::ostream & out, const std::list< std::list< size_t > > & sequences);
-  void printSums(std::ostream & out, const std::list< std::list< size_t > > & sequences);
+  void printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences);
+  void printSequences(std::ostream & out, const List< List< size_t > > & sequences);
+  void printSums(std::ostream & out, const List< List< size_t > > & sequences);
 }
 #endif

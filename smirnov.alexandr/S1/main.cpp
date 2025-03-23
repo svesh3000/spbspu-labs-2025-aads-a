@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include "list.hpp"
-#include "list"
 #include "read_sequences.hpp"
 #include "print_results.hpp"
 
@@ -10,7 +9,7 @@ int main()
   using namespace smirnov;
   try
   {
-    std::list< std::pair< std::string, std::list< size_t > > > sequences;
+    List< std::pair< std::string, List< size_t > > > sequences;
     readSequences(std::cin, sequences);
     if (sequences.empty())
     {
@@ -32,7 +31,7 @@ int main()
       std::cout << 0 << "\n";
       return 0;
     }
-    std::list< std::list< size_t > > resultSequences;
+    List< List< size_t > > resultSequences;
     newSequences(resultSequences, sequences);
     if (!resultSequences.empty())
     {

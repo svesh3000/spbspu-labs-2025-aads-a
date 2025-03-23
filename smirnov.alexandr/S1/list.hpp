@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cstddef>
+#include <stdexcept>
 #include "const_iterators.hpp"
 #include "node.hpp"
 
@@ -18,16 +19,16 @@ namespace smirnov
     List< T > & operator=(List< T > &&) noexcept;
     ConstIterator< T > begin() const noexcept;
     ConstIterator< T > end() const noexcept;
-    T & front() noexcept;
-    const T & front() const noexcept;
-    T & back() noexcept;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T &);
     void push_back(const T &);
-    void pop_front() noexcept;
-    void pop_front() const noexcept;
-    void pop_back() noexcept;
+    void pop_front();
+    void pop_back();
     void clear() noexcept;
     void swap(List &) noexcept;
   private:
@@ -110,20 +111,35 @@ namespace smirnov
   }
 
   template < typename T >
-  T & List< T >::front() noexcept
+  T & List< T >::front()
   {
+    assert(!empty());
     return fake_->next->data;
   }
 
   template < typename T >
-  const T & List< T >::front() const noexcept
+  const T & List< T >::front() const
   {
+    assert(!empty());
     return fake_->next->data;
   }
 
   template < typename T >
-  T & List< T >::back() noexcept
+  T & List< T >::back()
   {
+    assert(!empty());
+    Node< T > * current = fake_->next;
+    while (current->next != fake_)
+    {
+      current = current->next;
+    }
+    return current->data;
+  }
+
+  template < typename T >
+  const T & List< T >::back() const
+  {
+    assert(!empty());
     Node< T > * current = fake_->next;
     while (current->next != fake_)
     {
@@ -168,35 +184,27 @@ namespace smirnov
   }
 
   template < typename T >
-  void List< T >::pop_front() noexcept
+  void List< T >::pop_front()
   {
     assert(!empty());
-    Node< T >* temp = fake_->next;
+    Node< T > * temp = fake_->next;
     fake_->next = temp->next;
     delete temp;
     --size_;
   }
 
   template < typename T >
-  void List< T >::pop_front() const noexcept
+  void List< T >::pop_back()
   {
     assert(!empty());
-    Node< T >* temp = fake_->next;
-    fake_->next = temp->next;
-    delete temp;
-  }
-
-  template < typename T >
-  void List< T >::pop_back() noexcept
-  {
-    assert(!empty());
-    Node< T >* current = fake_;
+    Node< T > * current = fake_;
     while (current->next->next != fake_)
     {
       current = current->next;
     }
-    delete current->next;
+    Node< T > * toDelete = current->next;
     current->next = fake_;
+    delete toDelete;
     --size_;
   }
 

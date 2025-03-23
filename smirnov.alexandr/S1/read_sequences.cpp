@@ -1,13 +1,13 @@
 #include "read_sequences.hpp"
 #include <cctype>
-#include <list>
 #include <stdexcept>
+#include "list.hpp"
 
-void smirnov::readSequences(std::istream & in, std::list< std::pair< std::string, std::list< size_t > > > & sequences)
+void smirnov::readSequences(std::istream & in, List< std::pair< std::string, List< size_t > > > & sequences)
 {
   std::string input;
   std::string name;
-  std::list< size_t > list;
+  List< size_t > list;
   while (in >> input)
   {
     if (std::isdigit(input[0]))
@@ -39,25 +39,34 @@ void smirnov::readSequences(std::istream & in, std::list< std::pair< std::string
   }
 }
 
-void smirnov::newSequences(std::list< std::list< size_t > > & out, std::list< std::pair< std::string, std::list< size_t > > > & in)
+void smirnov::newSequences(List< List< size_t > > & out, List< std::pair< std::string, List< size_t > > > & in)
 {
-  bool hasNumbers = true;
-  while (hasNumbers)
+  size_t maxLength = 0;
+  for (auto it = in.begin(); it != in.end(); ++it)
   {
-    hasNumbers = false;
-    std::list< size_t > resultSequence;
+    if (it->second.size() > maxLength)
+    {
+      maxLength = it->second.size();
+    }
+  }
+  for (size_t i = 0; i < maxLength; ++i)
+  {
+    List< size_t > numbers;
     for (auto it = in.begin(); it != in.end(); ++it)
     {
-      if (!it->second.empty())
+      if (i < it->second.size())
       {
-        resultSequence.push_back(it->second.front());
-        it->second.pop_front();
-        hasNumbers = true;
+        auto numIt = it->second.begin();
+        for (size_t j = 0; j < i; ++j)
+        {
+          ++numIt;
+        }
+        numbers.push_back(*numIt);
       }
     }
-    if (!resultSequence.empty())
+    if (!numbers.empty())
     {
-      out.push_back(resultSequence);
+      out.push_back(numbers);
     }
   }
 }
