@@ -1,5 +1,5 @@
-#ifndef STACK_HPP
-#define STACK_HPP
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 
 #include <cstddef>
 #include <stdexcept>
@@ -7,21 +7,23 @@
 namespace mozhegova
 {
   template< typename T >
-  class Stack
+  class Queue
   {
   public:
-    Stack();
-    Stack(const Stack< T > &);
-    Stack(Stack< T > &&);
-    ~Stack();
+    Queue();
+    Queue(const Queue< T > &);
+    Queue(Queue< T > &&);
+    ~Queue();
 
-    Stack< T > & operator=(const Stack< T > &);
-    Stack< T > & operator=(Stack< T > &&);
+    Queue< T > & operator=(const Queue< T > &);
+    Queue< T > & operator=(Queue< T > &&);
 
     void push(const T & value);
     void pop();
-    T & top();
-    const T & top() const;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -34,14 +36,14 @@ namespace mozhegova
   };
 
   template< typename T >
-  Stack< T >::Stack():
+  Queue< T >::Queue():
     size_(0),
     capacity_(50),
     data_(new T[capacity_])
   {}
 
   template< typename T >
-  Stack< T >::Stack(const Stack< T > & other):
+  Queue< T >::Queue(const Queue< T > & other):
     size_(other.size_),
     capacity_(other.capacity_),
     data_(new T[capacity_])
@@ -53,7 +55,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Stack< T >::Stack(Stack< T > && other):
+  Queue< T >::Queue(Queue< T > && other):
     size_(other.size_),
     capacity_(other.capacity_),
     data_(other.data_)
@@ -64,17 +66,17 @@ namespace mozhegova
   }
 
   template< typename T >
-  Stack< T >::~Stack()
+  Queue< T >::~Queue()
   {
     delete[] data_;
   }
 
   template< typename T >
-  Stack< T > & Stack< T >::operator=(const Stack< T > & other)
+  Queue< T > & Queue< T >::operator=(const Queue< T > & other)
   {
     if (this != &other)
     {
-      Stack< T > copy(other);
+      Queue< T > copy(other);
       std::swap(size_, copy.size_);
       std::swap(capacity_, copy.capacity_);
       std::swap(data_, copy.data_);
@@ -83,7 +85,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Stack< T > & Stack< T >::operator=(Stack< T > && other)
+  Queue< T > & Queue< T >::operator=(Queue< T > && other)
   {
     if (this != &other)
     {
@@ -96,7 +98,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  void Stack< T >::push(const T & value)
+  void Queue< T >::push(const T & value)
   {
     if (size_ == capacity_)
     {
@@ -106,17 +108,41 @@ namespace mozhegova
   }
 
   template< typename T >
-  void Stack< T >::pop()
+  void Queue< T >::pop()
   {
     if (empty())
     {
       throw std::logic_error("empty stack");
+    }
+    for (size_t i = 1; i < size_; i++)
+    {
+      data_[i - 1] = data_[i];
     }
     size_--;
   }
 
   template< typename T >
-  T & Stack< T >::top()
+  T & Queue< T >::front()
+  {
+    if (empty())
+    {
+      throw std::logic_error("empty stack");
+    }
+    return data_[0];
+  }
+
+  template< typename T >
+  const T & Queue< T >::front() const
+  {
+    if (empty())
+    {
+      throw std::logic_error("empty stack");
+    }
+    return data_[0];
+  }
+
+  template< typename T >
+  T & Queue< T >::back()
   {
     if (empty())
     {
@@ -126,7 +152,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  const T & Stack< T >::top() const
+  const T & Queue< T >::back() const
   {
     if (empty())
     {
@@ -136,19 +162,19 @@ namespace mozhegova
   }
 
   template< typename T >
-  bool Stack< T >::empty() const noexcept
+  bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< typename T >
-  size_t Stack< T >::size() const noexcept
+  size_t Queue< T >::size() const noexcept
   {
     return size_;
   }
 
   template< typename T >
-  void Stack< T >::resize()
+  void Queue< T >::resize()
   {
     capacity_ *= 2;
     T * temp = new T[capacity_];
