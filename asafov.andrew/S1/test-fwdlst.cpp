@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE(swap_test)
   list.push_back(2);
   list.push_back(3);
   list.push_back(4);
-  asafov::Forward_list::iterator a = list.begin();
-  asafov::Forward_list::iterator b = list.end();
+  asafov::Forward_list<size_t>::iterator a = list.begin();
+  asafov::Forward_list<size_t>::iterator b = list.end();
   ++a;
   ++a;
   list.swap(a, b);
