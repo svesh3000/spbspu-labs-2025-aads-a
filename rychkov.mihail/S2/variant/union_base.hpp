@@ -255,7 +255,7 @@ namespace rychkov
 
       VariantBase() noexcept(is_nothrow_def_ctor)
       {
-        new (this->storage) variant_alternative_t< 0, Types... >();
+        new (this->storage) nth_type_t< 0, Types... >();
         this->active = 0;
       }
       VariantBase(int)

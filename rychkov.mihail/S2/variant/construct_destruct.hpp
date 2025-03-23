@@ -24,7 +24,7 @@ template< size_t N, class... Args >
 rychkov::Variant< Types... >::Variant(in_place_index_t< N >, Args&&... args):
   details::VariantBaseAlias< Types... >(-1)
 {
-  using real_type = variant_alternative_t< N, Types... >;
+  using real_type = nth_type_t< N, Types... >;
   new (this->storage) real_type(std::forward< Args >(args)...);
   this->active = N;
 }

@@ -12,9 +12,9 @@ T& rychkov::Variant< Types... >::emplace(Args&&... args)
 }
 template< class... Types >
 template< size_t N, class... Args >
-rychkov::variant_alternative_t< N, Types... >& rychkov::Variant< Types... >::emplace(Args&&... args)
+rychkov::nth_type_t< N, Types... >& rychkov::Variant< Types... >::emplace(Args&&... args)
 {
-  using real_type = variant_alternative_t< N, Types... >;
+  using real_type = nth_type_t< N, Types... >;
   if (!this->valueless())
   {
     this->destroy();

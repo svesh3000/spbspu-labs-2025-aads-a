@@ -1,6 +1,7 @@
 #ifndef FUNCTIONAL_HPP
 #define FUNCTIONAL_HPP
 
+#include <utility>
 #include <type_traits.hpp>
 
 namespace rychkov

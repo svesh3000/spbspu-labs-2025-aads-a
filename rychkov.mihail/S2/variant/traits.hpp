@@ -10,7 +10,7 @@ namespace rychkov
   {
   public:
     static constexpr bool is_def_ctor =
-        std::is_default_constructible< variant_alternative_t< 0, Types... > >::value;
+        std::is_default_constructible< nth_type_t< 0, Types... > >::value;
     static constexpr bool is_copy_ctor =
         conjunction_v< std::is_copy_constructible< Types >::value... >;
     static constexpr bool is_move_ctor =
@@ -23,7 +23,7 @@ namespace rychkov
         conjunction_v< std::is_default_constructible< Types >::value... >;
 
     static constexpr bool is_nothrow_def_ctor =
-        std::is_nothrow_default_constructible< variant_alternative_t< 0, Types... > >::value;
+        std::is_nothrow_default_constructible< nth_type_t< 0, Types... > >::value;
     static constexpr bool is_nothrow_copy_ctor =
         conjunction_v< std::is_nothrow_copy_constructible< Types >::value... >;
     static constexpr bool is_nothrow_move_ctor =

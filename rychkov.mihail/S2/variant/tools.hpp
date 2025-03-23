@@ -7,21 +7,42 @@ namespace rychkov
 {
   using byte = unsigned char;
 
+  template< class... Types >
+  class Variant;
+
   template< size_t N, class T, class... Types >
-  struct variant_alternative
+  struct nth_type
   {
-    using type = typename variant_alternative< N - 1, Types... >::type;
+    using type = typename nth_type< N - 1, Types... >::type;
   };
   template< class T, class... Types >
-  struct variant_alternative< 0, T, Types... >
+  struct nth_type< 0, T, Types... >
   {
     using type = T;
   };
   template< size_t N, class... Types >
-  using variant_alternative_t = typename variant_alternative< N, Types... >::type;
+  using nth_type_t = typename nth_type< N, Types... >::type;
 
+  template< size_t N, class T >
+  struct variant_alternative;
+  template< size_t N, class... Types >
+  struct variant_alternative< N, Variant< Types... > >
+  {
+    using type = nth_type_t< N, Types... >;
+  };
+  template< size_t N, class T >
+  using variant_alternative_t = typename variant_alternative< N, T >::type;
+
+  template< class T >
+  struct variant_size;
   template< class... Types >
-  constexpr size_t variant_size_v = sizeof...(Types);
+  struct variant_size< Variant< Types... > >: std::integral_constant< size_t, sizeof...(Types) >
+  {};
+  template< class... Types >
+  struct variant_size< const Variant< Types... > >: std::integral_constant< size_t, sizeof...(Types) >
+  {};
+  template< class T >
+  constexpr size_t variant_size_v = variant_size< T >::value;
 
   namespace details
   {

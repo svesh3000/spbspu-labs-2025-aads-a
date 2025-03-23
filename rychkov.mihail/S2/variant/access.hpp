@@ -27,20 +27,20 @@ const T* rychkov::get_if(const Variant< Types... >* variant) noexcept
   return get_if< find_uniq_type_in_pack< T, Types... >() >(variant);
 }
 template< size_t N, class... Types >
-rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(Variant< Types... >* variant) noexcept
+rychkov::nth_type_t< N, Types... >* rychkov::get_if(Variant< Types... >* variant) noexcept
 {
   if (variant->index() == N)
   {
-    return variant->template get< variant_alternative_t< N, Types... > >();
+    return variant->template get< nth_type_t< N, Types... > >();
   }
   return nullptr;
 }
 template< size_t N, class... Types >
-const rychkov::variant_alternative_t< N, Types... >* rychkov::get_if(const Variant< Types... >* variant) noexcept
+const rychkov::nth_type_t< N, Types... >* rychkov::get_if(const Variant< Types... >* variant) noexcept
 {
   if (variant->index() == N)
   {
-    return variant->template get< variant_alternative_t< N, Types... > >();
+    return variant->template get< nth_type_t< N, Types... > >();
   }
   return nullptr;
 }
@@ -66,9 +66,9 @@ const T&& rychkov::get(const Variant< Types... >&& variant)
   return std::move(get< T >(variant));
 }
 template< size_t N, class... Types >
-rychkov::variant_alternative_t< N, Types... >& rychkov::get(Variant< Types... >& variant)
+rychkov::nth_type_t< N, Types... >& rychkov::get(Variant< Types... >& variant)
 {
-  rychkov::variant_alternative_t< N, Types... >* resultPtr = get_if< N, Types... >(&variant);
+  rychkov::nth_type_t< N, Types... >* resultPtr = get_if< N, Types... >(&variant);
   if (resultPtr == nullptr)
   {
     details::throw_bad_variant_access(variant.valueless_by_exception());
@@ -76,9 +76,9 @@ rychkov::variant_alternative_t< N, Types... >& rychkov::get(Variant< Types... >&
   return *resultPtr;
 }
 template< size_t N, class... Types >
-const rychkov::variant_alternative_t< N, Types... >& rychkov::get(const Variant< Types... >& variant)
+const rychkov::nth_type_t< N, Types... >& rychkov::get(const Variant< Types... >& variant)
 {
-  rychkov::variant_alternative_t< N, Types... >* resultPtr = get_if< N >(&variant);
+  rychkov::nth_type_t< N, Types... >* resultPtr = get_if< N >(&variant);
   if (resultPtr != nullptr)
   {
     details::throw_bad_variant_access(variant.valueless_by_exception());
@@ -86,12 +86,12 @@ const rychkov::variant_alternative_t< N, Types... >& rychkov::get(const Variant<
   return *resultPtr;
 }
 template< size_t N, class... Types >
-rychkov::variant_alternative_t< N, Types... >&& rychkov::get(Variant< Types... >&& variant)
+rychkov::nth_type_t< N, Types... >&& rychkov::get(Variant< Types... >&& variant)
 {
   return std::move(get< N >(variant));
 }
 template< size_t N, class... Types >
-const rychkov::variant_alternative_t< N, Types... >&& rychkov::get(const Variant< Types... >&& variant)
+const rychkov::nth_type_t< N, Types... >&& rychkov::get(const Variant< Types... >&& variant)
 {
   return std::move(get< N >(variant));
 }

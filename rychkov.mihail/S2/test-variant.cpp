@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 #include <boost/test/unit_test.hpp>
 #include <functional.hpp>
 #include "variant.hpp"
@@ -41,6 +42,22 @@ namespace rychkov
     static_assert(std::is_same< invoke_result_t< Visitor, int >, int >::value, "");
     static_assert(!is_nothrow_invocable_v< Visitor, int >, "");
   }
+
+  template< class R, size_t... Actives, class F, class... Variants >
+  R invoke_visit(F&& func, Variants... args)
+  {
+    return invoke_r< R >(func, get< Actives >(args)...);
+  }
+  template< class T, size_t... Lens >
+  struct multidimensional_array
+  {
+    T data;
+  };
+  template< class T, size_t Len, size_t... Lens >
+  struct multidimensional_array< T, Len, Lens... >
+  {
+    multidimensional_array< T, Lens... > data[Len];
+  };
 }
 
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
@@ -60,6 +77,8 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   rychkov::Variant< int32_t, char > variant7(variant6);
   rychkov::Variant< char, std::string > variant8 = "works";
   variant8 = "works twice";
+  variant = 997;
+  rychkov::invoke_visit< int, 0 >(rychkov::test_visit::Visitor(), variant);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
