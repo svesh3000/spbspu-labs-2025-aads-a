@@ -240,9 +240,14 @@ namespace gavrilova {
   template< class T >
   void FwdList< T >::remove(const T &value) noexcept
   {
-    remove_if([&value](const T& data) {
-      return data == value;
-    });
+    struct IsEqual {
+      const T& value;
+      IsEqual(const T& v) : value(v) {}
+      bool operator()(const T& data) const {
+        return data == value;
+      }
+    };
+    remove_if(IsEqual(value));
   }
 
   template< class T >
