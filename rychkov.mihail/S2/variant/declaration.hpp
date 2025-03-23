@@ -1,6 +1,7 @@
 #ifndef DECLARATION_HPP
 #define DECLARATION_HPP
 
+#include <functional.hpp>
 #include "union_base.hpp"
 #include "tools.hpp"
 
@@ -88,6 +89,13 @@ namespace rychkov
     void throw_bad_variant_access(const char* message);
     void throw_bad_variant_access(bool valueless);
   }
+
+  template< class R, class F, class First, class... Variants >
+  R visit(F&& func, First&& first, Variants&&... args);
+  template< class R, class F >
+  R visit(F&& func);
+  template< class F, class... Variants >
+  invoke_result_t< F, variant_alternative_t< 0, Variants >... > visit(F&& func, Variants&&... args);
 }
 
 #endif

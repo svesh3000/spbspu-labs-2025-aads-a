@@ -42,15 +42,15 @@ namespace rychkov
   }
   template< class R, class F, class... Args >
   std::enable_if_t< !std::is_void< R >::value, R > invoke_r(F&& func, Args&&... args)
-      noexcept(noexcept(std::declval< F >()(std::declval< Args >()...)))
+      noexcept(noexcept(R(invoke(std::declval< F >(), std::declval< Args >()...))))
   {
-    return std::forward< F >(func)(std::forward< Args >(args)...);
+    return invoke(std::forward< F >(func), std::forward< Args >(args)...);
   }
   template< class R, class F, class... Args >
   std::enable_if_t< std::is_void< R >::value, void > invoke_r(F&& func, Args&&... args)
-      noexcept(noexcept(std::declval< F >()(std::declval< Args >()...)))
+      noexcept(noexcept(invoke(std::declval< F >(), std::declval< Args >()...)))
   {
-    std::forward< F >(func)(std::forward< Args >(args)...);
+    invoke(std::forward< F >(func), std::forward< Args >(args)...);
   }
 
   namespace details

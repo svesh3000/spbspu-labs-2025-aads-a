@@ -5,5 +5,6 @@
 #include "variant/access.hpp"
 #include "variant/modificate.hpp"
 #include "variant/construct_destruct.hpp"
+#include "variant/visit.hpp"
 
 #endif
