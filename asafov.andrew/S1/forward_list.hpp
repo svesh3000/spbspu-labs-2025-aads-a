@@ -76,7 +76,7 @@ namespace asafov
       current_(data.current_),
       last_(data.last_)
       {}
-      iterator(const iterator& data) noexcept:
+      const_iterator(const iterator& data) noexcept:
       current_(data.current_),
       last_(data.last_)
       {}
