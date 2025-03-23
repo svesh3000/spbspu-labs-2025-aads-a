@@ -202,6 +202,14 @@ namespace asafov
       return iterator(nullptr, tail_);
     }
 
+    T& front()
+    {
+      return head_->data_;
+    }
+    T& back()
+    {
+      return tail_->data_;
+    }
     bool empty() const
     {
       return !head_;
@@ -209,6 +217,18 @@ namespace asafov
     size_t size() const
     {
       return size_;
+    }
+    void swap(const iterator& a, const iterator& b)
+    {
+      Node* temp1 = head_;
+      while (temp1->next_ != a.current_) temp1 = temp1->next;
+      Node* temp2 = head_;
+      while (temp1->next_ != b.current_) temp1 = temp1->next;
+      temp1->next_ = b;
+      temp2->next_ = a;
+      Node* temp3 = a.current_->next_;
+      a.current_->next_ = b.current_->next_;
+      b.current_->next_ = temp3;
     }
     void pop_front() noexcept
     {
