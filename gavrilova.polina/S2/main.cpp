@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   }
 
   if (results.empty()) {
-    // std::cout << "\n";
+    std::cout << "\n";
     return 0;
   }
 
