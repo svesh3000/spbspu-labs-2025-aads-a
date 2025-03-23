@@ -3,7 +3,6 @@
 #include <limits>
 #include <cstddef>
 #include "queue.hpp"
-#include "post_expression.hpp"
 #include "stack.hpp"
 
 namespace
