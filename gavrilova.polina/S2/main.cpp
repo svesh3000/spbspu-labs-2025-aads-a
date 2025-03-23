@@ -43,11 +43,11 @@ int main(int argc, char* argv[])
   }
 
   if (results.empty()) {
-    std::cout << "\n";
+    // std::cout << "\n";
     return 0;
   }
 
-  std::cout << results.top() << "\n";
+  std::cout << results.top();
   results.pop();
   while (!results.empty()) {
     std::cout << " ";
