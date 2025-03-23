@@ -63,6 +63,7 @@ namespace asafov
     class const_iterator
     {
       friend class Forward_list;
+      friend class iterator;
     public:
       const_iterator():
       current_(nullptr),
@@ -129,6 +130,7 @@ namespace asafov
     class iterator
     {
       friend class Forward_list;
+      friend class const_iterator;
     public:
       iterator():
       current_(nullptr),
