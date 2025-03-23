@@ -16,9 +16,10 @@ namespace zakirov
     T & operator*();
     T * operator->();
     FwdIterator< T > & operator++();
-    bool operator!=(const FwdIterator< T > & other) const;
-    bool operator==(const FwdIterator< T > & other) const;
-    FwdListNode< T > * node_;
+    FwdIterator< T > & operator++(int);
+    bool operator!=(const FwdIterator< T > & other) const noexcept;
+    bool operator==(const FwdIterator< T > & other) const noexcept;
+    zakirov::FwdListNode< T > * node_;
   };
 
   template< typename T >
@@ -27,7 +28,7 @@ namespace zakirov
   {}
 
   template< typename T >
-  FwdIterator< T >::FwdIterator(FwdListNode< T > * node):
+  FwdIterator< T >::FwdIterator(zakirov::FwdListNode< T > * node):
     node_(node)
   {}
 
@@ -51,13 +52,21 @@ namespace zakirov
   }
 
   template< typename T >
-  bool FwdIterator< T >::operator!=(const FwdIterator& other) const
+  FwdIterator< T > & FwdIterator< T >::operator++(int)
+  {
+    FwdIterator< T > * primal_state = *this;
+    node_ = node_->next_;
+    return primal_state;
+  }
+
+  template< typename T >
+  bool FwdIterator< T >::operator!=(const FwdIterator< T > & other) const noexcept
   {
     return node_ != other.node_;
   }
 
   template< typename T >
-  bool FwdIterator< T >::operator==(const FwdIterator& other) const
+  bool FwdIterator< T >::operator==(const FwdIterator< T > & other) const noexcept
   {
     return node_ == other.node_;
   }
@@ -66,17 +75,18 @@ namespace zakirov
   struct CFwdIterator: public std::iterator< std::forward_iterator_tag, T >
   {
     CFwdIterator();
-    CFwdIterator(CFwdIterator< T > * node);
+    CFwdIterator(FwdListNode< T > * node);
     ~CFwdIterator() = default;
     CFwdIterator(const CFwdIterator< T > &) = default;
     CFwdIterator< T > & operator=(const CFwdIterator< T > &) = default;
-    T & operator*();
-    T * operator->();
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
     CFwdIterator< T > & operator++();
+    CFwdIterator< T > & operator++(int);
     bool operator!=(const CFwdIterator< T > & other) const;
     bool operator==(const CFwdIterator< T > & other) const;
   private:
-    CFwdIterator< T > * node_;
+    const zakirov::FwdListNode< T > * node_;
   };
 
   template< typename T >
@@ -85,18 +95,18 @@ namespace zakirov
   {}
 
   template< typename T >
-  CFwdIterator< T >::CFwdIterator(CFwdIterator< T > * node):
+  CFwdIterator< T >::CFwdIterator(FwdListNode< T > * node):
     node_(node)
   {}
 
   template< typename T >
-  T & CFwdIterator< T >::operator*()
+  const T & CFwdIterator< T >::operator*() const noexcept
   {
     return node_->data_;
   }
 
   template< typename T >
-  T * CFwdIterator< T >::operator->()
+  const T * CFwdIterator< T >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }
@@ -109,19 +119,24 @@ namespace zakirov
   }
 
   template< typename T >
-  bool CFwdIterator< T >::operator!=(const CFwdIterator& other) const
+  CFwdIterator< T > & CFwdIterator< T >::operator++(int)
+  {
+    FwdIterator< T > * primal_state = *this;
+    node_ = node_->next_;
+    return primal_state;
+  }
+
+  template< typename T >
+  bool CFwdIterator< T >::operator!=(const CFwdIterator< T > & other) const
   {
     return node_ != other.node_;
   }
 
   template< typename T >
-  bool CFwdIterator< T >::operator==(const CFwdIterator& other) const
+  bool CFwdIterator< T >::operator==(const CFwdIterator< T > & other) const
   {
     return node_ == other.node_;
   }
 }
-
-
-
 
 #endif
