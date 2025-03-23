@@ -247,6 +247,7 @@ namespace gavrilova {
         return data == value;
       }
     };
+    
     remove_if(IsEqual(value));
   }
 
