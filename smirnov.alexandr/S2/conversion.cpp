@@ -170,6 +170,8 @@ double smirnov::evaluatePostfix(Queue<std::string> & postfix)
   {
     throw std::invalid_argument("Too many operands");
   }
-  return static_cast<double>(result);
+  std::ostringstream oss;
+  oss << result;
+  return std::stod(oss.str());
 }
 
