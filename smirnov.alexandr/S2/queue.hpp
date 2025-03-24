@@ -46,7 +46,7 @@ namespace smirnov
   }
 
   template< typename T >
-  bool Queue<T>::empty() const
+  bool Queue< T >::empty() const
   {
     return data_.empty();
   }

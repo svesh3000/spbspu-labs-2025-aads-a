@@ -46,7 +46,7 @@ smirnov::Queue< std::string > smirnov::infixToPostfix(const std::string & infix)
       }
       catch (...)
       {
-        throw std::invalid_argument("Invalid token: " + token);
+        throw std::invalid_argument("Invalid token");
       }
     }
   }
@@ -64,8 +64,8 @@ smirnov::Queue< std::string > smirnov::infixToPostfix(const std::string & infix)
 long long smirnov::evaluatePostfix(Queue<std::string> & postfix)
 {
   Stack< long long > values;
-  constexpr long long max_val = std::numeric_limits<long long>::max();
-  constexpr long long min_val = std::numeric_limits<long long>::min();
+  constexpr long long max_val = std::numeric_limits< long long >::max();
+  constexpr long long min_val = std::numeric_limits< long long >::min();
   while (!postfix.empty())
   {
     std::string token = postfix.front();

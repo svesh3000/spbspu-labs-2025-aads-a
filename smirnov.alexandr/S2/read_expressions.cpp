@@ -5,7 +5,7 @@
 
 std::list< std::string > smirnov::readExpressions(const std::string & filename)
 {
-  std::list<std::string> expressions;
+  std::list< std::string > expressions;
   if (filename.empty())
   {
     processInput(std::cin, expressions);
