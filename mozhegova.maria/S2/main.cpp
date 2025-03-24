@@ -180,7 +180,7 @@ namespace
     }
     else if (op == "/")
     {
-      if ((1 / b > max / a) || (1 / b < min / a))
+      if (a == min && b == -1)
       {
         throw std::overflow_error("overflow");
       }
@@ -230,12 +230,15 @@ namespace
 
   void outputRes(std::ostream & out, mozhegova::Stack< long long > & res)
   {
-    out << res.top();
-    res.pop();
-    while (!res.empty())
+    if (!res.empty())
     {
-      out << " " << res.top();
+      out << res.top();
       res.pop();
+      while (!res.empty())
+      {
+        out << " " << res.top();
+        res.pop();
+      }
     }
   }
 }
