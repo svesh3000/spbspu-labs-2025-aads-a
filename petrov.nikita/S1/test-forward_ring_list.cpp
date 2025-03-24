@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
 #include <sstream>
-#include "forward_ring_list.hpp"
+#include "forward_ring_list_2.hpp"
 
 BOOST_AUTO_TEST_SUITE(forward_ring_list_iterator)
 
