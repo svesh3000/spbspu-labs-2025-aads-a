@@ -239,6 +239,7 @@ void resultsOutput(std::stack < long long > results, std::ostream& out)
     out << " " << results.top();
     results.pop();
   }
+  out << '\n';
 }
 
 void inputExpression(std::istream& in, std::queue < std::string >& infixExpressions)
