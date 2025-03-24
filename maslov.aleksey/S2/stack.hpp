@@ -2,7 +2,6 @@
 #define STACK_HPP
 
 #include <cstddef>
-#include <algorithm>
 #include <stdexcept>
 
 namespace maslov
