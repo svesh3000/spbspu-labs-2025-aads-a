@@ -143,6 +143,55 @@ namespace
     }
     return newQueue;
   }
+
+  mozhegova::Stack< long long > calculateExprs(mozhegova::Queue< mozhegova::Queue< std::string > > & queue)
+  {
+    mozhegova::Stack< long long > res;
+    while (!queue.empty())
+    {
+      mozhegova::Queue< std::string > postExpr = queue.front();
+      queue.pop();
+      mozhegova::Stack< long long > stack;
+      while (!postExpr.empty())
+      {
+        std::string token = postExpr.front();
+        postExpr.pop();
+        if (isOperand(token))
+        {
+          stack.push(std::stoll(token));
+        }
+        else
+        {
+          long long b = stack.top();
+          stack.pop();
+          long long a = stack.top();
+          stack.pop();
+          if (token == "+")
+          {
+            stack.push(a + b);
+          }
+          else if (token == "-")
+          {
+            stack.push(a - b);
+          }
+          else if (token == "*")
+          {
+            stack.push(a * b);
+          }
+          else if (token == "/")
+          {
+            stack.push(a / b);
+          }
+          else if (token == "%")
+          {
+            stack.push(a % b);
+          }
+        }
+      }
+      res.push(stack.top());
+    }
+    return res;
+  }
 }
 
 int main(int argc, char * argv[])
@@ -161,6 +210,7 @@ int main(int argc, char * argv[])
       inputExprs(std::cin, infExprs);
     }
     Queue< Queue< std::string > > postExprs = convertInfToPost(infExprs);
+    Stack< long long > results = calculateExprs(postExprs);
   }
   catch(const std::exception & e)
   {
