@@ -228,6 +228,7 @@ BOOST_AUTO_TEST_CASE(reverse_list_with_many_elements)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(copy_constuctor)
 
 BOOST_AUTO_TEST_CASE(make_list_from_other_which_is_empty)
@@ -279,6 +280,7 @@ BOOST_AUTO_TEST_CASE(make_list_from_other_with_many_elements)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(clear_method)
 
 BOOST_AUTO_TEST_CASE(clear_empty_list)
@@ -314,6 +316,7 @@ BOOST_AUTO_TEST_CASE(clear_list_with_many_elements)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(assign)
 
@@ -412,6 +415,7 @@ BOOST_AUTO_TEST_CASE(assign_many_element_list_from_empty_other)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(pop_front_method)
 
 BOOST_AUTO_TEST_CASE(pop_front_empty_list)
@@ -459,6 +463,7 @@ BOOST_AUTO_TEST_CASE(pop_front_three_element_list)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(remove_method)
 
@@ -572,6 +577,73 @@ BOOST_AUTO_TEST_CASE(remove_elements_from_list_which_are_there)
   }
   while (it++ != fwd_list.cend());
   BOOST_TEST(out.str() == "9 8 6 5 4 3 2");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(comparasion_operator)
+
+BOOST_AUTO_TEST_CASE(compare_empty_lists)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  out << (first_fwd_list == second_fwd_list);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(compare_empty_list_with_not_empty)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  second_fwd_list.push_front(1);
+  out << (first_fwd_list == second_fwd_list);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_equal_not_empty_lists)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(i);
+  }
+  out << (first_fwd_list == second_fwd_list);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_not_equal_not_empty_lists_different_size)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(4 - i);
+  }
+  second_fwd_list.pop_front();
+  out << (first_fwd_list == second_fwd_list);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_not_equal_not_empty_lists_one_size)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(4 - i);
+  }
+  out << (first_fwd_list == second_fwd_list);
+  BOOST_TEST(out.str() == "0");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
