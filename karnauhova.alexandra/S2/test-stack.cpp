@@ -41,16 +41,16 @@ BOOST_AUTO_TEST_CASE(test_constructors_and_operator_stack)
 {
   karnauhova::Stack<int> stack;
   stack.push(2);
-  
+
   karnauhova::Stack<int> copystack(stack);
   BOOST_TEST(copystack.size() == 1);
   BOOST_TEST(copystack.top() == 2);
-  
+
   karnauhova::Stack<int> movestack(std::move(stack));
   BOOST_TEST(movestack.size() == 1);
   BOOST_TEST(movestack.top() == 2);
   BOOST_TEST(stack.empty());
-  
+
   karnauhova::Stack<int> another_stack;
   another_stack.push(3);
   another_stack.push(4);

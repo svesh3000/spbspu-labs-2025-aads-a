@@ -45,16 +45,16 @@ BOOST_AUTO_TEST_CASE(test_constructors_and_operator_queue)
 {
   karnauhova::Queue<int> queue;
   queue.push(2);
-  
+
   karnauhova::Queue<int> copyqueue(queue);
   BOOST_TEST(copyqueue.size() == 1);
   BOOST_TEST(copyqueue.back() == 2);
-  
+
   karnauhova::Queue<int> movequeue(std::move(queue));
   BOOST_TEST(movequeue.size() == 1);
   BOOST_TEST(movequeue.back() == 2);
   BOOST_TEST(queue.empty());
-  
+
   karnauhova::Queue<int> another_queue;
   another_queue.push(3);
   another_queue.push(4);
