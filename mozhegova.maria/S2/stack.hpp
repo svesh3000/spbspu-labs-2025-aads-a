@@ -87,10 +87,11 @@ namespace mozhegova
   {
     if (this != &other)
     {
+      delete[] data_;
       std::swap(size_, other.size_);
       std::swap(capacity_, other.capacity_);
-      std::swap(data_, other.data_);
-      delete[] other.data_;
+      data_ = other.data_;
+      other.data_ = nullptr;
     }
     return *this;
   }

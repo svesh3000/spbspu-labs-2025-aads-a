@@ -89,10 +89,11 @@ namespace mozhegova
   {
     if (this != &other)
     {
+      delete[] data_;
       std::swap(size_, other.size_);
       std::swap(capacity_, other.capacity_);
-      std::swap(data_, other.data_);
-      delete[] other.data_;
+      data_ = other.data_;
+      other.data_ = nullptr;
     }
     return *this;
   }
@@ -112,7 +113,7 @@ namespace mozhegova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty queue");
     }
     for (size_t i = 1; i < size_; i++)
     {
@@ -126,7 +127,7 @@ namespace mozhegova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty queue");
     }
     return data_[0];
   }
@@ -136,7 +137,7 @@ namespace mozhegova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty queue");
     }
     return data_[0];
   }
@@ -146,7 +147,7 @@ namespace mozhegova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty queue");
     }
     return data_[size_ - 1];
   }
@@ -156,7 +157,7 @@ namespace mozhegova
   {
     if (empty())
     {
-      throw std::logic_error("empty stack");
+      throw std::logic_error("empty queue");
     }
     return data_[size_ - 1];
   }

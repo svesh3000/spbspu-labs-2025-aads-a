@@ -38,6 +38,11 @@ namespace
           temp.clear();
         }
       }
+      if (!temp.empty())
+      {
+        infExpr.push(temp);
+        temp.clear();
+      }
       if (!infExpr.empty())
       {
         queue.push(infExpr);
