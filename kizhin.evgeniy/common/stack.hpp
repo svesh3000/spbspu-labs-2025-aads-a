@@ -1,10 +1,10 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_STACK_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_STACK_HPP
 
-#include "forward-list.hpp"
+#include "buffer.hpp"
 
 namespace kizhin {
-  template < typename T, typename Container = ForwardList< T > >
+  template < typename T, typename Container = Buffer< T > >
   class Stack
   {
   public:
