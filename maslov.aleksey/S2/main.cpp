@@ -3,6 +3,12 @@
 #include <string>
 #include "queue.hpp"
 
+double calculatePostfix(maslov::Queue< std::string > postfixQueue)
+{}
+
+maslov::Queue< std::string > infixToPostfix(maslov::Queue< std::string > infixQueue)
+{}
+
 void splitExpression(const std::string & str, maslov::Queue< std::string > infixQueue)
 {
   std::string element;
@@ -73,6 +79,14 @@ int main(int argc, char ** argv)
   try
   {
     inputFile(filename, queue);
+    while (!queue.empty())
+    {
+      Queue< std::string > infixQueue = queue.front();
+      queue.pop();
+      Queue< std::string > postfixQueue = infixToPostfix(infixQueue);
+      double result = calculatePostfix(postfixQueue);
+      std::cout << result << "\n";
+    }
   }
   catch (const std::exception & e)
   {
