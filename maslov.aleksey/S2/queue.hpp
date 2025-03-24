@@ -14,7 +14,7 @@ namespace maslov
     Queue(Queue< T > && rhs) noexcept;
     ~Queue();
     Queue< T > & operator=(const Queue< T > & rhs);
-    Queue< T > & operator=(Queue && rhs) noexcept;
+    Queue< T > & operator=(Queue< T > && rhs) noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void push(const T & data);
@@ -23,7 +23,7 @@ namespace maslov
     const T & back() const;
     T & front();
     const T & front() const;
-    void swap(Queue< T > & rhs);
+    void swap(Queue< T > & rhs) noexcept;
    private:
     size_t capacity_;
     size_t size_;
@@ -169,7 +169,7 @@ namespace maslov
   }
 
   template< typename T >
-  void Queue< T >::swap(Queue< T > & rhs)
+  void Queue< T >::swap(Queue< T > & rhs) noexcept
   {
     std::swap(capacity_, rhs.capacity_);
     std::swap(size_, rhs.size_);

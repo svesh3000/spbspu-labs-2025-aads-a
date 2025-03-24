@@ -64,11 +64,11 @@ namespace
     }
     else if (el == "*")
     {
-      if (op2 != 0 && (op1 > (max / op2)))
+      if ((op2 != 0) && (op1 > (max / op2)))
       {
         throw std::runtime_error("ERROR: multiplication overflow");
       }
-      if (op2 != 0 && (op1 < (min / op2)))
+      if ((op2 != 0) && (op1 < (min / op2)))
       {
         throw std::runtime_error("ERROR: multiplication underflow");
       }
@@ -80,7 +80,7 @@ namespace
       {
         throw std::runtime_error("ERROR: division by zero");
       }
-      if (op1 == min && op2 == -1)
+      if ((op1 == min) && (op2 == -1))
       {
         throw std::runtime_error("ERROR: division overflow");
       }
@@ -104,8 +104,8 @@ namespace
 long long int maslov::calculatePostfix(Queue< std::string > postfixQueue)
 {
   Stack< long long int > stack;
-   while (!postfixQueue.empty())
-   {
+  while (!postfixQueue.empty())
+  {
     std::string element = postfixQueue.front();
     postfixQueue.pop();
     if (isNumber(element))
@@ -163,8 +163,8 @@ maslov::Queue< std::string > maslov::infixToPostfix(Queue< std::string > infixQu
     }
     else if (isOperator(element))
     {
-      int elementPrecedence = getPrecedence(element);
-      while (!stack.empty() && elementPrecedence <= getPrecedence(stack.top()))
+      int elPrecedence = getPrecedence(element);
+      while (!stack.empty() && elPrecedence <= getPrecedence(stack.top()))
       {
         postfixQueue.push(stack.top());
         stack.pop();
