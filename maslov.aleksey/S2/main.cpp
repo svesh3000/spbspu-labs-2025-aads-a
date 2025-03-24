@@ -35,8 +35,69 @@ int getPrecedence(const std::string & op)
   return 0;
 }
 
-double calculatePostfix(maslov::Queue< std::string > postfixQueue)
+long long int calculateOperation(long long int op1, long long int op2, const std::string & el)
 {
+  if (el == "+")
+  {
+    return op1 + op2;
+  }
+  else if (el == "-")
+  {
+    return op1 - op2;
+  }
+  else if (el == "*")
+  {
+    return op1 * op2;
+  }
+  else if (el == "/")
+  {
+    if (op2 == 0)
+    {
+      throw std::runtime_error("ERROR: division by zero");
+    }
+    return op1 / op2;
+  }
+  else if (el == "%")
+  {
+    if (op2 == 0)
+    {
+      throw std::runtime_error("ERROR: division by zero");
+    }
+    return op1 % op2;
+  }
+  else
+  {
+    throw std::runtime_error("ERROR: invalid operator");
+  }
+}
+
+long long int calculatePostfix(maslov::Queue< std::string > postfixQueue)
+{
+  maslov::Stack< long long int > stack;
+   while (!postfixQueue.empty())
+   {
+    std::string element = postfixQueue.front();
+    postfixQueue.pop();
+    if (isNumber(element))
+    {
+      stack.push(std::stoll(element));
+    }
+    else if (isOperator(element))
+    {
+      if (stack.size() < 2)
+      {
+        throw std::runtime_error("ERROR: the operator requires at least 2 operands");
+      }
+      long long int operand2 = stack.top();
+      stack.pop();
+      long long int operand1 = stack.top();
+      stack.pop();
+      stack.push(calculateOperation(operand1, operand2, element));
+    }
+  }
+  long long int result  = stack.top();
+  stack.pop();
+  return result;
 }
 
 maslov::Queue< std::string > infixToPostfix(maslov::Queue< std::string > infixQueue)
