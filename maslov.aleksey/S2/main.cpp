@@ -3,7 +3,24 @@
 #include <string>
 #include "queue.hpp"
 
-void inputFile(const std::string & filename, maslov::Queue< std::string > & queue)
+void splitExpression(const std::string & str, maslov::Queue< std::string >);
+
+void inputExpression(std::istream & in, maslov::Queue< maslov::Queue< std::string > > & queue)
+{
+  std::string str;
+  while (std::getline(in, str))
+  {
+    if (str.empty())
+    {
+      continue;
+    }
+    maslov::Queue< std::string > infixQueue;
+    splitExpression(str, infixQueue);
+    queue.push(infixQueue);
+  }
+}
+
+void inputFile(const std::string & filename, maslov::Queue< maslov::Queue< std::string > > & queue)
 {
   if (!filename.empty())
   {
@@ -23,12 +40,13 @@ void inputFile(const std::string & filename, maslov::Queue< std::string > & queu
 
 int main(int argc, char ** argv)
 {
+  using namespace maslov;
   std::string filename;
   if (argc > 1)
   {
     filename = argv[1];
   }
-  maslov::Queue< std::string > queue;
+  Queue< Queue< std::string > > queue;
   try
   {
     inputFile(filename, queue);

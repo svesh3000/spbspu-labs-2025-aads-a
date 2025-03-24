@@ -5,7 +5,9 @@ namespace maslov
 {
   template< typename T >
   struct Queue
-  {};
+  {
+    void push(const T & data);
+  };
 }
 
 #endif
