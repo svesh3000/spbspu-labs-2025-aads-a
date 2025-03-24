@@ -180,7 +180,7 @@ namespace mozhegova
     T * temp = new T[capacity_];
     for (size_t i = 0; i < size_; i++)
     {
-      temp[i] = data_[i]; 
+      temp[i] = data_[i];
     }
     delete[] data_;
     data_ = temp;
