@@ -241,6 +241,7 @@ abramov::Queue< std::string > *abramov::getPostfix(const std::string &s)
     {
       if (!bracket)
       {
+        delete queue_postfix;
         throw std::logic_error("Unbalanced brackets\n");
       }
       while (stack.top() != "(")
