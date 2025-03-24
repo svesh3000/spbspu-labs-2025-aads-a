@@ -192,12 +192,24 @@ namespace
     }
     return res;
   }
+
+  void outputRes(std::ostream & out, mozhegova::Stack< long long > & res)
+  {
+    out << res.top();
+    res.pop();
+    while (!res.empty())
+    {
+      out << " " << res.top();
+      res.pop();
+    }
+  }
 }
 
 int main(int argc, char * argv[])
 {
   using namespace mozhegova;
   Queue< Queue< std::string > > infExprs;
+  Queue< Queue< std::string > > postExprs;
   try
   {
     if (argc > 1)
@@ -209,12 +221,14 @@ int main(int argc, char * argv[])
     {
       inputExprs(std::cin, infExprs);
     }
-    Queue< Queue< std::string > > postExprs = convertInfToPost(infExprs);
-    Stack< long long > results = calculateExprs(postExprs);
+    postExprs = convertInfToPost(infExprs);
   }
   catch(const std::exception & e)
   {
     std::cerr << e.what() << '\n';
     return 1;
   }
+  Stack< long long > results = calculateExprs(postExprs);
+  outputRes(std::cout, results);
+  std::cout << "\n";
 }
