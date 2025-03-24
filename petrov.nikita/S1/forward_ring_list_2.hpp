@@ -348,25 +348,87 @@ namespace petrov
     {
       return;
     }
+    size_t size = this->size();
     auto todelete = head_;
     head_ = head_->next_;
     delete todelete;
+    size--;
+    if (!size)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
+    else
+    {
+      tail_->next_ = head_;
+    }
   }
 
   template< typename T >
   void ForwardRingList< T >::remove(const T & val)
   {
+    if (this->empty())
+    {
+      return;
+    }
+    size_t size = this->size();
+    size_t count = 0;
     auto it = this->begin();
     do
     {
       if (*it == val)
       {
-        auto todelete = it.node_;
-        it.node_ = it.node_->next_;
-        delete todelete;
+        count++;
       }
-    } 
+    }
     while (it++ != this->end());
+    if (count == size)
+    {
+      this->clear();
+      return;
+    }
+    auto subhead = head_;
+    while (subhead == head_)
+    {
+      if (subhead->data_ == val)
+      {
+        this->pop_front();
+        subhead = head_;
+        size--;
+      }
+      else
+      {
+        break;
+      }
+    }
+    while (subhead->next_ != tail_)
+    {
+      if (subhead->next_->data_ == val)
+      {
+        auto todelete = subhead->next_;
+        subhead->next_ = todelete->next_;
+        delete todelete;
+        size--;
+      }
+      else
+      {
+        subhead = subhead->next_;
+      }
+    }
+    if (subhead->next_->data_ == val)
+    {
+      auto todelete = subhead->next_;
+      subhead->next_ = todelete->next_;
+      delete todelete;
+      size--;
+      tail_ = subhead;
+      tail_->next_ = head_;
+    }
+    if (!size)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
   }
 
   template< typename T >

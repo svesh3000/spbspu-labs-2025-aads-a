@@ -412,4 +412,168 @@ BOOST_AUTO_TEST_CASE(assign_many_element_list_from_empty_other)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(pop_front_method)
+
+BOOST_AUTO_TEST_CASE(pop_front_empty_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.pop_front();
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(pop_front_one_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.push_front(1);
+  fwd_list.pop_front();
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(pop_front_two_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.push_front(1);
+  fwd_list.push_front(2);
+  fwd_list.pop_front();
+  auto it = fwd_list.cbegin();
+  out << *it << " " << *(++it);
+  BOOST_TEST(out.str() == "1 1");
+}
+
+BOOST_AUTO_TEST_CASE(pop_front_three_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.push_front(1);
+  fwd_list.push_front(2);
+  fwd_list.push_front(3);
+  fwd_list.pop_front();
+  auto it = fwd_list.cbegin();
+  out << *it << " " << *(++it) << " " <<  *(++it);
+  BOOST_TEST(out.str() == "2 1 2");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(remove_method)
+
+BOOST_AUTO_TEST_CASE(remove_element_from_empty_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.remove(1);
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(remove_element_from_one_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  fwd_list.push_front(1);
+  fwd_list.remove(1);
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(remove_element_from_list_filled_with_it)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 0; i < 10; i++)
+  {
+    fwd_list.push_front(1);
+  }
+  fwd_list.remove(1);
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(remove_element_from_list_which_are_not_there)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 1; i <= 10; i++)
+  {
+    fwd_list.push_front(i);
+  }
+  fwd_list.remove(11);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  BOOST_TEST(out.str() == "10 9 8 7 6 5 4 3 2 1");
+}
+
+BOOST_AUTO_TEST_CASE(remove_element_from_start_of_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 1; i <= 10; i++)
+  {
+    fwd_list.push_front(i);
+  }
+  fwd_list.remove(10);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  } 
+  while (it++ != fwd_list.cend());
+  out << " " << *it;
+  BOOST_TEST(out.str() == "9 8 7 6 5 4 3 2 1 9");
+}
+
+BOOST_AUTO_TEST_CASE(remove_element_from_end_of_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 1; i <= 10; i++)
+  {
+    fwd_list.push_front(i);
+  }
+  fwd_list.remove(1);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  out << " " << *it;
+  BOOST_TEST(out.str() == "10 9 8 7 6 5 4 3 2 10");
+}
+
+BOOST_AUTO_TEST_CASE(remove_elements_from_list_which_are_there)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 1; i <= 10; i++)
+  {
+    fwd_list.push_front(i);
+  }
+  fwd_list.remove(1);
+  fwd_list.remove(10);
+  fwd_list.remove(7);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  BOOST_TEST(out.str() == "9 8 6 5 4 3 2");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE_END()
