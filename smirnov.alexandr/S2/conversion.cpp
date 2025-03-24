@@ -61,7 +61,7 @@ smirnov::Queue< std::string > smirnov::infixToPostfix(const std::string & infix)
   return output;
 }
 
-double smirnov::evaluatePostfix(Queue<std::string> & postfix)
+long long smirnov::evaluatePostfix(Queue<std::string> & postfix)
 {
   Stack< long long > values;
   constexpr long long max_val = std::numeric_limits<long long>::max();
@@ -170,8 +170,6 @@ double smirnov::evaluatePostfix(Queue<std::string> & postfix)
   {
     throw std::invalid_argument("Too many operands");
   }
-  std::ostringstream oss;
-  oss << result;
-  return std::stod(oss.str());
+  return result;
 }
 

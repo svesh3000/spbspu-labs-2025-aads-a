@@ -7,6 +7,6 @@
 namespace smirnov
 {
   smirnov::Queue< std::string > infixToPostfix(const std::string & infix);
-  double evaluatePostfix(Queue< std::string > & postfix);
+  long long evaluatePostfix(Queue< std::string > & postfix);
 }
 #endif
