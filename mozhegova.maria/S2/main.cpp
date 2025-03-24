@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include "queue.hpp"
 #include "stack.hpp"
 
@@ -149,6 +150,53 @@ namespace
     return newQueue;
   }
 
+  long long calculateWithCheck(std::string op, long long a, long long b)
+  {
+    const long long max = std::numeric_limits< long long >::max();
+    const long long min = std::numeric_limits< long long >::min();
+    if (op == "+")
+    {
+      if (a > max - b)
+      {
+        throw std::overflow_error("overflow");
+      }
+      return a + b;
+    }
+    else if (op == "-")
+    {
+      if (a < min + b)
+      {
+        throw std::overflow_error("overflow");
+      }
+      return a - b;
+    }
+    else if (op == "*")
+    {
+      if ((a > max / b) || (a < min / b))
+      {
+        throw std::overflow_error("overflow");
+      }
+      return a * b;
+    }
+    else if (op == "/")
+    {
+      if ((1 / b > max / a) || (1 / b < min / a))
+      {
+        throw std::overflow_error("overflow");
+      }
+      return a / b;
+    }
+    else
+    {
+      long long res = a % b;
+      if (res < 0)
+      {
+        res += std::abs(b);
+      }
+      return res;
+    }
+  }
+
   mozhegova::Stack< long long > calculateExprs(mozhegova::Queue< mozhegova::Queue< std::string > > & queue)
   {
     mozhegova::Stack< long long > res;
@@ -171,26 +219,8 @@ namespace
           stack.pop();
           long long a = stack.top();
           stack.pop();
-          if (token == "+")
-          {
-            stack.push(a + b);
-          }
-          else if (token == "-")
-          {
-            stack.push(a - b);
-          }
-          else if (token == "*")
-          {
-            stack.push(a * b);
-          }
-          else if (token == "/")
-          {
-            stack.push(a / b);
-          }
-          else if (token == "%")
-          {
-            stack.push(a % b);
-          }
+          long long res = calculateWithCheck(token, a, b);
+          stack.push(res);
         }
       }
       res.push(stack.top());
@@ -215,6 +245,7 @@ int main(int argc, char * argv[])
   using namespace mozhegova;
   Queue< Queue< std::string > > infExprs;
   Queue< Queue< std::string > > postExprs;
+  Stack< long long > results;
   try
   {
     if (argc > 1)
@@ -227,13 +258,13 @@ int main(int argc, char * argv[])
       inputExprs(std::cin, infExprs);
     }
     postExprs = convertInfToPost(infExprs);
+    results = calculateExprs(postExprs);
   }
   catch(const std::exception & e)
   {
     std::cerr << e.what() << '\n';
     return 1;
   }
-  Stack< long long > results = calculateExprs(postExprs);
   outputRes(std::cout, results);
   std::cout << "\n";
 }
