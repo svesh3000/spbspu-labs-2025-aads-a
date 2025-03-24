@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include "queue.hpp"
 #include "stack.hpp"
 
@@ -37,16 +38,42 @@ int getPrecedence(const std::string & op)
 
 long long int calculateOperation(long long int op1, long long int op2, const std::string & el)
 {
+  const long long int min = std::numeric_limits< long long int >::min();
+  const long long int max = std::numeric_limits< long long int >::max();
   if (el == "+")
   {
+    if ((op2 > 0) && (op1 > (max - op2)))
+    {
+      throw std::runtime_error("ERROR: addition overflow");
+    }
+    if ((op2 < 0) && (op1 < (min - op2)))
+    {
+      throw std::runtime_error("ERROR: addition underflow");
+    }
     return op1 + op2;
   }
   else if (el == "-")
   {
+    if ((op2 > 0) && (op1 < (min + op2)))
+    {
+      throw std::runtime_error("ERROR: subtraction underflow");
+    }
+    if ((op2 < 0) && (op1 > (max + op2)))
+    {
+      throw std::runtime_error("ERROR: subtraction overflow");
+    }
     return op1 - op2;
   }
   else if (el == "*")
   {
+    if (op2 != 0 && (op1 > (max / op2)))
+    {
+      throw std::runtime_error("ERROR: multiplication overflow");
+    }
+    if (op2 != 0 && (op1 < (min / op2)))
+    {
+      throw std::runtime_error("ERROR: multiplication underflow");
+    }
     return op1 * op2;
   }
   else if (el == "/")
@@ -54,6 +81,10 @@ long long int calculateOperation(long long int op1, long long int op2, const std
     if (op2 == 0)
     {
       throw std::runtime_error("ERROR: division by zero");
+    }
+    if (op1 == min && op2 == -1)
+    {
+      throw std::runtime_error("ERROR: division overflow");
     }
     return op1 / op2;
   }
