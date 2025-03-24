@@ -67,30 +67,30 @@ bool additionOverflow(long long a, long long b)
   return (b > std::numeric_limits<long long>::max() - a);
 }
 
-bool multiplicationOverflow(long long a, long long b) 
+bool multiplicationOverflow(long long a, long long b)
 {
-  if (a == 0 || b == 0) 
+  if (a == 0 || b == 0)
   {
     return false;
   }
-  if (a > 0) 
+  if (a > 0)
   {
-    if (b > 0) 
+    if (b > 0)
     {
       return a > std::numeric_limits< long long >::max() / b;
     }
-    else 
+    else
     {
       return b < std::numeric_limits<long long >::min() / a;
     }
   }
-  else 
+  else
   {
-    if (b > 0) 
+    if (b > 0)
     {
       return a < std::numeric_limits< long long >::min() / b;
     }
-    else 
+    else
     {
       return a < std::numeric_limits< long long >::max() / b;
     }
