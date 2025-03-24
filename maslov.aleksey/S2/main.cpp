@@ -8,7 +8,7 @@ bool isNumber(const std::string & element)
 {
   try
   {
-    std::stoi(element);
+    std::stoll(element);
   }
   catch (const std::exception &)
   {
@@ -63,7 +63,7 @@ long long int calculateOperation(long long int op1, long long int op2, const std
     {
       throw std::runtime_error("ERROR: division by zero");
     }
-    return op1 % op2;
+    return (op1 % op2 + op2) % op2;
   }
   else
   {
@@ -147,10 +147,15 @@ maslov::Queue< std::string > infixToPostfix(maslov::Queue< std::string > infixQu
     }
     infixQueue.pop();
   }
+  while (!stack.empty())
+  {
+    postfixQueue.push(stack.top());
+    stack.pop();
+  }
   return postfixQueue;
 }
 
-void splitExpression(const std::string & str, maslov::Queue< std::string > infixQueue)
+void splitExpression(const std::string & str, maslov::Queue< std::string > & infixQueue)
 {
   std::string element;
   char separator = ' ';
@@ -207,6 +212,19 @@ void inputFile(const std::string & filename, maslov::Queue< maslov::Queue< std::
     inputExpression(std::cin, queue);
   }
 }
+void printData(std::ostream & out, maslov::Stack< long long int > & results)
+{
+  if (!results.empty())
+  { 
+    out << results.top();
+    results.pop();
+    while (!results.empty())
+    {
+      out << " " << results.top();
+      results.pop();
+    }
+  }
+}
 
 int main(int argc, char ** argv)
 {
@@ -217,6 +235,7 @@ int main(int argc, char ** argv)
     filename = argv[1];
   }
   Queue< Queue< std::string > > queue;
+  Stack<long long int> results;
   try
   {
     inputFile(filename, queue);
@@ -225,9 +244,11 @@ int main(int argc, char ** argv)
       Queue< std::string > infixQueue = queue.front();
       queue.pop();
       Queue< std::string > postfixQueue = infixToPostfix(infixQueue);
-      double result = calculatePostfix(postfixQueue);
-      std::cout << result << "\n";
+      long long int result = calculatePostfix(postfixQueue);
+      results.push(result);
     }
+    printData(std::cout, results);
+    std::cout << "\n";
   }
   catch (const std::exception & e)
   {
