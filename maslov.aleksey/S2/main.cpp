@@ -246,7 +246,7 @@ void inputFile(const std::string & filename, maslov::Queue< maslov::Queue< std::
 void printData(std::ostream & out, maslov::Stack< long long int > & results)
 {
   if (!results.empty())
-  { 
+  {
     out << results.top();
     results.pop();
     while (!results.empty())

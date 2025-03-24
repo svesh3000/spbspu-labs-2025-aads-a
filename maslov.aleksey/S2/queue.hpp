@@ -116,7 +116,7 @@ namespace maslov
       for (size_t i = 0; i < size_; ++i)
       {
         newData[i] = data_[i];
-      }  
+      }
       delete[] data_;
       data_ = newData;
     }
