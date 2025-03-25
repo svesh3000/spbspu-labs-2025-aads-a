@@ -24,9 +24,11 @@ namespace alymova
     T& back();
     const T& back() const;
     void push_back(const T& value);
-    //void push_back(T&& value);
+    void push_back(T&& value);
     void pop_front();
     void pop_back();
+    template< typename... Args >
+    void emplace(Args&&... args);
   private:
     size_t size_;
     size_t capacity_;
@@ -132,7 +134,8 @@ namespace alymova
   template< typename T >
   void Array< T >::push_back(const T& value)
   {
-    if (size_ == capacity_)
+    emplace(value);
+    /*if (size_ == capacity_)
     {
       int ratio = 2;
       T* array_new = new T[capacity_ * ratio];
@@ -145,7 +148,13 @@ namespace alymova
       capacity_ *= ratio;
     }
     array_[size_] = value;
-    size_++;
+    size_++;*/
+  }
+
+  template< typename T >
+  void Array< T >::push_back(T&& value)
+  {
+    emplace(std::forward< Args >(args));
   }
 
   template< typename T >
@@ -168,6 +177,26 @@ namespace alymova
   void Array< T >::clear()
   {
     delete[] array_;
+  }
+
+  template< typename T >
+  template< typename... Args >
+  void Array< T >::emplace(Args&&... args)
+  {
+    if (size_ == capacity_)
+    {
+      int ratio = 2;
+      T* array_new = new T[capacity_ * ratio];
+      for (size_t i = 0; i < size_; i++)
+      {
+        array_new[i] = array_[i];
+      }
+      clear();
+      array_ = array_new;
+      capacity_ *= ratio;
+    }
+    array_[size_] = T(std::forward< Args >(args));
+    size_++;
   }
 }
 #endif
