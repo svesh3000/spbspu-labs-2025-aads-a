@@ -143,7 +143,7 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
   finaev::Stack< long long > res;
   while (post.size() != 0)
   {
-    if (isDigit(post.top()))
+    while (isDigit(post.top()))
     {
       try
       {
@@ -158,21 +158,10 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
     }
     long long s = res.top();
     res.pop();
-    long long f = 0;
-    if (!res.isEmpty())
-    {
-      f = res.top();
-    }
+    long long f = res.top();
     res.pop();
-    if (!post.isEmpty())
-    {
-      res.push(finaev::count(f, s, post.top()[0]));
-    }
-    else
-    {
-      res.push(s);
-    }
+    res.push(finaev::count(f, s, post.top()[0]));
+    post.pop();
   }
   return res.top();
-  //aF
 }
