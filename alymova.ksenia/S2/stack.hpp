@@ -8,45 +8,17 @@ namespace alymova
   template< typename T >
   struct Stack
   {
-    Stack();
-    Stack(const Stack< T >& other);
-    Stack(Stack< T >&& other);
-    ~Stack() = default;
-
     bool empty() const;
     size_t size() const;
     T& top();
     const T& top() const;
     void push(const T& value);
     void push(T&& value);
-    //template< typename... Args >
-    //void emplace(Args&&... args);
     void pop();
 
   private:
     Array< T > data_;
   };
-
-  template< typename T >
-  Stack< T >::Stack():
-    data_()
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(const Stack< T >& other):
-    data_(other)
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(Stack< T >&& other):
-    data_(std::forward< T >(other.data_))
-  {}
-
-  /*template< typename T >
-  Stack< T >::~Stack()
-  {
-    data_.~Array();
-  }*/
 
   template< typename T >
   bool Stack< T >::empty() const

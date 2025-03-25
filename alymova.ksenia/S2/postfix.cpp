@@ -1,6 +1,7 @@
 #include "postfix.hpp"
 #include <cstddef>
 #include <string>
+#include <limits>
 #include "queue.hpp"
 #include "stack.hpp"
 
@@ -88,6 +89,10 @@ long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
       stack.pop();
       long long int item1 = stack.top();
       stack.pop();
+      if (is_overflow_addition(item1, item2))
+      {
+        throw std::overflow_error("Addition overflow");
+      }
       stack.push(item1 + item2);
     }
     else if (queue.front() == "-")
@@ -104,6 +109,10 @@ long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
       stack.pop();
       long long int item1 = stack.top();
       stack.pop();
+      if (is_overflow_multi(item1, item2))
+      {
+        throw std::overflow_error("Multiplication overflow");
+      }
       stack.push(item1 * item2);
     }
     else if (queue.front() == "/")
@@ -137,4 +146,30 @@ bool alymova::my_isdigit(const std::string& s)
     }
   }
   return true;
+}
+
+bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
+{
+  long long int max_sum = std::numeric_limits< long long int >::max();
+  long long int min_sum = std::numeric_limits< long long int >::min();
+  return (((max_sum - lhs) < rhs) || ((min_sum - lhs) > rhs));
+}
+
+bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
+{
+  long long int max_sum = std::numeric_limits< long long int >::max();
+  long long int min_sum = std::numeric_limits< long long int >::min();
+  if (lhs > 0 && rhs > 0)
+  {
+    return ((max_sum / lhs) < rhs);
+  }
+  else if ((lhs > 0 && rhs < 0) || (lhs < 0 && rhs > 0))
+  {
+    return ((min_sum / lhs) < rhs);
+  }
+  else if (lhs < 0 && rhs < 0)
+  {
+    return is_overflow_multi(-lhs, -rhs);
+  }
+  return false;
 }

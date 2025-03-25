@@ -8,11 +8,6 @@ namespace alymova
   template< typename T >
   struct Queue
   {
-    Queue();
-    Queue(const Queue< T >& other);
-    Queue(Queue< T >&& other);
-    ~Queue() = default;
-
     bool empty() const;
     size_t size() const;
     T& front();
@@ -21,34 +16,11 @@ namespace alymova
     const T& back() const;
     void push(const T& value);
     void push(T&& value);
-    //template< typename... Args >
-    //void emplace(Args&&... args);
     void pop();
 
   private:
     Array< T > data_;
   };
-
-  template< typename T >
-  Queue< T >::Queue():
-    data_()
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(const Queue< T >& other):
-    data_(other)
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(Queue< T >&& other):
-    data_(std::forward< Array< T > >(other.data_))
-  {}
-
-  /*template< typename T >
-  Queue< T >::~Queue()
-  {
-    data_.~Array();
-  }*/
 
   template< typename T >
   bool Queue< T >::empty() const
