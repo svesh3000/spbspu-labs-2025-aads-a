@@ -19,7 +19,7 @@ int main(int argc, char * argv[])
     }
     else
     {
-        finaev::countFinalResults(std::cin);
+      finaev::countFinalResults(std::cin);
     }
   }
   catch (const std::logic_error& e)
