@@ -44,23 +44,20 @@ int main()
     {
       std::cout << " " << it->first;
     }
-  while (it++ != head.cend());
+    while (it++ != head.cend());
   }
   std::cout << "\n";
   petrov::ForwardRingList< size_t > sums = {};
   do
   {
     size_t sum = 0;
-    auto it = head.begin();
+    auto it_out = head.begin();
     do
     {
-      if (it->second.empty())
+      if (it_out->second.empty())
       {
-        auto cpy_it = it;
-        ++cpy_it;
-        head.remove(*it);
-        it = cpy_it;
-        if (it == head.end())
+        head.remove(*it_out);
+        if (head.empty())
         {
           break;
         }
@@ -68,13 +65,14 @@ int main()
       }
       else
       {
-        if (it == head.begin())
+        auto it = it_out->second.begin();
+        if (it_out == head.begin())
         {
-          std::cout << *it->second.begin();
-          if (sum <= std::numeric_limits< size_t >::max() - *it->second.begin())
+          std::cout << *it;
+          if (sum <= std::numeric_limits< size_t >::max() - *it)
           {
-            sum += *it->second.begin();
-            it->second.pop_front();
+            sum += *it;
+            it_out->second.pop_front();
           }
           else
           {
@@ -85,11 +83,11 @@ int main()
         }
         else
         {
-          std::cout << " " << *it->second.begin();
-          if (sum <= std::numeric_limits< size_t >::max() - *it->second.begin())
+          std::cout << " " << *it;
+          if (sum <= std::numeric_limits< size_t >::max() - *it)
           {
-            sum += *it->second.begin();
-            it->second.pop_front();
+            sum += *it;
+            it_out->second.pop_front();
           }
           else
           {
@@ -100,12 +98,11 @@ int main()
         }
       }
     }
-    while (it++ != head.end());
+    while (it_out++ != head.end() && head.begin() != head.end());
     if (sum)
     {
       sums.push_front(sum);
       std::cout << "\n";
-      head.clear();
     }
   }
   while (!head.empty());
@@ -116,13 +113,20 @@ int main()
   else
   {
     sums.reverse();
-    auto it = sums.cbegin();
-    std::cout << *(it++);
-    do
+    if (sums.size() == 1)
     {
-      std::cout << " " << *it;
+      std::cout << *sums.cbegin();
     }
-    while (it++ != sums.cend());
+    else
+    {
+      auto it = sums.cbegin();
+      std::cout << *(it++);
+      do
+      {
+        std::cout << " " << *it;
+      }
+      while (it++ != sums.cend());
+    }
   }
   std::cout << "\n";
 }
