@@ -164,4 +164,5 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
     post.pop();
   }
   return res.top();
+  //aF
 }
