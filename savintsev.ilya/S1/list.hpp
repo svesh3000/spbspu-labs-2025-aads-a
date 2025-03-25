@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include <cassert>
 #include <initializer_list>
+#include <algorithm>
 #include "list-node.hpp"
 #include "list-iterators.hpp"
 
@@ -428,6 +429,80 @@ namespace savintsev
   typename List< T >::iterator List< T >::emplace_front(Args &&... args)
   {
     return insert(const_iterator(begin()), T(args...));
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    sort(std::less< T >());
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare comp)
+  {
+    if (list_size < 2)
+    {
+      return;
+    }
+
+    size_t mid = list_size / 2;
+    auto it = begin();
+    for (size_t i = 0; i < mid; ++i)
+    {
+      ++it;
+    }
+
+    List< T > right;
+    while (it != end())
+    {
+      right.push_back(std::move(*it));
+      it = erase(it);
+    }
+
+    sort(comp);
+    right.sort(comp);
+
+    merge(right, comp);
+  }
+
+  template< class T >
+  void savintsev::List< T >::merge(List< T > & x)
+  {
+    merge(x, std::less< T >());
+  }
+
+  template< class T >
+  template< class Compare >
+  void savintsev::List< T >::merge(List< T > & x, Compare comp)
+  {
+    if (std::addressof(x) == this || x.empty())
+    {
+      return;
+    }
+
+    auto it1 = begin();
+    auto it2 = x.begin();
+
+    while (it1 != end() && it2 != x.end())
+    {
+      if (comp(*it2, *it1))
+      {
+        auto next = it2;
+        ++next;
+        splice(it1, x, it2);
+        it2 = next;
+      }
+      else
+      {
+        ++it1;
+      }
+    }
+
+    if (it2 != x.end())
+    {
+      splice(end(), x, it2, x.end());
+    }
   }
 
   template< class T >
