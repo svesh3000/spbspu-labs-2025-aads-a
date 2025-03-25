@@ -52,7 +52,7 @@ namespace petrov
     bool operator==(const this_t & rhs) const;
     bool operator!=(const this_t & rhs) const;
   };
-  
+
   template< typename T >
   struct ForwardRingList
   {
@@ -61,9 +61,9 @@ namespace petrov
     using node_t = ListNode< T >;
     using const_it_t = ConstForwardListIterator< T >;
     using it_t = ForwardListIterator< T >;
-    ForwardRingList(): 
-      head_(nullptr), 
-      tail_(nullptr) 
+    ForwardRingList():
+      head_(nullptr),
+      tail_(nullptr)
     {}
     ForwardRingList(const this_t & rhs);
     ForwardRingList(this_t && rhs);
@@ -258,7 +258,7 @@ namespace petrov
           return false;
         }
         ++rhs_it;
-      } 
+      }
       while (it++ != this->cend());
       return true;
     }
@@ -326,7 +326,7 @@ namespace petrov
     do
     {
       ++count;
-    } 
+    }
     while (it++ != this->cend());
     return count;
   }

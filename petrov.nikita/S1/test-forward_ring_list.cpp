@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE(remove_element_from_start_of_list)
   do
   {
     out << " " << *it;
-  } 
+  }
   while (it++ != fwd_list.cend());
   out << " " << *it;
   BOOST_TEST(out.str() == "9 8 7 6 5 4 3 2 1 9");
