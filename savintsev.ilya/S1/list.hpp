@@ -38,12 +38,14 @@ namespace savintsev
     bool empty() const noexcept;
     size_t size() const noexcept;
 
+    List & operator=(const List & x);
+    List & operator=(List && x);
     List & operator=(std::initializer_list< T > il);
 
-    void push_front(const T & value);
-    void push_front(T && value);
-    void push_back(const T & value);
-    void push_back(T && value);
+    template< class U >
+    void push_front(U && value);
+    template< class U >
+    void push_back(U && value);
     void pop_front();
     void pop_back();
     void swap(List & rhs) noexcept;
@@ -67,11 +69,11 @@ namespace savintsev
     iterator erase(const_iterator pos) noexcept;
     iterator erase(const_iterator first, const_iterator last) noexcept;
 
-    iterator insert(const_iterator pos, const T & value);
     iterator insert(const_iterator pos, size_t n, const T & value);
     template< class InputIterator >
     iterator insert(const_iterator pos, InputIterator first, InputIterator last);
-    iterator insert(const_iterator pos, T && value);
+    template< class U >
+    iterator insert(const_iterator pos, U && value);
     iterator insert(const_iterator pos, std::initializer_list< T > il);
 
     void reverse() noexcept;
@@ -99,48 +101,33 @@ namespace savintsev
     void unique();
     template< class BinaryPredicate >
     void unique(BinaryPredicate binary_pred);
+
+    template< class U >
+    friend bool operator==(const List< U > & lhs, const List< U > & rhs) noexcept;
+    template< class U >
+    friend bool operator!=(const List< U > & lhs, const List< U > & rhs) noexcept;
+    template< class U >
+    friend bool operator<(const List< U > & lhs, const List< U > & rhs) noexcept;
+    template< class U >
+    friend bool operator<=(const List< U > & lhs, const List< U > & rhs) noexcept;
+    template< class U >
+    friend bool operator>(const List< U > & lhs, const List< U > & rhs) noexcept;
+    template< class U >
+    friend bool operator>=(const List< U > & lhs, const List< U > & rhs) noexcept;
+
   private:
     ListNode< T > * dummy;
     size_t list_size;
 
     template< class Compare >
     static bool compare_lists(const List & lhs, const List & rhs, Compare comp);
+    void destroy() noexcept;
   };
-
-  template< class T >
-  bool operator==(const List< T > & lhs, const List< T > & rhs) noexcept;
-
-  template< class T >
-  bool operator!=(const List< T > & lhs, const List< T > & rhs) noexcept;
-
-  template< class T >
-  bool operator<(const List< T > & lhs, const List< T > & rhs) noexcept;
-  template< class T >
-  bool operator<=(const List< T > & lhs, const List< T > & rhs) noexcept;
-
-  template< class T >
-  bool operator>(const List< T > & lhs, const List< T > & rhs) noexcept;
-  template< class T >
-  bool operator>=(const List< T > & lhs, const List< T > & rhs) noexcept;
-
 
   template< class T >
   bool operator==(const List< T > & lhs, const List< T > & rhs) noexcept
   {
-    if (lhs.size() != rhs.size())
-    {
-      return false;
-    }
-    auto jt = rhs.cbegin();
-    for (auto it = lhs.cbegin(); it != lhs.cend(); ++it)
-    {
-      if (!(*it == *jt))
-      {
-        return false;
-      }
-      ++jt;
-    }
-    return true;
+    return List< T >::compare_lists(lhs, rhs, std::equal_to< T >());
   }
 
   template< class T >
@@ -152,20 +139,7 @@ namespace savintsev
   template< class T >
   bool operator<(const List< T > & lhs, const List< T > & rhs) noexcept
   {
-    auto jt = rhs.cbegin();
-    for (auto it = lhs.cbegin(); it != lhs.cend(); ++it)
-    {
-      if (jt == rhs.end() || *jt < *it)
-      {
-        return false;
-      }
-      else if (*it < *jt)
-      {
-        return true;
-      }
-      ++jt;
-    }
-    return (jt != rhs.end());
+    return List< T >::compare_lists(lhs, rhs, std::less< T >());
   }
 
   template< class T >
@@ -195,29 +169,12 @@ namespace savintsev
   template< class T >
   List< T >::~List()
   {
-    clear();
-    delete dummy;
+    destroy();
   }
 
   template< class T >
-  List< T >::List(const List & rhs):
-    dummy(new ListNode< T >()),
-    list_size(0)
-  {
-    try
-    {
-      for (auto it = rhs.begin(); it != rhs.end(); ++it)
-      {
-        push_back(*it);
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      clear();
-      delete dummy;
-      throw;
-    }
-  }
+  List< T >::List(const List & rhs): List(rhs.begin(), rhs.end())
+  {}
 
   template< class T >
   List< T >::List(List && rhs):
@@ -245,28 +202,7 @@ namespace savintsev
     }
     catch (const std::bad_alloc & e)
     {
-      clear();
-      delete dummy;
-      throw;
-    }
-  }
-
-  template< class T >
-  List< T >::List(std::initializer_list< T > il):
-    dummy(new ListNode< T >()),
-    list_size(0)
-  {
-    try
-    {
-      for (auto it = il.begin(); it != il.end(); ++it)
-      {
-        push_back(*it);
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      clear();
-      delete dummy;
+      destroy();
       throw;
     }
   }
@@ -286,11 +222,14 @@ namespace savintsev
     }
     catch (const std::bad_alloc & e)
     {
-      clear();
-      delete dummy;
+      destroy();
       throw;
     }
   }
+
+  template< class T >
+  List< T >::List(std::initializer_list< T > il): List(il.begin(), il.end())
+  {}
 
   template< class T >
   typename List< T >::iterator List< T >::begin() noexcept
@@ -365,47 +304,42 @@ namespace savintsev
   }
 
   template< class T >
-  List< T > & List< T >::operator=(std::initializer_list< T > il)
+  List< T > & List< T >::operator=(const List< T > & x)
   {
-    clear();
-    for (auto it = il.begin(); it != il.end(); ++it)
-    {
-      push_back(*it);
-    }
+    assign(x.begin(), x.end());
     return *this;
   }
 
   template< class T >
-  void List< T >::push_front(const T & value)
+  List< T > & List< T >::operator=(List< T > && x)
   {
-    ListNode< T > * new_node = new ListNode< T >(value, dummy->next, dummy);
+    List temp(std::move(x));
+    swap(temp);
+    return *this;
+  }
+
+  template< class T >
+  List< T > & List< T >::operator=(std::initializer_list< T > il)
+  {
+    assign(il);
+    return *this;
+  }
+
+  template< class T >
+  template< class U >
+  void List< T >::push_front(U && value)
+  {
+    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), dummy->next, dummy);
     dummy->next->prev = new_node;
     dummy->next = new_node;
     ++list_size;
   }
 
   template< class T >
-  void List< T >::push_front(T && value)
+  template< class U >
+  void List< T >::push_back(U && value)
   {
-    ListNode< T > * new_node = new ListNode< T >(std::move(value), dummy->next, dummy);
-    dummy->next->prev = new_node;
-    dummy->next = new_node;
-    ++list_size;
-  }
-
-  template< class T >
-  void List< T >::push_back(const T & value)
-  {
-    ListNode< T > * new_node = new ListNode< T >(value, dummy, dummy->prev);
-    dummy->prev->next = new_node;
-    dummy->prev = new_node;
-    ++list_size;
-  }
-
-  template< class T >
-  void List< T >::push_back(T && value)
-  {
-    ListNode< T > * new_node = new ListNode< T >(std::move(value), dummy, dummy->prev);
+    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), dummy, dummy->prev);
     dummy->prev->next = new_node;
     dummy->prev = new_node;
     ++list_size;
@@ -452,32 +386,25 @@ namespace savintsev
   template< class T >
   void List< T >::remove(const T & value) noexcept
   {
-    for (auto it = cbegin(); it != cend(); ++it)
+    remove_if([& value](const T & rhs)
     {
-      if (*it == value)
-      {
-        it.node->prev->next = it.node->next;
-        it.node->next->prev = it.node->prev;
-        auto temp = it--;
-        delete temp.node;
-        --list_size;
-      }
-    }
+      return rhs == value;
+    });
   }
 
   template< class T >
   template< class Predicate >
   void List< T >::remove_if(Predicate pred) noexcept
   {
-    for (auto it = cbegin(); it != cend(); ++it)
+    for (auto it = cbegin(); it != cend();)
     {
       if (pred(*it))
       {
-        it.node->prev->next = it.node->next;
-        it.node->next->prev = it.node->prev;
-        auto temp = it--;
-        delete temp.node;
-        --list_size;
+        it = erase(it);
+      }
+      else
+      {
+        ++it;
       }
     }
   }
@@ -516,7 +443,7 @@ namespace savintsev
       {
         return true;
       }
-      else if (comp(*jt, *it))
+      if (comp(*jt, *it))
       {
         return false;
       }
@@ -592,31 +519,22 @@ namespace savintsev
   template< class T >
   void List< T >::assign(const_iterator first, const_iterator last)
   {
-    clear();
-    for (auto it = first; it != last; ++it)
-    {
-      push_back(*it);
-    }
+    List temp(first, last);
+    swap(temp);
   }
 
   template< class T >
   void List< T >::assign(size_t n, const T & value)
   {
-    clear();
-    for (size_t i = 0; i < n; ++i)
-    {
-      push_back(value);
-    }
+    List temp(n, value);
+    swap(temp);
   }
 
   template< class T >
   void List< T >::assign(std::initializer_list< T > il)
   {
-    clear();
-    for (auto it = il.begin(); it != il.end(); ++it)
-    {
-      push_back(*it);
-    }
+    List temp(il);
+    swap(temp);
   }
 
   template< class T >
@@ -639,16 +557,6 @@ namespace savintsev
       result = erase(it);
     }
     return result;
-  }
-
-  template< class T >
-  typename List< T >::iterator List< T >::insert(const_iterator pos, const T & value)
-  {
-    ListNode< T > * new_node = new ListNode< T >(value, pos.node, pos.node->prev);
-    list_size++;
-    pos.node->prev->next = new_node;
-    pos.node->prev = new_node;
-    return iterator(new_node);
   }
 
   template< class T >
@@ -691,9 +599,10 @@ namespace savintsev
   }
 
   template< class T >
-  typename List< T >::iterator List< T >::insert(const_iterator pos, T && value)
+  template< class U >
+  typename List< T >::iterator List< T >::insert(const_iterator pos, U && value)
   {
-    ListNode< T > * new_node = new ListNode< T >(std::move(value), pos.node, pos.node->prev);
+    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), pos.node, pos.node->prev);
     list_size++;
     pos.node->prev->next = new_node;
     pos.node->prev = new_node;
@@ -716,6 +625,14 @@ namespace savintsev
       pos = pos->prev;
     }
     while (pos != dummy);
+  }
+
+  template< class T >
+  void List< T >::destroy() noexcept
+  {
+    clear();
+    delete dummy;
+    dummy = nullptr;
   }
 }
 

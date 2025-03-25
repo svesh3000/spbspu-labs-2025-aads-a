@@ -12,7 +12,7 @@ namespace savintsev
     ListNode< T > * prev;
 
     template< typename U >
-    ListNode(U&& value, ListNode * nextNode = nullptr, ListNode * prevNode = nullptr):
+    ListNode(U && value, ListNode * nextNode = nullptr, ListNode * prevNode = nullptr):
       data(std::forward< U >(value)),
       next(nextNode),
       prev(prevNode)

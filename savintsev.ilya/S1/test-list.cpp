@@ -272,11 +272,18 @@ BOOST_AUTO_TEST_CASE(test_insert)
 
 BOOST_AUTO_TEST_CASE(test_operator_equal)
 {
-  lt< int > mylist(4ull, 20);
-  mylist = {19, 19, 19};
-  int test[] = {19, 19, 19};
-  BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 3);
-  BOOST_TEST(mylist.size() == 3);
+  lt< int > first(4ull, 20);
+  lt< int > second(6ull, 10);
+
+  second = first;
+  int test1[] = {20, 20, 20, 20};
+  BOOST_CHECK_EQUAL_COLLECTIONS(first.begin(), first.end(), test1, test1 + 4);
+  BOOST_TEST(first.size() == 4);
+
+  first = {19, 19, 19};
+  int test2[] = {19, 19, 19};
+  BOOST_CHECK_EQUAL_COLLECTIONS(first.begin(), first.end(), test2, test2 + 3);
+  BOOST_TEST(first.size() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(test_push_and_pop)
@@ -417,4 +424,26 @@ BOOST_AUTO_TEST_CASE(test_swap)
 
   BOOST_TEST(first.size() == 5);
   BOOST_TEST(second.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_comparsion)
+{
+  lt< int > first(3ull, 100);
+  lt< int > second(5ull, 100);
+
+  BOOST_TEST(first < second);
+
+  first.push_back(100);
+  first.push_back(100);
+
+  BOOST_TEST(first == second);
+
+  first.push_back(200);
+
+  BOOST_TEST(first > second);
+
+  first = {100, 100, 50, 100};
+  second = {100, 100, 200};
+
+  BOOST_TEST(first <= second);
 }
