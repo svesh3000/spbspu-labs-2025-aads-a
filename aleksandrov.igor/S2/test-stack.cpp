@@ -3,7 +3,7 @@
 
 BOOST_AUTO_TEST_CASE(stack_construction)
 {
-  aleksandrov::Stack< int(*(*)(void(*)()))(const volatile unsigned long long int*) > rifle;
+  aleksandrov::Stack< int > rifle;
   BOOST_TEST(rifle.empty());
 }
 

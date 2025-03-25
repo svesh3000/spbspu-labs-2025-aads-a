@@ -3,7 +3,7 @@
 
 BOOST_AUTO_TEST_CASE(queue_construction)
 {
-  aleksandrov::Queue< const volatile char*(*const(*volatile(*)[][777])() noexcept)[] > queue;
+  aleksandrov::Queue< int > queue;
   BOOST_TEST(queue.empty());
 }
 
