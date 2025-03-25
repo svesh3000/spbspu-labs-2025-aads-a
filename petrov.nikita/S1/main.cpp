@@ -98,7 +98,7 @@ int main()
         }
       }
     }
-    while (it_out++ != head.end() && head.begin() != head.end());
+    while (it_out++ != head.end() && it_out != head.begin() && head.begin() != head.end());
     if (sum)
     {
       sums.push_front(sum);
