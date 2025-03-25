@@ -152,7 +152,15 @@ bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 {
   long long int max_sum = std::numeric_limits< long long int >::max();
   long long int min_sum = std::numeric_limits< long long int >::min();
-  return (((max_sum - lhs) < rhs) || ((min_sum - lhs) > rhs));
+  if (lhs > 0 && rhs > 0)
+  {
+    return ((max_sum - lhs) < rhs);
+  }
+  if (lhs < 0 && rhs < 0)
+  {
+    return ((min_sum - lhs) > rhs);
+  }
+  return false;
 }
 
 bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
