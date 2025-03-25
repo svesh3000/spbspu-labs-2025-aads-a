@@ -77,7 +77,12 @@ namespace
     {
       throw std::logic_error("division by zero!\n");
     }
-    return a % b;
+    long long res = a % b;
+    if (res < 0)
+    {
+      res += std::abs(b);
+    }
+    return res;
   }
 }
 
