@@ -247,28 +247,35 @@ namespace petrov
   template< typename T >
   bool ForwardRingList< T >::operator==(const this_t & rhs) const
   {
-    if (this->size() == rhs.size() && this->size() != 0)
-    {
-      auto it = this->cbegin();
-      auto rhs_it = rhs.cbegin();
-      do
-      {
-        if (*it != *rhs_it)
-        {
-          return false;
-        }
-        ++rhs_it;
-      }
-      while (it++ != this->cend());
-      return true;
-    }
-    else if (this->size() == rhs.size() && this->size() == 0)
+    if (this->empty() && rhs.empty())
     {
       return true;
     }
     else
     {
-      return false;
+      if (this->size() == rhs.size() && this->size() != 0)
+      {
+        auto it = this->cbegin();
+        auto rhs_it = rhs.cbegin();
+        do
+        {
+          if (*it != *rhs_it)
+          {
+            return false;
+          }
+          ++rhs_it;
+        }
+        while (it++ != this->cend());
+        return true;
+      }
+      else if (this->size() == rhs.size() && this->size() == 0)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
     }
   }
 
