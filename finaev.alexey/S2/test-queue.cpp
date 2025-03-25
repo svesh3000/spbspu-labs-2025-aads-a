@@ -6,8 +6,8 @@ BOOST_AUTO_TEST_CASE(queue_push_and_top_test)
   finaev::Queue< int > test;
   test.push(10);
   BOOST_TEST(test.top() == 10);
-  test.push(20);  
-  BOOST_TEST(test.top() == 10);  
+  test.push(20);
+  BOOST_TEST(test.top() == 10);
 }
 
 BOOST_AUTO_TEST_CASE(queue_copy_constr_test)
