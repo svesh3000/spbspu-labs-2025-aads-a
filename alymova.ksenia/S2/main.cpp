@@ -20,7 +20,7 @@ bool my_isdigit(const std::string& s)
   }
   return true;
 }
-alymova::Queue< std::string > convert_postfix(std::string s)
+alymova::Queue< std::string > convert_postfix(const std::string& s)
 {
   alymova::Stack< std::string > stack;
   alymova::Queue< std::string > queue;
@@ -129,6 +129,14 @@ long long int count_postfix(alymova::Queue< std::string >& queue)
       long long int item1 = stack.top();
       stack.pop();
       stack.push(item1 / item2);
+    }
+    else if (queue.front() == "%")
+    {
+      long long int item2 = stack.top();
+      stack.pop();
+      long long int item1 = stack.top();
+      stack.pop();
+      stack.push(item1 % item2);
     }
     queue.pop();
   }
