@@ -24,7 +24,7 @@ alymova::Queue< std::string > convert_postfix(const std::string& s)
 {
   alymova::Stack< std::string > stack;
   alymova::Queue< std::string > queue;
-  for (size_t i = 0; s[i] != '\0'; i++)
+  for (size_t i = 0; i < s.size(); i++)
   {
     if (s[i] == '(')
     {
@@ -33,9 +33,8 @@ alymova::Queue< std::string > convert_postfix(const std::string& s)
     }
     if (std::isdigit(s[i]))
     {
-      std::string token(1, s[i]);
-      i++;
-      while (isdigit(s[i]) && s[i] != '\0')
+      std::string token;
+      while (isdigit(s[i]) && i != s.size())
       {
         token.push_back(s[i]);
         i++;
@@ -166,7 +165,7 @@ int main(int argc, char** argv)
   {
     try
     {
-      std::string s = "15 + 2 - 3";
+      std::string s;
       std::getline(*input, s);
       if (s.empty())
       {
@@ -191,6 +190,7 @@ int main(int argc, char** argv)
     std::cout << " " << res.top() << " ";
     res.pop();
   }
+  std::cout << '\n';
   if (argc == 2)
   {
     file.close();
