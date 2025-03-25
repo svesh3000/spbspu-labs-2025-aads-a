@@ -1,7 +1,5 @@
 #include <iostream>
-#include <list>
-#include <sstream>
-#include <cctype>
+#include <limits>
 #include "inputProcess.hpp"
 #include "list.hpp"
 #include "iterators.hpp"
@@ -20,13 +18,18 @@ int main()
     }
     outputListString(std::cout, list);
     std::cout << "\n";
-    outputProcess(std::cout, list);
-    list_int_t sums = countSums(list);
-    if (sums.empty())
+    size_t max_size = findMaxListSize(list);
+    if (max_size == 0)
     {
       std::cout << "0\n";
       return 0;
     }
+    for (size_t i = 0; i < max_size; ++i)
+    {
+      outputProcessOne(std::cout, list, i);
+      std::cout << "\n";
+    }
+    list_int_t sums = countSums(list);
     outputListInt(std::cout, sums);
     std::cout << "\n";
   }
