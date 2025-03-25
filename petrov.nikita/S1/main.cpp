@@ -1,18 +1,18 @@
-#include <forward_list>
+#include "forward_ring_list_2.hpp"
 #include <string>
 #include <iostream>
 #include <limits>
 
 int main()
 {
-  std::forward_list< std::pair< std::string, std::forward_list< size_t > > > head = {};
+  petrov::ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > > head = {};
   std::string sequence_num = {};
   size_t number = 0;
   while (!std::cin.eof())
   {
     std::cin.clear();
     std::cin >> sequence_num;
-    std::forward_list< size_t > subhead = {};
+    petrov::ForwardRingList< size_t > subhead = {};
     while (!std::cin.eof() && std::cin)
     {
       std::cin >> number;
@@ -32,25 +32,34 @@ int main()
     std::cout << "\n";
     return 0;
   }
-  auto it = head.begin();
-  std::cout << (it++)->first;
-  for (; it != head.end(); ++it)
+  auto it = head.cbegin();
+  if (head.size() == 1)
   {
-    std::cout << " " << it->first;
+    std::cout << it->first;
+  }
+  else
+  {
+    std::cout << (it++)->first;
+    do
+    {
+      std::cout << " " << it->first;
+    }
+  while (it++ != head.cend());
   }
   std::cout << "\n";
-  std::forward_list< size_t > sums = {};
+  petrov::ForwardRingList< size_t > sums = {};
   do
   {
     size_t sum = 0;
     auto it = head.begin();
-    while (it != head.end())
+    do
     {
       if (it->second.empty())
       {
-        auto temp = it._M_next();
+        auto cpy_it = it;
+        ++cpy_it;
         head.remove(*it);
-        it = temp;
+        it = cpy_it;
         if (it == head.end())
         {
           break;
@@ -90,12 +99,13 @@ int main()
           }
         }
       }
-      ++it;
     }
+    while (it++ != head.end());
     if (sum)
     {
       sums.push_front(sum);
       std::cout << "\n";
+      head.clear();
     }
   }
   while (!head.empty());
@@ -106,12 +116,13 @@ int main()
   else
   {
     sums.reverse();
-    auto it = sums.begin();
+    auto it = sums.cbegin();
     std::cout << *(it++);
-    for (; it != sums.end(); ++it)
+    do
     {
       std::cout << " " << *it;
     }
+    while (it++ != sums.cend());
   }
   std::cout << "\n";
 }

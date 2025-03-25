@@ -579,6 +579,22 @@ BOOST_AUTO_TEST_CASE(remove_elements_from_list_which_are_there)
   BOOST_TEST(out.str() == "9 8 6 5 4 3 2");
 }
 
+BOOST_AUTO_TEST_CASE(remove_elements_from_list_to_make_it_empty)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    fwd_list.push_front(i);
+  }
+  for (size_t i = 1; i <= 3; i++)
+  {
+    fwd_list.remove(i);
+  }
+  out << fwd_list.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
