@@ -41,7 +41,7 @@ void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
       }
       queue.push(token);
     }
-    if (s[i] == '+' || s[i] == '-')
+    else if (s[i] == '+' || s[i] == '-')
     {
       if (!stack.empty())
       {
@@ -54,7 +54,7 @@ void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
       std::string token(1, s[i]);
       stack.push(token);
     }
-    if (s[i] == ')')
+    else if (s[i] == ')')
     {
       while (stack.top() != "(")
       {
@@ -63,7 +63,7 @@ void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
       }
       stack.pop();
     }
-    if (s[i] == '/' || s[i] == '*')
+    else if (s[i] == '/' || s[i] == '*')
     {
       if (!stack.empty())
       {

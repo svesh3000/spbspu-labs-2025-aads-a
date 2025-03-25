@@ -135,20 +135,6 @@ namespace alymova
   void Array< T >::push_back(const T& value)
   {
     emplace(value);
-    /*if (size_ == capacity_)
-    {
-      int ratio = 2;
-      T* array_new = new T[capacity_ * ratio];
-      for (size_t i = 0; i < size_; i++)
-      {
-        array_new[i] = array_[i];
-      }
-      clear();
-      array_ = array_new;
-      capacity_ *= ratio;
-    }
-    array_[size_] = value;
-    size_++;*/
   }
 
   template< typename T >
@@ -162,7 +148,7 @@ namespace alymova
   {
     for (size_t i = 0; i < size_ - 1; i++)
     {
-      array_[i] = std::move(array_[i + 1]);
+      array_[i] = array_[i + 1];
     }
     size_--;
   }
