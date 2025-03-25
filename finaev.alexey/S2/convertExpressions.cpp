@@ -79,10 +79,12 @@ finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >&
 {
   finaev::Stack< std::string > temp;
   finaev::Queue< std::string > res;
+  bool isBracket = 0;
   while (!inf.isEmpty())
   {
     if (inf.top()[0] == '(' && inf.top().size() == 1)
     {
+      isBracket = 1;
       temp.push(inf.top());
       inf.pop();
     }
@@ -106,6 +108,7 @@ finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >&
     }
     else if (inf.top()[0] == ')' && inf.top().size() == 1)
     {
+      isBracket = 0;
       while (temp.top()[0] != '(')
       {
         res.push(temp.top());
@@ -126,6 +129,10 @@ finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >&
       res.push(temp.top());
       temp.pop();
     }
+  }
+  if (isBracket)
+  {
+    throw std::logic_error("Incorrect Expression!\n");
   }
   return res;
 }
