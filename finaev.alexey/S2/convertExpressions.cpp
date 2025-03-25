@@ -145,7 +145,7 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
   {
     while (isDigit(post.top()))
     {
-      try 
+      try
       {
         long long num = std::stoll(post.top(), nullptr, 10);
         res.push(num);

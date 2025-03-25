@@ -9,7 +9,7 @@
 namespace finaev
 {
   void countFinalResults(std::istream& in);
-  finaev::Queue < std::string > fromInfToPost(finaev::Queue< std::string >& inf);
+  Queue< std::string > fromInfToPost(finaev::Queue< std::string >& inf);
   long long calculatePost(finaev::Queue< std::string >& post);
 }
 
