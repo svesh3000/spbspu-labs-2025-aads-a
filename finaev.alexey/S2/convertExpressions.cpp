@@ -31,15 +31,7 @@ namespace
 
   bool isMorePriority(std::string& a, std::string& b)
   {
-    if ((a[0] == '+' || a[0] == '-') && (b[0] == '-' || b[0] == '+'))
-    {
-      return false;
-    }
-    else if ((a[0] == '*' || a[0] == '/' || a[0] == '%') && (b[0] == '*' || b[0] == '/' || b[0] == '%'))
-    {
-      return false;
-    }
-    else if ((a[0] == '+' || a[0] == '-') && (b[0] == '*' || b[0] == '/' || b[0] == '%'))
+    if ((a[0] == '+' || a[0] == '-') && (b[0] == '*' || b[0] == '/' || b[0] == '%'))
     {
       return false;
     }
