@@ -154,7 +154,7 @@ namespace alymova
   template< typename T >
   void Array< T >::push_back(T&& value)
   {
-    emplace(std::forward< Args >(args));
+    emplace(std::forward< T >(value));
   }
 
   template< typename T >
@@ -195,7 +195,7 @@ namespace alymova
       array_ = array_new;
       capacity_ *= ratio;
     }
-    array_[size_] = T(std::forward< Args >(args));
+    array_[size_] = T{std::forward< Args >(args)...};
     size_++;
   }
 }
