@@ -1,7 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include <cstddef>
-#include <cassert>
 #include "array.hpp"
 
 namespace alymova
@@ -66,28 +65,24 @@ namespace alymova
   template< typename T >
   T& Queue< T >::front()
   {
-    assert(size() != 0);
     return data_.front();
   }
 
   template< typename T >
   const T& Queue< T >::front() const
   {
-    assert(size() != 0);
     return data_.front();
   }
 
   template< typename T >
   T& Queue< T >::back()
   {
-    assert(size() != 0);
     return data_.back();
   }
 
   template< typename T >
   const T& Queue< T >::back() const
   {
-    assert(size() != 0);
     return data_.back();
   }
 
@@ -106,7 +101,6 @@ namespace alymova
   template< typename T >
   void Queue< T >::pop()
   {
-    assert(size() != 0);
     data_.pop_front();
   }
 }

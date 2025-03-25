@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <queue>
 #include <stack>
+#include <stdexcept>
 #include "queue.hpp"
 #include "stack.hpp"
 #include "array.hpp"

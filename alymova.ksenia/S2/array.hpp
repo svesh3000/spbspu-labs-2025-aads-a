@@ -2,6 +2,9 @@
 #define ARRAY_HPP
 #include <cstddef>
 #include <utility>
+#include <stdexcept>
+#include <cassert>
+
 namespace alymova
 {
   template< typename T >
