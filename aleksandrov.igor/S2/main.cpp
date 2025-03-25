@@ -81,9 +81,14 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  if (!results.empty())
+  {
+    std::cout << results.drop();
+  }
   while (!results.empty())
   {
-    std::cout << results.drop() << (results.empty() ? "\n" : " ");
+    std::cout << " " << results.drop();
   }
+  std::cout << "\n";
 }
 

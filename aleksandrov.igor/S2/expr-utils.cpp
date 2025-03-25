@@ -60,14 +60,14 @@ namespace aleksandrov
     long long int result = 0ll;
     if (sameSign(a, b) && a > 0)
     {
-      if (max - a > b)
+      if (max - a >= b)
       {
         result = a + b;
       }
     }
     else if (sameSign(a, b) && a < 0)
     {
-      if (min - a < b)
+      if (min - a <= b)
       {
         result = a + b;
       }
@@ -140,7 +140,7 @@ namespace aleksandrov
 
     const long long int min = std::numeric_limits< long long int >::min();
 
-    if (a < b)
+    if (a < b && -a < b)
     {
       return 0ll;
     }
@@ -163,7 +163,7 @@ namespace aleksandrov
     {
       throw std::invalid_argument("There was division by zero!");
     }
-    return a % b;
+    return (a % b + std::abs(b)) % std::abs(b);
   }
 
   Queue< std::string > infixToPostfix(Queue< std::string>& infix)
