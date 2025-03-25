@@ -129,7 +129,7 @@ long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
       stack.pop();
       long long int item1 = stack.top();
       stack.pop();
-      stack.push(item1 % item2);
+      stack.push(my_mod(item1, item2));
     }
     queue.pop();
   }
@@ -180,4 +180,25 @@ bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
     return is_overflow_multi(-lhs, -rhs);
   }
   return false;
+}
+long long int alymova::my_mod(long long int item1, long long int item2)
+{
+  long long int quot = item1 / item2;
+  if (!is_overflow_multi(item1, item2))
+  {
+    if (item1 < 0 && item2 < 0)
+    {
+      quot++;
+    }
+    if (item1 * item2 < 0)
+    {
+      quot--;
+    }
+  }
+  else
+  {
+    throw std::overflow_error("Multiplication overflow");
+  }
+  long long int res = item1 - quot * item2;
+  return res;
 }

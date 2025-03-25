@@ -1,5 +1,6 @@
 #ifndef POSTFIX_HPP
 #define POSTFIX_HPP
+#include <string>
 #include "queue.hpp"
 
 namespace alymova
@@ -9,5 +10,6 @@ namespace alymova
   bool my_isdigit(const std::string& s);
   bool is_overflow_addition(long long int lhs, long long int rhs);
   bool is_overflow_multi(long long int lhs, long long int rhs);
+  long long int my_mod(long long int item1, long long int item2);
 }
 #endif
