@@ -166,7 +166,7 @@ int main(int argc, char** argv)
   {
     try
     {
-      std::string s;
+      std::string s = "15 + 2 - 3";
       std::getline(*input, s);
       if (s.empty())
       {
