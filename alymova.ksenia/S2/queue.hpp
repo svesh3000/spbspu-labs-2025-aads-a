@@ -41,7 +41,7 @@ namespace alymova
 
   template< typename T >
   Queue< T >::Queue(Queue< T >&& other):
-    data_(std::forward< T >(other.data_))
+    data_(std::forward< Array< T > >(other.data_))
   {}
 
   /*template< typename T >

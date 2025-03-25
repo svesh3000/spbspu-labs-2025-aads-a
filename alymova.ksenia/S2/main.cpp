@@ -20,9 +20,10 @@ bool my_isdigit(const std::string& s)
   }
   return true;
 }
-void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
+alymova::Queue< std::string > convert_postfix(std::string s)
 {
   alymova::Stack< std::string > stack;
+  alymova::Queue< std::string > queue;
   for (size_t i = 0; s[i] != '\0'; i++)
   {
     if (s[i] == '(')
@@ -49,6 +50,10 @@ void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
         {
           queue.push(stack.top());
           stack.pop();
+          if (stack.empty())
+          {
+            break;
+          }
         }
       }
       std::string token(1, s[i]);
@@ -82,6 +87,7 @@ void convert_postfix(std::string s, alymova::Queue< std::string >& queue)
     queue.push(stack.top());
     stack.pop();
   }
+  return queue;
 }
 long long int count_postfix(alymova::Queue< std::string >& queue)
 {
@@ -152,15 +158,13 @@ int main(int argc, char** argv)
   {
     try
     {
-      alymova::Queue< std::string > queue;
-      alymova::Stack< std::string > stack;
       std::string s;
       std::getline(*input, s);
       if (s.empty())
       {
         continue;
       }
-      convert_postfix(s, queue);
+      alymova::Queue< std::string > queue = convert_postfix(s);
       res.push(count_postfix(queue));
     }
     catch(const std::exception& e)
