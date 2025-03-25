@@ -40,16 +40,16 @@ namespace finaev
   template < class T >
   void Stack< T>::swap(Stack<T>& other) noexcept
   {
-    std::swap(data_, other->data_);
-    std::swap(size_, other->size_);
-    std::swap(capacity_, other->capacity_);
+    std::swap(data_, other.data_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
   }
 
   template< class T >
   Stack< T >::Stack(const Stack< T >& other)
   {
-    data_ = new T[other->capacity_];
-    capacity_ = other->capacity_;
+    data_ = new T[other.capacity_];
+    capacity_ = other.capacity_;
     size_ = other.size_;
     for (size_t i = 0; i < size_; ++i)
     {
@@ -66,7 +66,6 @@ namespace finaev
     }
     Stack< T > temp(other);
     swap(temp);
-    delete[] temp.data_;
     return *this;
   }
 
@@ -89,7 +88,6 @@ namespace finaev
       return *this;
     }
     swap(other);
-    delete[] other.data_;
     return *this;
   }
 

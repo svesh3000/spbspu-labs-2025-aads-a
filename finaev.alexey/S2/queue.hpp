@@ -40,9 +40,9 @@ namespace finaev
   template < class T >
   void Queue< T >::swap(Queue< T >& other) noexcept
   {
-    std::swap(data_, other->data_);
-    std::swap(capacity_, other->capacity_);
-    std::swap(size_, other->size_);
+    std::swap(data_, other.data_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(size_, other.size_);
   }
 
   template < class T >
@@ -66,7 +66,6 @@ namespace finaev
     }
     Queue< T > temp(other);
     swap(temp);
-    delete[] temp.data_;
     return *this;
   }
 
@@ -89,7 +88,6 @@ namespace finaev
       return *this;
     }
     swap(other);
-    delete[] other.data_;
     return *this;
   }
 
