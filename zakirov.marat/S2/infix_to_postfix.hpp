@@ -8,7 +8,8 @@ namespace zakirov
   bool check_operand(char symbol);
   bool check_operator(char symbol);
   bool check_priority(char symbol);
-  Stack< char > transform_to_postfix(Queue< char > expression);
+  Stack< char > transform_to_postfix(Queue< char > infix);
+  double calculate_postfix(Queue< char > postfix);
 }
 
 #endif

@@ -40,15 +40,15 @@ bool zakirov::check_priority(char symbol)
   return 0;
 }
 
-zakirov::Stack< char > zakirov::transform_to_postfix(Queue< char > expression)
+zakirov::Stack< char > zakirov::transform_to_postfix(Queue< char > infix)
 {
   Stack< char > op_buffer;
   Stack< char > result;
 
-  for (size_t i = 0; i < expression.size(); ++i)
+  for (size_t i = 0; i < infix.size(); ++i)
   {
-    char symbol = expression.front();
-    expression.pop();
+    char symbol = infix.front();
+    infix.pop();
     if (check_operand(symbol))
     {
       result.push(symbol);
