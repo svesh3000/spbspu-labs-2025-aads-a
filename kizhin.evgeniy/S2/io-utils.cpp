@@ -60,45 +60,44 @@ std::istream& kizhin::operator>>(std::istream& in, Token& token)
 
 kizhin::PostfixExpression kizhin::inputPostfixExpression(std::istream& input)
 {
-  /* TODO: Refactor */
-  Stack< Token > opStack;
-  Queue< Token > outputQueue;
+  Stack< Token > operations;
+  Queue< Token > expression;
   Token token;
   while (input >> token) {
     if (token.type() == TokenType::number) {
-      outputQueue.push(token);
+      expression.push(token);
     } else if (token.type() == TokenType::bracket) {
       BracketType br = token.bracket();
       if (br == BracketType::opening) {
-        opStack.push(token);
+        operations.push(token);
       } else {
-        while (!opStack.empty() && opStack.top().type() != TokenType::bracket) {
-          outputQueue.push(opStack.top());
-          opStack.pop();
+        while (!operations.empty() && operations.top().type() != TokenType::bracket) {
+          expression.push(operations.top());
+          operations.pop();
         }
-        if (!opStack.empty()) {
-          opStack.pop();
+        if (!operations.empty()) {
+          operations.pop();
         }
       }
     } else if (token.type() == TokenType::operation) {
       const BinaryOperation* currOp = token.operation();
-      while (!opStack.empty() && opStack.top().type() == TokenType::operation) {
-        const BinaryOperation* stackOp = opStack.top().operation();
+      while (!operations.empty() && operations.top().type() == TokenType::operation) {
+        const BinaryOperation* stackOp = operations.top().operation();
         if (stackOp->precedence() >= currOp->precedence()) {
-          outputQueue.push(opStack.top());
-          opStack.pop();
+          expression.push(operations.top());
+          operations.pop();
         } else {
           break;
         }
       }
-      opStack.push(token);
+      operations.push(token);
     }
   }
-  while (!opStack.empty()) {
-    outputQueue.push(opStack.top());
-    opStack.pop();
+  while (!operations.empty()) {
+    expression.push(operations.top());
+    operations.pop();
   }
-  return PostfixExpression(outputQueue);
+  return PostfixExpression(expression);
 }
 
 kizhin::Token kizhin::constructToken(const char symbol)

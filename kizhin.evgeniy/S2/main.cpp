@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <forward-list.hpp>
 #include "io-utils.hpp"
 #include "postfix-expression.hpp"
 
