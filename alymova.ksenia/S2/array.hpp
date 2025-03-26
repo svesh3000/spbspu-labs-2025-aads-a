@@ -160,12 +160,6 @@ namespace alymova
   }
 
   template< typename T >
-  void Array< T >::clear()
-  {
-    delete[] array_;
-  }
-
-  template< typename T >
   template< typename... Args >
   void Array< T >::emplace(Args&&... args)
   {
@@ -183,6 +177,12 @@ namespace alymova
     }
     array_[size_] = T{std::forward< Args >(args)...};
     size_++;
+  }
+
+  template< typename T >
+  void Array< T >::clear()
+  {
+    delete[] array_;
   }
 }
 #endif
