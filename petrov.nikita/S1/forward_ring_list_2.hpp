@@ -413,7 +413,10 @@ namespace petrov
     auto subhead = head_;
     if (this->size() == 1)
     {
-      this->pop_front();
+      if (head_->data_ == val)
+      {
+        this->pop_front();
+      }
       return;
     }
     while (subhead->next_ != tail_)
