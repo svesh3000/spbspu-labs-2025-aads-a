@@ -450,7 +450,6 @@ namespace petrov
       head_ = nullptr;
       tail_ = nullptr;
     }
-    
   }
 
   template< typename T >
