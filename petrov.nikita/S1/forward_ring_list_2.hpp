@@ -410,14 +410,12 @@ namespace petrov
     {
       return;
     }
-    if (this->size() == 1 && head_->data_ == val)
+    auto subhead = head_;
+    if (this->size() == 1)
     {
-      delete head_;
-      head_ = nullptr;
-      tail_ = nullptr;
+      this->pop_front();
       return;
     }
-    auto subhead = head_;
     while (subhead->next_ != tail_)
     {
       if (subhead->next_->data_ == val)
@@ -431,24 +429,16 @@ namespace petrov
         subhead = subhead->next_;
       }
     }
-    size_t size = this->size();
     if (subhead->next_->data_ == val)
     {
       auto todelete = subhead->next_;
       tail_ = subhead;
-      subhead->next_ = todelete->next_;
+      tail_->next_ = todelete->next_;
       delete todelete;
-      size--;
     }
     if (head_->data_ == val)
     {
       this->pop_front();
-      size--;
-    }
-    if (!size)
-    {
-      head_ = nullptr;
-      tail_ = nullptr;
     }
   }
 
