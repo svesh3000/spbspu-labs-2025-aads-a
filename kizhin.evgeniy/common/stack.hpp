@@ -1,7 +1,9 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_STACK_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_COMMON_STACK_HPP
 
+#include <utility>
 #include "buffer.hpp"
+#include "type-utils.hpp"
 
 namespace kizhin {
   template < typename T, typename Container = Buffer< T > >
@@ -13,12 +15,13 @@ namespace kizhin {
     using reference = typename Container::reference;
     using const_reference = typename Container::const_reference;
 
-    Stack() noexcept(noexcept(Container())) = default;
+    Stack() noexcept(is_nothrow_default_constructible_v< Container >) = default;
     template < typename InputIt >
     Stack(InputIt, InputIt);
 
     size_type size() const noexcept;
     bool empty() const noexcept;
+    const Container& container() const noexcept;
 
     reference top() noexcept;
     const_reference top() const noexcept;
@@ -29,12 +32,7 @@ namespace kizhin {
     template < typename... Args >
     void emplace(Args&&...);
 
-    void swap(Stack&) /*TODO: noexcept(std::is_nothrow_swappable_v< Container >)*/;
-
-    template < typename U, typename C >
-    friend bool operator==(const Stack< U, C >&, const Stack< U, C >&);
-    template < typename U, typename C >
-    friend bool operator<(const Stack< U, C >&, const Stack< U, C >&);
+    void swap(Stack&) noexcept(is_nothrow_swappable_v< Container >);
 
   private:
     Container container_;
@@ -56,6 +54,12 @@ namespace kizhin {
   bool Stack< T, C >::empty() const noexcept
   {
     return container_.empty();
+  }
+
+  template < typename T, typename C >
+  const C& Stack< T, C >::container() const noexcept
+  {
+    return container_;
   }
 
   template < typename T, typename C >
@@ -96,7 +100,7 @@ namespace kizhin {
   }
 
   template < typename T, typename C >
-  void Stack< T, C >::swap(Stack& rhs)
+  void Stack< T, C >::swap(Stack& rhs) noexcept(is_nothrow_swappable_v< C >)
   {
     using std::swap;
     swap(container_, rhs.container_);
@@ -105,7 +109,7 @@ namespace kizhin {
   template < typename T, typename C >
   bool operator==(const Stack< T, C >& lhs, const Stack< T, C >& rhs)
   {
-    return lhs.container_ == rhs.container_;
+    return lhs.container() == rhs.container();
   }
 
   template < typename T, typename C >
@@ -117,7 +121,7 @@ namespace kizhin {
   template < typename T, typename C >
   bool operator<(const Stack< T, C >& lhs, const Stack< T, C >& rhs)
   {
-    return lhs.container_ < rhs.container_;
+    return lhs.container() < rhs.container();
   }
 
   template < typename T, typename C >
@@ -129,13 +133,13 @@ namespace kizhin {
   template < typename T, typename C >
   bool operator<=(const Stack< T, C >& lhs, const Stack< T, C >& rhs)
   {
-    return lhs < rhs || lhs == rhs;
+    return !(rhs < lhs);
   }
 
   template < typename T, typename C >
   bool operator>=(const Stack< T, C >& lhs, const Stack< T, C >& rhs)
   {
-    return lhs > rhs || lhs == rhs;
+    return !(lhs < rhs);
   }
 
   template < typename T, typename C >

@@ -58,12 +58,17 @@ std::istream& kizhin::operator>>(std::istream& in, Token& token)
   return in;
 }
 
-kizhin::PostfixExpression kizhin::inputPostfixExpression(std::istream& input)
+kizhin::PostfixExpression kizhin::inputPostfixExpression(std::istream& in)
 {
+  StreamGuard guard(in);
+  std::istream::sentry s(in);
+  if (!s) {
+    return PostfixExpression(Queue< Token >());
+  }
   Stack< Token > operations;
   Queue< Token > expression;
   Token token;
-  while (input >> token) {
+  while (in >> token) {
     if (token.type() == TokenType::number) {
       expression.push(token);
     } else if (token.type() == TokenType::bracket) {

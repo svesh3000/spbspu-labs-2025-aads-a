@@ -1,6 +1,6 @@
 #include "test-utils.hpp"
 
-void kizhin::testInvariants(const BufferT& list)
+void kizhin::testBufferInvariants(const BufferT& list)
 {
   BOOST_TEST(list.empty() == (list.size() == 0));
   BOOST_TEST(list.empty() == (list.begin() == list.end()));
@@ -16,7 +16,7 @@ void kizhin::testInvariants(const BufferT& list)
   BOOST_TEST(std::addressof(list.back()) == std::addressof(*beforeEnd));
 }
 
-void kizhin::testComparisonInvariants(const BufferT& lhs, const BufferT& rhs)
+void kizhin::testBufferComparison(const BufferT& lhs, const BufferT& rhs)
 {
   BOOST_TEST((lhs == rhs) == !(lhs != rhs));
   BOOST_TEST((lhs < rhs) == (rhs > lhs));

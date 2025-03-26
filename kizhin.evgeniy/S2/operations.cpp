@@ -5,8 +5,11 @@
 kizhin::BinaryOperation::number_type kizhin::Addition::eval(const number_type lhs,
     const number_type rhs) const
 {
-  if (lhs > std::numeric_limits< number_type >::max() - rhs) {
+  if (rhs > 0 && lhs > std::numeric_limits< number_type >::max() - rhs) {
     throw std::overflow_error("Addition overflow");
+  }
+  if (rhs < 0 && lhs < std::numeric_limits< number_type >::min() - rhs) {
+    throw std::underflow_error("Addition underflow");
   }
   return lhs + rhs;
 }
@@ -25,8 +28,11 @@ kizhin::Addition& kizhin::Addition::instance() noexcept
 kizhin::BinaryOperation::number_type kizhin::Subtraction::eval(const number_type lhs,
     const number_type rhs) const
 {
-  if (lhs < std::numeric_limits< number_type >::min() + rhs) {
+  if (rhs > 0 && lhs < std::numeric_limits< number_type >::min() + rhs) {
     throw std::underflow_error("Substraction underflow");
+  }
+  if (rhs < 0 && lhs > std::numeric_limits< number_type >::max() - rhs) {
+    throw std::overflow_error("Substraction overflow");
   }
   return lhs - rhs;
 }
@@ -45,7 +51,10 @@ kizhin::Subtraction& kizhin::Subtraction::instance() noexcept
 kizhin::BinaryOperation::number_type kizhin::Multiplication::eval(const number_type lhs,
     const number_type rhs) const
 {
-  if (lhs > std::numeric_limits< number_type >::max() / rhs) {
+  if (rhs == 0) {
+    return 0;
+  }
+  if (rhs != -1 && lhs > std::numeric_limits< number_type >::max() / rhs) {
     throw std::overflow_error("Multiplication overflow");
   }
   if (lhs < std::numeric_limits< number_type >::min() / rhs) {

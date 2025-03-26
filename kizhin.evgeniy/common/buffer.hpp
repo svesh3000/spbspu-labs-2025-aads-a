@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <utility>
 #include "algorithm-utils.hpp"
-#include "enable-if-input-iterator.hpp"
+#include "type-utils.hpp"
 
 namespace kizhin {
   template < typename T >
@@ -27,7 +27,7 @@ namespace kizhin {
     Buffer(const Buffer&);
     Buffer(Buffer&&) noexcept;
     Buffer(size_type, const_reference = value_type{});
-    template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
+    template < typename InputIt, enable_if_input_iterator< InputIt > = 0 >
     Buffer(InputIt, InputIt);
     Buffer(std::initializer_list< value_type >);
     ~Buffer();
@@ -36,7 +36,7 @@ namespace kizhin {
     Buffer& operator=(Buffer&&) noexcept;
 
     void assign(size_type, const_reference = value_type{});
-    template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
+    template < typename InputIt, enable_if_input_iterator< InputIt > = 0 >
     void assign(InputIt, InputIt);
     void assign(std::initializer_list< value_type >);
 
@@ -81,7 +81,7 @@ namespace kizhin {
     void expand(size_type);
     size_type growthCapacity(size_type) const;
 
-    template < typename InputIt, detail::enable_if_input_iterator< InputIt > = 0 >
+    template < typename InputIt, enable_if_input_iterator< InputIt > = 0 >
     void constructAtEnd(InputIt, InputIt);
     void constructAtEnd(size_type, const_reference = value_type());
     void destroyAtEnd(pointer) noexcept;
@@ -119,7 +119,7 @@ namespace kizhin {
   }
 
   template < typename T >
-  template < typename InputIt, typename detail::enable_if_input_iterator< InputIt > >
+  template < typename InputIt, enable_if_input_iterator< InputIt > >
   Buffer< T >::Buffer(InputIt first, const InputIt last):
     Buffer()
   {
@@ -165,7 +165,7 @@ namespace kizhin {
   }
 
   template < typename T >
-  template < typename InputIt, detail::enable_if_input_iterator< InputIt > >
+  template < typename InputIt, enable_if_input_iterator< InputIt > >
   void Buffer< T >::assign(const InputIt first, const InputIt last)
   {
     Buffer tmp(first, last);
@@ -386,7 +386,7 @@ namespace kizhin {
   }
 
   template < typename T >
-  template < typename InputIt, detail::enable_if_input_iterator< InputIt > >
+  template < typename InputIt, enable_if_input_iterator< InputIt > >
   void Buffer< T >::constructAtEnd(InputIt first, const InputIt last)
   {
     end_ = uninitializedCopy(first, last, end_);
@@ -427,7 +427,7 @@ namespace kizhin {
   template < typename T >
   bool operator==(const Buffer< T >& lhs, const Buffer< T >& rhs)
   {
-    return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin());
+    return lhs.size() == rhs.size() && compare(lhs.begin(), lhs.end(), rhs.begin());
   }
 
   template < typename T >

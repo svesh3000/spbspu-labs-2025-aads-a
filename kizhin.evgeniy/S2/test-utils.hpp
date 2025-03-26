@@ -6,8 +6,8 @@
 
 namespace kizhin {
   using BufferT = Buffer< double >;
-  void testInvariants(const BufferT&);
-  void testComparisonInvariants(const BufferT&, const BufferT&);
+  void testBufferInvariants(const BufferT&);
+  void testBufferComparison(const BufferT&, const BufferT&);
 }
 
 #endif

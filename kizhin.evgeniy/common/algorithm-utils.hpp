@@ -3,18 +3,11 @@
 
 #include <functional>
 #include <iterator>
+#include <utility>
 
 namespace kizhin {
 
-  namespace detail {
-    template < typename Iterator >
-    using IteratorValueType = typename std::iterator_traits< Iterator >::value_type;
-
-    template < typename Iterator >
-    using DefaultComparator = std::less< IteratorValueType< Iterator > >;
-  }
-
-  template < typename InputIt, typename Comp = detail::DefaultComparator< InputIt > >
+  template < typename InputIt, typename Comp = std::less<> >
   bool lexicographicalCompare(InputIt first1, InputIt last1, InputIt first2,
       InputIt last2, Comp comp = Comp{})
   {
@@ -27,6 +20,17 @@ namespace kizhin {
       }
     }
     return (first1 == last1) && (first2 != last2);
+  }
+
+  template < typename InputIt1, typename InputIt2, typename Comp = std::equal_to<> >
+  bool compare(InputIt1 first1, const InputIt1 last1, InputIt2 first2, Comp comp = Comp{})
+  {
+    for (; first1 != last1; ++first1, ++first2) {
+      if (!(comp(*first1, *first2))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   template < typename InputIt, typename ResultIt >
@@ -73,17 +77,6 @@ namespace kizhin {
       std::addressof(*first)->~value_type();
     }
     return first;
-  }
-
-  template < typename InputIt1, typename InputIt2 >
-  bool equal(InputIt1 first1, const InputIt1 last1, InputIt2 first2)
-  {
-    for (; first1 != last1; ++first1, ++first2) {
-      if (!(*first1 == *first2)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   template < typename InputIt, typename OutputIt >
