@@ -406,60 +406,70 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::remove(const T & val)
   {
-    if (this->empty())
     {
-      return;
-    }
-    if (this->size() == 1)
-    {
-      if (head_->data_ == val)
+      if (this->empty())
       {
-        this->pop_front();
+        return;
       }
-      return;
-    }
-    size_t size = this->size();
-    size_t count = 0;
-    auto it = this->cbegin();
-    do
-    {
-      if (*it == val)
+      size_t size = this->size();
+      size_t count = 0;
+      auto it = this->begin();
+      do
       {
-        count++;
+        if (*it == val)
+        {
+          count++;
+        }
       }
-    }
-    while (it++ != this->cend());
-    if (count == size)
-    {
-      this->clear();
-      return;
-    }
-    auto subhead = head_;
-    auto prev_subhead = tail_;
-    do
-    {
-      if (subhead->data_ == val)
+      while (it++ != this->end());
+      if (count == size)
       {
-        auto todelete = subhead;
-        subhead = todelete->next_;
-        prev_subhead->next_ = subhead;
-        if (todelete == head_)
+        this->clear();
+        return;
+      }
+      auto subhead = head_;
+      while (subhead == head_)
+      {
+        if (subhead->data_ == val)
         {
-          head_ = subhead;
+          this->pop_front();
+          subhead = head_;
+          size--;
         }
-        else if (todelete == tail_)
+        else
         {
-          tail_ = prev_subhead;
+          break;
         }
+      }
+      while (subhead->next_ != tail_)
+      {
+        if (subhead->next_->data_ == val)
+        {
+          auto todelete = subhead->next_;
+          subhead->next_ = todelete->next_;
+          delete todelete;
+          size--;
+        }
+        else
+        {
+          subhead = subhead->next_;
+        }
+      }
+      if (subhead->next_->data_ == val)
+      {
+        auto todelete = subhead->next_;
+        subhead->next_ = todelete->next_;
         delete todelete;
+        size--;
+        tail_ = subhead;
+        tail_->next_ = head_;
       }
-      else
+      if (!size)
       {
-        prev_subhead = subhead;
-        subhead = subhead->next_;
+        head_ = nullptr;
+        tail_ = nullptr;
       }
     }
-    while (subhead != head_);
   }
 
   template< typename T >

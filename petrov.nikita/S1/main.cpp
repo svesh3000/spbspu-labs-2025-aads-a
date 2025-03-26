@@ -54,18 +54,14 @@ int main()
     auto it_out = head.begin();
     do
     {
-      if (it_out->second.empty() && head.size() != 1)
+      if (it_out->second.empty())
       {
-        auto cpy_it = it_out;
-        ++cpy_it;
         head.remove(*it_out);
-        it_out = cpy_it;
+        if (head.empty())
+        {
+          break;
+        }
         continue;
-      }
-      else if (it_out->second.empty() && head.size() == 1)
-      {
-        head.remove(*it_out);
-        break;
       }
       else
       {
