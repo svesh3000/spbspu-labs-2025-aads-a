@@ -54,14 +54,15 @@ int main()
     auto it_out = head.begin();
     do
     {
-      if (it_out->second.empty())
+      if (it_out->second.empty() && head.size() != 1)
       {
-        head.remove(*it_out);
-        if (head.empty())
-        {
-          break;
-        }
-        continue;
+        auto val = *it_out;
+        head.remove(val);
+      }
+      else if (it_out->second.empty() && head.size() == 1)
+      {
+        head.pop_front();
+        break;
       }
       else
       {
@@ -98,7 +99,7 @@ int main()
         }
       }
     }
-    while (it_out++ != head.end() && it_out != head.begin() && head.begin() != head.end());
+    while (it_out++ != head.end() && head.begin() != head.end());
     if (sum)
     {
       sums.push_front(sum);
