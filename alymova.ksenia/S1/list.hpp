@@ -78,24 +78,23 @@ namespace alymova
     void splice(Iterator< T > position, List< T >& other, Iterator< T > i);
     void splice(Iterator< T > position, List< T >& other, Iterator< T > first, Iterator< T > last);
     void remove(const T& value) noexcept;
-    template< typename Predicate >
-    void remove_if(Predicate pred);
+    template< typename Comparator >
+    void remove_if(Comparator cmp);
     void unique();
-    template< typename Predicate >
-    void unique(Predicate pred);
+    template< typename Comparator >
+    void unique(Comparator cmp);
     void sort();
-    template< typename Predicate >
-    void sort(Predicate pred);
+    template< typename Comparator >
+    void sort(Comparator cmp);
     void merge(List< T >& other);
-    template< typename Predicate >
-    void merge(List< T >& other, Predicate pred);
+    template< typename Comparator >
+    void merge(List< T >& other, Comparator cmp);
     void reverse() noexcept;
   private:
     detail::ListNode< T >* fake_;
     detail::ListNode< T >* head_;
 
     void push_single(detail::ListNode< T >* node);
-    detail::ListNode< T >* get_last_node();
   };
 
   template< typename T >
@@ -179,13 +178,8 @@ namespace alymova
 
   template< typename T >
   List< T >::List(const List< T >& other):
-    List()
-  {
-    for (auto it = other.cbegin(); it != other.cend(); ++it)
-    {
-      push_back(*it);
-    }
-  }
+    List(other.begin(), other.end())
+  {}
 
   template< typename T >
   List< T >::List(List< T >&& other) noexcept:
@@ -216,13 +210,8 @@ namespace alymova
 
   template< typename T >
   List< T >::List(std::initializer_list< T > il):
-    List()
-  {
-    for (auto it = il.begin(); it != il.end(); ++it)
-    {
-      push_back(*it);
-    }
-  }
+    List(il.begin(), il.end())
+  {}
 
   template< typename T >
   List< T >& List< T >::operator=(const List< T >& other)
@@ -364,10 +353,7 @@ namespace alymova
   void List< T >::assign(std::initializer_list< T > il)
   {
     clear();
-    for (auto it = il.begin(); it != il.end(); ++it)
-    {
-      push_back(*it);
-    }
+    assign(il.begin(), il.end());
   }
 
   template< typename T >
@@ -408,7 +394,7 @@ namespace alymova
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    detail::ListNode< T >* subhead = get_last_node();
+    detail::ListNode< T >* subhead = fake_->prev;
     if (size() == 1)
     {
       head_ = fake_;
@@ -470,8 +456,7 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::erase(Iterator< T > position)
   {
-    Iterator< T > return_it = ++position;
-    --position;
+    auto return_it = Iterator< T >(position.node_->next);
     if (position == begin())
     {
       pop_front();
@@ -495,8 +480,7 @@ namespace alymova
   {
     while (first != last)
     {
-      Iterator< T > next = ++first;
-      --first;
+      auto next = Iterator< T >(first.node_->next);
       Iterator< T > tmp_it = erase(first);
       tmp_it = last;
       first = next;
@@ -534,7 +518,7 @@ namespace alymova
     }
     else
     {
-      detail::ListNode< T >* subhead = get_last_node();
+      detail::ListNode< T >* subhead = fake_->prev;
       subhead->next = node;
       node->prev = subhead;
       node->next = fake_;
@@ -627,8 +611,7 @@ namespace alymova
     auto other_it = first;
     while (other_it != last)
     {
-      Iterator< T > other_it_next = ++other_it;
-      --other_it;
+      auto other_it_next = Iterator< T >(other_it.node_->next);
       splice(position, other, other_it);
       other_it = other_it_next;
     }
@@ -652,16 +635,15 @@ namespace alymova
   }
 
   template< typename T >
-  template< typename Predicate >
-  void List< T >::remove_if(Predicate pred)
+  template< typename Comparator >
+  void List< T >::remove_if(Comparator cmp)
   {
     assert(!empty());
     auto it = begin();
     while (it != end())
     {
-      Iterator< T > it_next = ++it;
-      --it;
-      if (pred(*it))
+      auto it_next = Iterator< T >(it.node_->next);
+      if (cmp(*it))
       {
         erase(it);
       }
@@ -676,17 +658,16 @@ namespace alymova
   }
 
   template< typename T >
-  template< typename Predicate >
-  void List< T >::unique(Predicate pred)
+  template< typename Comparator >
+  void List< T >::unique(Comparator cmp)
   {
     detail::ListNode< T >* subhead = head_;
     auto it = begin();
     ++it;
     while (it != end() && it.node_ != nullptr)
     {
-      Iterator< T > it_next = ++it;
-      --it;
-      if (pred(*it, subhead->data))
+      auto it_next = Iterator< T >(it.node_->next);
+      if (cmp(*it, subhead->data))
       {
         erase(it);
       }
@@ -705,17 +686,16 @@ namespace alymova
   }
 
   template< typename T >
-  template< typename Predicate >
-  void List< T >::sort(Predicate pred)
+  template< typename Comparator >
+  void List< T >::sort(Comparator cmp)
   {
     for (auto it1 = begin(); it1 != end(); ++it1)
     {
       auto min_it = it1;
-      auto it2 = ++it1;
-      --it1;
+      auto it2 = Iterator< T >(it1.node_->next);
       for (; it2 != end(); ++it2)
       {
-        if (pred(*it2, *min_it))
+        if (cmp(*it2, *min_it))
         {
           min_it = it2;
         }
@@ -731,14 +711,14 @@ namespace alymova
   }
 
   template< typename T >
-  template< typename Predicate >
-  void List< T >::merge(List< T >& other, Predicate pred)
+  template< typename Comparator >
+  void List< T >::merge(List< T >& other, Comparator cmp)
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return;
     }
-    if (!(std::is_sorted(begin(), end(), pred) && std::is_sorted(other.begin(), other.end(), pred)))
+    if (!(std::is_sorted(begin(), end(), cmp) && std::is_sorted(other.begin(), other.end(), cmp)))
     {
       throw std::logic_error("Lists are not sorted");
     }
@@ -746,9 +726,8 @@ namespace alymova
     auto it = begin();
     while (!other.empty())
     {
-      auto it_other_next = ++it_other;
-      --it_other;
-      while (!pred(*it_other, *it) && it != end())
+      auto it_other_next = Iterator< T >(it_other.node_->next);
+      while (!cmp(*it_other, *it) && it != end())
       {
         ++it;
       }
@@ -769,8 +748,7 @@ namespace alymova
     head_->next = fake_;
     while (it != --end())
     {
-      auto it_next = ++it;
-      --it;
+      auto it_next = Iterator< T >(it.node_->next);
       detail::ListNode< T >* node = it.node_;
       std::swap(node->next, node->prev);
       it = it_next;
@@ -788,18 +766,6 @@ namespace alymova
     head_ = node;
     head_->next = fake_;
     fake_->prev = head_;
-  }
-
-  template< typename T >
-  detail::ListNode< T >* List< T >::get_last_node()
-  {
-    assert(!empty());
-    detail::ListNode< T >* subhead = head_;
-    for (auto it = ++begin(); it != end(); ++it)
-    {
-      subhead = subhead->next;
-    }
-    return subhead;
   }
 }
 #endif
