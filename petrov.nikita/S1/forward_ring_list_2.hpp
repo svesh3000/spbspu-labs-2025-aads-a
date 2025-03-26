@@ -452,6 +452,7 @@ namespace petrov
           tail_ = prev_subhead;
         }
         delete todelete;
+        todelete = nullptr;
       }
       else
       {
