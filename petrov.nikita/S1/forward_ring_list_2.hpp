@@ -410,7 +410,6 @@ namespace petrov
     {
       return;
     }
-    auto subhead = head_;
     if (this->size() == 1)
     {
       if (head_->data_ == val)
@@ -419,30 +418,48 @@ namespace petrov
       }
       return;
     }
-    while (subhead->next_ != tail_)
+    size_t size = this->size();
+    size_t count = 0;
+    auto it = this->cbegin();
+    do
     {
-      if (subhead->next_->data_ == val)
+      if (*it == val)
       {
-        auto todelete = subhead->next_;
-        subhead->next_ = todelete->next_;
+        count++;
+      }
+    } 
+    while (it++ != this->cend());
+    if (count == size)
+    {
+      this->clear();
+      return;
+    }
+    auto subhead = head_;
+    auto prev_subhead = tail_;
+    do
+    {
+      if (subhead->data_ == val)
+      {
+        auto todelete = subhead;
+        subhead = todelete->next_;
+        prev_subhead->next_ = subhead;
+        if (todelete == head_)
+        {
+          head_ = subhead;
+        }
+        else if (todelete == tail_)
+        {
+          tail_ = prev_subhead;
+        }
         delete todelete;
       }
       else
       {
+        prev_subhead = subhead;
         subhead = subhead->next_;
       }
     }
-    if (subhead->next_->data_ == val)
-    {
-      auto todelete = subhead->next_;
-      tail_ = subhead;
-      tail_->next_ = todelete->next_;
-      delete todelete;
-    }
-    if (head_->data_ == val)
-    {
-      this->pop_front();
-    }
+    while (subhead != head_);
   }
 
   template< typename T >
