@@ -411,59 +411,63 @@ namespace petrov
       return;
     }
     size_t size = this->size();
-    size_t count = 0;
-    auto it = this->begin();
-    do
+    auto subhead = tail_;
+    if (size == 1 && subhead->data_ == val)
     {
-      if (*it == val)
-      {
-        count++;
-      }
-    }
-    while (it++ != this->end());
-    if (count == size)
-    {
-      this->clear();
+      this->pop_front();
+      head_ = nullptr;
+      tail_ = nullptr;
       return;
     }
-    auto subhead = head_;
-    while (subhead == head_)
-    {
-      if (subhead->data_ == val)
-      {
-        this->pop_front();
-        subhead = head_;
-        size--;
-      }
-      else
-      {
-        break;
-      }
-    }
-    while (subhead->next_ != tail_)
+    do
     {
       if (subhead->next_->data_ == val)
       {
-        auto todelete = subhead->next_;
-        subhead->next_ = todelete->next_;
-        delete todelete;
-        size--;
+        if (subhead->next_ == head_)
+        {
+          auto todelete = subhead->next_;
+          subhead->next_ = todelete->next_;
+          delete todelete;
+          head_ = subhead->next_;
+          size--;
+        }
+        else if (subhead->next_ == tail_)
+        {
+          auto todelete = subhead->next_;
+          subhead->next_ = todelete->next_;
+          delete todelete;
+          tail_ = subhead;
+          size--;
+        }
+        else
+        {
+          auto todelete = subhead->next_;
+          subhead->next_ = todelete->next_;
+          delete todelete;
+          size--;
+        }
       }
       else
       {
         subhead = subhead->next_;
       }
     }
-    if (subhead->next_->data_ == val)
+    while (subhead->next_ != tail_);
+    if (size == 1 && subhead->data_ == val)
+    {
+      this->pop_front();
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
+    else if (subhead->next_->data_ == val)
     {
       auto todelete = subhead->next_;
       subhead->next_ = todelete->next_;
       delete todelete;
-      size--;
       tail_ = subhead;
-      tail_->next_ = head_;
+      size--;
     }
-    if (!size)
+    else if (!size)
     {
       head_ = nullptr;
       tail_ = nullptr;
