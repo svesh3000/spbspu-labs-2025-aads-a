@@ -427,7 +427,7 @@ namespace petrov
       {
         count++;
       }
-    } 
+    }
     while (it++ != this->cend());
     if (count == size)
     {
