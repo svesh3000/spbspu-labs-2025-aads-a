@@ -11,7 +11,7 @@ namespace alymova
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    Iterator(detail::ListNode< T >* node);
+    Iterator();
     Iterator< T >& operator++() noexcept;
     Iterator< T > operator++(int) noexcept;
     Iterator< T >& operator--() noexcept;
@@ -23,14 +23,14 @@ namespace alymova
   private:
     friend class List< T >;
     detail::ListNode< T >* node_;
-    Iterator();
+    Iterator(detail::ListNode< T >* node);
   };
   template< typename T >
   struct ConstIterator:
     public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    ConstIterator(detail::ListNode< T >* node);
+    ConstIterator();
     ConstIterator< T >& operator++() noexcept;
     ConstIterator< T > operator++(int) noexcept;
     ConstIterator< T >& operator--() noexcept;
@@ -42,7 +42,7 @@ namespace alymova
   private:
     friend class List< T >;
     const detail::ListNode< T >* node_;
-    ConstIterator();
+    ConstIterator(detail::ListNode< T >* node);
   };
 
   template< typename T >
