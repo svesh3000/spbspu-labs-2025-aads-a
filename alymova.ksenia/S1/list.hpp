@@ -78,8 +78,8 @@ namespace alymova
     void splice(Iterator< T > position, List< T >& other, Iterator< T > i);
     void splice(Iterator< T > position, List< T >& other, Iterator< T > first, Iterator< T > last);
     void remove(const T& value) noexcept;
-    template< typename Comparator >
-    void remove_if(Comparator cmp);
+    template< typename Predicate >
+    void remove_if(Predicate pred);
     void unique();
     template< typename Comparator >
     void unique(Comparator cmp);
@@ -634,15 +634,15 @@ namespace alymova
   }
 
   template< typename T >
-  template< typename Comparator >
-  void List< T >::remove_if(Comparator cmp)
+  template< typename Predicate >
+  void List< T >::remove_if(Predicate pred)
   {
     assert(!empty());
     auto it = begin();
     while (it != end())
     {
       auto it_next = Iterator< T >(it.node_->next);
-      if (cmp(*it))
+      if (pred(*it))
       {
         erase(it);
       }
