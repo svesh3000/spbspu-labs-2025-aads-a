@@ -410,64 +410,35 @@ namespace petrov
     {
       return;
     }
-    size_t size = this->size();
-    auto subhead = tail_;
-    if (size == 1 && subhead->data_ == val)
-    {
-      this->pop_front();
-      head_ = nullptr;
-      tail_ = nullptr;
-      return;
-    }
-    do
+    auto subhead = head_;
+    while (subhead->next_ != tail_)
     {
       if (subhead->next_->data_ == val)
       {
-        if (subhead->next_ == head_)
-        {
-          auto todelete = subhead->next_;
-          subhead->next_ = todelete->next_;
-          delete todelete;
-          head_ = subhead->next_;
-          size--;
-        }
-        else if (subhead->next_ == tail_)
-        {
-          auto todelete = subhead->next_;
-          subhead->next_ = todelete->next_;
-          delete todelete;
-          tail_ = subhead;
-          size--;
-        }
-        else
-        {
-          auto todelete = subhead->next_;
-          subhead->next_ = todelete->next_;
-          delete todelete;
-          size--;
-        }
+        auto todelete = subhead->next_;
+        subhead->next_ = todelete->next_;
+        delete todelete;
       }
       else
       {
         subhead = subhead->next_;
       }
-    }
-    while (subhead->next_ != tail_);
-    if (size == 1 && subhead->data_ == val)
-    {
-      this->pop_front();
-      head_ = nullptr;
-      tail_ = nullptr;
-    }
-    else if (subhead->next_->data_ == val)
+    } 
+    size_t size = this->size();
+    if (subhead->next_->data_ == val)
     {
       auto todelete = subhead->next_;
       subhead->next_ = todelete->next_;
-      delete todelete;
       tail_ = subhead;
+      delete todelete;
       size--;
     }
-    else if (!size)
+    if (head_->data_ == val)
+    {
+      this->pop_front();
+      size--;
+    }
+    if (!size)
     {
       head_ = nullptr;
       tail_ = nullptr;
