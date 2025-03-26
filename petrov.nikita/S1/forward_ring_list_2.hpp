@@ -431,29 +431,26 @@ namespace petrov
         subhead = subhead->next_;
       }
     }
+    size_t size = this->size();
     if (subhead->next_->data_ == val)
     {
       auto todelete = subhead->next_;
       tail_ = subhead;
       subhead->next_ = todelete->next_;
       delete todelete;
+      size--;
     }
     if (head_->data_ == val)
     {
-      if (this->size() == 1)
-      {
-        delete head_;
-        head_ = nullptr;
-        tail_ = nullptr;
-      }
-      else
-      {
-        auto temp = head_->next_;
-        delete head_;
-        head_ = temp;
-        tail_->next_ = head_;
-      }
+      this->pop_front();
+      size--;
     }
+    if (!size)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
+    
   }
 
   template< typename T >
