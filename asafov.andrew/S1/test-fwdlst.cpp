@@ -92,16 +92,6 @@ BOOST_AUTO_TEST_CASE(nonempty_test)
   BOOST_TEST(list.empty() == false);
 }
 
-BOOST_AUTO_TEST_CASE(swap_test)
-{
-  asafov::Forward_list<size_t> list;
-  list.push_back(1);
-  asafov::Forward_list<size_t> list2;
-  list2.push_back(2);
-  list.swap(list2);
-  BOOST_TEST(list.front() == 2 && list2.front() == 1);
-}
-
 BOOST_AUTO_TEST_CASE(pop_front_test)
 {
   asafov::Forward_list<size_t> list;
@@ -152,4 +142,14 @@ BOOST_AUTO_TEST_CASE(assign_test)
   asafov::Forward_list<size_t> list;
   list.assign(5, 1);
   BOOST_TEST(list.size() == 5 && *list.begin() == 1 && *list.end() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(swap_test)
+{
+  asafov::Forward_list<size_t> list;
+  list.push_back(1);
+  asafov::Forward_list<size_t> list2;
+  list2.push_back(2);
+  list.swap(list2);
+  BOOST_TEST(list.front() == 2 && list2.front() == 1);
 }
