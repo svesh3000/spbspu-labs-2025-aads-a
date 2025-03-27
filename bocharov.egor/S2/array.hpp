@@ -44,7 +44,6 @@ namespace bocharov
 
     void reallocate();
     void swap(Array< T > &) noexcept;
-
   };
 
   template< typename T >
