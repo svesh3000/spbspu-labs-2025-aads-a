@@ -129,7 +129,7 @@ namespace sveshnikov
         {
           push_back(*it);
         }
-        catch (std::bad_alloc &e)
+        catch (const std::bad_alloc &e)
         {
           clear();
           throw;
@@ -160,7 +160,7 @@ namespace sveshnikov
         push_back(val);
       }
     }
-    catch (std::bad_alloc &e)
+    catch (const std::bad_alloc &e)
     {
       clear();
       throw;
@@ -178,7 +178,7 @@ namespace sveshnikov
       {
         push_back(*first);
       }
-      catch (std::bad_alloc &e)
+      catch (const std::bad_alloc &e)
       {
         clear();
         throw;
