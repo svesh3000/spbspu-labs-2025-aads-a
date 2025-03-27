@@ -268,37 +268,13 @@ namespace demehin
   template< typename T >
   void List< T >::pop_front() noexcept
   {
-    Node* todelete = fake_->next;
-    fake_->next = todelete->next;
-    if (fake_->next != nullptr)
-    {
-      fake_->next->prev = fake_;
-    }
-    else
-    {
-      tail_ = nullptr;
-    }
-    delete todelete;
-    size_--;
+    erase(cbegin());
   }
 
   template< typename T >
   void List< T >::pop_back() noexcept
   {
-    Node* todelete = tail_;
-    tail_ = tail_->prev;
-
-    if (tail_ != nullptr)
-    {
-      tail_->next = nullptr;
-    }
-    else
-    {
-      fake_->next = nullptr;
-    }
-
-    delete todelete;
-    size_--;
+    erase(cIter(tail_));
   }
 
   template< typename T >
