@@ -101,7 +101,8 @@ BOOST_AUTO_TEST_CASE(swap_test)
   list.swap(list2);
   auto it1 = list.cbegin();
   auto it2 = list2.cbegin();
-  BOOST_TEST(*it1 == 2 && *it2 == 1);
+  bool a = *it1 == 2 && *it2 == 1;
+  BOOST_TEST(a);
 }
 
 BOOST_AUTO_TEST_CASE(pop_front_test)
