@@ -81,7 +81,7 @@ namespace sveshnikov
   template < class T >
   Queue< T > &Queue< T >::operator=(Queue &&other) noexcept
   {
-    swap(other);
+    swap(std::move(other));
     return *this;
   }
 
@@ -96,7 +96,7 @@ namespace sveshnikov
   const T &Queue< T >::front() const noexcept
   {
     assert(!empty());
-    return data[size - 1];
+    return data[0];
   }
 
   template < class T >
@@ -147,7 +147,13 @@ namespace sveshnikov
   void Queue< T >::pop()
   {
     assert(!empty());
-    delete data_[--size_];
+    delete data_[0];
+    size_--;
+    for (size_t i = 0; i < size_; i++)
+    {
+      data[i] = data[i+1];
+    }
+    data[size] = nullptr;
   }
 
   template < class T >
