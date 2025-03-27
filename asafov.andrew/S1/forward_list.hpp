@@ -63,9 +63,10 @@ namespace asafov
     }
     Forward_list& operator=(Forward_list&& list) noexcept
     {
-      Forward_list* temp = this;
-      list = temp;
-      return temp;
+      Forward_list* temp = list;
+      list = *this;
+      this = temp;
+      return *this;
     }
 
     class const_iterator
@@ -275,15 +276,16 @@ namespace asafov
 
     Forward_list& swap(Forward_list& list) noexcept
     {
-      Forward_list* temp = this;
-      list = temp;
-      return *temp;
+      Forward_list* temp = list;
+      list = *this;
+      this = temp;
+      return *this;
     }
     void remove(const T& value) noexcept
     {
       for (auto iter = head_; iter != tail_; iter = iter->next_)
       {
-        if (*iter->next_ == value)
+        if (iter->next_->data_ == value)
         {
           auto temp = iter->next_;
           iter->next_ = temp->next_;
@@ -295,7 +297,7 @@ namespace asafov
     {
       for (auto iter = head_; iter != tail_; iter = iter->next_)
       {
-        if (f(*iter->next_))
+        if (f(iter->next_->data_))
         {
           auto temp = iter->next_;
           iter->next_ = temp->next_;
