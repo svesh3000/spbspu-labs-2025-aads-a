@@ -277,13 +277,13 @@ namespace asafov
     {
       Forward_list* temp = this;
       list = temp;
-      return temp;
+      return *temp;
     }
     void remove(const T& value) noexcept
     {
       for (auto iter = head_; iter != tail_; iter = iter->next_)
       {
-        if (*iter->next == value)
+        if (*iter->next_ == value)
         {
           auto temp = iter->next_;
           iter->next_ = temp->next_;
@@ -295,7 +295,7 @@ namespace asafov
     {
       for (auto iter = head_; iter != tail_; iter = iter->next_)
       {
-        if (f(*iter->next))
+        if (f(*iter->next_))
         {
           auto temp = iter->next_;
           iter->next_ = temp->next_;
