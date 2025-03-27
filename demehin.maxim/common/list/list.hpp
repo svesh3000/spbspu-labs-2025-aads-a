@@ -19,7 +19,8 @@ namespace demehin
 
     List(size_t, const T&);
     explicit List(std::initializer_list< T >);
-    List(Iter, Iter);
+    template< typename InputIt >
+    List(InputIt, InputIt);
 
     ~List();
 
@@ -70,7 +71,8 @@ namespace demehin
     void removeIf(UnaryPredicate) noexcept;
 
     void assign(size_t, const T&);
-    void assign(Iter, Iter);
+    template< typename InputIt >
+    void assign(InputIt, InputIt);
     void assign(std::initializer_list < T >);
 
     Iter erase(cIter pos) noexcept;
@@ -122,7 +124,8 @@ namespace demehin
   }
 
   template< typename T >
-  List< T >::List(Iter first, Iter last):
+  template< typename InputIt >
+  List< T >::List(InputIt first, InputIt last):
     List()
   {
     assign(first, last);
@@ -171,17 +174,17 @@ namespace demehin
   }
 
   template< typename T >
-  bool List< T >::operator<(const List< T >& rhs) const noexcept
+  bool List< T >::operator>(const List< T >& rhs) const noexcept
   {
     auto it1 = begin();
     auto it2 = rhs.begin();
     while (it1 != end() && it2 != rhs.end())
     {
-      if (*it1 < *it2)
+      if (*it1 > *it2)
       {
         return true;
       }
-      if (*it1 > *it2)
+      if (*it1 < *it2)
       {
         return false;
       }
@@ -189,19 +192,19 @@ namespace demehin
       it2++;
     }
 
-    return size() < rhs.size();
+    return size() > rhs.size();
   }
 
   template< typename T >
   bool List< T >::operator<=(const List< T >& rhs) const noexcept
   {
-    return *this < rhs || *this == rhs;
+    return !(*this > rhs);
   }
 
   template< typename T >
-  bool List< T >::operator>(const List< T >& rhs) const noexcept
+  bool List< T >::operator<(const List< T >& rhs) const noexcept
   {
-    return !(*this <= rhs);
+    return rhs > *this;
   }
 
   template< typename T >
@@ -301,9 +304,7 @@ namespace demehin
   template< typename T >
   void List< T >::push_back(const T& data)
   {
-    Node* new_node = new Node(data);
-    new_node->next = nullptr;
-    new_node->prev = tail_;
+    Node* new_node = new Node(data, tail_, nullptr);
     if (tail_ != nullptr)
     {
       tail_->next = new_node;
@@ -391,130 +392,93 @@ namespace demehin
     }
   }
 
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >& other) noexcept
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>& other) noexcept
   {
-    if (other.empty())
-    {
-      return;
-    }
-
-    Node* first = other.fake_->next;
-    Node* last = other.tail_;
-    Node* posNode = pos.getNode();
-    Node* posPrev = posNode->prev;
-
-    if (posPrev != nullptr)
-    {
-      posPrev->next = first;
-    }
-
-    first->prev = posPrev;
-
-    if (posNode != nullptr)
-    {
-      posNode->prev = last;
-    }
-
-    last->next = posNode;
-
-    if (fake_->next == posNode)
-    {
-      fake_->next = first;
-    }
-    if (tail_ == posPrev)
-    {
-      tail_ = last;
-    }
-
-    size_ += other.size();
-    other.size_ = 0;
-    other.fake_ = nullptr;
-    other.tail_ = nullptr;
+    splice(pos, other, other.cbegin(), other.cend());
   }
 
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >&& other) noexcept
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>&& other) noexcept
   {
-    List< T > tempList(std::move(other));
-    splice(tempList);
+    splice(pos, other);
   }
 
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >& other, cIter it) noexcept
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>& other, cIter it) noexcept
   {
-    if (other.empty() || pos == cend() || it == other.cbegin())
+    auto it2 = it;
+    splice(pos, other, it, ++it2);
+  }
+
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>&& other, cIter it) noexcept
+  {
+    splice(pos, other, it);
+  }
+
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>& other, cIter first, cIter last) noexcept
+  {
+    if (first == last || other.empty() || &other == this)
     {
-      return;
-    }
-
-    Node* itNode = it.getNode();
-    Node* posNode = pos.getNode();
-    Node* itPrevNode = itNode->prev;
-
-    itPrevNode->next = itNode->next;
-    itNode->prev = posNode->prev;
-    itNode->next = posNode;
-    posNode->prev->next = itNode;
-    posNode->prev = itNode;
-    size_++;
-    other.size_--;
-  }
-
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >&& other, cIter it) noexcept
-  {
-    List< T > tempList(std::move(other));
-    splice(tempList);
-  }
-
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >& other, cIter first, cIter last) noexcept
-  {
-    if (other.empty() || pos == cend())
-    {
-      return;
+        return;
     }
 
     Node* posNode = pos.getNode();
     Node* firstNode = first.getNode();
-    Node* lastNode = last.getNode();
-    Node* posPrevNode = posNode->prev;
-    Node* lastNextNode = lastNode->next;
+    Node* lastNode = (last.getNode() != nullptr) ? last.getNode()->prev : other.tail_;
 
-    size_t node_cnt = 1;
-    for (Node* current = firstNode; current != lastNode; current = current->next)
+    size_t count = 0;
+    for (auto it = first; it != last; it++)
     {
-      node_cnt++;
+      count++;
     }
 
-    if (lastNextNode != nullptr)
+    if (firstNode->prev)
     {
-      lastNextNode->prev = firstNode->prev;
+      firstNode->prev->next = last.getNode();
+    }
+    else
+    {
+      other.fake_->next = last.getNode();
     }
 
-    if (posPrevNode != nullptr)
+    if (last.getNode())
     {
-      posPrevNode->next = firstNode;
+      last.getNode()->prev = firstNode->prev;
+    }
+    else
+    {
+      other.tail_ = firstNode->prev;
+    }
+
+    firstNode->prev = posNode->prev;
+    lastNode->next = posNode;
+
+    if (posNode->prev)
+    {
+      posNode->prev->next = firstNode;
     }
     else
     {
       fake_->next = firstNode;
     }
-
-    firstNode->prev = posPrevNode;
-    lastNode->next = posNode;
     posNode->prev = lastNode;
 
-    size_ += node_cnt;
-    other.size_ -= node_cnt;
+    if (posNode == fake_->next)
+    {
+      tail_ = lastNode;
+    }
+
+    other.size_ -= count;
+    size_ += count;
   }
 
-  template< typename T >
-  void List< T >::splice(cIter pos, List< T >&& other, cIter first, cIter last) noexcept
+  template <typename T>
+  void List<T>::splice(cIter pos, List<T>&& other, cIter first, cIter last) noexcept
   {
-    List< T > tempList(std::move(other));
-    splice(tempList);
+    splice(pos, other, first, last);
   }
 
   template< typename T >
@@ -562,7 +526,8 @@ namespace demehin
   }
 
   template< typename T >
-  void List< T >::assign(Iter first, Iter last)
+  template< typename InputIt >
+  void List< T >::assign(InputIt first, InputIt last)
   {
     List< T > temp;
     for (auto it = first; it != last; it++)
@@ -575,12 +540,7 @@ namespace demehin
   template< typename T >
   void List< T >::assign(std::initializer_list< T > ilist)
   {
-    List< T > temp;
-    for (const T& value : ilist)
-    {
-      temp.push_back(value);
-    }
-    swap(temp);
+    assign(ilist.begin(), ilist.end());
   }
 
   template< typename T >
@@ -654,7 +614,7 @@ namespace demehin
     }
 
     Iter toreturn = insert(pos, value);
-    List < T > values(--count, value);
+    List< T > values(--count, value);
     splice(pos, values);
     return toreturn;
   }
@@ -669,23 +629,8 @@ namespace demehin
     }
 
     Iter result = insert(pos, *first);
-    size_t inserted = 1;
-    try
-    {
-      for (++first; first != last; first++)
-      {
-        insert(pos, *first);
-        inserted++;
-      }
-    }
-    catch (const std::bad_alloc&)
-    {
-      while (inserted-- > 0)
-      {
-        erase(--pos);
-      }
-      throw;
-    }
+    List< T > tempList(++first, last);
+    splice(pos, tempList);
     return result;
   }
 
