@@ -14,7 +14,6 @@ int main(int argc, char ** argv)
   }
 
   zakirov::Stack< zakirov::Queue < std::string > > stack_qs;
-
   if (argc == 1)
   {
     zakirov::scan_infix(std::cin, stack_qs);
@@ -37,7 +36,7 @@ int main(int argc, char ** argv)
     return 0;
   }
 
-  std::cout << zakirov::calculate_postfix_expression(stack_qs.top());
+  std::cout << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
   stack_qs.pop();
   while (!stack_qs.empty())
   {

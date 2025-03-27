@@ -43,16 +43,14 @@ namespace zakirov
     data_(other.data_),
     back_(find_last(data_)),
     cback_(cfind_last(data_))
-  {
-  }
+  {}
 
   template < typename T >
   Queue< T >::Queue(Queue && other) noexcept:
-    data_(std::move(other.data_))
-  {
-    back_(find_last(data_));
-    cback_(cfind_last(data_));
-  }
+    data_(std::move(other.data_)),
+    back_(find_last(data_)),
+    cback_(cfind_last(data_))
+  {}
 
   template < typename T >
   bool Queue< T >::empty()

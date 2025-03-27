@@ -1,18 +1,21 @@
 #include "infix_to_postfix.hpp"
+#include <cmath>
 #include <cstddef>
 #include "stack.hpp"
 #include "queue.hpp"
+
+#include <iostream>
 
 bool zakirov::check_operand(const std::string & line)
 {
   size_t dot_counter = 0;
   std::string::const_iterator fillable_it = line.cbegin();
-  if (*fillable_it == '-' || *fillable_it == '+')
+  if ((*fillable_it == '-' || *fillable_it == '+') && line.size() != 1)
   {
     ++fillable_it;
   }
 
-  for (; fillable_it != line.end(); ++fillable_it)
+  for (; fillable_it != line.cend(); ++fillable_it)
   {
     if (*fillable_it == '.')
     {
@@ -20,13 +23,13 @@ bool zakirov::check_operand(const std::string & line)
     }
     else if (!isdigit(*fillable_it))
     {
-      throw std::invalid_argument("Incorrect element of expression");
+      return 0;
     }
   }
 
   if (dot_counter > 1)
   {
-    throw std::invalid_argument("Incorrect element of expression");
+    return 0;
   }
 
   return 1;
@@ -56,12 +59,12 @@ bool zakirov::check_priority(std::string symbol)
   return 0;
 }
 
-zakirov::Stack< std::string > zakirov::transform_to_postfix(Queue< std::string > infix)
+zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string > infix)
 {
   Stack< std::string > op_buffer;
-  Stack< std::string > result;
+  Queue< std::string > result;
 
-  for (size_t i = 0; i < infix.size(); ++i)
+  while (!infix.empty())
   {
     std::string symbol = infix.front();
     infix.pop();
@@ -133,9 +136,9 @@ double zakirov::transform_to_double(const std::string & line)
   }
 
   size_t size_b = num_buffer.size();
-  for (size_t i = 1; i < size_b; ++i)
+  for (size_t i = 0; i < size_b; ++i)
   {
-    result += num_buffer.top() * 10 * i;
+    result += (num_buffer.top() - '0') * std::pow(10, i);
     num_buffer.pop();
   }
 
@@ -173,7 +176,10 @@ double zakirov::calculate_postfix(double first, double second, char oper)
 double zakirov::calculate_postfix_expression(Queue< std::string > postfix)
 {
   Stack< double > result;
-  for (size_t i = 0; i < postfix.size(); ++i)
+  double first_v = 0.0;
+  double second_v = 0.0;
+  double result_v = 0.0;
+  while (!postfix.empty())
   {
     if (check_operand(postfix.front()))
     {
@@ -182,11 +188,12 @@ double zakirov::calculate_postfix_expression(Queue< std::string > postfix)
     }
     else if (check_operator(postfix.front()))
     {
-      double first = result.top();
+      first_v = result.top();
       result.pop();
-      double second = result.top();
+      second_v = result.top();
       result.pop();
-      result.push(calculate_postfix(first, second, postfix.front().front()));
+      result_v = calculate_postfix(first_v, second_v, postfix.front().front());
+      result.push(result_v);
       postfix.pop();
     }
   }
