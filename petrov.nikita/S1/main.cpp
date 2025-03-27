@@ -51,6 +51,7 @@ int main()
   do
   {
     size_t sum = 0;
+    auto prev_it_out = head.end();
     auto it_out = head.begin();
     do
     {
@@ -58,6 +59,7 @@ int main()
       {
         auto val = *it_out;
         head.remove(val);
+        it_out = prev_it_out;
       }
       else if (it_out->second.empty() && head.size() == 1)
       {
@@ -97,6 +99,7 @@ int main()
             return 1;
           }
         }
+        ++prev_it_out;
       }
     }
     while (it_out++ != head.end() && head.begin() != head.end());
