@@ -123,9 +123,9 @@ BOOST_AUTO_TEST_CASE(clear_test)
   list.push_back(4);
   list.remove(1);
   BOOST_TEST(list.size() == 3 && list.front() == 2);
-}*/
+}
 
-/*BOOST_AUTO_TEST_CASE(remove_if_test)
+BOOST_AUTO_TEST_CASE(remove_if_test)
 {
   auto odd { [] (const size_t& a) { return a%2==0; } };
   asafov::Forward_list<size_t> list;
@@ -135,16 +135,16 @@ BOOST_AUTO_TEST_CASE(clear_test)
   list.push_back(4);
   list.remove_if(odd);
   BOOST_TEST(list.size() == 2);
-}*/
+}
 
-/*BOOST_AUTO_TEST_CASE(assign_test)
+BOOST_AUTO_TEST_CASE(assign_test)
 {
   asafov::Forward_list<size_t> list;
   list.assign(5, 1);
   BOOST_TEST(list.size() == 5 && *list.begin() == 1 && *list.end() == 1);
-}*/
+}
 
-/*BOOST_AUTO_TEST_CASE(swap_test)
+BOOST_AUTO_TEST_CASE(swap_test)
 {
   asafov::Forward_list<size_t> list;
   list.push_back(1);
