@@ -52,12 +52,12 @@ template< class T >
 maslevtsov::Queue< T >::Queue(const Queue& rhs):
   data_(new T[rhs.capacity_]),
   size_(rhs.size_),
-  first_(rhs.first_),
+  first_(0),
   capacity_(rhs.capacity_)
 {
   try {
-    for (std::size_t i = 0; i < size_; ++i) {
-      data_[i] = rhs.data_[i];
+    for (std::size_t i = 0, j = rhs.first_; i != capacity_; ++i, j = (j + 1) % capacity_) {
+      data_[i] = rhs.data_[j];
     }
   } catch (const std::exception&) {
     delete[] data_;
@@ -76,9 +76,6 @@ maslevtsov::Queue< T >::Queue(Queue&& rhs) noexcept:
 template< class T >
 maslevtsov::Queue< T >::~Queue()
 {
-  while (!empty()) {
-    pop();
-  }
   delete[] data_;
 }
 
@@ -149,7 +146,6 @@ void maslevtsov::Queue< T >::push(T&& value)
 template< class T >
 void maslevtsov::Queue< T >::pop() noexcept
 {
-  data_[first_].~T();
   first_ = (first_ + 1) % capacity_;
   --size_;
 }
@@ -167,7 +163,7 @@ template< class T >
 template< class U >
 void maslevtsov::Queue< T >::push_impl(U&& value)
 {
-  if (size_ >= capacity_) {
+  if (size_ == capacity_) {
     expand_data(size_ * 2 + 1);
   }
   data_[size_] = std::forward< U >(value);
