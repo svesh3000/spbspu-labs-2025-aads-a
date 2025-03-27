@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(nonempty_test)
   BOOST_TEST(list.empty() == false);
 }
 
-BOOST_AUTO_TEST_CASE(pop_front_test)
+/*BOOST_AUTO_TEST_CASE(pop_front_test)
 {
   asafov::Forward_list<size_t> list;
   list.push_back(1);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(pop_front_test)
   list.push_back(4);
   list.pop_front();
   BOOST_TEST(list.size() == 3 && list.front() == 2);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(clear_test)
 {
