@@ -30,7 +30,7 @@ namespace asafov
         push_back(*i);
       }
     }
-    Forward_list(Forward_list&& list):
+    Forward_list(Forward_list&& list) noexcept:
     head_(list.head_),
     tail_(list.tail_),
     size_(list.size_)
@@ -38,6 +38,14 @@ namespace asafov
       list.head_ = nullptr;
       list.tail_ = nullptr;
       list.size_ = 0;
+    }
+    Forward_list(const size_t count, const T value):
+    Forward_list()
+    {
+      for (size_t i = 0; i < count; ++i)
+      {
+        push_back(value);
+      }
     }
     ~Forward_list() noexcept
     {
@@ -53,7 +61,7 @@ namespace asafov
       }
       return *this;
     }
-    Forward_list& operator=(Forward_list&& list)
+    Forward_list& operator=(Forward_list&& list) noexcept
     {
       Forward_list* temp = this;
       list = temp;
@@ -218,18 +226,6 @@ namespace asafov
     {
       return size_;
     }
-    void swap(const iterator& a, const iterator& b)
-    {
-      Node* temp1 = head_;
-      while (temp1->next_ != a.current_) temp1 = temp1->next;
-      Node* temp2 = head_;
-      while (temp1->next_ != b.current_) temp1 = temp1->next;
-      temp1->next_ = b;
-      temp2->next_ = a;
-      Node* temp3 = a.current_->next_;
-      a.current_->next_ = b.current_->next_;
-      b.current_->next_ = temp3;
-    }
     void pop_front() noexcept
     {
       size_--;
@@ -275,6 +271,42 @@ namespace asafov
       {
         pop_front();
       }
+    }
+
+    Forward_list& swap(Forward_list& list) noexcept
+    {
+      Forward_list* temp = this;
+      list = temp;
+      return temp;
+    }
+    void remove(const T& value) noexcept
+    {
+      for (auto iter = head_; iter != tail_; iter = iter->next_)
+      {
+        if (*iter->next == value)
+        {
+          auto temp = iter->next_;
+          iter->next_ = temp->next_;
+          delete temp;
+        }
+      }
+    }
+    void remove_if(bool(f)(const T&))
+    {
+      for (auto iter = head_; iter != tail_; iter = iter->next_)
+      {
+        if (f(*iter->next))
+        {
+          auto temp = iter->next_;
+          iter->next_ = temp->next_;
+          delete temp;
+        }
+      }
+    }
+    void assign(size_t count, const T value)
+    {
+      clear();
+      Forward_list(count, value);
     }
 
   private:
