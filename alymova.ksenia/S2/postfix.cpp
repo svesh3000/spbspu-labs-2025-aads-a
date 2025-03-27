@@ -30,7 +30,7 @@ alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
       }
       stack.pop();
     }
-    if (std::isdigit(s[i]))
+    else if (std::isdigit(s[i]))
     {
       std::string token;
       while (isdigit(s[i]) && i < s.size())
@@ -40,28 +40,10 @@ alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
       }
       queue.push(token);
     }
-    /*else if (is_second_priority(s[i]))
-    {
-      if (!stack.empty())
-      {
-        while (is_second_priority(stack.top()));
-        {
-          queue.push(stack.top());
-          stack.pop();
-          if (stack.empty())
-          {
-            break;
-          }
-        }
-      }
-      std::string token(1, s[i]);
-      stack.push(token);
-    }*/
     else if (is_first_priority(s[i]) || is_second_priority(s[i]))
     {
       if (!stack.empty())
       {
-        //bool for_first_priority = (is_first_priority(s[i])) ? is_first_priority(stack.top()) : true;
         while (is_need_priority(s[i], stack.top()))
         {
           std::cout << "add\n";
