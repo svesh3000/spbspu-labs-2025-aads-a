@@ -99,7 +99,9 @@ BOOST_AUTO_TEST_CASE(swap_test)
   asafov::Forward_list<size_t> list2;
   list2.push_back(2);
   list.swap(list2);
-  BOOST_TEST(*(list.cbegin()) == 2 && *(list2.cbegin()) == 1);
+  auto it1 = list.cbegin();
+  auto it2 = list2.cbegin();
+  BOOST_TEST(*it1 == 2 && *it2 == 1);
 }
 
 BOOST_AUTO_TEST_CASE(pop_front_test)
