@@ -566,23 +566,12 @@ namespace kiselev
       return Iterator(position.node_);
     }
     Iterator res = insert(position, data);
-    size_t i = 1;
-    try
+    if (n != 1)
     {
-      for (; i < n; ++i)
-      {
-        insert(position, data);
-      }
-      return Iterator(res.node_);
+      List< T > temp(--n, data);
+      splice(position, temp);
     }
-    catch (const std::bad_alloc&)
-    {
-      for (size_t j = 0; j < i; ++j)
-      {
-        position = erase(--position);
-      }
-      throw;
-    }
+    return res;
   }
 
   template< typename T >
@@ -594,25 +583,9 @@ namespace kiselev
       return Iterator(pos.node_);
     }
     Iterator res = insert(pos, *first);
-    ++first;
-    size_t i = 1;
-    try
-    {
-      for (; first != last; ++first)
-      {
-        insert(pos, *first);
-        ++i;
-      }
-      return res;
-    }
-    catch (const std::bad_alloc&)
-    {
-      for (size_t j = 0; j < i; ++j)
-      {
-        pos = erase(--pos);
-      }
-      throw;
-    }
+    List< T > temp(++first, last);
+    splice(pos, temp);
+    return res;
 
   }
 
