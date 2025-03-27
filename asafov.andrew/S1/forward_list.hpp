@@ -63,9 +63,15 @@ namespace asafov
     }
     Forward_list& operator=(Forward_list&& list) noexcept
     {
-      Forward_list* temp = list;
-      list = *this;
-      this = temp;
+      Node* head = list.head_;
+      Node* tail = list.tail_;
+      size_t size = list.size_;
+      list.head_ = head_;
+      list.tail_ = tail_;
+      list.size_ = size_;
+      head_ = head;
+      tail_ = tail;
+      size_ = size;
       return *this;
     }
 
@@ -276,9 +282,15 @@ namespace asafov
 
     Forward_list& swap(Forward_list& list) noexcept
     {
-      Forward_list* temp = list;
-      list = *this;
-      this = temp;
+      Node* head = list.head_;
+      Node* tail = list.tail_;
+      size_t size = list.size_;
+      list.head_ = head_;
+      list.tail_ = tail_;
+      list.size_ = size_;
+      head_ = head;
+      tail_ = tail;
+      size_ = size;
       return *this;
     }
     void remove(const T& value) noexcept
