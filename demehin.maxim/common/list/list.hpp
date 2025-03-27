@@ -102,11 +102,11 @@ namespace demehin
   template< typename T >
   List< T >::List():
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
-    tail_(nullptr),
+    tail_(fake_),
     size_(0)
   {
-    fake_->next = nullptr;
-    fake_->prev = nullptr;
+    fake_->next = fake_;
+    fake_->prev = fake_;
   }
 
   template< typename T >
@@ -227,7 +227,7 @@ namespace demehin
     List()
   {
     Node* current = rhs.fake_->next;
-    while (current != nullptr)
+    while (current != nullptr && current != rhs.fake_)
     {
       push_back(current->data);
       current = current->next;
@@ -250,7 +250,7 @@ namespace demehin
   template< typename T >
   typename List< T >::Iter List< T >::end() const noexcept
   {
-    return Iter(tail_->next);
+    return Iter(fake_);
   }
 
   template< typename T >
@@ -262,7 +262,7 @@ namespace demehin
   template< typename T >
   typename List< T >::cIter List< T >::cend() const noexcept
   {
-    return cIter(tail_->next);
+    return cIter(fake_);
   }
 
   template< typename T >
@@ -280,39 +280,13 @@ namespace demehin
   template< typename T >
   void List< T >::push_back(const T& data)
   {
-    Node* new_node = new Node(data, tail_, nullptr);
-    if (tail_ != nullptr)
-    {
-      tail_->next = new_node;
-    }
-    else
-    {
-      fake_->next = new_node;
-      new_node->prev = fake_;
-    }
-
-    tail_ = new_node;
-    size_++;
+    insert(cend(), data);
   }
 
   template< typename T >
   void List< T >::push_front(const T& data)
   {
-    Node* new_node = new Node(data);
-    new_node->next = fake_->next;
-
-    if (fake_->next != nullptr)
-    {
-      fake_->next->prev = new_node;
-    }
-    else
-    {
-      tail_ = new_node;
-    }
-
-    new_node->prev = fake_;
-    fake_->next = new_node;
-    size_++;
+    insert(cbegin(), data);
   }
 
   template< typename T >
@@ -522,24 +496,22 @@ namespace demehin
   template< typename T >
   typename List< T >::Iter List< T >::erase(cIter pos) noexcept
   {
-    const Node* todelete = pos.getNode();
+    Node* todelete = pos.getNode();
+    if (todelete == fake_)
+    {
+      return end();
+    }
     Iter toreturn(todelete->next);
-    if (todelete == fake_->next)
-    {
-      fake_->next = todelete->next;
-    }
-    else
-    {
-      todelete->prev->next = todelete->next;
-    }
+    todelete->prev->next = todelete->next;
+    todelete->next->prev = todelete->prev;
 
     if (todelete == tail_)
     {
-      tail_ = todelete->prev;
+      tail_ = (todelete->prev != fake_) ? todelete->prev : fake_;
     }
-    else
+    if (todelete == fake_->next)
     {
-      todelete->next->prev = todelete->prev;
+      fake_->next = todelete->next;
     }
     size_--;
     delete todelete;
@@ -560,16 +532,19 @@ namespace demehin
   template< typename T >
   typename List< T >::Iter List< T >::insert(cIter pos, const T& value)
   {
-    if (empty())
-    {
-      push_back(value);
-      return begin();
-    }
-
-    Node* posNode = pos.getNode();
+    Node* posNode = pos.getNode() ? pos.getNode() : fake_;
     Node* newNode = new Node(value, posNode->prev, posNode);
     posNode->prev->next = newNode;
     posNode->prev = newNode;
+
+    if (posNode == fake_)
+    {
+      tail_ = newNode;
+    }
+    if (newNode->prev == fake_)
+    {
+      fake_->next = newNode;
+    }
     size_++;
     return Iter(newNode);
   }
@@ -633,9 +608,10 @@ namespace demehin
     }
 
     Node* current = fake_->next;
+    Node* prev = fake_;
     Node* next = nullptr;
-    Node* prev = nullptr;
-    while (current != nullptr)
+    tail_ = fake_->next;
+    while (current != fake_)
     {
       next = current->next;
       current->next = prev;
@@ -643,9 +619,9 @@ namespace demehin
       prev = current;
       current = next;
     }
-    std::swap(fake_->next, tail_);
-    tail_->next = nullptr;
-    fake_->next->prev = fake_;
+    fake_->next = prev;
+    fake_->prev = tail_;
+    tail_->next = fake_;
   }
 }
 
