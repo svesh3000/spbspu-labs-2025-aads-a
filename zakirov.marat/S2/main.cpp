@@ -9,4 +9,5 @@ int main(int argc, char ** argv)
     std::cerr << "Incorrect command line argument" << '\n';
     return 1;
   }
+
 }

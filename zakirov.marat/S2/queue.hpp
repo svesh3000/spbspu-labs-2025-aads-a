@@ -71,44 +71,24 @@ namespace zakirov
   template < typename T >
   T & Queue< T >::front()
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *(data_.begin());
   }
 
   template < typename T >
   const T & Queue< T >::front() const
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *(data_.cbegin());
   }
 
   template < typename T >
   T & Queue< T >::back()
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *back_
   }
 
   template < typename T >
   const T & Queue< T >::back() const
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *сback_
   }
 

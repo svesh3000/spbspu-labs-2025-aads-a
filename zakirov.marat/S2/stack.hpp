@@ -56,22 +56,12 @@ namespace zakirov
   template < typename T >
   T & Stack< T >::top()
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *(data_.begin());
   }
 
   template < typename T >
   const T & Stack< T >::top() const
   {
-    if (empty())
-    {
-      throw std::invalid_argument("Empty stack");
-    }
-
     return *(data_.cbegin());
   }
 
@@ -84,7 +74,7 @@ namespace zakirov
   template < typename T >
   void Stack< T >::push(T && value)
   {
-    data_.push_front(value);
+    data_.push_front(std::move(value));
   }
 
   template < typename T >
