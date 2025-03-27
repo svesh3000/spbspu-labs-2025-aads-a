@@ -166,7 +166,7 @@ double zakirov::calculate_postfix(double first, double second, char oper)
   {
     return second - first;
   }
-  
+
   return second + first;
 }
 
