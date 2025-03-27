@@ -76,6 +76,9 @@ maslevtsov::Queue< T >::Queue(Queue&& rhs) noexcept:
 template< class T >
 maslevtsov::Queue< T >::~Queue()
 {
+  while (!empty()) {
+    pop();
+  }
   delete[] data_;
 }
 
