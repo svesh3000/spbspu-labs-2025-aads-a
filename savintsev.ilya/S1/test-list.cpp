@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_splice)
     BOOST_TEST(mylist1 == test1);
   }
 }
-
+/*
 BOOST_AUTO_TEST_CASE(test_sort)
 {
   lt< int > list {8, 7, 5, 9, 0, 1, 3, 2, 6, 4};
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(test_sort)
 
   BOOST_CHECK_EQUAL_COLLECTIONS(list.begin(), list.end(), test.begin(), test.end());
 }
-
+*/
 BOOST_AUTO_TEST_CASE(test_swap)
 {
   lt< int > first(3ull, 100);

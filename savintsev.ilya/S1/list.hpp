@@ -123,6 +123,8 @@ namespace savintsev
     template< class Compare >
     static bool compare_lists(const List & lhs, const List & rhs, Compare comp);
     void destroy() noexcept;
+    template< class Compare >
+    void merge_sort(Compare comp);
   };
 
   template< class T >
@@ -432,6 +434,31 @@ namespace savintsev
   }
 
   template< class T >
+  template< class Compare >
+  void List< T >::merge_sort(Compare comp)
+  {
+    if (list_size < 2)
+    {
+      return;
+    }
+
+    size_t mid = list_size / 2;
+    auto it = begin();
+    std::advance(it, mid);
+
+    List< T > right;
+    while (it != end())
+    {
+      right.push_back(std::move(*it));
+      it = erase(it);
+    }
+    merge_sort(comp);
+    right.merge_sort(comp);
+
+    merge(right, comp);
+  }
+
+  template< class T >
   void List< T >::sort()
   {
     sort(std::less< T >());
@@ -441,29 +468,16 @@ namespace savintsev
   template< class Compare >
   void List< T >::sort(Compare comp)
   {
-    if (list_size < 2)
+    List< T > temp(*this);
+
+    try
     {
-      return;
+      merge_sort(comp);
     }
-
-    size_t mid = list_size / 2;
-    auto it = begin();
-    for (size_t i = 0; i < mid; ++i)
+    catch (const std::exception & e)
     {
-      ++it;
+      *this = temp;
     }
-
-    List< T > right;
-    while (it != end())
-    {
-      right.push_back(std::move(*it));
-      it = erase(it);
-    }
-
-    sort(comp);
-    right.sort(comp);
-
-    merge(right, comp);
   }
 
   template< class T >
@@ -476,17 +490,12 @@ namespace savintsev
   template< class Compare >
   void savintsev::List< T >::merge(List< T > & x, Compare comp)
   {
-    if (std::addressof(x) == this || x.empty())
-    {
-      return;
-    }
-
     auto it1 = begin();
     auto it2 = x.begin();
 
     while (it1 != end() && it2 != x.end())
     {
-      if (comp(*it2, *it1))
+      if (comp(*it1, *it2))
       {
         auto next = it2;
         ++next;
