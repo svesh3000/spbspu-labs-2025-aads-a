@@ -2,7 +2,7 @@
 #define STACK_HPP
 #include <cstddef>
 #include <list>
-#include <stdexcept> 
+#include <stdexcept>
 #include "../S1/fwd_list.hpp"
 
 namespace zakirov
@@ -15,8 +15,8 @@ namespace zakirov
     Stack(const Stack & other);
     Stack(Stack && other) noexcept;
     ~Stack() = default;
-    bool empty() const;
-    size_t size() const;
+    bool empty();
+    size_t size();
     T & top();
     const T & top() const;
     void push (const T & value);
@@ -30,7 +30,7 @@ namespace zakirov
   Stack< T >::Stack():
     data_()
   {}
-  
+
   template < typename T >
   Stack< T >::Stack(const Stack & other):
     data_(other.data_)
@@ -42,13 +42,13 @@ namespace zakirov
   {}
 
   template < typename T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty()
   {
     return data_.empty();
   }
 
   template < typename T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size()
   {
     return data_.size();
   }

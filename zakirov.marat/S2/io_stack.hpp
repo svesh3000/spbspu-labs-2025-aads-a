@@ -1,5 +1,5 @@
-#ifndef INFIX_TO_POSTFIX_HPP
-#define INFIX_TO_POSTFIX_HPP
+#ifndef IO_STACK_HPP
+#define IO_STACK_HPP
 #include <iostream>
 #include <string>
 #include "queue.hpp"

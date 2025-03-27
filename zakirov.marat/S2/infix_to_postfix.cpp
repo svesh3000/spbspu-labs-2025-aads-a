@@ -152,7 +152,7 @@ double zakirov::transform_to_double(const std::string & line)
   return result;
 }
 
-double calculate_postfix(double first, double second, char oper)
+double zakirov::calculate_postfix(double first, double second, char oper)
 {
   if (oper == '/')
   {
