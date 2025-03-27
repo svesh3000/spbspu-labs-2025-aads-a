@@ -41,9 +41,9 @@ bool zakirov::check_operator(std::string symbol)
     {
       return 1;
     }
-
-    return 0;
   }
+
+  return 0;
 }
 
 bool zakirov::check_priority(std::string symbol)
@@ -166,10 +166,8 @@ double zakirov::calculate_postfix(double first, double second, char oper)
   {
     return second - first;
   }
-  else if (oper == '+')
-  {
-    return second + first;
-  }
+  
+  return second + first;
 }
 
 double zakirov::calculate_postfix_expression(Queue< std::string > postfix)
@@ -193,7 +191,7 @@ double zakirov::calculate_postfix_expression(Queue< std::string > postfix)
     }
   }
 
-  if (!result.size() == 1)
+  if (result.size() != 1)
   {
     throw std::invalid_argument("Incorrect expression");
   }
