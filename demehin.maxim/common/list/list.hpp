@@ -392,33 +392,33 @@ namespace demehin
     }
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>& other) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >& other) noexcept
   {
     splice(pos, other, other.cbegin(), other.cend());
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>&& other) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >&& other) noexcept
   {
     splice(pos, other);
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>& other, cIter it) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >& other, cIter it) noexcept
   {
     auto it2 = it;
     splice(pos, other, it, ++it2);
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>&& other, cIter it) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >&& other, cIter it) noexcept
   {
     splice(pos, other, it);
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>& other, cIter first, cIter last) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >& other, cIter first, cIter last) noexcept
   {
     if (first == last || other.empty() || &other == this)
     {
@@ -475,8 +475,8 @@ namespace demehin
     size_ += count;
   }
 
-  template <typename T>
-  void List<T>::splice(cIter pos, List<T>&& other, cIter first, cIter last) noexcept
+  template < typename T >
+  void List< T >::splice(cIter pos, List< T >&& other, cIter first, cIter last) noexcept
   {
     splice(pos, other, first, last);
   }
@@ -614,8 +614,11 @@ namespace demehin
     }
 
     Iter toreturn = insert(pos, value);
-    List< T > values(--count, value);
-    splice(pos, values);
+    if (count != 1)
+    {
+      List< T > values(--count, value);
+      splice(pos, values);
+    }
     return toreturn;
   }
 
