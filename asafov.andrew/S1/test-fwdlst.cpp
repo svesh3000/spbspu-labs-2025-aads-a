@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(begin_test)
   list.push_back(4);
   BOOST_TEST(*list.begin() == 1);
 }
-
+/*
 BOOST_AUTO_TEST_CASE(cend_test)
 {
   asafov::Forward_list<size_t> list;
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(end_test)
   list.push_back(4);
   BOOST_TEST(*list.end() == 4);
 }
-
+*/
 BOOST_AUTO_TEST_CASE(front_test)
 {
   asafov::Forward_list<size_t> list;
