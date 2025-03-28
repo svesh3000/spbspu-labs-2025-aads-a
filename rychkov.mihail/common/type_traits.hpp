@@ -6,21 +6,11 @@
 namespace rychkov
 {
   template< bool Logic1, bool... Logics >
-  struct conjunction
-  {
-    enum: bool
-    {
-      value = Logic1 && conjunction< Logics... >::value
-    };
-  };
+  struct conjunction: std::integral_constant< bool, Logic1 && conjunction< Logics... >::value >
+  {};
   template< bool Logic1 >
-  struct conjunction< Logic1 >
-  {
-    enum: bool
-    {
-      value = Logic1
-    };
-  };
+  struct conjunction< Logic1 >: std::integral_constant< bool, Logic1 >
+  {};
   template< bool... Logics >
   constexpr bool conjunction_v = conjunction< Logics... >::value;
 

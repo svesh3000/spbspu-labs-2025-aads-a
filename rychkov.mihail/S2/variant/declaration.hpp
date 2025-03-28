@@ -1,8 +1,9 @@
 #ifndef DECLARATION_HPP
 #define DECLARATION_HPP
 
-#include "union_base.hpp"
+#include <functional.hpp>
 #include "tools.hpp"
+#include "bases.hpp"
 
 namespace rychkov
 {
@@ -10,13 +11,13 @@ namespace rychkov
   class Variant;
 
   template< class T, class... Types >
-  T* get_if(Variant< Types... >* variant) noexcept;
+  constexpr std::enable_if_t< exactly_once< T >, T* > get_if(Variant< Types... >* variant) noexcept;
   template< class T, class... Types >
-  const T* get_if(const Variant< Types... >* variant) noexcept;
+  constexpr std::enable_if_t< exactly_once< T >, const T* > get_if(const Variant< Types... >* variant) noexcept;
   template< size_t N, class... Types >
-  variant_alternative_t< N, Types... >* get_if(Variant< Types... >* variant) noexcept;
+  nth_type_t< N, Types... >* get_if(Variant< Types... >* variant) noexcept;
   template< size_t N, class... Types >
-  const variant_alternative_t< N, Types... >* get_if(const Variant< Types... >* variant) noexcept;
+  const nth_type_t< N, Types... >* get_if(const Variant< Types... >* variant) noexcept;
 
   template< class... Types >
   class Variant: private details::VariantBaseAlias< Types... >
@@ -32,7 +33,7 @@ namespace rychkov
     template< class T,
           size_t RealTypeId = resolve_overloaded_construct_v< T, Types... >,
           class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
-          class RealType = variant_alternative_t< RealTypeId, Types... >,
+          class RealType = nth_type_t< RealTypeId, Types... >,
           class = std::enable_if_t< exactly_once< RealType, Types... > > >
     Variant(T&& value);
     ~Variant() = default;
@@ -42,42 +43,41 @@ namespace rychkov
     template< class T,
           size_t RealTypeId = resolve_overloaded_construct_v< T, Types... >,
           class = std::enable_if_t< RealTypeId != sizeof...(Types) >,
-          class RealType = variant_alternative_t< RealTypeId, Types... >,
+          class RealType = nth_type_t< RealTypeId, Types... >,
           class = std::enable_if_t< exactly_once< RealType, Types... > > >
     Variant& operator=(T&& rhs) noexcept(std::is_nothrow_constructible< RealType, T >::value
           && std::is_nothrow_assignable< RealType, T >::value);
 
     template< class T, class... Args >
     T& emplace(Args&&... args);
-    template< size_t N, class... Args >
-    variant_alternative_t< N, Types... >& emplace(Args&&... args);
+    using details::VariantBaseAlias< Types... >::emplace;
 
-    size_t index() const noexcept;
-    bool valueless_by_exception() const noexcept;
+    using details::VariantBaseAlias< Types... >::index;
+    using details::VariantBaseAlias< Types... >::valueless_by_exception;
   private:
     template< size_t N, class... Ts >
-    friend variant_alternative_t< N, Ts... >* rychkov::get_if(Variant< Ts... >* variant) noexcept;
+    friend nth_type_t< N, Ts... >* rychkov::get_if(Variant< Ts... >* variant) noexcept;
     template< size_t N, class... Ts >
-    friend const variant_alternative_t< N, Ts... >* rychkov::get_if(const Variant* variant) noexcept;
+    friend const nth_type_t< N, Ts... >* rychkov::get_if(const Variant* variant) noexcept;
   };
 
   template< class T, class... Types >
-  T& get(Variant< Types... >& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, T& > get(Variant< Types... >& variant);
   template< class T, class... Types >
-  const T& get(const Variant< Types... >& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, const T& > get(const Variant< Types... >& variant);
   template< class T, class... Types >
-  T&& get(Variant< Types... >&& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, T&& > get(Variant< Types... >&& variant);
   template< class T, class... Types >
-  const T&& get(const Variant< Types... >&& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, const T&& > get(const Variant< Types... >&& variant);
 
   template< size_t N, class... Types >
-  variant_alternative_t< N, Types... >& get(Variant< Types... >& variant);
+  nth_type_t< N, Types... >& get(Variant< Types... >& variant);
   template< size_t N, class... Types >
-  const variant_alternative_t< N, Types... >& get(const Variant< Types... >& variant);
+  const nth_type_t< N, Types... >& get(const Variant< Types... >& variant);
   template< size_t N, class... Types >
-  variant_alternative_t< N, Types... >&& get(Variant< Types... >&& variant);
+  nth_type_t< N, Types... >&& get(Variant< Types... >&& variant);
   template< size_t N, class... Types >
-  const variant_alternative_t< N, Types... >&& get(const Variant< Types... >&& variant);
+  const nth_type_t< N, Types... >&& get(const Variant< Types... >&& variant);
 
   template< class T, class... Types >
   bool holds_alternative(const Variant< Types... >& variant) noexcept;
@@ -88,6 +88,13 @@ namespace rychkov
     void throw_bad_variant_access(const char* message);
     void throw_bad_variant_access(bool valueless);
   }
+
+  template< class R, class F, class First, class... Variants >
+  constexpr R visit(F&& func, First&& first, Variants&&... args);
+  template< class R, class F >
+  constexpr R visit(F&& func);
+  template< class F, class... Variants >
+  constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... > visit(F&& func, Variants&&... args);
 }
 
 #endif

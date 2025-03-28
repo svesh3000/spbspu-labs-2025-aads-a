@@ -30,7 +30,7 @@ namespace rychkov
       return -1;
     }
   }
-  char pushLowPrioritized(rychkov::Queue< rychkov::Variant< long long, char > >& expression,
+  char popLowPrioritized(rychkov::Queue< rychkov::Variant< long long, char > >& expression,
       rychkov::Stack< char >& operators, int referencePriority = 0)
   {
     while (!operators.empty() && (rychkov::getPriority(operators.top()) > referencePriority))
@@ -84,24 +84,23 @@ int main(int argc, char** argv)
         isNumber = true;
         try
         {
-          rychkov::safeMul< long long >(number, 10);
-          rychkov::safeAdd< long long >(number, (c - '0'));
+          number = rychkov::safeMul< long long >(number, 10);
+          number = rychkov::safeAdd< long long >(number, c - '0');
         }
         catch (...)
         {
           std::cerr << "input overflow\n";
           return 1;
         }
-        number = number * 10 + (c - '0');
       }
       else
       {
         if (isNumber)
         {
           expression.push(number);
+          isNumber = false;
+          number = 0;
         }
-        isNumber = false;
-        number = 0;
         if (c == '\n')
         {
           break;
@@ -119,7 +118,7 @@ int main(int argc, char** argv)
             operators.push(c);
             continue;
           }
-          char equalPrioritized = rychkov::pushLowPrioritized(expression, operators, priority);
+          char equalPrioritized = rychkov::popLowPrioritized(expression, operators, priority);
           if ((equalPrioritized != '(') && (c == ')'))
           {
             std::cerr << "wrong parentheses order\n";
@@ -132,7 +131,7 @@ int main(int argc, char** argv)
         }
       }
     }
-    rychkov::pushLowPrioritized(expression, operators, 0);
+    rychkov::popLowPrioritized(expression, operators, 0);
     operators.clear();
     if (expression.empty())
     {
@@ -142,7 +141,7 @@ int main(int argc, char** argv)
     rychkov::Stack< long long > operands;
     if (!rychkov::holds_alternative< long long >(expression.front()))
     {
-      std::cerr << "expression don't starts with number\n";
+      std::cerr << "expression does not start with number\n";
       return 1;
     }
     operands.push(rychkov::get< long long >(expression.front()));

@@ -44,7 +44,9 @@ namespace rychkov
     private:
       size_type size_, capacity_, head_;
       value_type* data_;
+      unsigned char* raw_;
       size_type getLocalId(size_type globalId) const noexcept;
+      void allocate(size_type newCapacity);
     };
   }
 }
@@ -54,15 +56,14 @@ rychkov::details::QueueBase< T, PopFromTail >::QueueBase() noexcept:
   size_(0),
   capacity_(0),
   head_(0),
-  data_(nullptr)
+  data_(nullptr),
+  raw_(nullptr)
 {}
 template< class T, bool PopFromTail >
 rychkov::details::QueueBase< T, PopFromTail >::QueueBase(const QueueBase& rhs):
-  size_(0),
-  capacity_(rhs.capacity_),
-  head_(0),
-  data_(new value_type[rhs.capacity_])
+  QueueBase()
 {
+  allocate(rhs.capacity_);
   for (size_type i = 0; i < rhs.size_; i++)
   {
     push(rhs[i]);
@@ -73,7 +74,8 @@ rychkov::details::QueueBase< T, PopFromTail >::QueueBase(QueueBase&& rhs) noexce
   size_(std::exchange(rhs.size_, 0)),
   capacity_(std::exchange(rhs.capacity_, 0)),
   head_(rhs.head_),
-  data_(std::exchange(rhs.data_, nullptr))
+  data_(std::exchange(rhs.data_, nullptr)),
+  raw_(std::exchange(rhs.raw_, nullptr))
 {}
 template< class T, bool PopFromTail >
 rychkov::details::QueueBase< T, PopFromTail >::~QueueBase()
@@ -123,7 +125,7 @@ void rychkov::details::QueueBase< T, PopFromTail >::pop()
   }
   else
   {
-    data_[head_].~value_type();
+    operator[](0).~value_type();
     size_--;
     head_ = (++head_ < capacity_ ? head_ : head_ - capacity_);
   }
@@ -135,10 +137,11 @@ void rychkov::details::QueueBase< T, PopFromTail >::clear()
   {
     pop();
   }
-  delete[] data_;
+  delete[] raw_;
   capacity_ = 0;
   head_ = 0;
   data_ = nullptr;
+  raw_ = nullptr;
 }
 template< class T, bool PopFromTail >
 void rychkov::details::QueueBase< T, PopFromTail >::push(const value_type& value)
@@ -159,7 +162,7 @@ typename rychkov::details::QueueBase< T, PopFromTail >::reference
   {
     reserve(size_ * 2 + 1);
   }
-  new (data_ + getLocalId(size_)) value_type(args...);
+  new (data_ + getLocalId(size_)) value_type(std::forward< Args >(args)...);
   return operator[](size_++);
 }
 template< class T, bool PopFromTail >
@@ -169,6 +172,7 @@ void rychkov::details::QueueBase< T, PopFromTail >::swap(QueueBase& rhs) noexcep
   std::swap(capacity_, rhs.capacity_);
   std::swap(head_, rhs.head_);
   std::swap(data_, rhs.data_);
+  std::swap(raw_, rhs.raw_);
 }
 template< class T, bool PopFromTail >
 void rychkov::details::QueueBase< T, PopFromTail >::reserve(size_type newCapacity)
@@ -178,8 +182,7 @@ void rychkov::details::QueueBase< T, PopFromTail >::reserve(size_type newCapacit
     return;
   }
   QueueBase temp;
-  temp.capacity_ = newCapacity;
-  temp.data_ = new value_type[newCapacity];
+  temp.allocate(newCapacity);
   for (size_type i = 0; i < size_; i++)
   {
     temp.push(std::move_if_noexcept(operator[](i)));
@@ -204,6 +207,21 @@ typename rychkov::details::QueueBase< T, PopFromTail >::const_reference
     rychkov::details::QueueBase< T, PopFromTail >::operator[](size_type i) const
 {
   return data_[getLocalId(i)];
+}
+template< class T, bool PopFromTail >
+void rychkov::details::QueueBase< T, PopFromTail >::allocate(size_type newCapacity)
+{
+  if (newCapacity == 0)
+  {
+    raw_ = nullptr;
+    data_ = nullptr;
+    capacity_ = 0;
+    return;
+  }
+  raw_ = new unsigned char[newCapacity * sizeof(value_type) + alignof(value_type) - 1];
+  data_ = reinterpret_cast< value_type* >(reinterpret_cast< size_t >(raw_ + alignof(value_type) - 1)
+        & ~(alignof(value_type) - 1));
+  capacity_ = newCapacity;
 }
 
 #endif
