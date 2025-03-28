@@ -490,22 +490,17 @@ BOOST_AUTO_TEST_CASE(test_comparsion)
 
 BOOST_AUTO_TEST_CASE(test_unique)
 {
-  lt< int > first(3ull, 100);
-  lt< int > second(5ull, 100);
+  double mydoubles[] = {12.15, 2.72, 73.0, 12.77, 3.14, 12.77, 73.35, 72.25, 15.3, 72.25};
+  lt< double > mylist(mydoubles, mydoubles + 10);
 
-  BOOST_TEST(first < second);
+  mylist.sort();
 
-  first.push_back(100);
-  first.push_back(100);
+  mylist.unique();
 
-  BOOST_TEST(first == second);
+  mylist.unique(savintsev::same_integral_part);
 
-  first.push_back(200);
+  mylist.unique(savintsev::is_near());
 
-  BOOST_TEST(first > second);
-
-  first = {100, 100, 50, 100};
-  second = {100, 100, 200};
-
-  BOOST_TEST(first <= second);
+  lt< double > test = {2.72, 12.15, 72.25};
+  BOOST_TEST(mylist == test);
 }

@@ -539,11 +539,11 @@ namespace savintsev
 
   template< class T >
   template< class Predicate >
-  void List< T >::unique(Predicate pred)
+  void List< T >::unique(Predicate binary_pred)
   {
     for (auto it = begin(); it != end();)
     {
-      if (pred(*it, *std::next(it)))
+      if (binary_pred(*it, *std::next(it)))
       {
         it = erase(it);
       }
@@ -559,7 +559,6 @@ namespace savintsev
   {
     unique(std::equal_to<>());
   }
-
 
   template< class T >
   void List< T >::splice(const_iterator pos, List & rhs) noexcept

@@ -1,5 +1,6 @@
 #ifndef TEST_COMMON_HPP
 #define TEST_COMMON_HPP
+#include <cmath>
 
 namespace savintsev
 {
@@ -18,6 +19,17 @@ namespace savintsev
   {
     return int(first) < int(second);
   }
+  bool same_integral_part(double first, double second)
+  {
+    return int(first) == int(second);
+  }
+  struct is_near
+  {
+    bool operator()(double first, double second)
+    {
+      return fabs(first - second) < 5.0;
+    }
+  };
 }
 
 #endif
