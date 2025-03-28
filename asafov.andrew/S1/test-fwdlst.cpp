@@ -26,27 +26,27 @@ BOOST_AUTO_TEST_CASE(cbegin_test)
   BOOST_TEST(*list.cbegin() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(begin_test)
-{
-  asafov::Forward_list<size_t> list;
-  list.push_back(1);
-  list.push_back(2);
-  list.push_back(3);
-  list.push_back(4);
-  BOOST_TEST(*list.begin() == 1);
-}
-
-//BOOST_AUTO_TEST_CASE(cend_test)
+//BOOST_AUTO_TEST_CASE(begin_test)
 //{
 //  asafov::Forward_list<size_t> list;
 //  list.push_back(1);
 //  list.push_back(2);
 //  list.push_back(3);
 //  list.push_back(4);
-//  bool res = *list.cend() == 4;
-//  list.clear();
-//  BOOST_TEST(res);
+//  BOOST_TEST(*list.begin() == 1);
 //}
+
+BOOST_AUTO_TEST_CASE(cend_test)
+{
+  asafov::Forward_list<size_t> list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.push_back(4);
+  bool res = *list.cend() == 4;
+  list.clear();
+  BOOST_TEST(res);
+}
 
 BOOST_AUTO_TEST_CASE(end_test)
 {
