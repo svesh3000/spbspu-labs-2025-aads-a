@@ -295,7 +295,12 @@ namespace asafov
     }
     void remove(const T& value) noexcept
     {
-      for (auto iter = head_; iter != tail_; iter = iter->next_)
+      auto iter = head_;
+      if (iter->data_ == value)
+      {
+        pop_front();
+      }
+      for (; iter != tail_; iter = iter->next_)
       {
         if (iter->next_->data_ == value)
         {
@@ -307,7 +312,12 @@ namespace asafov
     }
     void remove_if(bool(f)(const T&))
     {
-      for (auto iter = head_; iter != tail_; iter = iter->next_)
+      auto iter = head_;
+      if (iter->data_ == value)
+      {
+        pop_front();
+      }
+      for (; iter != tail_; iter = iter->next_)
       {
         if (f(iter->next_->data_))
         {
