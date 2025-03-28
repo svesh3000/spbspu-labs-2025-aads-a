@@ -270,6 +270,31 @@ BOOST_AUTO_TEST_CASE(test_insert)
   BOOST_CHECK_EQUAL_COLLECTIONS(mylist.begin(), mylist.end(), test, test + 12);
 }
 
+BOOST_AUTO_TEST_CASE(test_merge)
+{
+  lt< double > first, second;
+
+  first.push_back(3.1);
+  first.push_back(2.2);
+  first.push_back(2.9);
+
+  second.push_back(3.7);
+  second.push_back(7.1);
+  second.push_back(1.4);
+
+  first.sort();
+  second.sort();
+
+  first.merge(second);
+
+  second.push_back(2.1);
+
+  first.merge(second, savintsev::mycomparison);
+
+  double test[] = {1.4, 2.2, 2.9, 2.1, 3.1, 3.7, 7.1};
+  BOOST_TEST(first == test);
+}
+
 BOOST_AUTO_TEST_CASE(test_operator_equal)
 {
   lt< int > first(4ull, 20);
@@ -442,6 +467,28 @@ BOOST_AUTO_TEST_CASE(test_swap)
 }
 
 BOOST_AUTO_TEST_CASE(test_comparsion)
+{
+  lt< int > first(3ull, 100);
+  lt< int > second(5ull, 100);
+
+  BOOST_TEST(first < second);
+
+  first.push_back(100);
+  first.push_back(100);
+
+  BOOST_TEST(first == second);
+
+  first.push_back(200);
+
+  BOOST_TEST(first > second);
+
+  first = {100, 100, 50, 100};
+  second = {100, 100, 200};
+
+  BOOST_TEST(first <= second);
+}
+
+BOOST_AUTO_TEST_CASE(test_unique)
 {
   lt< int > first(3ull, 100);
   lt< int > second(5ull, 100);

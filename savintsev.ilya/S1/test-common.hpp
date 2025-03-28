@@ -14,6 +14,10 @@ namespace savintsev
       return (value % 2) == 0;
     }
   };
+  bool mycomparison(double first, double second)
+  {
+    return int(first) < int(second);
+  }
 }
 
 #endif

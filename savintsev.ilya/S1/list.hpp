@@ -471,7 +471,13 @@ namespace savintsev
   }
 
   template< class T >
-  void savintsev::List< T >::merge(List< T > & x)
+  void List< T >::merge(List< T > & x)
+  {
+    merge(x, std::less< T >());
+  }
+
+  template< class T >
+  void List< T >::merge(List< T > && x)
   {
     merge(x, std::less< T >());
   }
@@ -505,6 +511,13 @@ namespace savintsev
 
   template< class T >
   template< class Compare >
+  void List< T >::merge(List< T > && x, Compare comp)
+  {
+    merge(x, comp);
+  }
+
+  template< class T >
+  template< class Compare >
   bool List< T >::compare_lists(const List & lhs, const List & rhs, Compare comp)
   {
     auto it = lhs.cbegin();
@@ -523,6 +536,30 @@ namespace savintsev
     }
     return comp(lhs.size(), rhs.size());
   }
+
+  template< class T >
+  template< class Predicate >
+  void List< T >::unique(Predicate pred)
+  {
+    for (auto it = begin(); it != end();)
+    {
+      if (pred(*it, *std::next(it)))
+      {
+        it = erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+  }
+
+  template< class T >
+  void List< T >::unique()
+  {
+    unique(std::equal_to<>());
+  }
+
 
   template< class T >
   void List< T >::splice(const_iterator pos, List & rhs) noexcept
