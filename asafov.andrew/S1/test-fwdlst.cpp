@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(pop_front_test)
   BOOST_TEST(list.size() == 3);
   BOOST_TEST(list.front() == 2);
 }
-
+*/
 BOOST_AUTO_TEST_CASE(clear_test)
 {
   asafov::Forward_list<size_t> list;
@@ -160,4 +160,4 @@ BOOST_AUTO_TEST_CASE(swap_test)
   BOOST_TEST(list.front() == 2);
   BOOST_TEST(list2.front() == 1 );
 }
-*/
+
