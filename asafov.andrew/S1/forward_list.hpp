@@ -313,7 +313,7 @@ namespace asafov
     void remove_if(bool(f)(const T&))
     {
       auto iter = head_;
-      if (iter->data_ == value)
+      if (f(iter->data_))
       {
         pop_front();
       }
