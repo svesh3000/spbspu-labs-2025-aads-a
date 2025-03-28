@@ -82,7 +82,7 @@ maslevtsov::Queue< T >::~Queue()
 template< class T >
 maslevtsov::Queue< T >& maslevtsov::Queue< T >::operator=(const Queue& rhs)
 {
-  Queue copied(rhs);
+  Queue< T > copied(rhs);
   swap(copied);
   return *this;
 }
@@ -90,7 +90,7 @@ maslevtsov::Queue< T >& maslevtsov::Queue< T >::operator=(const Queue& rhs)
 template< class T >
 maslevtsov::Queue< T >& maslevtsov::Queue< T >::operator=(Queue&& rhs) noexcept
 {
-  Queue moved(std::move(rhs));
+  Queue< T > moved(std::move(rhs));
   swap(rhs);
   return *this;
 }
@@ -166,8 +166,7 @@ void maslevtsov::Queue< T >::push_impl(U&& value)
   if (size_ == capacity_) {
     expand_data(size_ * 2 + 1);
   }
-  data_[size_] = std::forward< U >(value);
-  ++size_;
+  data_[size_++] = std::forward< U >(value);
 }
 
 template< class T >
