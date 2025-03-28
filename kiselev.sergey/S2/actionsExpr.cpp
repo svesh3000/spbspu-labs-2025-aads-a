@@ -233,7 +233,7 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
   }
 }
 
-std::ostream& kiselev::outputResults(std::ostream &output, stackNumber& results)
+std::ostream& kiselev::outputResults(std::ostream& output, stackNumber& results)
 {
   if (!results.empty())
   {

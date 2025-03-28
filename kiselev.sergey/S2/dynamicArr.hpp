@@ -1,9 +1,6 @@
 #ifndef DYNAMICARR_HPP
 #define DYNAMICARR_HPP
-#include <cstddef>
-#include <new>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 
 namespace kiselev
@@ -104,6 +101,7 @@ namespace kiselev
     catch (const std::bad_alloc&)
     {
       clear();
+      delete[] data_;
       throw;
     }
   }

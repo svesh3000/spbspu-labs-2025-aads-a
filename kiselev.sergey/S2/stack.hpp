@@ -104,7 +104,6 @@ namespace kiselev
   {
     arr_.clear();
   }
-
 }
 
 #endif
