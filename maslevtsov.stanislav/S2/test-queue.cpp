@@ -93,4 +93,19 @@ BOOST_AUTO_TEST_CASE(queue_pop_test)
   q.pop();
   BOOST_TEST(q.empty());
 }
+
+BOOST_AUTO_TEST_CASE(stack_swap_test)
+{
+  maslevtsov::Queue< int > s1;
+  s1.push(1);
+  maslevtsov::Queue< int > s2;
+  s2.push(2);
+  s2.push(3);
+  s1.swap(s2);
+  BOOST_TEST(s1.front() == 2);
+  BOOST_TEST(s1.back() == 3);
+  BOOST_TEST(s1.size() == 2);
+  BOOST_TEST(s2.front() == 1);
+  BOOST_TEST(s2.size() == 1);
+}
 BOOST_AUTO_TEST_SUITE_END()

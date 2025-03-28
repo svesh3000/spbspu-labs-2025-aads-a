@@ -82,4 +82,20 @@ BOOST_AUTO_TEST_CASE(stack_pop_test)
   s.pop();
   BOOST_TEST(s.empty());
 }
+
+BOOST_AUTO_TEST_CASE(stack_swap_test)
+{
+  maslevtsov::Stack< int > s1;
+  s1.push(1);
+  maslevtsov::Stack< int > s2;
+  s2.push(2);
+  s2.push(3);
+  s1.swap(s2);
+  BOOST_TEST(s1.top() == 3);
+  BOOST_TEST(s1.size() == 2);
+  s1.pop();
+  BOOST_TEST(s1.top() == 2);
+  BOOST_TEST(s2.top() == 1);
+  BOOST_TEST(s2.size() == 1);
+}
 BOOST_AUTO_TEST_SUITE_END()
