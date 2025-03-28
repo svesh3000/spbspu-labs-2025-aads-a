@@ -412,9 +412,9 @@ BOOST_AUTO_TEST_CASE(test_splice)
 BOOST_AUTO_TEST_CASE(test_sort)
 {
   lt< int > list {8, 7, 5, 9, 0, 1, 3, 2, 6, 4};
-  std::cout << "TAAAAKS\n";
+
   list.sort();
-  std::cout << "NICE\n";
+
   lt< int > test {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
   BOOST_TEST(list == test);
 

@@ -578,7 +578,6 @@ namespace savintsev
     ListNode< T > * last_node = last.node;
 
     first_node->prev->next = last_node;
-    last_node->prev->next = nullptr;
     last_node->prev->next = first_node;
     ListNode< T > * last_prev = last_node->prev;
     last_node->prev = first_node->prev;
