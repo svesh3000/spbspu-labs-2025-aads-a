@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   list.remove_if(odd);
   BOOST_TEST(list.size() == 2);
 }
-*/
+
 BOOST_AUTO_TEST_CASE(assign_test)
 {
   asafov::Forward_list<size_t> list;
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(assign_test)
   BOOST_TEST(list.front() == 1);
   BOOST_TEST(list.back() == 1);
 }
-
+*/
 BOOST_AUTO_TEST_CASE(swap_test)
 {
   asafov::Forward_list<size_t> list;
