@@ -447,11 +447,8 @@ namespace savintsev
     std::advance(it, mid);
 
     List< T > right;
-    while (it != end())
-    {
-      right.push_back(std::move(*it));
-      it = erase(it);
-    }
+    right.splice(right.begin(), *this, it, end());
+
     merge_sort(comp);
     right.merge_sort(comp);
 
@@ -469,15 +466,8 @@ namespace savintsev
   void List< T >::sort(Compare comp)
   {
     List< T > temp(*this);
-
-    try
-    {
-      merge_sort(comp);
-    }
-    catch (const std::exception & e)
-    {
-      *this = temp;
-    }
+    temp.merge_sort(comp);
+    *this = std::move(temp);
   }
 
   template< class T >
@@ -495,10 +485,9 @@ namespace savintsev
 
     while (it1 != end() && it2 != x.end())
     {
-      if (comp(*it1, *it2))
+      if (comp(*it2, *it1))
       {
-        auto next = it2;
-        ++next;
+        auto next = std::next(it2);
         splice(it1, x, it2);
         it2 = next;
       }
@@ -559,14 +548,17 @@ namespace savintsev
   template< class T >
   void List< T >::splice(const_iterator pos, List & rhs, const_iterator i) noexcept
   {
-    pos.node->prev->next = i.node;
-    pos.node->prev = i.node;
-    i.node->prev->next = i.node->next;
-    i.node->next->prev = i.node->prev;
-    i.node->next = pos.node;
-    i.node->prev = pos.node->prev->prev;
-    list_size++;
-    rhs.list_size--;
+    ListNode< T >* node = i.node;
+
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    --rhs.list_size;
+
+    node->prev = pos.node->prev;
+    node->next = pos.node;
+    pos.node->prev->next = node;
+    pos.node->prev = node;
+    ++list_size;
   }
 
   template< class T >
@@ -578,20 +570,23 @@ namespace savintsev
   template< class T >
   void List< T >::splice(const_iterator pos, List & rhs, const_iterator first, const_iterator last) noexcept
   {
-    size_t dist = std::distance(first, last);
-    list_size += dist;
-    rhs.list_size -= dist;
+    size_t count = std::distance(first, last);
+    list_size += count;
+    rhs.list_size -= count;
 
-    ListNode< T > * temp_first_prev = first.node->prev;
+    ListNode< T > * first_node = first.node;
+    ListNode< T > * last_node = last.node;
 
-    last.node->prev->next = pos.node;
-    pos.node->prev->next = first.node;
-    first.node->prev->next = last.node;
-    first.node->prev = pos.node->prev;
-    pos.node->prev = last.node->prev;
-    last.node->prev = temp_first_prev;
+    first_node->prev->next = last_node;
+    last_node->prev->next = nullptr;
+    last_node->prev->next = first_node;
+    ListNode< T > * last_prev = last_node->prev;
+    last_node->prev = first_node->prev;
 
-    temp_first_prev = nullptr;
+    first_node->prev = pos.node->prev;
+    pos.node->prev->next = first_node;
+    last_prev->next = pos.node;
+    pos.node->prev = last_prev;
   }
 
   template< class T >
