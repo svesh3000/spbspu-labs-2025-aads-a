@@ -39,7 +39,7 @@ namespace
     }
   }
 
-  void addNumberInStack(std::string & number, kiselev::stackNumber & stack)
+  void addNumberInStack(std::string & number, bocharov::stackNumber & stack)
   {
     if (!number.empty())
     {
