@@ -43,7 +43,9 @@ BOOST_AUTO_TEST_CASE(cend_test)
   list.push_back(2);
   list.push_back(3);
   list.push_back(4);
-  BOOST_TEST(*list.cend() == 4);
+  bool res = *list.cend() == 4;
+  list.clear();
+  BOOST_TEST(res);
 }
 
 BOOST_AUTO_TEST_CASE(end_test)
@@ -156,5 +158,5 @@ BOOST_AUTO_TEST_CASE(swap_test)
   list2.push_back(2);
   list.swap(list2);
   BOOST_TEST(list.front() == 2);
-  BOOST_TEST(list2.front() == 1);
+  BOOST_TEST(list2.front() == 1 );
 }
