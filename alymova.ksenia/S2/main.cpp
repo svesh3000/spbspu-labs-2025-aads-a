@@ -8,7 +8,7 @@
 #include "queue.hpp"
 #include "stack.hpp"
 #include "array.hpp"
-#include "postfix.hpp"
+#include "postfixProcess.hpp"
 
 int main(int argc, char** argv)
 {
@@ -29,10 +29,10 @@ int main(int argc, char** argv)
     }
     input = &file;
   }
-  alymova::Stack< long long int > res;
-  while (!(*input).eof())
+  try
   {
-    try
+    alymova::Stack< long long int > res;
+    while (!(*input).eof())
     {
       std::string s;
       std::getline(*input, s);
@@ -43,25 +43,25 @@ int main(int argc, char** argv)
       alymova::Queue< std::string > queue = alymova::convert_postfix(s);
       res.push(alymova::count_postfix(queue));
     }
-    catch(const std::exception& e)
+    if (!res.empty())
     {
-      std::cerr << e.what() << '\n';
-      return 1;
+      std::cout << res.top();
+      res.pop();
+    }
+    while (!res.empty())
+    {
+      std::cout << " " << res.top();
+      res.pop();
+    }
+    std::cout << '\n';
+    if (argc == 2)
+    {
+      file.close();
     }
   }
-  if (!res.empty())
+  catch(const std::exception& e)
   {
-    std::cout << res.top();
-    res.pop();
-  }
-  while (!res.empty())
-  {
-    std::cout << " " << res.top();
-    res.pop();
-  }
-  std::cout << '\n';
-  if (argc == 2)
-  {
-    file.close();
+    std::cerr << e.what() << '\n';
+    return 1;
   }
 }

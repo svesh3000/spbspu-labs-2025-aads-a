@@ -146,6 +146,7 @@ namespace alymova
   template< typename T >
   void Array< T >::pop_front()
   {
+    assert(size_ != 0);
     for (size_t i = 0; i < size_ - 1; i++)
     {
       array_[i] = array_[i + 1];
@@ -156,6 +157,7 @@ namespace alymova
   template< typename T >
   void Array< T >::pop_back()
   {
+    assert(size_ != 0);
     size_--;
   }
 
