@@ -2,7 +2,7 @@
 #include "queue.hpp"
 
 BOOST_AUTO_TEST_SUITE(queue_constructors_tests)
-BOOST_AUTO_TEST_CASE(default_constructor_test)
+BOOST_AUTO_TEST_CASE(queue_default_constructor_test)
 {
   maslevtsov::Queue< int > q;
   BOOST_TEST(q.empty());
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(queue_pop_test)
   BOOST_TEST(q.empty());
 }
 
-BOOST_AUTO_TEST_CASE(stack_swap_test)
+BOOST_AUTO_TEST_CASE(queue_swap_test)
 {
   maslevtsov::Queue< int > s1;
   s1.push(1);
