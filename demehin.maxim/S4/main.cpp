@@ -4,6 +4,7 @@
 #include <limits>
 #include "tree_manips.hpp"
 #include <fstream>
+#include <tree/node.hpp>
 
 namespace
 {
@@ -49,6 +50,7 @@ int main(int argc, char* argv[])
   {
     return 1;
   }
+
   std::ifstream file(argv[1]);
   MapOfTrees mapOfTrees;
   inputTrees(file, mapOfTrees);
