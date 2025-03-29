@@ -2,13 +2,15 @@
 #include <map>
 #include <string>
 #include <limits>
+#include "tree_manips.hpp"
+#include <fstream>
 
 namespace
 {
   using TreeMap = std::map< size_t, std::string >;
   using MapOfTrees = std::map< std::string, TreeMap >;
 
-  void printTrees(std::ostream& out, const MapOfTrees& mapOfTrees)
+  /*void printTrees(std::ostream& out, const MapOfTrees& mapOfTrees)
   {
     for (auto& x : mapOfTrees)
     {
@@ -19,7 +21,7 @@ namespace
       }
       out << "\n";
     }
-  }
+  }*/
 
   void inputTrees(std::istream& in, MapOfTrees& mapOfTrees)
   {
@@ -41,8 +43,15 @@ namespace
   }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+  if (argc != 2)
+  {
+    return 1;
+  }
+  std::ifstream file(argv[1]);
   MapOfTrees mapOfTrees;
-  inputTrees(std::cin, mapOfTrees);
+  inputTrees(file, mapOfTrees);
+
+  demehin::print(std::cout, std::cin, mapOfTrees);
 }

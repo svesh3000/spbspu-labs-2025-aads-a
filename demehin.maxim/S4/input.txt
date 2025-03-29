@@ -1,0 +1,3 @@
+first 1 cat 2 dog 3 pop
+second 2 cat 1 dog 3 pop
+third 1 mouse 3 bear 2 wolf
