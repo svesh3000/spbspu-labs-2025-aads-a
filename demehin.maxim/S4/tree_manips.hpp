@@ -10,7 +10,9 @@ namespace demehin
   using MapOfTrees = std::map< std::string, TreeMap >;
 
   void print(std::ostream& out, std::istream& in, const MapOfTrees& mapOfTrees);
-  void complement(std::istream& in, MapOfTrees& mapOfTrees);
+  void makeComplement(std::istream& in, MapOfTrees& mapOfTrees);
+  void makeIntersect(std::istream& in, MapOfTrees& mapOfTrees);
+  void makeUnion(std::istream& in, MapOfTrees& mapOfTrees);
 }
 
 #endif

@@ -61,7 +61,15 @@ int main(int argc, char* argv[])
     }
     else if (command == "complement")
     {
-      demehin::complement(std::cin, mapOfTrees);
+      demehin::makeComplement(std::cin, mapOfTrees);
+    }
+    else if (command == "intersect")
+    {
+      demehin::makeIntersect(std::cin, mapOfTrees);
+    }
+    else if (command == "union")
+    {
+      demehin::makeUnion(std::cin, mapOfTrees);
     }
   }
 }

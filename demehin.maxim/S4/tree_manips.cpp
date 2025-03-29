@@ -18,15 +18,11 @@ void demehin::print(std::ostream& out, std::istream& in, const MapOfTrees& mapOf
   out << "\n";
 }
 
-void demehin::complement(std::istream& in, MapOfTrees& mapOfTrees)
+void demehin::makeComplement(std::istream& in, MapOfTrees& mapOfTrees)
 {
-  std::string newName;
-  std::string name1;
-  std::string name2;
+  std::string newName, name1, name2;
   in >> newName >> name1 >> name2;
-  TreeMap newMap;
-  TreeMap map1;
-  TreeMap map2;
+  TreeMap newMap, map1, map2;
   if (mapOfTrees.at(name1).size() > mapOfTrees.at(name2).size())
   {
     map1 = mapOfTrees.at(name1);
@@ -41,6 +37,44 @@ void demehin::complement(std::istream& in, MapOfTrees& mapOfTrees)
   for (auto& key : map1)
   {
     if (map2.find(key.first) == map2.end())
+    {
+      newMap.insert(key);
+    }
+  }
+  mapOfTrees.insert(std::make_pair(newName, newMap));
+}
+
+void demehin::makeIntersect(std::istream& in, MapOfTrees& mapOfTrees)
+{
+  std::string newName, lhsName, rhsName;
+  in >> newName >> lhsName >> rhsName;
+  TreeMap newMap, lhsMap, rhsMap;
+  lhsMap = mapOfTrees.at(lhsName);
+  rhsMap = mapOfTrees.at(rhsName);
+  for (auto& key : lhsMap)
+  {
+    if (rhsMap.find(key.first) != rhsMap.end())
+    {
+      newMap.insert(key);
+    }
+  }
+  mapOfTrees.insert(std::make_pair(newName, newMap));
+}
+
+void demehin::makeUnion(std::istream& in, MapOfTrees& mapOfTrees)
+{
+  std::string newName, lhsName, rhsName;
+  in >> newName >> lhsName >> rhsName;
+  TreeMap newMap, lhsMap, rhsMap;
+  lhsMap = mapOfTrees.at(lhsName);
+  rhsMap = mapOfTrees.at(rhsName);
+  for (auto& key : lhsMap)
+  {
+    newMap.insert(key);
+  }
+  for (auto& key : rhsMap)
+  {
+    if (newMap.find(key.first) == newMap.end())
     {
       newMap.insert(key);
     }
