@@ -110,19 +110,20 @@ long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
         }
         stack.push(item1 + item2);
         break;
+      case '-':
+        if (is_overflow_substraction(item1, item2))
+        {
+          std::cout << item1 << " " << item2 << '\n';
+          throw std::overflow_error("Substraction overflow");
+        }
+        stack.push(item1 - item2);
+        break;
       case '*':
         if (is_overflow_multi(item1, item2))
         {
           throw std::overflow_error("Multiplication overflow");
         }
         stack.push(item1 * item2);
-        break;
-      case '-':
-        if (is_overflow_substraction(item1, item2))
-        {
-          throw std::overflow_error("Substraction overflow");
-        }
-        stack.push(item1 - item2);
         break;
       case '/':
         if (item2 == 0)
@@ -163,18 +164,28 @@ bool alymova::my_isdigit(const std::string& s)
 bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 {
   long long int max_sum = std::numeric_limits< long long int >::max();
-  if (same_sign(lhs, rhs))
+  long long int min_sum = std::numeric_limits< long long int >::min();
+  if (lhs > 0 & rhs > 0)
   {
-    return ((max_sum - std::abs(lhs)) < std::abs(rhs));
+    return ((max_sum - rhs) < lhs);
+  }
+  if (lhs < 0 && rhs < 0)
+  {
+    return ((min_sum - rhs) > lhs);
   }
   return false;
 }
 bool alymova::is_overflow_substraction(long long int lhs, long long int rhs)
 {
   long long int max_sum = std::numeric_limits< long long int >::max();
-  if (!same_sign(lhs, rhs))
+  long long int min_sum = std::numeric_limits< long long int >::min();
+  if (lhs > 0 && rhs < 0)
   {
-    return ((max_sum - std::abs(rhs)) < std::abs(lhs));
+    return ((max_sum + rhs) < lhs);
+  }
+  if (lhs < 0 && rhs > 0)
+  {
+    return ((min_sum + rhs) > lhs);
   }
   return false;
 }
@@ -208,7 +219,7 @@ long long int alymova::my_mod(long long int item1, long long int item2)
 }
 int alymova::sign(long long int item)
 {
-  return (item == 0 ? 0 : (item < 0 ? (-1) : 1));
+  return (item == 0ull ? 0 : (item < 0 ? (-1) : 1));
 }
 bool alymova::same_sign(long long int item1, long long int item2)
 {
