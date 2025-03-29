@@ -18,24 +18,25 @@ namespace sveshnikov
 
     T &top() noexcept;
     const T &top() const noexcept;
-    size_t getSize() noexcept;
-    bool empty() noexcept;
+    size_t getSize() const noexcept;
+    bool empty() const noexcept;
     void push(const T &data);
     void push(T &&data);
     void pop();
-    void swap(Stack &other);
+    void swap(Stack &other) noexcept;
 
   private:
     size_t capacity_;
     T *data_;
     size_t size_;
     void resize();
+    void reset();
   };
 
   template < class T >
   Stack< T >::Stack():
-    capacity_(100),
-    data_(new T[capacity_]),
+    capacity_(0),
+    data_(nullptr),
     size_(0)
   {}
 
@@ -57,7 +58,7 @@ namespace sveshnikov
     data_(other.data_),
     size_(other.size_)
   {
-    other.data_ = nullptr;
+    other.reset();
   }
 
   template < class T >
@@ -69,7 +70,7 @@ namespace sveshnikov
   template < class T >
   Stack< T > &Stack< T >::operator=(const Stack &other)
   {
-    if (*this != std::addressof(other))
+    if (this != std::addressof(other))
     {
       Stack rhs(other);
       swap(rhs);
@@ -80,7 +81,12 @@ namespace sveshnikov
   template < class T >
   Stack< T > &Stack< T >::operator=(Stack &&other) noexcept
   {
-    swap(other);
+    if (this != std::addressof(other))
+    {
+      delete[] data_;
+      reset();
+      swap(other);
+    }
     return *this;
   }
 
@@ -95,17 +101,17 @@ namespace sveshnikov
   const T &Stack< T >::top() const noexcept
   {
     assert(!empty());
-    return data[size - 1];
+    return data_[size_ - 1];
   }
 
   template < class T >
-  size_t Stack< T >::getSize() noexcept
+  size_t Stack< T >::getSize() const noexcept
   {
     return size_;
   }
 
   template < class T >
-  bool Stack< T >::empty() noexcept
+  bool Stack< T >::empty() const noexcept
   {
     return size_ == 0;
   }
@@ -146,15 +152,23 @@ namespace sveshnikov
   void Stack< T >::pop()
   {
     assert(!empty());
-    delete data_[--size_];
+    size_--;
   }
 
   template < class T >
-  void Stack< T >::swap(Stack &other)
+  void Stack< T >::swap(Stack &other) noexcept
   {
     std::swap(capacity_, other.capacity_);
     std::swap(data_, other.data_);
     std::swap(size_, other.size_);
+  }
+
+  template < class T >
+  void Stack< T >::reset()
+  {
+    capacity_ = 0;
+    data_ = nullptr;
+    size_ = 0;
   }
 }
 
