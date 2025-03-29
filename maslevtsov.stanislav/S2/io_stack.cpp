@@ -1,6 +1,6 @@
 #include "io_stack.hpp"
 
-void maslevtsov::input_expressions(std::istream& in, expression_stack& exp_stack)
+void maslevtsov::input_expressions(std::istream& in, expression_queue& exp_queue)
 {
   std::string str;
   while (!in.eof()) {
@@ -9,7 +9,7 @@ void maslevtsov::input_expressions(std::istream& in, expression_stack& exp_stack
       continue;
     }
     PostfixToken token(str);
-    exp_stack.push(token);
+    exp_queue.push(token);
   }
 }
 

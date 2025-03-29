@@ -1,11 +1,11 @@
 #include "expression_processing.hpp"
 
-void maslevtsov::calculate_expressions(expression_stack& exp_stack, results_stack& results)
+void maslevtsov::calculate_expressions(expression_queue& exp_queue, results_stack& results)
 {
-  expression_stack copy = exp_stack;
-  while (!exp_stack.empty()) {
-    results.push((exp_stack.top())());
-    exp_stack.pop();
+  expression_queue copy = exp_queue;
+  while (!exp_queue.empty()) {
+    results.push((exp_queue.front())());
+    exp_queue.pop();
   }
-  exp_stack = copy;
+  exp_queue = copy;
 }

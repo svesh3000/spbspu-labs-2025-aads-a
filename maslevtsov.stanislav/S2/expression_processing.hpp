@@ -5,10 +5,10 @@
 #include "stack.hpp"
 
 namespace maslevtsov {
-  using expression_stack = maslevtsov::Stack< maslevtsov::PostfixToken >;
+  using expression_queue = maslevtsov::Queue< maslevtsov::PostfixToken >;
   using results_stack = maslevtsov::Stack< long long >;
 
-  void calculate_expressions(expression_stack& exp_stack, results_stack& results);
+  void calculate_expressions(expression_queue& exp_queue, results_stack& results);
 }
 
 #endif
