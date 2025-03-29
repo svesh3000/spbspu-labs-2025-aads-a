@@ -29,21 +29,29 @@ namespace rychkov
     union UnionBase< IsTrivDestr >;
 
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N == 0, T& > get(details::UnionBase< IsTrivDestr, T, Types... >& base);
+    constexpr std::enable_if_t< N == 0, T& >
+        get(details::UnionBase< IsTrivDestr, T, Types... >& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N == 0, const T& > get(const details::UnionBase< IsTrivDestr, T, Types... >& base);
+    constexpr std::enable_if_t< N == 0, const T& >
+        get(const details::UnionBase< IsTrivDestr, T, Types... >& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N == 0, T&& > get(details::UnionBase< IsTrivDestr, T, Types... >&& base);
+    constexpr std::enable_if_t< N == 0, T&& >
+        get(details::UnionBase< IsTrivDestr, T, Types... >&& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N == 0, const T&& > get(const details::UnionBase< IsTrivDestr, T, Types... >&& base);
+    constexpr std::enable_if_t< N == 0, const T&& >
+        get(const details::UnionBase< IsTrivDestr, T, Types... >&& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N != 0, nth_type_t< N - 1, Types... >& > get(details::UnionBase< IsTrivDestr, T, Types... >& base);
+    constexpr std::enable_if_t< N != 0, nth_type_t< N - 1, Types... >& >
+        get(details::UnionBase< IsTrivDestr, T, Types... >& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N != 0, const nth_type_t< N - 1, Types... >& > get(const details::UnionBase< IsTrivDestr, T, Types... >& base);
+    constexpr std::enable_if_t< N != 0, const nth_type_t< N - 1, Types... >& >
+        get(const details::UnionBase< IsTrivDestr, T, Types... >& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N != 0, nth_type_t< N - 1, Types... >&& > get(details::UnionBase< IsTrivDestr, T, Types... >&& base);
+    constexpr std::enable_if_t< N != 0, nth_type_t< N - 1, Types... >&& >
+        get(details::UnionBase< IsTrivDestr, T, Types... >&& base);
     template< size_t N, bool IsTrivDestr, class T, class... Types >
-    constexpr std::enable_if_t< N != 0, const nth_type_t< N - 1, Types... >&& > get(const details::UnionBase< IsTrivDestr, T, Types... >&& base);
+    constexpr std::enable_if_t< N != 0, const nth_type_t< N - 1, Types... >&& >
+        get(const details::UnionBase< IsTrivDestr, T, Types... >&& base);
 
     template< bool isTrivDestr, class... Types >
     struct UnionStorage;

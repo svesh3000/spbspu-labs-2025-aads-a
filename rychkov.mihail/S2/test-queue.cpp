@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "queue.hpp"
+#include "mem_checker.hpp"
 
 BOOST_AUTO_TEST_SUITE(S2_queue_test)
 
@@ -58,6 +59,21 @@ BOOST_AUTO_TEST_CASE(pop_test)
   BOOST_TEST(queue.size() == 1);
   queue.pop();
   BOOST_TEST(queue.empty());
+}
+BOOST_AUTO_TEST_CASE(destructors_leak_test)
+{
+  struct A
+  {};
+  rychkov::MemTrack< A > observer{};
+  rychkov::Queue< rychkov::MemChecker< A > > queue;
+  queue.emplace();
+  queue.emplace();
+  queue.pop();
+  queue.emplace();
+  queue.emplace();
+  queue.emplace();
+  queue.pop();
+  queue.pop();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

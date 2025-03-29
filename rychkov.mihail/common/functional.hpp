@@ -30,7 +30,8 @@ namespace rychkov
     return std::forward< F >(func)(std::forward< Args >(args)...);
   }
   template< class Member, class Base, class Obj, class... Args >
-  decltype(std::declval< Member >()(std::declval< Args >()...)) invoke(Member Base::* member, Obj&& obj, Args&&... args)
+  decltype(std::declval< Member >()(std::declval< Args >()...))
+      invoke(Member Base::* member, Obj&& obj, Args&&... args)
       noexcept(noexcept(std::declval< Member >()(std::declval< Args >()...)))
   {
     return (std::forward< Obj >(obj).*member)(std::forward< Args >(args)...);
@@ -96,7 +97,7 @@ namespace rychkov
   template< class F, class... Args >
   constexpr bool is_invocable_v = is_invocable< F, Args... >::value;
   template< class F, class... Args >
-  constexpr bool  is_nothrow_invocable_v = is_nothrow_invocable< F, Args... >::value;
+  constexpr bool is_nothrow_invocable_v = is_nothrow_invocable< F, Args... >::value;
 };
 
 #endif

@@ -15,7 +15,7 @@ union rychkov::details::UnionBase< true, T, Types... >
   {}
   template< class... Args >
   constexpr UnionBase(in_place_index_t< 0 >, Args&&... args):
-    current(std::forward< Args >(args)...)
+    current{std::forward< Args >(args)...}
   {}
   template< size_t N, class... Args, class = std::enable_if_t< N != 0 > >
   constexpr UnionBase(in_place_index_t< N >, Args&&... args):
@@ -32,7 +32,7 @@ union rychkov::details::UnionBase< false, T, Types... >
   {}
   template< class... Args >
   constexpr UnionBase(in_place_index_t< 0 >, Args&&... args):
-    current(std::forward< Args >(args)...)
+    current{std::forward< Args >(args)...}
   {}
   template< size_t N, class... Args, class = std::enable_if_t< N != 0 > >
   constexpr UnionBase(in_place_index_t< N >, Args&&... args):
@@ -52,7 +52,8 @@ union rychkov::details::UnionBase< IsTrivDestr >
 template< class... Types >
 struct rychkov::details::UnionStorage< false, Types... >
 {
-  using size_type = select_size_type_t< sizeof(UnionBase< false, Types... >), byte, unsigned short, size_t >;
+  using size_type = select_size_type_t< sizeof(UnionBase< false, Types... >),
+        unsigned char, unsigned short, size_t >;
   UnionBase< false, Types... > storage;
   size_type active = static_cast< size_type >(variant_npos);
 
@@ -69,20 +70,16 @@ struct rychkov::details::UnionStorage< false, Types... >
   void destroy()
   {
     rychkov::visit(Destroyer(), *this);
-    setValueless();
+    active = static_cast< size_type >(variant_npos);
   }
 
-  constexpr size_t index()
+  constexpr size_t index() const noexcept
   {
     return valueless_by_exception() ? variant_npos : active;
   }
   constexpr bool valueless_by_exception() const noexcept
   {
     return active == static_cast< size_type >(variant_npos);
-  }
-  constexpr void setValueless() noexcept
-  {
-    active = static_cast< size_type >(variant_npos);
   }
   template< size_t N, class... Args >
   constexpr nth_type_t< N, Types... >& emplace(Args&&... args)
@@ -99,7 +96,8 @@ struct rychkov::details::UnionStorage< false, Types... >
 template< class... Types >
 struct rychkov::details::UnionStorage< true, Types... >
 {
-  using size_type = select_size_type_t< sizeof(UnionBase< true, Types... >), byte, unsigned short, size_t >;
+  using size_type = select_size_type_t< sizeof(UnionBase< true, Types... >),
+        unsigned char, unsigned short, size_t >;
   UnionBase< true, Types... > storage;
   size_type active = static_cast< size_type >(variant_npos);
 
@@ -111,7 +109,7 @@ struct rychkov::details::UnionStorage< true, Types... >
   {}
   void destroy()
   {
-    setValueless();
+    active = static_cast< size_type >(variant_npos);
   }
 
   constexpr size_t index() const noexcept
@@ -121,10 +119,6 @@ struct rychkov::details::UnionStorage< true, Types... >
   constexpr bool valueless_by_exception() const noexcept
   {
     return active == static_cast< size_type >(variant_npos);
-  }
-  constexpr void setValueless() noexcept
-  {
-    active = static_cast< size_type >(variant_npos);
   }
   template< size_t N, class... Args >
   constexpr nth_type_t< N, Types... >& emplace(Args&&... args)

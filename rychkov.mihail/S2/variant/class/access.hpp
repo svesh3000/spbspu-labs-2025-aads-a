@@ -18,13 +18,14 @@ private:
 };
 
 template< class T, class... Types >
-constexpr std::enable_if_t< rychkov::exactly_once< T >, T* >
+constexpr std::enable_if_t< rychkov::exactly_once< T, Types... >, T* >
     rychkov::get_if(Variant< Types... >* variant) noexcept
 {
   return get_if< find_unique_v< T, Types... > >(variant);
 }
 template< class T, class... Types >
-constexpr std::enable_if_t< rychkov::exactly_once< T >, const T* > rychkov::get_if(const Variant< Types... >* variant) noexcept
+constexpr std::enable_if_t< rychkov::exactly_once< T, Types... >, const T* >
+    rychkov::get_if(const Variant< Types... >* variant) noexcept
 {
   return get_if< find_unique_v< T, Types... > >(variant);
 }
@@ -74,7 +75,7 @@ constexpr std::enable_if_t< rychkov::exactly_once< T, Types... >, const T&& >
 template< size_t N, class... Types >
 rychkov::nth_type_t< N, Types... >& rychkov::get(Variant< Types... >& variant)
 {
-  if (variant.valueless_by_exception())
+  if (variant.index() != N)
   {
     details::throw_bad_variant_access(variant.valueless_by_exception());
   }
@@ -83,7 +84,7 @@ rychkov::nth_type_t< N, Types... >& rychkov::get(Variant< Types... >& variant)
 template< size_t N, class... Types >
 const rychkov::nth_type_t< N, Types... >& rychkov::get(const Variant< Types... >& variant)
 {
-  if (variant.valueless_by_exception())
+  if (variant.index() != N)
   {
     details::throw_bad_variant_access(variant.valueless_by_exception());
   }

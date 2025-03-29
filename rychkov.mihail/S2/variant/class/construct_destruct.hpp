@@ -13,7 +13,8 @@ rychkov::Variant< Types... >::Variant(T&& value):
 template< class... Types >
 template< class T, class... Args >
 rychkov::Variant< Types... >::Variant(in_place_type_t< T >, Args&&... args):
-  details::VariantBaseAlias< Types... >(in_place_index_t< find_unique_v< T, Types... > >(), std::forward< Args >(args)...)
+  details::VariantBaseAlias< Types... >(in_place_index_t< find_unique_v< T, Types... > >(),
+        std::forward< Args >(args)...)
 {}
 template< class... Types >
 template< size_t N, class... Args >

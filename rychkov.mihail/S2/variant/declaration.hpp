@@ -11,9 +11,11 @@ namespace rychkov
   class Variant;
 
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T >, T* > get_if(Variant< Types... >* variant) noexcept;
+  constexpr std::enable_if_t< exactly_once< T >, T* >
+      get_if(Variant< Types... >* variant) noexcept;
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T >, const T* > get_if(const Variant< Types... >* variant) noexcept;
+  constexpr std::enable_if_t< exactly_once< T >, const T* >
+      get_if(const Variant< Types... >* variant) noexcept;
   template< size_t N, class... Types >
   nth_type_t< N, Types... >* get_if(Variant< Types... >* variant) noexcept;
   template< size_t N, class... Types >
@@ -62,13 +64,17 @@ namespace rychkov
   };
 
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T, Types... >, T& > get(Variant< Types... >& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, T& >
+      get(Variant< Types... >& variant);
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T, Types... >, const T& > get(const Variant< Types... >& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, const T& >
+      get(const Variant< Types... >& variant);
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T, Types... >, T&& > get(Variant< Types... >&& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, T&& >
+      get(Variant< Types... >&& variant);
   template< class T, class... Types >
-  constexpr std::enable_if_t< exactly_once< T, Types... >, const T&& > get(const Variant< Types... >&& variant);
+  constexpr std::enable_if_t< exactly_once< T, Types... >, const T&& >
+      get(const Variant< Types... >&& variant);
 
   template< size_t N, class... Types >
   nth_type_t< N, Types... >& get(Variant< Types... >& variant);
@@ -94,7 +100,8 @@ namespace rychkov
   template< class R, class F >
   constexpr R visit(F&& func);
   template< class F, class... Variants >
-  constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... > visit(F&& func, Variants&&... args);
+  constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... >
+      visit(F&& func, Variants&&... args);
 }
 
 #endif

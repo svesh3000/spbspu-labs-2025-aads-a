@@ -6,8 +6,6 @@
 
 namespace rychkov
 {
-  using byte = unsigned char;
-
   template< class... Types >
   class Variant;
 
@@ -140,7 +138,8 @@ namespace rychkov
   template< class R, class F >
   constexpr R visit(F&& func);
   template< class F, class... Variants >
-  constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... > visit(F&& func, Variants&&... args);
+  constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... >
+      visit(F&& func, Variants&&... args);
   namespace details
   {
     template< class T, size_t... Lens >

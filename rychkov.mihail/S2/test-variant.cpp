@@ -112,7 +112,7 @@ namespace rychkov
 
 BOOST_AUTO_TEST_SUITE(S2_variant_test)
 
-BOOST_AUTO_TEST_CASE(print_info_test)
+BOOST_AUTO_TEST_CASE(visit_test)
 {
   rychkov::Variant< int, char > variant1 = 59;
   rychkov::Variant< int, char > variant2 = 934;
@@ -121,29 +121,102 @@ BOOST_AUTO_TEST_CASE(print_info_test)
   BOOST_TEST(rychkov::visit< int >(adder, variant1, variant2, variant1) == 59 * 2 + 934);
 }
 
-BOOST_AUTO_TEST_CASE(get_test)
+BOOST_AUTO_TEST_CASE(destructors_leak_test)
 {
   using rychkov::test_variant_traits::A1;
+  using A1_tracked = rychkov::MemChecker< A1 >;
   using rychkov::test_variant_traits::A2;
-  using rychkov::test_variant_traits::A3;
-  rychkov::MemTrack< A1, A2, A3 > protector{};
-  constexpr rychkov::Variant< A2, int, char > constexpr_var_1;
-  constexpr rychkov::Variant< A3, int, char > constexpr_var_2;
-  rychkov::Variant< rychkov::MemChecker< A2 >, int, char > var1;
-  rychkov::Variant< rychkov::MemChecker< A2 >, int, char > var2 = std::move(var1);
-  rychkov::Variant< int, char > variant;
-  rychkov::Variant< rychkov::MemChecker< A1 >, int, char, int > variant2{rychkov::in_place_index_t< 0 >()};
-  rychkov::Variant< int, char > variant3{rychkov::in_place_type_t< int >()};
-  variant3 = variant;
-  variant3 = std::move(variant);
-  variant3 = 934;
-  rychkov::Variant< int, char > variant4 = std::move(variant3);
-  rychkov::Variant< int, char > variant5;
-  variant5.emplace< 1 >('!');
-  rychkov::Variant< int, char > variant6(72);
-  rychkov::Variant< int, char > variant7('l');
-  rychkov::Variant< rychkov::MemChecker< A1 >, char > variant8 = rychkov::MemChecker< A1 >();
-  variant = 59;
+  using A2_tracked = rychkov::MemChecker< A2 >;
+
+  rychkov::MemTrack< A1, A2 > observer{};
+  rychkov::Variant< A1_tracked, A2_tracked, char > variant;
+  variant.emplace< 1 >();
+  variant.emplace< 2 >('E');
+  variant.emplace< A2_tracked >();
+  variant.emplace< char >();
+  variant = 'w';
+  variant = A2();
+}
+BOOST_AUTO_TEST_CASE(holds_test)
+{
+  rychkov::Variant< char, int > variant;
+  BOOST_TEST(rychkov::holds_alternative< char >(variant));
+  BOOST_TEST(variant.index() == 0);
+  BOOST_TEST(rychkov::get_if< 1 >(&variant) == nullptr);
+  BOOST_TEST(rychkov::get_if< 0 >(&variant) != nullptr);
+  BOOST_TEST(rychkov::get_if< int >(&variant) == nullptr);
+  BOOST_TEST(rychkov::get_if< char >(&variant) != nullptr);
+  variant = 43;
+  BOOST_TEST(rychkov::holds_alternative< int >(variant));
+  BOOST_TEST(variant.index() == 1);
+  BOOST_TEST(rychkov::get_if< 1 >(&variant) != nullptr);
+  BOOST_TEST(rychkov::get_if< 0 >(&variant) == nullptr);
+  BOOST_TEST(rychkov::get_if< int >(&variant) != nullptr);
+  BOOST_TEST(rychkov::get_if< char >(&variant) == nullptr);
+  BOOST_TEST(rychkov::get< 1 >(variant) == 43);
+}
+BOOST_AUTO_TEST_CASE(get_test)
+{
+  rychkov::Variant< char, int > variant{91};
+  BOOST_TEST(rychkov::get< int >(variant) == 91);
+  BOOST_TEST(rychkov::get< 1 >(variant) == 91);
+  BOOST_TEST(rychkov::get< int >(std::move(variant)) == 91);
+  BOOST_TEST(rychkov::get< 1 >(std::move(variant)) == 91);
+  BOOST_CHECK_THROW(rychkov::get< char >(variant), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< 0 >(variant), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< char >(std::move(variant)), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< 0 >(std::move(variant)), rychkov::bad_variant_access);
+
+  const rychkov::Variant< char, int > variant2{34};
+  BOOST_TEST(rychkov::get< int >(variant) == 91);
+  BOOST_TEST(rychkov::get< 1 >(variant) == 91);
+  BOOST_TEST(rychkov::get< int >(std::move(variant)) == 91);
+  BOOST_TEST(rychkov::get< 1 >(std::move(variant)) == 91);
+  BOOST_CHECK_THROW(rychkov::get< char >(variant), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< 0 >(variant), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< char >(std::move(variant)), rychkov::bad_variant_access);
+  BOOST_CHECK_THROW(rychkov::get< 0 >(std::move(variant)), rychkov::bad_variant_access);
+}
+BOOST_AUTO_TEST_CASE(in_place_test)
+{
+  rychkov::Variant< int, char, int > variant1{rychkov::in_place_index_t< 0 >(), 55};
+  rychkov::Variant< int, char > variant2{rychkov::in_place_type_t< char >(), 'l'};
+  BOOST_TEST(rychkov::get< 0 >(variant1) == 55);
+  BOOST_TEST(rychkov::get< char >(variant2) == 'l');
+}
+BOOST_AUTO_TEST_CASE(copy_move_test)
+{
+  struct A
+  {
+    int value = 0;
+    A(int rhs):
+      value(rhs)
+    {}
+    A(A&& rhs):
+      value(std::exchange(rhs.value, 0))
+    {}
+    A& operator=(A&& rhs)
+    {
+      value = std::exchange(rhs.value, 0);
+      return *this;
+    }
+  };
+  rychkov::Variant< A, int, char > variant1{rychkov::in_place_type_t< A >(), 55};
+  rychkov::Variant< A, int, char > variant2 = std::move(variant1);
+  BOOST_TEST(rychkov::get< A >(variant1).value == 0);
+  BOOST_TEST(rychkov::get< A >(variant2).value == 55);
+  variant1 = std::move(variant2);
+  BOOST_TEST(rychkov::get< A >(variant1).value == 55);
+  BOOST_TEST(rychkov::get< A >(variant2).value == 0);
+
+  rychkov::Variant< int, char > variant3 = 90;
+  rychkov::Variant< int, char > variant4 = variant3;
+  BOOST_TEST(rychkov::get< int >(variant3) == 90);
+  BOOST_TEST(rychkov::get< int >(variant4) == 90);
+  variant3 = '!';
+  BOOST_TEST(rychkov::get< char >(variant3) == '!');
+  variant4 = variant3;
+  BOOST_TEST(rychkov::get< char >(variant4) == '!');
 }
 
 BOOST_AUTO_TEST_SUITE_END()

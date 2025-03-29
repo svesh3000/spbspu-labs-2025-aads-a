@@ -18,16 +18,16 @@ namespace rychkov
 
     template< class R, class F, class... Variants, size_t... Actives, size_t... GenSequence >
     constexpr multidimensional_array< R(*)(F, Variants...), sizeof...(GenSequence) >
-      generate_visit_vtable(std::index_sequence< Actives... >,
-          std::index_sequence< GenSequence... >, std::index_sequence<>)
+        generate_visit_vtable(std::index_sequence< Actives... >,
+            std::index_sequence< GenSequence... >, std::index_sequence<>)
     {
       return {{ {&invoke_visit< R, Actives..., GenSequence >}... }};
     }
     template< class R, class F, class... Variants, size_t... Actives, size_t... GenSequence,
           size_t NextSize, size_t... Sizes >
     constexpr multidimensional_array< R(*)(F, Variants...), sizeof...(GenSequence), NextSize, Sizes... >
-      generate_visit_vtable(std::index_sequence< Actives... >, std::index_sequence< GenSequence... >,
-          std::index_sequence< NextSize, Sizes... >)
+        generate_visit_vtable(std::index_sequence< Actives... >, std::index_sequence< GenSequence... >,
+            std::index_sequence< NextSize, Sizes... >)
     {
       return {{generate_visit_vtable< R, F, Variants... >(std::index_sequence< Actives..., GenSequence >(),
                 std::make_index_sequence< NextSize >(), std::index_sequence< Sizes... >())...}};
@@ -38,9 +38,9 @@ namespace rychkov
         variant_size_v< remove_cvref_t< Variants > >... >;
     template< class R, class F, class First, class... Variants >
     constexpr vtable_type< R, F, First, Variants... > vtable =
-      details::generate_visit_vtable< R, F&&, First, Variants... >(std::index_sequence<>(),
-        std::make_index_sequence< variant_size_v< remove_cvref_t< First > > >(),
-        std::index_sequence< variant_size_v< remove_cvref_t< Variants > >... >());
+        details::generate_visit_vtable< R, F&&, First, Variants... >(std::index_sequence<>(),
+          std::make_index_sequence< variant_size_v< remove_cvref_t< First > > >(),
+          std::index_sequence< variant_size_v< remove_cvref_t< Variants > >... >());
   }
 }
 

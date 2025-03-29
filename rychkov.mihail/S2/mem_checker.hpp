@@ -11,7 +11,7 @@ namespace rychkov
   template< class Base >
   size_t active_tracked();
   template< class Base >
-  struct Counter
+  class Counter
   {
   public:
     Counter()
@@ -22,23 +22,18 @@ namespace rychkov
     {
       active++;
     }
-    Counter(Counter&&)
-    {
-      active++;
-    }
     ~Counter()
     {
       active--;
     }
 
     Counter& operator=(const Counter&) = default;
-    Counter& operator=(Counter&&) = default;
   private:
     static size_t active;
     friend size_t active_tracked< Base >();
   };
   template< class Base >
-  struct MemChecker: public Counter< Base >, public Base
+  class MemChecker: public Base, private Counter< Base >
   {
   public:
     MemChecker() = default;
@@ -49,7 +44,7 @@ namespace rychkov
     template< class T, class = std::enable_if_t< std::is_assignable< Base, T&& >::value > >
     MemChecker& operator=(T&& value)
     {
-      static_cast< Base& >(*this) = value;
+      static_cast< Base& >(*this) = std::forward< T >(value);
       return *this;
     }
   };
