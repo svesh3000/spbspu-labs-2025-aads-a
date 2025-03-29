@@ -3,8 +3,7 @@
 #include "expression_processing.hpp"
 
 namespace {
-  using expression_queue = maslevtsov::Queue< std::string >;
-  using expression_stack = maslevtsov::Stack< expression_queue >;
+  using expression_stack = maslevtsov::Stack< maslevtsov::PostfixToken >;
   using results_stack = maslevtsov::Stack< long long >;
 }
 
@@ -28,7 +27,7 @@ int main(int argc, char** argv)
       maslevtsov::input_expressions(fin, exp_stack);
     }
   } catch (const std::exception&) {
-    std::cerr << "Input error\n";
+    std::cerr << "Incorrect input\n";
     return 1;
   }
 
@@ -37,12 +36,6 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  try {
-    maslevtsov::convert_stack(exp_stack);
-  } catch (const std::exception&) {
-    std::cerr << "Invalid expression\n";
-    return 1;
-  }
   results_stack results;
   try {
     maslevtsov::calculate_expressions(exp_stack, results);

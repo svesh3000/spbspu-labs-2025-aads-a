@@ -11,6 +11,8 @@ namespace maslevtsov {
     PostfixToken() noexcept = default;
     PostfixToken(const PostfixToken& rhs) = default;
     PostfixToken(PostfixToken&& rhs) noexcept = default;
+    PostfixToken(const std::string& infix_token);
+    ~PostfixToken() = default;
 
     PostfixToken& operator=(const PostfixToken& rhs) = default;
     PostfixToken& operator=(PostfixToken&& rhs) noexcept = default;

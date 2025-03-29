@@ -2,12 +2,11 @@
 #define IO_STACK_HPP
 
 #include <iostream>
-#include "queue.hpp"
 #include "stack.hpp"
+#include "postfix_token.hpp"
 
 namespace maslevtsov {
-  using expression_queue = maslevtsov::Queue< std::string >;
-  using expression_stack = maslevtsov::Stack< expression_queue >;
+  using expression_stack = maslevtsov::Stack< maslevtsov::PostfixToken >;
   using results_stack = maslevtsov::Stack< long long >;
 
   void input_expressions(std::istream& in, expression_stack& exp_stack);
