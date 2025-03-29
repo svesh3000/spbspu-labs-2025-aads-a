@@ -31,6 +31,7 @@ namespace sveshnikov
     size_t size_;
     void resize();
     void reset();
+    T *formNewData() const;
   };
 
   template < class T >
@@ -43,14 +44,9 @@ namespace sveshnikov
   template < class T >
   Stack< T >::Stack(const Stack &other):
     capacity_(other.capacity_),
-    data_(new T[other.capacity_]),
+    data_(other.formNewData()),
     size_(other.size_)
-  {
-    for (size_t i = 0; i < other.size_; i++)
-    {
-      data_[i] = other.data_[i];
-    }
-  }
+  {}
 
   template < class T >
   Stack< T >::Stack(Stack &&other):
@@ -122,11 +118,7 @@ namespace sveshnikov
     if (size_ == capacity_)
     {
       capacity_ += 100;
-      T *new_data = new T[capacity_];
-      for (size_t i = 0; i < size_; i++)
-      {
-        new_data[i] = data_[i];
-      }
+      T *new_data = formNewData();
       delete[] data_;
       data_ = new_data;
     }
@@ -169,6 +161,17 @@ namespace sveshnikov
     capacity_ = 0;
     data_ = nullptr;
     size_ = 0;
+  }
+
+  template < class T >
+  T *Stack< T >::formNewData() const
+  {
+    T *new_data = new T[capacity_];
+    for (size_t i = 0; i < size_; i++)
+    {
+      new_data[i] = data_[i];
+    }
+    return new_data;
   }
 }
 

@@ -18,12 +18,12 @@ namespace sveshnikov
 
     T &front() noexcept;
     const T &front() const noexcept;
-    size_t getSize() noexcept;
-    bool empty() noexcept;
+    size_t getSize() const noexcept;
+    bool empty() const noexcept;
     void push(const T &data);
     void push(T &&data);
     void pop();
-    void swap(Queue &other);
+    void swap(Queue &other) noexcept;
 
   private:
     size_t capacity_;
@@ -31,34 +31,34 @@ namespace sveshnikov
     size_t size_;
     size_t first_;
     void resize();
+    void reset();
+    T *formNewData(size_t capacity) const;
   };
 
   template < class T >
   Queue< T >::Queue():
-    capacity_(100),
-    data_(new T[capacity_]),
-    size_(0)
+    capacity_(0),
+    data_(nullptr),
+    size_(0),
+    first_(0)
   {}
 
   template < class T >
   Queue< T >::Queue(const Queue &other):
     capacity_(other.capacity_),
-    data_(new T[other.capacity_]),
-    size_(other.size_)
-  {
-    for (size_t i = 0; i < other.size_; i++)
-    {
-      data_[i] = other.data_[i];
-    }
-  }
+    data_(other.formNewData(other.capacity_)),
+    size_(other.size_),
+    first_(0)
+  {}
 
   template < class T >
   Queue< T >::Queue(Queue &&other):
     capacity_(other.capacity_),
     data_(other.data_),
-    size_(other.size_)
+    size_(other.size_),
+    first_(other.first_)
   {
-    other.data_ = nullptr;
+    other.reset();
   }
 
   template < class T >
@@ -70,7 +70,7 @@ namespace sveshnikov
   template < class T >
   Queue< T > &Queue< T >::operator=(const Queue &other)
   {
-    if (*this != std::addressof(other))
+    if (this != std::addressof(other))
     {
       Queue rhs(other);
       swap(rhs);
@@ -81,14 +81,19 @@ namespace sveshnikov
   template < class T >
   Queue< T > &Queue< T >::operator=(Queue &&other) noexcept
   {
-    swap(std::move(other));
+    if (this != std::addressof(other))
+    {
+      delete[] data_;
+      reset();
+      swap(other);
+    }
     return *this;
   }
 
   template < class T >
   T &Queue< T >::front() noexcept
   {
-    return const_cast< T & >(static_cast< const Queue< T > & >(*this).top());
+    return const_cast< T & >(static_cast< const Queue< T > & >(*this).front());
     ;
   }
 
@@ -96,17 +101,17 @@ namespace sveshnikov
   const T &Queue< T >::front() const noexcept
   {
     assert(!empty());
-    return data[0];
+    return data_[first_];
   }
 
   template < class T >
-  size_t Queue< T >::getSize() noexcept
+  size_t Queue< T >::getSize() const noexcept
   {
     return size_;
   }
 
   template < class T >
-  bool Queue< T >::empty() noexcept
+  bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
@@ -116,12 +121,9 @@ namespace sveshnikov
   {
     if (size_ == capacity_)
     {
+      T *new_data = formNewData(capacity_ + 100);
       capacity_ += 100;
-      T *new_data = new T[capacity_];
-      for (size_t i = 0; i < size_; i++)
-      {
-        new_data[i] = data_[i];
-      }
+      first_ = 0;
       delete[] data_;
       data_ = new_data;
     }
@@ -131,7 +133,7 @@ namespace sveshnikov
   void Queue< T >::push(const T &data)
   {
     resize();
-    data_[size_] = data;
+    data_[(first_ + size_) % capacity_] = data;
     size_++;
   }
 
@@ -139,7 +141,7 @@ namespace sveshnikov
   void Queue< T >::push(T &&data)
   {
     resize();
-    data_[size_] = std::move(data);
+    data_[(first_ + size_) % capacity_] = std::move(data);
     size_++;
   }
 
@@ -147,21 +149,37 @@ namespace sveshnikov
   void Queue< T >::pop()
   {
     assert(!empty());
-    delete data_[0];
     size_--;
-    for (size_t i = 0; i < size_; i++)
-    {
-      data[i] = data[i+1];
-    }
-    data[size] = nullptr;
+    first_ = (first_ + 1) % capacity_;
   }
 
   template < class T >
-  void Queue< T >::swap(Queue &other)
+  void Queue< T >::swap(Queue &other) noexcept
   {
     std::swap(capacity_, other.capacity_);
     std::swap(data_, other.data_);
     std::swap(size_, other.size_);
+    std::swap(first_, other.first_);
+  }
+
+  template < class T >
+  void Queue< T >::reset()
+  {
+    capacity_ = 0;
+    data_ = nullptr;
+    size_ = 0;
+    first_ = 0;
+  }
+
+  template < class T >
+  T *Queue< T >::formNewData(size_t capacity) const
+  {
+    T *new_data = new T[capacity];
+    for (size_t i = 0; i < size_; i++)
+    {
+      new_data[i] = data_[(first_ + i) % capacity_];
+    }
+    return new_data;
   }
 }
 
