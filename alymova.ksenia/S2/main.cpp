@@ -5,6 +5,7 @@
 #include <queue>
 #include <stack>
 #include <stdexcept>
+#include <sstream>
 #include "queue.hpp"
 #include "stack.hpp"
 #include "array.hpp"
