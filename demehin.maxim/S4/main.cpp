@@ -52,6 +52,16 @@ int main(int argc, char* argv[])
   std::ifstream file(argv[1]);
   MapOfTrees mapOfTrees;
   inputTrees(file, mapOfTrees);
-
-  demehin::print(std::cout, std::cin, mapOfTrees);
+  std::string command;
+  while (std::cin >> command)
+  {
+    if (command == "print")
+    {
+      demehin::print(std::cout, std::cin, mapOfTrees);
+    }
+    else if (command == "complement")
+    {
+      demehin::complement(std::cin, mapOfTrees);
+    }
+  }
 }
