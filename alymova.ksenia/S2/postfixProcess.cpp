@@ -28,7 +28,7 @@ alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
       now = s_local.substr(0, space);
     }
     s_local = s_local.substr(space + 1);
-    std::cout << now << '\n';
+
     if (now == "(")
     {
       stack.push(now);
@@ -81,71 +81,6 @@ alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
     stack.pop();
   }
   return queue;
-  /*Stack< std::string > stack;
-  Queue< std::string > queue;
-  for (size_t i = 0; i < s.size(); i++)
-  {
-    if (s[i] == '(')
-    {
-      std::string token(1, s[i]);
-      stack.push(token);
-    }
-    else if (s[i] == ')')
-    {
-      while (stack.top() != "(")
-      {
-        queue.push(stack.top());
-        stack.pop();
-        if (stack.empty())
-        {
-          throw std::logic_error("Incorrect expression");
-        }
-      }
-      stack.pop();
-    }
-    else if (std::isdigit(s[i]))
-    {
-      std::string token(1, s[i]);
-      i++;
-      for (; isdigit(s[i]) && i < s.size(); i++)
-      {
-        token.push_back(s[i]);
-      }
-      i--;
-      queue.push(token);
-    }
-    else if (is_first_priority(s[i]) || is_second_priority(s[i]))
-    {
-      if (!stack.empty())
-      {
-        while (is_need_priority(s[i], stack.top()))
-        {
-          queue.push(stack.top());
-          stack.pop();
-          if (stack.empty())
-          {
-            break;
-          }
-        }
-      }
-      std::string token(1, s[i]);
-      stack.push(token);
-    }
-    else if (s[i] != ' ')
-    {
-      throw std::logic_error("Incorrect char");
-    }
-  }
-  while (!stack.empty())
-  {
-    if (stack.top() == "(")
-    {
-      throw std::logic_error("Incorrect expression");
-    }
-    queue.push(stack.top());
-    stack.pop();
-  }
-  return queue;*/
 }
 long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
 {
@@ -228,7 +163,6 @@ bool alymova::my_isdigit(const std::string& s)
 bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 {
   long long int max_sum = std::numeric_limits< long long int >::max();
-  long long int min_sum = std::numeric_limits< long long int >::min();
   if (same_sign(lhs, rhs))
   {
     return ((max_sum - std::abs(lhs)) < std::abs(rhs));
@@ -274,23 +208,15 @@ long long int alymova::my_mod(long long int item1, long long int item2)
 }
 int alymova::sign(long long int item)
 {
-  return (item == 0 ? 0 : (item < 0 ? (-1) : 1)); 
+  return (item == 0 ? 0 : (item < 0 ? (-1) : 1));
 }
 bool alymova::same_sign(long long int item1, long long int item2)
 {
   return (sign(item1) * sign(item2) > 0);
 }
-bool alymova::is_first_priority(char item)
-{
-  return (item == '*' || item == '/' || item == '%');
-}
 bool alymova::is_first_priority(const std::string& token)
 {
   return (token == "*" || token == "/" || token == "%");
-}
-bool alymova::is_second_priority(char item)
-{
-  return (item == '+' || item == '-');
 }
 bool alymova::is_second_priority(const std::string& token)
 {
