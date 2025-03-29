@@ -1,76 +1,106 @@
-#ifndef FORWARD_RING_LIST_HPP
-#define FORWARD_RING_LIST_HPP
+#ifndef FORWARD_RING_LIST_2_HPP
+#define FORWARD_RING_LIST_2_HPP
 
 #include <cstddef>
-#include <cassert>
 #include <memory>
+#include <cassert>
 
 namespace petrov
 {
   template< typename T >
-  struct ForwardRingList
+  struct ListNode
   {
-  public:
-    struct ForwardRingListIterator
-    {
-    public:
-      friend ForwardRingList< T >;
-      using this_t = ForwardRingListIterator;
-      ForwardRingListIterator(): node_(nullptr) {};
-      ForwardRingListIterator(const this_t & rhs) = default;
-      ~ForwardRingListIterator() = default;
-      this_t & operator=(const this_t & rhs) = default;
-      this_t & operator++();
-      this_t operator++(int);
-      T & operator*();
-      T * operator->();
-      const T & operator*() const;
-      const T * operator->() const;
-      bool operator!=(const this_t &) const;
-      bool operator==(const this_t &) const;
-    private:
-      ForwardRingList< T > * node_;
-    };
-
-    using this_t = ForwardRingList< T >;
-    using iterator_this_t = ForwardRingListIterator;
-    ForwardRingList() = default;
-    ForwardRingList(this_t & rhs);
-    ForwardRingList(this_t && rhs);
-    ~ForwardRingList();
-    this_t & operator=(this_t & rhs);
-    this_t & operator=(this_t && rhs);
-    iterator_this_t begin();
-    iterator_this_t end();
-    T front();
-    T back();
-    bool empty() noexcept;
-    size_t size() noexcept;
-    void push_front(const T & element);
-    void push_front(T && element);
-    void pop_front();
-    void pop_back();
-    void swap() noexcept;
-    void clear();
-    void reverse();
-
-  private:
     T data_;
-    ForwardRingListIterator first_;
-    ForwardRingListIterator last_;
-    ForwardRingList< T > * next_;
+    ListNode< T > * next_;
+    ListNode() = default;
   };
 
   template< typename T >
-  typename ForwardRingList< T >::ForwardRingListIterator::this_t & ForwardRingList< T >::iterator_this_t::operator++()
+  struct ConstForwardListIterator
+  {
+    const ListNode< T > * node_;
+    using node_t = ListNode< T >;
+    using this_t = ConstForwardListIterator< T >;
+    ConstForwardListIterator(): node_(nullptr) {}
+    ConstForwardListIterator(const this_t & rhs) = default;
+    ConstForwardListIterator(const node_t * node): node_(node) {}
+    ~ConstForwardListIterator() = default;
+    this_t & operator=(const this_t & rhs) = default;
+    this_t & operator++();
+    this_t operator++(int);
+    const T & operator*() const;
+    const T * operator->() const;
+    bool operator==(const this_t & rhs) const;
+    bool operator!=(const this_t & rhs) const;
+  };
+
+  template< typename T >
+  struct ForwardListIterator
+  {
+    ListNode< T > * node_;
+    using node_t = ListNode< T >;
+    using this_t = ForwardListIterator< T >;
+    ForwardListIterator(): node_(nullptr) {}
+    ForwardListIterator(const this_t & rhs) = default;
+    ForwardListIterator(node_t * node): node_(node) {}
+    ~ForwardListIterator() = default;
+    this_t & operator=(const this_t & rhs) = default;
+    this_t & operator++();
+    this_t operator++(int);
+    T & operator*();
+    T * operator->();
+    bool operator==(const this_t & rhs) const;
+    bool operator!=(const this_t & rhs) const;
+  };
+
+  template< typename T >
+  struct ForwardRingList
+  {
+  public:
+    using this_t = ForwardRingList< T >;
+    using node_t = ListNode< T >;
+    using const_it_t = ConstForwardListIterator< T >;
+    using it_t = ForwardListIterator< T >;
+    ForwardRingList():
+      head_(nullptr),
+      tail_(nullptr)
+    {}
+    ForwardRingList(const this_t & rhs);
+    ForwardRingList(this_t && rhs);
+    ~ForwardRingList();
+    this_t & operator=(const this_t & rhs);
+    this_t & operator=(this_t && rhs);
+    bool operator==(const this_t & rhs) const;
+    const_it_t cbegin() const;
+    const_it_t cend() const;
+    it_t begin();
+    it_t end();
+    T front() const;
+    T back() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    void push_front(const T & val);
+    void push_front (T && val);
+    void pop_front();
+    void remove(const T & val);
+    void clear();
+    void reverse();
+    void swap(this_t & rhs) noexcept;
+  private:
+    node_t * head_;
+    node_t * tail_;
+  };
+
+  template< typename T >
+  typename ConstForwardListIterator< T >::this_t & ConstForwardListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    this->node_ = node_->next_;
+    node_ = node_->next_;
     return *this;
   }
 
   template< typename T >
-  typename ForwardRingList< T >::ForwardRingListIterator::this_t ForwardRingList< T >::iterator_this_t::operator++(int)
+  typename ConstForwardListIterator< T >::this_t ConstForwardListIterator< T >::operator++(int)
   {
     assert(node_ != nullptr);
     this_t result(*this);
@@ -79,73 +109,118 @@ namespace petrov
   }
 
   template< typename T >
-  T & ForwardRingList< T >::ForwardRingListIterator::operator*()
+  const T & ConstForwardListIterator< T >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
   template< typename T >
-  T * ForwardRingList< T >::ForwardRingListIterator::operator->()
+  const T * ConstForwardListIterator< T >::operator->() const
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
   template< typename T >
-  bool ForwardRingList< T >::ForwardRingListIterator::operator==(const this_t & rhs) const
+  bool ConstForwardListIterator< T >::operator==(const this_t & rhs) const
   {
     return node_ == rhs.node_;
   }
 
   template< typename T >
-  bool ForwardRingList< T >::ForwardRingListIterator::operator!=(const this_t & rhs) const
+  bool ConstForwardListIterator< T >::operator!=(const this_t & rhs) const
   {
     return !(rhs == *this);
   }
 
   template< typename T >
-  ForwardRingList< T >::ForwardRingList(this_t & rhs)
+  typename ForwardListIterator< T >::this_t & ForwardListIterator< T >::operator++()
   {
-    if (rhs.empty())
-    {
-      return;
-    }
-    try
-    {
-      for (auto it = rhs.begin(); it != rhs.end(); ++it)
-      {
-        this->push_front(*it);
-      }
-      this->push_front(*rhs.end());
-    }
-    catch(const std::bad_alloc & e)
-    {
-      this->clear();
-    }
-    this->reverse();
+    assert(node_ != nullptr);
+    node_ = node_->next_;
+    return *this;
   }
 
   template< typename T >
-  ForwardRingList< T >::ForwardRingList(this_t && rhs)
+  typename ForwardListIterator< T >::this_t ForwardListIterator< T >::operator++(int)
+  {
+    assert(node_ != nullptr);
+    this_t result(*this);
+    ++(*this);
+    return result;
+  }
+
+  template< typename T >
+  T & ForwardListIterator< T >::operator*()
+  {
+    assert(node_ != nullptr);
+    return node_->data_;
+  }
+
+  template< typename T >
+  T * ForwardListIterator< T >::operator->()
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->data_);
+  }
+
+  template< typename T >
+  bool ForwardListIterator< T >::operator==(const this_t & rhs) const
+  {
+    return node_ == rhs.node_;
+  }
+
+  template< typename T >
+  bool ForwardListIterator< T >::operator!=(const this_t & rhs) const
+  {
+    return !(rhs == *this);
+  }
+
+  template< typename T >
+  ForwardRingList< T >::ForwardRingList(const this_t & rhs):
+    head_(nullptr),
+    tail_(nullptr)
   {
     if (rhs.empty())
     {
       return;
     }
-    try
+    auto it = rhs.cbegin();
+    head_ = new node_t;
+    head_->data_ = *it;
+    auto subhead = head_;
+    while (it++ != rhs.cend())
     {
-      for (auto it = rhs.begin(); it != rhs.end(); ++it)
-      {
-        this->push_front(*it);
-      }
-      this->push_front(*rhs.end());
+      subhead->next_ = new node_t;
+      subhead->next_->data_ = *it;
+      subhead = subhead->next_;
     }
-    catch(const std::bad_alloc & e)
+    subhead->next_ = head_;
+    tail_ = subhead;
+  }
+
+  template< typename T >
+  ForwardRingList< T >::ForwardRingList(this_t && rhs):
+    head_(nullptr),
+    tail_(nullptr)
+  {
+    if (rhs.empty())
     {
-      this->clear();
+      return;
     }
-    this->reverse();
+    auto it = rhs.cbegin();
+    head_ = new node_t;
+    head_->data_ = *it;
+    auto subhead = head_;
+    while (it++ != rhs.cend())
+    {
+      subhead->next_ = new node_t;
+      subhead->next_->data_ = *it;
+      subhead = subhead->next_;
+    }
+    subhead->next_ = head_;
+    tail_ = subhead;
   }
 
   template< typename T >
@@ -155,13 +230,237 @@ namespace petrov
   }
 
   template< typename T >
-  typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(this_t & rhs)
+  typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(const this_t & rhs)
   {
     this_t cpy(rhs);
-    this->clear();
-    std::swap(this->first_, cpy.first_);
-    std::swap(this->last_, cpy.last_);
+    this->swap(cpy);
     return *this;
+  }
+
+  template< typename T >
+  typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(this_t && rhs)
+  {
+    this->swap(rhs);
+    return *this;
+  }
+
+  template< typename T >
+  bool ForwardRingList< T >::operator==(const this_t & rhs) const
+  {
+    if (this->empty() && rhs.empty())
+    {
+      return true;
+    }
+    else
+    {
+      if (this->size() == rhs.size() && this->size() != 0)
+      {
+        auto it = this->cbegin();
+        auto rhs_it = rhs.cbegin();
+        do
+        {
+          if (*it != *rhs_it)
+          {
+            return false;
+          }
+          ++rhs_it;
+        }
+        while (it++ != this->cend());
+        return true;
+      }
+      else if (this->size() == rhs.size() && this->size() == 0)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+
+  template< typename T >
+  typename ForwardRingList< T >::const_it_t ForwardRingList< T >::cbegin() const
+  {
+    return const_it_t(head_);
+  }
+
+  template< typename T >
+  typename ForwardRingList< T >::const_it_t ForwardRingList< T >::cend() const
+  {
+    return const_it_t(tail_);
+  }
+
+  template< typename T >
+  typename ForwardRingList< T >::it_t ForwardRingList< T >::begin()
+  {
+    return it_t(head_);
+  }
+
+  template< typename T >
+  typename ForwardRingList< T >::it_t ForwardRingList< T >::end()
+  {
+    return it_t(tail_);
+  }
+
+  template< typename T >
+  T ForwardRingList< T >::front() const
+  {
+    return head_->data_;
+  }
+
+  template< typename T >
+  T ForwardRingList< T >::back() const
+  {
+    return tail_->data_;
+  }
+
+  template< typename T >
+  bool ForwardRingList< T >::empty() const noexcept
+  {
+    return !this->head_;
+  }
+
+  template< typename T >
+  size_t ForwardRingList< T >::size() const noexcept
+  {
+    if (this->empty())
+    {
+      return 0;
+    }
+    size_t count = 0;
+    auto it = this->cbegin();
+    do
+    {
+      ++count;
+    }
+    while (it++ != this->cend());
+    return count;
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::push_front(const T & val)
+  {
+    if (this->empty())
+    {
+      head_ = new node_t;
+      head_->data_ = val;
+      tail_ = head_;
+      head_->next_ = head_;
+      tail_->next_ = head_;
+    }
+    else
+    {
+      auto temp = tail_->next_;
+      tail_->next_ = new node_t;
+      tail_->next_->data_ = val;
+      head_ = tail_->next_;
+      head_->next_ = temp;
+    }
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::push_front(T && val)
+  {
+    if (this->empty())
+    {
+      head_ = new node_t;
+      head_->data_ = std::move(val);
+      tail_ = head_;
+      head_->next_ = head_;
+      tail_->next_ = head_;
+    }
+    else
+    {
+      auto temp = tail_->next_;
+      tail_->next_ = new node_t;
+      tail_->next_->data_ = std::move(val);
+      head_ = tail_->next_;
+      head_->next_ = temp;
+    }
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::pop_front()
+  {
+    if (this->empty())
+    {
+      return;
+    }
+    size_t size = this->size();
+    auto todelete = head_;
+    head_ = head_->next_;
+    delete todelete;
+    size--;
+    if (!size)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
+    else
+    {
+      tail_->next_ = head_;
+    }
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::remove(const T & val)
+  {
+    if (this->empty())
+    {
+      return;
+    }
+    if (this->size() == 1)
+    {
+      if (head_->data_ == val)
+      {
+        this->pop_front();
+      }
+      return;
+    }
+    size_t size = this->size();
+    size_t count = 0;
+    auto it = this->cbegin();
+    do
+    {
+      if (*it == val)
+      {
+        count++;
+      }
+    }
+    while (it++ != this->cend());
+    if (count == size)
+    {
+      this->clear();
+      return;
+    }
+    auto subhead = head_;
+    auto prev_subhead = tail_;
+    do
+    {
+      if (subhead->data_ == val)
+      {
+        auto todelete = subhead;
+        subhead = todelete->next_;
+        prev_subhead->next_ = subhead;
+        if (todelete == head_)
+        {
+          head_ = subhead;
+        }
+        else if (todelete == tail_)
+        {
+          tail_ = prev_subhead;
+        }
+        delete todelete;
+        todelete = nullptr;
+      }
+      else
+      {
+        prev_subhead = subhead;
+        subhead = subhead->next_;
+      }
+    }
+    while (subhead != head_);
   }
 
   template< typename T >
@@ -171,101 +470,16 @@ namespace petrov
     {
       return;
     }
-    for (auto it = this->begin(); it != this->end(); ++it)
+    auto it = this->begin();
+    while (it != this->end())
     {
+      auto temp = it.node_->next_;
       delete it.node_;
+      it.node_ = temp;
     }
-    delete this->end().node_;
-    first_.node_ = nullptr;
-    last_.node_ = nullptr;
-  }
-
-  template< typename T >
-  typename ForwardRingList< T >::iterator_this_t ForwardRingList< T >::begin()
-  {
-    return first_;
-  }
-
-  template< typename T >
-  typename ForwardRingList< T >::iterator_this_t ForwardRingList< T >::end()
-  {
-    return last_;
-  }
-
-  template< typename T >
-  T ForwardRingList< T >::front()
-  {
-    return *(first_);
-  }
-
-  template< typename T >
-  T ForwardRingList< T >::back()
-  {
-    return *(last_);
-  }
-
-  template< typename T >
-  bool ForwardRingList< T >::empty() noexcept
-  {
-    return (!this->begin().node_);
-  }
-
-  template< typename T >
-  size_t ForwardRingList< T >::size() noexcept
-  {
-    size_t count = 0;
-    for (auto it = this->begin(); it != this->end(); ++it)
-    {
-      count++;
-    }
-    return ++count;
-  }
-
-  template< typename T >
-  void ForwardRingList< T >::push_front(const T & element)
-  {
-    if (this->empty())
-    {
-      first_.node_ = new this_t;
-      first_.node_->data_ = element;
-      last_ = first_;
-    }
-    else
-    {
-      auto temp = first_.node_;
-      last_.node_->next_ = new this_t;
-      last_.node_->next_->data_ = element;
-      first_.node_ = last_.node_->next_;
-      first_.node_->next_ = temp;
-    }
-  }
-
-  template< typename T >
-  void ForwardRingList< T >::push_front(T && element)
-  {
-    if (this->empty())
-    {
-      first_.node_ = new this_t;
-      first_.node_->data_ = element;
-      first_.node_->next_ = first_.node_;
-      last_ = first_;
-    }
-    else
-    {
-      auto temp = first_.node_;
-      last_.node_->next_ = new this_t;
-      last_.node_->next_->data_ = element;
-      first_.node_ = last_.node_->next_;
-      first_.node_->next_ = temp;
-    }
-  }
-
-  template< typename T >
-  void ForwardRingList< T >::pop_front()
-  {
-    auto todelete = first_;
-    first_ = first_.node_->next_;
-    delete todelete;
+    delete it.node_;
+    head_ = nullptr;
+    tail_ = nullptr;
   }
 
   template< typename T >
@@ -286,9 +500,16 @@ namespace petrov
     }
     it.node_->next_ = prev.node_;
     prev = it;
-    auto temp = this->begin();
-    first_ = this->end();
-    last_ = temp;
+    auto temp = this->begin().node_;
+    head_ = this->end().node_;
+    tail_ = temp;
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::swap(this_t & rhs) noexcept
+  {
+    std::swap(head_, rhs.head_);
+    std::swap(tail_, rhs.tail_);
   }
 }
 
