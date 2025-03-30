@@ -30,7 +30,7 @@ namespace rychkov
   template< class Key, class Value, bool isConst, bool isReversed >
   class MapIterator;
 
-  template< class Key, class Value, class Compare >
+  template< class Key, class Value, class Compare = std::less<> >
   class Map
   {
   public:
