@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(push)
   sveshnikov::Queue< std::string > queue;
   queue.push("pobeda");
   BOOST_TEST(queue.front() == "pobeda");
-  for (size_t i = 0; i <  100; i++)
+  for (size_t i = 0; i < 100; i++)
   {
     queue.push(" URA!!!");
   }
@@ -70,21 +70,21 @@ BOOST_AUTO_TEST_CASE(front)
 {
   sveshnikov::Queue< int > queue;
   int x = 0;
-  for (size_t i = 0; i <  100; i++)
+  for (size_t i = 0; i < 100; i++)
   {
     queue.push(x + i);
   }
-  for (size_t i = 0; i <  99; i++)
+  for (size_t i = 0; i < 99; i++)
   {
     queue.pop();
   }
   BOOST_TEST(queue.front() == 99);
   x = 100;
-  for (size_t i = 0; i <  110; i++)
+  for (size_t i = 0; i < 110; i++)
   {
     queue.push(x + i);
   }
-  for (size_t i = 0; i <  109; i++)
+  for (size_t i = 0; i < 109; i++)
   {
     queue.pop();
   }
