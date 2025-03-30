@@ -8,38 +8,38 @@ namespace alymova
   template< typename T >
   struct Stack
   {
-    bool empty() const;
-    size_t size() const;
-    T& top();
-    const T& top() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    T& top() noexcept;
+    const T& top() const noexcept;
     void push(const T& value);
     void push(T&& value);
-    void pop();
+    void pop() noexcept;
 
   private:
     Array< T > data_;
   };
 
   template< typename T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return (data_.size() == 0);
   }
 
   template< typename T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return data_.size();
   }
 
   template< typename T >
-  T& Stack< T >::top()
+  T& Stack< T >::top() noexcept
   {
     return data_.back();
   }
 
   template< typename T >
-  const T& Stack< T >::top() const
+  const T& Stack< T >::top() const noexcept
   {
     return data_.back();
   }
@@ -57,7 +57,7 @@ namespace alymova
   }
 
   template< typename T >
-  void Stack< T >::pop()
+  void Stack< T >::pop() noexcept
   {
     data_.pop_back();
   }

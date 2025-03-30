@@ -8,52 +8,52 @@ namespace alymova
   template< typename T >
   struct Queue
   {
-    bool empty() const;
-    size_t size() const;
-    T& front();
-    const T& front() const;
-    T& back();
-    const T& back() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    T& front() noexcept;
+    const T& front() const noexcept;
+    T& back() noexcept;
+    const T& back() const noexcept;
     void push(const T& value);
     void push(T&& value);
-    void pop();
+    void pop() noexcept;
 
   private:
     Array< T > data_;
   };
 
   template< typename T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return data_.size() == 0;
   }
 
   template< typename T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return data_.size();
   }
 
   template< typename T >
-  T& Queue< T >::front()
+  T& Queue< T >::front() noexcept
   {
     return data_.front();
   }
 
   template< typename T >
-  const T& Queue< T >::front() const
+  const T& Queue< T >::front() const noexcept
   {
     return data_.front();
   }
 
   template< typename T >
-  T& Queue< T >::back()
+  T& Queue< T >::back() noexcept
   {
     return data_.back();
   }
 
   template< typename T >
-  const T& Queue< T >::back() const
+  const T& Queue< T >::back() const noexcept
   {
     return data_.back();
   }
@@ -71,7 +71,7 @@ namespace alymova
   }
 
   template< typename T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
     data_.pop_front();
   }
