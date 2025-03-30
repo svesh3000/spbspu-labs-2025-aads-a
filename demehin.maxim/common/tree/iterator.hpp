@@ -29,7 +29,7 @@ namespace demehin
     bool operator==(const this_t& rhs) const noexcept;
     bool operator!=(const this_t& rhs) const noexcept;
   private:
-    explicit TreeIterator(Node< T >*) noexcept;
+    explicit TreeIterator(Node*) noexcept;
     Node* getNode() const noexcept;
     Node* node_;
   };
@@ -40,7 +40,7 @@ namespace demehin
   {}
 
   template< typename Key, typename T, typename Cmp >
-  TreeIterator< Key, T, Cmp >::TreeIterator(Node< T >* node) noexcept:
+  TreeIterator< Key, T, Cmp >::TreeIterator(Node* node) noexcept:
     node_(node)
   {}
 
@@ -51,7 +51,7 @@ namespace demehin
     if (node_->right != nullptr)
     {
       node_ = node_->right;
-      while (node->left != nullptr)
+      while (node_->left != nullptr)
       {
         node_ = node_->left;
       }
