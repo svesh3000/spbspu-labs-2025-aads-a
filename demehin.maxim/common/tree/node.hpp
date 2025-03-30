@@ -22,7 +22,7 @@ namespace demehin
     parent(nullptr),
     left(nullptr),
     right(nullptr),
-    height(0)
+    height(1)
   {}
 
   template< typename Key, typename T >
