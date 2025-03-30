@@ -7,11 +7,7 @@ namespace alymova
 {
   struct Postfix
   {
-    //Postfix() = default;
-    //Postfix(const Postfix& other) = default;
-    //Postfix(Postfix&& other) = default;
     Postfix(const std::string& s);
-    //~Postfix() = default;
 
     long long int operator()();
     long long int operator+(const Postfix& other);
