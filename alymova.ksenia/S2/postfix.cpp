@@ -4,7 +4,8 @@
 #include "stack.hpp"
 #include "queue.hpp"
 
-alymova::Postfix::Postfix(const std::string& s)
+alymova::Postfix::Postfix(const std::string& s):
+  postfix_()
 {
   Stack< std::string > stack;
   std::string s_local = s;
@@ -144,43 +145,39 @@ long long int alymova::Postfix::operator()()
 long long int alymova::Postfix::operator+(const Postfix& other)
 {
   Postfix copy(*this);
-  copy.push(other);
-  copy.postfix_.push("+");
+  copy.push_operator(other, "+");
   return copy();
 }
 long long int alymova::Postfix::operator-(const Postfix& other)
 {
   Postfix copy(*this);
-  copy.push(other);
-  copy.postfix_.push("-");
+  copy.push_operator(other, "-");
   return copy();
 }
 long long int alymova::Postfix::operator*(const Postfix& other)
 {
   Postfix copy(*this);
-  copy.push(other);
-  copy.postfix_.push("*");
+  copy.push_operator(other, "*");
   return copy();
 }
 long long int alymova::Postfix::operator/(const Postfix& other)
 {
   Postfix copy(*this);
-  copy.push(other);
-  copy.postfix_.push("/");
+  copy.push_operator(other, "/");
   return copy();
 }
 long long int alymova::Postfix::operator%(const Postfix& other)
 {
   Postfix copy(*this);
-  copy.push(other);
-  copy.postfix_.push("%");
+  copy.push_operator(other, "%");
   return copy();
 }
-void alymova::Postfix::push(Postfix other)
+void alymova::Postfix::push_operator(Postfix other, std::string operation)
 {
   while (!other.postfix_.empty())
   {
     postfix_.push(other.postfix_.front());
     other.postfix_.pop();
   }
+  postfix_.push(operation);
 }

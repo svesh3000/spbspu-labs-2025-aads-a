@@ -18,7 +18,7 @@ namespace alymova
   private:
     Queue< std::string > postfix_;
 
-    void push(Postfix other);
+    void push_operator(Postfix other, std::string operation);
   };
 }
 #endif
