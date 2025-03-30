@@ -9,4 +9,5 @@ BOOST_AUTO_TEST_CASE(tree_construct_test)
   tree.insert(std::make_pair(3, "4"));
   tree.insert(std::make_pair(10, "11"));
   tree.insert(std::make_pair(2, "3"));
+  std::cout << tree.at(10) << "\n";
 }
