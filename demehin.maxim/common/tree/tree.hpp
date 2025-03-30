@@ -23,8 +23,9 @@ namespace demehin
     T& at(const Key&);
     const T& at(const Key&) const;
 
-    Iter find(const Key& key);
+    Iter find(const Key& key) const noexcept;
 
+    Iter begin() const noexcept;
     Iter end() const noexcept;
 
     size_t size() const noexcept;
@@ -82,6 +83,7 @@ namespace demehin
     bool isLeft = false;
     while (current != fakeRoot_ && current != nullptr)
     {
+      parent = current;
       if (cmp_(value.first, current->data.first))
       {
         current = current->left;
@@ -216,6 +218,43 @@ namespace demehin
       node = node->parent;
     }
   }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::begin() const noexcept
+  {
+    return Iter(root_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::end() const noexcept
+  {
+    return Iter(fakeRoot_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  T& Tree< Key, T, Cmp >::at(const Key& key)
+  {
+    auto searched = find(key);
+    if (searched != end())
+    {
+      return (*searched).second;
+    }
+    throw std::out_of_range("undefined key");
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::find(const Key& key) const noexcept
+  {
+    for (auto it = begin(); it != end(); it++)
+    {
+      if ((*it).first == key)
+      {
+        return it;
+      }
+    }
+    return end();
+  }
+
 }
 
 
