@@ -2,6 +2,7 @@
 #define STACK_HPP
 #include <cstddef>
 #include <algorithm>
+#include <cassert> 
 
 namespace sveshnikov
 {
