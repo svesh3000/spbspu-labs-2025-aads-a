@@ -2,14 +2,10 @@
 #include <fstream>
 #include <string>
 #include <cstddef>
-#include <queue>
-#include <stack>
 #include <stdexcept>
-#include <sstream>
 #include "queue.hpp"
 #include "stack.hpp"
-#include "array.hpp"
-#include "postfixProcess.hpp"
+#include "postfix.hpp"
 
 int main(int argc, char** argv)
 {
@@ -41,8 +37,8 @@ int main(int argc, char** argv)
       {
         continue;
       }
-      alymova::Queue< std::string > queue = alymova::convert_postfix(s);
-      res.push(alymova::count_postfix(queue));
+      alymova::Postfix postfix(s);
+      res.push(postfix());
     }
     if (!res.empty())
     {

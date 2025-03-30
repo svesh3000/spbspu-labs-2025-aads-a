@@ -1,14 +1,12 @@
 #include "postfixProcess.hpp"
 #include <cstddef>
 #include <string>
-#include <sstream>
 #include <limits>
 #include <stdexcept>
-#include <iostream>
 #include "queue.hpp"
 #include "stack.hpp"
 
-alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
+/*alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
 {
   Stack< std::string > stack;
   Queue< std::string > queue;
@@ -84,12 +82,12 @@ alymova::Queue< std::string > alymova::convert_postfix(const std::string& s)
 }
 long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
 {
-  Stack< long long int > stack; //exp
+  Stack< long long int > stack;
   while (!queue.empty())
   {
     if (my_isdigit(queue.front()))
     {
-      stack.push(std::stoll(queue.front())); //exp
+      stack.push(std::stoll(queue.front()));
     }
     else
     {
@@ -143,8 +141,12 @@ long long int alymova::count_postfix(alymova::Queue< std::string >& queue)
     }
     queue.pop();
   }
+  if (stack.size() > 1)
+  {
+    throw std::logic_error("Incorrect expression");
+  }
   return stack.top();
-}
+}*/
 bool alymova::my_isdigit(const std::string& s)
 {
   size_t i = 0;

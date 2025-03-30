@@ -11,12 +11,12 @@ namespace alymova
   struct Array
   {
     Array();
-    Array(const T& other);
-    Array(T&& other);
+    Array(const Array< T >& other);
+    Array(Array< T >&& other);
     ~Array();
 
-    Array& operator=(const T& other);
-    Array& operator=(T&& other);
+    Array& operator=(const Array< T >& other);
+    Array& operator=(Array< T >&& other);
 
     size_t size() const;
     T& front();
@@ -45,7 +45,7 @@ namespace alymova
   {}
 
   template< typename T >
-  Array< T >::Array(const T& other):
+  Array< T >::Array(const Array< T >& other):
     size_(other.size_),
     capacity_(other.capacity_),
     array_(new T[capacity_])
@@ -57,7 +57,7 @@ namespace alymova
         array_[i] = other.array_[i];
       }
     }
-    catch(const std::bad_alloc& e)
+    catch(const std::exception& e)
     {
       clear();
       throw;
@@ -65,7 +65,7 @@ namespace alymova
   }
 
   template< typename T >
-  Array< T >::Array(T&& other):
+  Array< T >::Array(Array< T >&& other):
     size_(std::exchange(other.size_, 0)),
     capacity_(std::exchange(other.capacity_, 10)),
     array_(std::exchange(other.array_, nullptr))
@@ -78,7 +78,7 @@ namespace alymova
   }
 
   template< typename T >
-  Array< T >& Array< T >::operator=(const T& other)
+  Array< T >& Array< T >::operator=(const Array< T >& other)
   {
     Array copy(other);
     std::swap(size_, copy.size_);
@@ -88,7 +88,7 @@ namespace alymova
   }
 
   template< typename T >
-  Array< T >& Array< T >::operator=(T&& other)
+  Array< T >& Array< T >::operator=(Array< T >&& other)
   {
     clear();
     size_ = std::exchange(other.size_, 0);
