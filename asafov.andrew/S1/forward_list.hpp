@@ -295,42 +295,93 @@ namespace asafov
     }
     void remove(const T& value) noexcept
     {
-      auto iter = head_;
-      if (iter->data_ == value)
+      if (!head_) return;
+      Node* current = head_;
+      Node* prev = tail_;
+      bool found = false;
+      do
       {
-        pop_front();
-      }
-      for (; iter != tail_; iter = iter->next_)
-      {
-        if (iter->next_->data_ == value)
+        if (current->data_ == value)
         {
-          auto temp = iter->next_;
-          iter->next_ = temp->next_;
-          delete temp;
+          found = true;
+          Node* toDelete = current;
+          if (current == head_)
+          {
+            head_ = head_->next_;
+            tail_->next_ = head_;
+          }
+          else if (current == tail_)
+          {
+            tail_ = prev;
+            tail_->next_ = head_;
+          }
+          else
+          {
+            prev->next_ = current->next_;
+          }
+          current = current->next_;
+          delete toDelete;
+          size_--;
         }
+        else
+        {
+          prev = current;
+          current = current->next_;
+        }
+      } while (current != head_ && found && size_ > 0);
+      if (size_ == 0)
+      {
+          head_ = tail_ = nullptr;
       }
     }
     void remove_if(bool(f)(const T&))
     {
-      auto iter = head_;
-      if (f(iter->data_))
-      {
-        pop_front();
-      }
-      for (; iter != tail_; iter = iter->next_)
-      {
-        if (f(iter->next_->data_))
+        if (!head_) return;
+        Node* current = head_;
+        Node* prev = tail_;
+        bool found = false;
+        do
         {
-          auto temp = iter->next_;
-          iter->next_ = temp->next_;
-          delete temp;
-        }
+          if (f(current->data_))
+          {
+            found = true;
+            Node* toDelete = current;
+            if (current == head_)
+            {
+              head_ = head_->next_;
+              tail_->next_ = head_;
+            }
+            else if (current == tail_)
+            {
+              tail_ = prev;
+              tail_->next_ = head_;
+            }
+            else
+            {
+              prev->next_ = current->next_;
+            }
+            current = current->next_;
+            delete toDelete;
+            size_--;
+            }
+            else
+            {
+              prev = current;
+              current = current->next_;
+            }
+        } while (current != head_ && found && size_ > 0);
+      if (size_ == 0)
+      {
+        head_ = tail_ = nullptr;
       }
     }
     void assign(size_t count, const T value)
     {
-      clear();
-      Forward_list(count, value);
+        clear();
+        for (size_t i = 0; i < count; ++i)
+        {
+          push_back(value);
+        }
     }
 
   private:
