@@ -3,8 +3,32 @@
 
 BOOST_AUTO_TEST_CASE(queue_construction)
 {
-  aleksandrov::Queue< int > queue;
-  BOOST_TEST(queue.empty());
+  aleksandrov::Queue< int > queue1;
+  queue1.push(12);
+  queue1.push(13);
+  BOOST_TEST(queue1.size() == 2);
+  aleksandrov::Queue< int > queue2(queue1);
+  BOOST_TEST(queue2.size() == 2);
+  BOOST_TEST(queue2.front() == 12);
+  aleksandrov::Queue< int > queue3(std::move(queue1));
+  BOOST_TEST(queue3.size() == 2);
+  BOOST_TEST(queue3.front() == 12);
+}
+
+BOOST_AUTO_TEST_CASE(queue_copy_move)
+{
+  aleksandrov::Queue< int > queue1;
+  queue1.push(1);
+  queue1.push(2);
+  aleksandrov::Queue< int > queue2;
+  queue2 = queue1;
+  BOOST_TEST(queue2.size() == 2);
+  BOOST_TEST(queue2.front() == 1);
+  queue2.push(3);
+  aleksandrov::Queue< int > queue3;
+  queue3 = std::move(queue2);
+  BOOST_TEST(queue3.size() == 3);
+  BOOST_TEST(queue3.front() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(queue_push)

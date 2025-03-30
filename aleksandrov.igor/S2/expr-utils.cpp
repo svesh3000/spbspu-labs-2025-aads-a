@@ -1,35 +1,20 @@
 #include "expr-utils.hpp"
-#include <limits>
 #include <stdexcept>
-#include "queue.hpp"
-#include "stack.hpp"
+#include <iostream>
+#include <sstream>
+#include "io-utils.hpp"
 
 namespace aleksandrov
 {
   namespace detail
   {
-    bool isOperation(const std::string& str)
+    bool isLessImportant(const InfixPart& a, const InfixPart& b)
     {
-      return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
-    }
-
-    bool isNumber(const std::string& str)
-    {
-      for (char c : str)
+      char op1 = a.getOperation();
+      char op2 = b.getOperation();
+      if (op1 == '+' || op1 == '-')
       {
-        if (!std::isdigit(c))
-        {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    bool isLessImportant(const std::string& op1, const std::string& op2)
-    {
-      if (op1 == "+" || op1 == "-")
-      {
-        return op2 == "*" || op2 == "/" || op2 == "%";
+        return op2 == '*' || op2 == '/' || op2 == '%';
       }
       return false;
     }
@@ -49,9 +34,6 @@ namespace aleksandrov
 
   long long int sum(long long int a, long long int b)
   {
-    const long long int max = std::numeric_limits< long long int >::max();
-    const long long int min = std::numeric_limits< long long int >::min();
-
     if ((!a && !b) || a == -b)
     {
       return 0ll;
@@ -60,14 +42,14 @@ namespace aleksandrov
     long long int result = 0ll;
     if (sameSign(a, b) && a > 0)
     {
-      if (max - a >= b)
+      if (LLIMax - a >= b)
       {
         result = a + b;
       }
     }
     else if (sameSign(a, b) && a < 0)
     {
-      if (min - a <= b)
+      if (LLIMin - a <= b)
       {
         result = a + b;
       }
@@ -86,9 +68,6 @@ namespace aleksandrov
 
   long long int mult(long long int a, long long int b)
   {
-    const long long int max = std::numeric_limits< long long int >::max();
-    const long long int min = std::numeric_limits< long long int >::min();
-
     if (!a || !b)
     {
       return 0ll;
@@ -98,14 +77,14 @@ namespace aleksandrov
     {
       if (a > 0ll)
       {
-        if (a > max / b)
+        if (a > LLIMax / b)
         {
           throw std::overflow_error("There was an overflow error!");
         }
       }
       else
       {
-        if (a < min / b)
+        if (a < LLIMin / b)
         {
           throw std::overflow_error("There was an overflow error!");
         }
@@ -115,14 +94,14 @@ namespace aleksandrov
     {
       if (a > 0ll)
       {
-        if (b < min / a)
+        if (b < LLIMin / a)
         {
           throw std::overflow_error("There was an overflow error!");
         }
       }
       else
       {
-        if (a < min / b)
+        if (a < LLIMin / b)
         {
           throw std::overflow_error("There was an overflow error!");
         }
@@ -137,16 +116,13 @@ namespace aleksandrov
     {
       throw std::invalid_argument("There was division by zero!");
     }
-
-    const long long int min = std::numeric_limits< long long int >::min();
-
     if (a < b && -a < b)
     {
       return 0ll;
     }
 
     long long int result = 0ll;
-    if (a != min || b != -1)
+    if (a != LLIMin || b != -1)
     {
       result = a / b;
     }
@@ -166,39 +142,39 @@ namespace aleksandrov
     return (a % b + std::abs(b)) % std::abs(b);
   }
 
-  Queue< std::string > infixToPostfix(Queue< std::string>& infix)
+  Queue< InfixPart > infixToPostfix(Queue< InfixPart >& infixExpr)
   {
-    Queue< std::string > postfix;
-    Stack< std::string > stack;
-    while (!infix.empty())
+    Queue< InfixPart > postfixExpr;
+    Stack< InfixPart > stack;
+    while (!infixExpr.empty())
     {
-      std::string token = infix.drop();
-      if (isNumber(token))
+      InfixPart token = infixExpr.drop();
+      if (token.isOperand())
       {
-        postfix.push(token);
+        postfixExpr.push(token);
       }
-      else if (token == "(")
+      else if (token.isOpeningBracket())
       {
         stack.push(token);
       }
-      else if (token == ")")
+      else if (token.isClosingBracket())
       {
-        while (!stack.empty() && stack.top() != "(")
+        while (!stack.empty() && !stack.top().isOpeningBracket())
         {
-          postfix.push(stack.drop());
+          postfixExpr.push(stack.drop());
         }
         if (stack.empty())
         {
-          throw std::logic_error("Mismatched parentheses!");
+          throw std::logic_error("Mismatched brackets!");
         }
         stack.drop();
       }
-      else if (isOperation(token))
+      else if (token.isOperation())
       {
-        while (!stack.empty() && isOperation(stack.top()) && !isLessImportant(stack.top(), \
+        while (!stack.empty() && stack.top().isOperation() && !isLessImportant(stack.top(), \
 token))
         {
-          postfix.push(stack.drop());
+          postfixExpr.push(stack.drop());
         }
         stack.push(token);
       }
@@ -209,34 +185,47 @@ token))
     }
     while (!stack.empty())
     {
-      if (stack.top() == "(" || stack.top() == ")")
+      if (stack.top().isOpeningBracket() || stack.top().isClosingBracket())
       {
-        throw std::logic_error("Mismatched parentheses!");
+        throw std::logic_error("Mismatched brackets!");
       }
-      postfix.push(stack.drop());
+      postfixExpr.push(stack.drop());
     }
-    return postfix;
+    return postfixExpr;
   }
 
-  long long int evalPostfix(Queue< std::string >& postfix)
+  Queue< Queue< InfixPart > > infixesToPostfixes(Queue< Queue< InfixPart > >& infixExprs)
+  {
+    Queue< Queue< InfixPart > > postfixExprs;
+    while (!infixExprs.empty())
+    {
+      Queue< InfixPart > infixExpr = infixExprs.front();
+      Queue< InfixPart > postfixExpr = infixToPostfix(infixExpr);
+      infixExprs.drop();
+      postfixExprs.push(postfixExpr);
+    }
+    return postfixExprs;
+  }
+
+  long long int evalPostfixExpr(Queue< InfixPart >& postfixExpr)
   {
     Stack< long long int > stack;
-    if (postfix.size() == 1)
+    if (postfixExpr.size() == 1)
     {
-      std::string token = postfix.drop();
-      if (isNumber(token))
+      InfixPart token = postfixExpr.drop();
+      if (token.isOperand())
       {
-        return std::stoll(token);
+        return token.getOperand();
       }
     }
-    while (!postfix.empty())
+    while (!postfixExpr.empty())
     {
-      std::string token = postfix.drop();
-      if (isNumber(token))
+      InfixPart token = postfixExpr.drop();
+      if (token.isOperand())
       {
-        stack.push(std::stoll(token));
+        stack.push(token.getOperand());
       }
-      else if (isOperation(token))
+      else if (token.isOperation())
       {
         if (stack.size() < 2)
         {
@@ -245,23 +234,24 @@ token))
         long long int second = stack.drop();
         long long int first = stack.drop();
         long long int result = 0ll;
-        if (token == "+")
+        char op = token.getOperation();
+        if (op == '+')
         {
           result = sum(first, second);
         }
-        else if (token == "-")
+        else if (op == '-')
         {
           result = sum(first, -second);
         }
-        else if (token == "*")
+        else if (op == '*')
         {
           result = mult(first, second);
         }
-        else if (token == "/")
+        else if (op == '/')
         {
           result = div(first, second);
         }
-        else if (token == "%")
+        else if (op == '%')
         {
           result = mod(first, second);
         }
@@ -277,6 +267,46 @@ token))
       throw std::logic_error("Incorrect expression!");
     }
     return stack.top();
+  }
+
+  Stack< long long int > evalPostfixExprs(Queue< Queue< InfixPart > >& postfixExprs)
+  {
+    Stack < long long int > results;
+    while (!postfixExprs.empty())
+    {
+      Queue< InfixPart > postfixExpr = postfixExprs.drop();
+      long long int result = 0ll;
+      result = evalPostfixExpr(postfixExpr);
+      results.push(result);
+    }
+    return results;
+  }
+
+  Queue< InfixPart > getInfixExpr(std::istream& input)
+  {
+    Queue< InfixPart > infixExpr;
+    InfixPart token('+');
+    while (input >> token)
+    {
+      infixExpr.push(token);
+    }
+    return infixExpr;
+  }
+
+  Queue< Queue< InfixPart > > getInfixExprs(std::istream& input)
+  {
+    Queue< Queue< InfixPart > > infixExprs;
+    std::string line;
+    while (std::getline(input, line))
+    {
+      if (!line.empty())
+      {
+        std::istringstream iss(line);
+        Queue< InfixPart > infixExpr = getInfixExpr(iss);
+        infixExprs.push(infixExpr);
+      }
+    }
+    return infixExprs;
   }
 }
 

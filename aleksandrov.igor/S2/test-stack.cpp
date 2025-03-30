@@ -3,8 +3,32 @@
 
 BOOST_AUTO_TEST_CASE(stack_construction)
 {
-  aleksandrov::Stack< int > rifle;
-  BOOST_TEST(rifle.empty());
+  aleksandrov::Stack< int > rifle1;
+  rifle1.push(24);
+  rifle1.push(25);
+  BOOST_TEST(rifle1.size() == 2);
+  aleksandrov::Stack< int > rifle2(rifle1);
+  BOOST_TEST(rifle2.size() == 2);
+  BOOST_TEST(rifle2.top() == 25);
+  aleksandrov::Stack< int > rifle3(std::move(rifle1));
+  BOOST_TEST(rifle3.size() == 2);
+  BOOST_TEST(rifle3.top() == 25);
+}
+
+BOOST_AUTO_TEST_CASE(stack_copy_move)
+{
+  aleksandrov::Stack< int > rifle1;
+  rifle1.push(76);
+  rifle1.push(77);
+  aleksandrov::Stack< int > rifle2;
+  rifle2 = rifle1;
+  BOOST_TEST(rifle2.size() == 2);
+  BOOST_TEST(rifle2.top() == 77);
+  rifle1.push(78);
+  aleksandrov::Stack< int > rifle3;
+  rifle3 = std::move(rifle1);
+  BOOST_TEST(rifle3.size() == 3);
+  BOOST_TEST(rifle3.top() == 78);
 }
 
 BOOST_AUTO_TEST_CASE(stack_push)
