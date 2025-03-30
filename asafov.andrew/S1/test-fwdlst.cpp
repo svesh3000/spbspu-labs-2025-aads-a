@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(remove_test)
 
 BOOST_AUTO_TEST_CASE(remove_if_test)
 {
-  auto odd { [] (const size_t& a) { return true } };
+  auto odd { [] (const size_t& a) { return true; } };
   asafov::Forward_list<size_t> list;
   list.push_back(1);
   list.push_back(2);
