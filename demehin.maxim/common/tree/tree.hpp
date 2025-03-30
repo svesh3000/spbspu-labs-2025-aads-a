@@ -52,12 +52,11 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >::Tree():
     fakeRoot_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
-    root_(nullptr),
-    cmp_(Cmp()),
+    root_(fakeRoot_),
+    cmp_(),
     size_(0)
   {
     fakeRoot_->left = fakeRoot_->right = fakeRoot_;
-    root_ = fakeRoot_;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -152,9 +151,25 @@ namespace demehin
       lt->right->parent = node;
     }
 
-    lt->right = node;
     lt->parent = node->parent;
     node->parent = lt;
+    lt->right = node;
+    if (lt->parent != fakeRoot_)
+    {
+      if (lt->parent->left == node)
+      {
+        lt->parent->left = lt;
+      }
+      else
+      {
+        lt->parent->right = lt;
+      }
+    }
+    else
+    {
+      root_ = lt;
+      fakeRoot_->right = lt;
+    }
 
     updateHeight(node);
     updateHeight(lt);
@@ -172,9 +187,26 @@ namespace demehin
       rt->left->parent = node;
     }
 
-    rt->left = node;
     rt->parent = node->parent;
     node->parent = rt;
+    rt->left = node;
+
+    if (rt->parent != fakeRoot_)
+    {
+      if (rt->parent->left == node)
+      {
+        rt->parent->left = rt;
+      }
+      else
+      {
+        rt->parent->right = rt;
+      }
+    }
+    else
+    {
+      root_ = rt;
+      fakeRoot_->right = rt;
+    }
 
     updateHeight(node);
     updateHeight(rt);
@@ -214,8 +246,18 @@ namespace demehin
   {
     while (node != fakeRoot_)
     {
+      Node* parent = node->parent;
+      bool isLeft = (parent->left == node);
       node = balance(node);
-      node = node->parent;
+      if (isLeft)
+      {
+        parent->left = node;
+      }
+      else
+      {
+        parent->right = node;
+      }
+      node = parent;
     }
   }
 
@@ -235,21 +277,30 @@ namespace demehin
   T& Tree< Key, T, Cmp >::at(const Key& key)
   {
     auto searched = find(key);
-    if (searched != end())
+    if (searched == end())
     {
-      return (*searched).second;
+      throw std::out_of_range("key not found");
     }
-    throw std::out_of_range("undefined key");
+    return searched->second;
   }
 
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::find(const Key& key) const noexcept
   {
-    for (auto it = begin(); it != end(); it++)
+    Node* current = root_;
+    while (current != nullptr && current != fakeRoot_)
     {
-      if ((*it).first == key)
+      if (cmp_(key, current->data.first))
       {
-        return it;
+        current = current->left;
+      }
+      else if (cmp_(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        return Iter(current);
       }
     }
     return end();
