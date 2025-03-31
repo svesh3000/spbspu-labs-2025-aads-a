@@ -39,19 +39,13 @@ BOOST_AUTO_TEST_CASE(begin_test)
 BOOST_AUTO_TEST_CASE(cend_test)
 {
   asafov::Forward_list<size_t> list;
-  list.push_back(1);
-  auto it = list.cbegin();
-  ++it;
-  BOOST_TEST(list.cend() == it);
+  BOOST_TEST(list.cend() == list.cbegin());
 }
 
 BOOST_AUTO_TEST_CASE(end_test)
 {
   asafov::Forward_list<size_t> list;
-  list.push_back(1);
-  auto it = list.begin();
-  ++it;
-  BOOST_TEST(list.end() == it);
+  BOOST_TEST(list.end() == list.begin());
 }
 
 BOOST_AUTO_TEST_CASE(front_test)
