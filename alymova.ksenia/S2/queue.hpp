@@ -25,7 +25,7 @@ namespace alymova
   template< typename T >
   bool Queue< T >::empty() const noexcept
   {
-    return data_.size() == 0;
+    return data_.empty();
   }
 
   template< typename T >

@@ -18,6 +18,7 @@ namespace alymova
     Array& operator=(const Array< T >& other);
     Array& operator=(Array< T >&& other) noexcept;
 
+    bool empty() const noexcept;
     size_t size() const noexcept;
     T& front() noexcept;
     const T& front() const noexcept;
@@ -58,10 +59,15 @@ namespace alymova
   {
     try
     {
-      for (size_t i = 0; i < size(); i++)
+      T* ptr = other.begin_;
+      for (size_t i = 0; i < other.size_; i++)
       {
-        array_[i] = other.array_[i];
-        size_++;
+        array_[i] = *ptr;
+        ptr++;
+        if (ptr == other.array_ + other.capacity_)
+        {
+          ptr = other.array_;
+        }
         size_ptr_++;
       }
     }
@@ -112,6 +118,12 @@ namespace alymova
   }
 
   template< typename T >
+  bool Array< T >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename T >
   size_t Array< T >::size() const noexcept
   {
     return size_;
@@ -135,9 +147,9 @@ namespace alymova
   T& Array< T >::back() noexcept
   {
     assert(size_ != 0);
-    if (size_ptr_ == begin_ && size_ != 0)
+    if (size_ptr_ == array_ && size_ != 0)
     {
-      return array_[capacity_ - 1];
+      return *(array_ + capacity_ - 1);
     }
     return *(size_ptr_ - 1);
   }
@@ -146,9 +158,9 @@ namespace alymova
   const T& Array< T >::back() const noexcept
   {
     assert(size_ != 0);
-    if (size_ptr_ == begin_ && size_ != 0)
+    if (size_ptr_ == array_ && size_ != 0)
     {
-      return array_[capacity_ - 1];
+      return *(array_ + capacity_ - 1);
     }
     return *(size_ptr_ - 1);
   }
@@ -169,7 +181,14 @@ namespace alymova
   void Array< T >::pop_front() noexcept
   {
     assert(size_ != 0);
-    begin_++;
+    if (begin_ == array_ + capacity_ - 1)
+    {
+      begin_ = array_;
+    }
+    else
+    {
+      begin_++;
+    }
     size_--;
   }
 
@@ -177,6 +196,10 @@ namespace alymova
   void Array< T >::pop_back() noexcept
   {
     assert(size_ != 0);
+    if (size_ptr_ == array_ && size_ != 0)
+    {
+      size_ptr_ = array_ + capacity_;
+    }
     size_ptr_--;
     size_--;
   }
