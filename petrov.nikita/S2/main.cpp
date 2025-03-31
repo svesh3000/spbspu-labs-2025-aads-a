@@ -2,8 +2,7 @@
 #include <iostream>
 #include <string>
 #include <queue>
-#include <stack>
-#include "calculate_arithmetic_expression.hpp"
+#include "calculate_arithmetic_expressions.hpp"
 
 namespace
 {
@@ -29,38 +28,39 @@ namespace
 
 int main(int argc, const char * const * argv)
 {
-  std::queue< std::string > queue;
-  std::stack< std::string > stack;
   std::string text;
+  std::queue< std::string > queue;
   if (checkArguments(argc) == 1)
   {
     std::ifstream input(argv[2]);
-    while (!std::cin.eof())
+    while (input)
     {
       input >> text;
-      if (text == "\n")
+      if (input.eof())
       {
-        std::queue< std::string > new_queue = petrov::transformInfixToPostfix(queue);
-        std::cout << petrov::calculatePostfixExpression(new_queue);
-        std::cout << "\n";
-        continue;
+        break;
       }
-      queue.push(text);
+      else
+      {
+        queue.push(text);
+      }
     }
   }
   else if (checkArguments(argc) == 2)
   {
-    while (!std::cin.eof())
+    while (std::cin)
     {
       std::cin >> text;
-      if (text == "\n")
+      if (std::cin.eof())
       {
-        std::queue< std::string > new_queue = petrov::transformInfixToPostfix(queue);
-        std::cout << petrov::calculatePostfixExpression(new_queue);
-        std::cout << "\n";
-        continue;
+        break;
       }
-      queue.push(text);
+      else
+      {
+        queue.push(text);
+      }
     }
   }
+  int * results = petrov::calculateArithmeticExpressions(queue);
+  std::cout << results[0] << "\n";
 }
