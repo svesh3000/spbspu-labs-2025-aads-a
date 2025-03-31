@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(test_basic)
   array_t array2(array1);
   BOOST_TEST(array1.empty());
   BOOST_TEST(array2.empty());
-  
+
   for (int i = 0; i < 5; i++)
   {
     std::string s(1ull, '1' + i);
