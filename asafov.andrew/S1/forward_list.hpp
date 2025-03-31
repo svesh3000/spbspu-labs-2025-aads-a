@@ -336,43 +336,42 @@ namespace asafov
     }
     void remove_if(bool(f)(const T&))
     {
-        if (!head_) return;
-        Node* current = head_;
-        Node* prev = tail_;
-        bool found = false;
-        do
+      if (!head_) return;
+      Node* current = head_;
+      Node* prev = tail_;
+      do
+      {
+        if (f(current->data_))
         {
-          if (f(current->data_))
+          Node* toDelete = current;
+          if (current == head_)
           {
-            found = true;
-            Node* toDelete = current;
-            if (current == head_)
-            {
-              head_ = head_->next_;
-              tail_->next_ = head_;
-            }
-            else if (current == tail_)
-            {
-              tail_ = prev;
-              tail_->next_ = head_;
-            }
-            else
-            {
-              prev->next_ = current->next_;
-            }
+            head_ = head_->next_;
+            tail_->next_ = head_;
+          }
+          else if (current == tail_)
+          {
+            tail_ = prev;
+            tail_->next_ = head_;
+          }
+          else
+          {
+            prev->next_ = current->next_;
+          }
+          current = current->next_;
+          delete toDelete;
+          size_--;
+          }
+          else
+          {
+            prev = current;
             current = current->next_;
-            delete toDelete;
-            size_--;
-            }
-            else
-            {
-              prev = current;
-              current = current->next_;
-            }
-        } while (current != head_ && found && size_ > 0);
+          }
+      } while (current != head_ && size_ > 0);
       if (size_ == 0)
       {
-        head_ = tail_ = nullptr;
+        head_ = nullptr;
+        tail_ = nullptr;
       }
     }
     void assign(size_t count, const T value)
