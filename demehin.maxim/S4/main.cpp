@@ -4,12 +4,13 @@
 #include <limits>
 #include "tree_manips.hpp"
 #include <fstream>
+#include <tree/tree.hpp>
 #include <tree/node.hpp>
 
 namespace
 {
-  using TreeMap = std::map< size_t, std::string >;
-  using MapOfTrees = std::map< std::string, TreeMap >;
+  using TreeMap = demehin::Tree< size_t, std::string >;
+  using MapOfTrees = demehin::Tree< std::string, TreeMap >;
 
   /*void printTrees(std::ostream& out, const MapOfTrees& mapOfTrees)
   {
@@ -53,25 +54,41 @@ int main(int argc, char* argv[])
 
   std::ifstream file(argv[1]);
   MapOfTrees mapOfTrees;
-  inputTrees(file, mapOfTrees);
-  std::string command;
-  while (std::cin >> command)
+  try
   {
-    if (command == "print")
+    inputTrees(file, mapOfTrees);
+  }
+  catch (std::logic_error&)
+  {
+    std::cout << "input!\n";
+    return 1;
+  }
+  std::string command;
+  try
+  {
+    while (std::cin >> command)
     {
-      demehin::print(std::cout, std::cin, mapOfTrees);
+      if (command == "print")
+      {
+        demehin::print(std::cout, std::cin, mapOfTrees);
+      }
+      else if (command == "complement")
+      {
+        demehin::makeComplement(std::cin, mapOfTrees);
+      }
+      else if (command == "intersect")
+      {
+        demehin::makeIntersect(std::cin, mapOfTrees);
+      }
+      else if (command == "union")
+      {
+        demehin::makeUnion(std::cin, mapOfTrees);
+      }
     }
-    else if (command == "complement")
-    {
-      demehin::makeComplement(std::cin, mapOfTrees);
-    }
-    else if (command == "intersect")
-    {
-      demehin::makeIntersect(std::cin, mapOfTrees);
-    }
-    else if (command == "union")
-    {
-      demehin::makeUnion(std::cin, mapOfTrees);
-    }
+  }
+  catch (std::logic_error&)
+  {
+    std::cout << "command\n";
+    return 1;
   }
 }
