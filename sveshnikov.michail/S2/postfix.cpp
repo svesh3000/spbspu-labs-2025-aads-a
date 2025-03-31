@@ -76,7 +76,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
     else if (infix.front() == ")")
     {
       num_close_paren++;
-      if (num_close_paren > num_open_paren || stack.top() == "(")
+      if (num_close_paren > num_open_paren || num_operands != num_operators + 1)
       {
         throw std::logic_error("ERROR: Incorrect infix notation 2!");
       }
@@ -218,6 +218,10 @@ long long sveshnikov::Postfix::calculate() const
       {
         isDivisionByZero(op);
         res %= op;
+        if (res < 0)
+        {
+          res += std::abs(op);
+        }
       }
       if (curr == "*")
       {

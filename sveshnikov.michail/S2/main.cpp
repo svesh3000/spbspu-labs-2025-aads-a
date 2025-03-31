@@ -29,12 +29,15 @@ int main(int argc, char **argv)
     std::cerr << e.what() << '\n';
     return 1;
   }
-  std::cout << results.top();
-  results.pop();
-  while (!results.empty())
+  if (!results.empty())
   {
-    std::cout << results.top() << " ";
+    std::cout << results.top();
     results.pop();
+    while (!results.empty())
+    {
+      std::cout << " " << results.top();
+      results.pop();
+    }
   }
   std::cout << '\n';
   return 0;

@@ -55,6 +55,9 @@ BOOST_AUTO_TEST_CASE(constructors)
   expr = "( )";
   BOOST_TEST(hasException(expr));
 
+  expr = "( 234 + ) 5";
+  BOOST_TEST(hasException(expr));
+
   expr = "( 1 + 2";
   BOOST_TEST(hasException(expr));
 
