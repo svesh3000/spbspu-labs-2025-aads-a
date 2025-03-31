@@ -12,12 +12,14 @@ namespace demehin
   public:
     using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
+
     Tree();
-
-
+    Tree(const Tree< Key, T, Cmp >&);
+    //Tree(Tree< Key, T, Cmp >&&);
 
     ~Tree();
 
+    Tree< Key, T, Cmp >& operator=(const Tree< Key, T, Cmp >&);
     std::pair< Iter, bool > insert(const DataPair&);
 
     T& at(const Key&);
@@ -32,6 +34,8 @@ namespace demehin
     bool empty() const noexcept;
     void clear() noexcept;
 
+    void swap(Tree< Key, T, Cmp >&) noexcept;
+    int Height();
   private:
     using Node = demehin::TreeNode< Key, T >;
 
@@ -57,6 +61,40 @@ namespace demehin
     size_(0)
   {
     fakeRoot_->left = fakeRoot_->right = fakeRoot_;
+    fakeRoot_->height = -1;
+    fakeRoot_->parent = nullptr;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  int Tree< Key, T, Cmp >::Height()
+  {
+    return fakeRoot_->height;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp >::Tree(const Tree< Key, T, Cmp >& other):
+    fakeRoot_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
+    root_(fakeRoot_),
+    cmp_(other.cmp_),
+    size_(0)
+  {
+    fakeRoot_->left = fakeRoot_->right = fakeRoot_;
+    fakeRoot_->height = -1;
+    for (auto it = other.begin(); it != other.end(); it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp >& Tree< Key, T, Cmp >::operator=(const Tree< Key, T, Cmp >& rhs)
+  {
+    if (this != &rhs)
+    {
+      Tree< Key, T, Cmp > temp(rhs);
+      swap(temp);
+    }
+    return *this;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -73,13 +111,14 @@ namespace demehin
     {
       root_ = newNode;
       root_->parent = fakeRoot_;
-      fakeRoot_->right = root_;
+      fakeRoot_->left = fakeRoot_->right = root_;
       size_++;
       return { Iter(root_), true };
     }
     Node* current = root_;
     Node* parent = fakeRoot_;
     bool isLeft = false;
+    bool isRightMost = true;
     while (current != fakeRoot_ && current != nullptr)
     {
       parent = current;
@@ -87,6 +126,7 @@ namespace demehin
       {
         current = current->left;
         isLeft = true;
+        isRightMost = false;
       }
       else if (cmp_(current->data.first, value.first))
       {
@@ -111,6 +151,11 @@ namespace demehin
       parent->right = newNode;
     }
 
+    if (isRightMost)
+    {
+      fakeRoot_->right = newNode;
+    }
+    newNode->left = newNode->right = nullptr;
     balanceUpper(newNode);
     size_++;
     return { Iter(newNode), true };
@@ -264,7 +309,16 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::begin() const noexcept
   {
-    return Iter(root_);
+    if (empty())
+    {
+      return end();
+    }
+    Node* current = root_;
+    while (current->left != nullptr)
+    {
+      current = current->left;
+    }
+    return Iter(current);
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -275,6 +329,17 @@ namespace demehin
 
   template< typename Key, typename T, typename Cmp >
   T& Tree< Key, T, Cmp >::at(const Key& key)
+  {
+    auto searched = find(key);
+    if (searched == end())
+    {
+      throw std::out_of_range("key not found");
+    }
+    return searched->second;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  const T& Tree< Key, T, Cmp >::at(const Key& key) const
   {
     auto searched = find(key);
     if (searched == end())
@@ -306,7 +371,26 @@ namespace demehin
     return end();
   }
 
-}
+  template< typename Key, typename T, typename Cmp >
+  size_t Tree< Key, T, Cmp >::size() const noexcept
+  {
+    return size_;
+  }
 
+  template< typename Key, typename T, typename Cmp >
+  bool Tree< Key, T, Cmp >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  void Tree< Key, T, Cmp >::swap(Tree< Key, T, Cmp >& rhs) noexcept
+  {
+    std::swap(fakeRoot_, rhs.fakeRoot_);
+    std::swap(root_, rhs.root_);
+    std::swap(cmp_, rhs.cmp_);
+    std::swap(size_, rhs.size_);
+  }
+}
 
 #endif

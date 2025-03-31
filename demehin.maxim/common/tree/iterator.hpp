@@ -23,46 +23,57 @@ namespace demehin
     this_t& operator--() noexcept;
     this_t operator--(int) noexcept;
 
-    DataPair& operator*() const noexcept;
+    DataPair& operator*() const;
     DataPair* operator->() const noexcept;
 
     bool operator==(const this_t& rhs) const noexcept;
     bool operator!=(const this_t& rhs) const noexcept;
   private:
+    //TreeIterator(Node* node, Node* end = nullptr) noexcept;
     explicit TreeIterator(Node*) noexcept;
     Node* getNode() const noexcept;
     Node* node_;
+    //Node* end_;
   };
 
   template< typename Key, typename T, typename Cmp >
   TreeIterator< Key, T, Cmp >::TreeIterator() noexcept:
     node_(nullptr)
+    //end_(nullptr)
   {}
 
   template< typename Key, typename T, typename Cmp >
   TreeIterator< Key, T, Cmp >::TreeIterator(Node* node) noexcept:
     node_(node)
+    //end_(end)
   {}
 
   template< typename Key, typename T, typename Cmp >
   typename TreeIterator< Key, T, Cmp >::this_t& TreeIterator< Key, T, Cmp >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    if (node_->right != nullptr)
+    //if (node_ == nullptr || node_->height == -1)
+    //{
+      //node_ = end_;
+      //return *this;
+    //}
+    if (node_->right != nullptr && node_->right->height != -1)
     {
       node_ = node_->right;
-      while (node_->left != nullptr)
+      while (node_->left != nullptr && node_->left->height != -1)
       {
         node_ = node_->left;
       }
     }
     else
     {
-      while ((node_->parent != nullptr) && (node_->parent->right == node_))
+      Node* parent = node_->parent;
+      while (parent != nullptr && parent->height != -1 && node_ == parent->right)
       {
-        node_ = node_->parent;
+        node_ = parent;
+        parent = parent->parent;
       }
-      node_ = node_->parent;
+      node_= parent;
     }
     return *this;
   }
@@ -109,9 +120,13 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::DataPair& TreeIterator< Key, T, Cmp >::operator*() const noexcept
+  typename TreeIterator< Key, T, Cmp >::DataPair& TreeIterator< Key, T, Cmp >::operator*() const
   {
-    assert(node_ != nullptr);
+    if (node_ == nullptr)
+    {
+      throw std::logic_error("1235");
+    }
+    //assert(node_ != nullptr);
     return node_->data;
   }
 
