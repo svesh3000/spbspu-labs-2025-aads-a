@@ -1,6 +1,5 @@
 #include "io-sequences.hpp"
 #include <iostream>
-#include <iterator>
 #include <limits>
 
 namespace
@@ -51,7 +50,7 @@ namespace
           continue;
         }
         iter_list_ull_t it_data = getElement(it, size_list);
-        if (sum > std::numeric_limits<unsigned long long>::max() - *it_data)
+        if (sum > std::numeric_limits< unsigned long long >::max() - *it_data)
         {
           throw std::overflow_error("ERROR: Overflow when calculating the amount!");
         }
