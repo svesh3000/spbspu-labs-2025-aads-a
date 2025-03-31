@@ -68,7 +68,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
     {
       if (!stack.empty() && !isOperator(stack.top()) && stack.top() != "(")
       {
-        throw std::logic_error("ERROR: Incorrect infix notation 1!");
+        throw std::logic_error("ERROR: Incorrect infix notation!");
       }
       stack.push("(");
       num_open_paren++;
@@ -78,7 +78,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       num_close_paren++;
       if (num_close_paren > num_open_paren || num_operands != num_operators + 1)
       {
-        throw std::logic_error("ERROR: Incorrect infix notation 2!");
+        throw std::logic_error("ERROR: Incorrect infix notation!");
       }
       push_out_stack(stack, getPriority(infix.front()));
       stack.pop();
@@ -88,7 +88,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       num_operators++;
       if (num_operators > num_operands)
       {
-        throw std::logic_error("ERROR: Incorrect infix notation 3!");
+        throw std::logic_error("ERROR: Incorrect infix notation!");
       }
       push_out_stack(stack, getPriority(infix.front()));
       stack.push(infix.front());
@@ -98,7 +98,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       num_operands++;
       if (num_operands > num_operators + 1)
       {
-        throw std::logic_error("ERROR: Incorrect infix notation 4!");
+        throw std::logic_error("ERROR: Incorrect infix notation!");
       }
       stoll(infix.front());
       expr_.push(infix.front());
@@ -108,7 +108,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
   push_out_stack(stack, 0);
   if (num_close_paren != num_open_paren || num_operands != num_operators + 1)
   {
-    throw std::logic_error("ERROR: Incorrect infix notation 5!");
+    throw std::logic_error("ERROR: Incorrect infix notation!");
   }
 }
 
