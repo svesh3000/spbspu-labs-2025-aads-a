@@ -16,7 +16,7 @@ namespace
       sveshnikov::Postfix postf2(infix2);
       postf2.calculate();
     }
-    catch(const std::exception& e)
+    catch (const std::exception &e)
     {
       hasExcept = true;
     }
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(calculate)
 {
-  std:: string expr = "9223372036854775805 + 10";
+  std::string expr = "9223372036854775805 + 10";
   BOOST_TEST(hasException(expr));
 
   expr = "-9223372036854775807 + -10";

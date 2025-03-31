@@ -2,7 +2,7 @@
 #define QUEUE_HPP
 #include <cstddef>
 #include <algorithm>
-#include <cassert> 
+#include <cassert>
 
 namespace sveshnikov
 {
