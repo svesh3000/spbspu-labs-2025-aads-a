@@ -367,7 +367,7 @@ namespace asafov
             prev = current;
             current = current->next_;
           }
-      } while (current != head_ && size_ > 0);
+      } while (size_ > 0);
       if (size_ == 0)
       {
         head_ = nullptr;
