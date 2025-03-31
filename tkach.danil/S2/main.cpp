@@ -63,7 +63,7 @@ namespace
   {
     in >> std::noskipws;
     std::string infix = "";
-    getline(in, infix);
+    std::getline(in, infix);
     if (infix.empty())
     {
       return;
