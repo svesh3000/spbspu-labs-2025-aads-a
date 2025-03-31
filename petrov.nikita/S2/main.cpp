@@ -20,7 +20,6 @@ namespace
     }
     else 
     {
-      std::cerr << "Too many arguments\n";
       return 0;
     }
   }
@@ -30,9 +29,15 @@ int main(int argc, const char * const * argv)
 {
   std::string text;
   std::queue< std::string > queue;
-  if (checkArguments(argc) == 1)
+  if (!checkArguments(argc))
   {
-    std::ifstream input(argv[2]);
+    std::cerr << "ERROR: Too many arguments";
+    std::cerr << "\n";
+    return 1;
+  }
+  else if (checkArguments(argc) == 1)
+  {
+    std::ifstream input(argv[1]);
     while (input)
     {
       input >> text;
