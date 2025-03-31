@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(cend_test)
   list.push_back(3);
   list.push_back(4);
   size_t size = 0;
-  for (auto it = list.cbegin; it != list.cend(); ++it, ++size);
+  for (auto it = list.cbegin(); it != list.cend(); ++it, ++size);
   BOOST_TEST(size == 4);
 }
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(end_test)
   list.push_back(3);
   list.push_back(4);
   size_t size = 0;
-  for (auto it = list.begin; it != list.end(); ++it, ++size);
+  for (auto it = list.begin(); it != list.end(); ++it, ++size);
   BOOST_TEST(size == 4);
 }
 
