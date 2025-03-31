@@ -60,12 +60,12 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
         }
         else
         {
-          while (!stack.empty() || stack.top() != "(")
+          while (!stack.empty() && stack.top() != "(")
           {
             new_queue.push(stack.top());
             stack.pop();
-            stack.push(token);
           }
+          stack.push(token);
         }
       }
       else
@@ -83,12 +83,12 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
         }
         else
         {
-          while (!stack.empty() || stack.top() != "(")
+          while (!stack.empty() && stack.top() != "(")
           {
             new_queue.push(stack.top());
             stack.pop();
-            stack.push(token);
           }
+          stack.push(token);
         }
       }
       else
