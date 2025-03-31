@@ -58,13 +58,17 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
   Stack< std::string > stack;
   size_t num_open_paren = 0, num_close_paren = 0;
   size_t num_operators = 0, num_operands = 0;
+  if (infix.empty())
+  {
+    return;
+  }
   while (!infix.empty())
   {
     if (infix.front() == "(")
     {
       if (!stack.empty() && !isOperator(stack.top()) && stack.top() != "(")
       {
-        throw std::logic_error("ERROR: Incorrect infix notation!");
+        throw std::logic_error("ERROR: Incorrect infix notation 1!");
       }
       stack.push("(");
       num_open_paren++;
@@ -74,21 +78,19 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       num_close_paren++;
       if (num_close_paren > num_open_paren || stack.top() == "(")
       {
-        throw std::logic_error("ERROR: Incorrect infix notation!");
+        throw std::logic_error("ERROR: Incorrect infix notation 2!");
       }
       push_out_stack(stack, getPriority(infix.front()));
       stack.pop();
     }
     else if (isOperator(infix.front()))
     {
+      num_operators++;
       if (num_operators > num_operands)
       {
-        throw std::logic_error("ERROR: Incorrect infix notation!");
+        throw std::logic_error("ERROR: Incorrect infix notation 3!");
       }
-      if (infix.front() == "+" || infix.front() == "-")
-      {
-        push_out_stack(stack, getPriority(infix.front()));
-      }
+      push_out_stack(stack, getPriority(infix.front()));
       stack.push(infix.front());
     }
     else
@@ -96,18 +98,18 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       num_operands++;
       if (num_operands > num_operators + 1)
       {
-        throw std::logic_error("ERROR: Incorrect infix notation!");
+        throw std::logic_error("ERROR: Incorrect infix notation 4!");
       }
       stoll(infix.front());
       expr_.push(infix.front());
     }
     infix.pop();
   }
+  push_out_stack(stack, 0);
   if (num_close_paren != num_open_paren || num_operands != num_operators + 1)
   {
-    throw std::logic_error("ERROR: Incorrect infix notation!");
+    throw std::logic_error("ERROR: Incorrect infix notation 5!");
   }
-  push_out_stack(stack, 0);
 }
 
 void sveshnikov::Postfix::push_out_stack(Stack< std::string > &stack, size_t priority)
@@ -159,7 +161,7 @@ sveshnikov::Postfix sveshnikov::Postfix::operator*(const Postfix &other) const
 sveshnikov::Postfix sveshnikov::Postfix::arith_operator_impl(Postfix other, std::string op) const
 {
   Postfix new_postfix(*this);
-  for (size_t i = 0; i < other.expr_.getSize(); i++)
+  while (!other.expr_.empty())
   {
     new_postfix.expr_.push(other.expr_.front());
     other.expr_.pop();
@@ -172,6 +174,7 @@ long long sveshnikov::Postfix::calculate() const
 {
   Stack< long long > stack;
   Queue< std::string > queue(expr_);
+  long long res = 0;
   while (!queue.empty())
   {
     std::string curr = std::move(queue.front());
@@ -184,17 +187,25 @@ long long sveshnikov::Postfix::calculate() const
       stack.pop();
       if (curr == "+")
       {
-        if (res > max_ll - op)
+        if (op > 0 && res > max_ll - op)
         {
           throw std::overflow_error("ERROR: Overflow when calculating the amount!");
+        }
+        else if (op < 0 && res < min_ll + op)
+        {
+          throw std::underflow_error("ERROR: Underflow when calculating the amount!");
         }
         res += op;
       }
       if (curr == "-")
       {
-        if (res < min_ll + op)
+        if (op > 0 && res < min_ll + op)
         {
           throw std::underflow_error("ERROR: Underflow when calculating the difference!");
+        }
+        else if (op < 0 && res > max_ll + op)
+        {
+          throw std::overflow_error("ERROR: Overflow when calculating the difference!");
         }
         res -= op;
       }
@@ -233,6 +244,7 @@ long long sveshnikov::Postfix::calculate() const
     {
       stack.push(std::stoll(curr));
     }
+    res = stack.top();
   }
-  return stack.top();
+  return res;
 }
