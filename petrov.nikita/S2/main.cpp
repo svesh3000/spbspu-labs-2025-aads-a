@@ -46,6 +46,10 @@ int main(int argc, const char * const * argv)
       {
         break;
       }
+      else if (text.empty())
+      {
+        continue;
+      }
       else
       {
         petrov::parseTextAndPushItToQueue(text, queue);
@@ -60,6 +64,10 @@ int main(int argc, const char * const * argv)
       if (std::cin.eof())
       {
         break;
+      }
+      else if (text.empty())
+      {
+        continue;
       }
       else
       {
