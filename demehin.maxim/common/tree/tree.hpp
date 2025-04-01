@@ -22,8 +22,13 @@ namespace demehin
     Tree< Key, T, Cmp >& operator=(const Tree< Key, T, Cmp >&);
     std::pair< Iter, bool > insert(const DataPair&);
 
+    Iter erase(Iter) noexcept;
+    size_t erase(const Key&) noexcept;
+    Iter erase(Iter, Iter) noexcept;
+
     T& at(const Key&);
     const T& at(const Key&) const;
+    T& operator[](const Key&);
 
     Iter find(const Key& key) const noexcept;
 
@@ -35,7 +40,7 @@ namespace demehin
     void clear() noexcept;
 
     void swap(Tree< Key, T, Cmp >&) noexcept;
-    int Height();
+
   private:
     using Node = demehin::TreeNode< Key, T >;
 
@@ -63,12 +68,6 @@ namespace demehin
     fakeRoot_->left = fakeRoot_->right = fakeRoot_;
     fakeRoot_->height = -1;
     fakeRoot_->parent = nullptr;
-  }
-
-  template< typename Key, typename T, typename Cmp >
-  int Tree< Key, T, Cmp >::Height()
-  {
-    return fakeRoot_->height;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -100,7 +99,17 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >::~Tree()
   {
+    clear();
     delete[] reinterpret_cast< char* >(fakeRoot_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  void Tree< Key, T, Cmp >::clear() noexcept
+  {
+    erase(begin(), end());
+    fakeRoot_->left = fakeRoot_->right = fakeRoot_;
+    root_ = fakeRoot_;
+    size_ = 0;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -118,7 +127,6 @@ namespace demehin
     Node* current = root_;
     Node* parent = fakeRoot_;
     bool isLeft = false;
-    bool isRightMost = true;
     while (current != fakeRoot_ && current != nullptr)
     {
       parent = current;
@@ -126,7 +134,6 @@ namespace demehin
       {
         current = current->left;
         isLeft = true;
-        isRightMost = false;
       }
       else if (cmp_(current->data.first, value.first))
       {
@@ -151,10 +158,6 @@ namespace demehin
       parent->right = newNode;
     }
 
-    if (isRightMost)
-    {
-      fakeRoot_->right = newNode;
-    }
     newNode->left = newNode->right = nullptr;
     balanceUpper(newNode);
     size_++;
@@ -307,6 +310,90 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::erase(Iter pos) noexcept
+  {
+    if (pos == end())
+    {
+      return end();
+    }
+
+    Node* todelete = pos.getNode();
+    Node* parent = todelete->parent;
+    Iter result = Iter(parent);
+
+    if (todelete->left == nullptr && todelete->right == nullptr)
+    {
+      if (parent->left == todelete)
+      {
+        parent->left = nullptr;
+      }
+      else
+      {
+        parent->right = nullptr;
+      }
+      result = Iter(parent);
+    }
+    else if (todelete->left == nullptr || todelete->right == nullptr)
+    {
+      Node* child = (todelete->left != nullptr) ? todelete->left : todelete->right;
+      if (parent->left == todelete)
+      {
+        parent->left = child;
+      }
+      else
+      {
+        parent->right = child;
+      }
+      child->parent = parent;
+      result = Iter(child);
+    }
+    else
+    {
+      Node* next = todelete->right;
+      while (next->left != nullptr)
+      {
+        next = next->left;
+      }
+      todelete->data = next->data;
+      return erase(Iter(next));
+    }
+
+    if (todelete == root_)
+    {
+      root_ = (parent != fakeRoot_) ? parent : fakeRoot_;
+      result = begin();
+    }
+
+    delete todelete;
+    size_--;
+    balanceUpper(parent);
+    return result;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::erase(Iter first, Iter last) noexcept
+  {
+    for (auto it = first; it != last;)
+    {
+      it = erase(it);
+    }
+    return last;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  size_t Tree< Key, T, Cmp >::erase(const Key& key) noexcept
+  {
+    Iter it = find(key);
+    if (it == end())
+    {
+      return 0;
+    }
+
+    erase(it);
+    return 1;
+  }
+
+  template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::begin() const noexcept
   {
     if (empty())
@@ -345,6 +432,18 @@ namespace demehin
     if (searched == end())
     {
       throw std::out_of_range("key not found");
+    }
+    return searched->second;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  T& Tree< Key, T, Cmp >::operator[](const Key& key)
+  {
+    auto searched = find(key);
+    if (searched == end())
+    {
+      insert(std::make_pair(key, T()));
+      searched = find(key);
     }
     return searched->second;
   }
