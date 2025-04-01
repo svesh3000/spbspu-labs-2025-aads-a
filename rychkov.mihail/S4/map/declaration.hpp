@@ -8,23 +8,27 @@
 
 namespace rychkov
 {
+  template< class Member, class Base >
+  size_t offsetOf(Member Base::* member)
+  {
+    return reinterpret_cast< char* >(std::addressof(static_cast< Base* >(nullptr)->*member))
+        - static_cast< char* >(nullptr);
+  }
+  template< class Member, class Base >
+  Base* getFakePointer(Member& fakeMember, Member Base::* member)
+  {
+    static size_t offset = offsetOf(member);
+    return reinterpret_cast< Base* >(reinterpret_cast< char* >(std::addressof(fakeMember)) - offset);
+  }
+
   template< class Key, class Value >
-  struct MapRightNode;
-  template< class Key, class Value >
-  struct MapLeftNode
+  struct MapNode
   {
     std::pair< Key, Value > data;
-    MapLeftNode* left = nullptr;
-    MapLeftNode* right = nullptr;
-    MapLeftNode* parent = nullptr;
-    MapRightNode< Key, Value >* second_part = nullptr;
-  };
-  template< class Key, class Value >
-  struct MapRightNode
-  {
-    std::pair< Key, Value > data;
-    MapLeftNode< Key, Value >* right = nullptr;
-    MapLeftNode< Key, Value >* first_part = nullptr;
+    MapNode* left = nullptr;
+    MapNode* right = nullptr;
+    MapNode* parent = nullptr;
+    MapNode* second_part = nullptr;
   };
 
   template< class Key, class Value, bool isConst, bool isReversed >
@@ -61,11 +65,11 @@ namespace rychkov
     };
 
     Map() noexcept(std::is_nothrow_default_constructible< value_compare >::value);
-    Map(const Map&);
-    Map(Map&&) noexcept(std::is_nothrow_move_constructible< value_compare >::value);;
+    Map(const Map& rhs);
+    Map(Map&& rhs) noexcept(std::is_nothrow_move_constructible< value_compare >::value);
     ~Map();
-    Map& operator=(const Map&);
-    Map& operator=(Map&&) noexcept(noexcept(swap(std::declval< Map >())));
+    Map& operator=(const Map& rhs);
+    Map& operator=(Map&& rhs) noexcept(noexcept(swap(std::declval< Map >())));
 
     bool empty() const noexcept;
     size_type size() const noexcept;
@@ -90,14 +94,23 @@ namespace rychkov
     template< class... Args >
     std::pair< iterator, bool > emplace(Args... args);
     template< class... Args >
-    iterator emplace_hint(Args... args);
+    iterator emplace_hint(const_iterator hint, Args... args);
 
     key_compare key_comp() const;
     value_compare value_comp() const;
+    MapNode< Key, Value >* fake_root() noexcept;
+    const MapNode< Key, Value >* fake_root() const noexcept;
   private:
-    MapLeftNode< Key, Value >* root_;
+    using node_type = MapNode< Key, Value >;
+    node_type* fake_left_;
+    node_type* fake_right_;
+    node_type* fake_parent_;
+    node_type* fake_second_part_;
     size_t size_;
     value_compare comp_;
+
+    const_iterator find_hint(const key_type& key);
+    void place_node(const_iterator hint, node_type* node);
   };
 }
 
