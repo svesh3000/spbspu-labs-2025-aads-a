@@ -9,46 +9,46 @@ namespace demehin
   class Tree;
 
   template< typename Key, typename T, typename Cmp >
-  class TreeConstIterator;
 
   template< typename Key, typename T, typename Cmp >
-  class TreeIterator
+  class TreeConstIterator
   {
     friend class Tree< Key, T, Cmp >;
+    friend class TreeIterator< Key, T, Cmp >;
   public:
-    using this_t = TreeIterator< Key, T, Cmp >;
+    using this_t = TreeConstIterator< Key, T, Cmp >;
     using Node = demehin::TreeNode< Key, T >;
     using DataPair = std::pair< Key, T >;
 
-    TreeIterator() noexcept;
+    TreeConstIterator() noexcept;
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
     this_t& operator--() noexcept;
     this_t operator--(int) noexcept;
 
-    DataPair& operator*() const;
-    DataPair* operator->() const noexcept;
+    const DataPair& operator*() const;
+    const DataPair* operator->() const noexcept;
 
     bool operator==(const this_t& rhs) const noexcept;
     bool operator!=(const this_t& rhs) const noexcept;
   private:
-    explicit TreeIterator(Node*) noexcept;
+    explicit TreeConstIterator(Node*) noexcept;
     Node* getNode() const noexcept;
     Node* node_;
   };
 
   template< typename Key, typename T, typename Cmp >
-  TreeIterator< Key, T, Cmp >::TreeIterator() noexcept:
+  TreeConstIterator< Key, T, Cmp >::TreeConstIterator() noexcept:
     node_(nullptr)
   {}
 
   template< typename Key, typename T, typename Cmp >
-  TreeIterator< Key, T, Cmp >::TreeIterator(Node* node) noexcept:
+  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(Node* node) noexcept:
     node_(node)
   {}
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::this_t& TreeIterator< Key, T, Cmp >::operator++() noexcept
+  typename TreeConstIterator< Key, T, Cmp >::this_t& TreeConstIterator< Key, T, Cmp >::operator++() noexcept
   {
     assert(node_ != nullptr);
     if (node_->right != nullptr && node_->right->height != -1)
@@ -73,7 +73,7 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::this_t TreeIterator< Key, T, Cmp >::operator++(int) noexcept
+  typename TreeConstIterator< Key, T, Cmp >::this_t TreeConstIterator< Key, T, Cmp >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
     this_t res(*this);
@@ -82,7 +82,7 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::this_t& TreeIterator< Key, T, Cmp >::operator--() noexcept
+  typename TreeConstIterator< Key, T, Cmp >::this_t& TreeConstIterator< Key, T, Cmp >::operator--() noexcept
   {
     assert(node_ != nullptr);
     if (node_->left != nullptr)
@@ -105,7 +105,7 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::this_t TreeIterator< Key, T, Cmp >::operator--(int) noexcept
+  typename TreeConstIterator< Key, T, Cmp >::this_t TreeConstIterator< Key, T, Cmp >::operator--(int) noexcept
   {
     assert(node_ != nullptr);
     this_t res(*this);
@@ -114,33 +114,33 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::DataPair& TreeIterator< Key, T, Cmp >::operator*() const
+  typename const TreeConstIterator< Key, T, Cmp >::DataPair& TreeConstIterator< Key, T, Cmp >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::DataPair* TreeIterator< Key, T, Cmp >::operator->() const noexcept
+  typename const TreeConstIterator< Key, T, Cmp >::DataPair* TreeConstIterator< Key, T, Cmp >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
   }
 
   template< typename Key, typename T, typename Cmp >
-  bool TreeIterator< Key, T, Cmp >::operator==(const this_t& rhs) const noexcept
+  bool TreeConstIterator< Key, T, Cmp >::operator==(const this_t& rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template< typename Key, typename T, typename Cmp >
-  bool TreeIterator< Key, T, Cmp >::operator!=(const this_t& rhs) const noexcept
+  bool TreeConstIterator< Key, T, Cmp >::operator!=(const this_t& rhs) const noexcept
   {
     return !(*this == rhs);
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename TreeIterator< Key, T, Cmp >::Node* TreeIterator< Key, T, Cmp >::getNode() const noexcept
+  typename TreeConstIterator< Key, T, Cmp >::Node* TreeConstIterator< Key, T, Cmp >::getNode() const noexcept
   {
     return node_;
   }
