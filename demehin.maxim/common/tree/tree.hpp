@@ -14,6 +14,8 @@ namespace demehin
     using cIter = TreeIterator< Key, T, Cmp >;
     using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
+    using IterPair = std::pair< Iter, Iter >;
+    using cIterPair = std::pair< cIter, cIter >;
 
     Tree();
     Tree(const Tree< Key, T, Cmp >&);
@@ -44,6 +46,13 @@ namespace demehin
     void clear() noexcept;
 
     size_t count(const Key&) const noexcept;
+
+    Iter lower_bound(const Key&) noexcept;
+    cIter lower_bound(const Key&) const noexcept;
+    Iter upper_bound(const Key&) noexcept;
+    cIter upper_bound(const Key&) const noexcept;
+    IterPair equal_range(const Key&) noexcept;
+    cIterPair equal_range(const Key&) const noexcept;
 
     void swap(Tree< Key, T, Cmp >&) noexcept;
 
@@ -535,6 +544,91 @@ namespace demehin
     return (find(key) != end());
   }
 
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::lower_bound(const Key& key) noexcept
+  {
+    Node* current = root_;
+    Node* res = fakeRoot_;
+    while (current != fakeRoot_ && current != nullptr)
+    {
+      if (!cmp_(current->data.first, key))
+      {
+        res = current;
+        current = current->left;
+      }
+      else
+      {
+        current = current->right;
+      }
+    }
+    return Iter(res);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::lower_bound(const Key& key) const noexcept
+  {
+    Node* current = root_;
+    Node* res = fakeRoot_;
+    while (current != fakeRoot_ && current != nullptr)
+    {
+      if (!cmp_(current->data.first, key))
+      {
+        res = current;
+        current = current->left;
+      }
+      else
+      {
+        current = current->right;
+      }
+    }
+    return cIter(res);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::upper_bound(const Key& key) noexcept
+  {
+    Node* current = root_;
+    Node* res = fakeRoot_;
+    while (current != fakeRoot_ && current != nullptr)
+    {
+      if (cmp_(current->data.first, key))
+      {
+        res = current;
+        current = current->right;
+      }
+      else
+      {
+        current = current->left;
+      }
+    }
+    return Iter(res);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::upper_bound(const Key& key) const noexcept
+  {
+    Node* current = root_;
+    Node* res = fakeRoot_;
+    while (current != fakeRoot_ && current != nullptr)
+    {
+      if (cmp_(current->data.first, key))
+      {
+        res = current;
+        current = current->right;
+      }
+      else
+      {
+        current = current->left;
+      }
+    }
+    return cIter(res);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::IterPair Tree< Key, T, Cmp >::equal_range(const Key& key) noexcept
+  {
+    return std::make_pair(lower_bound(key), upper_bound(key));
+  }
 }
 
 #endif
