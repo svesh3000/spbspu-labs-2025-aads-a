@@ -7,14 +7,15 @@ namespace alymova
 {
   struct Postfix
   {
+    Postfix() = default;
     Postfix(const std::string& s);
 
     long long int operator()();
-    long long int operator+(const Postfix& other);
-    long long int operator-(const Postfix& other);
-    long long int operator*(const Postfix& other);
-    long long int operator/(const Postfix& other);
-    long long int operator%(const Postfix& other);
+    Postfix operator+(const Postfix& other);
+    Postfix operator-(const Postfix& other);
+    Postfix operator*(const Postfix& other);
+    Postfix operator/(const Postfix& other);
+    Postfix operator%(const Postfix& other);
   private:
     Queue< std::string > postfix_;
 

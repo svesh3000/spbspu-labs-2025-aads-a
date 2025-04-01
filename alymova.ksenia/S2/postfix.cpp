@@ -79,11 +79,12 @@ alymova::Postfix::Postfix(const std::string& s):
 long long int alymova::Postfix::operator()()
 {
   Stack< long long int > stack;
-  while (!postfix_.empty())
+  Queue< std::string > copy(postfix_);
+  while (!copy.empty())
   {
-    if (my_isdigit(postfix_.front()))
+    if (my_isdigit(copy.front()))
     {
-      stack.push(std::stoll(postfix_.front()));
+      stack.push(std::stoll(copy.front()));
     }
     else
     {
@@ -95,7 +96,7 @@ long long int alymova::Postfix::operator()()
       stack.pop();
       long long int item1 = stack.top();
       stack.pop();
-      switch ((postfix_.front())[0])
+      switch ((copy.front())[0])
       {
       case '+':
         if (is_overflow_addition(item1, item2))
@@ -134,43 +135,43 @@ long long int alymova::Postfix::operator()()
         break;
       }
     }
-    postfix_.pop();
+    copy.pop();
   }
-  if (stack.size() > 1)
+  if (stack.size() != 1)
   {
     throw std::logic_error("Incorrect expression");
   }
   return stack.top();
 }
-long long int alymova::Postfix::operator+(const Postfix& other)
+alymova::Postfix alymova::Postfix::operator+(const Postfix& other)
 {
   Postfix copy(*this);
   copy.push_operator(other, "+");
-  return copy();
+  return copy;
 }
-long long int alymova::Postfix::operator-(const Postfix& other)
+alymova::Postfix alymova::Postfix::operator-(const Postfix& other)
 {
   Postfix copy(*this);
   copy.push_operator(other, "-");
-  return copy();
+  return copy;
 }
-long long int alymova::Postfix::operator*(const Postfix& other)
+alymova::Postfix alymova::Postfix::operator*(const Postfix& other)
 {
   Postfix copy(*this);
   copy.push_operator(other, "*");
-  return copy();
+  return copy;
 }
-long long int alymova::Postfix::operator/(const Postfix& other)
+alymova::Postfix alymova::Postfix::operator/(const Postfix& other)
 {
   Postfix copy(*this);
   copy.push_operator(other, "/");
-  return copy();
+  return copy;
 }
-long long int alymova::Postfix::operator%(const Postfix& other)
+alymova::Postfix alymova::Postfix::operator%(const Postfix& other)
 {
   Postfix copy(*this);
   copy.push_operator(other, "%");
-  return copy();
+  return copy;
 }
 void alymova::Postfix::push_operator(Postfix other, std::string operation)
 {
