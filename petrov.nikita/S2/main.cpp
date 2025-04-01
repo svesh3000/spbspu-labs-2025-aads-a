@@ -3,6 +3,7 @@
 #include <string>
 #include <queue>
 #include "calculate_arithmetic_expressions.hpp"
+#include "parse_text_and_push_it_to_queue.hpp"
 
 namespace
 {
@@ -40,14 +41,14 @@ int main(int argc, const char * const * argv)
     std::ifstream input(argv[1]);
     while (input)
     {
-      input >> text;
+      std::getline(input, text, '\n');
       if (input.eof())
       {
         break;
       }
       else
       {
-        queue.push(text);
+        petrov::parseTextAndPushItToQueue(text, queue);
       }
     }
   }
@@ -55,17 +56,25 @@ int main(int argc, const char * const * argv)
   {
     while (std::cin)
     {
-      std::cin >> text;
+      std::getline(std::cin, text);
       if (std::cin.eof())
       {
         break;
       }
       else
       {
-        queue.push(text);
+        petrov::parseTextAndPushItToQueue(text, queue);
       }
     }
   }
-  int * results = petrov::calculateArithmeticExpressions(queue);
-  std::cout << results[0] << "\n";
+  std::stack< int > output_stack = petrov::calculateArithmeticExpressions(queue);
+  std::cout << output_stack.top();
+  output_stack.pop();
+  size_t stack_size = output_stack.size();
+  for (size_t i = 0; i < stack_size; i++)
+  {
+    std::cout << " " << output_stack.top();
+    output_stack.pop();
+  }
+  std::cout << "\n";
 }

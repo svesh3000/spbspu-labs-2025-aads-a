@@ -11,24 +11,24 @@ namespace
   }
 }
 
-int * petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
+std::stack< int > petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
 {
-  std::queue< std::string > new_queue = transformInfixToPostfix(queue);
-  std::stack< int > stack = calculatePostfixExpression(new_queue);
-  int * results = new int[stack.size()];
-  for (size_t i = 0; i < stack.size(); i++)
+  std::stack< int > stack;
+  int result = 0;
+  while (!queue.empty())
   {
-    results[i] = stack.top();
-    stack.pop();
+    std::queue< std::string > new_queue = transformInfixToPostfix(queue);
+    result = calculatePostfixExpression(new_queue);
+    stack.push(result);
   }
-  return results;
+  return stack;
 }
 
 std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::string > & queue)
 {
   std::stack< std::string > stack;
   std::queue< std::string > new_queue;
-  while (!queue.empty())
+  while (queue.front() != "|")
   {
     std::cout << "Queue members:\n";
     std::string token = queue.front();
@@ -98,6 +98,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
     }
     queue.pop();
   }
+  queue.pop();
   while (!stack.empty())
   {
     new_queue.push(stack.top());
@@ -106,7 +107,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
   return new_queue;
 }
 
-std::stack< int > petrov::calculatePostfixExpression(std::queue< std::string > & queue)
+int petrov::calculatePostfixExpression(std::queue< std::string > & queue)
 {
   std::stack< int > stack;
   int result = 0;
@@ -166,5 +167,5 @@ std::stack< int > petrov::calculatePostfixExpression(std::queue< std::string > &
     }
     queue.pop();
   }
-  return stack;
+  return stack.top();
 }
