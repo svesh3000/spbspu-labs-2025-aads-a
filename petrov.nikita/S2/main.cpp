@@ -19,7 +19,7 @@ namespace
     {
       return 2;
     }
-    else 
+    else
     {
       return 0;
     }
