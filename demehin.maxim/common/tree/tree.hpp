@@ -3,6 +3,7 @@
 #include <functional>
 #include "node.hpp"
 #include "iterator.hpp"
+#include "cIterator.hpp"
 
 namespace demehin
 {
@@ -10,12 +11,13 @@ namespace demehin
   class Tree
   {
   public:
+    using cIter = TreeIterator< Key, T, Cmp >;
     using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
 
     Tree();
     Tree(const Tree< Key, T, Cmp >&);
-    //Tree(Tree< Key, T, Cmp >&&);
+    Tree(Tree< Key, T, Cmp >&&);
 
     ~Tree();
 
@@ -30,14 +32,18 @@ namespace demehin
     const T& at(const Key&) const;
     T& operator[](const Key&);
 
-    Iter find(const Key& key) const noexcept;
+    Iter find(const Key&) const noexcept;
 
     Iter begin() const noexcept;
+    cIter cbegin() const noexcept;
     Iter end() const noexcept;
+    cIter cend() const noexcept;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
     void clear() noexcept;
+
+    size_t count(const Key&) const noexcept;
 
     void swap(Tree< Key, T, Cmp >&) noexcept;
 
@@ -86,6 +92,14 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp >::Tree(Tree< Key, T, Cmp >&& other):
+    fakeRoot_(std::exchange(other.fakeRoot_, nullptr)),
+    root_(std::exchange(other.root_, nullptr)),
+    cmp_(std::move(other.cmp_)),
+    size_(std::exchange(other.size_, 0))
+  {}
+
+  template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >& Tree< Key, T, Cmp >::operator=(const Tree< Key, T, Cmp >& rhs)
   {
     if (this != &rhs)
@@ -99,8 +113,11 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >::~Tree()
   {
-    clear();
-    delete[] reinterpret_cast< char* >(fakeRoot_);
+    if (fakeRoot_ != nullptr)
+    {
+      clear();
+      delete[] reinterpret_cast< char* >(fakeRoot_);
+    }
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -409,9 +426,30 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::cbegin() const noexcept
+  {
+    if (empty())
+    {
+      return cend();
+    }
+    Node* current = root_;
+    while (current->left != nullptr)
+    {
+      current = current->left;
+    }
+    return cIter(current);
+  }
+
+  template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::end() const noexcept
   {
     return Iter(fakeRoot_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::cend() const noexcept
+  {
+    return cIter(fakeRoot_);
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -490,6 +528,13 @@ namespace demehin
     std::swap(cmp_, rhs.cmp_);
     std::swap(size_, rhs.size_);
   }
+
+  template< typename Key, typename T, typename Cmp >
+  size_t Tree< Key, T, Cmp >::count(const Key& key) const noexcept
+  {
+    return (find(key) != end());
+  }
+
 }
 
 #endif
