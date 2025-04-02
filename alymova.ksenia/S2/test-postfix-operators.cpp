@@ -4,7 +4,7 @@
 #include "postfix.hpp"
 #include "postfixProcess.hpp"
 
-BOOST_AUTO_TEST_CASE(test_plus)
+BOOST_AUTO_TEST_CASE(test_operators)
 {
   using namespace alymova;
   Postfix p1("2 + 2");
@@ -41,40 +41,4 @@ BOOST_AUTO_TEST_CASE(test_plus)
   p3 = p5 % p1;
   BOOST_TEST(p3() == 3);
   BOOST_TEST(p3() == my_mod(p5(), p1()));
-}
-BOOST_AUTO_TEST_CASE(test_minus)
-{
-  using namespace alymova;
-  Postfix p1("2 + 2");
-  Postfix p2("3 * 3");
-  Postfix p3(p1 - p2);
-  BOOST_TEST(p3() == -5);
-  BOOST_TEST(p3() == p1() - p2());
-}
-BOOST_AUTO_TEST_CASE(test_multi)
-{
-  using namespace alymova;
-  Postfix p1("2 + 2");
-  Postfix p2("3 * 3");
-  Postfix p3(p1 * p2);
-  BOOST_TEST(p3() == 36);
-  BOOST_TEST(p3() == p1() * p2());
-}
-BOOST_AUTO_TEST_CASE(test_division)
-{
-  using namespace alymova;
-  Postfix p1("5 * 8");
-  Postfix p2("2 + 2");
-  Postfix p3 (p1 / p2);
-  BOOST_TEST(p3() == 10);
-  BOOST_TEST(p3() == p1() / p2());
-}
-BOOST_AUTO_TEST_CASE(test_mod)
-{
-  using namespace alymova;
-  Postfix p1("5 * 7");
-  Postfix p2("2 + 2");
-  Postfix p3 (p1 % p2);
-  BOOST_TEST(p3() == 3);
-  BOOST_TEST(p3() == my_mod(p1(), p2()));
 }
