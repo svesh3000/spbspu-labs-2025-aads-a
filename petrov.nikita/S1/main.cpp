@@ -22,7 +22,8 @@ int main()
   }
   catch(const std::out_of_range & e)
   {
-    std::cerr << "\n" << e.what() << "\n";
+    std::cout << "\n";
+    std::cerr << e.what() << "\n";
     return 1;
   }
   sums.reverse();
