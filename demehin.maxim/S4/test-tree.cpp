@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(tree_test)
   demehin::Tree< size_t, std::string > cpy_tree(tree);
 
   tree.swap(cpy_tree);
-  for (auto it = tree.begin(); it != tree.end(); ++it)
+  for (auto it = cpy_tree.begin(); it != cpy_tree.end(); ++it)
   {
     std::cout << (*it).second << "\n";
   }
@@ -47,7 +47,13 @@ BOOST_AUTO_TEST_CASE(tree_construct_test)
   demehin::Tree< size_t, std::string > tree_cpy(tree);
   BOOST_TEST(tree_cpy.size() == 3);
   BOOST_TEST((*tree_cpy.begin()).second == "1");
-  demehin::Tree< size_t, std::string > tr_mv(std::move(tree_cpy));
+  demehin::Tree< size_t, std::string > tree_mv(std::move(tree_cpy));
+
+  demehin::Tree< size_t, std::string > range_tree(++tree_mv.begin(), tree_mv.end());
+  std::ostringstream out;
+  printTreeValues(out, range_tree);
+  BOOST_TEST(out.str() == "310");
+
 }
 
 BOOST_AUTO_TEST_CASE(tree_modifiers_test)
