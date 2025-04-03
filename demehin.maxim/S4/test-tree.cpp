@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(tree_test)
   tree.insert(std::make_pair(4, "5"));
   BOOST_TEST(tree.count(3) == 1);
 
-  for (auto it = tree.begin(); it != tree.end(); ++it)
+  /*for (auto it = tree.begin(); it != tree.end(); ++it)
   {
     std::cout << (*it).second << "\n";
   }
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(tree_test)
   for (auto it = cpy_tree.begin(); it != cpy_tree.end(); ++it)
   {
     std::cout << (*it).second << "\n";
-  }
+  }*/
 }
 
 
