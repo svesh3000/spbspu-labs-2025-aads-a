@@ -1,32 +1,14 @@
 #include "forward_ring_list.hpp"
 #include <string>
+#include "manipulations_with_fwd_ring_list.hpp"
 #include <iostream>
 #include <limits>
 
 int main()
 {
   petrov::ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > > head = {};
-  std::string sequence_num = {};
-  size_t number = 0;
-  while (!std::cin.eof())
-  {
-    std::cin.clear();
-    std::cin >> sequence_num;
-    petrov::ForwardRingList< size_t > subhead = {};
-    while (!std::cin.eof() && std::cin)
-    {
-      std::cin >> number;
-      if (!std::cin)
-      {
-        break;
-      }
-      subhead.push_front(number);
-    }
-    subhead.reverse();
-    head.push_front({ sequence_num, subhead });
-  }
-  head.reverse();
-  if (sequence_num.empty())
+  petrov::inputValuesIntoFwdRingList(std::cin, head);
+  if (head.empty())
   {
     std::cout << 0;
     std::cout << "\n";
