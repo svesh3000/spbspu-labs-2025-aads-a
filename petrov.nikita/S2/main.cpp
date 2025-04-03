@@ -77,6 +77,7 @@ int main(int argc, const char * const * argv)
   }
   if (queue.empty())
   {
+    std::cout << "\n";
     return 0;
   }
   std::stack< long long int > output_stack;

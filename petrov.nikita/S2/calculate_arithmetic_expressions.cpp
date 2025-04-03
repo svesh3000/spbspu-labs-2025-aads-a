@@ -158,16 +158,17 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
         if (first_operand < 0)
         {
           result = second_operand % std::abs(first_operand);
+          result = first_operand - result;
         }
         else if (second_operand < 0)
         {
           result = std::abs(second_operand) % first_operand;
+          result = first_operand - result;
         }
         else
         {
           result = second_operand % first_operand;
         }
-        result = first_operand - result;
         stack.push(result);
       }
       else if (token == "+")
