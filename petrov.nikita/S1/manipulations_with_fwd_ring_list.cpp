@@ -106,3 +106,22 @@ void petrov::AddElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublis
     throw std::out_of_range("ERROR: Overflow");
   }
 }
+
+std::ostream & petrov::outputSums(std::ostream & out, const result_list_type sums)
+{
+  if (sums.size() == 1)
+  {
+    out << *sums.cbegin();
+  }
+  else
+  {
+    auto it = sums.cbegin();
+    out << *(it++);
+    do
+    {
+      out << " " << *it;
+    }
+    while (it++ != sums.cend());
+  }
+  return out;
+}

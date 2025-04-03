@@ -16,6 +16,8 @@ namespace petrov
   
   result_list_type getListOfSequencesFromListOfSums(list_type fwd_ring_list);
   void AddElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublist_it_t it);
+
+  std::ostream & outputSums(std::ostream & out, const result_list_type sums);
 }
 
 

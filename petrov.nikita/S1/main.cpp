@@ -16,27 +16,14 @@ int main()
   }
   petrov::outputNamesOfSuquences(std::cout, fwd_ring_list);
   petrov::ForwardRingList< size_t > sums = petrov::getListOfSequencesFromListOfSums(fwd_ring_list);
+  sums.reverse();
   if (sums.empty())
   {
     std::cout << 0;
   }
   else
   {
-    sums.reverse();
-    if (sums.size() == 1)
-    {
-      std::cout << *sums.cbegin();
-    }
-    else
-    {
-      auto it = sums.cbegin();
-      std::cout << *(it++);
-      do
-      {
-        std::cout << " " << *it;
-      }
-      while (it++ != sums.cend());
-    }
+    petrov::outputSums(std::cout, sums);
   }
   std::cout << "\n";
 }
