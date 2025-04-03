@@ -2,6 +2,7 @@
 #define TREE_HPP
 #include <functional>
 #include <cstddef>
+#include <type_traits>
 #include "treeNode.hpp"
 
 namespace kiselev
@@ -13,16 +14,23 @@ namespace kiselev
     using value = std::pair< Key, Value >;
 
     BinarySearchTree();
-    void push(Key k, Value v);
-    Value get(Key k);
-    void pop(Key k);
+
+    size_t size() const noexcept;
+    bool empty() const noexcept;
+
+    void swap(BinarySearchTree< Key, Value, Cmp >&) noexcept;
+    void clear() noexcept;
+
+    void push(Key, Value);
+    Value get(Key);
+    void pop(Key);
   private:
     using Node = TreeNode< Key, Value>;
 
-    void rotateLeft(Node* node);
-    void rotateRight(Node* node);
-    void fixInsert(Node* node);
-    void fixDelete(Node* node);
+    void rotateLeft(Node* node) noexcept;
+    void rotateRight(Node* node) noexcept;
+    void fixInsert(Node* node) noexcept;
+    void fixDelete(Node* node) noexcept;
     Node* root_;
     Cmp cmp_;
     size_t size_;
@@ -35,7 +43,7 @@ namespace kiselev
   {}
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::rotateLeft(Node* node)
+  void BinarySearchTree< Key, Value, Cmp >::rotateLeft(Node* node) noexcept
   {
     Node* child = node->right;
     node->right = child->left;
@@ -61,7 +69,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::rotateRight(Node* node)
+  void BinarySearchTree< Key, Value, Cmp >::rotateRight(Node* node) noexcept
   {
     Node* child = node->left;
     node->left = child->right;
@@ -87,7 +95,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::fixInsert(Node* node)
+  void BinarySearchTree< Key, Value, Cmp >::fixInsert(Node* node) noexcept
   {
     Node* parent = nullptr;
     Node* grandParent = nullptr;
@@ -146,7 +154,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::fixDelete(Node* node)
+  void BinarySearchTree< Key, Value, Cmp >::fixDelete(Node* node) noexcept
   {
     while (node && node->color == Color::BLACK)
     {
@@ -226,6 +234,25 @@ namespace kiselev
       }
     }
     node->color = Color::BLACK;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  size_t BinarySearchTree< Key, Value, Cmp >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  bool BinarySearchTree< Key, Value, Cmp >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  void BinarySearchTree< Key, Value, Cmp >::swap(BinarySearchTree< Key, Value, Cmp >& tree) noexcept
+  {
+    std::swap(root_, tree.root_);
+    std::swap(size_, tree.size_);
   }
 }
 #endif
