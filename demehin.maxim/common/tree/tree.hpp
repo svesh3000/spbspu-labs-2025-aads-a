@@ -18,13 +18,20 @@ namespace demehin
     using cIterPair = std::pair< cIter, cIter >;
 
     Tree();
+    template< typename InputIt >
+    Tree(InputIt, InputIt);
+    explicit Tree(std::initializer_list< T >);
     Tree(const Tree< Key, T, Cmp >&);
     Tree(Tree< Key, T, Cmp >&&);
 
     ~Tree();
 
     Tree< Key, T, Cmp >& operator=(const Tree< Key, T, Cmp >&);
+
     std::pair< Iter, bool > insert(const DataPair&);
+    template< typename InputIt >
+    void insert(InputIt, InputIt);
+    Iter insert(cIter, const DataPair&);
 
     Iter erase(Iter) noexcept;
     size_t erase(const Key&) noexcept;
@@ -53,6 +60,12 @@ namespace demehin
     cIter upper_bound(const Key&) const noexcept;
     IterPair equal_range(const Key&) noexcept;
     cIterPair equal_range(const Key&) const noexcept;
+
+    template< typename... Args >
+    std::pair< Iter, bool > emplace(Args&&...);
+
+    template< typename... Args >
+    Iter emplace_hint(cIter, Args&&...);
 
     void swap(Tree< Key, T, Cmp >&) noexcept;
 
@@ -84,6 +97,22 @@ namespace demehin
     fakeRoot_->height = -1;
     fakeRoot_->parent = nullptr;
   }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename InputIt >
+  Tree< Key, T, Cmp >::Tree(InputIt first, InputIt last):
+    Tree()
+  {
+    for (auto it = first; it != last; it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp >::Tree(std::initializer_list< T > iList):
+    Tree(iList.begin(), iList.end())
+  {}
 
   template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >::Tree(const Tree< Key, T, Cmp >& other):
@@ -141,7 +170,34 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::insert(const DataPair& value)
   {
-    Node* newNode = new Node(value);
+    return emplace(value);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::insert(cIter hint, const DataPair& value)
+  {
+    return emplace_hint(hint, value);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename InputIt >
+  void Tree< Key, T, Cmp >::insert(InputIt first, InputIt last)
+  {
+    Tree< Key, T, Cmp > temp;
+    for (; first != last; first++)
+    {
+      temp.insert(*first);
+    }
+    swap(temp);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename... Args >
+  std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::emplace(Args&&... args)
+  {
+    Node* newNode = new Node(std::forward< Args >(args)...);
+    const Key& key = newNode->data.first;
+
     if (root_ == fakeRoot_)
     {
       root_ = newNode;
@@ -150,18 +206,20 @@ namespace demehin
       size_++;
       return { Iter(root_), true };
     }
+
     Node* current = root_;
     Node* parent = fakeRoot_;
     bool isLeft = false;
+
     while (current != fakeRoot_ && current != nullptr)
     {
       parent = current;
-      if (cmp_(value.first, current->data.first))
+      if (cmp_(key, current->data.first))
       {
         current = current->left;
         isLeft = true;
       }
-      else if (cmp_(current->data.first, value.first))
+      else if (cmp_(current->data.first, key))
       {
         current = current->right;
         isLeft = false;
@@ -171,9 +229,7 @@ namespace demehin
         delete newNode;
         return { Iter(current), false };
       }
-
     }
-
     newNode->parent = parent;
     if (isLeft)
     {
@@ -183,11 +239,36 @@ namespace demehin
     {
       parent->right = newNode;
     }
-
     newNode->left = newNode->right = nullptr;
     balanceUpper(newNode);
     size_++;
     return { Iter(newNode), true };
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename... Args >
+  typename Tree< Key, T, Cmp >::Iter Tree< Key, T, Cmp >::emplace_hint(cIter hint, Args&&... args)
+  {
+    if (empty())
+    {
+      return emplace(std::forward< Args >(args)...).first;
+    }
+
+    if (hint != cend())
+    {
+      if (cmp_(*hint, std::forward< Args >(args)...) && (std::next(hint) == cend() ||
+        cmp_(std::forward< Args >(args)..., *std::next(hint))))
+      {
+        Node* newNode = new Node(std::forward< Args >(args)...);
+        Node* hintNode = hint.getNode();
+        newNode->parent = hintNode;
+        hintNode->right = newNode;
+        balanceUpper(newNode);
+        size_++;
+        return Iter(newNode);
+      }
+    }
+    return emplace(std::forward< Args >(args)...).first;
   }
 
   template< typename Key, typename T, typename Cmp >
