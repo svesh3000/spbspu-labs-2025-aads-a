@@ -1,6 +1,7 @@
 #include "calculate_arithmetic_expressions.hpp"
 #include <limits>
 #include <stdexcept>
+#include <iostream>
 
 namespace
 {
@@ -100,6 +101,10 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
   queue.pop();
   while (!stack.empty())
   {
+    if (stack.top() == "(" || stack.top() == ")")
+    {
+      throw std::invalid_argument("ERROR: Incorrect Expression");
+    }
     new_queue.push(stack.top());
     stack.pop();
   }
@@ -125,15 +130,14 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
         stack.pop();
         long long int second_operand = stack.top();
         stack.pop();
-        if (second_operand <= std::numeric_limits< long long int >::max() / first_operand)
+        if (std::abs(second_operand) <= std::numeric_limits< long long int >::max() / std::abs(first_operand))
         {
-          result = second_operand + first_operand;
+          result = second_operand * first_operand;
         }
         else
         {
           throw std::out_of_range("ERROR: Out of range");
         }
-        result = second_operand * first_operand;
         stack.push(result);
       }
       else if (token == "/")
@@ -151,7 +155,19 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
         stack.pop();
         long long int second_operand = stack.top();
         stack.pop();
-        result = second_operand % first_operand;
+        if (first_operand < 0)
+        {
+          result = second_operand % std::abs(first_operand);
+        }
+        else if (second_operand < 0)
+        {
+          result = std::abs(second_operand) % first_operand;
+        }
+        else
+        {
+          result = second_operand % first_operand;
+        }
+        result = first_operand - result;
         stack.push(result);
       }
       else if (token == "+")
@@ -168,7 +184,6 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
         {
           throw std::out_of_range("ERROR: Out of range");
         }
-        result = second_operand + first_operand;
         stack.push(result);
       }
       else if (token == "-")
@@ -179,13 +194,12 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
         stack.pop();
         if (second_operand >= std::numeric_limits< long long int >::min() + first_operand)
         {
-          result = second_operand + first_operand;
+          result = second_operand - first_operand;
         }
         else
         {
           throw std::out_of_range("ERROR: Out of range");
         }
-        result = second_operand - first_operand;
         stack.push(result);
       }
       queue.pop();
