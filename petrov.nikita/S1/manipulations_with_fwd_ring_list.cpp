@@ -9,6 +9,10 @@ std::istream & petrov::inputValuesIntoFwdRingList(std::istream & in, list_type &
   {
     in.clear();
     in >> sequence_num;
+    if (sequence_num.empty())
+    {
+      break;
+    }
     petrov::ForwardRingList< size_t > sublist = {};
     while (!in.eof() && in)
     {
@@ -69,18 +73,25 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
       }
       else
       {
-        auto it = it_out->second.begin();
-        if (it_out == fwd_ring_list.begin())
+        try
         {
-          std::cout << *it;
-          AddElementToSumAndPopFrontIt(sum, it_out, it);
+          auto it = it_out->second.begin();
+          if (it_out == fwd_ring_list.begin())
+          {
+            std::cout << *it;
+            AddElementToSumAndPopFrontIt(sum, it_out, it);
+          }
+          else
+          {
+            std::cout << " " << *it;
+            AddElementToSumAndPopFrontIt(sum, it_out, it);
+          }
+          ++prev_it_out;
         }
-        else
+        catch(const std::exception& e)
         {
-          std::cout << " " << *it;
-          AddElementToSumAndPopFrontIt(sum, it_out, it);
+          throw;
         }
-        ++prev_it_out;
       }
     }
     while (it_out++ != fwd_ring_list.end() && fwd_ring_list.begin() != fwd_ring_list.end());
