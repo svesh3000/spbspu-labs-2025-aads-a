@@ -24,3 +24,23 @@ std::istream & petrov::inputValuesIntoFwdRingList(std::istream & in, my_type & f
   fwd_ring_list.reverse();
   return in;
 }
+
+std::ostream & petrov::outputNamesOfSuquences(std::ostream & out, const my_type & fwd_ring_list)
+{
+  auto it = fwd_ring_list.cbegin();
+  if (fwd_ring_list.size() == 1)
+  {
+    out << it->first;
+  }
+  else
+  {
+    out << (it++)->first;
+    do
+    {
+      out << " " << it->first;
+    }
+    while (it++ != fwd_ring_list.cend());
+  }
+  out << "\n";
+  return out;
+}

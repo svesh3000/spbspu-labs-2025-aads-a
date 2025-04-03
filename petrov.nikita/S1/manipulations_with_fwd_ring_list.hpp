@@ -9,6 +9,7 @@ namespace petrov
   using my_type = ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > >;
 
   std::istream & inputValuesIntoFwdRingList(std::istream & in, my_type & fwd_ring_list);
+  std::ostream & outputNamesOfSuquences(std::ostream & out, const my_type & fwd_ring_list);
 }
 
 

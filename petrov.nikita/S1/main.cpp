@@ -6,52 +6,38 @@
 
 int main()
 {
-  petrov::ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > > head = {};
-  petrov::inputValuesIntoFwdRingList(std::cin, head);
-  if (head.empty())
+  petrov::ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > > fwd_ring_list = {};
+  petrov::inputValuesIntoFwdRingList(std::cin, fwd_ring_list);
+  if (fwd_ring_list.empty())
   {
     std::cout << 0;
     std::cout << "\n";
     return 0;
   }
-  auto it = head.cbegin();
-  if (head.size() == 1)
-  {
-    std::cout << it->first;
-  }
-  else
-  {
-    std::cout << (it++)->first;
-    do
-    {
-      std::cout << " " << it->first;
-    }
-    while (it++ != head.cend());
-  }
-  std::cout << "\n";
+  petrov::outputNamesOfSuquences(std::cout, fwd_ring_list);
   petrov::ForwardRingList< size_t > sums = {};
   do
   {
     size_t sum = 0;
-    auto prev_it_out = head.end();
-    auto it_out = head.begin();
+    auto prev_it_out = fwd_ring_list.end();
+    auto it_out = fwd_ring_list.begin();
     do
     {
-      if (it_out->second.empty() && head.size() != 1)
+      if (it_out->second.empty() && fwd_ring_list.size() != 1)
       {
         auto val = *it_out;
-        head.remove(val);
+        fwd_ring_list.remove(val);
         it_out = prev_it_out;
       }
-      else if (it_out->second.empty() && head.size() == 1)
+      else if (it_out->second.empty() && fwd_ring_list.size() == 1)
       {
-        head.pop_front();
+        fwd_ring_list.pop_front();
         break;
       }
       else
       {
         auto it = it_out->second.begin();
-        if (it_out == head.begin())
+        if (it_out == fwd_ring_list.begin())
         {
           std::cout << *it;
           if (sum <= std::numeric_limits< size_t >::max() - *it)
@@ -84,14 +70,14 @@ int main()
         ++prev_it_out;
       }
     }
-    while (it_out++ != head.end() && head.begin() != head.end());
+    while (it_out++ != fwd_ring_list.end() && fwd_ring_list.begin() != fwd_ring_list.end());
     if (sum)
     {
       sums.push_front(sum);
       std::cout << "\n";
     }
   }
-  while (!head.empty());
+  while (!fwd_ring_list.empty());
   if (sums.empty())
   {
     std::cout << 0;
