@@ -13,7 +13,7 @@ namespace petrov
 
   std::istream & inputValuesIntoFwdRingList(std::istream & in, list_type & fwd_ring_list);
   std::ostream & outputNamesOfSuquences(std::ostream & out, const list_type & fwd_ring_list);
-  
+
   result_list_type getListOfSequencesFromListOfSums(list_type fwd_ring_list);
   void AddElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublist_it_t it);
 
