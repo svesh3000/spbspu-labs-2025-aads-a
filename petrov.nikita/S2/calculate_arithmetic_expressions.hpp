@@ -7,9 +7,9 @@
 
 namespace petrov
 {
-  std::stack< int > calculateArithmeticExpressions(std::queue< std::string > & queue);
+  std::stack< long long int > calculateArithmeticExpressions(std::queue< std::string > & queue);
   std::queue< std::string > transformInfixToPostfix(std::queue< std::string > & queue);
-  int calculatePostfixExpression(std::queue< std::string > & queue);
+  long long int calculatePostfixExpression(std::queue< std::string > & queue);
 }
 
 #endif

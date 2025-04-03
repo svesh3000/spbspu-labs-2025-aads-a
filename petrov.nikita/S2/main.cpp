@@ -75,7 +75,16 @@ int main(int argc, const char * const * argv)
       }
     }
   }
-  std::stack< int > output_stack = petrov::calculateArithmeticExpressions(queue);
+  std::stack< long long int > output_stack;
+  try
+  {
+    output_stack = petrov::calculateArithmeticExpressions(queue);
+  }
+  catch(const std::out_of_range & e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   std::cout << output_stack.top();
   output_stack.pop();
   size_t stack_size = output_stack.size();

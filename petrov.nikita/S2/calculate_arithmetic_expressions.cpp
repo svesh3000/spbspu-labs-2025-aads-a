@@ -1,20 +1,21 @@
 #include "calculate_arithmetic_expressions.hpp"
-#include <iostream>
+#include <limits>
+#include <stdexcept>
 
 namespace
 {
-  int isdigit(std::string & string);
+  long long int isdigit(std::string & string);
 
-  int isdigit(std::string & string)
+  long long int isdigit(std::string & string)
   {
     return string.find_first_not_of("0123456789") == string.npos;
   }
 }
 
-std::stack< int > petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
+std::stack< long long int > petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
 {
-  std::stack< int > stack;
-  int result = 0;
+  std::stack< long long int > stack;
+  long long int result = 0;
   while (!queue.empty())
   {
     std::queue< std::string > new_queue = transformInfixToPostfix(queue);
@@ -30,9 +31,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
   std::queue< std::string > new_queue;
   while (queue.front() != "|")
   {
-    std::cout << "Queue members:\n";
     std::string token = queue.front();
-    std::cout << token << "\n";
     if (isdigit(token))
     {
       new_queue.push(token);
@@ -107,65 +106,94 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
   return new_queue;
 }
 
-int petrov::calculatePostfixExpression(std::queue< std::string > & queue)
+long long int petrov::calculatePostfixExpression(std::queue< std::string > & queue)
 {
-  std::stack< int > stack;
-  int result = 0;
-  while (!queue.empty())
+  std::stack< long long int > stack;
+  long long int result = 0;
+  try
   {
-    std::cout << "New queue members:\n";
-    std::string token = queue.front();
-    std::cout << token << "\n";
-    if (isdigit(token))
+    while (!queue.empty())
     {
-      stack.push(std::stoi(token));
+      std::string token = queue.front();
+      if (isdigit(token))
+      {
+        stack.push(std::stoll(token));
+      }
+      else if (token == "*")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        if (second_operand <= std::numeric_limits< long long int >::max() / first_operand)
+        {
+          result = second_operand + first_operand;
+        }
+        else
+        {
+          throw std::out_of_range("ERROR: Out of range");
+        }
+        result = second_operand * first_operand;
+        stack.push(result);
+      }
+      else if (token == "/")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        result = second_operand / first_operand;
+        stack.push(result);
+      }
+      else if (token == "%")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        result = second_operand % first_operand;
+        stack.push(result);
+      }
+      else if (token == "+")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        if (second_operand <= std::numeric_limits< long long int >::max() - first_operand)
+        {
+          result = second_operand + first_operand;
+        }
+        else
+        {
+          throw std::out_of_range("ERROR: Out of range");
+        }
+        result = second_operand + first_operand;
+        stack.push(result);
+      }
+      else if (token == "-")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        if (second_operand >= std::numeric_limits< long long int >::min() + first_operand)
+        {
+          result = second_operand + first_operand;
+        }
+        else
+        {
+          throw std::out_of_range("ERROR: Out of range");
+        }
+        result = second_operand - first_operand;
+        stack.push(result);
+      }
+      queue.pop();
     }
-    else if (token == "*")
-    {
-      int first_operand = stack.top();
-      stack.pop();
-      int second_operand = stack.top();
-      stack.pop();
-      result = second_operand * first_operand;
-      stack.push(result);
-    }
-    else if (token == "/")
-    {
-      int first_operand = stack.top();
-      stack.pop();
-      int second_operand = stack.top();
-      stack.pop();
-      result = second_operand / first_operand;
-      stack.push(result);
-    }
-    else if (token == "%")
-    {
-      int first_operand = stack.top();
-      stack.pop();
-      int second_operand = stack.top();
-      stack.pop();
-      result = second_operand % first_operand;
-      stack.push(result);
-    }
-    else if (token == "+")
-    {
-      int first_operand = stack.top();
-      stack.pop();
-      int second_operand = stack.top();
-      stack.pop();
-      result = second_operand + first_operand;
-      stack.push(result);
-    }
-    else if (token == "-")
-    {
-      int first_operand = stack.top();
-      stack.pop();
-      int second_operand = stack.top();
-      stack.pop();
-      result = second_operand - first_operand;
-      stack.push(result);
-    }
-    queue.pop();
+  }
+  catch (const std::out_of_range & e)
+  {
+    throw;
   }
   return stack.top();
 }
