@@ -8,6 +8,7 @@ void demehin::print(std::ostream& out, std::istream& in, const MapOfTrees& mapOf
   if (map.empty())
   {
     out << "<EMPTY>\n";
+    return;
   }
 
   out << datasetName;
