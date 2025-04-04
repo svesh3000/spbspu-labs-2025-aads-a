@@ -71,14 +71,14 @@ void demehin::makeIntersect(std::istream& in, MapOfTrees& mapOfTrees)
     }
   }
 
-  if (newName == name1)
+  if (newName == lhsName)
   {
-    mapOfTrees[name1] = newMap;
+    mapOfTrees[lhsName] = newMap;
     return;
   }
-  else if (newName == name2)
+  else if (newName == rhsName)
   {
-    mapOfTrees[name2] = newMap;
+    mapOfTrees[rhsName] = newMap;
     return;
   }
   mapOfTrees.insert(std::make_pair(newName, newMap));
@@ -103,14 +103,14 @@ void demehin::makeUnion(std::istream& in, MapOfTrees& mapOfTrees)
     }
   }
 
-  if (newName == name1)
+  if (newName == lhsName)
   {
-    mapOfTrees[name1] = newMap;
+    mapOfTrees[lhsName] = newMap;
     return;
   }
-  else if (newName == name2)
+  else if (newName == rhsName)
   {
-    mapOfTrees[name2] = newMap;
+    mapOfTrees[rhsName] = newMap;
     return;
   }
   mapOfTrees.insert(std::make_pair(newName, newMap));
