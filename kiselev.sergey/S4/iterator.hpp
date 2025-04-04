@@ -1,18 +1,12 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <endian.h>
-#include <sched.h>
-#include "tree.hpp"
 #include "treeNode.hpp"
 
 namespace kiselev
 {
   template< typename Key, typename Value, typename Cmp >
-  class BinarySearchTree;
+  class RBTree;
 
   namespace detail
   {
@@ -46,7 +40,7 @@ namespace kiselev
       TreeNode< Key, Value>* node_;
       explicit Iterator(TreeNode< Key, Value >*);
       friend class Iterator< Key, Value, Cmp, !IsConst >;
-      friend class BinarySearchTree< Key, Value >;
+      friend class RBTree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >

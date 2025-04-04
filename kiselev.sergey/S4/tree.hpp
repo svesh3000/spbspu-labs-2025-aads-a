@@ -2,24 +2,32 @@
 #define TREE_HPP
 #include <functional>
 #include <cstddef>
-#include <type_traits>
-#include "treeNode.hpp"
+#include "iterator.hpp"
 
 namespace kiselev
 {
   template< typename Key, typename Value, typename Cmp = std::less< Key > >
-  class BinarySearchTree
+  class RBTree
   {
   public:
     using value = std::pair< Key, Value >;
+    using Iterator = detail::Iterator< Key, Value, Cmp, false >;
+    using ConstIterator = detail::Iterator< Key, Value, Cmp, true >;
 
-    BinarySearchTree();
+    RBTree();
 
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    void swap(BinarySearchTree< Key, Value, Cmp >&) noexcept;
+    Iterator begin() noexcept;
+    ConstIterator cbegin() const noexcept;
+    Iterator end() noexcept;
+    ConstIterator cend() const noexcept;
+
+    void swap(RBTree< Key, Value, Cmp >&) noexcept;
     void clear() noexcept;
+    Iterator find(const Key&) noexcept;
+    ConstIterator find(const Key&) const noexcept;
 
     void push(Key, Value);
     Value get(Key);
@@ -37,13 +45,13 @@ namespace kiselev
   };
 
   template< typename Key, typename Value, typename Cmp >
-  BinarySearchTree< Key, Value, Cmp >::BinarySearchTree():
+  RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
     size_(0)
   {}
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::rotateLeft(Node* node) noexcept
+  void RBTree< Key, Value, Cmp >::rotateLeft(Node* node) noexcept
   {
     Node* child = node->right;
     node->right = child->left;
@@ -69,7 +77,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::rotateRight(Node* node) noexcept
+  void RBTree< Key, Value, Cmp >::rotateRight(Node* node) noexcept
   {
     Node* child = node->left;
     node->left = child->right;
@@ -95,7 +103,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::fixInsert(Node* node) noexcept
+  void RBTree< Key, Value, Cmp >::fixInsert(Node* node) noexcept
   {
     Node* parent = nullptr;
     Node* grandParent = nullptr;
@@ -154,7 +162,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::fixDelete(Node* node) noexcept
+  void RBTree< Key, Value, Cmp >::fixDelete(Node* node) noexcept
   {
     while (node && node->color == Color::BLACK)
     {
@@ -237,22 +245,108 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  size_t BinarySearchTree< Key, Value, Cmp >::size() const noexcept
+  size_t RBTree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
   }
 
   template< typename Key, typename Value, typename Cmp >
-  bool BinarySearchTree< Key, Value, Cmp >::empty() const noexcept
+  bool RBTree< Key, Value, Cmp >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< typename Key, typename Value, typename Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::swap(BinarySearchTree< Key, Value, Cmp >& tree) noexcept
+  void RBTree< Key, Value, Cmp >::swap(RBTree< Key, Value, Cmp >& tree) noexcept
   {
     std::swap(root_, tree.root_);
     std::swap(size_, tree.size_);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::begin() noexcept
+  {
+    if (empty())
+    {
+      return end();
+    }
+    Node* temp = root_;
+    while (temp->left)
+    {
+      temp = temp->left;
+    }
+    return Iterator(temp);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cbegin() const noexcept
+  {
+    if (empty())
+    {
+      return cend();
+    }
+    Node* temp = root_;
+    while (temp->left)
+    {
+      temp = temp->left;
+    }
+    return ConstIterator(temp);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::end() noexcept
+  {
+    return Iterator(nullptr);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cend() const noexcept
+  {
+    return ConstIterator(nullptr);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::find(const Key& key) noexcept
+  {
+    Node* temp = root_;
+    while (temp)
+    {
+      if (cmp_(key, temp->data.first))
+      {
+        temp = temp->left;
+      }
+      else if (cmp_(temp->data.first, key))
+      {
+        temp = temp->right;
+      }
+      else
+      {
+        return Iterator(temp);
+      }
+    }
+    return end();
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::find(const Key& key) const noexcept
+  {
+    const Node* temp = root_;
+    while (temp)
+    {
+      if (cmp_(key, temp->data.first))
+      {
+        temp = temp->left;
+      }
+      else if (cmp_(temp->data.first, key))
+      {
+        temp = temp->right;
+      }
+      else
+      {
+        return ConstIterator(temp);
+      }
+    }
+    return cend();
   }
 }
 #endif

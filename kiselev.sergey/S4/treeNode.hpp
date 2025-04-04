@@ -1,5 +1,6 @@
 #ifndef TREENODE_HPP
 #define TREENODE_HPP
+#include <utility>
 
 namespace kiselev
 {
@@ -11,8 +12,7 @@ namespace kiselev
   template< class Key, class Value >
   struct TreeNode
   {
-    Key key;
-    Value value;
+    std::pair< Key, Value > data;
     Color color;
     TreeNode* left;
     TreeNode* right;
