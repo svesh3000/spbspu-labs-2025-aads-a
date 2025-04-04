@@ -58,37 +58,28 @@ int main(int argc, char* argv[])
   {
     inputTrees(file, mapOfTrees);
   }
-  catch (std::logic_error&)
+  catch (std::exception&)
   {
-    std::cout << "input!\n";
+    std::cout << "input error\n";
     return 1;
   }
+
+  demehin::Tree< std::string, std::function< void() > > commands;
+  commands["print"] = [&](){ demehin::print(std::cout, std::cin, mapOfTrees); };
+  commands["complement"] = [&](){ demehin::makeComplement(std::cin, mapOfTrees); };
+  commands["intersect"] = [&](){ demehin::makeIntersect(std::cin, mapOfTrees); };
+  commands["union"] = [&](){ demehin::makeUnion(std::cin, mapOfTrees); };
+
   std::string command;
-  try
+  while (std::cin >> command)
   {
-    while (std::cin >> command)
+    try
     {
-      if (command == "print")
-      {
-        demehin::print(std::cout, std::cin, mapOfTrees);
-      }
-      else if (command == "complement")
-      {
-        demehin::makeComplement(std::cin, mapOfTrees);
-      }
-      else if (command == "intersect")
-      {
-        demehin::makeIntersect(std::cin, mapOfTrees);
-      }
-      else if (command == "union")
-      {
-        demehin::makeUnion(std::cin, mapOfTrees);
-      }
+      commands.at(command)();
     }
-  }
-  catch (std::logic_error&)
-  {
-    std::cout << "command\n";
-    return 1;
+    catch (const std::out_of_range&)
+    {
+      std::cerr << "<INVALID COMMAND>\n";
+    }
   }
 }
