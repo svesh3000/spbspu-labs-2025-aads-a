@@ -54,8 +54,9 @@ int main(int argc, char ** argv)
   stack_qs.pop();
   while (!stack_qs.empty())
   {
-    std::cout << ' ' << zakirov::calculate_postfix_expression(stack_qs.top());
+    std::cout << ' ' << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
     stack_qs.pop();
   }
+
   std::cout << '\n';
 }

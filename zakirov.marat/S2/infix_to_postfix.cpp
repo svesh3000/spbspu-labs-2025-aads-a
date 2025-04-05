@@ -5,48 +5,47 @@
 #include "stack.hpp"
 #include "queue.hpp"
 #include <iostream>
-
 void zakirov::check_overflow(llint first, llint second, char oper)
 {
   llint llint_max = std::numeric_limits< llint >::max();
   llint llint_min = std::numeric_limits< llint >::min();
+  llint max_num = std::max(first, second);
+  llint min_num = std::min(first, second);
   if (oper == '+')
   {
-    if ((first < 0 && second < 0) && (llint_min - first > second))
+    if ((max_num > 0 && min_num > 0) && (llint_max - max_num < min_num))
     {
       throw std::overflow_error("Variable overflow");
     }
-    else if ((first > 0 && second > 0) && (llint_max - first < second))
+    else if ((max_num < 0 && min_num < 0) && (llint_min - max_num > min_num))
     {
-      throw std::overflow_error("Variable overflow");
+      throw std::overflow_error("Variable underflow");
     }
   }
   else if (oper == '-')
   {
-    if ((first < 0 && second > 0) && (llint_max + first < second))
+    if ((max_num < 0 && min_num > 0) && (llint_max + max_num < min_num))
     {
       throw std::overflow_error("Variable overflow");
     }
-    else if ((first > 0 && second < 0) && (llint_min + first > second))
+    else if ((max_num > 0 && min_num < 0) && (llint_min + max_num > min_num))
     {
-      throw std::overflow_error("Variable overflow");
+      throw std::overflow_error("Variable underflow");
     }
   }
   else if (oper == '*')
   {
-    if (((first < 0 && second < 0) || (first > 0 && second > 0)) && (llint_max / first < second))
+    if (((max_num < 0 && min_num < 0) || (max_num > 0 && min_num > 0)) && (llint_max / max_num < min_num))
     {
       throw std::overflow_error("Variable overflow");
     }
-    else if (((first > 0 && second < 0) || (first < 0 && second > 0)) && (llint_min / first > second))
+    else if (((max_num > 0 && min_num < 0) || (max_num < 0 && min_num > 0)) && (llint_min / max_num > min_num))
     {
-      throw std::overflow_error("Variable overflow");
+      throw std::overflow_error("Variable underflow");
     }
   }
   else if (oper == '/')
   {
-    llint max_num = std::max(first, second);
-    llint min_num = std::min(first, second);
     if (min_num == llint_min && max_num == -1)
     {
       throw std::overflow_error("Variable overflow");
@@ -225,8 +224,13 @@ zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
   {
     return second + first;
   }
+  
+  if (oper == '%' && second < 0)
+  {
+    return first + (second % first);
+  }
 
-  return std::abs(second) % std::abs(first);
+  return second % first;
 }
 
 zakirov::llint zakirov::calculate_postfix_expression(Queue< std::string > postfix)
