@@ -73,25 +73,18 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
       }
       else
       {
-        try
+        auto it = it_out->second.begin();
+        if (it_out == fwd_ring_list.begin())
         {
-          auto it = it_out->second.begin();
-          if (it_out == fwd_ring_list.begin())
-          {
-            std::cout << *it;
-            AddElementToSumAndPopFrontIt(sum, it_out, it);
-          }
-          else
-          {
-            std::cout << " " << *it;
-            AddElementToSumAndPopFrontIt(sum, it_out, it);
-          }
-          ++prev_it_out;
+          std::cout << *it;
+          AddElementToSumAndPopFrontIt(sum, it_out, it);
         }
-        catch(const std::exception& e)
+        else
         {
-          throw;
+          std::cout << " " << *it;
+          AddElementToSumAndPopFrontIt(sum, it_out, it);
         }
+        ++prev_it_out;
       }
     }
     while (it_out++ != fwd_ring_list.end() && fwd_ring_list.begin() != fwd_ring_list.end());

@@ -190,11 +190,25 @@ namespace petrov
     head_ = new node_t;
     head_->data_ = *it;
     auto subhead = head_;
-    while (it++ != rhs.cend())
+    try
     {
-      subhead->next_ = new node_t;
-      subhead->next_->data_ = *it;
-      subhead = subhead->next_;
+      while (it++ != rhs.cend())
+      {
+        subhead->next_ = new node_t;
+        subhead->next_->data_ = *it;
+        subhead = subhead->next_;
+      }
+    }
+    catch (const std::bad_alloc & e)
+    {
+      while (head_->next_)
+      {
+        auto todelete = head_;
+        head_ = todelete->next_;
+        delete todelete;
+      }
+      delete head_;
+      throw;
     }
     subhead->next_ = head_;
     tail_ = subhead;
@@ -213,11 +227,25 @@ namespace petrov
     head_ = new node_t;
     head_->data_ = *it;
     auto subhead = head_;
-    while (it++ != rhs.cend())
+    try
     {
-      subhead->next_ = new node_t;
-      subhead->next_->data_ = *it;
-      subhead = subhead->next_;
+      while (it++ != rhs.cend())
+      {
+        subhead->next_ = new node_t;
+        subhead->next_->data_ = *it;
+        subhead = subhead->next_;
+      }
+    }
+    catch (const std::bad_alloc & e)
+    {
+      while (head_->next_)
+      {
+        auto todelete = head_;
+        head_ = todelete->next_;
+        delete todelete;
+      }
+      delete head_;
+      throw;
     }
     subhead->next_ = head_;
     tail_ = subhead;
