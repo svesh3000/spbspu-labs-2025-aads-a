@@ -43,6 +43,15 @@ void zakirov::check_overflow(llint first, llint second, char oper)
       throw std::overflow_error("Variable overflow");
     }
   }
+  else if (oper == '/')
+  {
+    llint max_num = std::max(first, second);
+    llint min_num = std::min(first, second);
+    if (min_num == llint_min && max_num == -1)
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+  }
 }
 
 bool zakirov::check_operand(const std::string & line)
@@ -199,23 +208,21 @@ zakirov::llint zakirov::transform_to_llint(const std::string & line)
 
 zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
 {
+  check_overflow(second, first, oper);
   if (oper == '/')
   {
     return second / first;
   }
   else if (oper == '*')
   {
-    check_overflow(second, first, oper);
     return second * first;
   }
   else if (oper == '-')
   {
-    check_overflow(second, first, oper);
     return second - first;
   }
   else if (oper == '+')
   {
-    check_overflow(second, first, oper);
     return second + first;
   }
 
