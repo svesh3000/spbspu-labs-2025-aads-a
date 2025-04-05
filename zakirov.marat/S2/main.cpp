@@ -36,7 +36,16 @@ int main(int argc, char ** argv)
     return 0;
   }
 
-  std::cout << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
+  try
+  {
+    std::cout << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
+  }
+  catch (const std::overflow_error & e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
+
   stack_qs.pop();
   while (!stack_qs.empty())
   {

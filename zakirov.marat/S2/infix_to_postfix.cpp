@@ -1,10 +1,42 @@
 #include "infix_to_postfix.hpp"
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include "stack.hpp"
 #include "queue.hpp"
-
 #include <iostream>
+
+void zakirov::check_overflow(llint first, llint second, char oper)
+{
+  llint llint_max = std::numeric_limits< llint >::max();
+  llint llint_min = std::numeric_limits< llint >::min();
+  if (oper == '+')
+  {
+    if ((first < 0 && second < 0) && (llint_min - first > second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+    else if ((first > 0 && second > 0) && (llint_max - first < second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+  }
+  else if (oper == '-')
+  {
+    if ((first < 0 && second > 0) && (llint_max + first < second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+    else if ((first > 0 && second < 0) && (llint_min + first > second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+  }
+  else if (oper == '*' && (llint_max / std::abs(first) > std::abs(second)))
+  {
+    throw std::overflow_error("Variable overflow");
+  }
+}
 
 bool zakirov::check_operand(const std::string & line)
 {
@@ -37,8 +69,8 @@ bool zakirov::check_operand(const std::string & line)
 
 bool zakirov::check_operator(std::string symbol)
 {
-  constexpr char operators[4] = {'+', '-', '*', '/'};
-  for (size_t i = 0; i < 4; ++i)
+  constexpr char operators[5] = {'+', '-', '*', '/', '%'};
+  for (size_t i = 0; i < 5; ++i)
   {
     if (symbol.front() == operators[i] && symbol.size() == 1)
     {
@@ -125,37 +157,40 @@ zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string >
   return result;
 }
 
-double zakirov::transform_to_double(const std::string & line)
+zakirov::llint zakirov::transform_to_llint(const std::string & line)
 {
   Stack< char > num_buffer;
+  bool flag = false;
   std::string::const_iterator fillable_it = line.cbegin();
-  double result = 0;
-  for (; *fillable_it != '.' && fillable_it != line.end(); ++fillable_it)
+  if (*fillable_it == '-')
+  {
+    flag = true;
+    ++fillable_it;
+  }
+
+  llint result = 0;
+  for (; fillable_it != line.end(); ++fillable_it)
   {
     num_buffer.push(*fillable_it);
   }
 
   size_t size_b = num_buffer.size();
-  for (size_t i = 0; i < size_b; ++i)
+  llint num_power = 1;
+  if (flag)
   {
-    result += (num_buffer.top() - '0') * std::pow(10, i);
+    num_power = -1;
+  }
+
+  for (size_t i = 0; i < size_b; ++i, num_power *= 10)
+  {
+    result += (num_buffer.top() - '0') * num_power;
     num_buffer.pop();
-  }
-
-  if (*fillable_it == '.')
-  {
-    ++fillable_it;
-  }
-
-  for (size_t i = 1; fillable_it != line.end(); ++fillable_it, ++i)
-  {
-    result += *fillable_it / 10 * i;
   }
 
   return result;
 }
 
-double zakirov::calculate_postfix(double first, double second, char oper)
+zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
 {
   if (oper == '/')
   {
@@ -163,27 +198,34 @@ double zakirov::calculate_postfix(double first, double second, char oper)
   }
   else if (oper == '*')
   {
+    check_overflow(second, first, oper);
     return second * first;
   }
   else if (oper == '-')
   {
+    check_overflow(second, first, oper);
     return second - first;
   }
+  else if (oper == '+')
+  {
+    check_overflow(second, first, oper);
+    return second + first;
+  }
 
-  return second + first;
+  return std::abs(second) % std::abs(first);
 }
 
-double zakirov::calculate_postfix_expression(Queue< std::string > postfix)
+zakirov::llint zakirov::calculate_postfix_expression(Queue< std::string > postfix)
 {
-  Stack< double > result;
-  double first_v = 0.0;
-  double second_v = 0.0;
-  double result_v = 0.0;
+  Stack< llint > result;
+  llint first_v = 0;
+  llint second_v = 0;
+  llint result_v = 0;
   while (!postfix.empty())
   {
     if (check_operand(postfix.front()))
     {
-      result.push(transform_to_double(postfix.front()));
+      result.push(transform_to_llint(postfix.front()));
       postfix.pop();
     }
     else if (check_operator(postfix.front()))
