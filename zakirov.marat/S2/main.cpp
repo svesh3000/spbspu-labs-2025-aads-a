@@ -40,6 +40,11 @@ int main(int argc, char ** argv)
   {
     std::cout << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
   }
+  catch (const std::invalid_argument & e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
   catch (const std::overflow_error & e)
   {
     std::cerr << e.what() << '\n';

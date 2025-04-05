@@ -32,9 +32,16 @@ void zakirov::check_overflow(llint first, llint second, char oper)
       throw std::overflow_error("Variable overflow");
     }
   }
-  else if (oper == '*' && (llint_max / std::abs(first) > std::abs(second)))
+  else if (oper == '*')
   {
-    throw std::overflow_error("Variable overflow");
+    if (((first < 0 && second < 0) || (first > 0 && second > 0)) && (llint_max / first < second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
+    else if (((first > 0 && second < 0) || (first < 0 && second > 0)) && (llint_min / first > second))
+    {
+      throw std::overflow_error("Variable overflow");
+    }
   }
 }
 
@@ -106,7 +113,7 @@ zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string >
     }
     else if (check_operator(symbol))
     {
-      while (!op_buffer.empty() && check_priority(symbol) <= check_priority(op_buffer.top()))
+      while (!op_buffer.empty() && check_priority(symbol) <= check_priority(op_buffer.top()) && op_buffer.top() != "(")
       {
         result.push(op_buffer.top());
         op_buffer.pop();
