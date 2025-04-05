@@ -4,7 +4,7 @@
 #include <limits>
 #include "stack.hpp"
 #include "queue.hpp"
-#include <iostream>
+
 void zakirov::check_overflow(llint first, llint second, char oper)
 {
   llint llint_max = std::numeric_limits< llint >::max();
@@ -224,7 +224,7 @@ zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
   {
     return second + first;
   }
-  
+
   if (oper == '%' && second < 0)
   {
     return first + (second % first);
