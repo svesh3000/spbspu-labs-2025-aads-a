@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <ios>
+#include <type_traits>
 #include <utility>
 #include "iterator.hpp"
 #include "treeNode.hpp"
@@ -20,7 +21,7 @@ namespace kiselev
 
     RBTree();
     RBTree(const RBTree< Key, Value, Cmp >&);
-    RBTree(RBTree< Key, Value, Cmp >&&);
+    RBTree(RBTree< Key, Value, Cmp >&&) noexcept;
     RBTree(std::initializer_list< value >);
     template< typename InputIt >
     RBTree(InputIt first, InputIt last);
@@ -45,6 +46,12 @@ namespace kiselev
     template< typename InputIt >
     void insert(InputIt first, InputIt last);
     void insert(std::initializer_list< value >);
+
+    Iterator erase(Iterator) noexcept;
+    Iterator erase(ConstIterator) noexcept;
+    size_t erase(const Key&) noexcept;
+    Iterator erase(Iterator first, Iterator last) noexcept;
+    Iterator erase(ConstIterator first, ConstIterator last) noexcept;
 
     template< typename... Args >
     std::pair< Iterator, bool > emplace(Args&&...);
@@ -88,7 +95,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree):
+  RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree) noexcept:
     root_(std::exchange(tree.root_, nullptr)),
     size_(std::exchange(tree.size_, 0))
   {}
@@ -130,6 +137,18 @@ namespace kiselev
     RBTree< Key, Value, Cmp > temp(il);
     swap(temp);
     return *this;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >::~RBTree()
+  {
+    clear();
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  void RBTree< Key, Value, Cmp >::clear() noexcept
+  {
+    erase(begin(), end());
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -556,5 +575,120 @@ namespace kiselev
     insert(il.begin(), il.end());
   }
 
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(ConstIterator pos) noexcept
+  {
+    if (pos == end())
+    {
+      return end();
+    }
+    Node* toDelete = pos.node_;
+    Node* temp = nullptr;
+    if (toDelete->left)
+    {
+      temp = toDelete->left;
+      while (temp->right)
+      {
+        temp = temp->right;
+      }
+    }
+    else if (toDelete->right)
+    {
+      temp = toDelete->right;
+      while (temp->left)
+      {
+        temp = temp->left;
+      }
+    }
+    if (toDelete == root_ && !temp)
+    {
+      delete root_;
+      root_ = nullptr;
+      --size_;
+      return end();
+    }
+    if (!temp)
+    {
+      temp = toDelete;
+    }
+    else if (temp->parent)
+    {
+      if (temp->parent->right == temp)
+      {
+        temp->parent->right = temp->left ? temp->left : temp->right;
+      }
+      else if (temp->parent->left == temp)
+      {
+        temp->parent->left = temp->left ? temp->left : temp->right;
+      }
+    }
+    Node* child = temp->left ? temp->left : temp->right;
+    if (child)
+    {
+      child->parent = temp->parent;
+    }
+    if (temp != toDelete)
+    {
+      std::swap(temp->data, toDelete->data);
+      std::swap(temp->color, toDelete->color);
+    }
+    if (temp == root_)
+    {
+      root_ = child;
+    }
+    if (temp->color == Color::BLACK)
+    {
+      if (child && child->color == Color::RED)
+      {
+        child->color = Color::BLACK;
+      }
+      else
+      {
+        fixDelete(child ? child : temp->parent);
+      }
+    }
+    Iterator res = pos.node_;
+    ++res;
+    delete temp;
+    --size_;
+    return res;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(Iterator pos) noexcept
+  {
+    ConstIterator it = pos;
+    return erase(it);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  size_t RBTree< Key, Value, Cmp >::erase(const Key& key) noexcept
+  {
+    Iterator it = find(key);
+    if (it == end())
+    {
+      return 0;
+    }
+    erase(it);
+    return 1;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(ConstIterator first, ConstIterator last) noexcept
+  {
+    while (first != last)
+    {
+      first = erase(first);
+    }
+    return Iterator(last.node_);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(Iterator first, Iterator last) noexcept
+  {
+    ConstIterator constFirst(first);
+    ConstIterator constLast(last);
+    return erase(constFirst, constLast);
+  }
 }
 #endif
