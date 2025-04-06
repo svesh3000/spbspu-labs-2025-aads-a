@@ -2,7 +2,10 @@
 #define TREE_HPP
 #include <functional>
 #include <cstddef>
+#include <ios>
+#include <utility>
 #include "iterator.hpp"
+#include "treeNode.hpp"
 
 namespace kiselev
 {
@@ -23,6 +26,11 @@ namespace kiselev
     ConstIterator cbegin() const noexcept;
     Iterator end() noexcept;
     ConstIterator cend() const noexcept;
+
+    template< typename... Args >
+    std::pair< Iterator, bool > emplace(Args&&...);
+    template< typename... Args >
+    Iterator emplaceHint(ConstIterator, Args&&...);
 
     void swap(RBTree< Key, Value, Cmp >&) noexcept;
     void clear() noexcept;
@@ -347,6 +355,89 @@ namespace kiselev
       }
     }
     return cend();
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename... Args >
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::emplace(Args &&... args)
+  {
+    value val(std::forward< Args >(args)...);
+    const Key& key = val.first;
+    Node* temp = root_;
+    Node* parent = nullptr;
+    while (temp)
+    {
+      parent = temp;
+      if (cmp_(temp->data.first, key))
+      {
+        temp = temp->left;
+      }
+      else if (cmp_(key, temp->data.first))
+      {
+        temp = temp->right;
+      }
+      else
+      {
+        return { Iterator(temp), false };
+      }
+    }
+
+    Node* newNode = new Node(val, Color::RED, nullptr, nullptr, parent);
+    if (!parent)
+    {
+      root_ = newNode;
+    }
+    else if (cmp_(parent->data.first))
+    {
+      parent->right = newNode;
+    }
+    else
+    {
+      parent->left = newNode;
+    }
+    fixInsert(newNode);
+    size_++;
+    return { Iterator(newNode), true };
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename... Args >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::emplaceHint(ConstIterator hint, Args &&... args)
+  {
+    if (hint == end() || empty())
+    {
+      return emplace(std::forward< Args >(args)...).first;
+    }
+    value val(std::forward< Args >(args)...);
+    const Key& key = val.first;
+    Node* pos = hint.node_;
+    if (cmp_(key, pos->data.first))
+    {
+      if (!hint->left)
+      {
+        Node* newNode = new Node(val, Color::RED, nullptr, nullptr, pos);
+        pos->left = newNode;
+        fixInsert(newNode);
+        ++size_;
+        return Iterator(newNode);
+      }
+    }
+    else if (cmp_(pos->data.first, key))
+    {
+      if (!pos->right)
+      {
+        Node* newNode = new Node(val, Color::RED, nullptr, nullptr, pos);
+        pos->right = newNode;
+        fixInsert(newNode);
+        ++size_;
+        return Iterator(newNode);
+      }
+    }
+    else
+    {
+      return Iterator(pos);
+    }
+    return emplace(std::forward< Args >(args)...).first;
   }
 }
 #endif
