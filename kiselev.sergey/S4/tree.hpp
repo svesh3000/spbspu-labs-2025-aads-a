@@ -2,6 +2,7 @@
 #define TREE_HPP
 #include <functional>
 #include <cstddef>
+#include <initializer_list>
 #include <ios>
 #include <utility>
 #include "iterator.hpp"
@@ -26,6 +27,14 @@ namespace kiselev
     ConstIterator cbegin() const noexcept;
     Iterator end() noexcept;
     ConstIterator cend() const noexcept;
+
+    std::pair< Iterator, bool > insert(const Value&);
+    std::pair< Iterator, bool > insert(Value&);
+    Iterator insert(ConstIterator, const Value&);
+    Iterator insert(Iterator, const Value&);
+    template< typename InputIt >
+    void insert(InputIt first, InputIt last);
+    void insert(std::initializer_list< value >);
 
     template< typename... Args >
     std::pair< Iterator, bool > emplace(Args&&...);
@@ -439,5 +448,48 @@ namespace kiselev
     }
     return emplace(std::forward< Args >(args)...).first;
   }
+  template< typename Key, typename Value, typename Cmp >
+  std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const Value& value)
+  {
+    return emplace(value);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(Value& value)
+  {
+    return emplace(value);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(ConstIterator pos, const Value& value)
+  {
+    return emplaceHint(pos, value);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(Iterator pos, const Value& value)
+  {
+    ConstIterator it(pos.node_);
+    return emplaceHint(it, value);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename InputIt >
+  void RBTree< Key, Value, Cmp >::insert(InputIt first, InputIt last)
+  {
+    RBTree< Key, Value, Cmp > temp(*this);
+    for (; first != last; ++first)
+    {
+      temp.insert(*first);
+    }
+    swap(temp);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  void RBTree< Key, Value, Cmp >::insert(std::initializer_list< value > il)
+  {
+    insert(il.begin(), il.end());
+  }
+
 }
 #endif
