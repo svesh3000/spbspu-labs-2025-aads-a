@@ -31,10 +31,12 @@ namespace demehin
 
     bool operator==(const this_t& rhs) const noexcept;
     bool operator!=(const this_t& rhs) const noexcept;
+
   private:
-    explicit TreeIterator(Node*) noexcept;
     Node* getNode() const noexcept;
     Node* node_;
+
+    explicit TreeIterator(Node*) noexcept;
   };
 
   template< typename Key, typename T, typename Cmp >
@@ -101,7 +103,6 @@ namespace demehin
       }
       node_ = node_->parent;
     }
-    return *this;
     return *this;
   }
 
