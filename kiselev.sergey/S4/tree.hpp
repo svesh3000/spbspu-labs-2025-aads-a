@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <ios>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include "iterator.hpp"
@@ -18,6 +19,8 @@ namespace kiselev
     using value = std::pair< Key, Value >;
     using Iterator = detail::Iterator< Key, Value, Cmp, false >;
     using ConstIterator = detail::Iterator< Key, Value, Cmp, true >;
+    using IteratorPair = std::pair< Iterator, Iterator >;
+    using ConstIteratorPair = std::pair< ConstIterator, ConstIterator >;
 
     RBTree();
     RBTree(const RBTree< Key, Value, Cmp >&);
@@ -60,8 +63,16 @@ namespace kiselev
 
     void swap(RBTree< Key, Value, Cmp >&) noexcept;
     void clear() noexcept;
+
     Iterator find(const Key&) noexcept;
     ConstIterator find(const Key&) const noexcept;
+    size_t count(const Key&) const noexcept;
+    Iterator lowerBound(const Key&) noexcept;
+    ConstIterator lowerBound(const Key&) const noexcept;
+    Iterator upperBound(const Key&) noexcept;
+    ConstIterator upperBound(const Key&) const noexcept;
+    std::pair< Iterator, Iterator > equalRange(const Key&) noexcept;
+    std::pair< ConstIterator, ConstIterator > equalRange(const Key&) const noexcept;
 
     void push(Key, Value);
     Value get(Key);
@@ -689,6 +700,77 @@ namespace kiselev
     ConstIterator constFirst(first);
     ConstIterator constLast(last);
     return erase(constFirst, constLast);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  size_t RBTree< Key, Value, Cmp >::count(const Key& key) const noexcept
+  {
+    ConstIterator it = find(key);
+    return it == cend() ? 0 : 1;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::lowerBound(const Key& key) noexcept
+  {
+    Node* temp = root_;
+    Node* res = nullptr;
+    while (temp)
+    {
+      if (!cmp_(temp->data.first, key))
+      {
+        res = temp;
+        temp = temp->left;
+      }
+      else
+      {
+        temp = temp->right;
+      }
+    }
+    return Iterator(res);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::lowerBound(const Key& key) const noexcept
+  {
+    return ConstIterator(lowerBound(key));
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::upperBound(const Key& key) noexcept
+  {
+    Node* temp = root_;
+    Node* res = nullptr;
+    while (temp)
+    {
+      if (cmp_(key, temp->data.first))
+      {
+        res = temp;
+        temp = temp->left;
+      }
+      else
+      {
+        temp = temp->right;
+      }
+    }
+    return Iterator(res);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::upperBound(const Key& key) const noexcept
+  {
+    return ConstIterator(upperBound(key));
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::IteratorPair RBTree< Key, Value, Cmp >::equalRange(const Key& key) noexcept
+  {
+    return { Iterator(lowerBound(key)), Iterator(upperBound(key)) };
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstIteratorPair RBTree< Key, Value, Cmp >::equalRange(const Key& key) const noexcept
+  {
+    return { ConstIterator(lowerBound(key)), ConstIterator(upperBound(key)) };
   }
 }
 #endif
