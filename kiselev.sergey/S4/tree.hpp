@@ -19,6 +19,16 @@ namespace kiselev
     using ConstIterator = detail::Iterator< Key, Value, Cmp, true >;
 
     RBTree();
+    RBTree(const RBTree< Key, Value, Cmp >&);
+    RBTree(RBTree< Key, Value, Cmp >&&);
+    RBTree(std::initializer_list< value >);
+    template< typename InputIt >
+    RBTree(InputIt first, InputIt last);
+    ~RBTree();
+
+    RBTree< Key, Value, Cmp >& operator=(const RBTree< Key, Value, Cmp >&);
+    RBTree< Key, Value, Cmp >& operator=(RBTree< Key, Value, Cmp >&&);
+    RBTree< Key, Value, Cmp >& operator=(std::initializer_list< value >);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -66,6 +76,61 @@ namespace kiselev
     root_(nullptr),
     size_(0)
   {}
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >::RBTree(const RBTree< Key, Value, Cmp >& tree):
+    RBTree()
+  {
+    for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree):
+    root_(std::exchange(tree.root_, nullptr)),
+    size_(std::exchange(tree.size_, 0))
+  {}
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename InputIt >
+  RBTree< Key, Value, Cmp >::RBTree(InputIt first, InputIt last):
+    RBTree()
+  {
+    for (; first != last; ++first)
+    {
+      insert(*first);
+    }
+  }
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >::RBTree(std::initializer_list< value > il):
+    RBTree(il.begin(), il.end())
+  {}
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >& RBTree< Key, Value, Cmp >::operator=(const RBTree< Key, Value, Cmp >& tree)
+  {
+    RBTree< Key, Value, Cmp > cpy(tree);
+    swap(cpy);
+    return *this;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >& RBTree< Key, Value, Cmp >::operator=(RBTree< Key, Value, Cmp >&& tree)
+  {
+    RBTree< Key, Value, Cmp > temp(std::move(tree));
+    swap(temp);
+    return *this;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  RBTree< Key, Value, Cmp >& RBTree< Key, Value, Cmp >::operator=(std::initializer_list< value > il)
+  {
+    RBTree< Key, Value, Cmp > temp(il);
+    swap(temp);
+    return *this;
+  }
 
   template< typename Key, typename Value, typename Cmp >
   void RBTree< Key, Value, Cmp >::rotateLeft(Node* node) noexcept
