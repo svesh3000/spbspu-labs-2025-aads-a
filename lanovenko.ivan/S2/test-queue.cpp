@@ -41,3 +41,30 @@ BOOST_AUTO_TEST_CASE(queue_empty_test_without_value)
   lanovenko::Queue< int > test{};
   BOOST_TEST(test.empty() == true);
 }
+
+BOOST_AUTO_TEST_CASE(size_test)
+{
+  lanovenko::Queue< int > test{};
+  test.push(2);
+  test.push(3);
+  BOOST_TEST(test.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(front_test)
+{
+  lanovenko::Queue< int > test{};
+  test.push(1);
+  BOOST_TEST(test.front() == 1);
+  test.pop();
+  test.push(2);
+  BOOST_TEST(test.front() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(back_test)
+{
+  lanovenko::Queue< int > test{};
+  test.push(3);
+  test.push(2);
+  test.push(1);
+  BOOST_TEST(test.back() == 1);
+}
