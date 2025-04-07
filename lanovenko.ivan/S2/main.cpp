@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     std::ifstream input(argv[1]);
     inputExpression(input, infixExpressions);
   }
-  Queue< Queue < std::string > > postfixExpressions;
+  Queue< Queue < std::string > > postfixExpressions{};
   while (!infixExpressions.empty())
   {
     std::string expression = infixExpressions.front();
