@@ -87,21 +87,22 @@ namespace petrov
   {
     if (this->empty())
     {
+      delete[] massive_;
       capacity_ = 5;
       massive_ = new T[capacity_];
       massive_[size_of_stack_++] = element;
     }
     else if (size_of_stack_ == capacity_)
     {
-      T * temp = massive_;
-      massive_ = new T[capacity_ *= 2];
+      T * temp = new T[capacity_ *= 2];
       size_t i = 0;
       while (i < size_of_stack_)
       {
-        massive_[i] = temp[i];
+        temp[i] = massive_[i];
         ++i;
       }
-      delete[] temp;
+      delete[] massive_;
+      massive_ = temp;
       massive_[i] = element;
       size_of_stack_++;
     }
@@ -124,6 +125,10 @@ namespace petrov
   template< typename T >
   T & Stack< T >::top()
   {
+    if (this->empty())
+    {
+      throw std::logic_error("ERROR: Stack is empty");
+    }
     return massive_[size_of_stack_ - 1];
   }
 
