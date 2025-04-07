@@ -98,7 +98,8 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
     }
     else if (token == "+" || token == "-")
     {
-      if (stack.empty() || stack.top() == "**" || stack.top() == "/" || stack.top() == "*" || stack.top() == "%" || stack.top() == "+" || stack.top() == "-")
+      if (stack.empty() || stack.top() == "**" || stack.top() == "/" 
+              || stack.top() == "*" || stack.top() == "%" || stack.top() == "+" || stack.top() == "-")
       {
         if (stack.empty())
         {
