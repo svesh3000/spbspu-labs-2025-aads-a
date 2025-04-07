@@ -50,9 +50,32 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
       }
       stack.pop();
     }
+    else if (token == "**")
+    {
+      if (stack.empty() || stack.top() == "**")
+      {
+        if (stack.empty())
+        {
+          stack.push(token);
+        }
+        else
+        {
+          while (!stack.empty() && stack.top() != "(")
+          {
+            new_queue.push(stack.top());
+            stack.pop();
+          }
+          stack.push(token);
+        }
+      }
+      else
+      {
+        stack.push(token);
+      }
+    }
     else if (token == "*" || token == "/" || token == "%")
     {
-      if (stack.empty() || stack.top() == "/" || stack.top() == "*" || stack.top() == "%")
+      if (stack.empty() || stack.top() == "**" || stack.top() == "/" || stack.top() == "*" || stack.top() == "%")
       {
         if (stack.empty())
         {
@@ -75,7 +98,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
     }
     else if (token == "+" || token == "-")
     {
-      if (stack.empty() ||  stack.top() == "/" || stack.top() == "*" || stack.top() == "%" || stack.top() == "+" || stack.top() == "-")
+      if (stack.empty() || stack.top() == "**" || stack.top() == "/" || stack.top() == "*" || stack.top() == "%" || stack.top() == "+" || stack.top() == "-")
       {
         if (stack.empty())
         {
@@ -123,6 +146,34 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
       if (isdigit(token))
       {
         stack.push(std::stoll(token));
+      }
+      else if (token == "**")
+      {
+        long long int first_operand = stack.top();
+        stack.pop();
+        long long int second_operand = stack.top();
+        stack.pop();
+        long long int multiplier = second_operand;
+        if (first_operand == 0)
+        {
+          stack.push(1ll);
+        }
+        else
+        {
+          for (long long int i = 1; i < first_operand; i++)
+          {
+            if (std::abs(second_operand) <= std::numeric_limits< long long int >::max() / std::abs(multiplier))
+            {
+              second_operand *= multiplier;
+            }
+            else
+            {
+              throw std::out_of_range("ERROR: Out of range");
+            }
+          }
+          result = second_operand;
+          stack.push(result);
+        }
       }
       else if (token == "*")
       {
