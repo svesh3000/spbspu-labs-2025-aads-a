@@ -45,12 +45,12 @@ namespace dribas
     template< class Predicate >
     void remove_if(Predicate) noexcept;
     void remove(const T&) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >& other) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >&& other) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >& other, dribas::Iterator< T, true > it) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >&& other, dribas::Iterator< T, true > it) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >& other, dribas::Iterator< T, true > first, dribas::Iterator< T, true > last) noexcept;
-    void splice(dribas::Iterator< T, true > pos, List< T >&& other, dribas::Iterator< T, true > first, dribas::Iterator< T, true > last) noexcept;
+    void splice(constItartor pos, List< T >& other) noexcept;
+    void splice(constItartor pos, List< T >&& other) noexcept;
+    void splice(constItartor pos, List< T >& other, constItartor it) noexcept;
+    void splice(constItartor pos, List< T >&& other, constItartor it) noexcept;
+    void splice(constItartor pos, List< T >& other, constItartor first, constItartor last) noexcept;
+    void splice(constItartor pos, List< T >&& other, constItartor first, constItartor last) noexcept;
     template< class InputIt >
     void assign(InputIt first, InputIt last);
     template< class R >
@@ -73,7 +73,8 @@ namespace dribas
 }
 
 template < class T >
-void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >& other, dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >& other,
+  dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
 {
   if (!(&other == this || first == last)) {
     Node< T >* first_node = first.node_;
@@ -147,7 +148,8 @@ void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other,
 }
 
 template < class T >
-void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other, dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other,
+  dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
 {
   splice(pos, other, first, last);
 }
