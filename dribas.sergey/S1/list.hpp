@@ -71,8 +71,9 @@ namespace dribas
     size_t size_;
   };
 }
+
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other, Itarator<T, true> first, Itarator<T, true> last) noexcept 
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
 {
   if (!(&other == this || first == last)) {
     Node< T >* first_node = first.node_;
@@ -107,7 +108,7 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other, Itarator<T
       tail_ = last_node ? last_node->prev_ : other.tail_;
     }
     size_t count = 0;
-    Node<T>* current = first_node;
+    Node< T >* current = first_node;
     while (current != last_node) {
       ++count;
       current = current->next_;
@@ -118,7 +119,7 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other, Itarator<T
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other, Itarator<T, true> it) noexcept
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other, Itarator<T, true> it) noexcept
 {
   if (it != other.end()) {
     splice(pos, other, it, Itarator<T, true>(it.node_->next_));
@@ -126,7 +127,7 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other, Itarator<T
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other) noexcept
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other) noexcept
 {
   if (!other.empty()) {
     splice(pos, other, other.begin(), other.end());
@@ -134,19 +135,19 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List<T>& other) noexcept
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other) noexcept
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other) noexcept
 {
   splice(pos, other);
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other, Itarator<T, true> it) noexcept
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other, Itarator<T, true> it) noexcept
 {
   splice(pos, other, it);
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
+void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
 {
   splice(pos, other, first, last);
 }
@@ -202,11 +203,11 @@ dribas::Itarator< T, true > dribas::List< T >::cend() const noexcept
 template< class T >
 void dribas::List< T >::remove(const T& value) noexcept
 {
-  Node<T>* current = head_;
-  Node<T>* prev = nullptr;
+  Node< T >* current = head_;
+  Node< T >* prev = nullptr;
   while (current) {
     if (current->data_ == value) {
-      Node<T>* toDelete = current;
+      Node< T >* toDelete = current;
       if (prev) {
         prev->next_ = current->next_;
       } else {
@@ -259,13 +260,13 @@ void dribas::List< T >::assign(InputIt first, InputIt last)
 
 template<class T>
 template<class Predicate>
-void dribas::List<T>::remove_if(Predicate predicator) noexcept
+void dribas::List< T >::remove_if(Predicate predicator) noexcept
 {
-  Node<T>* current = head_;
-  Node<T>* prev = nullptr;
+  Node< T >* current = head_;
+  Node< T >* prev = nullptr;
   while (current) {
     if (predicator(current->data_)) {
-      Node<T>* toDelete = current;
+      Node< T >* toDelete = current;
       if (prev) {
         prev->next_ = current->next_;
       } else {
