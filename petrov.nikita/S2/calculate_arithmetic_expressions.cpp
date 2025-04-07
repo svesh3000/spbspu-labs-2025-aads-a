@@ -13,9 +13,9 @@ namespace
   }
 }
 
-std::stack< long long int > petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
+petrov::Stack< long long int > petrov::calculateArithmeticExpressions(std::queue< std::string > & queue)
 {
-  std::stack< long long int > stack;
+  petrov::Stack< long long int > stack;
   long long int result = 0;
   while (!queue.empty())
   {
@@ -28,7 +28,7 @@ std::stack< long long int > petrov::calculateArithmeticExpressions(std::queue< s
 
 std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::string > & queue)
 {
-  std::stack< std::string > stack;
+  petrov::Stack< std::string > stack;
   std::queue< std::string > new_queue;
   while (queue.front() != "|")
   {
@@ -137,7 +137,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
 
 long long int petrov::calculatePostfixExpression(std::queue< std::string > & queue)
 {
-  std::stack< long long int > stack;
+  petrov::Stack< long long int > stack;
   long long int result = 0;
   try
   {

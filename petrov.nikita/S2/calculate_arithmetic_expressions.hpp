@@ -3,11 +3,11 @@
 
 #include <string>
 #include <queue>
-#include <stack>
+#include "stack.hpp"
 
 namespace petrov
 {
-  std::stack< long long int > calculateArithmeticExpressions(std::queue< std::string > & queue);
+  petrov::Stack< long long int > calculateArithmeticExpressions(std::queue< std::string > & queue);
   std::queue< std::string > transformInfixToPostfix(std::queue< std::string > & queue);
   long long int calculatePostfixExpression(std::queue< std::string > & queue);
 }

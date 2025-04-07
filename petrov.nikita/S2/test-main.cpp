@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(raise_five_to_first_power)
   std::queue< std::string > queue;
   std::string text = "5 ** 1";
   petrov::parseTextAndPushItToQueue(text, queue);
-  std::stack< long long int > output_stack;
+  petrov::Stack< long long int > output_stack;
   output_stack = petrov::calculateArithmeticExpressions(queue);
   out << output_stack.top();
   output_stack.pop();
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(raise_five_to_second_and_third_power)
   petrov::parseTextAndPushItToQueue(text, queue);
   text = "5 ** 3";
   petrov::parseTextAndPushItToQueue(text, queue);
-  std::stack< long long int > output_stack;
+  petrov::Stack< long long int > output_stack;
   output_stack = petrov::calculateArithmeticExpressions(queue);
   out << output_stack.top();
   output_stack.pop();
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(raise_three_to_ten_and_five_power)
   petrov::parseTextAndPushItToQueue(text, queue);
   text = "3 ** 5";
   petrov::parseTextAndPushItToQueue(text, queue);
-  std::stack< long long int > output_stack;
+  petrov::Stack< long long int > output_stack;
   output_stack = petrov::calculateArithmeticExpressions(queue);
   out << output_stack.top();
   output_stack.pop();
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(raise_five_to_zero_power)
   std::queue< std::string > queue;
   std::string text = "5 ** 0";
   petrov::parseTextAndPushItToQueue(text, queue);
-  std::stack< long long int > output_stack;
+  petrov::Stack< long long int > output_stack;
   output_stack = petrov::calculateArithmeticExpressions(queue);
   out << output_stack.top();
   output_stack.pop();
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(arithmetic_expression)
   std::queue< std::string > queue;
   std::string text = "( ( 5 + 2 ) ** 2 ) + 1";
   petrov::parseTextAndPushItToQueue(text, queue);
-  std::stack< long long int > output_stack;
+  petrov::Stack< long long int > output_stack;
   output_stack = petrov::calculateArithmeticExpressions(queue);
   out << output_stack.top();
   output_stack.pop();
