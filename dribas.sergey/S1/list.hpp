@@ -146,7 +146,7 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other, Itarator<
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other, Itarator<T, true> first, Itarator<T, true> last) noexcept 
+void dribas::List< T >::splice(Itarator<T, true> pos, List<T>&& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
 {
   splice(pos, other, first, last);
 }
