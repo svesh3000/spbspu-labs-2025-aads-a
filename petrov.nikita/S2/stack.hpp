@@ -12,9 +12,9 @@ namespace petrov
   {
   public:
     using this_t = Stack< T >;
-    Stack(): 
+    Stack():
       massive_(nullptr),
-      capacity_(0), 
+      capacity_(0),
       size_of_stack_(0)
     {}
     Stack(const this_t & rhs);
