@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <ios>
 #include <iterator>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include "iterator.hpp"
@@ -33,6 +34,11 @@ namespace kiselev
     RBTree< Key, Value, Cmp >& operator=(const RBTree< Key, Value, Cmp >&);
     RBTree< Key, Value, Cmp >& operator=(RBTree< Key, Value, Cmp >&&);
     RBTree< Key, Value, Cmp >& operator=(std::initializer_list< value >);
+    Value& operator[](const Key&);
+    const Value& operator[](const Key&) const;
+
+    Value& at(const Key&);
+    const Value& at(const Key&) const;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -771,6 +777,41 @@ namespace kiselev
   typename RBTree< Key, Value, Cmp >::ConstIteratorPair RBTree< Key, Value, Cmp >::equalRange(const Key& key) const noexcept
   {
     return { ConstIterator(lowerBound(key)), ConstIterator(upperBound(key)) };
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  const Value& RBTree< Key, Value, Cmp >::operator[](const Key& key) const
+  {
+    ConstIterator it = find(key);
+    if (it == cend())
+    {
+      it = insert({ key, value() }).first;
+    }
+    return it.node_->data.second;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  Value& RBTree< Key, Value, Cmp >::operator[](const Key& key)
+  {
+    return const_cast< Value& >(static_cast< const RBTree< Key, Value, Cmp >& >(*this).operator[](key));
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  const Value& RBTree< Key, Value, Cmp >::at(const Key& key) const
+  {
+    ConstIterator it = find(key);
+    if (it == cend())
+    {
+      throw std::out_of_range("There is no such key");
+    }
+    return (*it).second;
+    //return it.node_->data.second;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  Value& RBTree< Key, Value, Cmp >::at(const Key& key)
+  {
+    return const_cast< Value& >(static_cast< const RBTree< Key, Value, Cmp >& >(*this).at(key));
   }
 }
 #endif
