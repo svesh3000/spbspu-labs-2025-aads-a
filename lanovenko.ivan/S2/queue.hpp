@@ -1,12 +1,13 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include <list>
-#include <utility>
+#include <cassert>
+#include <cstddef>
+#include <stdexcept>
 
 namespace lanovenko
 {
-  template < typename T >
+  template< typename T >
   class Queue
   {
   public:
@@ -16,48 +17,65 @@ namespace lanovenko
     Queue(Queue&&) = default;
     Queue& operator=(const Queue&) = default;
     Queue& operator=(Queue&&) = default;
-
-    template < typename U >
-    void push(U&& data) noexcept;
-    void pop() noexcept;
-    T& front() noexcept;
-    const T& front() const noexcept;
-
+    size_t size() const noexcept;
     bool empty() const noexcept;
+    T& front() noexcept;
+    T& back() noexcept;
+    void push(const T& value);
+    void pop() noexcept;
   private:
-    std::list< T > data_;
+    size_t size_;
+    size_t first_;
+    static const size_t max_size_2 = 100;
+    T data_[max_size_2];
   };
 }
 
-template < typename T >
-template < typename U >
-void lanovenko::Queue< T >::push(U&& data) noexcept
+template< typename T >
+size_t lanovenko::Queue< T >::size() const noexcept
 {
-  data_.push_back(std::forward< U >(data));
+  return size_;
 }
 
-template < typename T >
-void lanovenko::Queue< T >::pop() noexcept
-{
-  data_.pop_front();
-}
-
-template < typename T >
-T& lanovenko::Queue< T >::front() noexcept
-{
-  return data_.front();
-}
-
-template < typename T >
-const T& lanovenko::Queue< T >::front() const noexcept
-{
-  return data_.front_();
-}
-
-template < typename T >
+template< typename T >
 bool lanovenko::Queue< T >::empty() const noexcept
 {
-  return data_.empty();
+  return size_ == 0;
+}
+
+template< typename T >
+T& lanovenko::Queue< T >::front() noexcept
+{
+  assert(!this->empty());
+  return data_[first_];
+}
+
+template < typename T >
+T& lanovenko::Queue< T >::back() noexcept
+{
+  assert(!this->empty());
+  return data_[size_ - 1];
+}
+
+template< typename T >
+void lanovenko::Queue< T >::push(const T& value)
+{
+  if (size_ == max_size_2)
+  {
+    throw std::logic_error("Queue overflow");
+  }
+  data_[size_++] = value;
+}
+
+template< typename T >
+void lanovenko::Queue< T >::pop() noexcept
+{
+  assert(!this->empty());
+  size_--;
+  if (size_ != 0)
+  {
+    first_++;
+  }
 }
 
 #endif

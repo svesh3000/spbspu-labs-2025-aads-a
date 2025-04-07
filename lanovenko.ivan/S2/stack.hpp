@@ -1,65 +1,69 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include <list>
-#include <utility>
+#include <cassert>
+#include <cstddef>
+#include <stdexcept>
 
 namespace lanovenko
 {
-  template < class T >
+  template< typename T >
   class Stack
   {
   public:
     ~Stack() = default;
     Stack() = default;
-    Stack(const Stack&) = default;
-    Stack(Stack&&) = default;
-    Stack& operator=(const Stack&) = default;
-    Stack& operator=(Stack&&) = default;
-
-    template < typename U >
-    void push(U&& data) noexcept;
+    Stack(const Stack& rhs) = default;
+    Stack(Stack&& rhs) = default;
+    Stack& operator=(const Stack& rhs) = default;
+    Stack& operator=(Stack&& rhs) = default;
+    void push(const T& data);
+    size_t size() const noexcept;
     void pop() noexcept;
-
     T& top() noexcept;
-    const T& top() const noexcept;
-
-    bool empty() const noexcept;
+    bool empty();
   private:
-    std::list< T > data_;
+    size_t size_;
+    static const size_t max_size_ = 100;
+    T data_[max_size_];
   };
 }
 
-
-template < typename T >
-template < typename U >
-void lanovenko::Stack< T >::push(U&& data) noexcept
+template< typename T >
+size_t lanovenko::Stack< T >::size() const noexcept
 {
-  data_.push_front(std::forward< U >(data));
-}
-
-template < typename T >
-void lanovenko::Stack< T >::pop() noexcept
-{
-  data_.pop_front();
-}
-
-template < typename T >
-T& lanovenko::Stack< T >::top() noexcept
-{
-  return data_.front();
-}
-
-template < typename T >
-const T& lanovenko::Stack< T >::top() const noexcept
-{
-  return data_.front();
+  return size_;
 }
 
 template< typename T >
-bool lanovenko::Stack< T >::empty() const noexcept
+T& lanovenko::Stack< T >::top() noexcept
 {
-  return data_.empty();
+  assert(!this->empty());
+  return data_[size_ - 1];
+}
+
+template< typename T >
+bool lanovenko::Stack< T >::empty()
+{
+  return size_ == 0;
+}
+
+template< typename T >
+void lanovenko::Stack< T >::pop() noexcept
+{
+  assert(!this->empty());
+  size_--;
+}
+
+template< typename T >
+void lanovenko::Stack< T >::push(const T& data)
+{
+  if (size_ == max_size_)
+  {
+    throw std::logic_error("Stack overflow!");
+  }
+  data_[size_] = data;
+  size_++;
 }
 
 #endif
