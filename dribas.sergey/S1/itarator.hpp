@@ -6,7 +6,7 @@
 
 namespace dribas
 {
-  template< class T > 
+  template< class T >
   class List;
 
   template< class T, bool ifConst >

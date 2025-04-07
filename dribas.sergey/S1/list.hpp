@@ -44,7 +44,7 @@ namespace dribas
 
     template< class Predicate >
     void remove_if(Predicate) noexcept;
-    void remove(const T&) noexcept; 
+    void remove(const T&) noexcept;
     void splice(Itarator< T, true > pos, List< T >& other) noexcept;
     void splice(Itarator< T, true > pos, List< T >&& other) noexcept;
     void splice(Itarator< T, true > pos, List< T >& other, Itarator< T, true > it) noexcept;
