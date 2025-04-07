@@ -93,11 +93,9 @@ void lanovenko::pushCalculated(Stack < long long >& result, char operation)
   result.push(calculateBinary(a, b, operation));
 }
 
-
-
 long long lanovenko::calcualtePostfix(Queue< std::string >& postfix)
 {
-  Stack < long long > result;
+  Stack < long long > result{};
   while (!postfix.empty())
   {
     char current = postfix.front().front();
