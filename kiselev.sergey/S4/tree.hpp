@@ -42,10 +42,10 @@ namespace kiselev
     Iterator end() noexcept;
     ConstIterator cend() const noexcept;
 
-    std::pair< Iterator, bool > insert(const Value&);
-    std::pair< Iterator, bool > insert(Value&);
-    Iterator insert(ConstIterator, const Value&);
-    Iterator insert(Iterator, const Value&);
+    std::pair< Iterator, bool > insert(const value&);
+    std::pair< Iterator, bool > insert(value&);
+    Iterator insert(ConstIterator, const value&);
+    Iterator insert(Iterator, const value&);
     template< typename InputIt >
     void insert(InputIt first, InputIt last);
     void insert(std::initializer_list< value >);
@@ -116,7 +116,7 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::RBTree(InputIt first, InputIt last):
     RBTree()
   {
-    for (; first != last; ++first)
+    for (; first != last; first++)
     {
       insert(*first);
     }
@@ -288,7 +288,7 @@ namespace kiselev
           rotateLeft(node->parent);
           brother = node->parent->right;
         }
-        if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right == Color::BLACK))
+        if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right->color == Color::BLACK))
         {
           brother->color = Color::RED;
           node = node->parent;
@@ -486,12 +486,12 @@ namespace kiselev
       }
     }
 
-    Node* newNode = new Node(val, Color::RED, nullptr, nullptr, parent);
+    Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, parent };
     if (!parent)
     {
       root_ = newNode;
     }
-    else if (cmp_(parent->data.first))
+    else if (cmp_(parent->data.first, key))
     {
       parent->right = newNode;
     }
@@ -519,7 +519,7 @@ namespace kiselev
     {
       if (!hint->left)
       {
-        Node* newNode = new Node(val, Color::RED, nullptr, nullptr, pos);
+        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
         pos->left = newNode;
         fixInsert(newNode);
         ++size_;
@@ -530,7 +530,7 @@ namespace kiselev
     {
       if (!pos->right)
       {
-        Node* newNode = new Node(val, Color::RED, nullptr, nullptr, pos);
+        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
         pos->right = newNode;
         fixInsert(newNode);
         ++size_;
@@ -544,28 +544,28 @@ namespace kiselev
     return emplace(std::forward< Args >(args)...).first;
   }
   template< typename Key, typename Value, typename Cmp >
-  std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const Value& value)
+  std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
   {
-    return emplace(value);
+    return emplace(val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(Value& value)
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(value& val)
   {
-    return emplace(value);
+    return emplace(val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(ConstIterator pos, const Value& value)
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(ConstIterator pos, const value& val)
   {
-    return emplaceHint(pos, value);
+    return emplaceHint(pos, val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(Iterator pos, const Value& value)
+  typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(Iterator pos, const value& val)
   {
     ConstIterator it(pos.node_);
-    return emplaceHint(it, value);
+    return emplaceHint(it, val);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -589,7 +589,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(ConstIterator pos) noexcept
   {
-    if (pos == end())
+    if (pos == cend())
     {
       return end();
     }
@@ -658,7 +658,7 @@ namespace kiselev
         fixDelete(child ? child : temp->parent);
       }
     }
-    Iterator res = pos.node_;
+    Iterator res(pos.node_);
     ++res;
     delete temp;
     --size_;
@@ -668,7 +668,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::erase(Iterator pos) noexcept
   {
-    ConstIterator it = pos;
+    ConstIterator it(pos);
     return erase(it);
   }
 

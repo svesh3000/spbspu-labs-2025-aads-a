@@ -15,21 +15,21 @@ namespace kiselev
     {
     public:
       using value = std::pair< Key, Value >;
-      using reference = std::conditional< IsConst, const value&, value&>;
-      using pointer = std::conditional< IsConst, const value*, value*>;
+      using reference = std::conditional_t< IsConst, const value&, value& >;
+      using pointer = std::conditional_t< IsConst, const value*, value* >;
       using iterator = Iterator< Key, Value, Cmp, IsConst >;
 
       Iterator();
-      template < bool OtherIsConst, std::enable_if< IsConst && !OtherIsConst, int > = 0 >
-      Iterator(const iterator&) noexcept;
-      template< bool OtherIsConst, std::enable_if< IsConst && !OtherIsConst, int > = 0 >
-      iterator& operator=(const iterator&) noexcept;
+      template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
+      Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
+      template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
+      iterator& operator=(const Iterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
 
       iterator& operator++() noexcept;
-      iterator& operator++(int) noexcept;
+      iterator operator++(int) noexcept;
 
       iterator& operator--() noexcept;
-      iterator& operator--(int) noexcept;
+      iterator operator--(int) noexcept;
 
       reference operator*() const noexcept;
       pointer operator->() const noexcept;
@@ -37,7 +37,7 @@ namespace kiselev
       bool operator==(const iterator&) const noexcept;
       bool operator!=(const iterator&) const noexcept;
     private:
-      TreeNode< Key, Value>* node_;
+      TreeNode< Key, Value >* node_;
       explicit Iterator(TreeNode< Key, Value >*);
       friend class Iterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
@@ -49,8 +49,8 @@ namespace kiselev
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    template< bool OtherIsConst, std::enable_if< IsConst && !OtherIsConst, int > >
-    Iterator< Key, Value, Cmp, IsConst >::Iterator(const iterator& other) noexcept:
+    template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
+    Iterator< Key, Value, Cmp, IsConst >::Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept:
       node_(other.node_)
     {}
 
@@ -60,8 +60,8 @@ namespace kiselev
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    template< bool OtherIsConst, std::enable_if< IsConst && !OtherIsConst, int > >
-    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator=(const iterator& other) noexcept
+    template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
+    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator=(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
     {
       node_ = other.node_;
       return *this;
@@ -71,25 +71,34 @@ namespace kiselev
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator++() noexcept
     {
       assert(node_ != nullptr);
-      TreeNode< Key, Value >* temp = node_;
-      if (temp->right)
+      if (node_->right)
       {
-        temp = temp->right;
-        while (temp->left)
+        node_ = node_->right;
+        while (node_->left)
         {
-          temp = temp->left;
+          node_ = node_->left;
         }
-        return iterator(temp);
+        return *this;
       }
-      while (temp->parent && temp == temp->parent->right)
+      TreeNode< Key, Value >* parent = node_->parent;
+      /*
+      while (node_->parent && node_ == node_->parent->right)
       {
-        temp = temp->parent;
+        node_ = node_->parent;
       }
-      return iterator(temp->parent);
+      node_ = node_->parent;
+      */
+      while (parent && node_ == parent->right)
+      {
+        node_ = parent;
+        parent = parent->parent;
+      }
+      node_ = parent;
+      return *this;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator++(int) noexcept
+    Iterator< Key, Value, Cmp, IsConst > Iterator< Key, Value, Cmp, IsConst >::operator++(int) noexcept
     {
       assert(node_ != nullptr);
       iterator result(*this);
@@ -101,25 +110,25 @@ namespace kiselev
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator--() noexcept
     {
       assert(node_ != nullptr);
-      TreeNode< Key, Value>* temp = node_;
-      if (temp->left)
+      if (node_->left)
       {
-        temp = temp->left;
-        while (temp->right)
+        node_ = node_->left;
+        while (node_->right)
         {
-          temp = temp->right;
+          node_ = node_->right;
         }
-        return iterator(temp);
+        return iterator(node_);
       }
-      while (temp->parent && temp == temp->parent->left)
+      while (node_->parent && node_ == node_->parent->left)
       {
-        temp = temp->parent;
+        node_ = node_->parent;
       }
-      return iterator(temp->parent);
+      node_ = node_->parent;
+      return *this;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator--(int) noexcept
+    Iterator< Key, Value, Cmp, IsConst > Iterator< Key, Value, Cmp, IsConst >::operator--(int) noexcept
     {
       assert(node_ != nullptr);
       iterator result(*this);
@@ -131,14 +140,14 @@ namespace kiselev
     typename Iterator< Key, Value, Cmp, IsConst >::reference Iterator< Key, Value, Cmp, IsConst >::operator*() const noexcept
     {
       assert(node_ != nullptr);
-      return node_->value;
+      return node_->data;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     typename Iterator< Key, Value, Cmp, IsConst >::pointer Iterator< Key, Value, Cmp, IsConst >::operator->() const noexcept
     {
       assert(node_ != nullptr);
-      return std::addressof(node_->value);
+      return std::addressof(node_->data);
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
