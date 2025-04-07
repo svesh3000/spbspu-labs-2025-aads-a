@@ -86,7 +86,7 @@ void lanovenko::pushCalculated(Stack < long long >& result, char operation)
   result.pop();
   if (result.empty())
   {
-    throw std::invalid_argument("Wrong eptession");
+    throw std::invalid_argument("Wrong expression");
   }
   long long a = result.top();
   result.pop();

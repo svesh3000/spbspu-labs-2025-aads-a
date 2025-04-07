@@ -26,7 +26,7 @@ namespace lanovenko
   private:
     size_t size_;
     size_t first_;
-    static const size_t max_size_2 = 100;
+    static const size_t max_size_2 = 20;
     T data_[max_size_2];
   };
 }
