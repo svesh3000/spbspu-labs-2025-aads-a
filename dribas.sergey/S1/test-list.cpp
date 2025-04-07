@@ -96,6 +96,7 @@ bool predicate(int i)
 {
   return i == 1;
 }
+
 BOOST_AUTO_TEST_CASE(removeIf) {
   List< int > list;
   list.push_back(1);

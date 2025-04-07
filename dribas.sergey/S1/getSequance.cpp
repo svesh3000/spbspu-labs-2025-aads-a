@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 #include "list.hpp"
-#include "itarator.hpp"
+#include "iterator.hpp"
 
 dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >dribas::getSequance(std::istream& input, bool& overflow)
 {

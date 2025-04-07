@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include "node.hpp"
-#include "itarator.hpp"
+#include "iterator.hpp"
 
 namespace dribas
 {
@@ -12,17 +12,17 @@ namespace dribas
   class List final
   {
   public:
-    using itarator = Itarator< T, false >;
-    using constItartor = Itarator< T, true >;
+    using Iterator = dribas::Iterator< T, false >;
+    using constItartor = dribas::Iterator< T, true >;
 
     List();
     List(const List< T >& rhs);
     List(List< T >&& rhs) noexcept;
     ~List();
 
-    itarator begin() noexcept;
+    Iterator begin() noexcept;
     constItartor begin() const noexcept;
-    itarator end() noexcept;
+    Iterator end() noexcept;
     constItartor end() const noexcept;
     constItartor cbegin() const noexcept;
     constItartor cend() const noexcept;
@@ -45,12 +45,12 @@ namespace dribas
     template< class Predicate >
     void remove_if(Predicate) noexcept;
     void remove(const T&) noexcept;
-    void splice(Itarator< T, true > pos, List< T >& other) noexcept;
-    void splice(Itarator< T, true > pos, List< T >&& other) noexcept;
-    void splice(Itarator< T, true > pos, List< T >& other, Itarator< T, true > it) noexcept;
-    void splice(Itarator< T, true > pos, List< T >&& other, Itarator< T, true > it) noexcept;
-    void splice(Itarator< T, true > pos, List< T >& other, Itarator< T, true > first, Itarator< T, true > last) noexcept;
-    void splice(Itarator< T, true > pos, List< T >&& other, Itarator< T, true > first, Itarator< T, true > last) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >& other) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >&& other) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >& other, dribas::Iterator< T, true > it) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >&& other, dribas::Iterator< T, true > it) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >& other, dribas::Iterator< T, true > first, dribas::Iterator< T, true > last) noexcept;
+    void splice(dribas::Iterator< T, true > pos, List< T >&& other, dribas::Iterator< T, true > first, dribas::Iterator< T, true > last) noexcept;
     template< class InputIt >
     void assign(InputIt first, InputIt last);
     template< class R >
@@ -73,7 +73,7 @@ namespace dribas
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >& other, dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
 {
   if (!(&other == this || first == last)) {
     Node< T >* first_node = first.node_;
@@ -119,15 +119,15 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other, Itarator
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other, Itarator<T, true> it) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >& other, dribas::Iterator<T, true> it) noexcept
 {
   if (it != other.end()) {
-    splice(pos, other, it, Itarator<T, true>(it.node_->next_));
+    splice(pos, other, it, dribas::Iterator<T, true>(it.node_->next_));
   }
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >& other) noexcept
 {
   if (!other.empty()) {
     splice(pos, other, other.begin(), other.end());
@@ -135,68 +135,68 @@ void dribas::List< T >::splice(Itarator<T, true> pos, List< T >& other) noexcept
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other) noexcept
 {
   splice(pos, other);
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other, Itarator<T, true> it) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other, dribas::Iterator<T, true> it) noexcept
 {
   splice(pos, other, it);
 }
 
 template < class T >
-void dribas::List< T >::splice(Itarator<T, true> pos, List< T >&& other, Itarator<T, true> first, Itarator<T, true> last) noexcept
+void dribas::List< T >::splice(dribas::Iterator<T, true> pos, List< T >&& other, dribas::Iterator<T, true> first, dribas::Iterator<T, true> last) noexcept
 {
   splice(pos, other, first, last);
 }
 
 template< class T >
-dribas::Itarator< T, false > dribas::List< T >::begin() noexcept
+dribas::Iterator< T, false > dribas::List< T >::begin() noexcept
 {
-  return Itarator< T, false >(head_);
+  return dribas::Iterator< T, false >(head_);
 }
 
 template< class T >
-dribas::Itarator< T, false > dribas::List< T >::end() noexcept
+dribas::Iterator< T, false > dribas::List< T >::end() noexcept
 {
   if (tail_) {
-    return Itarator< T, false >(tail_->next_);
+    return dribas::Iterator< T, false >(tail_->next_);
   } else {
-    return Itarator< T, false >(nullptr);
+    return dribas::Iterator< T, false >(nullptr);
   }
 }
 
 template< class T >
-dribas::Itarator< T, true > dribas::List< T >::begin() const noexcept
+dribas::Iterator< T, true > dribas::List< T >::begin() const noexcept
 {
-  return Itarator< T, true >(head_);
+  return dribas::Iterator< T, true >(head_);
 }
 
 template< class T >
-dribas::Itarator< T, true > dribas::List< T >::end() const noexcept
+dribas::Iterator< T, true > dribas::List< T >::end() const noexcept
 {
   if (tail_) {
-    return Itarator< T, true >(tail_->next_);
+    return dribas::Iterator< T, true >(tail_->next_);
   } else {
-    return Itarator< T, true >(nullptr);
+    return dribas::Iterator< T, true >(nullptr);
   }
 }
 
 template< class T >
-dribas::Itarator< T, true > dribas::List< T >::cbegin() const noexcept
+dribas::Iterator< T, true > dribas::List< T >::cbegin() const noexcept
 {
-  return Itarator< T, true >(head_);
+  return dribas::Iterator< T, true >(head_);
 }
 
 template< class T >
-dribas::Itarator< T, true > dribas::List< T >::cend() const noexcept
+dribas::Iterator< T, true > dribas::List< T >::cend() const noexcept
 {
   if (tail_) {
-    return Itarator< T, true >(tail_->next_);
+    return dribas::Iterator< T, true >(tail_->next_);
   } else {
-    return Itarator< T, true >(nullptr);
+    return dribas::Iterator< T, true >(nullptr);
   }
 }
 
