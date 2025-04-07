@@ -3,10 +3,11 @@
 #include <iostream>
 #include <limits>
 #include "list.hpp"
-#include "constIterator.hpp"
+#include "itarator.hpp"
 
-dribas::List< std::pair< std::string, dribas::List< unsigned long long > > > dribas::getSequance(std::istream& input, bool& overflow) {
-  List< std::pair< std::string, List< unsigned long long > > > allSequance;
+dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >dribas::getSequance(std::istream& input, bool& overflow)
+{
+  List< std::pair< std::string, List< unsigned long long > > >allSequance;
   std::string sequance;
   while (input >> sequance) {
     List< unsigned long long > numbers{};

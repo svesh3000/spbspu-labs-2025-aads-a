@@ -92,6 +92,32 @@ BOOST_AUTO_TEST_CASE(operatorAt) {
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(MethodList)
+bool predicate(int i)
+{
+  return i == 1;
+}
+BOOST_AUTO_TEST_CASE(removeIf) {
+  List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.remove_if(predicate);
+  BOOST_CHECK(list.front() == 2);
+  list.clear();
+  list.remove_if(predicate);
+  BOOST_CHECK(list.empty());
+}
+BOOST_AUTO_TEST_CASE(remove ) {
+  List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.remove(1);
+  BOOST_CHECK(list.front() == 2);
+  list.clear();
+  list.remove(1);
+  BOOST_CHECK(list.empty());
+}
 BOOST_AUTO_TEST_CASE(empty) {
   List< int > list;
   BOOST_CHECK(list.empty());
@@ -104,9 +130,7 @@ BOOST_AUTO_TEST_CASE(size) {
   list.push_back(1);
   BOOST_CHECK(list.size() == 1);
 }
-
-BOOST_AUTO_TEST_CASE(PushFrontToNonEmptyList)
-{
+BOOST_AUTO_TEST_CASE(PushFrontToNonEmptyList) {
   dribas::List< int > list;
   list.push_front(2);
   list.push_front(1);
@@ -238,5 +262,57 @@ BOOST_AUTO_TEST_CASE(ClearAlreadyEmptyList) {
   list.clear();
   BOOST_CHECK(list.empty());
 }
+BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(Itarator)
+BOOST_AUTO_TEST_CASE(iteratorBeginEnd) {
+  List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  auto it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+}
+BOOST_AUTO_TEST_CASE(iteratorEmptyList) {
+  List< int > emptyList;
+  BOOST_CHECK(emptyList.begin() == emptyList.end());
+  const List< int > constEmptyList;
+  BOOST_CHECK(constEmptyList.begin() == constEmptyList.end());
+  BOOST_CHECK(constEmptyList.cbegin() == constEmptyList.cend());
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AssignRangeTests)
+BOOST_AUTO_TEST_CASE(assignRangeFromVector)
+{
+  dribas::List< int > list;
+  list.push_back(100);
+  std::vector< int > vec = {1, 2, 3, 4, 5};
+  list.assign_range(vec);
+  BOOST_CHECK(list.size() == 5);
+  BOOST_CHECK(list.front() == 1);
+  BOOST_CHECK(list.back() == 5);
+}
+BOOST_AUTO_TEST_CASE(assignRangeFromArray)
+{
+  dribas::List<double> list;
+  double arr[] = {1.1, 2.2, 3.3};
+  list.assign_range(arr);
+  BOOST_CHECK(list.size() == 3);
+  BOOST_CHECK_CLOSE(list.front(), 1.1, 0.001);
+  BOOST_CHECK_CLOSE(list.back(), 3.3, 0.001);
+}
+BOOST_AUTO_TEST_CASE(assignRangeFromEmpty)
+{
+  dribas::List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  std::vector< int > empty_vec;
+  list.assign_range(empty_vec);
+  BOOST_CHECK(list.empty());
+}
 BOOST_AUTO_TEST_SUITE_END()
