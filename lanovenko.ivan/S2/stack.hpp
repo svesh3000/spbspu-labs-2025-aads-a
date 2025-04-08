@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <cstddef>
-#include <stdexcept>
+#include <utility>
 
 namespace lanovenko
 {
@@ -11,44 +11,101 @@ namespace lanovenko
   class Stack
   {
   public:
-    ~Stack() = default;
-    Stack() = default;
-    Stack(const Stack& rhs) = default;
-    Stack(Stack&& rhs) = default;
-    Stack& operator=(const Stack& rhs) = default;
-    Stack& operator=(Stack&& rhs) = default;
-    void push(const T& data);
-    size_t size() const noexcept;
+    ~Stack();
+    Stack();
+    Stack(const Stack& rhs);
+    Stack(Stack&& rhs) noexcept;
+    Stack& operator=(const Stack& rhs);
+    Stack& operator=(Stack&& rhs) noexcept;
+    bool empty() const noexcept;
+    void swap(Stack& rhs) noexcept;
     void pop() noexcept;
-    T& top() noexcept;
-    bool empty();
+    void push(const T& value);
+    size_t size() const noexcept;
+    T& top();
   private:
+    const size_t max_size_;
     size_t size_;
-    static const size_t max_size_ = 20;
-    T data_[max_size_];
+    T* data_;
   };
 }
 
 template< typename T >
-size_t lanovenko::Stack< T >::size() const noexcept
+lanovenko::Stack< T >::~Stack()
 {
-  return size_;
+  delete[] data_;
+  size_ = 0;
+  data_ = nullptr;
 }
 
 template< typename T >
-T& lanovenko::Stack< T >::top() noexcept
+lanovenko::Stack< T >::Stack():
+  max_size_(1'000),
+  size_(0),
+  data_(new T[max_size_])
+{}
+
+template< typename T >
+lanovenko::Stack< T >::Stack(const Stack& rhs):
+  max_size_(rhs.max_size_),
+  size_(rhs.size_),
+  data_(new T[max_size_]{})
 {
-  assert(!this->empty());
-  return data_[size_ - 1];
+  Stack< T > temporary{};
+  for (size_t i = 0; i < rhs.size_; i++)
+  {
+    temporary.push(rhs.data_[i]);
+  }
+  swap(temporary);
 }
 
 template< typename T >
-bool lanovenko::Stack< T >::empty()
+lanovenko::Stack< T >::Stack(Stack&& rhs) noexcept:
+  max_size_(rhs.max_size_),
+  size_(rhs.size_),
+  data_(rhs.data_)
+{
+  rhs.size_ = 0;
+  rhs.data_ = nullptr;
+}
+
+template< typename T >
+lanovenko::Stack< T >& lanovenko::Stack< T >::operator=(const Stack& rhs)
+{
+  if (this != &rhs)
+  {
+    Stack< T > temporary(rhs);
+    swap(temporary);
+  }
+  return *this;
+}
+
+template<typename T>
+lanovenko::Stack< T >& lanovenko::Stack< T >::operator=(Stack&& rhs) noexcept
+{
+  if (this != &rhs)
+  {
+    Stack< T > temporary(std::move(rhs));
+    swap(temporary);
+  }
+  return *this;
+}
+
+template<typename T>
+inline bool lanovenko::Stack< T >::empty() const noexcept
 {
   return size_ == 0;
 }
 
-template< typename T >
+template < typename T >
+inline void lanovenko::Stack< T >::swap(Stack& rhs) noexcept
+{
+  using std::swap;
+  swap(size_, rhs.size_);
+  swap(data_, rhs.data_);
+}
+
+template<typename T>
 void lanovenko::Stack< T >::pop() noexcept
 {
   assert(!this->empty());
@@ -56,14 +113,23 @@ void lanovenko::Stack< T >::pop() noexcept
 }
 
 template< typename T >
-void lanovenko::Stack< T >::push(const T& data)
+void lanovenko::Stack< T >::push(const T& rhs)
 {
-  if (size_ == max_size_)
-  {
-    throw std::logic_error("Stack overflow!");
-  }
-  data_[size_] = data;
-  size_++;
+  assert(size_ < max_size_);
+  data_[size_++] = rhs;
+}
+
+template<typename T>
+inline size_t lanovenko::Stack< T >::size() const noexcept
+{
+  return size_;
+}
+
+template< typename T >
+T& lanovenko::Stack< T >::top()
+{
+  assert(!this->empty());
+  return data_[size_ - 1];
 }
 
 #endif

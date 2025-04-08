@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <cstddef>
-#include <stdexcept>
+#include <utility>
 
 namespace lanovenko
 {
@@ -11,60 +11,105 @@ namespace lanovenko
   class Queue
   {
   public:
-    ~Queue() = default;
-    Queue() = default;
-    Queue(const Queue&) = default;
-    Queue(Queue&&) = default;
-    Queue& operator=(const Queue&) = default;
-    Queue& operator=(Queue&&) = default;
-    size_t size() const noexcept;
+    ~Queue();
+    Queue();
+    Queue(const Queue& rhs);
+    Queue(Queue&& rhs) noexcept;
+    Queue& operator=(const Queue& rhs);
+    Queue& operator=(Queue&& rhs) noexcept;
+    void swap(Queue& rhs) noexcept;
+    void push(const T& data);
+    void pop() noexcept;
     bool empty() const noexcept;
+    size_t size() const noexcept;
     T& front() noexcept;
     T& back() noexcept;
-    void push(const T& value);
-    void pop() noexcept;
   private:
+    const size_t max_size_;
     size_t size_;
     size_t first_;
-    static const size_t max_size_2 = 20;
-    T data_[max_size_2];
+    T* data_;
   };
 }
 
-template< typename T >
-size_t lanovenko::Queue< T >::size() const noexcept
+template< typename T > 
+lanovenko::Queue< T >::~Queue()
 {
-  return size_;
+  size_ = first_ = 0;
+  delete[] data_;
+  data_ = nullptr;
 }
 
 template< typename T >
-bool lanovenko::Queue< T >::empty() const noexcept
-{
-  return size_ == 0;
-}
+lanovenko::Queue< T >::Queue():
+  max_size_(1'000),
+  size_(0),
+  first_(0),
+  data_(new T[max_size_])
+{}
 
 template< typename T >
-T& lanovenko::Queue< T >::front() noexcept
+lanovenko::Queue< T >::Queue(const Queue& rhs):
+  max_size_(rhs.max_size_),
+  size_(rhs.size_),
+  first_(rhs.first_),
+  data_(new T[max_size_])
 {
-  assert(!this->empty());
-  return data_[first_];
-}
-
-template < typename T >
-T& lanovenko::Queue< T >::back() noexcept
-{
-  assert(!this->empty());
-  return data_[size_ - 1];
-}
-
-template< typename T >
-void lanovenko::Queue< T >::push(const T& value)
-{
-  if (size_ == max_size_2)
+  Queue< T > temporary{};
+  for (size_t i = 0; i < rhs.size_; i++)
   {
-    throw std::logic_error("Queue overflow");
+    temporary.push(rhs.data_[i]);
   }
-  data_[size_++] = value;
+  swap(temporary);
+}
+
+template< typename T >
+lanovenko::Queue< T >::Queue(Queue&& rhs) noexcept:
+  max_size_(rhs.max_size_),
+  size_(rhs.size_),
+  first_(rhs.first_),
+  data_(rhs.data_)
+{
+  rhs.size_ = rhs.first_ = 0;
+  rhs.data_ = nullptr;
+}
+
+template< typename T >
+lanovenko::Queue< T >& lanovenko::Queue< T >::operator=(const Queue& rhs)
+{
+  if (this != &rhs)
+  {
+    Queue< T > temporary(rhs);
+    swap(temporary);
+  }
+  return *this;
+}
+
+template< typename T >
+lanovenko::Queue< T >& lanovenko::Queue< T >::operator=(Queue&& rhs) noexcept
+{
+  if (this != &rhs)
+  {
+    Queue< T > temporary(std::move(rhs));
+    swap(temporary);
+  }
+  return *this;
+}
+
+template< typename T >
+inline void lanovenko::Queue< T >::swap(Queue& rhs) noexcept
+{
+  using std::swap;
+  swap(size_, rhs.size_);
+  swap(first_, rhs.first_);
+  swap(data_, rhs.data_);
+}
+
+template< typename T >
+void lanovenko::Queue< T >::push(const T& data)
+{
+  assert(size_ < max_size_);
+  data_[size_++] = data;
 }
 
 template< typename T >
@@ -76,6 +121,32 @@ void lanovenko::Queue< T >::pop() noexcept
   {
     first_++;
   }
+}
+
+template< typename T >
+inline bool lanovenko::Queue< T >::empty() const noexcept
+{
+  return size_ == 0;
+}
+
+template< typename T >
+inline size_t lanovenko::Queue< T >::size() const noexcept
+{
+  return size_;
+}
+
+template< typename T >
+T& lanovenko::Queue< T >::front() noexcept
+{
+  assert(!this->empty());
+  return data_[first_];
+}
+
+template< typename T >
+T& lanovenko::Queue< T >::back() noexcept
+{
+  assert(!this->empty());
+  return data_[size_ - 1];
 }
 
 #endif
