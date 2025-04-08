@@ -18,7 +18,7 @@ namespace savintsev
     List();
     ~List();
     List(const List & rhs);
-    List(List && rhs);
+    List(List && rhs) noexcept;
     List(size_t n, const T & value);
     template< class InputIterator >
     List(InputIterator first, InputIterator last);
@@ -167,7 +167,10 @@ namespace savintsev
   List< T >::List():
     dummy(new ListNode< T >()),
     list_size(0)
-  {}
+  {
+    dummy->next = dummy;
+    dummy->prev = dummy;
+  }
 
   template< class T >
   List< T >::~List()
@@ -176,19 +179,16 @@ namespace savintsev
   }
 
   template< class T >
-  List< T >::List(const List & rhs): List(rhs.begin(), rhs.end())
+  List< T >::List(const List & rhs):
+    List(rhs.begin(), rhs.end())
   {}
 
   template< class T >
-  List< T >::List(List && rhs):
-    dummy(rhs.dummy),
-    list_size(rhs.list_size)
+  List< T >::List(List && rhs) noexcept:
+    dummy(nullptr),
+    list_size(0)
   {
-    ListNode< T > * new_dummy = new ListNode< T >();
-    rhs.dummy = new_dummy;
-    rhs.dummy->next = rhs.dummy;
-    rhs.dummy->prev = rhs.dummy;
-    rhs.list_size = 0;
+    swap(rhs);
   }
 
   template< class T >
@@ -196,6 +196,8 @@ namespace savintsev
     dummy(new ListNode< T >()),
     list_size(0)
   {
+    dummy->next = dummy;
+    dummy->prev = dummy;
     try
     {
       for (size_t i = 0; i < n; ++i)
@@ -216,6 +218,8 @@ namespace savintsev
     dummy(new ListNode< T >()),
     list_size(0)
   {
+    dummy->next = dummy;
+    dummy->prev = dummy;
     try
     {
       for (auto it = first; it != last; ++it)
@@ -231,7 +235,8 @@ namespace savintsev
   }
 
   template< class T >
-  List< T >::List(std::initializer_list< T > il): List(il.begin(), il.end())
+  List< T >::List(std::initializer_list< T > il):
+    List(il.begin(), il.end())
   {}
 
   template< class T >
@@ -332,7 +337,7 @@ namespace savintsev
   template< class U >
   void List< T >::push_front(U && value)
   {
-    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), dummy->next, dummy);
+    ListNode< T > * new_node = new ListNode< T >{std::forward< U >(value), dummy->next, dummy};
     dummy->next->prev = new_node;
     dummy->next = new_node;
     ++list_size;
@@ -342,7 +347,7 @@ namespace savintsev
   template< class U >
   void List< T >::push_back(U && value)
   {
-    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), dummy, dummy->prev);
+    ListNode< T > * new_node = new ListNode< T >{std::forward< U >(value), dummy, dummy->prev};
     dummy->prev->next = new_node;
     dummy->prev = new_node;
     ++list_size;
@@ -416,21 +421,29 @@ namespace savintsev
   template< class... Args >
   typename List< T >::iterator List< T >::emplace(const_iterator pos, Args &&... args)
   {
-    return insert(pos, T(args...));
+    ListNode< T > * node = new ListNode< T >{T(std::forward< Args >(args)...), pos.node, pos.node->prev};
+    node->next = pos.node;
+    node->prev = pos.node->prev;
+  
+    pos.node->prev->next = node;
+    pos.node->prev = node;
+  
+    ++list_size;
+    return iterator(node);
   }
 
   template< class T >
   template< class... Args >
   typename List< T >::iterator List< T >::emplace_back(Args &&... args)
   {
-    return insert(const_iterator(end()), T(args...));
+    return emplace(cend(), std::forward< Args >(args)...);
   }
 
   template< class T >
   template< class... Args >
   typename List< T >::iterator List< T >::emplace_front(Args &&... args)
   {
-    return insert(const_iterator(begin()), T(args...));
+    return emplace(cbegin(), std::forward< Args >(args)...);
   }
 
   template< class T >
@@ -538,8 +551,8 @@ namespace savintsev
   }
 
   template< class T >
-  template< class Predicate >
-  void List< T >::unique(Predicate binary_pred)
+  template< class BinaryPredicate >
+  void List< T >::unique(BinaryPredicate binary_pred)
   {
     for (auto it = begin(); it != end();)
     {
@@ -716,10 +729,10 @@ namespace savintsev
   template< class U >
   typename List< T >::iterator List< T >::insert(const_iterator pos, U && value)
   {
-    ListNode< T > * new_node = new ListNode< T >(std::forward< U >(value), pos.node, pos.node->prev);
-    list_size++;
+    ListNode< T > * new_node = new ListNode< T >{std::forward< U >(value), pos.node, pos.node->prev};
     pos.node->prev->next = new_node;
     pos.node->prev = new_node;
+    ++list_size;
     return iterator(new_node);
   }
 

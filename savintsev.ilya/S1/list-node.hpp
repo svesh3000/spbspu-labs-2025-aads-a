@@ -10,18 +10,6 @@ namespace savintsev
     T data;
     ListNode< T > * next;
     ListNode< T > * prev;
-
-    template< typename U >
-    ListNode(U && value, ListNode * nextNode = nullptr, ListNode * prevNode = nullptr):
-      data(std::forward< U >(value)),
-      next(nextNode),
-      prev(prevNode)
-    {}
-    ListNode():
-      data(),
-      next(this),
-      prev(this)
-    {}
   };
 }
 

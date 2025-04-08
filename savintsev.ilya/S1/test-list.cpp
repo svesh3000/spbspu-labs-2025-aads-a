@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_fill_constructor)
 {
   lt< int > list1(8ull, 0);
   auto it = list1.cbegin();
-  for (size_t i = 0; i < 8; ++i)
+  for (int i = 0; i < 8; ++i)
   {
     BOOST_TEST(*it == 0);
   }
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(test_assign)
   lt< int > list2;
   list1.assign(7, 100);
   auto it = list1.begin();
-  for (size_t i = 0; i < 7; ++i)
+  for (int i = 0; i < 7; ++i)
   {
     BOOST_TEST(*it++ == 100);
   }
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE(test_insert)
   lt< int > mylist;
   lt< int >::iterator it;
 
-  for (size_t i = 1; i <= 5; ++i)
+  for (int i = 1; i <= 5; ++i)
   {
     mylist.push_back(i);
   }
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
 BOOST_AUTO_TEST_CASE(test_remove_if)
 {
   savintsev::List< int > list1;
-  for (size_t i = 1; i <= 10; ++i)
+  for (int i = 1; i <= 10; ++i)
   {
     list1.push_back(i);
   }

@@ -72,7 +72,7 @@ int main()
   }
   if (sums.empty())
   {
-    sums.push_back(0);
+    sums.push_back(0ull);
   }
 
   {
