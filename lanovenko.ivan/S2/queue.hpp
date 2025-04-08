@@ -32,7 +32,7 @@ namespace lanovenko
   };
 }
 
-template< typename T > 
+template< typename T >
 lanovenko::Queue< T >::~Queue()
 {
   size_ = first_ = 0;
