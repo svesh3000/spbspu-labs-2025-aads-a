@@ -12,13 +12,14 @@ int main() {
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
+  auto cur_it = listOfPairs.begin();
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
-    listOfPairs.push_front({name, numbers});
+    listOfPairs.insert(cur_it, {name, numbers});
+    ++cur_it;
     ++numOfPairs;
   }
-  listOfPairs.reverse();
 
   if (numOfPairs) {
     outNames(std::cout, listOfPairs);
