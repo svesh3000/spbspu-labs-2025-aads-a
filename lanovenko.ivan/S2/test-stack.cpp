@@ -41,3 +41,20 @@ BOOST_AUTO_TEST_CASE(empty_test_without_value)
   lanovenko::Stack< int > test{};
   BOOST_TEST(test.empty() == true);
 }
+
+BOOST_AUTO_TEST_CASE(swap2_test)
+{
+  lanovenko::Stack< int > test1{};
+  for(size_t i = 0; i < 3; i++)
+  {
+    test1.push(i);
+  }
+  lanovenko::Stack< int > test2{};
+  for (size_t i = 0; i < 5; i++)
+  {
+    test2.push(i);
+  }
+  test2.swap(test1);
+  BOOST_TEST(test2.size() == 3);
+  BOOST_TEST(test2.top() == 2);
+}

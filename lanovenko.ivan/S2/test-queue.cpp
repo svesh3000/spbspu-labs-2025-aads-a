@@ -68,3 +68,20 @@ BOOST_AUTO_TEST_CASE(back_test)
   test.push(1);
   BOOST_TEST(test.back() == 1);
 }
+
+BOOST_AUTO_TEST_CASE(swap1_test)
+{
+  lanovenko::Queue< int > test1{};
+  for(size_t i = 0; i < 3; i++)
+  {
+    test1.push(i);
+  }
+  lanovenko::Queue< int > test2{};
+  for (size_t i = 0; i < 5; i++)
+  {
+    test2.push(i);
+  }
+  test2.swap(test1);
+  BOOST_TEST(test2.size() == 3);
+  BOOST_TEST(test2.back() == 2);
+}
