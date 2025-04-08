@@ -424,10 +424,10 @@ namespace savintsev
     ListNode< T > * node = new ListNode< T >{T(std::forward< Args >(args)...), pos.node, pos.node->prev};
     node->next = pos.node;
     node->prev = pos.node->prev;
-  
+
     pos.node->prev->next = node;
     pos.node->prev = node;
-  
+
     ++list_size;
     return iterator(node);
   }
