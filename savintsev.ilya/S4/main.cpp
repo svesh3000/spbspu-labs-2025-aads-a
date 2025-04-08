@@ -24,7 +24,7 @@ int main(int argc, char ** argv)
   using tree_t = std::map< int, string >;
   using storage_t = std::map< string, tree_t >;
 
-  storage_t dataset;
+  storage_t datasets;
 
   while (file)
   {
@@ -38,21 +38,22 @@ int main(int argc, char ** argv)
       file >> key >> value;
       values[key] = value;
     }
-    dataset[label] = values;
+    datasets[label] = values;
   }
 
   string command;
   while (std::cin)
   {
     std::cin >> command;
-    if (command == "print")
+    if (command == "print" || command == "p")
     {
       string label;
       std::cin >> label;
-      tree_t values = dataset[label];
+      tree_t values = datasets.at(label);
       if (values.empty())
       {
         std::cout << "EMPTY\n";
+        continue;
       }
       std::cout << label;
       for (auto it = values.begin(); it != values.end(); ++it)
@@ -61,6 +62,69 @@ int main(int argc, char ** argv)
       }
       std::cout << '\n';
       command.clear();
+    }
+    else if (command == "complement" || command == "c")
+    {
+      string newset;
+      string set1;
+      string set2;
+      std::cin >> newset >> set1 >> set2;
+      tree_t values = datasets[set1];
+      for (auto it = datasets[set2].begin(); it != datasets[set2].end(); ++it)
+      {
+        if (values.count(it->first))
+        {
+          values.erase(it->first);
+          //it = safe;
+        }
+        else
+        {
+          values[it->first] = it->second;
+        }
+        //safe = it;
+      }
+      datasets[newset] = values;
+      command.clear();
+    }
+    else if (command == "intersect" || command == "i")
+    {
+      string newset;
+      string set1;
+      string set2;
+      std::cin >> newset >> set1 >> set2;
+      tree_t values = datasets[set1];
+      for (auto it = values.begin(), safe = values.begin(); it != values.end(); ++it)
+      {
+        if (!datasets[set2].count(it->first))
+        {
+          values.erase(it->first);
+          it = safe;
+        }
+        safe = it;
+      }
+      datasets[newset] = values;
+      command.clear();
+    }
+    else if (command == "union" || command == "u")
+    {
+      string newset;
+      string set1;
+      string set2;
+      std::cin >> newset >> set1 >> set2;
+      tree_t values = datasets[set1];
+      for (auto it = datasets[set2].begin(); it != datasets[set2].end(); ++it)
+      {
+        if (!values.count(it->first))
+        {
+          values[it->first] = it->second;
+        }
+      }
+      datasets[newset] = values;
+      command.clear();
+    }
+    else
+    {
+      std::cout << "INVALID COMMAND\n";
     }
   }
 }
