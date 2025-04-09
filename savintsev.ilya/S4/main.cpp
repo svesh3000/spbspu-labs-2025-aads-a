@@ -49,7 +49,8 @@ int main(int argc, char ** argv)
     {
       string label;
       std::cin >> label;
-      tree_t values = datasets.at(label);
+      tree_t values;
+      values = datasets.at(label);
       if (values.empty())
       {
         std::cout << "EMPTY\n";
@@ -69,19 +70,17 @@ int main(int argc, char ** argv)
       string set1;
       string set2;
       std::cin >> newset >> set1 >> set2;
-      tree_t values = datasets[set1];
+      tree_t values = datasets.at(set1);
       for (auto it = datasets[set2].begin(); it != datasets[set2].end(); ++it)
       {
         if (values.count(it->first))
         {
           values.erase(it->first);
-          //it = safe;
         }
         else
         {
           values[it->first] = it->second;
         }
-        //safe = it;
       }
       datasets[newset] = values;
       command.clear();
