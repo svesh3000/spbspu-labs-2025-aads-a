@@ -521,7 +521,7 @@ namespace gavrilova {
       return Iterator(pos.node_);
     }
     Iterator result = insert(pos, *first);
-    List< T > tempList(++first, last);
+    FwdList< T > tempList(++first, last);
     splice(pos, tempList);
     return result;
   }

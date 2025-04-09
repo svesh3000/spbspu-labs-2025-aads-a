@@ -12,7 +12,7 @@ int main() {
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
-  auto cur_it = listOfPairs.begin();
+  IteratorFwd< std::pair< std::string, FwdList< ULL > >  > cur_it = listOfPairs.begin();
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;

@@ -14,6 +14,7 @@ namespace gavrilova {
     ConstIteratorFwd(): node_(nullptr) {};
     ~ConstIteratorFwd() = default;
     ConstIteratorFwd(const this_t&) = default;
+    ConstIteratorFwd(IteratorFwd< T >& other): node_(other.node_) {};
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++();
@@ -28,7 +29,6 @@ namespace gavrilova {
     friend class FwdList< T >;
     friend class IteratorFwd< T >;
     explicit ConstIteratorFwd(NodeFwdList< T >* node): node_(node) {};
-    ConstIteratorFwd(IteratorFwd< T >& other): node_(other.node_) {};
   };
 }
 
