@@ -1,13 +1,13 @@
-#ifndef BST_ITERATOR_H
-#define BST_ITERATOR_H
+#ifndef TTT_ITERATOR_H
+#define TTT_ITERATOR_H
 #include <iterator>
 #include <utility>
-#include "bst-node.hpp"
+#include "ttt-node.hpp"
 
 namespace savintsev
 {
-  template< typename Key, typename Value, typename Compare >
-  class BinSearchTree;
+  //template< typename Key, typename Value, typename Compare >
+  //class BinSearchTree;
 
   //template< typename Key, typename Value, typename Compare >
   //class ConstIterator;

@@ -1,20 +1,20 @@
-#ifndef BST_MAIN_HPP
-#define BST_MAIN_HPP
+#ifndef TTT_BODY_HPP
+#define TTT_BODY_HPP
 #include <functional>
-#include "bst-node.hpp"
-#include "bst-iterator.hpp"
+#include "ttt-node.hpp"
+#include "ttt-iterator.hpp"
 
 namespace savintsev
 {
   template< typename Key, typename Value, typename Compare >
-  class BinSearchTree
+  class TwoThreeTree
   {
   public:
     using key_type = Key;
     using mapped_type = Value;
 
     using iterator = BidirectIterator< Key, Value >;
-    BinSearchTree();
+    TwoThreeTree();
 
     iterator begin() noexcept;
     iterator end() noexcept;
@@ -34,19 +34,19 @@ namespace savintsev
   };
 
   template< typename Key, typename Value, typename Compare >
-  BinSearchTree< Key, Value, Compare >::BinSearchTree():
+  TwoThreeTree< Key, Value, Compare >::TwoThreeTree():
     root_(nullptr),
     size_(0)
   {}
 
   template< typename K, typename V, typename C >
-  typename BinSearchTree< K, V, C >::iterator BinSearchTree< K, V, C >::end() noexcept
+  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::end() noexcept
   {
     return iterator();
   }
 
   template< typename K, typename V, typename C >
-  typename BinSearchTree< K, V, C >::iterator BinSearchTree< K, V, C >::find(const key_type & k)
+  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::find(const key_type & k)
   {
     iterator temp = lazy_find(k);
     if (k != temp.node_->data_[temp.is_righ_])
@@ -57,7 +57,7 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  typename BinSearchTree< K, V, C >::mapped_type & BinSearchTree< K, V, C >::operator[](const key_type & k)
+  typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](const key_type & k)
   {
     iterator temp = lazy_find(k);
     if (k != temp.node_->data_[temp.is_righ_])
@@ -68,7 +68,7 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  typename BinSearchTree< K, V, C >::iterator BinSearchTree< K, V, C >::lazy_find(const key_type & k)
+  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
   {
     node_t< K, V > * temp = root_;
     while (temp->data_[0]->first != k)

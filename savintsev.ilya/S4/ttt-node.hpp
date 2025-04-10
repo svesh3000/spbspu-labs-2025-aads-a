@@ -1,5 +1,5 @@
-#ifndef BST_NODE_H
-#define BST_NODE_H
+#ifndef TTT_NODE_H
+#define TTT_NODE_H
 #include <cstddef>
 #include <utility>
 

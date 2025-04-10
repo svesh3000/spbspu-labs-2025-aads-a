@@ -27,7 +27,7 @@ namespace savintsev
         file >> key >> value;
         values[key] = value;
       }
-      datasets[label] = values;
+      datasets[label] = std::move(values);
     }
     return datasets;
   }
@@ -56,7 +56,7 @@ namespace savintsev
     std::string newset, set1, set2;
     std::cin >> newset >> set1 >> set2;
     Dataset values = datasets.at(set1);
-    for (auto it = datasets[set2].begin(); it != datasets[set2].end(); ++it)
+    for (auto it = datasets.at(set2).begin(); it != datasets.at(set2).end(); ++it)
     {
       if (values.count(it->first))
       {
@@ -67,39 +67,43 @@ namespace savintsev
         values[it->first] = it->second;
       }
     }
-    datasets[newset] = values;
+    datasets[newset] = std::move(values);
   }
 
   void intersect_datasets(DatasetCollection & datasets)
   {
     std::string newset, set1, set2;
     std::cin >> newset >> set1 >> set2;
-    Dataset values = datasets[set1];
-    for (auto it = values.begin(), safe = values.begin(); it != values.end(); ++it)
+
+    Dataset values = datasets.at(set1);
+    for (auto it = values.begin(); it != values.end();)
     {
-      if (!datasets[set2].count(it->first))
+      if (!datasets.at(set2).count(it->first))
       {
-        values.erase(it->first);
-        it = safe;
+        it = values.erase(it);
       }
-      safe = it;
+      else
+      {
+        ++it;
+      }
     }
-    datasets[newset] = values;
+
+    datasets[newset] = std::move(values);
   }
 
   void union_datasets(DatasetCollection & datasets)
   {
     std::string newset, set1, set2;
     std::cin >> newset >> set1 >> set2;
-    Dataset values = datasets[set1];
-    for (auto it = datasets[set2].begin(); it != datasets[set2].end(); ++it)
+    Dataset values = datasets.at(set1);
+    for (auto it = datasets.at(set2).begin(); it != datasets.at(set2).end(); ++it)
     {
       if (!values.count(it->first))
       {
         values[it->first] = it->second;
       }
     }
-    datasets[newset] = values;
+    datasets[newset] = std::move(values);
   }
 
   DatasetCommands register_commands()

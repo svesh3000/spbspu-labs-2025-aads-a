@@ -36,6 +36,10 @@ int main(int argc, char ** argv)
     catch (const std::exception & e)
     {
       std::cout << "<INVALID COMMAND>\n";
+      while (std::cin.peek() != '\n')
+      {
+        std::cin >> command;
+      }
     }
   }
 }
