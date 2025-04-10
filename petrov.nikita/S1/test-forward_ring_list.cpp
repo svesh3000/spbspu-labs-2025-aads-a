@@ -598,7 +598,7 @@ BOOST_AUTO_TEST_CASE(remove_elements_from_list_to_make_it_empty)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(comparasion_operator)
+BOOST_AUTO_TEST_SUITE(are_equal_comparasion_operator)
 
 BOOST_AUTO_TEST_CASE(compare_empty_lists)
 {
@@ -663,5 +663,73 @@ BOOST_AUTO_TEST_CASE(compare_two_not_equal_not_empty_lists_one_size)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(are_not_equal_comparasion_operator)
+
+BOOST_AUTO_TEST_CASE(compare_empty_lists)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  out << (first_fwd_list != second_fwd_list);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(compare_empty_list_with_not_empty)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  second_fwd_list.push_front(1);
+  out << (first_fwd_list != second_fwd_list);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_equal_not_empty_lists)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(i);
+  }
+  out << (first_fwd_list != second_fwd_list);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_not_equal_not_empty_lists_different_size)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(4 - i);
+  }
+  second_fwd_list.pop_front();
+  out << (first_fwd_list != second_fwd_list);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(compare_two_not_equal_not_empty_lists_one_size)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first_fwd_list = {};
+  petrov::ForwardRingList< int > second_fwd_list = {};
+  for (size_t i = 1; i <= 3; i++)
+  {
+    first_fwd_list.push_front(i);
+    second_fwd_list.push_front(4 - i);
+  }
+  out << (first_fwd_list != second_fwd_list);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE_END()

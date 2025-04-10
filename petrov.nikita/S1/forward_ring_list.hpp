@@ -1,6 +1,7 @@
 #ifndef FORWARD_RING_LIST_HPP
 #define FORWARD_RING_LIST_HPP
 
+#include <iterator>
 #include <cstddef>
 #include <memory>
 #include <cassert>
@@ -18,7 +19,7 @@ namespace petrov
   struct ForwardRingList;
 
   template< typename T >
-  struct ConstForwardListIterator
+  struct ConstForwardListIterator: std::iterator< std::forward_iterator_tag, T >
   {
     friend struct ForwardRingList< T >;
   public:
@@ -28,7 +29,9 @@ namespace petrov
       node_(nullptr) 
     {}
     ConstForwardListIterator(const this_t & rhs) = default;
-    ConstForwardListIterator(const node_t * node): node_(node) {}
+    explicit ConstForwardListIterator(const node_t * node): 
+      node_(node) 
+    {}
     ~ConstForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
     this_t & operator++();
@@ -42,7 +45,7 @@ namespace petrov
   };
 
   template< typename T >
-  struct ForwardListIterator
+  struct ForwardListIterator: std::iterator< std::forward_iterator_tag, T >
   {
     friend struct ForwardRingList< T >;
   public:
@@ -52,7 +55,9 @@ namespace petrov
       node_(nullptr) 
     {}
     ForwardListIterator(const this_t & rhs) = default;
-    ForwardListIterator(node_t * node): node_(node) {}
+    explicit ForwardListIterator(node_t * node):
+      node_(node) 
+    {}
     ~ForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
     this_t & operator++();
@@ -83,12 +88,13 @@ namespace petrov
     this_t & operator=(const this_t & rhs);
     this_t & operator=(this_t && rhs);
     bool operator==(const this_t & rhs) const;
+    bool operator!=(const this_t & rhs) const;
     const_it_t cbegin() const;
     const_it_t cend() const;
     it_t begin();
     it_t end();
-    T front() const;
-    T back() const;
+    T & front() const;
+    T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T & val);
@@ -199,15 +205,14 @@ namespace petrov
       return;
     }
     auto it = rhs.cbegin();
-    head_ = new node_t;
+    head_ = new node_t{ *it, nullptr };
     head_->data = *it;
     auto subhead = head_;
     try
     {
       while (it++ != rhs.cend())
       {
-        subhead->next = new node_t;
-        subhead->next->data = *it;
+        subhead->next = new node_t{ *it, nullptr };
         subhead = subhead->next;
       }
     }
@@ -228,45 +233,14 @@ namespace petrov
 
   template< typename T >
   ForwardRingList< T >::ForwardRingList(this_t && rhs):
-    head_(nullptr),
-    tail_(nullptr)
-  {
-    if (rhs.empty())
-    {
-      return;
-    }
-    auto it = rhs.cbegin();
-    head_ = new node_t;
-    head_->data = *it;
-    auto subhead = head_;
-    try
-    {
-      while (it++ != rhs.cend())
-      {
-        subhead->next = new node_t;
-        subhead->next->data = *it;
-        subhead = subhead->next;
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      while (head_->next)
-      {
-        auto todelete = head_;
-        head_ = todelete->next;
-        delete todelete;
-      }
-      delete head_;
-      throw;
-    }
-    subhead->next = head_;
-    tail_ = subhead;
-  }
+    head_(rhs.head_),
+    tail_(rhs.tail_)
+  {}
 
   template< typename T >
   ForwardRingList< T >::~ForwardRingList()
   {
-    this->clear();
+    clear();
   }
 
   template< typename T >
@@ -320,6 +294,12 @@ namespace petrov
   }
 
   template< typename T >
+  bool ForwardRingList< T >::operator!=(const this_t & rhs) const
+  {
+    return !(*this == rhs);
+  }
+
+  template< typename T >
   typename ForwardRingList< T >::const_it_t ForwardRingList< T >::cbegin() const
   {
     return const_it_t(head_);
@@ -344,13 +324,13 @@ namespace petrov
   }
 
   template< typename T >
-  T ForwardRingList< T >::front() const
+  T & ForwardRingList< T >::front() const
   {
     return head_->data;
   }
 
   template< typename T >
-  T ForwardRingList< T >::back() const
+  T & ForwardRingList< T >::back() const
   {
     return tail_->data;
   }
