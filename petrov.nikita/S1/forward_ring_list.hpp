@@ -15,9 +15,13 @@ namespace petrov
   };
 
   template< typename T >
+  struct ForwardRingList;
+
+  template< typename T >
   struct ConstForwardListIterator
   {
-    const ListNode< T > * node_;
+    friend struct ForwardRingList< T >;
+  public:
     using node_t = ListNode< T >;
     using this_t = ConstForwardListIterator< T >;
     ConstForwardListIterator(): 
@@ -33,12 +37,15 @@ namespace petrov
     const T * operator->() const;
     bool operator==(const this_t & rhs) const;
     bool operator!=(const this_t & rhs) const;
+  private:
+    const ListNode< T > * node_;
   };
 
   template< typename T >
   struct ForwardListIterator
   {
-    ListNode< T > * node_;
+    friend struct ForwardRingList< T >;
+  public:
     using node_t = ListNode< T >;
     using this_t = ForwardListIterator< T >;
     ForwardListIterator(): 
@@ -54,6 +61,8 @@ namespace petrov
     T * operator->();
     bool operator==(const this_t & rhs) const;
     bool operator!=(const this_t & rhs) const;
+  private:
+    ListNode< T > * node_;
   };
 
   template< typename T >
