@@ -64,6 +64,11 @@ namespace
 
   void printSums(const duhanina::List< duhanina::List< unsigned long long > >& listPair)
   {
+    if (listPair.empty())
+    {
+      std::cout << "\n";
+      return;
+    }
     duhanina::List< unsigned long long > sums;
     for (auto it = listPair.begin(); it != listPair.end(); ++it)
     {
