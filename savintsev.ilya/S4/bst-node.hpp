@@ -1,19 +1,19 @@
 #ifndef BST_NODE_H
 #define BST_NODE_H
 #include <cstddef>
+#include <utility>
 
 namespace savintsev
 {
-  template< typename Key, typename Value, typename Compare >
+  template< typename Key, typename Value >
   struct Node
   {
-    Key keys_[2];
-    Value vals_[2];
-    Compare comp_;
+    using value_type = std::pair< Key, Value >;
+    value_type data_[2];
 
-    Node * left_ = nullptr;
-    Node * midd_ = nullptr;
-    Node * righ_ = nullptr;
+    Node * sons_[3] = nullptr;
+    //Node * midd_ = nullptr;
+    //Node * righ_ = nullptr;
     Node * parent_ = nullptr;
 
     size_t hold_ = 0;

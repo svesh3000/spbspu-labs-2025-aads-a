@@ -10,13 +10,14 @@ namespace savintsev
   public:
     BinSearchTree();
   private:
-    Node< Key, Value, Compare > * head_;
+    Node< Key, Value > * root_;
+    Compare comp_;
     size_t size_;
   };
 
   template< typename Key, typename Value, typename Compare >
   BinSearchTree< Key, Value, Compare >::BinSearchTree():
-    head_(new Node< Key, Value, Compare >{}),
+    root_(nullptr),
     size_(0)
   {}
 }
