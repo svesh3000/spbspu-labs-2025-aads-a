@@ -13,7 +13,7 @@ namespace savintsev
   //class ConstIterator;
 
   template< typename Key, typename Value >
-  class Iterator:
+  class BidirectIterator:
     public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value >>
   {
     using value_type = std::pair< Key, Value >;
@@ -22,37 +22,39 @@ namespace savintsev
     //friend class BinSearchTree< Key, Value, Compare >;
     //friend class ConstIterator< T >;
   public:
-    Iterator():
+    BidirectIterator():
       node_(nullptr)
     {}
     value_type & operator*()
     {
-      node_->data_;
+      node_->data_[node_->is_righ_];
     }
     value_type * operator->()
     {
-      return std::addressof(node_->data_);
+      return std::addressof(node_->data_[node_->is_righ_]);
     }
     const value_type & operator*() const
     {
-      node_->data_;
+      node_->data_[node_->is_righ_];
     }
     const value_type * operator->() const
     {
-      return std::addressof(node_->data_);
+      return std::addressof(node_->data_[node_->is_righ_]);
     }
-    Iterator & operator++()
+    BidirectIterator & operator++()
     {}
-    Iterator operator++(int);
-    Iterator & operator--();
-    Iterator operator--(int);
-    bool operator!=(const Iterator & rhs) const;
-    bool operator==(const Iterator & rhs) const;
+    BidirectIterator operator++(int);
+    BidirectIterator & operator--();
+    BidirectIterator operator--(int);
+    bool operator!=(const BidirectIterator & rhs) const;
+    bool operator==(const BidirectIterator & rhs) const;
   private:
-    Node< Key, Value > * node_;
+    node_t< Key, Value > * node_;
+    bool is_righ_ = false;
 
-    Iterator(Node< Key, Value > * rhs):
-      node_(rhs)
+    BidirectIterator(node_t< Key, Value > * rhs, bool is_right = false):
+      node_(rhs),
+      is_righ_(is_right)
     {}
   };
 /*
