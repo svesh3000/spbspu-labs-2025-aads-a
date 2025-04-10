@@ -25,12 +25,12 @@ namespace petrov
   public:
     using node_t = ListNode< T >;
     using this_t = ConstForwardListIterator< T >;
-    ConstForwardListIterator(): 
-      node_(nullptr) 
+    ConstForwardListIterator():
+      node_(nullptr)
     {}
     ConstForwardListIterator(const this_t & rhs) = default;
-    explicit ConstForwardListIterator(const node_t * node): 
-      node_(node) 
+    explicit ConstForwardListIterator(const node_t * node):
+      node_(node)
     {}
     ~ConstForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
@@ -51,12 +51,12 @@ namespace petrov
   public:
     using node_t = ListNode< T >;
     using this_t = ForwardListIterator< T >;
-    ForwardListIterator(): 
-      node_(nullptr) 
+    ForwardListIterator():
+      node_(nullptr)
     {}
     ForwardListIterator(const this_t & rhs) = default;
     explicit ForwardListIterator(node_t * node):
-      node_(node) 
+      node_(node)
     {}
     ~ForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
