@@ -45,7 +45,11 @@ int main(int argc, char ** argv)
   while (std::cin)
   {
     std::cin >> command;
-    if (command == "print" || command == "p")
+    if (!std::cin)
+    {
+      break;
+    }
+    if (command == "print")
     {
       string label;
       std::cin >> label;
@@ -64,7 +68,7 @@ int main(int argc, char ** argv)
       std::cout << '\n';
       command.clear();
     }
-    else if (command == "complement" || command == "c")
+    else if (command == "complement")
     {
       string newset;
       string set1;
@@ -85,7 +89,7 @@ int main(int argc, char ** argv)
       datasets[newset] = values;
       command.clear();
     }
-    else if (command == "intersect" || command == "i")
+    else if (command == "intersect")
     {
       string newset;
       string set1;
@@ -104,7 +108,7 @@ int main(int argc, char ** argv)
       datasets[newset] = values;
       command.clear();
     }
-    else if (command == "union" || command == "u")
+    else if (command == "union")
     {
       string newset;
       string set1;
