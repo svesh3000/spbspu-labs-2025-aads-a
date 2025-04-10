@@ -81,7 +81,8 @@ std::istream & petrov::inputValuesIntoFwdRingList(std::istream & in, list_type &
       sublist.push_front(number);
     }
     sublist.reverse();
-    fwd_ring_list.push_front({ sequence_num, sublist });
+    pair_of_string_and_list new_pair = { sequence_num, sublist };
+    fwd_ring_list.push_front(new_pair);
   }
   fwd_ring_list.reverse();
   return in;

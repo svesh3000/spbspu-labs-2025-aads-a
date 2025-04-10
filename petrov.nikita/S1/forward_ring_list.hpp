@@ -97,8 +97,8 @@ namespace petrov
     T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void push_front(const T & val);
-    void push_front (T && val);
+    template< typename U >
+    void push_front (U && val);
     void pop_front();
     void remove(const T & val);
     void clear();
@@ -233,9 +233,11 @@ namespace petrov
 
   template< typename T >
   ForwardRingList< T >::ForwardRingList(this_t && rhs):
-    head_(rhs.head_),
-    tail_(rhs.tail_)
-  {}
+    head_(nullptr),
+    tail_(nullptr)
+  {
+    swap(rhs);
+  }
 
   template< typename T >
   ForwardRingList< T >::~ForwardRingList()
@@ -247,14 +249,14 @@ namespace petrov
   typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(const this_t & rhs)
   {
     this_t cpy(rhs);
-    this->swap(cpy);
+    swap(cpy);
     return *this;
   }
 
   template< typename T >
   typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(this_t && rhs)
   {
-    this->swap(rhs);
+    swap(rhs);
     return *this;
   }
 
@@ -359,7 +361,8 @@ namespace petrov
   }
 
   template< typename T >
-  void ForwardRingList< T >::push_front(const T & val)
+  template< typename U >
+  void ForwardRingList< T >::push_front(U && val)
   {
     if (this->empty())
     {
@@ -374,27 +377,6 @@ namespace petrov
       auto temp = tail_->next;
       tail_->next = new node_t;
       tail_->next->data = val;
-      head_ = tail_->next;
-      head_->next = temp;
-    }
-  }
-
-  template< typename T >
-  void ForwardRingList< T >::push_front(T && val)
-  {
-    if (this->empty())
-    {
-      head_ = new node_t;
-      head_->data = std::move(val);
-      tail_ = head_;
-      head_->next = head_;
-      tail_->next = head_;
-    }
-    else
-    {
-      auto temp = tail_->next;
-      tail_->next = new node_t;
-      tail_->next->data = std::move(val);
       head_ = tail_->next;
       head_->next = temp;
     }
