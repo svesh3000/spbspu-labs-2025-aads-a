@@ -1,7 +1,8 @@
-#include "forward_ring_list.hpp"
 #include <string>
 #include <iostream>
 #include <limits>
+#include "forward_ring_list.hpp"
+
 
 using namespace petrov;
 using pair_of_string_and_list = std::pair< std::string, petrov::ForwardRingList< size_t > >;
