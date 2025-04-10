@@ -1,24 +1,171 @@
 #include "forward_ring_list.hpp"
 #include <string>
-#include "manipulations_with_fwd_ring_list.hpp"
 #include <iostream>
 #include <limits>
 
+using namespace petrov;
+using pair_of_string_and_list = std::pair< std::string, petrov::ForwardRingList< size_t > >;
+using list_type = ForwardRingList< pair_of_string_and_list >;
+using list_it_t = ForwardListIterator< pair_of_string_and_list >;
+using sublist_it_t = ForwardListIterator< size_t >;
+using result_list_type = ForwardRingList< size_t >;
+
+namespace
+{
+  std::istream & inputValuesIntoFwdRingList(std::istream & in, list_type & fwd_ring_list);
+  std::ostream & outputNamesOfSuquences(std::ostream & out, const list_type & fwd_ring_list);
+
+  result_list_type getListOfSequencesFromListOfSums(list_type fwd_ring_list);
+  void addElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublist_it_t it);
+
+  std::ostream & outputSums(std::ostream & out, const result_list_type sums);
+
+  std::istream & inputValuesIntoFwdRingList(std::istream & in, list_type & fwd_ring_list)
+  {
+    std::string sequence_num = {};
+    size_t number = 0;
+    while (!in.eof())
+    {
+      in.clear();
+      in >> sequence_num;
+      if (sequence_num.empty())
+      {
+        break;
+      }
+      petrov::ForwardRingList< size_t > sublist = {};
+      while (!in.eof() && in)
+      {
+        in >> number;
+        if (!in)
+        {
+          break;
+        }
+        sublist.push_front(number);
+      }
+      sublist.reverse();
+      fwd_ring_list.push_front({ sequence_num, sublist });
+    }
+    fwd_ring_list.reverse();
+    return in;
+  }
+
+  std::ostream & outputNamesOfSuquences(std::ostream & out, const list_type & fwd_ring_list)
+  {
+    auto it = fwd_ring_list.cbegin();
+    if (fwd_ring_list.size() == 1)
+    {
+      out << it->first;
+    }
+    else
+    {
+      out << (it++)->first;
+      do
+      {
+        out << " " << it->first;
+      }
+      while (it++ != fwd_ring_list.cend());
+    }
+    out << "\n";
+    return out;
+  }
+
+  result_list_type getListOfSequencesFromListOfSums(list_type fwd_ring_list)
+  {
+    result_list_type sums = {};
+    do
+    {
+      size_t sum = 0;
+      auto prev_it_out = fwd_ring_list.end();
+      auto it_out = fwd_ring_list.begin();
+      do
+      {
+        if (it_out->second.empty() && fwd_ring_list.size() != 1)
+        {
+          auto val = *it_out;
+          fwd_ring_list.remove(val);
+          it_out = prev_it_out;
+        }
+        else if (it_out->second.empty() && fwd_ring_list.size() == 1)
+        {
+          fwd_ring_list.pop_front();
+          break;
+        }
+        else
+        {
+          auto it = it_out->second.begin();
+          if (it_out == fwd_ring_list.begin())
+          {
+            std::cout << *it;
+            addElementToSumAndPopFrontIt(sum, it_out, it);
+          }
+          else
+          {
+            std::cout << " " << *it;
+            addElementToSumAndPopFrontIt(sum, it_out, it);
+          }
+          ++prev_it_out;
+        }
+      }
+      while (it_out++ != fwd_ring_list.end() && fwd_ring_list.begin() != fwd_ring_list.end());
+      if (sum)
+      {
+        sums.push_front(sum);
+        std::cout << "\n";
+      }
+    }
+    while (!fwd_ring_list.empty());
+    return sums;
+  }
+
+  void addElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublist_it_t it)
+  {
+    if (sum <= std::numeric_limits< size_t >::max() - *it)
+    {
+      sum += *it;
+      it_out->second.pop_front();
+    }
+    else
+    {
+      throw std::out_of_range("ERROR: Overflow");
+    }
+  }
+
+  std::ostream & outputSums(std::ostream & out, const result_list_type sums)
+  {
+    if (sums.size() == 1)
+    {
+      out << *sums.cbegin();
+    }
+    else
+    {
+      auto it = sums.cbegin();
+      out << *(it++);
+      do
+      {
+        out << " " << *it;
+      }
+      while (it++ != sums.cend());
+    }
+    return out;
+  }
+
+}
+
 int main()
 {
-  petrov::ForwardRingList< std::pair< std::string, petrov::ForwardRingList< size_t > > > fwd_ring_list = {};
-  petrov::ForwardRingList< size_t > sums = {};
+  list_type fwd_ring_list = {};
+  result_list_type sums = {};
   try
   {
-    petrov::inputValuesIntoFwdRingList(std::cin, fwd_ring_list);
+    inputValuesIntoFwdRingList(std::cin, fwd_ring_list);
     if (fwd_ring_list.empty())
     {
       std::cout << 0;
       std::cout << "\n";
       return 0;
     }
-    petrov::outputNamesOfSuquences(std::cout, fwd_ring_list);
-    sums = petrov::getListOfSequencesFromListOfSums(fwd_ring_list);
+    outputNamesOfSuquences(std::cout, fwd_ring_list);
+    sums = getListOfSequencesFromListOfSums(fwd_ring_list);
   }
   catch (const std::out_of_range & e)
   {
@@ -39,7 +186,7 @@ int main()
   }
   else
   {
-    petrov::outputSums(std::cout, sums);
+    outputSums(std::cout, sums);
   }
   std::cout << "\n";
 }
