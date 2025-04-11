@@ -263,15 +263,15 @@ namespace petrov
   template< typename T >
   bool ForwardRingList< T >::operator==(const this_t & rhs) const
   {
-    if (this->empty() && rhs.empty())
+    if (empty() && rhs.empty())
     {
       return true;
     }
     else
     {
-      if (this->size() == rhs.size() && this->size() != 0)
+      if (size() == rhs.size() && size() != 0)
       {
-        auto it = this->cbegin();
+        auto it = cbegin();
         auto rhs_it = rhs.cbegin();
         do
         {
@@ -281,10 +281,10 @@ namespace petrov
           }
           ++rhs_it;
         }
-        while (it++ != this->cend());
+        while (it++ != cend());
         return true;
       }
-      else if (this->size() == rhs.size() && this->size() == 0)
+      else if (size() == rhs.size() && size() == 0)
       {
         return true;
       }
@@ -340,23 +340,23 @@ namespace petrov
   template< typename T >
   bool ForwardRingList< T >::empty() const noexcept
   {
-    return !this->head_;
+    return !head_;
   }
 
   template< typename T >
   size_t ForwardRingList< T >::size() const noexcept
   {
-    if (this->empty())
+    if (empty())
     {
       return 0;
     }
     size_t count = 0;
-    auto it = this->cbegin();
+    auto it = cbegin();
     do
     {
       ++count;
     }
-    while (it++ != this->cend());
+    while (it++ != cend());
     return count;
   }
 
@@ -364,19 +364,16 @@ namespace petrov
   template< typename U >
   void ForwardRingList< T >::push_front(U && val)
   {
-    if (this->empty())
+    if (empty())
     {
-      head_ = new node_t;
-      head_->data = val;
+      head_ = new node_t{ val, head_ };
       tail_ = head_;
-      head_->next = head_;
       tail_->next = head_;
     }
     else
     {
       auto temp = tail_->next;
-      tail_->next = new node_t;
-      tail_->next->data = val;
+      tail_->next = new node_t{ val, nullptr };
       head_ = tail_->next;
       head_->next = temp;
     }
@@ -385,7 +382,7 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::pop_front()
   {
-    if (this->empty())
+    if (empty())
     {
       return;
     }
@@ -408,21 +405,21 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::remove(const T & val)
   {
-    if (this->empty())
+    if (empty())
     {
       return;
     }
-    if (this->size() == 1)
+    if (size() == 1)
     {
       if (head_->data == val)
       {
-        this->pop_front();
+        pop_front();
       }
       return;
     }
     size_t size = this->size();
     size_t count = 0;
-    auto it = this->cbegin();
+    auto it = cbegin();
     do
     {
       if (*it == val)
@@ -430,10 +427,10 @@ namespace petrov
         count++;
       }
     }
-    while (it++ != this->cend());
+    while (it++ != cend());
     if (count == size)
     {
-      this->clear();
+      clear();
       return;
     }
     auto subhead = head_;
@@ -468,12 +465,12 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::clear()
   {
-    if (this->empty())
+    if (empty())
     {
       return;
     }
-    auto it = this->begin();
-    while (it != this->end())
+    auto it = begin();
+    while (it != end())
     {
       auto temp = it.node_->next;
       delete it.node_;
@@ -487,14 +484,14 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::reverse()
   {
-    if (this->empty())
+    if (empty())
     {
       return;
     }
-    auto prev = this->end();
-    auto next = ++this->begin();
-    auto it = this->begin();
-    while (it != this->end())
+    auto prev = end();
+    auto next = ++begin();
+    auto it = begin();
+    while (it != end())
     {
       it.node_->next = prev.node_;
       prev = it;
@@ -502,8 +499,8 @@ namespace petrov
     }
     it.node_->next = prev.node_;
     prev = it;
-    auto temp = this->begin().node_;
-    head_ = this->end().node_;
+    auto temp = begin().node_;
+    head_ = end().node_;
     tail_ = temp;
   }
 
