@@ -12,17 +12,15 @@ namespace tkach
   public:
     Queue() = default;
     Queue(const Queue< T >&);
-    Queue(Queue< T >&&);
+    Queue(Queue< T >&&) noexcept;
     ~Queue() = default;
-    Queue< T >& operator=(Queue< T >&&) noexcept;
+    Queue< T >& operator=(Queue< T >&&);
     Queue< T >& operator=(const Queue< T >&) noexcept;
     void pop();
     void push(const T& data);
     void push(T&& data);
     size_t size() const noexcept;
     bool empty() const noexcept;
-    T& back();
-    const T& back() const;
     T& front();
     const T& front() const;
     void swap(Queue< T >& other);
@@ -98,18 +96,6 @@ namespace tkach
   bool Queue< T >::empty() const noexcept
   {
     return array_.empty();
-  }
-
-  template< typename T >
-  T& Queue< T >::back()
-  {
-    return const_cast< T& >(static_cast< const Queue< T >* >(this)->back());
-  }
-
-  template< typename T >
-  const T& Queue< T >::back() const
-  {
-    return array_.back();
   }
 
   template< typename T >

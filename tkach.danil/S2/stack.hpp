@@ -11,11 +11,11 @@ namespace tkach
   {
   public:
     Stack() = default;
-    Stack(const Stack< T >&);
-    Stack(Stack< T >&&);
+    Stack(const Stack< T >&) = default;
+    Stack(Stack< T >&&) noexcept = default;
     ~Stack() = default;
-    Stack< T >& operator=(Stack< T >&&) noexcept;
-    Stack< T >& operator=(const Stack< T >&) noexcept;
+    Stack< T >& operator=(Stack< T >&&) noexcept = default;
+    Stack< T >& operator=(const Stack< T >&) noexcept = default;
     void pop();
     void push(const T& data);
     void push(T&& data);
@@ -27,40 +27,6 @@ namespace tkach
   private:
     DynArray< T > array_;
   };
-
-   template< typename T >
-  Stack< T >::Stack(const Stack< T >& other):
-    array_(other.array_)
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(Stack< T >&& other):
-    array_(std::move(other.array_))
-  {}
-
-  template< typename T >
-  Stack< T >& Stack< T >::operator=(Stack< T >&& other) noexcept
-  {
-    if (this == std::addressof(other))
-    {
-      return *this;
-    }
-    Stack< T > temp(std::move(other));
-    swap(temp);
-    return *this;
-  }
-
-  template< typename T >
-  Stack< T >& Stack< T >::operator=(const Stack< T >& other) noexcept
-  {
-    if (this == std::addressof(other))
-    {
-      return *this;
-    }
-    Stack< T > temp(other);
-    swap(temp);
-    return *this;
-  }
 
   template< typename T >
   void Stack< T >::pop()
