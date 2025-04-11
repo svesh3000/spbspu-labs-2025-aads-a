@@ -9,7 +9,7 @@ namespace
 {
   using ExprsStack = demehin::Stack< demehin::Queue < std::string > >;
 
-  void inputExprs(std::istream& in, ExprsStack& stack)
+  /*void inputExprs(std::istream& in, ExprsStack& stack)
   {
     demehin::Queue< std::string > exprQueue;
     std::string line;
@@ -55,6 +55,35 @@ namespace
         exprQueue.clear();
       }
     }
+  }*/
+
+  void inputExprs(std::istream& in, ExprsStack& stack)
+  {
+    std::string line;
+    while (std::getline(in, line))
+    {
+      if (line.empty())
+      {
+        continue;
+      }
+
+      demehin::Queue< std::string > exprQueue;
+      size_t token_begin = 0;
+      size_t token_end = line.find(' ');
+
+      while (token_end != std::string::npos)
+      {
+        exprQueue.push(line.substr(token_begin, token_end - token_begin));
+        token_begin = token_end + 1;
+        token_end = line.find(' ', token_begin);
+      }
+
+      exprQueue.push(line.substr(token_begin));
+      if (!exprQueue.empty())
+      {
+        stack.push(exprQueue);
+      }
+    }
   }
 
   void printValues(std::ostream& out, demehin::Stack< long long int  > stack)
@@ -96,7 +125,7 @@ int main(int argc, char* argv[])
     printValues(std::cout, res);
     std::cout << "\n";
   }
-  catch (std::exception& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
