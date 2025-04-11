@@ -51,8 +51,8 @@ namespace tkach
     template< class InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > in_list);
-    template< class Q >
-    Iterator< T > insertAfter(Citerator < T > pos, Q&& value);
+    Iterator< T > insertAfter(Citerator < T > pos, const T& value);
+    Iterator< T > insertAfter(Citerator < T > pos, T&& value);
     Iterator< T > insertAfter(Citerator < T > pos, size_t count, const T & data);
     template< class InputIt >
     Iterator< T > insertAfter(Citerator < T > pos, InputIt first, InputIt last);
@@ -70,6 +70,8 @@ namespace tkach
     void pushFt(Args&&... args);
     template< class... Args >
     void pushBk(Args&&... args);
+    template< class... Args >
+    Iterator< T > insertAft(Citerator< T > pos, Args&&... args);
   };
 
   template< typename T >
@@ -483,15 +485,15 @@ namespace tkach
   }
 
   template< typename T >
-  template< class Q >
-  Iterator< T > List< T >::insertAfter(Citerator< T > pos, Q&& value)
+  template< class... Args >
+  Iterator< T > List< T >::insertAft(Citerator< T > pos, Args&&... args)
   {
     if (empty())
     {
       return Iterator< T >();
     }
     Node< T >* temp = pos.node_;
-    Node< T >* new_node = new Node< T >{temp->next_, std::forward< Q >(value)};
+    Node< T >* new_node = new Node< T >{temp->next_, std::forward< Args >(args)...};
     if (temp == tail_)
     {
       tail_ = new_node;
@@ -499,6 +501,18 @@ namespace tkach
     temp->next_ = new_node;
     size_++;
     return Iterator< T >(new_node);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insertAfter(Citerator< T > pos, T&& value)
+  {
+    return insertAft(pos, std::move(value));
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insertAfter(Citerator< T > pos, const T& value)
+  {
+    return insertAft(pos, value);
   }
 
   template< typename T >
