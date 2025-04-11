@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <string>
+#include <utility>
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
@@ -23,6 +24,5 @@ BOOST_AUTO_TEST_CASE(constructors)
   ++it;
   RBTree< size_t, std::string > rangeTree(it, inilTree.end());
   BOOST_TEST(rangeTree.size() == 2);
-
 }
 BOOST_AUTO_TEST_SUITE_END();

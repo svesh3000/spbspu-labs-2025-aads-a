@@ -32,7 +32,7 @@ namespace kiselev
     ~RBTree();
 
     RBTree< Key, Value, Cmp >& operator=(const RBTree< Key, Value, Cmp >&);
-    RBTree< Key, Value, Cmp >& operator=(RBTree< Key, Value, Cmp >&&);
+    RBTree< Key, Value, Cmp >& operator=(RBTree< Key, Value, Cmp >&&) noexcept;
     RBTree< Key, Value, Cmp >& operator=(std::initializer_list< value >);
     Value& operator[](const Key&);
     const Value& operator[](const Key&) const;
@@ -50,6 +50,7 @@ namespace kiselev
 
     std::pair< Iterator, bool > insert(const value&);
     std::pair< Iterator, bool > insert(value&);
+    std::pair< Iterator, bool > insert(value&&);
     Iterator insert(ConstIterator, const value&);
     Iterator insert(Iterator, const value&);
     template< typename InputIt >
@@ -141,7 +142,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  RBTree< Key, Value, Cmp >& RBTree< Key, Value, Cmp >::operator=(RBTree< Key, Value, Cmp >&& tree)
+  RBTree< Key, Value, Cmp >& RBTree< Key, Value, Cmp >::operator=(RBTree< Key, Value, Cmp >&& tree) noexcept
   {
     RBTree< Key, Value, Cmp > temp(std::move(tree));
     swap(temp);
@@ -225,7 +226,7 @@ namespace kiselev
   {
     Node* parent = nullptr;
     Node* grandParent = nullptr;
-    while (node != root_ && node->color == Color::RED && node->parent->color == Color::RED)
+    while (node != root_ && node->color == Color::RED && node->parent && node->parent->color == Color::RED)
     {
       parent = node->parent;
       grandParent = parent->parent;
@@ -287,7 +288,7 @@ namespace kiselev
       if (node == node->parent->left)
       {
         Node* brother = node->parent->right;
-        if (brother->color == Color::RED)
+        if (brother && brother->color == Color::RED)
         {
           brother->color = Color::BLACK;
           node->parent->color = Color::RED;
@@ -448,7 +449,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::find(const Key& key) const noexcept
   {
-    const Node* temp = root_;
+    Node* temp = root_;
     while (temp)
     {
       if (cmp_(key, temp->data.first))
@@ -473,16 +474,22 @@ namespace kiselev
   {
     value val(std::forward< Args >(args)...);
     const Key& key = val.first;
+    if (!root_)
+    {
+      root_ = new Node{ std::move(val), Color::BLACK, nullptr, nullptr, nullptr };
+      size_ = 1;
+      return { Iterator(root_), true };
+    }
     Node* temp = root_;
     Node* parent = nullptr;
     while (temp)
     {
       parent = temp;
-      if (cmp_(temp->data.first, key))
+      if (cmp_(key, temp->data.first))
       {
         temp = temp->left;
       }
-      else if (cmp_(key, temp->data.first))
+      else if (cmp_(temp->data.first, key))
       {
         temp = temp->right;
       }
@@ -492,12 +499,12 @@ namespace kiselev
       }
     }
 
-    Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, parent };
-    if (!parent)
-    {
-      root_ = newNode;
-    }
-    else if (cmp_(parent->data.first, key))
+    Node* newNode = new Node{ std::move(val), Color::RED, nullptr, nullptr, parent };
+    //if (!parent)
+    //{
+      //root_ = newNode;
+    //}
+    if (cmp_(parent->data.first, key))
     {
       parent->right = newNode;
     }
@@ -514,7 +521,7 @@ namespace kiselev
   template< typename... Args >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::emplaceHint(ConstIterator hint, Args &&... args)
   {
-    if (hint == end() || empty())
+    if (hint == cend() || empty())
     {
       return emplace(std::forward< Args >(args)...).first;
     }
@@ -549,6 +556,7 @@ namespace kiselev
     }
     return emplace(std::forward< Args >(args)...).first;
   }
+
   template< typename Key, typename Value, typename Cmp >
   std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
   {
@@ -559,6 +567,12 @@ namespace kiselev
   std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(value& val)
   {
     return emplace(val);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(value&& val)
+  {
+    return emplace(std::move(val));
   }
 
   template< typename Key, typename Value, typename Cmp >
