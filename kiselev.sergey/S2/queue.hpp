@@ -64,7 +64,7 @@ namespace kiselev
   template< typename T >
   void Queue< T >::push(T&& data)
   {
-    arr_.push(data);
+    arr_.push(std::move(data));
   }
 
   template< typename T >
