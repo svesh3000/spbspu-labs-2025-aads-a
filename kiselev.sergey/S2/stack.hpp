@@ -1,6 +1,5 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include <sys/types.h>
 #include "dynamicArr.hpp"
 namespace kiselev
 {
@@ -17,10 +16,10 @@ namespace kiselev
     Stack< T >& operator=(const Stack< T >&);
     Stack< T >& operator=(Stack< T >&&) noexcept;
 
-    T& back();
-    const T& back() const;
+    T& top();
+    const T& top() const;
     void pop() noexcept;
-    void push(T&) noexcept;
+    void push(const T&) noexcept;
     void push(T&&) noexcept;
 
     size_t size() const noexcept;
@@ -28,9 +27,7 @@ namespace kiselev
     void clear() noexcept;
 
   private:
-
     DynamicArr< T > arr_;
-
   };
 
   template< typename T >
@@ -58,13 +55,13 @@ namespace kiselev
   }
 
   template< typename T >
-  T& Stack< T >::back()
+  T& Stack< T >::top()
   {
     return arr_.back();
   }
 
   template< typename T >
-  const T& Stack< T >::back() const
+  const T& Stack< T >::top() const
   {
     return arr_.back();
   }
@@ -72,11 +69,11 @@ namespace kiselev
   template< typename T >
   void Stack< T >::pop() noexcept
   {
-    return arr_.popBack();
+    arr_.popBack();
   }
 
   template< typename T >
-  void Stack< T >::push(T& data) noexcept
+  void Stack< T >::push(const T& data) noexcept
   {
     arr_.push(data);
   }
@@ -84,7 +81,7 @@ namespace kiselev
   template< typename T >
   void Stack< T >::push(T&& data) noexcept
   {
-    return arr_.push(data);
+    arr_.push(std::move(data));
   }
 
   template< typename T >

@@ -24,7 +24,7 @@ namespace kiselev
     const T& front() const;
     void popBack();
     void popFront();
-    void push(T&) noexcept;
+    void push(const T&) noexcept;
     void push(T&&) noexcept;
     void clear() noexcept;
 
@@ -32,7 +32,6 @@ namespace kiselev
     bool empty() const noexcept;
 
   private:
-
     T** data_;
     size_t capacity_;
     size_t size_;
@@ -40,7 +39,6 @@ namespace kiselev
 
     void reallocate();
     void swap(DynamicArr< T >&) noexcept;
-
   };
 
   template< typename T >
@@ -98,7 +96,7 @@ namespace kiselev
         data_[i] = new T(*arr.data_[i + begin_]);
       }
     }
-    catch (const std::bad_alloc&)
+    catch (...)
     {
       clear();
       delete[] data_;
@@ -202,7 +200,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void DynamicArr< T >::push(T& data) noexcept
+  void DynamicArr< T >::push(const T& data) noexcept
   {
     if (size_ >= capacity_)
     {

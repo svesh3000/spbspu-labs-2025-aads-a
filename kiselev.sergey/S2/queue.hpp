@@ -1,7 +1,5 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include <cstddef>
-#include <exception>
 #include "dynamicArr.hpp"
 namespace kiselev
 {
@@ -31,9 +29,7 @@ namespace kiselev
     void clear() noexcept;
 
   private:
-
     DynamicArr< T > arr_;
-
   };
 
   template< typename T >

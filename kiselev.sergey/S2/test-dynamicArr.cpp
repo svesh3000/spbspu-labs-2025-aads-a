@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(moveArr.front() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(operators)
+BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   kiselev::DynamicArr< int > arr;
   kiselev::DynamicArr< int > arr2;
