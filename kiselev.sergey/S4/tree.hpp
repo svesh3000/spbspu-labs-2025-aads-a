@@ -226,7 +226,7 @@ namespace kiselev
   {
     Node* parent = nullptr;
     Node* grandParent = nullptr;
-    while (node != root_ && node->color == Color::RED && node->parent && node->parent->color == Color::RED)
+    while (node && node->color == Color::RED && node->parent && node->parent->color == Color::RED)
     {
       parent = node->parent;
       grandParent = parent->parent;
@@ -283,7 +283,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   void RBTree< Key, Value, Cmp >::fixDelete(Node* node) noexcept
   {
-    while (node && node->color == Color::BLACK)
+    while (node != root_ && node->color == Color::BLACK)
     {
       if (node == node->parent->left)
       {
@@ -297,6 +297,12 @@ namespace kiselev
         }
         if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right->color == Color::BLACK))
         {
+          /*
+          if (brother)
+          {
+            brother->color = Color::RED;
+          }
+          */
           brother->color = Color::RED;
           node = node->parent;
         }
@@ -325,7 +331,7 @@ namespace kiselev
       else
       {
         Node* brother = node->parent->left;
-        if (brother->color == Color::RED)
+        if (brother && brother->color == Color::RED)
         {
           brother->color = Color::BLACK;
           node->parent->color = Color::RED;
@@ -334,6 +340,12 @@ namespace kiselev
         }
         if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right->color == Color::BLACK))
         {
+          /*
+          if (brother)
+          {
+            brother->color = Color::RED;
+          }
+          */
           brother->color = Color::RED;
           node = node->parent;
         }
@@ -360,7 +372,10 @@ namespace kiselev
         }
       }
     }
-    node->color = Color::BLACK;
+    if (node)
+    {
+      node->color = Color::BLACK;
+    }
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -500,10 +515,6 @@ namespace kiselev
     }
 
     Node* newNode = new Node{ std::move(val), Color::RED, nullptr, nullptr, parent };
-    //if (!parent)
-    //{
-      //root_ = newNode;
-    //}
     if (cmp_(parent->data.first, key))
     {
       parent->right = newNode;
@@ -611,78 +622,53 @@ namespace kiselev
   {
     if (pos == cend())
     {
-      return end();
+        return end();
     }
     Node* toDelete = pos.node_;
-    Node* temp = nullptr;
-    if (toDelete->left)
+    Node* replace = nullptr;
+    Node* child = nullptr;
+    if (!toDelete->left || !toDelete->right)
     {
-      temp = toDelete->left;
-      while (temp->right)
-      {
-        temp = temp->right;
-      }
+        replace = toDelete;
     }
-    else if (toDelete->right)
+    else
     {
-      temp = toDelete->right;
-      while (temp->left)
-      {
-        temp = temp->left;
-      }
+        replace = toDelete->right;
+        while (replace->left)
+        {
+            replace = replace->left;
+        }
     }
-    if (toDelete == root_ && !temp)
-    {
-      delete root_;
-      root_ = nullptr;
-      --size_;
-      return end();
-    }
-    if (!temp)
-    {
-      temp = toDelete;
-    }
-    else if (temp->parent)
-    {
-      if (temp->parent->right == temp)
-      {
-        temp->parent->right = temp->left ? temp->left : temp->right;
-      }
-      else if (temp->parent->left == temp)
-      {
-        temp->parent->left = temp->left ? temp->left : temp->right;
-      }
-    }
-    Node* child = temp->left ? temp->left : temp->right;
+    child = replace->left ? replace->left : replace->right;
     if (child)
     {
-      child->parent = temp->parent;
+        child->parent = replace->parent;
     }
-    if (temp != toDelete)
+    if (!replace->parent)
     {
-      std::swap(temp->data, toDelete->data);
-      std::swap(temp->color, toDelete->color);
+        root_ = child;
     }
-    if (temp == root_)
+    else if (replace == replace->parent->left)
     {
-      root_ = child;
+        replace->parent->left = child;
     }
-    if (temp->color == Color::BLACK)
+    else
     {
-      if (child && child->color == Color::RED)
-      {
-        child->color = Color::BLACK;
-      }
-      else
-      {
-        fixDelete(child ? child : temp->parent);
-      }
+        replace->parent->right = child;
     }
-    Iterator res(pos.node_);
-    ++res;
-    delete temp;
+    if (replace != toDelete)
+    {
+        toDelete->data = std::move(replace->data);
+    }
+    if (replace->color == Color::BLACK)
+    {
+        fixDelete(child ? child : replace->parent);
+    }
+    Iterator next(pos.node_);
+    ++next;
+    delete replace;
     --size_;
-    return res;
+    return next;
   }
 
   template< typename Key, typename Value, typename Cmp >
