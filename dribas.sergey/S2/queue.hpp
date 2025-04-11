@@ -21,8 +21,8 @@ namespace dribas {
     void push(const T& value);
     void push(T&& value);
     void pop() noexcept;
-    bool empty() noexcept const;
-    size_t size() noexcept const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
     void swap(Queue& other) noexcept;
 
   private:
@@ -32,7 +32,7 @@ namespace dribas {
 
   template < class T >
   Queue< T >::Queue():
-    size_(0),
+    size_(0)
   {}
 
   template < class T >
@@ -88,19 +88,19 @@ namespace dribas {
       newQ[i] = queue_;
     }
     delete[] queue_;
-    queue_[size_++] = value;
+    newQ[size_++] = value;
     queue_ = newQ;
   }
 
   template < class T >
   void Queue< T >::push(T&& value)
   {
-    T* newQ = new T[size + 1];
+    T* newQ = new T[size_ + 1];
     for (size_t i = 0; i < size_; i++) {
-      newQ[i] = queue_;
+      newQ[i] = queue_[i];
     }
     delete[] queue_;
-    queue_[size_++] = value;
+    newQ[size_++] = value;
     queue_ = newQ;
   }
 
@@ -128,13 +128,13 @@ namespace dribas {
   }
 
   template < class T >
-  bool Queue< T >::empty() noexcept
+  bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < class T >
-  size_t Queue< T >::size() noexcept
+  size_t Queue< T >::size() const noexcept
   {
     return size_;
   }
