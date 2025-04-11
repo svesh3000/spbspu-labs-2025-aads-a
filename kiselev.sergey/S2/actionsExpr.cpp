@@ -89,7 +89,7 @@ namespace
       throw std::logic_error("Underflow");
     }
   }
-  void checkDivision(long long int a, long long int b)
+  void checkDivision(long long int b)
   {
     if (b == 0)
     {
@@ -98,8 +98,6 @@ namespace
   }
   long long int calculatingOperation(long long int a, long long b, const char& operation)
   {
-    long long int max = std::numeric_limits< long long int >::max();
-    long long int min = std::numeric_limits< long long int >::min();
     switch (operation)
     {
     case '+':
@@ -112,10 +110,10 @@ namespace
       checkMultiplicate(a, b);
       return a * b;
     case '/':
-      checkDivision(a, b);
+      checkDivision(b);
       return a / b;
     case '%':
-      checkDivision(a, b);
+      checkDivision(b);
       return a >= 0 ? a % b : (b - std::abs(a % b)) % b;
     default:
       throw std::logic_error("Invalid operation");
