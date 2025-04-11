@@ -68,7 +68,8 @@ namespace
         new_list.pushBack(pair_second_front);
         it->second.popFront();
         it++;
-      } while (it != fd_pair_list.begin());
+      }
+      while (it != fd_pair_list.begin());
       if (!new_list.empty())
       {
         out << new_list.front();

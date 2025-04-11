@@ -18,7 +18,7 @@ namespace tkach
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
     List(size_t count, const T & data);
-    template< class InputIt>
+    template< class InputIt >
     List(InputIt first, InputIt last);
     List(std::initializer_list< T > in_list);
     ~List();
@@ -45,16 +45,16 @@ namespace tkach
     void spliceAfter(Citerator< T > pos, List< T >& other, Citerator< T > first, Citerator< T > last);
     void spliceAfter(Citerator< T > pos, List< T >&& other, Citerator< T > first, Citerator< T > last);
     void remove(const T& value);
-    template< class UnaryPredicate>
+    template< class UnaryPredicate >
     void removeIf(UnaryPredicate p);
     void assign(size_t count, const T& value);
     template< class InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > in_list);
-    template< class Q>
+    template< class Q >
     Iterator< T > insertAfter(Citerator < T > pos, Q&& value);
     Iterator< T > insertAfter(Citerator < T > pos, size_t count, const T & data);
-    template< class InputIt>
+    template< class InputIt >
     Iterator< T > insertAfter(Citerator < T > pos, InputIt first, InputIt last);
     Iterator< T > insertAfter(Citerator < T > pos, std::initializer_list< T > in_list);
     Iterator< T > eraseAfter(Citerator < T > pos);
@@ -66,10 +66,10 @@ namespace tkach
     size_t size_;
     List< T > getList(const List< T >& other) const;
     List< T > getList(size_t count, const T & data) const;
-    template< class Q>
-    void pushFt(Q&& data);
-    template< class Q>
-    void pushBk(Q&& data);
+    template< class... Args >
+    void pushFt(Args&&... args);
+    template< class... Args >
+    void pushBk(Args&&... args);
   };
 
   template< typename T >
@@ -255,10 +255,10 @@ namespace tkach
   }
 
   template< class T >
-  template< class Q>
-  void List< T >::pushFt(Q&& data)
+  template< class... Args >
+  void List< T >::pushFt(Args&&... args)
   {
-    Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
+    Node< T >* new_node = new Node< T >{nullptr, std::forward< Args >(args)...};
     if (empty())
     {
       tail_ = new_node;
@@ -273,10 +273,10 @@ namespace tkach
   }
 
   template< class T >
-  template< class Q>
-  void List< T >::pushBk(Q&& data)
+  template< class... Args >
+  void List< T >::pushBk(Args&&... args)
   {
-    Node< T >* new_node = new Node< T >{std::forward< Q >(data), nullptr};
+    Node< T >* new_node = new Node< T >{nullptr, std::forward< Args >(args)...};
     if (empty())
     {
       tail_ = new_node;
@@ -322,7 +322,7 @@ namespace tkach
   }
 
   template< typename T >
-  template< class UnaryPredicate>
+  template< class UnaryPredicate >
   void List< T >::removeIf(UnaryPredicate p)
   {
     if (empty())
@@ -483,7 +483,7 @@ namespace tkach
   }
 
   template< typename T >
-  template< class Q>
+  template< class Q >
   Iterator< T > List< T >::insertAfter(Citerator< T > pos, Q&& value)
   {
     if (empty())
@@ -491,7 +491,7 @@ namespace tkach
       return Iterator< T >();
     }
     Node< T >* temp = pos.node_;
-    Node< T >* new_node = new Node< T >{std::forward< Q >(value), temp->next_};
+    Node< T >* new_node = new Node< T >{temp->next_, std::forward< Q >(value)};
     if (temp == tail_)
     {
       tail_ = new_node;
@@ -502,7 +502,7 @@ namespace tkach
   }
 
   template< typename T >
-  template< class InputIt>
+  template< class InputIt >
   Iterator< T > List< T >::insertAfter(Citerator < T > pos, InputIt first, InputIt last)
   {
     spliceAfter(pos, List< T >(first, last));
