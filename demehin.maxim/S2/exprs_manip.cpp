@@ -2,30 +2,18 @@
 #include <stdexcept>
 #include <iostream>
 #include <algorithm>
+#include <calc_utils.hpp>
 
 namespace
 {
-  using lli = long long int;
-
-  bool isNumber(const std::string& str)
-  {
-    try
-    {
-      std::stoll(str);
-      return true;
-    }
-    catch(...)
-    {
-      return false;
-    }
-  }
+  using long_t = long long int;
 
   bool isOperator(const std::string& str)
   {
     return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
-  lli  getOpPriority(const std::string& op)
+  long_t getOpPriority(const std::string& op)
   {
     if (op == "+" || op == "-")
     {
@@ -38,25 +26,25 @@ namespace
     return 0;
   }
 
-  lli modulate(lli a, lli b)
-  {
-    if (b < 0)
-    {
-      return -modulate(-a, -b);
-    }
+  //long_t modulate(long_t a, long_t b)
+  //{
+    //if (b < 0)
+    //{
+     // return -modulate(-a, -b);
+    //}
 
-    lli res = a % b;
-    if (res < 0)
-    {
-      res += b;
-    }
-    return res;
-  }
+    //long_t res = a % b;
+    //if (res < 0)
+    //{
+      //res += b;
+    //}
+    //return res;
+  //}
 
-  bool isMultipOverflow(lli a, lli b)
+  /*bool isMultipOverflow(long_t a, long_t b)
   {
-    lli max = std::numeric_limits< lli >::max();
-    lli min = std::numeric_limits< lli >::min();
+    long_t max = std::numeric_limits< long_t >::max();
+    long_t min = std::numeric_limits< long_t >::min();
     if (a > 0 && b > 0 && a > max / b)
     {
       return true;
@@ -74,55 +62,60 @@ namespace
       return true;
     }
     return false;
-  }
+  }*/
 
-  lli performOperation(lli op1, lli op2, const std::string& operation)
+  long_t performOperation(long_t op1, long_t op2, const std::string& operation)
   {
-    lli max = std::numeric_limits< lli >::max();
-    lli min = std::numeric_limits< lli >::min();
+    //long_t max = std::numeric_limits< long_t >::max();
+    //long_t min = std::numeric_limits< long_t >::min();
     if (operation == "+")
     {
-      if (op1 > max - op2)
-      {
-        throw std::logic_error("overflow");
-      }
-      return op1 + op2;
+      //if (op1 > max - op2)
+      //{
+        //throw std::logic_error("overflow");
+      //}
+      //return op1 + op2;
+      return demehin::sumChecked(op1, op2);
     }
     if (operation == "-")
     {
-      if (op1 < min + op2 )
-      {
-        throw std::logic_error("underflow");
-      }
-      return op1 - op2;
+      //if (op1 < min + op2 )
+      //{
+        //throw std::logic_error("underflow");
+      //}
+      //return op1 - op2;
+      return demehin::subtractChecked(op1, op2);
     }
     if (operation == "*")
     {
-      if (isMultipOverflow(op1, op2))
-      {
-        throw std::logic_error("overflow");
-      }
-      return op1 * op2;
+      //if (isMultipOverflow(op1, op2))
+      //{
+        //throw std::logic_error("overflow");
+      //}
+      //return op1 * op2;
+      return demehin::multipChecked(op1, op2);
     }
     if (operation == "/")
     {
-      if (op2 == 0)
-      {
-        throw std::logic_error("division by zero");
-      }
-      if ((op1 == min && op2 == -1) || (op2 == min && op1 == -1))
-      {
-        throw std::logic_error("overflow");
-      }
-      return op1 / op2;
+      //if (op2 == 0)
+      //{
+        //throw std::logic_error("division by zero");
+      //}
+      //if ((op1 == min && op2 == -1) || (op2 == min && op1 == -1))
+      //{
+        //throw std::logic_error("overflow");
+      //}
+      //return op1 / op2;
+      return demehin::divideChecked(op1, op2);
     }
     if (operation == "%")
     {
-      if (op2 == 0)
-      {
-        throw std::logic_error("zero modulation");
-      }
-      return modulate(op1, op2);
+      //if (op2 == 0)
+      //{
+        //throw std::logic_error("zero modulation");
+      //}
+      //return modulate(op1, op2);
+      return demehin::modulateChecked(op1, op2);
     }
     throw std::logic_error("invalid operation");
   }
@@ -136,42 +129,45 @@ demehin::ExprQueue demehin::convertQueue(ExprQueue& infExpr)
   {
     std::string front = infExpr.front();
     infExpr.pop();
-    if (isNumber(front))
+    try
     {
+      std::stoll(front);
       postExpr.push(front);
     }
-    else if (front == "(")
+    catch (...)
     {
-      stack.push(front);
-    }
-    else if (front == ")")
-    {
-      while (!stack.empty() && stack.top() != "(")
+      if (front == "(")
       {
-        postExpr.push(stack.top());
+        stack.push(front);
+      }
+      else if (front == ")")
+      {
+        while (!stack.empty() && stack.top() != "(")
+        {
+          postExpr.push(stack.top());
+          stack.pop();
+        }
+        if (stack.empty())
+        {
+          throw std::logic_error("wrong brackets");
+        }
         stack.pop();
       }
-      if (stack.empty())
+      else if (isOperator(front))
       {
-        throw std::logic_error("wrong brackets");
+        while (!stack.empty() && getOpPriority(front) <= getOpPriority(stack.top()))
+        {
+          postExpr.push(stack.top());
+          stack.pop();
+        }
+        stack.push(front);
       }
-      stack.pop();
-    }
-    else if (isOperator(front))
-    {
-      while (!stack.empty() && getOpPriority(front) <= getOpPriority(stack.top()))
+      else
       {
-        postExpr.push(stack.top());
-        stack.pop();
+        throw std::logic_error("invalid argument");
       }
-      stack.push(front);
-    }
-    else
-    {
-      throw std::logic_error("invalid argument");
     }
   }
-
   while (!stack.empty())
   {
     if (stack.top() == "(")
@@ -193,31 +189,31 @@ void demehin::convertStack(ExprsStack& infStack, ExprsStack& postStack)
   }
 }
 
-lli demehin::calculateExpr(const ExprQueue& expr)
+long_t demehin::calculateExpr(const ExprQueue& expr)
 {
-  Stack< lli > stack;
+  Stack< long_t > stack;
   ExprQueue exprCpy(expr);
   while (!exprCpy.empty())
   {
     std::string token = exprCpy.front();
     exprCpy.pop();
 
-    if (isNumber(token))
+    try
     {
       stack.push(std::stoll(token));
     }
-    else
+    catch (...)
     {
       if (stack.size() < 2)
       {
         throw std::logic_error("not enough operands");
       }
-      lli op1 = stack.top();
+      long_t op1 = stack.top();
       stack.pop();
-      lli op2 = stack.top();
+      long_t op2 = stack.top();
       stack.pop();
 
-      lli result = performOperation(op2, op1, token);
+      long_t result = performOperation(op2, op1, token);
       stack.push(result);
     }
   }
@@ -225,7 +221,7 @@ lli demehin::calculateExpr(const ExprQueue& expr)
   return stack.top();
 }
 
-void demehin::getExprsValues(ExprsStack postStack, Stack< lli >& values)
+void demehin::getExprsValues(ExprsStack postStack, Stack< long_t >& values)
 {
   while (!postStack.empty())
   {
