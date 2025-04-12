@@ -13,7 +13,7 @@ namespace
     return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
-  long_t getOpPriority(const std::string& op)
+  int getOpPriority(const std::string& op)
   {
     if (op == "+" || op == "-")
     {
@@ -26,95 +26,31 @@ namespace
     return 0;
   }
 
-  //long_t modulate(long_t a, long_t b)
-  //{
-    //if (b < 0)
-    //{
-     // return -modulate(-a, -b);
-    //}
-
-    //long_t res = a % b;
-    //if (res < 0)
-    //{
-      //res += b;
-    //}
-    //return res;
-  //}
-
-  /*bool isMultipOverflow(long_t a, long_t b)
+  int compareOpPriority(const std::string& op1, const std::string& op2)
   {
-    long_t max = std::numeric_limits< long_t >::max();
-    long_t min = std::numeric_limits< long_t >::min();
-    if (a > 0 && b > 0 && a > max / b)
-    {
-      return true;
-    }
-    if (a < 0 && b < 0 && a < max / b)
-    {
-      return true;
-    }
-    if (a > 0 && b < 0 && b < min / a)
-    {
-      return true;
-    }
-    if (a < 0 && b > 0 && a < min / b)
-    {
-      return true;
-    }
-    return false;
-  }*/
+    return getOpPriority(op1) - getOpPriority(op2);
+  }
 
   long_t performOperation(long_t op1, long_t op2, const std::string& operation)
   {
-    //long_t max = std::numeric_limits< long_t >::max();
-    //long_t min = std::numeric_limits< long_t >::min();
     if (operation == "+")
     {
-      //if (op1 > max - op2)
-      //{
-        //throw std::logic_error("overflow");
-      //}
-      //return op1 + op2;
       return demehin::sumChecked(op1, op2);
     }
     if (operation == "-")
     {
-      //if (op1 < min + op2 )
-      //{
-        //throw std::logic_error("underflow");
-      //}
-      //return op1 - op2;
       return demehin::subtractChecked(op1, op2);
     }
     if (operation == "*")
     {
-      //if (isMultipOverflow(op1, op2))
-      //{
-        //throw std::logic_error("overflow");
-      //}
-      //return op1 * op2;
       return demehin::multipChecked(op1, op2);
     }
     if (operation == "/")
     {
-      //if (op2 == 0)
-      //{
-        //throw std::logic_error("division by zero");
-      //}
-      //if ((op1 == min && op2 == -1) || (op2 == min && op1 == -1))
-      //{
-        //throw std::logic_error("overflow");
-      //}
-      //return op1 / op2;
       return demehin::divideChecked(op1, op2);
     }
     if (operation == "%")
     {
-      //if (op2 == 0)
-      //{
-        //throw std::logic_error("zero modulation");
-      //}
-      //return modulate(op1, op2);
       return demehin::modulateChecked(op1, op2);
     }
     throw std::logic_error("invalid operation");
@@ -155,7 +91,7 @@ demehin::ExprQueue demehin::convertQueue(ExprQueue& infExpr)
       }
       else if (isOperator(front))
       {
-        while (!stack.empty() && getOpPriority(front) <= getOpPriority(stack.top()))
+        while (!stack.empty() && compareOpPriority(front, stack.top()) <= 0)
         {
           postExpr.push(stack.top());
           stack.pop();

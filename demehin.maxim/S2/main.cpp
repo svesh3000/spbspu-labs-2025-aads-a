@@ -9,54 +9,6 @@ namespace
 {
   using ExprsStack = demehin::Stack< demehin::Queue < std::string > >;
 
-  /*void inputExprs(std::istream& in, ExprsStack& stack)
-  {
-    demehin::Queue< std::string > exprQueue;
-    std::string line;
-
-    while (std::getline(in, line))
-    {
-      if (line.empty())
-      {
-        if (!exprQueue.empty())
-        {
-          stack.push(exprQueue);
-        }
-      }
-
-      std::string token;
-      for (char c : line)
-      {
-        if (std::isspace(c))
-        {
-          continue;
-        }
-        else if (std::isdigit(c))
-        {
-          token += c;
-        }
-        else
-        {
-          if (!token.empty())
-          {
-            exprQueue.push(token);
-            token.clear();
-          }
-          exprQueue.push(std::string(1, c));
-        }
-      }
-      if (!token.empty())
-      {
-        exprQueue.push(token);
-      }
-      if (!exprQueue.empty())
-      {
-        stack.push(exprQueue);
-        exprQueue.clear();
-      }
-    }
-  }*/
-
   void inputExprs(std::istream& in, ExprsStack& stack)
   {
     std::string line;
