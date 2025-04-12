@@ -110,18 +110,18 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
     size_t sum = 0;
     auto prev_it_out = fwd_ring_list.end();
     auto it_out = fwd_ring_list.begin();
-    do
+    if (it_out->second.empty() && fwd_ring_list.size() == 1)
+    {
+      fwd_ring_list.pop_front();
+      break;
+    }
+    else
     {
       if (it_out->second.empty() && fwd_ring_list.size() != 1)
       {
         auto val = *it_out;
         fwd_ring_list.remove(val);
         it_out = prev_it_out;
-      }
-      else if (it_out->second.empty() && fwd_ring_list.size() == 1)
-      {
-        fwd_ring_list.pop_front();
-        break;
       }
       else
       {
@@ -130,8 +130,23 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
         addElementToSumAndPopFrontIt(sum, it_out, it);
         ++prev_it_out;
       }
+      while (it_out++ != fwd_ring_list.end())
+      {
+        if (it_out->second.empty() && fwd_ring_list.size() != 1)
+        {
+          auto val = *it_out;
+          fwd_ring_list.remove(val);
+          it_out = prev_it_out;
+        }
+        else
+        {
+          auto it = it_out->second.begin();
+          std::cout << " " << *it;
+          addElementToSumAndPopFrontIt(sum, it_out, it);
+          ++prev_it_out;
+        }
+      }
     }
-    while (it_out++ != fwd_ring_list.end() && std::cout << " ");
     if (sum)
     {
       sums.push_front(sum);
