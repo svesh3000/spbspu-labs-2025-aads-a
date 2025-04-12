@@ -15,7 +15,9 @@ BOOST_AUTO_TEST_CASE(queue_copy_constructor_test)
   q1.push(2);
   maslevtsov::Queue< int > q2(q1);
   BOOST_TEST(q1.front() == q2.front());
-  BOOST_TEST(q1.back() == q2.back());
+  q1.pop();
+  q2.pop();
+  BOOST_TEST(q1.front() == q2.front());
   BOOST_TEST(q1.size() == q2.size());
 }
 BOOST_AUTO_TEST_SUITE_END()
@@ -29,7 +31,9 @@ BOOST_AUTO_TEST_CASE(queue_copy_assignment_operator_test)
   maslevtsov::Queue< int > q2;
   q2 = q1;
   BOOST_TEST(q1.front() == q2.front());
-  BOOST_TEST(q1.back() == q2.back());
+  q1.pop();
+  q2.pop();
+  BOOST_TEST(q1.front() == q2.front());
   BOOST_TEST(q1.size() == q2.size());
 }
 BOOST_AUTO_TEST_SUITE_END()
@@ -41,14 +45,6 @@ BOOST_AUTO_TEST_CASE(queue_front_test)
   q.push(1);
   q.push(2);
   BOOST_TEST(q.front() == 1);
-}
-
-BOOST_AUTO_TEST_CASE(queue_back_test)
-{
-  maslevtsov::Queue< int > q;
-  q.push(1);
-  q.push(2);
-  BOOST_TEST(q.back() == 2);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -78,8 +74,9 @@ BOOST_AUTO_TEST_CASE(queue_push_test)
   BOOST_TEST(q.size() == 1);
   int n = 2;
   q.push(n);
-  BOOST_TEST(q.back() == 2);
-  BOOST_TEST(q.size() == 2);
+  q.pop();
+  BOOST_TEST(q.front() == 2);
+  BOOST_TEST(q.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(queue_pop_test)
@@ -103,8 +100,9 @@ BOOST_AUTO_TEST_CASE(queue_swap_test)
   s2.push(3);
   s1.swap(s2);
   BOOST_TEST(s1.front() == 2);
-  BOOST_TEST(s1.back() == 3);
-  BOOST_TEST(s1.size() == 2);
+  s1.pop();
+  BOOST_TEST(s1.front() == 3);
+  BOOST_TEST(s1.size() == 1);
   BOOST_TEST(s2.front() == 1);
   BOOST_TEST(s2.size() == 1);
 }

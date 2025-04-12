@@ -1,32 +1,32 @@
 #include "postfix_token.hpp"
+#include <sstream>
 #include "stack.hpp"
 #include "checked_operations.hpp"
 
 namespace {
-  bool is_num(const std::string& str) noexcept
-  {
-    for (auto i = str.cbegin(); i != str.cend(); ++i) {
-      if (!std::isdigit(*i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   bool is_operation(const std::string& str) noexcept
   {
     return str == "*" || str == "/" || str == "%" || str == "+" || str == "-";
   }
 
-  int get_precedence(const std::string& operation) noexcept
+  int get_precedence(char op)
   {
-    if (operation == "*" || operation == "/" || operation == "%") {
+    switch (op) {
+    case '*':
+    case '/':
+    case '%':
       return 1;
-    }
-    if (operation == "+" || operation == "-") {
+    case '+':
+    case '-':
       return 2;
+    default:
+      return 3;
     }
-    return 3;
+  }
+
+  bool precedence_comp(const std::string& left, const std::string& right) noexcept
+  {
+    return get_precedence(left[0]) <= get_precedence(right[0]);
   }
 }
 
@@ -35,22 +35,15 @@ maslevtsov::PostfixToken::PostfixToken(const std::string& infix_token):
 {
   Stack< std::string > dump;
   std::string element = "";
-  for (auto i = infix_token.cbegin(); i != infix_token.cend(); ++i) {
-    if (!std::isspace(*i)) {
-      element += *i;
-      if (i != --infix_token.cend()) {
-        continue;
-      }
-    }
+  std::istringstream iss(infix_token);
+  while (iss >> element) {
     if (element == "") {
       continue;
     }
     if (element == "(") {
       dump.push(element);
-    } else if (is_num(element)) {
-      token_.push(element);
     } else if (is_operation(element)) {
-      while (!dump.empty() && (get_precedence(dump.top()) <= get_precedence(element))) {
+      while (!dump.empty() && (precedence_comp(dump.top(), element))) {
         token_.push(dump.top());
         dump.pop();
       }
@@ -64,10 +57,11 @@ maslevtsov::PostfixToken::PostfixToken(const std::string& infix_token):
         throw std::logic_error("invalid expression");
       }
       dump.pop();
+    } else if (std::stoll(element)) {
+      token_.push(element);
     } else {
       throw std::logic_error("invalid expression");
     }
-    element.clear();
   }
   while (!dump.empty()) {
     if (!is_operation(dump.top())) {
@@ -114,10 +108,7 @@ long long maslevtsov::PostfixToken::operator()() const
   Stack< long long > dump;
   Queue< std::string > exp = token_;
   while (!exp.empty()) {
-    if (is_num(exp.front())) {
-      dump.push(std::stoll(exp.front()));
-      exp.pop();
-    } else {
+    if (is_operation(exp.front())) {
       if (dump.size() < 2) {
         throw std::logic_error("invalid expression");
       }
@@ -126,6 +117,9 @@ long long maslevtsov::PostfixToken::operator()() const
       long long operand1 = dump.top();
       dump.pop();
       dump.push(checked_operation(operand1, operand2, exp.front()));
+      exp.pop();
+    } else {
+      dump.push(std::stoll(exp.front()));
       exp.pop();
     }
   }
