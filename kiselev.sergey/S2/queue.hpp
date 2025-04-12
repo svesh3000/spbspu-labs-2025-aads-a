@@ -14,7 +14,7 @@ namespace kiselev
     const T& back() const;
 
     void pop() noexcept;
-    void push(T&);
+    void push(const T&);
     void push(T&&);
 
     size_t size() const noexcept;
@@ -56,7 +56,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void Queue< T >::push(T& data)
+  void Queue< T >::push(const T& data)
   {
     arr_.push(data);
   }
