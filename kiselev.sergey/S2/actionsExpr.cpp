@@ -6,10 +6,12 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include "queue.hpp"
+#include "stack.hpp"
 
 namespace
 {
-  int getPriority(const char& operation)
+  int getPriority(const std::string& operation)
   {
     if (operation == '+' || operation == '-')
     {
@@ -22,7 +24,7 @@ namespace
     return 0;
   }
 
-  bool isOperator(const char& c)
+  bool isOperator(const std::string& c)
   {
     return c == '+' || c == '-' || c == '/' || c == '*' || c == '%';
   }
@@ -125,64 +127,52 @@ namespace
 
 kiselev::queue kiselev::convertExpr(queue& infix)
 {
-  queue postfix;
-  Stack< char > operators;
-  std::string number;
+  queue postfixExprs;
   while (!infix.empty())
   {
-    std::string line = infix.front();
+    Expr infixExpr = infix.front();
     infix.pop();
-    std::string postfixLine;
-    for (char s: line)
+    Expr postfixExpr;
+    Stack< std::string > operators;
+    while (!infixExpr.empty())
     {
-      if (std::isspace(s))
+      std::string partInfix = infixExpr.front();
+      infixExpr.pop();
+      if (partInfix == "(")
       {
-        addNumberInLine(postfixLine, number);
-        continue;
+        operators.push(partInfix);
       }
-      if (std::isdigit(s))
+      else if (partInfix == ")")
       {
-        number += s;
+        while (!operators.empty() && operators.top() == "(")
+        {
+          postfixExpr.push(operators.top());
+          operators.top();
+        }
+        operators.pop();
+      }
+      else if (isOperator(partInfix))
+      {
+        while (!operators.empty() && getPriority(operators.top()) >= getPriority(partInfix))
+        {
+          postfixExpr.push(operators.top());
+          operators.pop();
+        }
+        operators.push(partInfix);
       }
       else
       {
-        addNumberInLine(postfixLine, number);
-        if (s == '(')
-        {
-          operators.push(s);
-        }
-        else if (isOperator(s))
-        {
-          while (!operators.empty() && getPriority(operators.top()) >= getPriority(s))
-          {
-            postfixLine += ' ';
-            postfixLine += operators.top();
-            operators.pop();
-          }
-          operators.push(s);
-        }
-        else if (s == ')')
-        {
-          while (!operators.empty() && operators.top() != '(')
-          {
-            postfixLine += ' ';
-            postfixLine += operators.top();
-            operators.pop();
-          }
-          operators.pop();
-        }
+        postfixExpr.push(partInfix);
       }
     }
-    addNumberInLine(postfixLine, number);
     while (!operators.empty())
     {
-      postfixLine += ' ';
-      postfixLine += operators.top();
+      postfixExpr.push(operators.top());
       operators.pop();
     }
-    postfix.push(postfixLine);
+    postfixExprs.push(postfixExpr);
   }
-  return postfix;
+  return postfixExprs;
 }
 
 kiselev::stackNumber kiselev::calculationExpr(queue& postfix)
@@ -240,7 +230,7 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
     {
       continue;
     }
-    Expr expr;
+    Expr infixExpr;
     std::string partExpr;
     size_t start = 0;
     size_t end = line.find(' ');
@@ -249,7 +239,7 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
       partExpr = line.substr(start, end - start);
       if (!partExpr.empty())
       {
-        expr.push(partExpr);
+        infixExpr.push(partExpr);
       }
       start = end + 1;
       end = line.find(' ', start);
@@ -257,7 +247,7 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
     partExpr = line.substr(start);
     if (!partExpr.empty())
     {
-      expr.push(partExpr);
+      infixExpr.push(partExpr);
     }
     exprs.push(expr);
   }
