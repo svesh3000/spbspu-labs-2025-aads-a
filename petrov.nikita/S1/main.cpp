@@ -131,7 +131,7 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
         ++prev_it_out;
       }
     }
-    while (it_out++ != fwd_ring_list.end() && std::cout << " " && fwd_ring_list.begin() != fwd_ring_list.end());
+    while (it_out++ != fwd_ring_list.end() && std::cout << " ");
     if (sum)
     {
       sums.push_front(sum);
