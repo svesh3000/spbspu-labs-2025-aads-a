@@ -40,4 +40,13 @@ BOOST_AUTO_TEST_CASE(assignment_operators)
   BOOST_TEST(moveTree.size() == 3);
   BOOST_TEST(copyTree.size() == 0);
 }
+
+BOOST_AUTO_TEST_CASE(index_operator_and_at)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
+  BOOST_TEST(tree[1] == "1");
+  tree[4];
+  BOOST_TEST(tree.size() == 4);
+  BOOST_TEST(tree.at(2) == "2");
+}
 BOOST_AUTO_TEST_SUITE_END();

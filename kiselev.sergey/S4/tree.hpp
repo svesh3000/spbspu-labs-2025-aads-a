@@ -783,17 +783,18 @@ namespace kiselev
   const Value& RBTree< Key, Value, Cmp >::operator[](const Key& key) const
   {
     ConstIterator it = find(key);
-    if (it == cend())
-    {
-      it = insert({ key, value() }).first;
-    }
-    return it.node_->data.second;
+    return (*it).second;
   }
 
   template< typename Key, typename Value, typename Cmp >
   Value& RBTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    return const_cast< Value& >(static_cast< const RBTree< Key, Value, Cmp >& >(*this).operator[](key));
+    Iterator it = find(key);
+    if (it == end())
+    {
+      it = insert(std::make_pair(key, Value())).first;
+    }
+    return (*it).second;
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -805,7 +806,6 @@ namespace kiselev
       throw std::out_of_range("There is no such key");
     }
     return (*it).second;
-    //return it.node_->data.second;
   }
 
   template< typename Key, typename Value, typename Cmp >
