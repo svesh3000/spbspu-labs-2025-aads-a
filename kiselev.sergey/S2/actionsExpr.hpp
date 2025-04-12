@@ -3,7 +3,6 @@
 #include "queue.hpp"
 #include "stack.hpp"
 #include <iostream>
-#include <ostream>
 #include <string>
 
 namespace kiselev
