@@ -116,7 +116,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
       }
       else if (partInfix == ")")
       {
-        while (!operators.empty() && operators.top() == "(")
+        while (!operators.empty() && operators.top() != "(")
         {
           postfixExpr.push(operators.top());
           operators.top();
@@ -223,7 +223,10 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
     {
       infixExpr.push(partExpr);
     }
-    exprs.push(infixExpr);
+    if (!infixExpr.empty())
+    {
+      exprs.push(infixExpr);
+    }
   }
 }
 
