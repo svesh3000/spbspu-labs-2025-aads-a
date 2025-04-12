@@ -57,10 +57,9 @@ maslevtsov::PostfixToken::PostfixToken(const std::string& infix_token):
         throw std::logic_error("invalid expression");
       }
       dump.pop();
-    } else if (std::stoll(element)) {
-      token_.push(element);
     } else {
-      throw std::logic_error("invalid expression");
+      std::stoll(element);
+      token_.push(element);
     }
   }
   while (!dump.empty()) {
