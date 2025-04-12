@@ -1,4 +1,5 @@
 #include "actionsExpr.hpp"
+#include <cstddef>
 #include <limits>
 #include <cctype>
 #include <new>
@@ -239,7 +240,26 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
     {
       continue;
     }
-    exprs.push(line);
+    Expr expr;
+    std::string partExpr;
+    size_t start = 0;
+    size_t end = line.find(' ');
+    while (end != std::string::npos)
+    {
+      partExpr = line.substr(start, end - start);
+      if (!partExpr.empty())
+      {
+        expr.push(partExpr);
+      }
+      start = end + 1;
+      end = line.find(' ', start);
+    }
+    partExpr = line.substr(start);
+    if (!partExpr.empty())
+    {
+      expr.push(partExpr);
+    }
+    exprs.push(expr);
   }
 }
 
