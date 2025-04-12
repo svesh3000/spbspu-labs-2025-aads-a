@@ -144,4 +144,23 @@ BOOST_AUTO_TEST_CASE(find)
   RBTree< size_t, std::string >::ConstIterator cit = tree.find(3);
   BOOST_CHECK(cit != tree.cend());
 }
+
+BOOST_AUTO_TEST_CASE(count_lowerBound_upperBound_equalRange)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" }, { 4, "4" }, { 5, "5" } });
+  size_t i = tree.count(1);
+  BOOST_TEST(i == 1);
+  i = tree.count(7);
+  BOOST_TEST(i == 0);
+  RBTree< size_t, std::string >::Iterator it = tree.lowerBound(2);
+  BOOST_TEST((*it).first == 2);
+  it = tree.lowerBound(7);
+  BOOST_CHECK(it == tree.end());
+  it = tree.upperBound(4);
+  BOOST_CHECK((*it).first == 5);
+  RBTree< size_t, std::string >::Iterator first = tree.lowerBound(3);
+  it = tree.upperBound(3);
+  BOOST_CHECK(first == tree.equalRange(3).first);
+  BOOST_CHECK(it == tree.equalRange(3).second);
+}
 BOOST_AUTO_TEST_SUITE_END();
