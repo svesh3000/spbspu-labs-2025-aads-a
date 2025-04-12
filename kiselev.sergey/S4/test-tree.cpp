@@ -50,12 +50,12 @@ BOOST_AUTO_TEST_CASE(index_operator_and_at)
   BOOST_TEST(tree.at(2) == "2");
 }
 
-BOOST_AUTO_TEST_CASE(size_and_empty)
+BOOST_AUTO_TEST_CASE(size_and_empty_and_clear)
 {
-  RBTree< size_t, std::string > tree;
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" }, { 4, "4" } });
+  BOOST_TEST(tree.size() == 4);
+  tree.clear();
   BOOST_TEST(tree.empty());
-  tree.insert({ 1, "1" });
-  BOOST_TEST(tree.size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(insert_element)
@@ -122,5 +122,26 @@ BOOST_AUTO_TEST_CASE(emplace_element_and_hint)
   BOOST_TEST((*it).first == 5);
   tree.emplace(1, "1");
   BOOST_TEST(tree.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(swap)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
+  RBTree< size_t, std::string >::Iterator it = tree.begin();
+  RBTree< size_t, std::string > tree2;
+  tree2.swap(tree);
+  BOOST_CHECK(tree2.begin() == it);
+  BOOST_TEST(tree.empty());
+}
+
+BOOST_AUTO_TEST_CASE(find)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
+  RBTree< size_t, std::string >::Iterator it = tree.find(1);
+  BOOST_CHECK(it != tree.end());
+  it = tree.find(4);
+  BOOST_CHECK(it == tree.end());
+  RBTree< size_t, std::string >::ConstIterator cit = tree.find(3);
+  BOOST_CHECK(cit != tree.cend());
 }
 BOOST_AUTO_TEST_SUITE_END();
