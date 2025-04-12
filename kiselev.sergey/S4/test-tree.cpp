@@ -57,4 +57,40 @@ BOOST_AUTO_TEST_CASE(size_and_empty)
   tree.insert({ 1, "1" });
   BOOST_TEST(tree.size() == 1);
 }
+
+BOOST_AUTO_TEST_CASE(insert_element)
+{
+  RBTree< size_t, std::string > tree;
+  RBTree< size_t, std::string >::Iterator it = tree.insert({ 1, "1" }).first;
+  BOOST_TEST((*it).first == 1);
+  bool isInserted = tree.insert({ 1, "1" }).second;
+  BOOST_TEST(!isInserted);
+  std::pair< size_t, std::string > pair1 = { 2, "2" };
+  tree.insert(pair1);
+  BOOST_TEST(tree.size() == 2);
+  const std::pair< size_t, std::string > pair2 = { 3, "3" };
+  tree.insert(pair2);
+  BOOST_TEST(tree.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(insert_hint)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
+  RBTree< size_t, std::string >::Iterator it = tree.begin();
+  RBTree< size_t, std::string >::ConstIterator cit = tree.cend();
+  tree.insert(it, std::make_pair(4, "4"));
+  BOOST_TEST(tree.size() == 4);
+  tree.insert(cit, std::make_pair(5, "5"));
+  BOOST_TEST(tree.size() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(insert_range_and_init)
+{
+  RBTree< size_t, std::string > tree;
+  RBTree< size_t, std::string > tree2({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
+  tree.insert(++tree2.begin(), tree2.end());
+  BOOST_TEST(tree.size() == 2);
+  tree.insert({ { 4, "4" }, { 1, "1" }, { 5, "5" } });
+  BOOST_TEST(tree.size() == 5);
+}
 BOOST_AUTO_TEST_SUITE_END();

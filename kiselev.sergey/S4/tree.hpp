@@ -541,7 +541,7 @@ namespace kiselev
     Node* pos = hint.node_;
     if (cmp_(key, pos->data.first))
     {
-      if (!hint->left)
+      if (!pos->left)
       {
         Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
         pos->left = newNode;
