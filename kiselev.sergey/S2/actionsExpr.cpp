@@ -119,7 +119,7 @@ kiselev::queue kiselev::convertExpr(queue& infix)
         while (!operators.empty() && operators.top() != "(")
         {
           postfixExpr.push(operators.top());
-          operators.top();
+          operators.pop();
         }
         operators.pop();
       }
@@ -223,10 +223,7 @@ void kiselev::inputExprs(std::istream& input, queue& exprs)
     {
       infixExpr.push(partExpr);
     }
-    if (!infixExpr.empty())
-    {
-      exprs.push(infixExpr);
-    }
+    exprs.push(infixExpr);
   }
 }
 
