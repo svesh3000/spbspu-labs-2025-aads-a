@@ -216,7 +216,7 @@ namespace petrov
         subhead = subhead->next;
       }
     }
-    catch (const std::bad_alloc & e)
+    catch (...)
     {
       while (head_->next)
       {
@@ -256,7 +256,11 @@ namespace petrov
   template< typename T >
   typename ForwardRingList< T >::this_t & ForwardRingList< T >::operator=(this_t && rhs)
   {
-    swap(rhs);
+    clear();
+    head_ = rhs.head_;
+    tail_ = rhs.tail_;
+    rhs.head_ = nullptr;
+    rhs.tail_ = nullptr;
     return *this;
   }
 

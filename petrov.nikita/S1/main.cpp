@@ -34,17 +34,11 @@ int main()
     outputNamesOfSuquences(std::cout, fwd_ring_list);
     sums = getListOfSequencesFromListOfSums(fwd_ring_list);
   }
-  catch (const std::out_of_range & e)
+  catch (const std::exception & e)
   {
     std::cout << "\n";
     std::cerr << e.what() << "\n";
     return 1;
-  }
-  catch (const std::bad_alloc & e)
-  {
-    std::cout << "\n";
-    std::cerr << "ERROR: Out of memory" << "\n";
-    return 2;
   }
   sums.reverse();
   if (sums.empty())
@@ -165,7 +159,7 @@ void petrov::addElementToSumAndPopFrontIt(size_t & sum, list_it_t it_out, sublis
   }
   else
   {
-    throw std::out_of_range("ERROR: Overflow");
+    throw std::out_of_range("ERROR: Out of range");
   }
 }
 
