@@ -80,7 +80,8 @@ namespace petrov
     using it_t = ForwardListIterator< T >;
     ForwardRingList():
       head_(nullptr),
-      tail_(nullptr)
+      tail_(nullptr),
+      size_(0)
     {}
     ForwardRingList(const this_t & rhs);
     ForwardRingList(this_t && rhs);
@@ -107,6 +108,7 @@ namespace petrov
   private:
     node_t * head_;
     node_t * tail_;
+    size_t size_;
   };
 
   template< typename T >
@@ -198,7 +200,8 @@ namespace petrov
   template< typename T >
   ForwardRingList< T >::ForwardRingList(const this_t & rhs):
     head_(nullptr),
-    tail_(nullptr)
+    tail_(nullptr),
+    size_(rhs.size_)
   {
     if (rhs.empty())
     {
@@ -234,7 +237,8 @@ namespace petrov
   template< typename T >
   ForwardRingList< T >::ForwardRingList(this_t && rhs):
     head_(nullptr),
-    tail_(nullptr)
+    tail_(nullptr),
+    size_(rhs.size_)
   {
     swap(rhs);
   }
@@ -259,8 +263,10 @@ namespace petrov
     clear();
     head_ = rhs.head_;
     tail_ = rhs.tail_;
+    size_ = rhs.size_;
     rhs.head_ = nullptr;
     rhs.tail_ = nullptr;
+    rhs.size_ = 0;
     return *this;
   }
 
@@ -344,24 +350,13 @@ namespace petrov
   template< typename T >
   bool ForwardRingList< T >::empty() const noexcept
   {
-    return !head_;
+    return !size_;
   }
 
   template< typename T >
   size_t ForwardRingList< T >::size() const noexcept
   {
-    if (empty())
-    {
-      return 0;
-    }
-    size_t count = 0;
-    auto it = cbegin();
-    do
-    {
-      ++count;
-    }
-    while (it++ != cend());
-    return count;
+    return size_;
   }
 
   template< typename T >
@@ -373,6 +368,7 @@ namespace petrov
       head_ = new node_t{ val, head_ };
       tail_ = head_;
       tail_->next = head_;
+      size_++;
     }
     else
     {
@@ -380,6 +376,7 @@ namespace petrov
       tail_->next = new node_t{ val, nullptr };
       head_ = tail_->next;
       head_->next = temp;
+      size_++;
     }
   }
 
@@ -390,12 +387,11 @@ namespace petrov
     {
       return;
     }
-    size_t size = this->size();
     auto todelete = head_;
     head_ = head_->next;
     delete todelete;
-    size--;
-    if (!size)
+    size_--;
+    if (!size_)
     {
       head_ = nullptr;
       tail_ = nullptr;
@@ -456,6 +452,7 @@ namespace petrov
         }
         delete todelete;
         todelete = nullptr;
+        size_--;
       }
       else
       {
@@ -483,6 +480,7 @@ namespace petrov
     delete it.node_;
     head_ = nullptr;
     tail_ = nullptr;
+    size_ = 0;
   }
 
   template< typename T >
@@ -513,6 +511,7 @@ namespace petrov
   {
     std::swap(head_, rhs.head_);
     std::swap(tail_, rhs.tail_);
+    std::swap(size_, rhs.size_);
   }
 }
 
