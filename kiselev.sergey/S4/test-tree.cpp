@@ -93,4 +93,22 @@ BOOST_AUTO_TEST_CASE(insert_range_and_init)
   tree.insert({ { 4, "4" }, { 1, "1" }, { 5, "5" } });
   BOOST_TEST(tree.size() == 5);
 }
+BOOST_AUTO_TEST_CASE(erase_position)
+{
+  RBTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" }, { 4, "4" } });
+  RBTree< size_t, std::string >::Iterator it = tree.erase(tree.begin());
+  BOOST_CHECK(it == tree.begin());
+  it = tree.erase(tree.cbegin());
+  BOOST_CHECK(it == tree.begin());
+  size_t i = tree.erase(3);
+  BOOST_TEST(i == 1);
+  i = tree.erase(6);
+  BOOST_TEST(i == 0);
+  tree = { { 1, "1" }, { 2, "2" }, { 3, "3" } };
+  tree.erase(tree.begin(), tree.end());
+  BOOST_TEST(tree.empty());
+  tree = { { 1, "1" }, { 2, "2" }, { 3, "3" } };
+  tree.erase(tree.cbegin(), tree.cend());
+  BOOST_TEST(tree.empty());
+}
 BOOST_AUTO_TEST_SUITE_END();
