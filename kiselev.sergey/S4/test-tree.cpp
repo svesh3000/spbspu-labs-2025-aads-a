@@ -111,4 +111,16 @@ BOOST_AUTO_TEST_CASE(erase_position)
   tree.erase(tree.cbegin(), tree.cend());
   BOOST_TEST(tree.empty());
 }
+BOOST_AUTO_TEST_CASE(emplace_element_and_hint)
+{
+  RBTree< size_t, std::string > tree;
+  tree.emplace(1, "1");
+  BOOST_TEST(tree.size() == 1);
+  RBTree< size_t, std::string >::Iterator it = tree.emplace(2, "2").first;
+  BOOST_TEST((*it).first == 2);
+  it = tree.emplaceHint(tree.cbegin(), 5, "5");
+  BOOST_TEST((*it).first == 5);
+  tree.emplace(1, "1");
+  BOOST_TEST(tree.size() == 3);
+}
 BOOST_AUTO_TEST_SUITE_END();
