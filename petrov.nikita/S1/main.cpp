@@ -126,16 +126,16 @@ petrov::result_list_type petrov::getListOfSequencesFromListOfSums(list_type fwd_
       else
       {
         auto it = it_out->second.begin();
-        std::cout << *it << " ";
+        std::cout << *it;
         addElementToSumAndPopFrontIt(sum, it_out, it);
         ++prev_it_out;
       }
     }
-    while (it_out++ != fwd_ring_list.end() && fwd_ring_list.begin() != fwd_ring_list.end());
+    while (it_out++ != fwd_ring_list.end() && std::cout << " " && fwd_ring_list.begin() != fwd_ring_list.end());
     if (sum)
     {
       sums.push_front(sum);
-      std::cout << "\b \b\n";
+      std::cout << "\n";
     }
   }
   while (!fwd_ring_list.empty());
