@@ -57,4 +57,20 @@ void kiselev::intersect(std::istream& in, dataset& dict)
   dict[newName] = newTree;
 }
 
+void kiselev::unite(std::istream& in, dataset& dict)
+{
+  std::string newName;
+  std::string firstName;
+  std::string secondName;
+  in >> newName >> firstName >> secondName;
+  data firstTree = dict.at(firstName);
+  data secondTree = dict.at(secondName);
+  data newTree = firstTree;
+  for (auto it = secondTree.cbegin(); it != secondTree.cend(); ++it)
+  {
+    newTree.insert(*it);
+  }
+  dict[newName] = newTree;
+}
+
 

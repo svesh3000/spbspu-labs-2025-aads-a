@@ -10,5 +10,6 @@ namespace kiselev
   void print(std::ostream&, std::istream&, const dataset&);
   void complement(std::istream&, dataset&);
   void intersect(std::istream&, dataset&);
+  void unite(std::istream&, dataset&);
 }
 #endif
