@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <string>
 
 void kiselev::print(std::ostream& out, std::istream& in, const dataset& dict)
 {
@@ -13,9 +14,28 @@ void kiselev::print(std::ostream& out, std::istream& in, const dataset& dict)
   out << name;
   for (auto it = tree.cbegin(); it != tree.cend(); ++it)
   {
-    out << " " << (*it).first << " " << (*it).second;
+    out << " " << it->first << " " << it->second;
   }
   out << "\n";
+}
+
+void kiselev::complement(std::istream& in, dataset& dict)
+{
+    std::string newName;
+    std::string firstName;
+    std::string secondName;
+    in >> newName >> firstName >> secondName;
+    data newTree;
+    data firstTree = dict.at(firstName);
+    data secondTree = dict.at(secondName);
+    for (auto it = firstTree.cbegin(); it != firstTree.cend(); ++it)
+    {
+      if (secondTree.find(it->first) == secondTree.end())
+      {
+        newTree.insert(*it);
+      }
+    }
+    dict[newName] = newTree;
 }
 
 

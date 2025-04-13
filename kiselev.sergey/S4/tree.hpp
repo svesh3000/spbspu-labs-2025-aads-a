@@ -768,7 +768,7 @@ namespace kiselev
   const Value& RBTree< Key, Value, Cmp >::operator[](const Key& key) const
   {
     ConstIterator it = find(key);
-    return (*it).second;
+    return it->second;
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -779,7 +779,7 @@ namespace kiselev
     {
       it = insert(std::make_pair(key, Value())).first;
     }
-    return (*it).second;
+    return it->second;
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -790,7 +790,7 @@ namespace kiselev
     {
       throw std::out_of_range("There is no such key");
     }
-    return (*it).second;
+    return it->second;
   }
 
   template< typename Key, typename Value, typename Cmp >
