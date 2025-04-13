@@ -66,7 +66,7 @@ namespace
   {
     if (listPair.empty())
     {
-      std::cout << "\n";
+      std::cout << "0\n";
       return;
     }
     duhanina::List< unsigned long long > sums;
