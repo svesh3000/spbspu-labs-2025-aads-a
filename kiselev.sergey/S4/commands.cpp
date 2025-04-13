@@ -21,21 +21,40 @@ void kiselev::print(std::ostream& out, std::istream& in, const dataset& dict)
 
 void kiselev::complement(std::istream& in, dataset& dict)
 {
-    std::string newName;
-    std::string firstName;
-    std::string secondName;
-    in >> newName >> firstName >> secondName;
-    data newTree;
-    data firstTree = dict.at(firstName);
-    data secondTree = dict.at(secondName);
-    for (auto it = firstTree.cbegin(); it != firstTree.cend(); ++it)
+  std::string newName;
+  std::string firstName;
+  std::string secondName;
+  in >> newName >> firstName >> secondName;
+  data newTree;
+  data firstTree = dict.at(firstName);
+  data secondTree = dict.at(secondName);
+  for (auto it = firstTree.cbegin(); it != firstTree.cend(); ++it)
+  {
+    if (secondTree.find(it->first) == secondTree.end())
     {
-      if (secondTree.find(it->first) == secondTree.end())
-      {
-        newTree.insert(*it);
-      }
+      newTree.insert(*it);
     }
-    dict[newName] = newTree;
+  }
+  dict[newName] = newTree;
+}
+
+void kiselev::intersect(std::istream& in, dataset& dict)
+{
+  std::string newName;
+  std::string firstName;
+  std::string secondName;
+  in >> newName >> firstName >> secondName;
+  data newTree;
+  data firstTree = dict.at(firstName);
+  data secondTree = dict.at(secondName);
+  for (auto it = firstTree.cbegin(); it != firstTree.cend(); ++it)
+  {
+    if (secondTree.find(it->first) != secondTree.end())
+    {
+      newTree.insert(*it);
+    }
+  }
+  dict[newName] = newTree;
 }
 
 

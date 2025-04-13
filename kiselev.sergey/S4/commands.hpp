@@ -9,5 +9,6 @@ namespace kiselev
   using dataset = RBTree< std::string, data >;
   void print(std::ostream&, std::istream&, const dataset&);
   void complement(std::istream&, dataset&);
+  void intersect(std::istream&, dataset&);
 }
 #endif
