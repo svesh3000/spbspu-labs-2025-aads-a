@@ -81,9 +81,6 @@ namespace kiselev
     std::pair< Iterator, Iterator > equalRange(const Key&) noexcept;
     std::pair< ConstIterator, ConstIterator > equalRange(const Key&) const noexcept;
 
-    void push(Key, Value);
-    Value get(Key);
-    void pop(Key);
   private:
     using Node = TreeNode< Key, Value>;
 
@@ -297,12 +294,6 @@ namespace kiselev
         }
         if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right->color == Color::BLACK))
         {
-          /*
-          if (brother)
-          {
-            brother->color = Color::RED;
-          }
-          */
           brother->color = Color::RED;
           node = node->parent;
         }
@@ -340,12 +331,6 @@ namespace kiselev
         }
         if ((!brother->left || brother->left->color == Color::BLACK) && (!brother->right || brother->right->color == Color::BLACK))
         {
-          /*
-          if (brother)
-          {
-            brother->color = Color::RED;
-          }
-          */
           brother->color = Color::RED;
           node = node->parent;
         }

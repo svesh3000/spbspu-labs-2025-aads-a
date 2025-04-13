@@ -62,7 +62,8 @@ namespace kiselev
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator=(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
+    Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator=(
+      const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
     {
       node_ = other.node_;
       return *this;
@@ -81,20 +82,11 @@ namespace kiselev
         }
         return *this;
       }
-      TreeNode< Key, Value >* parent = node_->parent;
-      /*
       while (node_->parent && node_ == node_->parent->right)
       {
         node_ = node_->parent;
       }
       node_ = node_->parent;
-      */
-      while (parent && node_ == parent->right)
-      {
-        node_ = parent;
-        parent = parent->parent;
-      }
-      node_ = parent;
       return *this;
     }
 
