@@ -1,32 +1,37 @@
+#include <cstddef>
 #include <exception>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
+#include <string>
+#include <utility>
 #include "commands.hpp"
-#include "tree.hpp"
 using namespace kiselev;
 
 namespace
 {
   void input(std::istream& in, dataset& dictionary)
   {
-    while (in)
+    std::string name;
+    std::string value;
+    size_t key;
+    while (in >> name)
     {
-      std::string name;
-      in >> name;
       data tree;
-      size_t key;
-      std::string value;
-      while (in)
+      if (in.get() == '\n')
       {
-        in >> key >> value;
-        if (in.fail())
+        dictionary.insert(std::make_pair(name, tree));
+        continue;
+      }
+      while (in >> key >> value)
+      {
+        tree.insert(std::make_pair(key, value));
+        if (in.get() == '\n')
         {
-          in.clear();
           break;
         }
-        tree.insert(std::make_pair(key, value));
       }
       dictionary.insert(std::make_pair(name, tree));
     }
@@ -43,7 +48,7 @@ int main(int argc, char** argv)
   dataset dictionary;
   try
   {
-    input(std::cin, dictionary);
+    input(file, dictionary);
   }
   catch (const std::exception&)
   {
@@ -62,11 +67,10 @@ int main(int argc, char** argv)
     {
       commands.at(command)();
     }
-    catch (const std::exception&)
+    catch (const std::out_of_range&)
     {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
