@@ -18,9 +18,10 @@ namespace
       data tree;
       size_t key;
       std::string value;
-      while (in && in.peek() != '\n')
+      //while (in && in.peek() != '\n')
+      while (in >> key >> value)
       {
-        in >> key >> value;
+        //in >> key >> value;
         tree.insert(std::make_pair(key, value));
       }
       dictionary.insert(std::make_pair(name, tree));
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
   dataset dictionary;
   try
   {
-    input(file, dictionary);
+    input(std::cin, dictionary);
   }
   catch (const std::exception&)
   {
@@ -60,8 +61,8 @@ int main(int argc, char** argv)
     catch (const std::exception&)
     {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
