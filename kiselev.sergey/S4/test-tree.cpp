@@ -1,7 +1,3 @@
-#include <cstddef>
-#include <string>
-#include <utility>
-#include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include "tree.hpp"

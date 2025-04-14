@@ -1,15 +1,8 @@
 #ifndef TREE_HPP
 #define TREE_HPP
-#include <functional>
-#include <cstddef>
 #include <initializer_list>
-#include <ios>
-#include <iterator>
 #include <stdexcept>
-#include <type_traits>
-#include <utility>
 #include "iterator.hpp"
-#include "treeNode.hpp"
 
 namespace kiselev
 {

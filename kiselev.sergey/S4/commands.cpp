@@ -1,6 +1,5 @@
 #include "commands.hpp"
 #include <stdexcept>
-#include <string>
 #include <utility>
 
 void kiselev::print(std::ostream& out, std::istream& in, const dataset& dict)
@@ -56,7 +55,7 @@ void kiselev::intersect(std::istream& in, dataset& dict)
       newTree.insert(*it);
     }
   }
-  dict[newName] = std::move(newTree);
+  dict[newName] = newTree;
 }
 
 void kiselev::unite(std::istream& in, dataset& dict)
