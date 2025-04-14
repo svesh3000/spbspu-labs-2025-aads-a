@@ -500,7 +500,7 @@ namespace kiselev
     }
 
     Node* newNode = new Node{ std::move(val), Color::RED, nullptr, nullptr, parent };
-    if (cmp_(parent->data.first, key))
+    if (cmp_(parent->data.first, newNode->data.first))
     {
       parent->right = newNode;
     }

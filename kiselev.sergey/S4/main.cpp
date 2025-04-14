@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     std::cerr << "Error during input\n";
     return 1;
   }
-  std::map< std::string, std::function< void() > > commands;
+  RBTree< std::string, std::function< void() > > commands;
   commands.insert(std::make_pair("print", [&](){ print(std::cout, std::cin, dictionary); }));
   commands.insert(std::make_pair("complement", [&](){ complement(std::cin, dictionary); }));
   commands.insert(std::make_pair("intersect", [&](){ intersect(std::cin, dictionary); }));
