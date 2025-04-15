@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <iostream>
 #include <initializer_list>
 #include <stdexcept>
 #include "NodeFwdList.hpp"
@@ -301,10 +302,10 @@ namespace gavrilova {
   template< class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator it) noexcept
   {
-    if (!(*it) || *it == other.fake_) {
+    if (!(it.node_) || it.node_ == other.fake_) {
       return;
     }
-    Iterator it_next = it;
+    CIterator it_next = it;
     if (pos == it || pos == ++it_next) {
       return;
     }
@@ -334,27 +335,32 @@ namespace gavrilova {
   template< class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator first, CIterator last) noexcept
   {
-    if(other.empty()) {
+    if(other.empty() || first == last || first == other.cend()) {
+      std::cout << "!!!!!!!!!!!\n";
       return;
     }
+
     NodeFwdList< T >* before_first_other = first.node_;
     ++first;
     NodeFwdList< T >* first_other = first.node_;
     NodeFwdList< T >* last_other = last.node_;
 
     size_t count_moved = 0;
-    for (auto it = first; it != last; ++it) {
-      ++count_moved;
+    NodeFwdList< T >* cur_node = nullptr;
+    for (auto it = first; it != last; it++) {
+      std::cout << ++count_moved << "\n";
+      cur_node = it.node_;
     }
-    before_first_other->next = last_other->next;
+
+    before_first_other->next = last_other;
     other.nodeCount_ -= count_moved;
 
     NodeFwdList< T >* node = pos.node_;
     NodeFwdList< T >* node_next = node->next;
     node->next = first_other;
-    last_other->next = node_next;
+    cur_node->next = node_next;
 
-    nodeCount_ += other.nodeCount_;
+    nodeCount_ += count_moved;
   }
 
   template< class T >
@@ -433,13 +439,13 @@ namespace gavrilova {
   template< class T >
   bool FwdList< T >::operator>=(const FwdList< T >& other) const noexcept
   {
-    return !(other < *this);
+    return !(*this < other);
   }
 
   template< class T >
   bool FwdList< T >::operator<=(const FwdList< T >& other) const noexcept
   {
-    return !(other > *this);
+    return !(*this > other);
   }
 
   template< class T>
@@ -481,13 +487,18 @@ namespace gavrilova {
   template< class T>
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, const T& value)
   {
+    // std::cout << "insert1\n";
     NodeFwdList< T >* node = pos.node_;
     if (node == fake_) {
       push_front(value);
+      // std::cout << "before begin\n";
       return begin();
     }
+    // std::cout << "insert2\n";
     NodeFwdList< T >* node_next = node->next;
+    // std::cout << "insert3\n";
     node->next = new NodeFwdList< T >{value, node_next};
+    // std::cout << "insert4\n";
     ++nodeCount_;
     return Iterator(node->next);
   }
