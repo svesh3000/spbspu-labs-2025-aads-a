@@ -1,6 +1,6 @@
 #include <iostream>
-#include "actions.hpp"
 #include <exception>
+#include "actions.hpp"
 
 using namespace bocharov;
 
