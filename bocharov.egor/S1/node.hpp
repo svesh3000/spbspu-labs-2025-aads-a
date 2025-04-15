@@ -4,9 +4,8 @@
 namespace bocharov
 {
   template< typename T >
-  class Node
+  struct Node
   {
-  public:
     T data_;
     Node< T > * next_;
   };
