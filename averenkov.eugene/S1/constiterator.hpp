@@ -38,7 +38,7 @@ namespace averenkov
   ConstListIterator< T >& ConstListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
-    node_ = node_->next_;
+    node_ = node_->next;
     return *this;
   }
 
@@ -55,14 +55,14 @@ namespace averenkov
   T& ConstListIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
-    return node_->data_;
+    return node_->data;
   }
 
   template< class T >
   T* ConstListIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data_);
+    return std::addressof(node_->data);
   }
 
   template< class T >
