@@ -15,6 +15,9 @@ namespace bocharov
   class Iterator final: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
+    using reference = std::conditional_t< IsConst, const T &, T & >;
+    using pointer = std::conditional_t< IsConst, const T *, T * >;
+
     Iterator() noexcept:
       node_(nullptr)
     {}
@@ -36,13 +39,13 @@ namespace bocharov
       return result;
     }
 
-    typename std::conditional< is_const, const T &, T & >::type operator*() const noexcept
+    typename reference::type operator*() const noexcept
     {
       assert(node_ && "dereferencing empty iterator");
       return node_->data_;
     }
 
-    typename std::conditional< is_const, const T *, T * >::type operator->() const noexcept
+    typename pointer::type operator->() const noexcept
     {
       assert(node_ && "dereferencing empty iterator");
       return std::addressof(node_->data_);
