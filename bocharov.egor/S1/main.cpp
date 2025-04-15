@@ -1,5 +1,5 @@
-#include <iostream>
 #include <exception>
+#include <iostream>
 #include "actions.hpp"
 
 using namespace bocharov;
