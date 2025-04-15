@@ -39,13 +39,13 @@ namespace bocharov
       return result;
     }
 
-    typename reference::type operator*() const noexcept
+    typename reference operator*() const noexcept
     {
       assert(node_ && "dereferencing empty iterator");
       return node_->data_;
     }
 
-    typename pointer::type operator->() const noexcept
+    typename pointer operator->() const noexcept
     {
       assert(node_ && "dereferencing empty iterator");
       return std::addressof(node_->data_);
