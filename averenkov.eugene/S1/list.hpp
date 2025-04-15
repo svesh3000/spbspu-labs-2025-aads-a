@@ -260,7 +260,7 @@ namespace averenkov
   template < class T >
   void List< T >::remove(const T& value)
   {
-    remove_if(std::bind(std::equal_to< T >(), std::placeholders::_1, value));
+    removeIf(std::bind(std::equal_to< T >(), std::placeholders::_1, value));
   }
 
   template < class T >
