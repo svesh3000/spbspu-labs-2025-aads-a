@@ -25,7 +25,7 @@ namespace bocharov
     List(std::initializer_list< T > init);
     ~List();
 
-    List & operator=(const List & rhs) noexcept;
+    List & operator=(const List & rhs);
     List & operator=(List && rhs) noexcept;
     List & operator=(std::initializer_list< T > ilist);
 
