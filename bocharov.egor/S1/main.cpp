@@ -2,7 +2,7 @@
 #include "actions.hpp"
 #include <exception>
 
-using namespace bocharov
+using namespace bocharov;
 
 int main()
 {
