@@ -146,7 +146,7 @@ bocharov::List< T >::~List()
 }
 
 template< typename T >
-typename bocharov::List< T >::List & bocharov::List< T >::operator=(const List & rhs)
+class bocharov::List< T >::List & bocharov::List< T >::operator=(const List & rhs)
 {
   List< T > copied_rhs(rhs);
   swap(copied_rhs);
@@ -154,7 +154,7 @@ typename bocharov::List< T >::List & bocharov::List< T >::operator=(const List &
 }
 
 template< typename T >
-typename bocharov::List< T >::List & bocharov::List< T >::operator=(List && rhs) noexcept
+class bocharov::List< T >::List & bocharov::List< T >::operator=(List && rhs) noexcept
 {
   List< T > copied_rhs(std::move(rhs));
   swap(copied_rhs);
