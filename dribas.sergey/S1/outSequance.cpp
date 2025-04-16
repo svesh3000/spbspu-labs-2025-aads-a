@@ -48,13 +48,11 @@ void dribas::outSequanceNameSum(std::ostream& out, const List< std::pair< std::s
       sums.push_back(sum);
       sum = 0;
   }
-    if (isOverflow) {
+    if (isOverflow || sums.begin() == sums.end()) {
       return;
     }
 
-    if (sums.begin() != sums.end()) {
-      out << *sums.begin();
-    }
+    out << *sums.begin();
     for (auto i = ++sums.begin(); i != sums.end(); i++) {
         out << " " << *i;
     }
