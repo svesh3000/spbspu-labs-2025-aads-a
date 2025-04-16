@@ -1,6 +1,8 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
+#include <iterator>
+
 #include "node.hpp"
 
 namespace dribas
@@ -9,14 +11,13 @@ namespace dribas
   class List;
 
   template< class T, bool ifConst >
-  class Iterator
+  class Iterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
     friend class List< T >;
   public:
     using iter = Iterator< T, ifConst >;
 
     Iterator() noexcept;
-    Iterator(Node< T >* head) noexcept;
     Iterator(const iter&) = default;
 
     iter& operator=(const iter&) = default;
@@ -28,10 +29,11 @@ namespace dribas
     bool operator==(const iter& other) const noexcept;
     bool operator!=(const iter& other) const noexcept;
 
-    const T& operator*() const noexcept;
-    const T* operator->() const noexcept;
+    T& operator*();
+    T* operator->();
   private:
     Node< T >* head_;
+    explicit Iterator(Node< T >* head) noexcept;
   };
 
   template< class T, bool ifConst >
@@ -87,15 +89,15 @@ namespace dribas
   }
 
   template< class T, bool ifConst >
-  const T& Iterator< T,  ifConst >::operator*() const noexcept
+  T& Iterator< T,  ifConst >::operator*()
   {
     return head_->data_;
   }
 
   template< class T, bool ifConst >
-  const T* Iterator< T,  ifConst >::operator->() const noexcept
+  T* Iterator< T,  ifConst >::operator->()
   {
-    return std::addressof(head_->data);
+    return std::addressof(head_->data_);
   }
 }
 

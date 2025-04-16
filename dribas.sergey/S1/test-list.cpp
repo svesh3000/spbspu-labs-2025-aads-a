@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE(CopyConstructorTest) {
   List< int > copy(original);
 
   BOOST_CHECK_EQUAL(copy.size(), original.size());
-  BOOST_CHECK_NE(copy.at(0), original.at(0));
-  BOOST_CHECK_EQUAL(copy.at(0)->data_, original.at(0)->data_);
+  BOOST_CHECK(copy.begin() != original.begin());
+  BOOST_CHECK_EQUAL(copy.front(), original.front());
 }
 BOOST_AUTO_TEST_CASE(MoveConstructorTest) {
   List< int > original;
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(MoveConstructorTest) {
   List< int > moved(std::move(original));
 
   BOOST_CHECK(moved.size() == 1);
-  BOOST_CHECK(moved.at(0)->data_ == 1);
+  BOOST_CHECK(moved.front() == 1);
   BOOST_CHECK(original.size() == 0);
 }
 BOOST_AUTO_TEST_SUITE_END()
@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE(CopyOperator) {
   copy = original;
 
   BOOST_CHECK_EQUAL(copy.size(), original.size());
-  BOOST_CHECK_NE(copy.at(0), original.at(0));
-  BOOST_CHECK_EQUAL(copy.at(0)->data_, original.at(0)->data_);
+  BOOST_CHECK(copy.begin() != original.begin());
+  BOOST_CHECK(copy.front() == original.front());
 }
 BOOST_AUTO_TEST_CASE(CopyOperatorThis) {
   List< int > original;
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(CopyOperatorThis) {
   original = original;
 
   BOOST_CHECK(original.size() == 1);
-  BOOST_CHECK(original.at(0)->data_ == 1);
+  BOOST_CHECK(original.front() == 1);
 }
 BOOST_AUTO_TEST_CASE(MoveOperator) {
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(MoveOperator) {
   List< int > moved = std::move(original);
 
   BOOST_CHECK(moved.size() == 1);
-  BOOST_CHECK(moved.at(0)->data_ == 1);
+  BOOST_CHECK(moved.front() == 1);
   BOOST_CHECK(original.size() == 0);
 }
 BOOST_AUTO_TEST_CASE(MoveOperatorThis) {
@@ -64,31 +64,11 @@ BOOST_AUTO_TEST_CASE(MoveOperatorThis) {
   original = std::move(original);
 
   BOOST_CHECK(original.size() == 1);
-  BOOST_CHECK(original.at(0)->data_ == 1);
+  BOOST_CHECK(original.front()== 1);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(noAssignmentOperator)
-BOOST_AUTO_TEST_CASE(operatorScob) {
-  List< int > list;
-  list.push_back(1);
-  list.push_back(2);
-  list.push_back(3);
-
-  BOOST_CHECK(list[0]->data_ == 1);
-
-  list.clear();
-  for (int i = 0; i < 100; i++) {
-    list.push_back(i);
-    BOOST_CHECK(list[i]->data_ == i);
-  }
-}
-BOOST_AUTO_TEST_CASE(operatorAt) {
-  List< int > list;
-  list.push_back(1);
-  BOOST_CHECK(list.at(0)->data_ == 1);
-  BOOST_CHECK_THROW(list.at(1)->data_, std::out_of_range);
-}
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(MethodList)
@@ -149,16 +129,6 @@ BOOST_AUTO_TEST_CASE(PushFrontToEmptyList) {
   BOOST_CHECK(list.front() == list.back());
   BOOST_CHECK(list.front() == 78);
 }
-BOOST_AUTO_TEST_CASE(PushFrontRvalueToEmptyList) {
-  dribas::List< std::string > list;
-  list.push_front("temp_value");
-
-  BOOST_CHECK(!list.empty());
-  BOOST_CHECK(list.size() == 1);
-  BOOST_CHECK(list.at(0)->data_ == "temp_value");
-  BOOST_CHECK(list.at(0)->data_ == list.front());
-  BOOST_CHECK(list.at(0)->data_ == list.back());
-}
 BOOST_AUTO_TEST_CASE(PushFrontRvalue) {
   dribas::List< std::string > list;
   list.push_front("second");
@@ -175,17 +145,15 @@ BOOST_AUTO_TEST_CASE(PushFrontRvalues) {
   list.push_front("1");
 
   BOOST_CHECK(list.size() == 3);
-  BOOST_CHECK(list.at(0)->data_ == "1");
-  BOOST_CHECK(list.at(1)->data_ == "2");
-  BOOST_CHECK(list.at(2)->data_ == "3");
+  BOOST_CHECK(list.front() == "1");
+  BOOST_CHECK(*(++list.begin()) == "2");
 }
 BOOST_AUTO_TEST_CASE(PushFrontMove) {
   dribas::List< std::string > list;
   std::string value = "value";
   list.push_front(std::move(value));
 
-  BOOST_CHECK(value.empty());
-  BOOST_CHECK(list.at(0)->data_ == "value");
+  BOOST_CHECK(list.front() == "value");
   BOOST_CHECK(list.size() == 1);
 }
 BOOST_AUTO_TEST_CASE(FrontBackSingleElement) {

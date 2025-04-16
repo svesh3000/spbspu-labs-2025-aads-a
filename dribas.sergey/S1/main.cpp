@@ -13,10 +13,10 @@ int main()
     return 1;
   }
   if (!sequance.empty()) {
-    dribas::getSequanceName(std::cout, sequance);
+    dribas::outSequanceName(std::cout, sequance);
     std::cout << '\n';
   }
-  dribas::getSequanceNameSum(std::cout, sequance);
+  dribas::outSequanceNameSum(std::cout, sequance);
   std::cout << '\n';
   if (isOverflow) {
     std::cerr << "OverFlow!\n";
