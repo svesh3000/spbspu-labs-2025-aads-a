@@ -12,8 +12,6 @@ namespace alymova
     size_t size() const noexcept;
     T& front() noexcept;
     const T& front() const noexcept;
-    T& back() noexcept;
-    const T& back() const noexcept;
     void push(const T& value);
     void push(T&& value);
     void pop() noexcept;
@@ -45,19 +43,7 @@ namespace alymova
   {
     return data_.front();
   }
-
-  template< typename T >
-  T& Queue< T >::back() noexcept
-  {
-    return data_.back();
-  }
-
-  template< typename T >
-  const T& Queue< T >::back() const noexcept
-  {
-    return data_.back();
-  }
-
+  
   template< typename T >
   void Queue< T >::push(const T& value)
   {

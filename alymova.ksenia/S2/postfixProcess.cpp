@@ -3,8 +3,6 @@
 #include <string>
 #include <limits>
 #include <stdexcept>
-#include "queue.hpp"
-#include "stack.hpp"
 
 bool alymova::my_isdigit(const std::string& s)
 {
@@ -24,8 +22,8 @@ bool alymova::my_isdigit(const std::string& s)
 }
 bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 {
-  long long int max_sum = std::numeric_limits< long long int >::max();
-  long long int min_sum = std::numeric_limits< long long int >::min();
+  const long long int max_sum = std::numeric_limits< long long int >::max();
+  const long long int min_sum = std::numeric_limits< long long int >::min();
   if (lhs > 0 && rhs > 0)
   {
     return ((max_sum - rhs) < lhs);
@@ -38,29 +36,29 @@ bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 }
 bool alymova::is_overflow_substraction(long long int lhs, long long int rhs)
 {
-  long long int max_sum = std::numeric_limits< long long int >::max();
-  long long int min_sum = std::numeric_limits< long long int >::min();
+  const long long int max_substr = std::numeric_limits< long long int >::max();
+  const long long int min_substr = std::numeric_limits< long long int >::min();
   if (lhs > 0 && rhs < 0)
   {
-    return ((max_sum + rhs) < lhs);
+    return ((max_substr + rhs) < lhs);
   }
   if (lhs < 0 && rhs > 0)
   {
-    return ((min_sum + rhs) > lhs);
+    return ((min_substr + rhs) > lhs);
   }
   return false;
 }
 bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
 {
-  long long int max_sum = std::numeric_limits< long long int >::max();
-  long long int min_sum = std::numeric_limits< long long int >::min();
+  const long long int max_multi = std::numeric_limits< long long int >::max();
+  const long long int min_multi = std::numeric_limits< long long int >::min();
   if ((lhs > 0 && rhs > 0) || (lhs < 0 && rhs < 0))
   {
-    return (std::abs(max_sum / lhs) < std::abs(rhs));
+    return (std::abs(max_multi / lhs) < std::abs(rhs));
   }
   else
   {
-    return (std::abs(min_sum / lhs) < std::abs(rhs));
+    return (std::abs(min_multi / lhs) < std::abs(rhs));
   }
   return false;
 }
@@ -75,8 +73,7 @@ long long int alymova::my_mod(long long int item1, long long int item2)
   {
     quot--;
   }
-  long long int res = item1 - quot * item2;
-  return res;
+  return item1 - quot * item2; 
 }
 bool alymova::is_first_priority(const std::string& token)
 {

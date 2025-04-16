@@ -71,7 +71,7 @@ namespace alymova
         size_ptr_++;
       }
     }
-    catch(const std::exception& e)
+    catch (...)
     {
       clear();
       throw;
@@ -233,7 +233,7 @@ namespace alymova
           i++;
         }
       }
-      catch (const std::exception&)
+      catch (...)
       {
         delete[] array_new;
         throw;
