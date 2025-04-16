@@ -43,7 +43,7 @@ namespace alymova
   {
     return data_.front();
   }
-  
+
   template< typename T >
   void Queue< T >::push(const T& value)
   {

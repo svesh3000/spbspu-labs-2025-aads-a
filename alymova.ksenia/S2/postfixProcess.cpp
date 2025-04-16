@@ -73,7 +73,7 @@ long long int alymova::my_mod(long long int item1, long long int item2)
   {
     quot--;
   }
-  return item1 - quot * item2; 
+  return item1 - quot * item2;
 }
 bool alymova::is_first_priority(const std::string& token)
 {
