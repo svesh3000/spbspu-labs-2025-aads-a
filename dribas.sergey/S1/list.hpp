@@ -198,8 +198,8 @@ namespace dribas
   template< class T >
   void dribas::List< T >::remove(const T& value) noexcept
   {
-    remove_if([&value](const T& element) { 
-        return element == value; 
+    remove_if([&value](const T& element) {
+        return element == value;
     });
   }
 
