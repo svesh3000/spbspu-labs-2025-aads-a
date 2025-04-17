@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <limits>
 
 namespace maslevtsov {
   using set_t = std::map< int, std::string >;
@@ -125,10 +126,11 @@ int main(int argc, char** argv)
         std::cin >> newname >> setname >> setname2;
         union_sets(data_map, newname, setname, setname2);
       } else {
-        std::cout << "<INVALID COMMAND>\n";
+        throw std::invalid_argument("invalid command");
       }
-    } catch (const std::out_of_range&) {
+    } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }
