@@ -34,10 +34,9 @@ void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
 void maslevtsov::print_set(std::ostream& out, const setmap_t& map, const std::string& setname)
 {
   set_t set;
-  try {
-    set = map.at(setname);
-  } catch (const std::out_of_range&) {
-    out << "<EMPTY>\n";
+  set = map.at(setname);
+  if (set.empty()) {
+    out << "<EMPTY>";
     return;
   }
   out << setname;
@@ -56,7 +55,9 @@ void maslevtsov::complement_sets(setmap_t& map, const std::string& newname, cons
       newset.insert(std::make_pair(it->first, it->second));
     }
   }
-  map.insert(std::make_pair(newname, newset));
+  if (!newset.empty()) {
+    map[newname] = newset;
+  }
 }
 
 void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
@@ -69,7 +70,9 @@ void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const
       newset.insert(std::make_pair(it->first, it->second));
     }
   }
-  map.insert(std::make_pair(newname, newset));
+  if (!newset.empty()) {
+    map[newname] = newset;
+  }
 }
 
 void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
@@ -83,7 +86,9 @@ void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std
   for (auto it = set2.cbegin(); it != set2.cend(); ++it) {
     newset.insert(std::make_pair(it->first, it->second));
   }
-  map.insert(std::make_pair(newname, newset));
+  if (!newset.empty()) {
+    map[newname] = newset;
+  }
 }
 
 int main(int argc, char** argv)
