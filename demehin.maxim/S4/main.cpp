@@ -52,10 +52,10 @@ int main(int argc, char* argv[])
   }
 
   demehin::Tree< std::string, std::function< void() > > commands;
-  commands["print"] = [&](){ demehin::print(std::cout, std::cin, mapOfTrees); };
-  commands["complement"] = [&](){ demehin::makeComplement(std::cin, mapOfTrees); };
-  commands["intersect"] = [&](){ demehin::makeIntersect(std::cin, mapOfTrees); };
-  commands["union"] = [&](){ demehin::makeUnion(std::cin, mapOfTrees); };
+  commands["print"] = std::bind(demehin::print, std::ref(std::cout), std::ref(std::cin), std::ref(mapOfTrees));
+  commands["complement"] = std::bind(demehin::makeComplement, std::ref(std::cin), std::ref(mapOfTrees));
+  commands["intersect"] = std::bind(demehin::makeIntersect, std::ref(std::cin), std::ref(mapOfTrees));
+  commands["union"] = std::bind(demehin::makeUnion, std::ref(std::cin), std::ref(mapOfTrees));
 
   std::string command;
   while (std::cin >> command)
