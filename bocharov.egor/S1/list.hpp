@@ -64,6 +64,7 @@ namespace bocharov
     void push_back(const T & value);
     void push_back(T && value);
     void pop_front() noexcept;
+    void pop_back() noexcept;
     void swap(List & other) noexcept;
 
     void splice_after(const_iterator pos, List & other);
@@ -399,6 +400,29 @@ void bocharov::List< T >::pop_front() noexcept
   delete to_delete;
   --size_;
 }
+
+template< typename T >
+void bocharov::List< T >::pop_back() noexcept
+{
+  assert(!empty() && "pop_front() to empty list");
+  if (size_ == 1)
+  {
+    delete tail_;
+    tail_ = nullptr;
+    size_ = 0;
+    return;
+  }
+  Node< T > * pred = tail_->next_;
+  while (pred->next_ != tail_)
+  {
+    pred = pred->next_;
+  }
+  pred->next_ = tail_->next_;
+  delete tail_;
+  tail_ = pred;
+  --size_;
+}
+
 
 template< typename T >
 void bocharov::List< T >::swap(List & other) noexcept
