@@ -8,9 +8,12 @@ namespace maslevtsov {
   using setmap_t = std::map< std::string, set_t >;
 
   void input_setmap(std::istream& in, setmap_t& map);
-  void print(std::ostream& out, const setmap_t& map, const std::string& setname);
-  void complement(const setmap_t& map, const std::string& newname, const std::string& setname1,
+  void print_set(std::ostream& out, const setmap_t& map, const std::string& setname);
+  void complement_sets(const setmap_t& map, const std::string& newname, const std::string& setname1,
     const std::string& setname2);
+  void intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
+    const std::string& setname2);
+  void union_sets(setmap_t& map, const std::string& newname, const std::string& setname1, const std::string& setname2);
 }
 
 void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
@@ -28,7 +31,7 @@ void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
   }
 }
 
-void maslevtsov::print(std::ostream& out, const setmap_t& map, const std::string& setname)
+void maslevtsov::print_set(std::ostream& out, const setmap_t& map, const std::string& setname)
 {
   set_t set = map.at(setname);
   out << setname;
@@ -37,13 +40,26 @@ void maslevtsov::print(std::ostream& out, const setmap_t& map, const std::string
   }
 }
 
-void maslevtsov::complement(setmap_t& map, const std::string& newname, const std::string& setname1,
+void maslevtsov::complement_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
   const std::string& setname2)
 {
   set_t set1 = map.at(setname1), set2 = map.at(setname2);
   set_t newset;
   for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
     if (set2.find(it->first) == set2.end()) {
+      newset.insert(std::make_pair(it->first, it->second));
+    }
+  }
+  map.insert(std::make_pair(newname, newset));
+}
+
+void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
+  const std::string& setname2)
+{
+  set_t set1 = map.at(setname1), set2 = map.at(setname2);
+  set_t newset;
+  for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
+    if (set2.find(it->first) != set2.end()) {
       newset.insert(std::make_pair(it->first, it->second));
     }
   }
