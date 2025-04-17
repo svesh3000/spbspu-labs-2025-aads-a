@@ -202,3 +202,23 @@ BOOST_AUTO_TEST_CASE(capacity_test)
   BOOST_TEST(tree.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(operators_test)
+{
+  demehin::Tree< size_t, std::string > tree;
+  tree[2] = "2";
+  tree[1] = "1";
+  tree[3] = "3";
+
+  demehin::Tree< size_t, std::string > cpy_tree = tree;
+  std::ostringstream out1;
+  printTreeValues(out1, cpy_tree);
+  BOOST_TEST(cpy_tree.size() == 3);
+  BOOST_TEST(out1.str() == "123");
+
+  cpy_tree.erase(2);
+  demehin::Tree< size_t, std::string > mv_tree = std::move(cpy_tree);
+  std::ostringstream out2;
+  printTreeValues(out2, mv_tree);
+  BOOST_TEST(mv_tree.size() == 2);
+  BOOST_TEST(out2.str() == "13");
+}
