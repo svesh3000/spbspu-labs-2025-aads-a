@@ -9,7 +9,7 @@ namespace maslevtsov {
 
   void input_setmap(std::istream& in, setmap_t& map);
   void print_set(std::ostream& out, const setmap_t& map, const std::string& setname);
-  void complement_sets(const setmap_t& map, const std::string& newname, const std::string& setname1,
+  void complement_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
     const std::string& setname2);
   void intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
     const std::string& setname2);
@@ -33,7 +33,13 @@ void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
 
 void maslevtsov::print_set(std::ostream& out, const setmap_t& map, const std::string& setname)
 {
-  set_t set = map.at(setname);
+  set_t set;
+  try {
+    set = map.at(setname);
+  } catch (const std::out_of_range&) {
+    out << "<EMPTY>\n";
+    return;
+  }
   out << setname;
   for (auto it = set.cbegin(); it != set.cend(); ++it) {
     out << ' ' << it->first << ' ' << it->second;
@@ -94,4 +100,36 @@ int main(int argc, char** argv)
   }
   setmap_t data_map;
   input_setmap(fin, data_map);
+
+  std::string command;
+  while (std::cin) {
+    std::cin >> command;
+    if (std::cin.eof()) {
+      break;
+    }
+    std::string setname;
+    try {
+      if (command == "print") {
+        std::cin >> setname;
+        print_set(std::cout, data_map, setname);
+        std::cout << '\n';
+      } else if (command == "complement") {
+        std::string newname, setname2;
+        std::cin >> newname >> setname >> setname2;
+        complement_sets(data_map, newname, setname, setname2);
+      } else if (command == "intersect") {
+        std::string newname, setname2;
+        std::cin >> newname >> setname >> setname2;
+        intersect_sets(data_map, newname, setname, setname2);
+      } else if (command == "union") {
+        std::string newname, setname2;
+        std::cin >> newname >> setname >> setname2;
+        union_sets(data_map, newname, setname, setname2);
+      } else {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    } catch (const std::out_of_range&) {
+      std::cout << "<INVALID COMMAND>\n";
+    }
+  }
 }
