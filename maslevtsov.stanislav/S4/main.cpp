@@ -4,23 +4,34 @@
 #include <map>
 
 namespace maslevtsov {
-  using set = std::map< int, std::string >;
-  using setmap = std::map< std::string, set >;
-  void input_setmap(std::istream& in, setmap& map);
+  using set_t = std::map< int, std::string >;
+  using setmap_t = std::map< std::string, set_t >;
+
+  void input_setmap(std::istream& in, setmap_t& map);
+  void print(std::ostream& out, const std::string& setname, const setmap_t& map);
 }
 
-void maslevtsov::input_setmap(std::istream& in, setmap& map)
+void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
 {
   std::string setname, value;
   int key = 0;
   while (in) {
-    set s;
+    set_t set;
     in >> setname;
     while (in && in.peek() != '\n') {
       in >> key >> value;
-      s.insert(std::make_pair(key, value));
+      set.insert(std::make_pair(key, value));
     }
-    map.insert(std::make_pair(setname, s));
+    map.insert(std::make_pair(setname, set));
+  }
+}
+
+void maslevtsov::print(std::ostream& out, const std::string& setname, const setmap_t& map)
+{
+  set_t set = map.at(setname);
+  out << setname;
+  for (auto it = set.cbegin(); it != set.cend(); ++it) {
+    out << ' ' << it->first << ' ' << it->second;
   }
 }
 
@@ -36,6 +47,6 @@ int main(int argc, char** argv)
     std::cerr << "<INVALID DATA FILE>\n";
     return 1;
   }
-  setmap data_map;
+  setmap_t data_map;
   input_setmap(fin, data_map);
 }
