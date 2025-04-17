@@ -55,9 +55,7 @@ void maslevtsov::complement_sets(setmap_t& map, const std::string& newname, cons
       newset.insert(std::make_pair(it->first, it->second));
     }
   }
-  if (!newset.empty()) {
-    map[newname] = newset;
-  }
+  map[newname] = newset;
 }
 
 void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
@@ -70,9 +68,7 @@ void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const
       newset.insert(std::make_pair(it->first, it->second));
     }
   }
-  if (!newset.empty()) {
-    map[newname] = newset;
-  }
+  map[newname] = newset;
 }
 
 void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
@@ -86,9 +82,7 @@ void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std
   for (auto it = set2.cbegin(); it != set2.cend(); ++it) {
     newset.insert(std::make_pair(it->first, it->second));
   }
-  if (!newset.empty()) {
-    map[newname] = newset;
-  }
+  map[newname] = newset;
 }
 
 int main(int argc, char** argv)
