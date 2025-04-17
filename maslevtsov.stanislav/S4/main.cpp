@@ -66,6 +66,20 @@ void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const
   map.insert(std::make_pair(newname, newset));
 }
 
+void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
+  const std::string& setname2)
+{
+  set_t set1 = map.at(setname1), set2 = map.at(setname2);
+  set_t newset;
+  for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
+    newset.insert(std::make_pair(it->first, it->second));
+  }
+  for (auto it = set2.cbegin(); it != set2.cend(); ++it) {
+    newset.insert(std::make_pair(it->first, it->second));
+  }
+  map.insert(std::make_pair(newname, newset));
+}
+
 int main(int argc, char** argv)
 {
   using namespace maslevtsov;
