@@ -29,6 +29,7 @@ namespace demehin
     ~Tree();
 
     Tree< Key, T, Cmp >& operator=(const Tree< Key, T, Cmp >&);
+    Tree< Key, T, Cmp >& operator=(Tree< Key, T, Cmp >&&);
 
     std::pair< Iter, bool > insert(const DataPair&);
     template< typename InputIt >
@@ -148,9 +149,20 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >& Tree< Key, T, Cmp >::operator=(const Tree< Key, T, Cmp >& rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       Tree< Key, T, Cmp > temp(rhs);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp >& Tree< Key, T, Cmp >::operator=(Tree< Key, T, Cmp >&& rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      Tree< Key, T, Cmp > temp(std::move(rhs));
       swap(temp);
     }
     return *this;
