@@ -404,7 +404,7 @@ void bocharov::List< T >::pop_front() noexcept
 template< typename T >
 void bocharov::List< T >::pop_back() noexcept
 {
-  assert(!empty() && "pop_front() to empty list");
+  assert(!empty() && "pop_back() to empty list");
   if (size_ == 1)
   {
     delete tail_;

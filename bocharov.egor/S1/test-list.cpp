@@ -270,6 +270,15 @@ BOOST_AUTO_TEST_CASE(pop_front_test)
   BOOST_TEST(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(pop_back_test)
+{
+  bocharov::List<int> list = {1, 2};
+  list.pop_back();
+  BOOST_TEST(list.back() == 1);
+  list.pop_back();
+  BOOST_TEST(list.empty());
+}
+
 BOOST_AUTO_TEST_CASE(swap_test)
 {
   bocharov::List< int > list1 = {0};
