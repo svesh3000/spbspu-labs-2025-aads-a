@@ -46,5 +46,5 @@ int main() {
   } else {
     outFwdListULL(std::cout, sums);
   }
-  // std::cout << "1\n";
+ std::cout << "1\n";
 }
