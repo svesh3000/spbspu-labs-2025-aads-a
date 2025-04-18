@@ -51,7 +51,7 @@ namespace maslevtsov {
     std::pair< const_iterator, const_iterator > equal_range(const Key& key) const;
 
   private:
-    TwoThreeTreeNode< value_type >* fake_root_;
+    TwoThreeTreeNode< value_type >* dummy_root_;
     size_type size_;
   };
 }
