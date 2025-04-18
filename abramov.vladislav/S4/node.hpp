@@ -7,6 +7,7 @@ namespace abramov
   template< class Key, class Value >
   struct Node
   {
+    Node();
     Node(const std::pair< Key, Value > &p, const Node< Key, Value > *parent);
   private:
     std::pair< Key, Value > data_;
@@ -15,6 +16,14 @@ namespace abramov
     Node< Key, Value > *rigth_;
     size_t heigth_;
   };
+
+  template< class Key, class Value >
+  Node::Node():
+    data_(std::pair< Key, Value >()),
+    parent_(nullptr),
+    left_(nullptr),
+    rigth_(nullptr)
+  {}
 
   template< class Key, class Value >
   Node::Node(const std::pair< Key, Value > &p, const Node< Key, Value > *parent):
