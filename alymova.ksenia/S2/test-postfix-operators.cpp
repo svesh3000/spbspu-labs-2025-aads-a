@@ -40,5 +40,5 @@ BOOST_AUTO_TEST_CASE(test_operators)
 
   p3 = p5 % p1;
   BOOST_TEST(p3() == 3);
-  BOOST_TEST(p3() == my_mod(p5(), p1()));
+  BOOST_TEST(p3() == mod(p5(), p1()));
 }
