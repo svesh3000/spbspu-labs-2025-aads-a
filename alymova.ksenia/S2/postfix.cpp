@@ -150,7 +150,7 @@ long long int alymova::Postfix::operator()()
     }
     else
     {
-      stack.push(std::stoll(copy.front())); 
+      stack.push(std::stoll(copy.front()));
     }
     copy.pop();
   }
