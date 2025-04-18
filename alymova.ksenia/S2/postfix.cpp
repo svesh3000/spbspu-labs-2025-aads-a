@@ -11,8 +11,8 @@ alymova::Postfix::Postfix(const std::string& s):
   std::string s_local = s;
   while (!s_local.empty())
   {
-    size_t space = s_local.find(" ");
     std::string now;
+    size_t space = s_local.find(" ");
     if (space == std::string::npos)
     {
       now = s_local;
@@ -41,11 +41,23 @@ alymova::Postfix::Postfix(const std::string& s):
       }
       stack.pop();
     }
-    else if (my_isdigit(now))
+    else if (is_operation(now))
     {
-      postfix_.push(now);
+      if (!stack.empty())
+      {
+        while (is_notless_priority(now, stack.top()))
+        {
+          postfix_.push(stack.top());
+          stack.pop();
+          if (stack.empty())
+          {
+            break;
+          }
+        }
+      }
+      stack.push(now);
     }
-    else if (is_first_priority(now) || is_second_priority(now))
+    /*else if (is_first_priority(now) || is_second_priority(now))
     {
       if (!stack.empty())
       {
@@ -60,10 +72,11 @@ alymova::Postfix::Postfix(const std::string& s):
         }
       }
       stack.push(now);
-    }
+    }*/
     else
     {
-      throw std::logic_error("Incorrect char");
+      stoll(now);
+      postfix_.push(now);
     }
   }
   while (!stack.empty())
@@ -82,11 +95,11 @@ long long int alymova::Postfix::operator()()
   Queue< std::string > copy(postfix_);
   while (!copy.empty())
   {
-    if (my_isdigit(copy.front()))
+    /*if (my_isdigit(copy.front()))
     {
       stack.push(std::stoll(copy.front()));
-    }
-    else
+    }*/
+    if (is_operation(copy.front()))
     {
       if (stack.size() < 2)
       {
@@ -134,6 +147,10 @@ long long int alymova::Postfix::operator()()
         stack.push(my_mod(item1, item2));
         break;
       }
+    }
+    else
+    {
+      stack.push(std::stoll(copy.front())); 
     }
     copy.pop();
   }

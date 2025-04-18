@@ -4,22 +4,6 @@
 #include <limits>
 #include <stdexcept>
 
-bool alymova::my_isdigit(const std::string& s)
-{
-  size_t i = 0;
-  if (s[0] == '-' && s.size() > 1)
-  {
-    i++;
-  }
-  for (; i < s.size(); i++)
-  {
-    if (!std::isdigit(s[i]))
-    {
-      return false;
-    }
-  }
-  return true;
-}
 bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
 {
   const long long int max_sum = std::numeric_limits< long long int >::max();
@@ -83,14 +67,31 @@ bool alymova::is_second_priority(const std::string& token)
 {
   return (token == "+" || token == "-");
 }
-bool alymova::is_need_priority(const std::string& item, const std::string& token)
+bool alymova::is_notless_priority(const std::string& token, const std::string& top)
 {
-  if (is_second_priority(item))
+  if (token == "*" || token == "/" || token == "%")
+  {
+    return (top == "*" || top == "/" || top == "%");
+  }
+  return is_operation(top);
+  /*if (is_second_priority(item))
   {
     return (is_first_priority(token) || is_second_priority(token));
   }
   else
   {
     return is_first_priority(token);
+  }*/
+}
+bool alymova::is_operation(const std::string& token)
+{
+  const std::string operations[5] = {"+", "-", "*", "/", "%"};
+  for (std::string s: operations)
+  {
+    if (token == s)
+    {
+      return true;
+    }
   }
+  return false;
 }

@@ -10,7 +10,7 @@ namespace alymova
   {
     bool empty() const noexcept;
     size_t size() const noexcept;
-    T& top() noexcept;
+    T& top();
     const T& top() const noexcept;
     void push(const T& value);
     void push(T&& value);
@@ -33,7 +33,7 @@ namespace alymova
   }
 
   template< typename T >
-  T& Stack< T >::top() noexcept
+  T& Stack< T >::top()
   {
     return data_.back();
   }

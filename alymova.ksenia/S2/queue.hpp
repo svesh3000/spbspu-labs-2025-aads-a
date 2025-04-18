@@ -10,7 +10,7 @@ namespace alymova
   {
     bool empty() const noexcept;
     size_t size() const noexcept;
-    T& front() noexcept;
+    T& front();
     const T& front() const noexcept;
     void push(const T& value);
     void push(T&& value);
@@ -33,7 +33,7 @@ namespace alymova
   }
 
   template< typename T >
-  T& Queue< T >::front() noexcept
+  T& Queue< T >::front()
   {
     return data_.front();
   }

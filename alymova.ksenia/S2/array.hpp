@@ -20,9 +20,9 @@ namespace alymova
 
     bool empty() const noexcept;
     size_t size() const noexcept;
-    T& front() noexcept;
+    T& front();
     const T& front() const noexcept;
-    T& back() noexcept;
+    T& back();
     const T& back() const noexcept;
     void push_back(const T& value);
     void push_back(T&& value);
@@ -30,32 +30,33 @@ namespace alymova
     void pop_back() noexcept;
     template< typename... Args >
     void emplace_back(Args&&... args);
+    void swap(Array< T >& other);
   private:
-    size_t size_;
-    size_t capacity_;
     T* array_;
     T* begin_;
     T* size_ptr_;
+    size_t size_;
+    size_t capacity_;
 
     void clear() noexcept;
   };
 
   template< typename T >
   Array< T >::Array():
-    size_(0),
-    capacity_(10),
-    array_(new T[capacity_]{}),
+    array_(new T[10]{}),
     begin_(array_),
-    size_ptr_(array_)
+    size_ptr_(array_),
+    size_(0),
+    capacity_(10)
   {}
 
   template< typename T >
   Array< T >::Array(const Array< T >& other):
-    size_(other.size_),
-    capacity_(other.capacity_),
-    array_(new T[capacity_]{}),
+    array_(new T[10]{}),
     begin_(array_),
-    size_ptr_(array_)
+    size_ptr_(array_),
+    size_(other.size_),
+    capacity_(other.capacity_)
   {
     try
     {
@@ -80,11 +81,11 @@ namespace alymova
 
   template< typename T >
   Array< T >::Array(Array< T >&& other) noexcept:
-    size_(std::exchange(other.size_, 0)),
-    capacity_(std::exchange(other.capacity_, 10)),
     array_(std::exchange(other.array_, nullptr)),
     begin_(std::exchange(other.begin_, nullptr)),
-    size_ptr_(std::exchange(other.size_ptr_, nullptr))
+    size_ptr_(std::exchange(other.size_ptr_, nullptr)),
+    size_(std::exchange(other.size_, 0)),
+    capacity_(std::exchange(other.capacity_, 0))
   {}
 
   template< typename T >
@@ -97,23 +98,15 @@ namespace alymova
   Array< T >& Array< T >::operator=(const Array< T >& other)
   {
     Array copy(other);
-    std::swap(size_, copy.size_);
-    std::swap(capacity_, copy.capacity_);
-    std::swap(array_, copy.array_);
-    std::swap(begin_, copy.begin_);
-    std::swap(size_ptr_, copy.size_ptr_);
+    swap(copy);
     return *this;
   }
 
   template< typename T >
   Array< T >& Array< T >::operator=(Array< T >&& other) noexcept
   {
-    clear();
-    size_ = std::exchange(other.size_, 0);
-    capacity_ = std::exchange(other.capacity_, 10);
-    array_ = std::exchange(other.array_, nullptr);
-    begin_ = std::exchange(other.begin_, nullptr);
-    size_ptr_ = std::exchange(other.size_ptr_, nullptr);
+    Array moved(std::move(other));
+    swap(moved);
     return *this;
   }
 
@@ -130,7 +123,7 @@ namespace alymova
   }
 
   template< typename T >
-  T& Array< T >::front() noexcept
+  T& Array< T >::front()
   {
     assert(size_ != 0);
     return *begin_;
@@ -144,7 +137,7 @@ namespace alymova
   }
 
   template< typename T >
-  T& Array< T >::back() noexcept
+  T& Array< T >::back()
   {
     assert(size_ != 0);
     if (size_ptr_ == array_ && size_ != 0)
@@ -247,6 +240,16 @@ namespace alymova
     *size_ptr_ = T{std::forward< Args >(args)...};
     size_ptr_++;
     size_++;
+  }
+
+  template< typename T >
+  void Array< T >::swap(Array< T >& other)
+  {
+    std::swap(array_, other.array_);
+    std::swap(begin_, other.begin_);
+    std::swap(size_ptr_, other.size_ptr_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
   }
 
   template< typename T >
