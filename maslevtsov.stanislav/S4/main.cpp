@@ -6,6 +6,7 @@
 int main(int argc, char** argv)
 {
   using namespace maslevtsov;
+
   if (argc != 2) {
     std::cerr << "<INVALID PARAMETERS>\n";
     return 1;
