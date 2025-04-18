@@ -4,7 +4,7 @@
 #include <limits>
 #include <stdexcept>
 
-bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
+bool alymova::isOverflowAddition(long long int lhs, long long int rhs)
 {
   const long long int max_sum = std::numeric_limits< long long int >::max();
   const long long int min_sum = std::numeric_limits< long long int >::min();
@@ -18,7 +18,7 @@ bool alymova::is_overflow_addition(long long int lhs, long long int rhs)
   }
   return false;
 }
-bool alymova::is_overflow_substraction(long long int lhs, long long int rhs)
+bool alymova::isOverflowSubstraction(long long int lhs, long long int rhs)
 {
   const long long int max_substr = std::numeric_limits< long long int >::max();
   const long long int min_substr = std::numeric_limits< long long int >::min();
@@ -32,7 +32,7 @@ bool alymova::is_overflow_substraction(long long int lhs, long long int rhs)
   }
   return false;
 }
-bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
+bool alymova::isOverflowMulti(long long int lhs, long long int rhs)
 {
   const long long int max_multi = std::numeric_limits< long long int >::max();
   const long long int min_multi = std::numeric_limits< long long int >::min();
@@ -46,7 +46,7 @@ bool alymova::is_overflow_multi(long long int lhs, long long int rhs)
   }
   return false;
 }
-long long int alymova::my_mod(long long int item1, long long int item2)
+long long int alymova::mod(long long int item1, long long int item2)
 {
   long long int quot = item1 / item2;
   if (item1 < 0 && item2 < 0)
@@ -59,31 +59,15 @@ long long int alymova::my_mod(long long int item1, long long int item2)
   }
   return item1 - quot * item2;
 }
-bool alymova::is_first_priority(const std::string& token)
-{
-  return (token == "*" || token == "/" || token == "%");
-}
-bool alymova::is_second_priority(const std::string& token)
-{
-  return (token == "+" || token == "-");
-}
-bool alymova::is_notless_priority(const std::string& token, const std::string& top)
+bool alymova::detail::haveNotLessPriority(const std::string& token, const std::string& top)
 {
   if (token == "*" || token == "/" || token == "%")
   {
     return (top == "*" || top == "/" || top == "%");
   }
-  return is_operation(top);
-  /*if (is_second_priority(item))
-  {
-    return (is_first_priority(token) || is_second_priority(token));
-  }
-  else
-  {
-    return is_first_priority(token);
-  }*/
+  return isOperation(top);
 }
-bool alymova::is_operation(const std::string& token)
+bool alymova::detail::isOperation(const std::string& token)
 {
   const std::string operations[5] = {"+", "-", "*", "/", "%"};
   for (std::string s: operations)

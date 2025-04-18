@@ -41,11 +41,11 @@ alymova::Postfix::Postfix(const std::string& s):
       }
       stack.pop();
     }
-    else if (is_operation(now))
+    else if (detail::isOperation(now))
     {
       if (!stack.empty())
       {
-        while (is_notless_priority(now, stack.top()))
+        while (detail::haveNotLessPriority(now, stack.top()))
         {
           postfix_.push(stack.top());
           stack.pop();
@@ -57,22 +57,6 @@ alymova::Postfix::Postfix(const std::string& s):
       }
       stack.push(now);
     }
-    /*else if (is_first_priority(now) || is_second_priority(now))
-    {
-      if (!stack.empty())
-      {
-        while (is_need_priority(now, stack.top()))
-        {
-          postfix_.push(stack.top());
-          stack.pop();
-          if (stack.empty())
-          {
-            break;
-          }
-        }
-      }
-      stack.push(now);
-    }*/
     else
     {
       stoll(now);
@@ -95,11 +79,7 @@ long long int alymova::Postfix::operator()()
   Queue< std::string > copy(postfix_);
   while (!copy.empty())
   {
-    /*if (my_isdigit(copy.front()))
-    {
-      stack.push(std::stoll(copy.front()));
-    }*/
-    if (is_operation(copy.front()))
+    if (detail::isOperation(copy.front()))
     {
       if (stack.size() < 2)
       {
@@ -112,21 +92,21 @@ long long int alymova::Postfix::operator()()
       switch ((copy.front())[0])
       {
       case '+':
-        if (is_overflow_addition(item1, item2))
+        if (isOverflowAddition(item1, item2))
         {
           throw std::overflow_error("Addition overflow");
         }
         stack.push(item1 + item2);
         break;
       case '-':
-        if (is_overflow_substraction(item1, item2))
+        if (isOverflowSubstraction(item1, item2))
         {
           throw std::overflow_error("Substraction overflow");
         }
         stack.push(item1 - item2);
         break;
       case '*':
-        if (is_overflow_multi(item1, item2))
+        if (isOverflowMulti(item1, item2))
         {
           throw std::overflow_error("Multiplication overflow");
         }
@@ -144,7 +124,7 @@ long long int alymova::Postfix::operator()()
         {
           throw std::logic_error("Division by 0");
         }
-        stack.push(my_mod(item1, item2));
+        stack.push(mod(item1, item2));
         break;
       }
     }
