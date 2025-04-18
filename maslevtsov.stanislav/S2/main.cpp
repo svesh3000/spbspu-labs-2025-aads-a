@@ -2,10 +2,10 @@
 #include "io_stack.hpp"
 #include "expression_processing.hpp"
 
-using namespace maslevtsov;
-
 int main(int argc, char** argv)
 {
+  using namespace maslevtsov;
+
   if (argc > 2) {
     std::cerr << "Invalid amount of arguments\n";
     return 1;
