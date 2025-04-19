@@ -12,6 +12,8 @@ namespace maslevtsov {
   class TwoThreeIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
+    friend class TwoThreeTree;
+
     TwoThreeIterator();
     TwoThreeIterator(const TwoThreeIterator& rhs) noexcept = default;
     ~TwoThreeIterator() = default;
@@ -32,7 +34,7 @@ namespace maslevtsov {
     TwoThreeTreeNode< T >* node_;
     bool is_first_;
 
-    explicit TwoThreeIterator(TwoThreeTreeNode< T >* node, bool is_first_);
+    TwoThreeIterator(TwoThreeTreeNode< T >* node, bool is_first_);
     TwoThreeTreeNode< T >* get_min_node(TwoThreeTreeNode< T >* node);
     TwoThreeTreeNode< T >* get_max_node(TwoThreeTreeNode< T >* node);
   };
