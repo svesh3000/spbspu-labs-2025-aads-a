@@ -1,26 +1,26 @@
 #ifndef TWO_THREE_TREE_DECLARATION_HPP
 #define TWO_THREE_TREE_DECLARATION_HPP
 
-#include "two_three_iterator.hpp"
+#include "tree_iterator.hpp"
 
 namespace maslevtsov {
   template< class Key, class T, class Compare = std::less< Key > >
-  class TwoThreeTree
+  class Tree
   {
   public:
     using value_type = std::pair< const Key, T >;
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using const_iterator = TwoThreeIterator< value_type >;
+    using const_iterator = TreeIterator< value_type >;
 
-    TwoThreeTree();
-    TwoThreeTree(const TwoThreeTree& rhs);
-    TwoThreeTree(TwoThreeTree&& rhs) noexcept;
-    ~TwoThreeTree();
+    Tree();
+    Tree(const Tree& rhs);
+    Tree(Tree&& rhs) noexcept;
+    ~Tree();
 
-    TwoThreeTree& operator=(const TwoThreeTree& rhs);
-    TwoThreeTree& operator=(TwoThreeTree&& rhs) noexcept;
+    Tree& operator=(const Tree& rhs);
+    Tree& operator=(Tree&& rhs) noexcept;
 
     T& operator[](const Key& key) noexcept;
     T& operator[](Key&& key) noexcept;
@@ -42,7 +42,7 @@ namespace maslevtsov {
     // iterator erase(iterator pos);
     iterator erase(const_iterator pos);
     size_type erase(const Key& key);
-    void swap(TwoThreeTree& other) noexcept;
+    void swap(Tree& other) noexcept;
 
     size_type count(const Key& key) const;
     // iterator find(const Key& key);
@@ -51,7 +51,7 @@ namespace maslevtsov {
     std::pair< const_iterator, const_iterator > equal_range(const Key& key) const;
 
   private:
-    using Node = TwoThreeTreeNode< value_type >;
+    using Node = TreeNode< value_type >;
 
     Node* dummy_root_;
     size_type size_;
