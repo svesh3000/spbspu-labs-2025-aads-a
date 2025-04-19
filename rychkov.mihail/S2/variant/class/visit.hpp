@@ -34,7 +34,7 @@ namespace rychkov
     }
 
     template< class R, class F, class... Variants >
-    using vtable_type = details::multidimensional_array< R(*)(F&&, Variants...),
+    using vtable_type = multidimensional_array< R(*)(F&&, Variants...),
         variant_size_v< remove_cvref_t< Variants > >... >;
     template< class R, class F, class First, class... Variants >
     constexpr vtable_type< R, F, First, Variants... > vtable =

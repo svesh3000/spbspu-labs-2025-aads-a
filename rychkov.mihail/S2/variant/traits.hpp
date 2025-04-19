@@ -42,26 +42,6 @@ namespace rychkov
     static constexpr bool is_trivially_destructible =
         conjunction_v< std::is_trivially_destructible< Types >::value... >;
   };
-  namespace details
-  {
-    template< class T >
-    constexpr size_t max_size_v = ((1ULL << (8 * sizeof(T) - 1)) - 1) * 2 + 1;
-
-    template< size_t N, class PossibleSize_t, class... Ts >
-    struct select_size_type
-    {
-      using type = std::conditional_t< (N < max_size_v< PossibleSize_t >),
-            PossibleSize_t, typename select_size_type< N, Ts... >::type >;
-    };
-    template< size_t N, class PossibleSize_t >
-    struct select_size_type< N, PossibleSize_t >
-    {
-      static_assert(N < max_size_v< PossibleSize_t >, "size type deduction failed");
-      using type = PossibleSize_t;
-    };
-    template< size_t N, class... Ts >
-    using select_size_type_t = typename select_size_type< N, Ts... >::type;
-  }
 }
 
 #endif

@@ -9,20 +9,20 @@
 namespace rychkov
 {
   template< class Base >
-  size_t active_tracked();
+  size_t active_tracked() noexcept;
   template< class Base >
   class Counter
   {
   public:
-    Counter()
+    Counter() noexcept
     {
       active++;
     }
-    Counter(const Counter&)
+    Counter(const Counter&) noexcept
     {
       active++;
     }
-    ~Counter()
+    ~Counter() noexcept
     {
       active--;
     }
@@ -30,7 +30,7 @@ namespace rychkov
     Counter& operator=(const Counter&) = default;
   private:
     static size_t active;
-    friend size_t active_tracked< Base >();
+    friend size_t active_tracked< Base >() noexcept;
   };
   template< class Base >
   class MemChecker: public Base, private Counter< Base >
@@ -38,11 +38,11 @@ namespace rychkov
   public:
     MemChecker() = default;
     template< class... Args, class = std::enable_if_t< std::is_constructible< Base, Args&&... >::value > >
-    MemChecker(Args&&... args):
+    MemChecker(Args&&... args) noexcept(std::is_nothrow_constructible< Base, Args&&... >::value):
       Base(std::forward< Args >(args)...)
     {}
     template< class T, class = std::enable_if_t< std::is_assignable< Base, T&& >::value > >
-    MemChecker& operator=(T&& value)
+    MemChecker& operator=(T&& value) noexcept(std::is_nothrow_assignable< Base, T&& >::value)
     {
       static_cast< Base& >(*this) = std::forward< T >(value);
       return *this;
@@ -51,7 +51,7 @@ namespace rychkov
   template< class Base >
   size_t Counter< Base >::active = 0;
   template< class Base >
-  size_t active_tracked()
+  size_t active_tracked() noexcept
   {
     return Counter< Base >::active;
   }

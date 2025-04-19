@@ -52,8 +52,7 @@ union rychkov::details::UnionBase< IsTrivDestr >
 template< class... Types >
 struct rychkov::details::UnionStorage< false, Types... >
 {
-  using size_type = select_size_type_t< sizeof(UnionBase< false, Types... >),
-        unsigned char, unsigned short, size_t >;
+  using size_type = rychkov::select_size_type_t< sizeof(UnionBase< false, Types... >) >;
   UnionBase< false, Types... > storage;
   size_type active = static_cast< size_type >(variant_npos);
 
