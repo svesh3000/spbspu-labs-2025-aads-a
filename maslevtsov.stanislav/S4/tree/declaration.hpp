@@ -60,6 +60,7 @@ namespace maslevtsov {
     Compare compare_;
 
     void clear_subtree(Node* node) noexcept;
+    iterator find_impl(const Key& key);
   };
 }
 

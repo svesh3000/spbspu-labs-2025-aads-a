@@ -61,9 +61,15 @@ template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::operator[](Key&& key) noexcept
 {}
 
-// template< class Key, class T, class Compare >
-// T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
-// {}
+template< class Key, class T, class Compare >
+T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
+{
+  auto it = find(key);
+  if (it != end()) {
+    return it->second;
+  }
+  throw std::out_of_range("invalid key");
+}
 
 template< class Key, class T, class Compare >
 const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
@@ -75,9 +81,11 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
   throw std::out_of_range("invalid key");
 }
 
-// template< class Key, class T, class Compare >
-// typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
-// {}
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
+{
+  return {const_iterator::get_min_node(dummy_root_->left_), true};
+}
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::begin() const
@@ -92,9 +100,11 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   return {const_iterator::get_min_node(dummy_root_->left_), true};
 }
 
-// template< class Key, class T, class Compare >
-// typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
-// {}
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
+{
+  return {dummy_root_, true};
+}
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
@@ -127,20 +137,20 @@ void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
   dummy_root_->left_ = nullptr;
 }
 
-// template< class Key, class T, class Compare >
-// std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
-//   maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
-// {}
+template< class Key, class T, class Compare >
+std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
+  maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
+{}
 
-// template< class Key, class T, class Compare >
-// typename maslevtsov::Tree< Key, T, Compare >::iterator
-//   maslevtsov::Tree< Key, T, Compare >::erase(typename maslevtsov::Tree< Key, T, Compare >::iterator pos)
-// {}
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator
+  maslevtsov::Tree< Key, T, Compare >::erase(typename maslevtsov::Tree< Key, T, Compare >::iterator pos)
+{}
 
-// template< class Key, class T, class Compare >
-// typename maslevtsov::Tree< Key, T, Compare >::iterator
-//   erase(typename maslevtsov::Tree< Key, T, Compare >::const_iterator pos)
-// {}
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator
+  erase(typename maslevtsov::Tree< Key, T, Compare >::const_iterator pos)
+{}
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::size_type erase(const Key& key)
@@ -162,16 +172,56 @@ typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T
   return 0;
 }
 
-// template< class Key, class T, class Compare >
-// typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find(const Key& key)
-// {}
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find(const Key& key)
+{
+  auto it = find_impl(key);
+  if (it != end()) {
+    return {it.node_, it.is_first_};
+  }
+  return end();
+}
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::find(const Key& key) const
 {
+  auto it = find_impl(key);
+  if (it != end()) {
+    return {it.node_, it.is_first_};
+  }
+  return cend();
+}
+
+template< class Key, class T, class Compare >
+std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator,
+  typename maslevtsov::Tree< Key, T, Compare >::iterator >
+  maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key)
+{}
+
+template< class Key, class T, class Compare >
+std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
+  typename maslevtsov::Tree< Key, T, Compare >::const_iterator >
+  maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key) const
+{}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
+{
+  if (!node) {
+    return;
+  }
+  clear_subtree(node->left_);
+  clear_subtree(node->middle_);
+  clear_subtree(node->right_);
+  delete node;
+}
+
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find_impl(const Key& key)
+{
   if (empty()) {
-    return cend();
+    return end();
   }
   Node* current = dummy_root_->left_;
   while (current) {
@@ -193,31 +243,7 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator
       break;
     }
   }
-  return cend();
-}
-
-// template< class Key, class T, class Compare >
-// std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator,
-//   typename maslevtsov::Tree< Key, T, Compare >::iterator >
-//   maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key)
-// {}
-
-template< class Key, class T, class Compare >
-std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
-  typename maslevtsov::Tree< Key, T, Compare >::const_iterator >
-  maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key) const
-{}
-
-template< class Key, class T, class Compare >
-void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
-{
-  if (!node) {
-    return;
-  }
-  clear_subtree(node->left_);
-  clear_subtree(node->middle_);
-  clear_subtree(node->right_);
-  delete node;
+  return end();
 }
 
 #endif
