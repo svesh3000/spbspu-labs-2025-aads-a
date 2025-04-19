@@ -13,7 +13,8 @@ namespace maslevtsov {
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using const_iterator = TreeIterator< value_type >;
+    using iterator = TreeIterator< value_type, false >;
+    using const_iterator = TreeIterator< value_type, true >;
 
     Tree();
     Tree(const Tree& rhs);
@@ -28,10 +29,10 @@ namespace maslevtsov {
     T& at(const Key& key);
     const T& at(const Key& key) const;
 
-    // iterator begin();
+    iterator begin();
     const_iterator begin() const;
     const_iterator cbegin() const noexcept;
-    // iterator end();
+    iterator end();
     const_iterator end() const;
     const_iterator cend() const noexcept;
 
@@ -39,16 +40,16 @@ namespace maslevtsov {
     size_type size() noexcept;
 
     void clear() noexcept;
-    // std::pair< iterator, bool > insert(const value_type& value);
-    // iterator erase(iterator pos);
-    // iterator erase(const_iterator pos);
+    std::pair< iterator, bool > insert(const value_type& value);
+    iterator erase(iterator pos);
+    iterator erase(const_iterator pos);
     size_type erase(const Key& key);
     void swap(Tree& other) noexcept;
 
     size_type count(const Key& key) const;
-    // iterator find(const Key& key);
+    iterator find(const Key& key);
     const_iterator find(const Key& key) const;
-    // std::pair< iterator, iterator > equal_range(const Key& key);
+    std::pair< iterator, iterator > equal_range(const Key& key);
     std::pair< const_iterator, const_iterator > equal_range(const Key& key) const;
 
   private:
