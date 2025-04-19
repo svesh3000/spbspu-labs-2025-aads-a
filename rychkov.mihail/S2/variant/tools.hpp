@@ -3,30 +3,12 @@
 
 #include <cstddef>
 #include <type_traits.hpp>
+#include <type_tools.hpp>
 
 namespace rychkov
 {
   template< class... Types >
   class Variant;
-
-  namespace details
-  {
-    template< class AlwaysVoid, size_t N, class... Types >
-    struct nth_type
-    {};
-    template< size_t N, class T, class... Types >
-    struct nth_type< std::enable_if_t< (N != 0) && (N <= sizeof...(Types)), void >, N, T, Types... >
-    {
-      using type = typename nth_type< void, N - 1, Types... >::type;
-    };
-    template< class T, class... Types >
-    struct nth_type< void, 0, T, Types... >
-    {
-      using type = T;
-    };
-  }
-  template< size_t N, class... Types >
-  using nth_type_t = typename details::nth_type< void, N, Types... >::type;
 
   template< size_t N, class T >
   struct variant_alternative;
@@ -140,30 +122,6 @@ namespace rychkov
   template< class F, class... Variants >
   constexpr invoke_result_t< F, variant_alternative_t< 0, remove_cvref_t< Variants > >... >
       visit(F&& func, Variants&&... args);
-  namespace details
-  {
-    template< class T, size_t... Lens >
-    struct multidimensional_array;
-    template< class T >
-    struct multidimensional_array< T >
-    {
-      T data;
-      constexpr T operator()() const
-      {
-        return data;
-      }
-    };
-    template< class T, size_t Len, size_t... Lens >
-    struct multidimensional_array< T, Len, Lens... >
-    {
-      multidimensional_array< T, Lens... > data[Len];
-      template< class... Sizes >
-      constexpr T operator()(size_t i, Sizes... sizes) const
-      {
-        return data[i](sizes...);
-      }
-    };
-  }
 }
 
 #endif
