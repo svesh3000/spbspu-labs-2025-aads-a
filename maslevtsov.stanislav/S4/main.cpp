@@ -2,6 +2,7 @@
 #include <fstream>
 #include <limits>
 #include "map_operations.hpp"
+#include "tree/definition.hpp"
 
 int main(int argc, char** argv)
 {

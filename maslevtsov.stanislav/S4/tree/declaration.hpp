@@ -1,6 +1,7 @@
 #ifndef TREE_DECLARATION_HPP
 #define TREE_DECLARATION_HPP
 
+#include <utility>
 #include "tree_iterator.hpp"
 
 namespace maslevtsov {
@@ -40,7 +41,7 @@ namespace maslevtsov {
     void clear() noexcept;
     // std::pair< iterator, bool > insert(const value_type& value);
     // iterator erase(iterator pos);
-    iterator erase(const_iterator pos);
+    // iterator erase(const_iterator pos);
     size_type erase(const Key& key);
     void swap(Tree& other) noexcept;
 
@@ -55,6 +56,7 @@ namespace maslevtsov {
 
     Node* dummy_root_;
     size_type size_;
+    Compare compare_;
 
     void clear_subtree(Node* node) noexcept;
   };

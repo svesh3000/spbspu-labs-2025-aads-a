@@ -2,11 +2,13 @@
 #define TREE_DEFINITION_HPP
 
 #include "declaration.hpp"
+#include <utility>
 
 template< class Key, class T, class Compare >
 maslevtsov::Tree< Key, T, Compare >::Tree():
   dummy_root_(new Node{value_type(), value_type(), nullptr, nullptr, nullptr, nullptr, true}),
-  size_(0)
+  size_(0),
+  compare_(Compare())
 {}
 
 template< class Key, class T, class Compare >
@@ -14,7 +16,7 @@ maslevtsov::Tree< Key, T, Compare >::Tree(const Tree& rhs):
   Tree()
 {
   for (auto it = rhs.cbegin(); it != rhs.cend(); ++it) {
-    insert(std::make_pair(it.first, it.second));
+    insert(std::make_pair(it->first, it->second));
   }
 }
 
@@ -59,13 +61,19 @@ template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::operator[](Key&& key) noexcept
 {}
 
-template< class Key, class T, class Compare >
-T& at(const Key& key)
-{}
+// template< class Key, class T, class Compare >
+// T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
+// {}
 
 template< class Key, class T, class Compare >
 const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
-{}
+{
+  auto it = find(key);
+  if (it != cend()) {
+    return it->second;
+  }
+  throw std::out_of_range("invalid key");
+}
 
 // template< class Key, class T, class Compare >
 // typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
@@ -147,7 +155,12 @@ void maslevtsov::Tree< Key, T, Compare >::swap(Tree& other) noexcept
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::count(const Key& key) const
-{}
+{
+  if (find(key) != cend()) {
+    return 1;
+  }
+  return 0;
+}
 
 // template< class Key, class T, class Compare >
 // typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find(const Key& key)
@@ -156,7 +169,32 @@ typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::find(const Key& key) const
-{}
+{
+  if (empty()) {
+    return cend();
+  }
+  Node* current = dummy_root_->left_;
+  while (current) {
+    if (current->left_ && current->middle_ && current->right_) {
+      if (compare_(key, current->data1_.first)) {
+        current = current->left;
+      } else if (!current->is_two && compare_(key, current->data2_.first)) {
+        current = current->middle;
+      } else {
+        current = current->right;
+      }
+    } else {
+      if (!compare_(key, current->data1_.first) && !compare_(current->data1_.first, key)) {
+        return {current, true};
+      }
+      if (!current->is_two && !compare_(key, current->data2_.first) && !compare_(current->data2_.first, key)) {
+        return {current, false};
+      }
+      break;
+    }
+  }
+  return cend();
+}
 
 // template< class Key, class T, class Compare >
 // std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator,

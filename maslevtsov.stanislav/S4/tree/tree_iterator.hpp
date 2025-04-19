@@ -5,13 +5,11 @@
 #include "tree_node.hpp"
 
 namespace maslevtsov {
-  template< class Key, class T, class Compare = std::less< Key > >
-  class Tree;
-
   template< class T >
   class TreeIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
+    template< class Key, class Type, class Compare >
     friend class Tree;
 
     TreeIterator();
@@ -48,7 +46,7 @@ namespace maslevtsov {
   typename TreeIterator< T >::TreeIterator& TreeIterator< T >::operator++()
   {
     if (!(node_->is_two) && is_first_) {
-      TwoThreeTreeNode< T >* min_node = get_min_node(node_->middle_);
+      TreeNode< T >* min_node = get_min_node(node_->middle_);
       if (!min_node) {
         is_first_ = false;
       } else {
@@ -56,7 +54,7 @@ namespace maslevtsov {
       }
       return *this;
     }
-    TwoThreeTreeNode< T >* min_node = get_min_node(node_->right_);
+    TreeNode< T >* min_node = get_min_node(node_->right_);
     if (!min_node) {
       if (node_->parent_) {
         while (node_->parent_ && node_->parent_->right_ == node_) {
@@ -80,7 +78,7 @@ namespace maslevtsov {
   template< class T >
   typename TreeIterator< T >::TreeIterator& TreeIterator< T >::operator++(int)
   {
-    TwoThreeIterator< T > result(*this);
+    TreeIterator< T > result(*this);
     ++(*this);
     return result;
   }
@@ -89,7 +87,7 @@ namespace maslevtsov {
   typename TreeIterator< T >::TreeIterator& TreeIterator< T >::operator--()
   {
     if (!(node_->is_two) && !is_first_) {
-      TwoThreeTreeNode< T >* max_node = get_max_node(node_->middle_);
+      TreeNode< T >* max_node = get_max_node(node_->middle_);
       if (!max_node) {
         is_first_ = true;
       } else {
@@ -97,7 +95,7 @@ namespace maslevtsov {
       }
       return *this;
     }
-    TwoThreeTreeNode< T >* max_node = get_max_node(node_->left_);
+    TreeNode< T >* max_node = get_max_node(node_->left_);
     if (!max_node) {
       if (node_->parent_) {
         while (node_->parent_ && node_->parent_->left_ == node_) {
@@ -129,19 +127,19 @@ namespace maslevtsov {
   template< class T >
   const T& TreeIterator< T >::operator*() const
   {
-    return (is_first_) ? node_->data1_ : node_->data2_;
+    return is_first_ ? node_->data1_ : node_->data2_;
   }
 
   template< class T >
   const T* TreeIterator< T >::operator->() const
   {
-    return (is_first_) ? std::addressof(node_->data1_) : std::addressof(node_->data2_);
+    return is_first_ ? std::addressof(node_->data1_) : std::addressof(node_->data2_);
   }
 
   template< class T >
   bool TreeIterator< T >::operator==(const TreeIterator& rhs) const
   {
-    return node_ == other.node_ && (node_ == nullptr || is_first_ == other.is_first_);
+    return node_ == rhs.node_ && (!node_ || is_first_ == rhs.is_first_);
   }
 
   template< class T >
@@ -159,7 +157,7 @@ namespace maslevtsov {
   template< class T >
   TreeIterator< T >* TreeIterator< T >::get_min_node(TreeIterator< T >* node)
   {
-    TwoThreeTreeNode< T >* result = node;
+    TreeNode< T >* result = node;
     while (result && result->left_) {
       result = result->left_;
     }
@@ -169,7 +167,7 @@ namespace maslevtsov {
   template< class T >
   TreeIterator< T >* TreeIterator< T >::get_max_node(TreeIterator< T >* node)
   {
-    TwoThreeTreeNode< T >* result = node;
+    TreeNode< T >* result = node;
     while (result && result->right_) {
       result = result->right_;
     }
