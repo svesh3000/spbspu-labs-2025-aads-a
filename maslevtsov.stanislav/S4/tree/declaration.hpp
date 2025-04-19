@@ -1,5 +1,5 @@
-#ifndef TWO_THREE_TREE_DECLARATION_HPP
-#define TWO_THREE_TREE_DECLARATION_HPP
+#ifndef TREE_DECLARATION_HPP
+#define TREE_DECLARATION_HPP
 
 #include "tree_iterator.hpp"
 
