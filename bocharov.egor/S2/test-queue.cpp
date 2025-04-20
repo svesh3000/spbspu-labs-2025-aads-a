@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include "queue.hpp"
+
 BOOST_AUTO_TEST_SUITE(queue)
 
 BOOST_AUTO_TEST_CASE(constructors)
@@ -14,7 +15,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(moveQueue.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(operators)
+BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   bocharov::Queue< int > queue;
   bocharov::Queue< int > queue2;

@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(moveStack.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(operators)
+BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   bocharov::Stack< int > stack;
   bocharov::Stack< int > stack2;
@@ -34,10 +34,10 @@ BOOST_AUTO_TEST_CASE(back_and_push_and_pop)
   stack.push(1);
   int i = 5;
   stack.push(i);
-  const int a = stack.back();
+  const int a = stack.top();
   BOOST_TEST(a == 5);
   stack.pop();
-  BOOST_TEST(stack.back() == 1);
+  BOOST_TEST(stack.top() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(empty_and_size_and_clear)
