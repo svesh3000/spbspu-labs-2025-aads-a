@@ -4,11 +4,17 @@
 #include "declaration.hpp"
 #include <memory>
 
-template< class Key, class Value, class Compare >
-typename rychkov::Map< Key, Value, Compare >::node_type*
-    rychkov::Map< Key, Value, Compare >::fake_root() noexcept
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::node_type*
+    rychkov::Map< Key, Mapped, Compare, N >::fake_root() noexcept
 {
-  return getFakePointer(fake_left_, &node_type::left);
+  return getFakePointer(fake_parent_, &node_type::parent_);
+}
+template< class Key, class Mapped, class Compare, size_t N >
+const typename rychkov::Map< Key, Mapped, Compare, N >::node_type*
+    rychkov::Map< Key, Mapped, Compare, N >::fake_root() const noexcept
+{
+  return getFakePointer(fake_parent_, &node_type::parent_);
 }
 
 #endif

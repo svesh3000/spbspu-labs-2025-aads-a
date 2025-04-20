@@ -1,10 +1,10 @@
 #ifndef DECLARATION_HPP
 #define DECLARATION_HPP
 
-#include <cstddef>
 #include <functional>
-#include <utility>
+#include <memory>
 #include <type_traits.hpp>
+#include "node.hpp"
 
 namespace rychkov
 {
@@ -21,26 +21,16 @@ namespace rychkov
     return reinterpret_cast< Base* >(reinterpret_cast< char* >(std::addressof(fakeMember)) - offset);
   }
 
-  template< class Key, class Value >
-  struct MapNode
-  {
-    std::pair< Key, Value > data;
-    MapNode* left = nullptr;
-    MapNode* right = nullptr;
-    MapNode* parent = nullptr;
-    MapNode* second_part = nullptr;
-  };
-
-  template< class Key, class Value, bool isConst, bool isReversed >
+  template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
   class MapIterator;
 
-  template< class Key, class Value, class Compare = std::less<> >
+  template< class Key, class Mapped, class Compare = std::less<>, size_t N = 2 >
   class Map
   {
   public:
     using key_type = Key;
-    using mapped_type = Value;
-    using value_type = std::pair< const Key, Value >;
+    using mapped_type = Mapped;
+    using value_type = std::pair< const Key, Mapped >;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
     using key_compare = Compare;
@@ -50,10 +40,10 @@ namespace rychkov
     using pointer = value_type*;
     using const_pointer = const value_type*;
 
-    using iterator = MapIterator< Key, Value, false, false >;
-    using const_iterator = MapIterator< Key, Value, false, false >;
-    using reverse_iterator = MapIterator< Key, Value, false, false >;
-    using const_reverse_iterator = MapIterator< Key, Value, false, false >;
+    using iterator = MapIterator< key_type, mapped_type, N, false, false >;
+    using const_iterator = MapIterator< key_type, mapped_type, N, true, false >;
+    using reverse_iterator = MapIterator< key_type, mapped_type, N, false, true >;
+    using const_reverse_iterator = MapIterator< key_type, mapped_type, N, true, true >;
 
     struct value_compare
     {
@@ -98,19 +88,21 @@ namespace rychkov
 
     key_compare key_comp() const;
     value_compare value_comp() const;
-    MapNode< Key, Value >* fake_root() noexcept;
-    const MapNode< Key, Value >* fake_root() const noexcept;
+    static constexpr size_t node_capacity = N;
+    using node_type = MapNode< key_type, mapped_type, node_capacity >;
+    node_type* fake_root() noexcept;
+    const node_type* fake_root() const noexcept;
   private:
-    using node_type = MapNode< Key, Value >;
-    node_type* fake_left_;
-    node_type* fake_right_;
-    node_type* fake_parent_;
-    node_type* fake_second_part_;
+    typename node_type::size_type fake_size_ = 0;
+    typename node_type::size_type fake_real_places_[node_capacity];
+    node_type* fake_parent_ = nullptr;
+    node_type* fake_children_[node_capacity + 1];
     size_t size_;
     value_compare comp_;
 
     const_iterator find_hint(const key_type& key);
     void place_node(const_iterator hint, node_type* node);
+    void destroy_subtree(node_type* node);
   };
 }
 

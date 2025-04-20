@@ -3,78 +3,61 @@
 
 #include "declaration.hpp"
 
-template< class Key, class Value, class Compare >
-rychkov::Map< Key, Value, Compare >::Map()
+template< class Key, class Value, class Compare, size_t N >
+rychkov::Map< Key, Value, Compare, N >::Map()
     noexcept(std::is_nothrow_default_constructible< value_compare >::value):
-  fake_left_(nullptr),
-  fake_right_(nullptr),
   fake_parent_(nullptr),
-  fake_second_part_(nullptr),
+  fake_children_{},
   size_(0),
   comp_()
 {}
-template< class Key, class Value, class Compare >
-rychkov::Map< Key, Value, Compare >::Map(Map&& rhs)
+template< class Key, class Value, class Compare, size_t N >
+rychkov::Map< Key, Value, Compare, N >::Map(Map&& rhs)
     noexcept(std::is_nothrow_move_constructible< value_compare >::value):
-  fake_left_(std::exchange(rhs.fake_left_, nullptr)),
-  fake_right_(nullptr),
   fake_parent_(std::exchange(rhs.fake_parent_, nullptr)),
-  fake_second_part_(nullptr),
+  fake_children_(rhs.fake_children_),
   size_(std::exchange(rhs.size_, 0)),
   comp_(std::move(rhs.comp_))
 {}
-template< class Key, class Value, class Compare >
-rychkov::Map< Key, Value, Compare >&
-    rychkov::Map< Key, Value, Compare >::operator=(Map&& rhs) noexcept(noexcept(swap(std::declval< Map >())))
+template< class Key, class Value, class Compare, size_t N >
+rychkov::Map< Key, Value, Compare, N >&
+    rychkov::Map< Key, Value, Compare, N >::operator=(Map&& rhs) noexcept(noexcept(swap(std::declval< Map >())))
 {
   Map temp = std::move(*this);
   swap(rhs);
   return *this;
 }
-template< class Key, class Value, class Compare >
-rychkov::Map< Key, Value, Compare >::~Map()
+template< class Key, class Value, class Compare, size_t N >
+rychkov::Map< Key, Value, Compare, N >::~Map()
 {
   clear();
 }
-template< class Key, class Value, class Compare >
-void rychkov::Map< Key, Value, Compare >::swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_type >)
+template< class Key, class Value, class Compare, size_t N >
+void rychkov::Map< Key, Value, Compare, N >::swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_type >)
 {
-  std::swap(fake_left_, rhs.fake_left_);
-  std::swap(fake_parent_, rhs.fake_parent_);
-  std::swap(size_, rhs.size_);
   std::swap(comp_, rhs.comp_);
+  std::swap(fake_parent_, rhs.fake_parent_);
+  std::swap(fake_children_[0], rhs.fake_children_[0]);
+  std::swap(fake_children_[node_capacity], rhs.fake_children_[node_capacity]);
+  std::swap(size_, rhs.size_);
 }
-template< class Key, class Value, class Compare >
-void rychkov::Map< Key, Value, Compare >::clear()
+template< class Key, class Value, class Compare, size_t N >
+void rychkov::Map< Key, Value, Compare, N >::clear()
 {
-  while (fake_left_)
+  destroy_subtree(fake_root());
+}
+template< class Key, class Value, class Compare, size_t N >
+void rychkov::Map< Key, Value, Compare, N >::destroy_subtree(node_type* node)
+{
+  if (node == nullptr)
   {
-    if (fake_left_->left != nullptr)
-    {
-      fake_left_ = fake_left_->left;
-    }
-    else if (fake_left_->right != nullptr)
-    {
-      fake_left_ = fake_left_->right;
-    }
-    else if (fake_left_->second_part != nullptr)
-    {
-      if (fake_left_->second_part->right != nullptr)
-      {
-        fake_left_ = fake_left_->second_part->right;
-      }
-      else
-      {
-        delete fake_left_->second_part;
-        fake_left_->second_part = nullptr;
-      }
-    }
-    else
-    {
-      node_type* temp = fake_left_;
-      fake_left_ = fake_left_->parent;
-      delete temp;
-    }
+    return;
+  }
+  for (typename node_type::size_type i = 0; i < node->size(); i++)
+  {
+    node_type* child = node->getChild(i);
+    destroy_subtree(child);
+    delete child;
   }
 }
 

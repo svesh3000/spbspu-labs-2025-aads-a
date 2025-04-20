@@ -4,106 +4,95 @@
 #include "declaration.hpp"
 #include <iterator>
 
-template< class Key, class Value, bool isConst, bool isReversed >
+template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
 class rychkov::MapIterator
 {
 public:
   using difference_type = ptrdiff_t;
-  using value_type = std::pair< Key, Value >;
+  using value_type = std::pair< Key, Mapped >;
   using pointer = value_type*;
   using reference = value_type&;
   using iterator_category = std::bidirectional_iterator_tag;
 
   MapIterator() noexcept:
-    node_(nullptr)
-  {}
-
-  template< class = std::enable_if_t< !isConst > >
-  MapIterator(MapIterator< Key, Value, false, isReversed > rhs) noexcept:
-    node_(rhs.node_)
+    node_(nullptr),
+    pointed_(0)
+  {};
+  template< bool isConst1 = isConst >
+  MapIterator(typename std::enable_if_t< isConst && isConst1,
+        MapIterator< Key, Mapped, N, false, isReversed > > rhs) noexcept:
+    node_(rhs.node_),
+    pointed_(rhs.pointed_)
   {}
 
   bool operator==(MapIterator rhs) const noexcept
   {
-    return node_ == rhs.node_;
+    return (node_ == rhs.node_) && (pointed_ == rhs.pointed_);
   }
   bool operator!=(MapIterator rhs) const noexcept
   {
-    return !(*this == rhs);
+    return !operator==(rhs);
   }
 
   MapIterator& operator++() noexcept
   {
-    if (isReversed)
-    {
-      shiftLeft();
-    }
-    else
-    {
-      shiftRight();
-    }
-    return *this;
+    isReversed ? shiftLeft() : shiftRight();
   }
   MapIterator operator++(int) noexcept
   {
     MapIterator temp = *this;
-    ++(*this);
+    operator++();
     return temp;
   }
   MapIterator& operator--() noexcept
   {
-    if (isReversed)
-    {
-      shiftRight();
-    }
-    else
-    {
-      shiftLeft();
-    }
-    return *this;
+    isReversed ? shiftLeft() : shiftRight();
   }
   MapIterator operator--(int) noexcept
   {
     MapIterator temp = *this;
-    --(*this);
+    operator++();
     return temp;
   }
 
-  template< class = std::enable_if_t< !isConst > >
-  value_type& operator*() noexcept
+  template< bool isConst1 = isConst >
+  typename std::enable_if_t< !isConst && !isConst1, value_type& > operator*() noexcept
   {
-    return node_->data;
+    return node_->operator[](pointed_);
   }
   const value_type& operator*() const noexcept
   {
-    return node_->data;
+    return node_->operator[](pointed_);
   }
-  template< class = std::enable_if_t< !isConst > >
-  value_type* operator->() noexcept
+
+  template< bool isConst1 = isConst >
+  typename std::enable_if_t< !isConst && !isConst1, value_type* > operator->() noexcept
   {
-    return std::addressof(node_->data);
+    return std::addressof(node_->operator[](pointed_));
   }
   const value_type* operator->() const noexcept
   {
-    return std::addressof(node_->data);
+    return std::addressof(node_->operator[](pointed_));
   }
 private:
-  template< class K, class V, class C >
+  template< class K, class M, class C, size_t N1 >
   friend class Map;
-  friend class MapIterator< Key, Value, true, isReversed >;
+  friend class MapIterator< Key, Mapped, N, true, isReversed >;
 
-  using node_type = MapNode< Key, Value >;
+  using node_type = MapNode< Key, Mapped, N >;
   node_type* node_;
+  typename node_type::size_type pointed_;
 
-  MapIterator(node_type* data) noexcept:
-    node_(data)
+  MapIterator(node_type* node, typename node_type::size_type pointed) noexcept:
+    node_(node),
+    pointed_(pointed)
   {}
   void shiftLeft() noexcept;
   void shiftRight() noexcept;
 };
 
-template< class Key, class Value, bool isConst, bool isReversed >
-void rychkov::MapIterator< Key, Value, isConst, isReversed >::shiftLeft() noexcept
+template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
+void rychkov::MapIterator< Key, Mapped, N, isConst, isReversed >::shiftLeft() noexcept
 {
   /*if (node_->parent != nullptr)
   {
@@ -124,8 +113,8 @@ void rychkov::MapIterator< Key, Value, isConst, isReversed >::shiftLeft() noexce
     node_ = node_->second_part == nullptr ? node_->second_part->right : node_->right;
   }*/
 }
-template< class Key, class Value, bool isConst, bool isReversed >
-void rychkov::MapIterator< Key, Value, isConst, isReversed >::shiftRight() noexcept
+template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
+void rychkov::MapIterator< Key, Mapped, N, isConst, isReversed >::shiftRight() noexcept
 {
   /*if (!isLeftActive_)
   {
