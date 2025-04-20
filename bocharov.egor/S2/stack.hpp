@@ -1,7 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include <sys/types.h>
 #include "array.hpp"
 
 namespace bocharov
@@ -10,19 +9,10 @@ namespace bocharov
   class Stack
   {
   public:
-
-    Stack() = default;
-    Stack(const Stack< T > &);
-    Stack(Stack< T > &&) noexcept;
-    ~Stack() = default;
-
-    Stack< T > & operator=(const Stack< T > &);
-    Stack< T > & operator=(Stack< T > &&) noexcept;
-
-    T & back();
-    const T & back() const;
+    T & top();
+    const T & top() const;
     void pop() noexcept;
-    void push(T &) noexcept;
+    void push(const T &) noexcept;
     void push(T &&) noexcept;
 
     size_t size() const noexcept;
@@ -30,42 +20,17 @@ namespace bocharov
     void clear() noexcept;
 
   private:
-
     Array< T > arr_;
   };
 
   template< typename T >
-  Stack< T >::Stack(const Stack< T > & stack):
-    arr_(stack.arr_)
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(Stack< T > && stack) noexcept:
-    arr_(std::move(stack.arr_))
-  {}
-
-  template< typename T >
-  Stack< T > & Stack< T >::operator=(const Stack< T > & stack)
-  {
-    arr_ = stack.arr_;
-    return *this;
-  }
-
-  template< typename T >
-  Stack< T > & Stack< T >::operator=(Stack< T > && stack) noexcept
-  {
-    arr_ = std::move(stack.arr_);
-    return *this;
-  }
-
-  template< typename T >
-  T & Stack< T >::back()
+  T & Stack< T >::top()
   {
     return arr_.back();
   }
 
   template< typename T >
-  const T & Stack< T >::back() const
+  const T & Stack< T >::top() const
   {
     return arr_.back();
   }
@@ -77,7 +42,7 @@ namespace bocharov
   }
 
   template< typename T >
-  void Stack< T >::push(T & data) noexcept
+  void Stack< T >::push(const T & data) noexcept
   {
     arr_.push(data);
   }
@@ -85,7 +50,7 @@ namespace bocharov
   template< typename T >
   void Stack< T >::push(T && data) noexcept
   {
-    return arr_.push(data);
+    return arr_.push(std::move(data));
   }
 
   template< typename T >
