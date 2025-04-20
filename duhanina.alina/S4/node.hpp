@@ -1,7 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include <cstddef>
 #include <utility>
 
 namespace duhanina
@@ -13,7 +12,7 @@ namespace duhanina
     Node* left;
     Node* right;
     Node* parent;
-    size_t height;
+    int height;
 
     Node(const Key& k, const Value& v, Node* p);
   };
