@@ -154,7 +154,9 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::erase(const Key& key)
-{}
+{
+  return 0;
+}
 
 template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::swap(Tree& other) noexcept
