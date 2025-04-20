@@ -1,10 +1,7 @@
 #ifndef DYNAMICARR_HPP
 #define DYNAMICARR_HPP
 
-#include <cstddef>
-#include <new>
 #include <stdexcept>
-#include <type_traits>
 #include <utility>
 
 namespace bocharov
@@ -28,7 +25,7 @@ namespace bocharov
     const T & front() const;
     void popBack();
     void popFront();
-    void push(T &) noexcept;
+    void push(const T &) noexcept;
     void push(T &&) noexcept;
     void clear() noexcept;
 
@@ -102,9 +99,10 @@ namespace bocharov
         data_[i] = new T(*arr.data_[i + begin_]);
       }
     }
-    catch (const std::bad_alloc &)
+    catch (...)
     {
       clear();
+      delete[] data_;
       throw;
     }
   }
@@ -205,7 +203,7 @@ namespace bocharov
   }
 
   template< typename T >
-  void Array< T >::push(T & data) noexcept
+  void Array< T >::push(const T & data) noexcept
   {
     if (size_ >= capacity_)
     {
