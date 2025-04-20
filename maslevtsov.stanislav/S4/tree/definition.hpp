@@ -149,11 +149,11 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator
-  erase(typename maslevtsov::Tree< Key, T, Compare >::const_iterator pos)
+  maslevtsov::Tree< Key, T, Compare >::erase(typename maslevtsov::Tree< Key, T, Compare >::const_iterator pos)
 {}
 
 template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::size_type erase(const Key& key)
+typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::erase(const Key& key)
 {}
 
 template< class Key, class T, class Compare >
@@ -225,22 +225,18 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
   }
   Node* current = dummy_root_->left_;
   while (current) {
-    if (current->left_ && current->middle_ && current->right_) {
-      if (compare_(key, current->data1_.first)) {
-        current = current->left;
-      } else if (!current->is_two && compare_(key, current->data2_.first)) {
-        current = current->middle;
-      } else {
-        current = current->right;
-      }
+    if (!compare_(key, current->data1_.first) && !compare_(current->data1_.first, key)) {
+      return {current, 1};
+    }
+    if (!(current->is_two) && !compare_(key, current->data2_.first) && !compare_(current->data2_.first, key)) {
+      return {current, 0};
+    }
+    if (compare_(key, current->data1_.first)) {
+      current = current->left_;
+    } else if (!(current->is_two) && compare_(key, current->data2_.first)) {
+      current = current->middle_;
     } else {
-      if (!compare_(key, current->data1_.first) && !compare_(current->data1_.first, key)) {
-        return {current, true};
-      }
-      if (!current->is_two && !compare_(key, current->data2_.first) && !compare_(current->data2_.first, key)) {
-        return {current, false};
-      }
-      break;
+      current = current->right_;
     }
   }
   return end();
