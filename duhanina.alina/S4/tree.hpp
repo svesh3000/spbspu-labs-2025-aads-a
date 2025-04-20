@@ -9,20 +9,20 @@
 namespace duhanina
 {
   template < typename Key, typename Value, typename Compare >
-  class BinarySearchTree
+  class Tree
   {
   public:
     using Node_t = Node< Key, Value >;
     using Iterator_t = Iterator< Key, Value, Compare >;
     using ConstIterator_t = ConstIterator< Key, Value, Compare >;
 
-    BinarySearchTree();
-    BinarySearchTree(const BinarySearchTree& other);
-    BinarySearchTree(BinarySearchTree&& other) noexcept;
-    ~BinarySearchTree();
+    Tree();
+    Tree(const Tree& other);
+    Tree(Tree&& other) noexcept;
+    ~Tree();
 
-    BinarySearchTree& operator=(const BinarySearchTree& other);
-    BinarySearchTree& operator=(BinarySearchTree&& other) noexcept;
+    Tree& operator=(const Tree& other);
+    Tree& operator=(Tree&& other) noexcept;
 
     Iterator_t begin() const noexcept;
     ConstIterator_t cbegin() const noexcept;
@@ -37,7 +37,7 @@ namespace duhanina
     bool empty() const;
 
     void clear();
-    void swap(BinarySearchTree& other);
+    void swap(Tree& other);
 
     Iterator_t insert(const std::pair< const Key, Value >& value);
     Iterator_t insert(std::pair< const Key, Value >&& value);
@@ -85,8 +85,6 @@ namespace duhanina
     Node_t* findNextNode(Node_t* node) const;
   };
 
-  using Tree = BinarySearchTree;
-
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree():
     fakeRoot_(new Node_t(Key(), Value(), nullptr)),
@@ -111,14 +109,14 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::~Tree()
+  Tree< Key, Value, Compare >::~Tree< Key, Value, Compare >()
   {
     clear();
     delete fakeRoot_;
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree& other)
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree< Key, Value, Compare >& other)
   {
     if (this != std::addressof(other))
     {
@@ -130,7 +128,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other) noexcept
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
@@ -224,7 +222,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::swap(Tree& other)
+  void Tree< Key, Value, Compare >::swap(Tree< Key, Value, Compare >& other)
   {
     std::swap(fakeRoot_, other.fakeRoot_);
     std::swap(size_, other.size_);

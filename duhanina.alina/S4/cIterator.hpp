@@ -9,7 +9,7 @@
 namespace duhanina
 {
   template < typename Key, typename Value, typename Compare >
-  class BinarySearchTree;
+  class Tree;
 
   template < typename Key, typename Value, typename Compare >
   class ConstIterator: public std::iterator< std::bidirectional_iterator_tag, std::pair< const Key, Value > >
@@ -31,7 +31,7 @@ namespace duhanina
 
   private:
     const Node< Key, Value >* current_;
-    friend class BinarySearchTree< Key, Value, Compare >;
+    friend class Tree< Key, Value, Compare >;
   };
 
   template < typename Key, typename Value, typename Compare >

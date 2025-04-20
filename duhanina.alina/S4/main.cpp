@@ -5,8 +5,8 @@
 #include "tree.hpp"
 
 
-using Dictionary = duhanina::BinarySearchTree< size_t, std::string, std::less< size_t > >;
-using DictionaryStorage = duhanina::BinarySearchTree< std::string, Dictionary, std::less< std::string > >;
+using Dictionary = duhanina::Tree< size_t, std::string, std::less< size_t > >;
+using DictionaryStorage = duhanina::Tree< std::string, Dictionary, std::less< std::string > >;
 
 namespace
 {
