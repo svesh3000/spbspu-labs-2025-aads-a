@@ -85,14 +85,16 @@ namespace duhanina
     Node_t* findNextNode(Node_t* node) const;
   };
 
+  using Tree = BinarySearchTree;
+
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >::BinarySearchTree():
+  Tree< Key, Value, Compare >::Tree():
     fakeRoot_(new Node_t(Key(), Value(), nullptr)),
     size_(0)
   {}
 
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >::BinarySearchTree(const BinarySearchTree& other):
+  Tree< Key, Value, Compare >::Tree(const Tree& other):
     fakeRoot_(new Node_t(Key(), Value(), nullptr)),
     size_(other.size_)
   {
@@ -100,7 +102,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >::BinarySearchTree(BinarySearchTree&& other) noexcept:
+  Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
     fakeRoot_(other.fakeRoot_),
     size_(other.size_)
   {
@@ -109,14 +111,14 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >::~BinarySearchTree()
+  Tree< Key, Value, Compare >::~Tree()
   {
     clear();
     delete fakeRoot_;
   }
 
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >& BinarySearchTree< Key, Value, Compare >::operator=(const BinarySearchTree& other)
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree& other)
   {
     if (this != std::addressof(other))
     {
@@ -128,7 +130,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  BinarySearchTree< Key, Value, Compare >& BinarySearchTree< Key, Value, Compare >::operator=(BinarySearchTree&& other) noexcept
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other) noexcept
   {
     if (this != std::addressof(other))
     {
@@ -143,7 +145,7 @@ namespace duhanina
   }
 
   template< typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::begin() const noexcept
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::begin() const noexcept
   {
     if (empty())
     {
@@ -153,7 +155,7 @@ namespace duhanina
   }
 
   template< typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::ConstIterator_t BinarySearchTree< Key, Value, Compare >::cbegin() const noexcept
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::cbegin() const noexcept
   {
     if (empty())
     {
@@ -163,26 +165,26 @@ namespace duhanina
   }
 
   template< typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::end() const noexcept
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::end() const noexcept
   {
     return Iterator_t(fakeRoot_);
   }
 
   template< typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::ConstIterator_t BinarySearchTree< Key, Value, Compare >::cend() const noexcept
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::cend() const noexcept
   {
     return ConstIterator_t(fakeRoot_);
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::push(const Key& k, const Value& v)
+  void Tree< Key, Value, Compare >::push(const Key& k, const Value& v)
   {
     setRoot(insert(getRoot(), k, v, fakeRoot_));
     size_++;
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value BinarySearchTree< Key, Value, Compare >::get(const Key& k) const
+  Value Tree< Key, Value, Compare >::get(const Key& k) const
   {
     Node_t* node = find(getRoot(), k);
     if (!node)
@@ -193,7 +195,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value BinarySearchTree< Key, Value, Compare >::drop(const Key& k)
+  Value Tree< Key, Value, Compare >::drop(const Key& k)
   {
     Value value = get(k);
     setRoot(remove(getRoot(), k));
@@ -202,19 +204,19 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  size_t BinarySearchTree< Key, Value, Compare >::size() const
+  size_t Tree< Key, Value, Compare >::size() const
   {
     return size_;
   }
 
   template < typename Key, typename Value, typename Compare >
-  bool BinarySearchTree< Key, Value, Compare >::empty() const
+  bool Tree< Key, Value, Compare >::empty() const
   {
     return size_ == 0;
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::clear()
+  void Tree< Key, Value, Compare >::clear()
   {
     clear(getRoot());
     setRoot(nullptr);
@@ -222,21 +224,21 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::swap(BinarySearchTree& other)
+  void Tree< Key, Value, Compare >::swap(Tree& other)
   {
     std::swap(fakeRoot_, other.fakeRoot_);
     std::swap(size_, other.size_);
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::insert(const std::pair< const Key, Value >& value)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::insert(const std::pair< const Key, Value >& value)
   {
     push(value.first, value.second);
     return Iterator_t(find(getRoot(), value.first));
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::insert(std::pair< const Key, Value >&& value)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::insert(std::pair< const Key, Value >&& value)
   {
     push(std::move(value.first), std::move(value.second));
     return Iterator_t(find(getRoot(), value.first));
@@ -244,7 +246,7 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   template< typename InputIt >
-  void BinarySearchTree< Key, Value, Compare >::insert(InputIt first, InputIt last)
+  void Tree< Key, Value, Compare >::insert(InputIt first, InputIt last)
   {
     for (auto it = first; it != last; ++it)
     {
@@ -253,7 +255,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::erase(Iterator_t pos) noexcept
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::erase(Iterator_t pos) noexcept
   {
     if (pos == end() || pos.current_ == nullptr)
     {
@@ -273,7 +275,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  size_t BinarySearchTree< Key, Value, Compare >::erase(const Key& key) noexcept
+  size_t Tree< Key, Value, Compare >::erase(const Key& key) noexcept
   {
     Iterator_t it = find(key);
     if (it != end())
@@ -285,7 +287,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::erase(Iterator_t first, Iterator_t last) noexcept
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::erase(Iterator_t first, Iterator_t last) noexcept
   {
     while (first != last)
     {
@@ -295,7 +297,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& BinarySearchTree< Key, Value, Compare >::at(const Key& key)
+  Value& Tree< Key, Value, Compare >::at(const Key& key)
   {
     Node_t* node = find(getRoot(), key);
     if (!node)
@@ -306,7 +308,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  const Value& BinarySearchTree< Key, Value, Compare >::at(const Key& key) const
+  const Value& Tree< Key, Value, Compare >::at(const Key& key) const
   {
     Node_t* node = find(getRoot(), key);
     if (!node)
@@ -317,7 +319,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& BinarySearchTree< Key, Value, Compare >::operator[](const Key& key)
+  Value& Tree< Key, Value, Compare >::operator[](const Key& key)
   {
     Node_t* node = find(getRoot(), key);
     if (!node)
@@ -329,7 +331,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& BinarySearchTree< Key, Value, Compare >::operator[](Key&& key)
+  Value& Tree< Key, Value, Compare >::operator[](Key&& key)
   {
     Node_t* node = find(getRoot(), key);
     if (!node)
@@ -341,7 +343,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  size_t BinarySearchTree< Key, Value, Compare >::count(const Key& key) const
+  size_t Tree< Key, Value, Compare >::count(const Key& key) const
   {
     if (find(getRoot(), key))
     {
@@ -352,7 +354,7 @@ namespace duhanina
 
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::find(const Key& key) noexcept
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::find(const Key& key) noexcept
   {
     Node_t* node = find(getRoot(), key);
     if (node != nullptr)
@@ -366,7 +368,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::ConstIterator_t BinarySearchTree< Key, Value, Compare >::find(const Key& key) const noexcept
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::find(const Key& key) const noexcept
   {
     const Node_t* node = find(getRoot(), key);
     if (node != nullptr)
@@ -380,21 +382,21 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< typename BinarySearchTree< Key, Value, Compare >::Node_t*, typename BinarySearchTree< Key, Value, Compare >::Node_t* >
-    BinarySearchTree< Key, Value, Compare >::equal_range(const Key& key)
+  std::pair< typename Tree< Key, Value, Compare >::Node_t*, typename Tree< Key, Value, Compare >::Node_t* >
+    Tree< Key, Value, Compare >::equal_range(const Key& key)
   {
     return { lower_bound(key), upper_bound(key) };
   }
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< const typename BinarySearchTree< Key, Value, Compare >::Node_t*, const typename BinarySearchTree< Key, Value, Compare >::Node_t* >
-    BinarySearchTree< Key, Value, Compare >::equal_range(const Key& key) const
+  std::pair< const typename Tree< Key, Value, Compare >::Node_t*, const typename Tree< Key, Value, Compare >::Node_t* >
+    Tree< Key, Value, Compare >::equal_range(const Key& key) const
   {
     return { lower_bound(key), upper_bound(key) };
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::lower_bound(const Key& key)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key)
   {
     Node_t* current = getRoot();
     Node_t* result = nullptr;
@@ -421,7 +423,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::ConstIterator_t BinarySearchTree< Key, Value, Compare >::lower_bound(const Key& key) const
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key) const
   {
     const Node_t* current = getRoot();
     const Node_t* result = nullptr;
@@ -448,7 +450,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Iterator_t BinarySearchTree< Key, Value, Compare >::upper_bound(const Key& key)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key)
   {
     Node_t* current = getRoot();
     Node_t* result = nullptr;
@@ -475,7 +477,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::ConstIterator_t BinarySearchTree< Key, Value, Compare >::upper_bound(const Key& key) const
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key) const
   {
     const Node_t* current = getRoot();
     const Node_t* result = nullptr;
@@ -502,13 +504,13 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::getRoot() const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::getRoot() const
   {
     return fakeRoot_->left;
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::setRoot(Node_t* newRoot)
+  void Tree< Key, Value, Compare >::setRoot(Node_t* newRoot)
   {
     fakeRoot_->left = newRoot;
     if (newRoot)
@@ -518,7 +520,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::updateHeight(Node_t* node)
+  void Tree< Key, Value, Compare >::updateHeight(Node_t* node)
   {
     if (node == nullptr)
     {
@@ -538,7 +540,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  int BinarySearchTree< Key, Value, Compare >::getBalance(Node_t* node)
+  int Tree< Key, Value, Compare >::getBalance(Node_t* node)
   {
     if (!node)
     {
@@ -558,7 +560,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::rotateRight(Node_t* root)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateRight(Node_t* root)
   {
     Node_t* leftChild = root->left;
     Node_t* leftRightSubtree = leftChild->right;
@@ -576,7 +578,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::rotateLeft(Node_t* root)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateLeft(Node_t* root)
   {
     Node_t* rightChild = root->right;
     Node_t* rightLeftSubtree = rightChild->left;
@@ -594,7 +596,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::insert(Node_t* node, const Key& k, const Value& v, Node_t* parent)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::insert(Node_t* node, const Key& k, const Value& v, Node_t* parent)
   {
     if (!node)
     {
@@ -637,7 +639,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::find(Node_t* node, const Key& k) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::find(Node_t* node, const Key& k) const
   {
     while (node)
     {
@@ -658,7 +660,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::findMin(Node_t* node) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMin(Node_t* node) const
   {
     if (!node)
     {
@@ -672,7 +674,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::findMax(Node_t* node) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMax(Node_t* node) const
   {
     if (!node)
     {
@@ -686,7 +688,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::remove(Node_t* node, const Key& k)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, const Key& k)
   {
     if (!node)
     {
@@ -755,7 +757,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void BinarySearchTree< Key, Value, Compare >::clear(Node_t* node)
+  void Tree< Key, Value, Compare >::clear(Node_t* node)
   {
     if (node)
     {
@@ -766,7 +768,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t* BinarySearchTree< Key, Value, Compare >::copyTree(Node_t* node, Node_t* parent)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::copyTree(Node_t* node, Node_t* parent)
   {
     if (!node)
     {
@@ -780,8 +782,8 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename BinarySearchTree< Key, Value, Compare >::Node_t*
-    BinarySearchTree< Key, Value, Compare >::findNextNode(Node_t* node) const
+  typename Tree< Key, Value, Compare >::Node_t*
+    Tree< Key, Value, Compare >::findNextNode(Node_t* node) const
   {
     if (node == nullptr)
     {
