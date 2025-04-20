@@ -22,11 +22,6 @@ int main(int argc, char ** argv)
   {
     std::ifstream file(argv[1]);
     zakirov::scan_infix(file, stack_qs);
-    if (!file)
-    {
-      std::cerr << "Critical error in file" << '\n';
-      return 1;
-    }
   }
 
   if (stack_qs.empty())
