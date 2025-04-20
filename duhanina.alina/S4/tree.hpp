@@ -594,7 +594,8 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::insert(Node_t* node, const Key& k, const Value& v, Node_t* parent)
+  typename Tree< Key, Value, Compare >::Node_t*
+    Tree< Key, Value, Compare >::insert(Node_t* node, const Key& k, const Value& v, Node_t* parent)
   {
     if (!node)
     {
