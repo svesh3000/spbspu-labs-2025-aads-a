@@ -20,9 +20,9 @@ namespace duhanina
   template < typename Key, typename Value >
   Node< Key, Value >::Node(const Key& k, const Value& v, Node* p):
     data(std::make_pair(k, v)),
-    parent(p),
     left(nullptr),
     right(nullptr),
+    parent(p),
     height(1)
   {}
 }

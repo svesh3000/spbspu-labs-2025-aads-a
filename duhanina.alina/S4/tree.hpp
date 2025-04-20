@@ -8,7 +8,7 @@
 
 namespace duhanina
 {
-  template < typename Key, typename Value, typename Compare = std::less< Key > >
+  template < typename Key, typename Value, typename Compare >
   class BinarySearchTree
   {
   public:
