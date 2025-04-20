@@ -22,7 +22,7 @@ std::map< std::string, std::map< int, std::string > > abramov::getDataSets(std::
   return collection;
 }
 
-void abramov::printDataSet(const std::string &name, const std::map< std::string, std::map< int, std::string > > &dicts)
+void abramov::printDataSet(const std::string &name, const collection &dicts)
 {
   std::cout << name << " ";
   std::map< int, std::string > dict = dicts.find(name)->second;
@@ -33,7 +33,7 @@ void abramov::printDataSet(const std::string &name, const std::map< std::string,
   std::cout << (--dict.end())->first << " " << (--dict.end())->second << "\n";
 }
 
-std::map< int, std::string > abramov::complementDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts)
+std::map< int, std::string > abramov::complementDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
@@ -48,7 +48,7 @@ std::map< int, std::string > abramov::complementDataSets(const std::string &s1, 
   return res;
 }
 
-std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts)
+std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
@@ -63,7 +63,7 @@ std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, c
   return res;
 }
 
-std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts)
+std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
@@ -82,7 +82,7 @@ std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const
   return res;
 }
 
-void abramov::doCommand(const std::string &s, std::istream &in, std::map< std::string, std::map< int, std::string > > &dicts)
+void abramov::doCommand(const std::string &s, std::istream &in, collection &dicts)
 {
   std::string s1;
   std::string s2;
@@ -111,6 +111,10 @@ void abramov::doCommand(const std::string &s, std::istream &in, std::map< std::s
   }
   else
   {
+    if (std::cin.eof())
+    {
+      return;
+    }
     std::cout << "<INVALID COMMAND>\n";
     std::cin.clear();
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
