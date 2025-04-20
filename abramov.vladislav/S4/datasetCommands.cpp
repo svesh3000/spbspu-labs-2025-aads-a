@@ -80,3 +80,38 @@ std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const
   }
   return res;
 }
+
+void abramov::doCommand(const std::string &s, std::istream &in, std::map< std::string, std::map< int, std::string > > &dicts)
+{
+  std::string s1;
+  std::string s2;
+  if (s == "PRINT")
+  {
+    in >> s1;
+    printDataSet(s1, dicts);
+  }
+  else if (s == "COMPLEMENT")
+  {
+    std::string name;
+    in >> name >> s1 >> s2;
+    dicts[name] = complementDataSets(s1, s2, dicts)
+  }
+  else if (s == "INTERSECT")
+  {
+    std::string name;
+    in >> name >> s1 >> s2;
+    dicts[name] = intersectDataSets(s1, s2, dicts);
+  }
+  else if (s == "UNION")
+  {
+    std::string name;
+    in >> name >> s1 >> s2;
+    dicts[name] = unionDataSets(s1, s2, dicts);
+  }
+  else
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
+}

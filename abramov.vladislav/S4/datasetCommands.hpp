@@ -11,5 +11,6 @@ namespace abramov
   std::map< int, std::string > complementDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts);
   std::map< int, std::string > intersectDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts);
   std::map< int, std::string > unionDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts);
+  void doCommand(const std::string &s, std::istream &in, std::map< std::string, std::map< int, std::string > > &dicts);
 }
 #endif
