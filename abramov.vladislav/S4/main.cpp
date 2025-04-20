@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &)
     {
-      std::cerr << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }
