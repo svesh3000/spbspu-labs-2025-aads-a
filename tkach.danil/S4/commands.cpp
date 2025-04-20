@@ -1,13 +1,5 @@
 #include "commands.hpp"
 #include <cstddef>
-namespace
-{
-  void printTree(std::ostream& out, const tkach::AvlTree< size_t, std::string >& root)
-  {
-    printTree(out, root., val_min);
-
-  }
-}
 
 void tkach::print(std::istream& in, const AvlTree< std::string, AvlTree< size_t, std::string > >& avltree, std::ostream& out)
 {
@@ -15,5 +7,9 @@ void tkach::print(std::istream& in, const AvlTree< std::string, AvlTree< size_t,
   in >> name;
   AvlTree< size_t, std::string > root = avltree.at(name);
   out << name;
-
+  for (auto it = root.cbegin(); it != root.cend(); ++it)
+  {
+    out << " " << (*it).first << " " << (*it).second;
+  }
+  out << "\n";
 }

@@ -3,6 +3,8 @@
 
 #include <functional>
 #include "node_tree.hpp"
+#include "c_iterator.hpp"
+#include "iterator.hpp"
 
 namespace tkach
 {
@@ -14,18 +16,23 @@ namespace tkach
     void insert(const std::pair< Key, Value > & pair);
     void insert(std::pair< Key, Value > && pair);
     void clear();
-    TreeNode< Key, Value >* find(const Key& key);
+    TreeNode< Key, Value >* find(const Key& key) const;
     Value& at(const Key& key);
     const Value& at(const Key& key) const;
+    Citerator< Key, Value, Cmp > cbegin() const;
+    Iterator< Key, Value, Cmp > begin();
+    Citerator< Key, Value, Cmp > cend() const;
+    Iterator< Key, Value, Cmp > end();
   private:
     TreeNode< Key, Value >* root_;
     size_t size_;
     Cmp cmp_;
     template< class... Args >
-    void insertSingle(Args... args);
+    void insertSingle(Args&&... args);
     template< class... Args >
-    TreeNode< Key, Value >* insertCmp(TreeNode< Key, Value >* root, Args... args);
+    TreeNode< Key, Value >* insertCmp(TreeNode< Key, Value >* root, Args&&... args);
     void clearFrom(TreeNode< Key, Value >* node);
+    TreeNode< Key, Value >* findMin(TreeNode< Key, Value >* node) const;
   };
 
   template< class Key, class Value, class Cmp >
@@ -34,6 +41,40 @@ namespace tkach
     size_(0),
     cmp_()
   {}
+
+  template< class Key, class Value, class Cmp >
+  Citerator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::cbegin() const
+  {
+    return Citerator< Key, Value, Cmp >(findMin(root_));
+  }
+  
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::begin()
+  {
+    return Iterator< Key, Value, Cmp >(findMin(root_));
+  }
+  
+  template< class Key, class Value, class Cmp >
+  Citerator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::cend() const
+  {
+    return Citerator< Key, Value, Cmp >();
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::end()
+  {
+    return Iterator< Key, Value, Cmp >();
+  }
+
+  template< class Key, class Value, class Cmp >
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::findMin(TreeNode< Key, Value >* root) const
+  {
+    while (root != nullptr && root->left != nullptr)
+    {
+      root = root->left;
+    }
+    return root;
+  }
 
   template< class Key, class Value, class Cmp >
   Value& AvlTree< Key, Value, Cmp >::at(const Key& key)
@@ -49,7 +90,7 @@ namespace tkach
   template< class Key, class Value, class Cmp >
   const Value& AvlTree< Key, Value, Cmp >::at(const Key& key) const
   {
-    TreeNode< Key, Value >* node = find(key);
+    const TreeNode< Key, Value >* node = find(key);
     if (node)
     {
       return node->data.second;
@@ -71,11 +112,11 @@ namespace tkach
 
   template< class Key, class Value, class Cmp >
   template< class... Args >
-  void AvlTree< Key, Value, Cmp >::insertSingle(Args... args)
+  void AvlTree< Key, Value, Cmp >::insertSingle(Args&&... args)
   {
     try
     {
-      root_ = insertCmp(root_, args);
+      root_ = insertCmp(root_, std::forward< Args >(args)...);
       size_++;
     }
     catch (...)
@@ -87,15 +128,15 @@ namespace tkach
 
   template< class Key, class Value, class Cmp >
   template< class... Args >
-  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::insertCmp(TreeNode< Key, Value >* root, Args... args)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::insertCmp(TreeNode< Key, Value >* root, Args&&... args)
   {
     if (root == nullptr)
     {
       return new TreeNode< Key, Value >(std::forward< Args >(args)...);
     }
-    else if (cmp(value, root->data))
+    else if (cmp_(std::get<0>(std::forward<Args>(args)...), root->data.first))
     {
-      root->left = insertCmp(root->left, args);
+      root->left = insertCmp(root->left, std::forward< Args >(args)...);
       if (root->left->parent == nullptr)
       {
         root->left->parent = root;
@@ -103,7 +144,7 @@ namespace tkach
     }
     else
     {
-      root->right = insertCmp(root->right, args);
+      root->right = insertCmp(root->right, std::forward< Args >(args)...);
       if (root->right->parent == nullptr)
       {
         root->right->parent = root;
@@ -113,12 +154,12 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::find(const Key& key)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::find(const Key& key) const
   {
     TreeNode< Key, Value >* root = root_;
     while (root_ != nullptr && key != root->data.first)
     {
-      if (cmp(key, root->data.first))
+      if (cmp_(key, root->data.first))
       {
         root = root->left;
       }
