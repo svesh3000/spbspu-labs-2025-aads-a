@@ -1,5 +1,6 @@
 #include "datasetCommands.hpp"
 #include <iostream>
+#include <limits>
 
 std::map< std::string, std::map< int, std::string > > abramov::getDataSets(std::ifstream &in)
 {
@@ -29,7 +30,7 @@ void abramov::printDataSet(const std::string &name, const std::map< std::string,
   {
     std::cout << it->first << " " << it->second << " ";
   }
-  std::cout << (--dict.end())->first << (--dict.end())->second << "\n";
+  std::cout << (--dict.end())->first << " " << (--dict.end())->second << "\n";
 }
 
 std::map< int, std::string > abramov::complementDataSets(const std::string &s1, const std::string &s2, const std::map< std::string, std::map< int, std::string > > &dicts)
@@ -94,7 +95,7 @@ void abramov::doCommand(const std::string &s, std::istream &in, std::map< std::s
   {
     std::string name;
     in >> name >> s1 >> s2;
-    dicts[name] = complementDataSets(s1, s2, dicts)
+    dicts[name] = complementDataSets(s1, s2, dicts);
   }
   else if (s == "INTERSECT")
   {
