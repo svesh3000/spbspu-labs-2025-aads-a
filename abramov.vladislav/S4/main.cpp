@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
   using namespace abramov;
-  if (argc > 2)
+  if (argc != 2)
   {
     std::cerr << "Wrong parameters\n";
     return 1;
