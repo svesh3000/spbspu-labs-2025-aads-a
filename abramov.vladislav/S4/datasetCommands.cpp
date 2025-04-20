@@ -95,7 +95,7 @@ std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const
   }
   for (auto it = dict2.begin(); it != dict2.end(); ++it)
   {
-    if (res.find(it->first) != res.end())
+    if (res.find(it->first) == res.end())
     {
       res[it->first] = it->second;
     }
