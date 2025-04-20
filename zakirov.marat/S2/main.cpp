@@ -17,11 +17,6 @@ int main(int argc, char ** argv)
   if (argc == 1)
   {
     zakirov::scan_infix(std::cin, stack_qs);
-    if (!std::cin)
-    {
-      std::cerr << "Critical error in getting line" << '\n';
-      return 1;
-    }
   }
   else if (argc == 2)
   {
