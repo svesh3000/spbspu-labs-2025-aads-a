@@ -1,6 +1,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 #include <utility>
+#include <cstddef>
 
 namespace abramov
 {
@@ -18,7 +19,7 @@ namespace abramov
   };
 
   template< class Key, class Value >
-  Node::Node():
+  Node< Key, Value >::Node():
     data_(std::pair< Key, Value >()),
     parent_(nullptr),
     left_(nullptr),
@@ -26,11 +27,11 @@ namespace abramov
   {}
 
   template< class Key, class Value >
-  Node::Node(const std::pair< Key, Value > &p, const Node< Key, Value > *parent):
+  Node<Key, Value >::Node(const std::pair< Key, Value > &p, const Node< Key, Value > *parent):
     data_(p),
     parent_(parent),
     left_(parent->left_),
-    rigth_(parent->right_)
+    rigth_(parent->right_),
     heigth_(parent->heigth + 1)
   {}
 }

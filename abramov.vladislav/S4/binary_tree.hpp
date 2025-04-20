@@ -2,6 +2,7 @@
 #define BINARY_TREE_HPP
 #include <cstddef>
 #include <algorithm>
+#include <functional>
 #include "node.hpp"
 
 namespace abramov
@@ -16,7 +17,7 @@ namespace abramov
     void push(Key key, Value value);
     size_t size() const noexcept;
     bool empty() const noexcept;
-    void swap() noexcept;
+    void swap(BinarySearchTree &rhs) noexcept;
     void clear() noexcept;
   private:
     Node< Key, Value > *root_;
@@ -28,28 +29,28 @@ namespace abramov
     void clearNodes(Node< Key, Value > *root) noexcept;
   };
 
-  template< class Key, class Value, class Cmp = std::less< Key> >
+  template< class Key, class Value, class Cmp >
   BinarySearchTree< Key, Value, Cmp >::BinarySearchTree():
     root_(new Node< Key, Value >),
     fake_(root_),
-    cmp_(std::less< Key > >)
-    size_(0);
+    cmp_(std::less< Key >()),
+    size_(0)
   {}
 
-  template< class Key, class Value, class Cmp = std::less< Key> >
+  template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::push(Key key, Value value)
   {
     if (size_ == 0)
     {
       std::pair< Key, Value > p(key, value);
-      root_ = new Node(p, Node{ p, nullptr, fake_, fake_ });
+      root_ = new Node< Key, Value >(p, Node< Key, Value >{ p, nullptr, fake_, fake_ });
       ++size_;
       return;
     }
     Node< Key, Value > *node = root_;
     while (root_->left != fake_ || root_->rigth != fake_)
     {
-      if (cmp(key, root_->data_.first())
+      if (cmp(key, root_->data_.first()))
       {
         root_ = root_->left;
       }
@@ -59,8 +60,8 @@ namespace abramov
       }
     }
     std::pair< Key, Value > p(key, value);
-    Node< Key, Value > *leaf = new Node(p, node);
-    if (cmp(key, root_->data.first())
+    Node< Key, Value > *leaf = new Node< Key, Value >(p, node);
+    if (cmp(key, root_->data.first()))
     {
       root_->left = leaf;
     }
@@ -71,19 +72,19 @@ namespace abramov
     ++size_;
   }
 
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp >
   size_t BinarySearchTree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
   }
 
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp >
   bool BinarySearchTree< Key, Value, Cmp >::empty() const noexcept
   {
     return size_ == 0;
   }
 
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::swap(BinarySearchTree< Key, Value, Cmp > &rhs) noexcept
   {
     std::swap(root_, rhs.root_);
@@ -92,8 +93,8 @@ namespace abramov
     std::swap(size_, rhs.size_);
   }
 
-  template< class Key, class Value, class Cmp = std::less< Key > >
-  void clearNodes(Node< Key, Value > *root) noexcept
+  template< class Key, class Value, class Cmp >
+  void BinarySearchTree< Key, Value, Cmp >::clearNodes(Node< Key, Value > *root) noexcept
   {
     if (root != fake_)
     {
@@ -103,7 +104,7 @@ namespace abramov
     }
   }
 
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::clear() noexcept
   {
     Node< Key, Value > *root = root_;
