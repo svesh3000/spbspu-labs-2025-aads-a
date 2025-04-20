@@ -19,6 +19,13 @@ int main(int argc, char **argv)
   {
     std::string s;
     std::cin >> s;
-    doCommand(s, std::cin, dicts);
+    try
+    {
+      doCommand(s, std::cin, dicts);
+    }
+    catch (const std::exception &)
+    {
+      std::cerr << "<INVALID COMMAND>\n";
+    }
   }
 }

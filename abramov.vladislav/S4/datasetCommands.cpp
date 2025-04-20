@@ -35,6 +35,10 @@ void abramov::printDataSet(const std::string &name, const collection &dicts)
 
 std::map< int, std::string > abramov::complementDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
+  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  {
+    throw std::logic_error("No such dictionaries\n");
+  }
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
   std::map< int, std::string > res = std::map< int, std::string >();
@@ -50,6 +54,10 @@ std::map< int, std::string > abramov::complementDataSets(const std::string &s1, 
 
 std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
+  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  {
+    throw std::logic_error("No such dictionaries\n");
+  }
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
   std::map< int, std::string > res = std::map< int, std::string >();
@@ -65,6 +73,10 @@ std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, c
 
 std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
 {
+  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  {
+    throw std::logic_error("No such dictionaries\n");
+  }
   std::map< int, std::string > dict1 = dicts.find(s1)->second;
   std::map< int, std::string > dict2 = dicts.find(s2)->second;
   std::map< int, std::string > res = std::map< int, std::string >();
