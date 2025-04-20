@@ -24,8 +24,16 @@ std::map< std::string, std::map< int, std::string > > abramov::getDataSets(std::
 
 void abramov::printDataSet(const std::string &name, const collection &dicts)
 {
-  std::cout << name << " ";
+  if (dicts.find(name) == dicts.end())
+  {
+    throw std::logic_error("No dictionary\n");
+  }
   std::map< int, std::string > dict = dicts.find(name)->second;
+  if (dict.empty())
+  {
+    std::cout << "<EMPTY>\n";
+  }
+  std::cout << name << " ";
   for (auto it = dict.begin(); it != --dict.end(); ++it)
   {
     std::cout << it->first << " " << it->second << " ";
