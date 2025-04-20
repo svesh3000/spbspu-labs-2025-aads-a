@@ -32,6 +32,7 @@ void abramov::printDataSet(const std::string &name, const collection &dicts)
   if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
+    return;
   }
   std::cout << name << " ";
   for (auto it = dict.begin(); it != --dict.end(); ++it)
