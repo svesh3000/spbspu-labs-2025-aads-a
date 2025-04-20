@@ -1,111 +1,98 @@
 #include "actions.hpp"
 #include <limits>
-#include <cctype>
-#include <new>
-#include <ostream>
 #include <stdexcept>
-#include <string>
 
 namespace
 {
-  int getPriority(const char & operation)
+  int getPriority(const std::string & operation)
   {
-    if (operation == '+' || operation == '-')
+    if (operation == "+" || operation == "-")
     {
       return 1;
     }
-    else if (operation == '*' || operation == '/' || operation == '%')
+    else if (operation == "*" || operation == "/" || operation == "%")
     {
       return 2;
     }
     return 0;
   }
 
-  bool isOperator(const char & c)
+  bool isOperator(const std::string & c)
   {
-    return c == '+' || c == '-' || c == '/' || c == '*' || c == '%';
+    return c == "+" || c == "-" || c == "/" || c == "*" || c == "%";
   }
 
-  void addNumberInLine(std::string & line, std::string & number)
-  {
-    if (!number.empty())
-    {
-      if (!line.empty())
-      {
-        line += ' ';
-      }
-      line += number;
-      number.clear();
-    }
-  }
-
-  void addNumberInStack(std::string & number, bocharov::stackNumber & stack)
-  {
-    if (!number.empty())
-    {
-      stack.push(std::stoll(number));
-      number.clear();
-    }
-  }
-
-  bool isMultiplicateOverflow(long long int a, long long int b)
+  void checkMultiplicate(long long int a, long long int b)
   {
     long long int max = std::numeric_limits< long long int >::max();
     long long int min = std::numeric_limits< long long int >::min();
+    bool isOverflow = false;
     if (a > 0 && b > 0 && a > max / b)
     {
-      return true;
+      isOverflow = true;
     }
     else if (a > 0 && b < 0 && b < min / a)
     {
-      return true;
+      isOverflow = true;
     }
     else if (a < 0 && b > 0 && a < min / b)
     {
-      return true;
+      isOverflow = true;
     }
     else if (a < 0 && b < 0 && b < max / a)
     {
-      return true;
+      isOverflow = true;
     }
-    return false;
+    if (isOverflow)
+    {
+      throw std::logic_error("Overflow");
+    }
   }
 
-  long long int calculatingOperation(long long int a, long long b, const char & operation)
+  void checkSum(long long int a, long long int b)
   {
     long long int max = std::numeric_limits< long long int >::max();
+    if (a > max - b)
+    {
+      throw std::logic_error("Overflow");
+    }
+  }
+
+  void checkDifference(long long int a, long long b)
+  {
     long long int min = std::numeric_limits< long long int >::min();
-    switch (operation)
+    if (a < min + b)
+    {
+      throw std::logic_error("Underflow");
+    }
+  }
+
+  void checkDivision(long long int b)
+  {
+    if (b == 0)
+    {
+      throw std::logic_error("Dividing by 0");
+    }
+  }
+
+  long long int calculatingOperation(long long int a, long long b, const std::string & operation)
+  {
+    switch (operation.front())
     {
     case '+':
-      if (a > max - b)
-      {
-        throw std::logic_error("Overflow");
-      }
+      checkSum(a, b);
       return a + b;
     case '-':
-      if (a < min + b)
-      {
-        throw std::logic_error("Underflow");
-      }
+      checkDifference(a, b);
       return a - b;
     case '*':
-      if (isMultiplicateOverflow(a, b))
-      {
-        throw std::logic_error("Overflow");
-      }
+      checkMultiplicate(a, b);
       return a * b;
     case '/':
-      if (b == 0)
-      {
-        throw std::logic_error("Dividing by 0");
-      }
+      checkDivision(b);
       return a / b;
     case '%':
-      if (b == 0)
-      {
-        throw std::logic_error("Dividing by 0");
-      }
+      checkDivision(b);
       return a >= 0 ? a % b : (b - std::abs(a % b)) % b;
     default:
       throw std::logic_error("Invalid operation");
@@ -116,109 +103,98 @@ namespace
 
 bocharov::queue bocharov::convertExpr(queue & infix)
 {
-  queue postfix;
-  Stack< char > operators;
-  std::string number;
+  queue postfixExprs;
   while (!infix.empty())
   {
-    std::string line = infix.front();
+    Expr infixExpr = infix.front();
     infix.pop();
-    std::string postfixLine;
-    for (char s: line)
+    Expr postfixExpr;
+    Stack< std::string > operators;
+    while (!infixExpr.empty())
     {
-      if (isspace(s))
+      std::string partInfix = infixExpr.front();
+      infixExpr.pop();
+      if (partInfix == "(")
       {
-        addNumberInLine(postfixLine, number);
-        continue;
+        operators.push(partInfix);
       }
-      if (isdigit(s))
+      else if (partInfix == ")")
       {
-        number += s;
+        while (!operators.empty() && operators.top() != "(")
+        {
+          postfixExpr.push(operators.top());
+          operators.pop();
+        }
+        operators.pop();
+      }
+      else if (isOperator(partInfix))
+      {
+        while (!operators.empty() && getPriority(operators.top()) >= getPriority(partInfix))
+        {
+          postfixExpr.push(operators.top());
+          operators.pop();
+        }
+        operators.push(partInfix);
       }
       else
       {
-        addNumberInLine(postfixLine, number);
-        if (s == '(')
-        {
-          operators.push(s);
-        }
-        else if (isOperator(s))
-        {
-          while (!operators.empty() && getPriority(operators.back()) >= getPriority(s))
-          {
-            postfixLine += ' ';
-            postfixLine += operators.back();
-            operators.pop();
-          }
-          operators.push(s);
-        }
-        else if (s == ')')
-        {
-          while (!operators.empty() && operators.back() != '(')
-          {
-            postfixLine += ' ';
-            postfixLine += operators.back();
-            operators.pop();
-          }
-          operators.pop();
-        }
+        postfixExpr.push(partInfix);
       }
     }
-    addNumberInLine(postfixLine, number);
     while (!operators.empty())
     {
-      postfixLine += ' ';
-      postfixLine += operators.back();
+      postfixExpr.push(operators.top());
       operators.pop();
     }
-    postfix.push(postfixLine);
+    postfixExprs.push(postfixExpr);
   }
-  return postfix;
+  return postfixExprs;
 }
 
-bocharov::stackNumber bocharov::calculationExpr(queue & postfix)
+bocharov::stackNumber bocharov::calculationExpr(queue & postfixExprs)
 {
   stackNumber results;
-  while (!postfix.empty())
+  while (!postfixExprs.empty())
   {
     stackNumber numbers;
-    std::string line = postfix.front();
-    postfix.pop();
-    std::string number;
-    for (char s: line)
+    Expr postfixExpr = postfixExprs.front();
+    postfixExprs.pop();
+    while (!postfixExpr.empty())
     {
-      if (isspace(s))
+      std::string partPostfix = postfixExpr.front();
+      postfixExpr.pop();
+      if (isOperator(partPostfix))
       {
-        addNumberInStack(number, numbers);
-        continue;
-      }
-      if (isdigit(s))
-      {
-        number += s;
-      }
-      else if (isOperator(s))
-      {
-        addNumberInStack(number, numbers);
         if (numbers.size() < 2)
         {
           throw std::logic_error("Not enough operands");
         }
-        long long int right = numbers.back();
+        long long int right = numbers.top();
         numbers.pop();
-        long long int left = numbers.back();
+        long long int left = numbers.top();
         numbers.pop();
-        long long int result = calculatingOperation(left, right, s);
+        long long int result = calculatingOperation(left, right, partPostfix);
         numbers.push(result);
       }
+      else
+      {
+        try
+        {
+          long long int number = stoll(partPostfix);
+          numbers.push(number);
+        }
+        catch (...)
+        {
+          throw std::logic_error("Invalid number");
+        }
+      }
     }
-    addNumberInStack(number, numbers);
     if (numbers.size() != 1)
     {
       throw std::logic_error("Too many operands");
     }
-    results.push(numbers.back());
+    results.push(numbers.top());
   }
-
   return results;
 }
 
@@ -231,7 +207,26 @@ void bocharov::inputExprs(std::istream & input, queue & exprs)
     {
       continue;
     }
-    exprs.push(line);
+    Expr infixExpr;
+    std::string partExpr;
+    size_t start = 0;
+    size_t end = line.find(' ');
+    while (end != std::string::npos)
+    {
+      partExpr = line.substr(start, end - start);
+      if (!partExpr.empty())
+      {
+        infixExpr.push(partExpr);
+      }
+      start = end + 1;
+      end = line.find(' ', start);
+    }
+    partExpr = line.substr(start);
+    if (!partExpr.empty())
+    {
+      infixExpr.push(partExpr);
+    }
+    exprs.push(infixExpr);
   }
 }
 
@@ -239,11 +234,11 @@ std::ostream & bocharov::outputResults(std::ostream & output, stackNumber & resu
 {
   if (!results.empty())
   {
-    output << results.back();
+    output << results.top();
     results.pop();
     while (!results.empty())
     {
-      output << " " << results.back();
+      output << " " << results.top();
       results.pop();
     }
   }
