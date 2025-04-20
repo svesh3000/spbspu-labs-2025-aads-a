@@ -1,6 +1,7 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 #include <utility>
+#include <cstddef>
 
 template< class Key, class Value >
 struct Node
@@ -9,6 +10,7 @@ struct Node
   Node* left;
   Node* right;
   Node* parent;
+  size_t height;
 
   Node(const Key& k, const Value& v, Node* p);
 };

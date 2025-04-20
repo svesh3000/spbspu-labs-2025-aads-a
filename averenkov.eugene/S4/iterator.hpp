@@ -13,7 +13,7 @@ public:
   explicit Iterator(Node< Key, Value >* node);
 
   std::pair< Key, Value > operator*() const;
-  pointer operator->() const;
+  std::pair< Key, Value > operator->() const;
 
   Iterator& operator++();
   Iterator operator++(int);
@@ -42,16 +42,14 @@ Iterator< Key, Value, Compare >::Iterator(Node< Key, Value >* node):
 }
 
 template < class Key, class Value, class Compare >
-typename Iterator< Key, Value, Compare >::reference
-Iterator< Key, Value, Compare >::operator*() const
+std::pair< Key, Value > Iterator< Key, Value, Compare >::operator*() const
 {
   assert(current != nullptr);
   return current->data;
 }
 
 template < class Key, class Value, class Compare >
-typename Iterator< Key, Value, Compare >::pointer
-Iterator< Key, Value, Compare >::operator->() const
+std::pair< Key, Value > Iterator< Key, Value, Compare >::operator->() const
 {
   assert(current != nullptr);
   return &current->data;
