@@ -86,26 +86,24 @@ void abramov::doCommand(const std::string &s, std::istream &in, collection &dict
 {
   std::string s1;
   std::string s2;
-  if (s == "PRINT")
+  std::string name;
+  if (s == "print")
   {
     in >> s1;
     printDataSet(s1, dicts);
   }
-  else if (s == "COMPLEMENT")
+  else if (s == "complement")
   {
-    std::string name;
     in >> name >> s1 >> s2;
     dicts[name] = complementDataSets(s1, s2, dicts);
   }
-  else if (s == "INTERSECT")
+  else if (s == "intersect")
   {
-    std::string name;
     in >> name >> s1 >> s2;
     dicts[name] = intersectDataSets(s1, s2, dicts);
   }
-  else if (s == "UNION")
+  else if (s == "union")
   {
-    std::string name;
     in >> name >> s1 >> s2;
     dicts[name] = unionDataSets(s1, s2, dicts);
   }
