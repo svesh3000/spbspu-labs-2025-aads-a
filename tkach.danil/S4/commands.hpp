@@ -7,6 +7,7 @@
 namespace tkach
 {
   void print(std::istream& in, const AvlTree< std::string, AvlTree< size_t, std::string > >& avltree, std::ostream& out);
+  void intersect(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree);
 }
 
 #endif

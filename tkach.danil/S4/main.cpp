@@ -21,7 +21,7 @@ namespace
       while(in.get(c) && c != '\n')
       {
         in >> key >> value;
-        temp.insert(std::make_pair(key, value));
+        temp.insert({key, value});
       }
       fulldata.insert(std::make_pair(name, temp));
     }
@@ -45,6 +45,7 @@ int main()
     return 1;
   }
   AvlTree< std::string, AvlTree< size_t, std::string > > data = inputDataSets(in);
+  intersect(std::cin, data);
   print(std::cin, data, std::cout);
   return 0;
 }

@@ -21,7 +21,7 @@ namespace tkach
   template< class Key, class Value >
   template< class... Args >
   TreeNode< Key, Value >::TreeNode(Args... args):
-    data(std::pair< Key, Value >(std::forward< Args >(args)...)),
+    data{std::pair< Key, Value >(std::forward< Args >(args)...)},
     parent(nullptr),
     right(nullptr),
     left(nullptr),

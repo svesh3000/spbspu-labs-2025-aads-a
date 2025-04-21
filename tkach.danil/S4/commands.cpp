@@ -13,3 +13,22 @@ void tkach::print(std::istream& in, const AvlTree< std::string, AvlTree< size_t,
   }
   out << "\n";
 }
+
+void tkach::intersect(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree)
+{
+  std::string new_name;
+  std::string first_name;
+  std::string last_name;
+  in >> new_name >> first_name >> last_name;
+  AvlTree< size_t, std::string > root;
+  const AvlTree< size_t, std::string > first = avltree.at(first_name);
+  const AvlTree< size_t, std::string > second = avltree.at(last_name);
+  for (auto it = first.cbegin(); it != first.cend(); ++it)
+  {
+    if (second.find(it->first) != second.cend())
+    {
+      root.insert({it->first, it->second});
+    }
+  }
+  avltree.insert({new_name, root});
+}
