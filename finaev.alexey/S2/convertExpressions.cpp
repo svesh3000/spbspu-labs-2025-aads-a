@@ -69,7 +69,6 @@ finaev::Queue< std::string > finaev::fromInfToPost(Queue< std::string >& inf)
   Stack< std::string > temp;
   Queue< std::string > res;
   bool isBracket = 0;
-
   while (!inf.isEmpty())
   {
     if (inf.top()[0] == '(' && inf.top().size() == 1)
@@ -80,13 +79,11 @@ finaev::Queue< std::string > finaev::fromInfToPost(Queue< std::string >& inf)
     }
     else if (isExpression(inf.top()))
     {
-      if (!temp.isEmpty() && isExpression(temp.top()))
+      
+      while (!temp.isEmpty() && isExpression(temp.top()) && (isMorePriority(temp.top(), inf.top()) || (!isMorePriority(inf.top(), temp.top()))))
       {
-        if (isMorePriority(temp.top(), inf.top()))
-        {
-          res.push(temp.top());
-          temp.pop();
-        }
+        res.push(temp.top());
+        temp.pop();
       }
       temp.push(inf.top());
       inf.pop();
