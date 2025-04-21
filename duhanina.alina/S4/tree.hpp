@@ -17,6 +17,12 @@ namespace duhanina
     using ConstIterator_t = ConstIterator< Key, Value, Compare >;
 
     Tree();
+
+    template< typename InputIt >
+    Tree(InputIt, InputIt);
+
+    explicit Tree(std::initializer_list< std::pair< Key, Value > >);
+
     Tree(const Tree& other);
     Tree(Tree&& other) noexcept;
     ~Tree();
@@ -33,11 +39,11 @@ namespace duhanina
     Value get(const Key& k) const;
     Value drop(const Key& k);
 
-    size_t size() const;
-    bool empty() const;
+    size_t size() const noexcept;
+    bool empty() const noexcept;
 
-    void clear();
-    void swap(Tree& other);
+    void clear() noexcept;
+    void swap(Tree& other) noexcept;
 
     Iterator_t insert(const std::pair< const Key, Value >& value);
     Iterator_t insert(std::pair< const Key, Value >&& value);
@@ -53,42 +59,58 @@ namespace duhanina
     Value& operator[](const Key& key);
     Value& operator[](Key&& key);
 
-    size_t count(const Key& key) const;
+    size_t count(const Key& key) const noexcept;
     Iterator_t find(const Key& key) noexcept;
     ConstIterator_t find(const Key& key) const noexcept;
 
-    std::pair< Node_t*, Node_t* > equal_range(const Key& key);
-    std::pair< const Node_t*, const Node_t* > equal_range(const Key& key) const;
-    Iterator_t lower_bound(const Key& key);
-    ConstIterator_t lower_bound(const Key& key) const;
-    Iterator_t upper_bound(const Key& key);
-    ConstIterator_t upper_bound(const Key& key) const;
+    std::pair< Node_t*, Node_t* > equal_range(const Key& key) noexcept;
+    std::pair< const Node_t*, const Node_t* > equal_range(const Key& key) const noexcept;
+    Iterator_t lower_bound(const Key& key) noexcept;
+    ConstIterator_t lower_bound(const Key& key) const noexcept;
+    Iterator_t upper_bound(const Key& key) noexcept;
+    ConstIterator_t upper_bound(const Key& key) const noexcept;
 
   private:
     Node_t* fakeRoot_;
     size_t size_;
     Compare comp_;
 
-    Node_t* getRoot() const;
-    void setRoot(Node_t* newRoot);
-    void updateHeight(Node_t* Node_t);
-    int getBalance(Node_t* node);
-    Node_t* rotateRight(Node_t* y);
-    Node_t* rotateLeft(Node_t* x);
+    Node_t* getRoot() const noexcept;
+    void setRoot(Node_t* newRoot) noexcept;
+    void updateHeight(Node_t* Node_t) noexcept;
+    int getBalance(Node_t* node) noexcept;
+    Node_t* rotateRight(Node_t* y) noexcept;
+    Node_t* rotateLeft(Node_t* x) noexcept;
     Node_t* insert(Node_t* node, const Key& k, const Value& v, Node_t* parent);
-    Node_t* find(Node_t* node, const Key& k) const;
-    Node_t* findMin(Node_t* node) const;
-    Node_t* findMax(Node_t* node) const;
-    Node_t* remove(Node_t* node, const Key& k);
-    void clear(Node_t* node);
+    Node_t* find(Node_t* node, const Key& k) const noexcept;
+    Node_t* findMin(Node_t* node) const noexcept;
+    Node_t* findMax(Node_t* node) const noexcept;
+    Node_t* remove(Node_t* node, const Key& k) noexcept;
+    void clear(Node_t* node) noexcept;
     Node_t* copyTree(Node_t* node, Node_t* parent);
-    Node_t* findNextNode(Node_t* node) const;
+    Node_t* findNextNode(Node_t* node) const noexcept;
   };
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree():
     fakeRoot_(new Node_t(Key(), Value(), nullptr)),
     size_(0)
+  {}
+
+  template< typename Key, typename Value, typename Compare >
+  template< typename InputIt >
+  Tree< Key, Value, Compare >::Tree(InputIt first, InputIt last):
+    Tree()
+  {
+    for (auto it = first; it != last; it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  Tree< Key, Value, Compare >::Tree(std::initializer_list< std::pair< Key, Value > > iList):
+    Tree(iList.begin(), iList.end())
   {}
 
   template < typename Key, typename Value, typename Compare >
@@ -202,19 +224,19 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  size_t Tree< Key, Value, Compare >::size() const
+  size_t Tree< Key, Value, Compare >::size() const noexcept
   {
     return size_;
   }
 
   template < typename Key, typename Value, typename Compare >
-  bool Tree< Key, Value, Compare >::empty() const
+  bool Tree< Key, Value, Compare >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::clear()
+  void Tree< Key, Value, Compare >::clear() noexcept
   {
     clear(getRoot());
     setRoot(nullptr);
@@ -222,7 +244,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::swap(Tree< Key, Value, Compare >& other)
+  void Tree< Key, Value, Compare >::swap(Tree< Key, Value, Compare >& other) noexcept
   {
     std::swap(fakeRoot_, other.fakeRoot_);
     std::swap(size_, other.size_);
@@ -341,7 +363,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  size_t Tree< Key, Value, Compare >::count(const Key& key) const
+  size_t Tree< Key, Value, Compare >::count(const Key& key) const noexcept
   {
     if (find(getRoot(), key))
     {
@@ -381,20 +403,20 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   std::pair< typename Tree< Key, Value, Compare >::Node_t*, typename Tree< Key, Value, Compare >::Node_t* >
-    Tree< Key, Value, Compare >::equal_range(const Key& key)
+    Tree< Key, Value, Compare >::equal_range(const Key& key) noexcept
   {
     return { lower_bound(key), upper_bound(key) };
   }
 
   template < typename Key, typename Value, typename Compare >
   std::pair< const typename Tree< Key, Value, Compare >::Node_t*, const typename Tree< Key, Value, Compare >::Node_t* >
-    Tree< Key, Value, Compare >::equal_range(const Key& key) const
+    Tree< Key, Value, Compare >::equal_range(const Key& key) const noexcept
   {
     return { lower_bound(key), upper_bound(key) };
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key) noexcept
   {
     Node_t* current = getRoot();
     Node_t* result = nullptr;
@@ -421,7 +443,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key) const
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::lower_bound(const Key& key) const noexcept
   {
     const Node_t* current = getRoot();
     const Node_t* result = nullptr;
@@ -448,7 +470,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key)
+  typename Tree< Key, Value, Compare >::Iterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key) noexcept
   {
     Node_t* current = getRoot();
     Node_t* result = nullptr;
@@ -475,7 +497,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key) const
+  typename Tree< Key, Value, Compare >::ConstIterator_t Tree< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
   {
     const Node_t* current = getRoot();
     const Node_t* result = nullptr;
@@ -502,13 +524,13 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::getRoot() const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::getRoot() const noexcept
   {
     return fakeRoot_->left;
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::setRoot(Node_t* newRoot)
+  void Tree< Key, Value, Compare >::setRoot(Node_t* newRoot) noexcept
   {
     fakeRoot_->left = newRoot;
     if (newRoot)
@@ -518,7 +540,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::updateHeight(Node_t* node)
+  void Tree< Key, Value, Compare >::updateHeight(Node_t* node) noexcept
   {
     if (node == nullptr)
     {
@@ -538,7 +560,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  int Tree< Key, Value, Compare >::getBalance(Node_t* node)
+  int Tree< Key, Value, Compare >::getBalance(Node_t* node) noexcept
   {
     if (!node)
     {
@@ -558,7 +580,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateRight(Node_t* root)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateRight(Node_t* root) noexcept
   {
     Node_t* leftChild = root->left;
     Node_t* leftRightSubtree = leftChild->right;
@@ -576,7 +598,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateLeft(Node_t* root)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::rotateLeft(Node_t* root) noexcept
   {
     Node_t* rightChild = root->right;
     Node_t* rightLeftSubtree = rightChild->left;
@@ -638,7 +660,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::find(Node_t* node, const Key& k) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::find(Node_t* node, const Key& k) const noexcept
   {
     while (node)
     {
@@ -659,7 +681,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMin(Node_t* node) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMin(Node_t* node) const noexcept
   {
     if (!node)
     {
@@ -673,7 +695,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMax(Node_t* node) const
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::findMax(Node_t* node) const noexcept
   {
     if (!node)
     {
@@ -687,7 +709,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, const Key& k)
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, const Key& k) noexcept
   {
     if (!node)
     {
@@ -756,7 +778,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  void Tree< Key, Value, Compare >::clear(Node_t* node)
+  void Tree< Key, Value, Compare >::clear(Node_t* node) noexcept
   {
     if (node)
     {
@@ -782,7 +804,7 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   typename Tree< Key, Value, Compare >::Node_t*
-    Tree< Key, Value, Compare >::findNextNode(Node_t* node) const
+    Tree< Key, Value, Compare >::findNextNode(Node_t* node) const noexcept
   {
     if (node == nullptr)
     {
