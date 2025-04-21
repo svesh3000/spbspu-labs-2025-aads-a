@@ -63,12 +63,12 @@ namespace finaev
       {
         for (size_t i = 0; i < size_; ++i)
         {
-          data_[i] = other.data_[i]; 
+          data_[i] = other.data_[i];
         }
       }
       catch (...)
       {
-        delete[] data_; 
+        delete[] data_;
         data_ = nullptr;
         capacity_ = 0;
         size_ = 0;
@@ -107,7 +107,7 @@ namespace finaev
   template < class T >
   Queue< T >& Queue< T >::operator=(Queue< T >&& other) noexcept
   {
-    if (this != std::addressof(other)) 
+    if (this != std::addressof(other))
     {
       delete[] data_;
       data_ = other.data_;

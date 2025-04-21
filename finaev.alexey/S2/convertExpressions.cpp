@@ -18,11 +18,11 @@ namespace
     }
     else if ((a[0] == '*' || a[0] == '/' || a[0] == '%') && (b[0] == '+' || b[0] == '-'))
     {
-      return true; 
+      return true;
     }
     else if (a[0] == '^' && b[0] != '^')
     {
-      return true; 
+      return true;
     }
     return false;
   }
