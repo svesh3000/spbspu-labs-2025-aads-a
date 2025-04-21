@@ -1,6 +1,7 @@
 #ifndef FORWARD_LIST_HPP
 #define FORWARD_LIST_HPP
 #include <memory>
+#include <stdexcept>
 
 namespace asafov
 {
