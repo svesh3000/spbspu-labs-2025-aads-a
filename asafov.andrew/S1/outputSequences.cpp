@@ -6,7 +6,7 @@ namespace
   {
     for (size_t i = 0; i < size; i++)
     {
-      if(begins[i]!=ends[i])
+      if (begins[i] != ends[i])
       {
         return false;
       }
@@ -21,15 +21,23 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   {
     out << "0\n";
     return;
-  };
+  }
   if (sequences.cbegin()->second.empty())
   {
     out << sequences.cbegin()->first << "\n0\n";
     return;
-  };
+  }
 
   data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size()];
-  data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
+  data_list_t::const_iterator* ends = nullptr;
+  try
+  {
+    data_list_t::const_iterator* ends = new data_list_t::const_iterator[sequences.size()];
+  }
+  catch (const std::bad_alloc&)
+  {
+    delete[] begins;
+  }
   sequence_list_t::const_iterator seqiter = sequences.cbegin();
   size_t size = 0;
   auto iter = sequences.cbegin();
@@ -51,32 +59,36 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   }
 
   data_list_t sums;
-  bool flag1 = true;
+  bool isAllItersEnds = true;
   while (!allItersEnds(begins, ends, size))
   {
     data_t sum = 0;
-    bool flag = false;
+    if (begins[0] != ends[0])
+    {
+      if (sum > std::numeric_limits<data_t>::max() - *begins[0])
+      {
+        isAllItersEnds = false;
+      }
+      else
+      {
+        sum += *begins[0];
+      }
+      out << ' ' << *begins[0];
+      ++begins[0];
+    }
     for (size_t i = 0; i < size;)
     {
       if (begins[i] != ends[i])
       {
         if (sum > std::numeric_limits<data_t>::max() - *begins[i])
         {
-          flag1 = false;
+          isAllItersEnds = false;
         }
         else
         {
           sum += *begins[i];
         }
-        if (flag == true)
-        {
-          out << ' ' << *begins[i];
-        }
-        else
-        {
-          out << *begins[i];
-          flag = true;
-        }
+        out << ' ' << *begins[i];
         ++begins[i++];
       }
       else
@@ -88,7 +100,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     sums.push_back(sum);
   }
 
-  if (flag1 == false)
+  if (isAllItersEnds == false)
   {
     sums.clear();
     delete[] begins;
