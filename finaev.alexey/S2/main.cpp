@@ -1,7 +1,6 @@
 #include <iostream>
-#include "convertExpressions.hpp"
 #include <fstream>
-
+#include "convertExpressions.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -12,22 +11,25 @@ int main(int argc, char * argv[])
       std::cerr << "too much arguments\n";
       return 1;
     }
-    else if (argc == 2)
+    std::ifstream mainFile;
+    if (argc == 2)
     {
-      std::ifstream in(argv[1]);
-      finaev::countFinalResults(in);
+      mainFile.open(argv[1]);
+      if (!mainFile)
+      {
+        throw std::logic_error("error main file open\n");
+      }
+    }
+    if (mainFile.is_open())
+    {
+      finaev::countFinalResults(mainFile);
     }
     else
     {
       finaev::countFinalResults(std::cin);
     }
   }
-  catch (const std::logic_error& e)
-  {
-    std::cout << e.what();
-    return 1;
-  }
-  catch (const std::overflow_error& e)
+  catch (const std::exception& e)
   {
     std::cout << e.what();
     return 1;

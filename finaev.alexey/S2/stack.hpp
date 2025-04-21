@@ -18,24 +18,22 @@ namespace finaev
     void addSize();
     bool isEmpty() const noexcept;
     size_t size() const noexcept;
-    void push(T rhs);
+    void push(const T& rhs);
     void pop();
-    T& top() const noexcept;
+    T& top() noexcept;
     ~Stack();
   private:
-    T* data_;
-    size_t size_;
     size_t capacity_;
+    size_t size_;
+    T* data_;
   };
 
   template< class T >
   Stack< T >::Stack():
-    data_(nullptr),
+    capacity_(1),
     size_(0),
-    capacity_(20)
-  {
-    data_ = new T[capacity_];
-  }
+    data_(new T[capacity_])
+  {}
 
   template < class T >
   void Stack< T>::swap(Stack<T>& other) noexcept
@@ -46,21 +44,35 @@ namespace finaev
   }
 
   template< class T >
-  Stack< T >::Stack(const Stack< T >& other)
+  Stack< T >::Stack(const Stack< T >& other):
+    capacity_(other.capacity_),
+    size_(other.size_),
+    data_(new T[capacity_])
   {
-    data_ = new T[other.capacity_];
-    capacity_ = other.capacity_;
-    size_ = other.size_;
-    for (size_t i = 0; i < size_; ++i)
+    if (capacity_ > 0)
     {
-      data_[i] = other.data_[i];
+      try
+      {
+        for (size_t i = 0; i < size_; ++i)
+        {
+          data_[i] = other.data_[i]; 
+        }
+      }
+      catch (...)
+      {
+        delete[] data_; 
+        data_ = nullptr;
+        capacity_ = 0;
+        size_ = 0;
+        throw;
+      }
     }
   }
 
   template< class T >
   Stack< T >& Stack< T >::operator=(const Stack< T >& other)
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -83,25 +95,38 @@ namespace finaev
   template < class T >
   Stack< T >& Stack< T >::operator=(Stack< T >&& other) noexcept
   {
-    if (this == &other)
+    if (this != std::addressof(other)) 
     {
-      return *this;
+      delete[] data_;
+      data_ = other.data_;
+      size_ = other.size_;
+      capacity_ = other.capacity_;
+      other.data_ = nullptr;
+      other.size_ = 0;
+      other.capacity_ = 0;
     }
-    swap(other);
     return *this;
   }
 
   template < class T >
   void Stack< T >::addSize()
   {
-    const size_t newSize = capacity_ + 50;
-    T* newArr = new T[newSize];
-    for (size_t i = 0; i < size_; ++i)
+    const size_t newCapacity = capacity_ + 50;
+    T* newArr = new T[newCapacity];
+    try
     {
-      newArr[i] = data_[i];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        newArr[i] = std::move(data_[i]);
+      }
+    }
+    catch(...)
+    {
+      delete[] newArr;
+      throw;
     }
     delete[] data_;
-    capacity_ += 50;
+    capacity_ = newCapacity;
     data_ = newArr;
   }
 
@@ -118,7 +143,7 @@ namespace finaev
   }
 
   template < class T >
-  void Stack< T >::push(T rhs)
+  void Stack< T >::push(const T& rhs)
   {
     if (size_ == capacity_)
     {
@@ -129,7 +154,7 @@ namespace finaev
   }
 
   template < class T >
-  T& Stack< T >::top() const noexcept
+  T& Stack< T >::top() noexcept
   {
     return data_[size_ - 1];
   }
@@ -144,6 +169,7 @@ namespace finaev
   Stack< T >::~Stack()
   {
     delete[] data_;
+    data_ = nullptr;
   }
 }
 

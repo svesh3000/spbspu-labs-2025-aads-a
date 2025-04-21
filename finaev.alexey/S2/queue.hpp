@@ -18,24 +18,26 @@ namespace finaev
     void addSize();
     bool isEmpty() const noexcept;
     size_t size() const noexcept;
-    void push(T rhs);
-    T& top() const noexcept;
+    void push(const T& rhs);
+    T& top() noexcept;
     void pop();
     ~Queue();
   private:
-    T* data_;
     size_t capacity_;
     size_t size_;
+    size_t head_;
+    size_t tail_;
+    T* data_;
   };
 
   template < class T >
   Queue< T >::Queue():
-    data_(nullptr),
-    capacity_(50),
-    size_(0)
-  {
-    data_ = new T[capacity_];
-  }
+    capacity_(1),
+    size_(0),
+    head_(0),
+    tail_(0),
+    data_(new T[capacity_])
+  {}
 
   template < class T >
   void Queue< T >::swap(Queue< T >& other) noexcept
@@ -43,24 +45,42 @@ namespace finaev
     std::swap(data_, other.data_);
     std::swap(capacity_, other.capacity_);
     std::swap(size_, other.size_);
+    std::swap(head_, other.head_);
+    std::swap(tail_, other.tail_);
   }
 
   template < class T >
-  Queue< T >::Queue(const Queue< T >& other)
+  Queue< T >::Queue(const Queue< T >& other):
+    capacity_(other.capacity_),
+    size_(other.size_),
+    head_(other.head_),
+    tail_(other.tail_),
+    data_(new T[other.capacity_])
   {
-    data_ = new T[other.capacity_];
-    capacity_ = other.capacity_;
-    size_ = other.size_;
-    for (size_t i = 0; i < size_; ++i)
+    if (capacity_ > 0)
     {
-      data_[i] = other.data_[i];
+      try
+      {
+        for (size_t i = 0; i < size_; ++i)
+        {
+          data_[i] = other.data_[i]; 
+        }
+      }
+      catch (...)
+      {
+        delete[] data_; 
+        data_ = nullptr;
+        capacity_ = 0;
+        size_ = 0;
+        throw;
+      }
     }
   }
 
   template < class T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& other)
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -71,38 +91,75 @@ namespace finaev
 
   template < class T >
   Queue< T >::Queue(Queue< T >&& other) noexcept:
-    data_(other.data_),
     capacity_(other.capacity_),
-    size_(other.size_)
+    size_(other.size_),
+    head_(other.head_),
+    tail_(other.tail_),
+    data_(other.data_)
   {
     other.data_ = nullptr;
     other.capacity_ = 0;
     other.size_ = 0;
+    other.head_ = 0;
+    other.tail_ = 0;
   }
 
   template < class T >
   Queue< T >& Queue< T >::operator=(Queue< T >&& other) noexcept
   {
-    if (this == &other)
+    if (this != std::addressof(other)) 
     {
-      return *this;
+      delete[] data_;
+      data_ = other.data_;
+      size_ = other.size_;
+      capacity_ = other.capacity_;
+      head_ = other.head_;
+      tail_ = other.tail_;
+      other.data_ = nullptr;
+      other.size_ = 0;
+      other.capacity_ = 0;
+      other.tail_ = 0;
+      other.head_ = 0;
     }
-    swap(other);
     return *this;
   }
 
   template < class T >
   void Queue< T >::addSize()
   {
-    const size_t newSize = capacity_ + 50;
-    T* newArr = new T[newSize];
-    for (size_t i = 0; i < size_; ++i)
+    const size_t newCapacity = capacity_ + 50;
+    T* newArr = new T[newCapacity];
+    try
     {
-      newArr[i] = data_[i];
+      if (head_ < tail_)
+      {
+        for (size_t i = 0; i < size_; ++i)
+        {
+          newArr[i] = data_[i];
+        }
+      }
+      else
+      {
+        for (size_t i = 0; i < (capacity_ - head_); ++i)
+        {
+          newArr[i] = std::move(data_[head_ + i]);
+        }
+        for (size_t i = 0; i < tail_; ++i)
+        {
+          newArr[capacity_ - head_ + i] = std::move(data_[i]);
+        }
+      }
+    }
+    catch(...)
+    {
+      delete[] newArr;
+      throw;
     }
     delete[] data_;
-    capacity_ += 50;
+    capacity_ = newCapacity;
     data_ = newArr;
+    head_ = 0;
+    tail_ = size_;
   }
 
   template < class T >
@@ -118,29 +175,27 @@ namespace finaev
   }
 
   template < class T >
-  void Queue< T >::push(T rhs)
+  void Queue< T >::push(const T& rhs)
   {
     if (size_ == capacity_)
     {
       addSize();
     }
-    data_[size_] = rhs;
+    data_[tail_] = rhs;
+    tail_ = (tail_ + 1) % capacity_;
     ++size_;
   }
 
   template < class T >
-  T& Queue< T >::top() const noexcept
+  T& Queue< T >::top() noexcept
   {
-    return data_[0];
+    return data_[head_];
   }
 
   template < class T >
   void Queue< T >::pop()
   {
-    for (size_t i = 1; i < size_; ++i)
-    {
-      data_[i - 1] = std::move(data_[i]);
-    }
+    head_ = (head_ + 1) % capacity_;
     --size_;
   }
 
@@ -148,6 +203,7 @@ namespace finaev
   Queue< T >::~Queue()
   {
     delete[] data_;
+    data_ = nullptr;
   }
 }
 

@@ -5,37 +5,26 @@
 
 namespace
 {
-  bool isDigit(std::string& a)
+  bool isExpression(std::string a)
   {
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-      if (a[i] > '9' || a[i] < '0')
-      {
-        return false;
-      }
-    }
-    return true;
+    return ((a[0] == '+' || a[0] == '-' || a[0] == '*' || a[0] == '/' || a[0] == '%' || a[0] == '^') && a.size() == 1);
   }
 
-  bool isExpression(std::string& a)
+  bool isMorePriority(std::string a, std::string b)
   {
-    if ((a[0] == '+' || a[0] == '-' || a[0] == '*' || a[0] == '/' || a[0] == '%') && a.size() == 1)
-    {
-      return true;
-    }
-    else
+    if (b[0] == '^')
     {
       return false;
     }
-  }
-
-  bool isMorePriority(std::string& a, std::string& b)
-  {
-    if ((a[0] == '+' || a[0] == '-') && (b[0] == '*' || b[0] == '/' || b[0] == '%'))
+    else if ((a[0] == '*' || a[0] == '/' || a[0] == '%') && (b[0] == '+' || b[0] == '-'))
     {
-      return false;
+      return true; 
     }
-    return true;
+    else if (a[0] == '^' && b[0] != '^')
+    {
+      return true; 
+    }
+    return false;
   }
 }
 
@@ -75,22 +64,18 @@ void finaev::countFinalResults(std::istream& in)
   std::cout << "\n";
 }
 
-finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >& inf)
+finaev::Queue< std::string > finaev::fromInfToPost(Queue< std::string >& inf)
 {
-  finaev::Stack< std::string > temp;
-  finaev::Queue< std::string > res;
+  Stack< std::string > temp;
+  Queue< std::string > res;
   bool isBracket = 0;
+
   while (!inf.isEmpty())
   {
     if (inf.top()[0] == '(' && inf.top().size() == 1)
     {
       isBracket = 1;
       temp.push(inf.top());
-      inf.pop();
-    }
-    else if (isDigit(inf.top()))
-    {
-      res.push(inf.top());
       inf.pop();
     }
     else if (isExpression(inf.top()))
@@ -119,16 +104,14 @@ finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >&
     }
     else
     {
-      throw std::invalid_argument("invalid argument!\n");
+      res.push(inf.top());
+      inf.pop();
     }
   }
-  if (!temp.isEmpty())
+  while (!temp.isEmpty())
   {
-    while (!temp.isEmpty())
-    {
-      res.push(temp.top());
-      temp.pop();
-    }
+    res.push(temp.top());
+    temp.pop();
   }
   if (isBracket)
   {
@@ -139,10 +122,19 @@ finaev::Queue< std::string > finaev::fromInfToPost(finaev::Queue< std::string >&
 
 long long finaev::calculatePost(finaev::Queue< std::string >& post)
 {
-  finaev::Stack< long long > res;
-  while (post.size() != 0)
+  Stack< long long > res;
+  while (!post.isEmpty())
   {
-    while (!post.isEmpty() && isDigit(post.top()))
+    if (isExpression(post.top()))
+    {
+      long long s = res.top();
+      res.pop();
+      long long f = res.top();
+      res.pop();
+      res.push(finaev::count(f, s, post.top()[0]));
+      post.pop();
+    }
+    else
     {
       try
       {
@@ -150,21 +142,15 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
         res.push(num);
         post.pop();
       }
-      catch (const std::overflow_error&)
+      catch (const std::out_of_range&)
       {
-        throw;
+        throw std::overflow_error("Overflow\n");
+      }
+      catch(const std::invalid_argument&)
+      {
+        throw std::invalid_argument("invalid token\n");
       }
     }
-    if (res.size() == 1)
-    {
-      return res.top();
-    }
-    long long s = res.top();
-    res.pop();
-    long long f = res.top();
-    res.pop();
-    res.push(finaev::count(f, s, post.top()[0]));
-    post.pop();
   }
   return res.top();
 }

@@ -3,7 +3,7 @@
 
 namespace finaev
 {
-  long long count(long long& a, long long& b, char& sign);
+  long long count(long long a, long long b, char sign);
 }
 
 #endif

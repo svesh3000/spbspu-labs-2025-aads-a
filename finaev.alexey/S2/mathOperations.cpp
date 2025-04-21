@@ -1,10 +1,11 @@
 #include "mathOperations.hpp"
 #include <limits>
 #include <stdexcept>
+#include <cmath>
 
 namespace
 {
-  long long countPlus(long long& a, long long& b)
+  long long countPlus(long long a, long long b)
   {
     if (a > 0 && b > (std::numeric_limits< long long >::max() - a))
     {
@@ -17,7 +18,7 @@ namespace
     return a + b;
   }
 
-  long long countMinus(long long& a, long long& b)
+  long long countMinus(long long a, long long b)
   {
     if (b > 0 && a < (std::numeric_limits< long long >::min() + b))
     {
@@ -30,7 +31,7 @@ namespace
     return a - b;
   }
 
-  long long countMult(long long& a, long long& b)
+  long long countMult(long long a, long long b)
   {
     if (a > 0 && b > 0)
     {
@@ -63,7 +64,7 @@ namespace
     return a * b;
   }
 
-  long long countDiv(long long& a, long long& b)
+  long long countDiv(long long a, long long b)
   {
     if (b == 0)
     {
@@ -71,7 +72,8 @@ namespace
     }
     return a / b;
   }
-  long long countOstByDiv(long long& a, long long& b)
+
+  long long countOstByDiv(long long a, long long b)
   {
     if (b == 0)
     {
@@ -84,9 +86,60 @@ namespace
     }
     return res;
   }
+
+  long long countExponentiation(long long a, long long b)
+  {
+    if (a == 0)
+    {
+      if (b < 0)
+        {
+          throw std::invalid_argument("Zero cannot be raised to a negative power!\n");
+        }
+        return 0;
+    }
+    if (a == 0 && b == 0)
+    {
+      throw std::invalid_argument("0^0 is undefined!");
+    }
+    if (b >= 0)
+    {
+      long long res = 1;
+      for (long long i = 0; i < b; ++i)
+      {
+        if (res > (std::numeric_limits< long long >::max() / a))
+        {
+          throw std::overflow_error("Overflow!\n");
+        }
+        res *= a;
+      }
+      return res;
+    }
+    else
+    {
+      if (a == 1)
+      {
+        return 1;
+      }
+      else if (a == -1)
+      {
+        if (std::abs(b) % 2 == 0)
+        {
+          return 1; 
+        }
+        else
+        {
+          return -1; 
+        }
+      }
+      else
+      {
+        return 0; 
+      }
+    }
+  }
 }
 
-long long finaev::count(long long& a, long long& b, char& sign)
+long long finaev::count(long long a, long long b, char sign)
 {
   if (sign == '+')
   {
@@ -108,5 +161,9 @@ long long finaev::count(long long& a, long long& b, char& sign)
   {
     return countOstByDiv(a, b);
   }
-  return 0;
+  else if (sign == '^')
+  {
+    return countExponentiation(a, b);
+  }
+  throw std::invalid_argument("Unknown operation\n");
 }
