@@ -6,12 +6,19 @@ void tkach::print(std::istream& in, const AvlTree< std::string, AvlTree< size_t,
   std::string name;
   in >> name;
   AvlTree< size_t, std::string > root = avltree.at(name);
-  out << name;
-  for (auto it = root.cbegin(); it != root.cend(); ++it)
+  if (root.empty())
   {
-    out << " " << (*it).first << " " << (*it).second;
+    out << "<EMPTY>\n";
   }
-  out << "\n";
+  else
+  {
+    out << name;
+    for (auto it = root.cbegin(); it != root.cend(); ++it)
+    {
+      out << " " << (*it).first << " " << (*it).second;
+    }
+    out << "\n";
+  }
 }
 
 void tkach::intersect(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree)

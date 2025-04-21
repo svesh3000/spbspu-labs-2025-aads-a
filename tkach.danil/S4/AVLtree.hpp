@@ -29,6 +29,7 @@ namespace tkach
     Iterator< Key, Value, Cmp > begin();
     Citerator< Key, Value, Cmp > cend() const;
     Iterator< Key, Value, Cmp > end();
+    bool empty();
   private:
     TreeNode< Key, Value >* root_;
     size_t size_;
@@ -60,6 +61,12 @@ namespace tkach
     std::swap(other.root_, root_);
     std::swap(size_, other.size_);
     std::swap(cmp_, other.cmp_);
+  }
+
+  template< class Key, class Value, class Cmp >
+  bool AvlTree< Key, Value, Cmp >::empty()
+  {
+    return size_ == 0;
   }
 
   template< class Key, class Value, class Cmp >
