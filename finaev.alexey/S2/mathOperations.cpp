@@ -20,19 +20,19 @@ namespace
 
   long long countMinus(long long a, long long b)
   {
-    if (b > 0) 
+    if (b > 0)
     {
       if (a < (std::numeric_limits<long long>::min() + b))
       {
         throw std::overflow_error("Underflow!\n");
       }
     }
-    else if (b < 0) 
+    else if (b < 0)
     {
       if (a > (std::numeric_limits<long long>::max() + b))
       {
         throw std::overflow_error("Overflow!\n");
-      }       
+      }
     }
     return a - b;
   }

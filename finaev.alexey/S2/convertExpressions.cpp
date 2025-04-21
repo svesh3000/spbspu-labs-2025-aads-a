@@ -79,7 +79,6 @@ finaev::Queue< std::string > finaev::fromInfToPost(Queue< std::string >& inf)
     }
     else if (isExpression(inf.top()))
     {
-      
       while (!temp.isEmpty() && isExpression(temp.top()) && (isMorePriority(temp.top(), inf.top()) || (!isMorePriority(inf.top(), temp.top()))))
       {
         res.push(temp.top());
