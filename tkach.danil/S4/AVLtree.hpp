@@ -13,6 +13,9 @@ namespace tkach
   {
   public:
     AvlTree();
+    AvlTree(const AvlTree< Key, Value, Cmp >& other);
+    AvlTree(AvlTree< Key, Value, Cmp >&& other);
+    ~AvlTree();
     void insert(const std::pair< Key, Value > & pair);
     void insert(std::pair< Key, Value > && pair);
     void clear();
@@ -44,8 +47,25 @@ namespace tkach
   AvlTree< Key, Value, Cmp >::AvlTree():
     root_(nullptr),
     size_(0),
-    cmp_()
+    cmp_(cmp())
   {}
+
+  template< class Key, class Value, class Cmp >
+  AvlTree< Key, Value, Cmp >::~AvlTree()
+  {
+    clear();
+  }
+
+  template< class Key, class Value, class Cmp >
+  AvlTree< Key, Value, Cmp >::AvlTree(const AvlTree< Key, Value, Cmp >& other):
+
+  {}
+
+  template< class Key, class Value, class Cmp >
+  AvlTree< Key, Value, Cmp >::AvlTree(AvlTree< Key, Value, Cmp >&& other)
+  {
+
+  }
 
   template< class Key, class Value, class Cmp >
   void AvlTree< Key, Value, Cmp >::fixHeight(TreeNode< Key, Value >* node)

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <cstddef>
 #include "AVLtree.hpp"
 #include "commands.hpp"
@@ -21,9 +22,9 @@ namespace
       while(in.get(c) && c != '\n')
       {
         in >> key >> value;
-        temp.insert({key, value});
+        temp.insert(std::make_pair(key, value));
       }
-      fulldata.insert(std::make_pair(name, temp));
+      fulldata.insert(std::make_pair(name, std::move(temp)));
     }
     return fulldata;
   }
@@ -45,7 +46,40 @@ int main()
     return 1;
   }
   AvlTree< std::string, AvlTree< size_t, std::string > > data = inputDataSets(in);
-  intersect(std::cin, data);
-  print(std::cin, data, std::cout);
+  std::string command;
+  while (std::cin >> command)
+  {
+    try
+    {
+      if (command == "print")
+      {
+        print(std::cin, data, std::cout);
+      }
+      else if (command == "intersect")
+      {
+        intersect(std::cin, data);
+      }
+      else if (command == "complement")
+      {
+        complement(std::cin, data);
+      }
+      else if (command == "union")
+      {
+        unionTree(std::cin, data);
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    }
+    catch (const std::exception& e)
+    {
+      std::cerr << e.what() << "\n";
+      return 1;
+    }
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
+
   return 0;
 }
