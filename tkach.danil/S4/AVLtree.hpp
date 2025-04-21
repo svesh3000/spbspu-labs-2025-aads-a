@@ -30,6 +30,7 @@ namespace tkach
     Citerator< Key, Value, Cmp > cend() const;
     Iterator< Key, Value, Cmp > end();
     bool empty();
+    size_t size();
   private:
     TreeNode< Key, Value >* root_;
     size_t size_;
@@ -67,6 +68,12 @@ namespace tkach
   bool AvlTree< Key, Value, Cmp >::empty()
   {
     return size_ == 0;
+  }
+
+  template< class Key, class Value, class Cmp >
+  size_t AvlTree< Key, Value, Cmp >::size()
+  {
+    return size_;
   }
 
   template< class Key, class Value, class Cmp >
