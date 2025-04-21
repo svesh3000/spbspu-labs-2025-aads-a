@@ -30,7 +30,14 @@ void tkach::intersect(std::istream& in, AvlTree< std::string, AvlTree< size_t, s
       root.insert(std::make_pair(it->first, it->second));
     }
   }
-  avltree.insert(std::make_pair(new_name, root));
+  try
+  {
+    avltree.at(new_name) = root;
+  }
+  catch (const std::out_of_range&)
+  {
+    avltree.insert(std::make_pair(new_name, root));
+  }
 }
 
 void tkach::complement(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree)
@@ -56,7 +63,14 @@ void tkach::complement(std::istream& in, AvlTree< std::string, AvlTree< size_t, 
       root.insert({it->first, it->second});
     }
   }
-  avltree.insert({new_name, root});
+  try
+  {
+    avltree.at(new_name) = root;
+  }
+  catch (const std::out_of_range&)
+  {
+    avltree.insert(std::make_pair(new_name, root));
+  }
 }
 
 void tkach::unionTree(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree)
@@ -79,6 +93,13 @@ void tkach::unionTree(std::istream& in, AvlTree< std::string, AvlTree< size_t, s
       root.insert({it->first, it->second});
     }
   }
-  avltree.insert({new_name, root});
+  try
+  {
+    avltree.at(new_name) = root;
+  }
+  catch (const std::out_of_range&)
+  {
+    avltree.insert(std::make_pair(new_name, root));
+  }
 }
 

@@ -16,6 +16,8 @@ namespace tkach
     AvlTree(const AvlTree< Key, Value, Cmp >& other);
     AvlTree(AvlTree< Key, Value, Cmp >&& other) noexcept;
     ~AvlTree();
+    AvlTree< Key, Value, Cmp >& operator=(const AvlTree< Key, Value, Cmp >& other);
+    AvlTree< Key, Value, Cmp >& operator=(AvlTree< Key, Value, Cmp >&& other) noexcept;
     void insert(const std::pair< Key, Value > & pair);
     void insert(std::pair< Key, Value > && pair);
     void clear();
@@ -42,6 +44,7 @@ namespace tkach
     void fixHeight(TreeNode< Key, Value >* node);
     size_t height(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* makeTree(const AvlTree< Key, Value, Cmp >& other);
+    void swap(AvlTree< Key, Value, Cmp >& other) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
@@ -50,6 +53,38 @@ namespace tkach
     size_(0),
     cmp_(Cmp())
   {}
+
+  template< class Key, class Value, class Cmp >
+  void AvlTree< Key, Value, Cmp >::swap(AvlTree< Key, Value, Cmp >& other) noexcept
+  {
+    std::swap(other.root_, root_);
+    std::swap(size_, other.size_);
+    std::swap(cmp_, other.cmp_);
+  }
+
+  template< class Key, class Value, class Cmp >
+  AvlTree< Key, Value, Cmp >& AvlTree< Key, Value, Cmp >::operator=(const AvlTree< Key, Value, Cmp >& other)
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    AvlTree< Key, Value, Cmp > temp(other);
+    swap(temp);
+    return *this;
+  }
+
+  template< class Key, class Value, class Cmp >
+  AvlTree< Key, Value, Cmp >& AvlTree< Key, Value, Cmp >::operator=(AvlTree< Key, Value, Cmp >&& other) noexcept
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    AvlTree< Key, Value, Cmp > temp(std::move(other));
+    swap(temp);
+    return *this;
+  }
 
   template< class Key, class Value, class Cmp >
   TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::makeTree(const AvlTree< Key, Value, Cmp >& other)
@@ -211,7 +246,7 @@ namespace tkach
     {
       return node->second;
     }
-    throw std::out_of_range("No that element");
+    throw std::out_of_range("<INVALID COMMAND>");
   }
 
   template< class Key, class Value, class Cmp >
