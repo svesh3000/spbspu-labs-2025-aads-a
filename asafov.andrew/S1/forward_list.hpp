@@ -208,19 +208,19 @@ namespace asafov
 
     T& front() noexcept
     {
-      return head_->data_ ? head_->data_ : throw logic_error("list is empty!");
+      return head_->data_ ? head_->data_ : throw std::logic_error("list is empty!");
     }
     const T& front() const noexcept
     {
-      return head_->data_ ? head_->data_ : throw logic_error("list is empty!");
+      return head_->data_ ? head_->data_ : throw std::logic_error("list is empty!");
     }
     T& back() noexcept
     {
-      return tail_->data_ ? tail_->data_ : throw logic_error("list is empty!");
+      return tail_->data_ ? tail_->data_ : throw std::logic_error("list is empty!");
     }
     const T& back() const noexcept
     {
-      return tail_->data_ ? tail_->data_ : throw logic_error("list is empty!");
+      return tail_->data_ ? tail_->data_ : throw std::logic_error("list is empty!");
     }
     bool empty() const noexcept
     {
@@ -383,7 +383,6 @@ namespace asafov
       clear();
       swap(temp);
       delete temp;
-      return *this;
     }
 
   private:
