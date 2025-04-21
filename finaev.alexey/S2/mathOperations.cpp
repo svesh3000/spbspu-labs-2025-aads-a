@@ -107,7 +107,7 @@ namespace
     {
       throw std::invalid_argument("0^0 is undefined!");
     }
-    if (b >= 0)
+    if (a >= 0 && b >= 0)
     {
       long long res = 1;
       for (long long i = 0; i < b; ++i)

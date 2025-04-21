@@ -83,9 +83,9 @@ namespace finaev
 
   template < class T >
   Stack< T >::Stack(Stack< T >&& other) noexcept:
-    data_(other.data_),
+    capacity_(other.capacity_),
     size_(other.size_),
-    capacity_(other.capacity_)
+    data_(other.data_)
   {
     other.data_ = nullptr;
     other.capacity_ = 0;
