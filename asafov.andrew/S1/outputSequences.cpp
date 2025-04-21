@@ -68,7 +68,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
       out << ' ' << *begins[0];
       ++begins[0];
     }
-    for (size_t i = 0; i < size;)
+    for (size_t i = 1; i < size;)
     {
       if (begins[i] != ends[i])
       {
