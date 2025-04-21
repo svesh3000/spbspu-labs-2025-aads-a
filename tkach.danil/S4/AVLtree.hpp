@@ -14,7 +14,7 @@ namespace tkach
   public:
     AvlTree();
     AvlTree(const AvlTree< Key, Value, Cmp >& other);
-    AvlTree(AvlTree< Key, Value, Cmp >&& other);
+    AvlTree(AvlTree< Key, Value, Cmp >&& other) noexcept;
     ~AvlTree();
     void insert(const std::pair< Key, Value > & pair);
     void insert(std::pair< Key, Value > && pair);
@@ -37,18 +37,32 @@ namespace tkach
     TreeNode< Key, Value >* insertCmp(TreeNode< Key, Value >* root, const Key& key, Args&&... args);
     void clearFrom(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* findMin(TreeNode< Key, Value >* node) const;
-    TreeNode< Key, Value >*  rotateLeft( TreeNode< Key, Value >*  const root);
-    TreeNode< Key, Value >*  rotateRight( TreeNode< Key, Value >*  const root);
+    TreeNode< Key, Value >* rotateLeft( TreeNode< Key, Value >* const root);
+    TreeNode< Key, Value >* rotateRight( TreeNode< Key, Value >* const root);
     void fixHeight(TreeNode< Key, Value >* node);
     size_t height(TreeNode< Key, Value >* node);
+    TreeNode< Key, Value >* makeTree(const AvlTree< Key, Value, Cmp >& other);
   };
 
   template< class Key, class Value, class Cmp >
   AvlTree< Key, Value, Cmp >::AvlTree():
     root_(nullptr),
     size_(0),
-    cmp_(cmp())
+    cmp_(Cmp())
   {}
+
+  template< class Key, class Value, class Cmp >
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::makeTree(const AvlTree< Key, Value, Cmp >& other)
+  {
+    AvlTree< Key, Value, Cmp > temp;
+    for (auto it = other.cbegin(); it != other.cend(); ++it)
+    {
+      temp.insert(std::make_pair((*it).first, it->second));
+    }
+    TreeNode< Key, Value >* temp_r = temp.root_;
+    temp.root_ = nullptr;
+    return temp_r;
+  }
 
   template< class Key, class Value, class Cmp >
   AvlTree< Key, Value, Cmp >::~AvlTree()
@@ -58,13 +72,19 @@ namespace tkach
 
   template< class Key, class Value, class Cmp >
   AvlTree< Key, Value, Cmp >::AvlTree(const AvlTree< Key, Value, Cmp >& other):
-
+    root_(makeTree(other)),
+    size_(other.size_),
+    cmp_(other.cmp_)
   {}
 
   template< class Key, class Value, class Cmp >
-  AvlTree< Key, Value, Cmp >::AvlTree(AvlTree< Key, Value, Cmp >&& other)
+  AvlTree< Key, Value, Cmp >::AvlTree(AvlTree< Key, Value, Cmp >&& other) noexcept:
+    root_(other.root_),
+    size_(other.size_),
+    cmp_(other.cmp_)
   {
-
+    other.root_ = nullptr;
+    other.size_ = 0;
   }
 
   template< class Key, class Value, class Cmp >
@@ -80,7 +100,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >*  AvlTree< Key, Value, Cmp >::rotateLeft( TreeNode< Key, Value >* const root)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateLeft( TreeNode< Key, Value >* const root)
   {
     if (root == nullptr || root->right == nullptr)
     {
@@ -112,7 +132,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >*  AvlTree< Key, Value, Cmp >::rotateRight( TreeNode< Key, Value >* const root)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateRight( TreeNode< Key, Value >* const root)
   {
     if (root == nullptr || root->left == nullptr)
     {
@@ -142,19 +162,19 @@ namespace tkach
     fixHeight(rotate_tree);
     return rotate_tree;
   }
-  
+
   template< class Key, class Value, class Cmp >
   Citerator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::cbegin() const
   {
     return Citerator< Key, Value, Cmp >(findMin(root_));
   }
-  
+
   template< class Key, class Value, class Cmp >
   Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::begin()
   {
     return Iterator< Key, Value, Cmp >(findMin(root_));
   }
-  
+
   template< class Key, class Value, class Cmp >
   Citerator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::cend() const
   {
@@ -287,7 +307,7 @@ namespace tkach
   Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::find(const Key& key)
   {
     TreeNode< Key, Value >* root = root_;
-    while (root_ != nullptr && key != root->data.first)
+    while (root != nullptr && key != root->data.first)
     {
       if (cmp_(key, root->data.first))
       {

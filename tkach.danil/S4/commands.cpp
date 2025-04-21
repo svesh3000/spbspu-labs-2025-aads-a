@@ -27,10 +27,10 @@ void tkach::intersect(std::istream& in, AvlTree< std::string, AvlTree< size_t, s
   {
     if (second.find(it->first) != second.cend())
     {
-      root.insert({it->first, it->second});
+      root.insert(std::make_pair(it->first, it->second));
     }
   }
-  avltree.insert({new_name, root});
+  avltree.insert(std::make_pair(new_name, root));
 }
 
 void tkach::complement(std::istream& in, AvlTree< std::string, AvlTree< size_t, std::string > >& avltree)
@@ -74,10 +74,11 @@ void tkach::unionTree(std::istream& in, AvlTree< std::string, AvlTree< size_t, s
   }
   for (auto it = second.cbegin(); it != second.cend(); ++it)
   {
-    if (root.find(it->first) != root.end())
+    if (root.find(it->first) == root.end())
     {
       root.insert({it->first, it->second});
     }
   }
   avltree.insert({new_name, root});
 }
+

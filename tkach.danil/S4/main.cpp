@@ -30,16 +30,15 @@ namespace
   }
 }
 
-int main()
+int main(const int argc, const char* const* const argv)
 {
   using namespace tkach;
-  // if (argc != 2)
-  // {
-  //   std::cerr << "Error: incorrect input\n";
-  //   return 1;
-  // }
-  // std::fstream in2(argv[1]);
-  std::fstream in("/home/danil//spbspu-labs-2025-aads-a/tkach.danil/S4/input.txt");
+  if (argc != 2)
+  {
+    std::cerr << "Error: incorrect input\n";
+    return 1;
+  }
+  std::fstream in(argv[1]);
   if (!in.is_open())
   {
     std::cerr << "File is not open\n";
