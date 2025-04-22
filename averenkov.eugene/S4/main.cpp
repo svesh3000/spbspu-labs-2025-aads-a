@@ -12,8 +12,8 @@ void loadDictionaries(const std::string& filename, DictionaryStorage& storage)
   std::ifstream file(filename);
   if (!file)
   {
-    std::cerr << "Error opening file: " << filename << "\n";
-    exit(1);
+    std::cerr << "file error\n";
+    return;
   }
 
   std::string line;
@@ -33,10 +33,10 @@ void loadDictionaries(const std::string& filename, DictionaryStorage& storage)
     std::string value;
     while (iss >> key >> value)
     {
-      dict.insert(std::pair<const int, std::string>(key, value));
+      dict.insert(std::pair< const int, std::string >(key, value));
     }
 
-    storage.insert(std::pair<const std::string, Dictionary>(dictName, dict));
+    storage.insert(std::pair< const std::string, Dictionary >(dictName, dict));
   }
 }
 
@@ -56,12 +56,11 @@ void printDictionary(const Dictionary& dict, const std::string& name)
   std::cout << "\n";
 }
 
-void complement(DictionaryStorage& storage, const std::string& newName,
-               const std::string& name1, const std::string& name2)
+void complement(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
-  
+
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
@@ -73,19 +72,18 @@ void complement(DictionaryStorage& storage, const std::string& newName,
   {
     if (dict2->second.find(it->first) == dict2->second.end())
     {
-      result.insert(std::pair<const int, std::string>(it->first, it->second));
+      result.insert(std::pair< const int, std::string >(it->first, it->second));
     }
   }
 
-  storage.insert(std::pair<const std::string, Dictionary>(newName, result));
+  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
 }
 
-void intersect(DictionaryStorage& storage, const std::string& newName,
-              const std::string& name1, const std::string& name2)
+void intersect(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
-  
+
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
@@ -97,19 +95,18 @@ void intersect(DictionaryStorage& storage, const std::string& newName,
   {
     if (dict2->second.find(it->first) != dict2->second.end())
     {
-      result.insert(std::pair<const int, std::string>(it->first, it->second));
+      result.insert(std::pair< const int, std::string >(it->first, it->second));
     }
   }
 
-  storage.insert(std::pair<const std::string, Dictionary>(newName, result));
+  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
 }
 
-void unionDicts(DictionaryStorage& storage, const std::string& newName,
-               const std::string& name1, const std::string& name2)
+void unionDicts(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
-  
+
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
@@ -121,11 +118,11 @@ void unionDicts(DictionaryStorage& storage, const std::string& newName,
   {
     if (result.find(it->first) == result.end())
     {
-      result.insert(std::pair<const int, std::string>(it->first, it->second));
+      result.insert(std::pair< const int, std::string >(it->first, it->second));
     }
   }
 
-  storage.insert(std::pair<const std::string, Dictionary>(newName, result));
+  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
 }
 
 int main(int argc, char* argv[])

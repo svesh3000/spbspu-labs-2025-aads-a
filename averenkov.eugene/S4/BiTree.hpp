@@ -92,7 +92,7 @@ using NodeType = Node< Key, Value >;
 template < class Key, class Value, class Compare >
 BinarySearchTree< Key, Value, Compare >::BinarySearchTree():
   root(nullptr),
-  fake_root(new NodeType(Key(), Value())),
+  fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(Compare()),
   size_(0)
 {
@@ -102,7 +102,7 @@ BinarySearchTree< Key, Value, Compare >::BinarySearchTree():
 template < class Key, class Value, class Compare >
 BinarySearchTree< Key, Value, Compare >::BinarySearchTree(const Compare& cmp):
   root(nullptr),
-  fake_root(new NodeType(Key(), Value())),
+  fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
@@ -112,7 +112,7 @@ BinarySearchTree< Key, Value, Compare >::BinarySearchTree(const Compare& cmp):
 template < class Key, class Value, class Compare >
 BinarySearchTree< Key, Value, Compare >::BinarySearchTree(const BinarySearchTree& other):
   root(nullptr),
-  fake_root(new NodeType(Key(), Value())),
+  fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(other.comp),
   size_(0)
 {

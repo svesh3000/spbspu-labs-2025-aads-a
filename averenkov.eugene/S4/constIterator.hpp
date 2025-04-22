@@ -59,7 +59,7 @@ template < class Key, class Value, class Compare >
 const std::pair< const Key, Value >* ConstIterator< Key, Value, Compare >::operator->() const
 {
   assert(current != nullptr);
-  return &current->data;
+  return std::addressof(current->data);
 }
 
 template < class Key, class Value, class Compare >
