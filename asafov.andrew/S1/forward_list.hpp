@@ -207,7 +207,7 @@ namespace asafov
       return iterator(nullptr, tail_);
     }
 
-    T& front() noexcept
+    T& front()
     {
       if (head_->data_)
       {
@@ -218,7 +218,7 @@ namespace asafov
         throw std::logic_error("list is empty!");
       }
     }
-    const T& front() const noexcept
+    const T& front() const
     {
       if (head_->data_)
       {
@@ -229,7 +229,7 @@ namespace asafov
         throw std::logic_error("list is empty!");
       }
     }
-    T& back() noexcept
+    T& back()
     {
       if (tail_->data_)
       {
@@ -240,7 +240,7 @@ namespace asafov
         throw std::logic_error("list is empty!");
       }
     }
-    const T& back() const noexcept
+    const T& back() const
     {
       if (tail_->data_)
       {

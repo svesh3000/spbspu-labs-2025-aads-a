@@ -204,7 +204,6 @@ BOOST_AUTO_TEST_CASE(assign_test)
     std::cerr << e.what() << '\n';
   }
   BOOST_TEST(test);
-  bool test = true;
   try
   {
     test = list.back() == 1;
