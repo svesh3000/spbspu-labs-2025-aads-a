@@ -52,7 +52,7 @@ int main(int argc, char** argv)
       if (command == "print")
       {
         std::string dataset;
-        *input >> dataset >> dataset;;
+        *input >> dataset;
         print(*out, dicts, dataset);
       }
       else if (command == "complement")
