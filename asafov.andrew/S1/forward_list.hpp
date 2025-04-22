@@ -329,7 +329,7 @@ namespace asafov
       }
     }
     template< class C >
-    void remove_if(C) noexcept
+    void remove_if(C condition) noexcept
     {
       if (!head_)
       {
@@ -340,7 +340,7 @@ namespace asafov
       bool found = false;
       do
       {
-        if (C(current->data_))
+        if (condition(current->data_))
         {
           found = true;
           Node* toDelete = current;
