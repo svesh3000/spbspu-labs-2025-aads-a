@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(front_test)
   bool test = true;
   try
   {
-    list.front() == 1;
+    test = list.front() == 1;
   }
   catch (const std::exception e)
   {
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(back_test)
   bool test = true;
   try
   {
-    list.back() == 4;
+    test = list.back() == 4;
   }
   catch (const std::exception e)
   {
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(pop_front_test)
   bool test = true;
   try
   {
-    list.front() == 2;
+    test = list.front() == 2;
   }
   catch (const std::exception e)
   {
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(remove_test)
   bool test = true;
   try
   {
-    list.front() == 2;
+    test = list.front() == 2;
   }
   catch (const std::exception e)
   {
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   bool test = true;
   try
   {
-    list.front() == 2;
+    test = list.front() == 2;
   }
   catch (const std::exception e)
   {
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(assign_test)
   bool test = true;
   try
   {
-    list.front() == 1;
+    test = list.front() == 1;
   }
   catch (const std::exception e)
   {
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(assign_test)
   bool test = true;
   try
   {
-    list.back() == 1;
+    test = list.back() == 1;
   }
   catch (const std::exception e)
   {
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(swap_test)
   bool test = true;
   try
   {
-    list.front() == 2;
+    test = list.front() == 2;
   }
   catch (const std::exception e)
   {
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(swap_test)
   BOOST_TEST(test);
   try
   {
-    list2.front() == 1;
+    test = list2.front() == 1;
   }
   catch (const std::exception e)
   {

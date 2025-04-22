@@ -209,19 +209,47 @@ namespace asafov
 
     T& front() noexcept
     {
-      return head_->data_ ? head_->data_ : throw std::logic_error("list is empty!");
+      if (head_->data_)
+      {
+        return head_->data_;
+      }
+      else
+      {
+        throw std::logic_error("list is empty!");
+      }
     }
     const T& front() const noexcept
     {
-      return head_->data_ ? head_->data_ : throw std::logic_error("list is empty!");
+      if (head_->data_)
+      {
+        return head_->data_;
+      }
+      else
+      {
+        throw std::logic_error("list is empty!");
+      }
     }
     T& back() noexcept
     {
-      return tail_->data_ ? tail_->data_ : throw std::logic_error("list is empty!");
+      if (tail_->data_)
+      {
+        return tail_->data_;
+      }
+      else
+      {
+        throw std::logic_error("list is empty!");
+      }
     }
     const T& back() const noexcept
     {
-      return tail_->data_ ? tail_->data_ : throw std::logic_error("list is empty!");
+      if (tail_->data_)
+      {
+        return tail_->data_;
+      }
+      else
+      {
+        throw std::logic_error("list is empty!");
+      }
     }
     bool empty() const noexcept
     {
