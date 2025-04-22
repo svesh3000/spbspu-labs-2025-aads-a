@@ -399,22 +399,20 @@ void Tree< Key, Value, Compare >::clear()
   {
     destroy_tree(root);
   }
-  root = fake_root;
+  root = nullptr;
   size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
-void Tree< Key, Value, Compare >::destroy_tree(NodeType* NodeType)
+void Tree< Key, Value, Compare >::destroy_tree(NodeType* node)
 {
-  if (NodeType->left && NodeType->left != fake_root)
+  if (node)
   {
-    destroy_tree(NodeType->left);
+    destroy_tree(node->left);
+    destroy_tree(node->right);
+    delete node;
   }
-  if (NodeType->right && NodeType->right != fake_root)
-  {
-    destroy_tree(NodeType->right);
-  }
-  delete NodeType;
+  return;
 }
 
 template < class Key, class Value, class Compare >
@@ -528,10 +526,7 @@ size_t Tree< Key, Value, Compare >::count(const Key& key) const
 }
 
 template < class Key, class Value, class Compare >
-std::pair<
-  typename Tree< Key, Value, Compare >::iterator,
-  typename Tree< Key, Value, Compare >::iterator
->
+std::pair< typename Tree< Key, Value, Compare >::iterator, typename Tree< Key, Value, Compare >::iterator >
 Tree< Key, Value, Compare >::equal_range(const Key& key)
 {
   return { lower_bound(key), upper_bound(key) };
@@ -693,8 +688,7 @@ void Tree< Key, Value, Compare >::insert(InputIt first, InputIt last)
 }
 
 template < class Key, class Value, class Compare >
-void Tree< Key, Value, Compare >::insert(
-  std::initializer_list< std::pair< const Key, Value > > ilist)
+void Tree< Key, Value, Compare >::insert(std::initializer_list< std::pair< const Key, Value > > ilist)
 {
   for (const auto& item : ilist)
   {
