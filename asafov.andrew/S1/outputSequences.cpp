@@ -65,7 +65,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
       {
         sum += *begins[0];
       }
-      out << ' ' << *begins[0];
+      out << *begins[0];
       ++begins[0];
     }
     for (size_t i = 1; i < size;)
