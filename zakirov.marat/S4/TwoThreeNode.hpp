@@ -4,21 +4,21 @@
 
 namespace zakirov
 {
-  template < typename T>
+  template < typename T, typename K >
   class TwoThreeNode
   {
   public:
-  TwoThreeNode(const T & data, size_t key);
-    TwoThreeNode< T > * top_;
-    TwoThreeNode< T > * left_;
-    TwoThreeNode< T > * middle_;
-    TwoThreeNode< T > * right_;
+    TwoThreeNode(const T & data, K key);
+    TwoThreeNode< T, K > * top_;
+    TwoThreeNode< T, K > * left_;
+    TwoThreeNode< T, K > * middle_;
+    TwoThreeNode< T, K > * right_;
     T data_;
-    size_t key_;
+    K key_;
   };
 
-  template < typename T>
-  TwoThreeNode< T >::TwoThreeNode(const T & data, size_t key):
+  template < typename T, typename K >
+  TwoThreeNode< T, K >::TwoThreeNode(const T & data, K key):
     top_(nullptr),
     left_(nullptr),
     middle_(nullptr),
