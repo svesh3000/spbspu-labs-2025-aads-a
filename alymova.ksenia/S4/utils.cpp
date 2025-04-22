@@ -8,7 +8,12 @@ void alymova::print(std::ostream& out, const all_dict_t& dicts, const std::strin
   auto it1 = dicts.find(dataset);
   if (it1 == dicts.end())
   {
-    throw std::logic_error("<INVALID PRINT>");
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  if ((*it1).second.empty())
+  {
+    out << "<EMPTY>";
+    return;
   }
   out << (*it1).first;
   for (auto it2 = (*it1).second.begin(); it2 != (*it1).second.end(); it2++)
@@ -25,7 +30,7 @@ alymova::dict_t alymova::complement(all_dict_t& dicts, const std::string& newdat
   auto it2 = dicts.find(dataset2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
-    throw std::logic_error("<INVALID COMPLEMENT>");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   dict_t dict1 = (*it1).second;
   dict_t dict2 = (*it2).second;
@@ -55,7 +60,7 @@ alymova::dict_t alymova::intersect(all_dict_t& dicts, const std::string& newdata
   auto it2 = dicts.find(dataset2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
-    throw std::logic_error("<INVALID INTERSECT>");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   dict_t dict1 = (*it1).second;
   dict_t dict2 = (*it2).second;
@@ -77,7 +82,7 @@ alymova::dict_t alymova::unionDict(all_dict_t& dicts, const std::string& newdata
   auto it2 = dicts.find(dataset2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
-    throw std::logic_error("<INVALID UNION>");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   dict_t dict_complement = complement(dicts, newdataset, dataset1, dataset2);
   dict_t dict_intersect_result = intersect(dicts, newdataset, dataset1, dataset2);
