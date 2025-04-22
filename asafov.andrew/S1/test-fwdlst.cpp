@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "forward_list.hpp"
 #include <iostream>
+#include <stdexcept>
 
 BOOST_AUTO_TEST_CASE(push_back_and_size_test)
 {
@@ -68,7 +69,7 @@ BOOST_AUTO_TEST_CASE(front_test)
   {
     test = list.front() == 1;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -87,7 +88,7 @@ BOOST_AUTO_TEST_CASE(back_test)
   {
     test = list.back() == 4;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_CASE(pop_front_test)
   {
     test = list.front() == 2;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -156,7 +157,7 @@ BOOST_AUTO_TEST_CASE(remove_test)
   {
     test = list.front() == 2;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -181,7 +182,7 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   {
     test = list.front() == 2;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -198,7 +199,7 @@ BOOST_AUTO_TEST_CASE(assign_test)
   {
     test = list.front() == 1;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -208,7 +209,7 @@ BOOST_AUTO_TEST_CASE(assign_test)
   {
     test = list.back() == 1;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -227,7 +228,7 @@ BOOST_AUTO_TEST_CASE(swap_test)
   {
     test = list.front() == 2;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
@@ -236,7 +237,7 @@ BOOST_AUTO_TEST_CASE(swap_test)
   {
     test = list2.front() == 1;
   }
-  catch (const std::exception e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
