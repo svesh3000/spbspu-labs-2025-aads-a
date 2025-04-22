@@ -4,8 +4,8 @@
 #include <string>
 #include "BiTree.hpp"
 
-using Dictionary = BinarySearchTree<int, std::string>;
-using DictionaryStorage = BinarySearchTree<std::string, Dictionary>;
+using Dictionary = Tree< int, std::string >;
+using DictionaryStorage = Tree< std::string, Dictionary >;
 
 using str = const std::string&;
 
