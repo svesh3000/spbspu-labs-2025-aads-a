@@ -14,19 +14,19 @@ int main(int argc, char** argv)
 
   std::istream* input = &std::cin;
   std::ostream* out = &std::cout;
-  /*if (argc != 2)
+  if (argc != 2)
   {
     std::cerr << "<INCORRECT ARGUMENTS>\n";
     return 1;
-  }*/
-  /*std::ifstream file;
+  }
+  std::ifstream file;
   file.open(argv[1]);
   if (!file.is_open())
   {
     std::cerr << "<INCORRECT FILE>\n";
     return 1;
   }
-  input = &file;*/
+  input = &file;
 
   try
   {
