@@ -47,20 +47,21 @@ int main(int argc, char** argv)
     (*input).clear();
 
     std::string command;
-    while ((*input >> command))
+    while ((std::cin >> command))
     {
       if (command == "print")
       {
         std::string dataset;
-        *input >> dataset;
+        std::cin >> dataset;
         print(*out, dicts, dataset);
+        *out << '\n';
       }
       else if (command == "complement")
       {
         std::string newdataset;
         std::string dataset1;
         std::string dataset2;
-        *input >> newdataset >> dataset1 >> dataset2;
+        std::cin >> newdataset >> dataset1 >> dataset2;
         complement(dicts, newdataset, dataset1, dataset2);
       }
       else if (command == "intersect")
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
         std::string newdataset;
         std::string dataset1;
         std::string dataset2;
-        *input >> newdataset >> dataset1 >> dataset2;
+        std::cin >> newdataset >> dataset1 >> dataset2;
         intersect(dicts, newdataset, dataset1, dataset2);
       }
       else if (command == "union")
@@ -76,7 +77,7 @@ int main(int argc, char** argv)
         std::string newdataset;
         std::string dataset1;
         std::string dataset2;
-        *input >> newdataset >> dataset1 >> dataset2;
+        std::cin >> newdataset >> dataset1 >> dataset2;
         unionDict(dicts, newdataset, dataset1, dataset2);
       }
       else
