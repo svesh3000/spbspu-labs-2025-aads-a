@@ -84,8 +84,8 @@ alymova::dict_t alymova::unionDict(all_dict_t& dicts, const std::string& newdata
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  dict_t dict_complement = complement(dicts, newdataset, dataset1, dataset2);
   dict_t dict_intersect_result = intersect(dicts, newdataset, dataset1, dataset2);
+  dict_t dict_complement = complement(dicts, newdataset, dataset1, dataset2);
   for (auto it = dict_complement.begin(); it != dict_complement.end(); it++)
   {
     dict_intersect_result[(*it).first] = (*it).second;
