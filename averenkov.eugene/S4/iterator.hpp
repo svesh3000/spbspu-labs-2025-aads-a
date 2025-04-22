@@ -70,13 +70,13 @@ Iterator< Key, Value, Compare >::operator++()
   }
   else
   {
-    NodeType* parent = current->parent;
+    auto* parent = current->parent;
     while (parent && current == parent->right)
     {
       current = parent;
       parent = parent->parent;
     }
-    current = (parent && parent != fake_root) ? parent : nullptr;
+    current = parent;
   }
   return *this;
 }
@@ -105,13 +105,13 @@ Iterator< Key, Value, Compare >::operator--()
   }
   else
   {
-    NodeType* parent = current->parent;
+    auto* parent = current->parent;
     while (parent && current == parent->left)
     {
       current = parent;
       parent = parent->parent;
     }
-    current = (parent && parent != fake_root) ? parent : nullptr;
+    current = parent;
   }
   return *this;
 }
