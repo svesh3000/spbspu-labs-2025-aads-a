@@ -7,7 +7,9 @@
 using Dictionary = BinarySearchTree<int, std::string>;
 using DictionaryStorage = BinarySearchTree<std::string, Dictionary>;
 
-void loadDictionaries(const std::string& filename, DictionaryStorage& storage)
+using str = const std::string&;
+
+void loadDictionaries(str filename, DictionaryStorage& storage)
 {
   std::ifstream file(filename);
   if (!file)
@@ -40,7 +42,7 @@ void loadDictionaries(const std::string& filename, DictionaryStorage& storage)
   }
 }
 
-void printDictionary(const Dictionary& dict, const std::string& name)
+void printDictionary(const Dictionary& dict, str name)
 {
   if (dict.empty())
   {
@@ -56,7 +58,8 @@ void printDictionary(const Dictionary& dict, const std::string& name)
   std::cout << "\n";
 }
 
-void complement(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
+
+void complement(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
@@ -79,7 +82,7 @@ void complement(DictionaryStorage& storage, const std::string& newName, const st
   storage.insert(std::pair< const std::string, Dictionary >(newName, result));
 }
 
-void intersect(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
+void intersect(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
@@ -102,7 +105,7 @@ void intersect(DictionaryStorage& storage, const std::string& newName, const std
   storage.insert(std::pair< const std::string, Dictionary >(newName, result));
 }
 
-void unionDicts(DictionaryStorage& storage, const std::string& newName, const std::string& name1, const std::string& name2)
+void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
