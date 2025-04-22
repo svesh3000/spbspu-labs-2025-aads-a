@@ -411,7 +411,6 @@ namespace asafov
       }
       clear();
       swap(temp);
-      delete temp;
     }
 
   private:

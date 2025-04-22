@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include "forward_list.hpp"
+#include <iostream>
 
 BOOST_AUTO_TEST_CASE(push_back_and_size_test)
 {
