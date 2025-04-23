@@ -36,7 +36,7 @@ namespace finaev
   {}
 
   template< class T >
-  T& listIterator< T >::operator*() 
+  T& listIterator< T >::operator*()
   {
     return node_->data;
   }
@@ -91,3 +91,4 @@ namespace finaev
 }
 
 #endif
+
