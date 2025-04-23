@@ -3,17 +3,17 @@
 
 namespace finaev
 {
-  template< class T >
+  template < class T>
   struct Node
   {
     Node(const T& data);
     T data;
-    Node< T >* next;
+    Node < T >* next;
     Node< T >* prev;
   };
 }
 
-template< class T >
+template < class T >
 finaev::Node< T >::Node(const T& data):
   data(data),
   next(nullptr),

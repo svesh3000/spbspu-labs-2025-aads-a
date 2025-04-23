@@ -7,29 +7,29 @@
 
 namespace finaev
 {
-  template< class T >
+  template <class T>
   struct List
   {
   public:
     List();
-    List(const List< T >&);
-    List< T >& operator=(const List< T >&);
+    List(const List<T>&);
+    List< T >& operator=(const List<T>&);
     List(List&&) noexcept;
-    List< T >& operator=(List< T >&&) noexcept;
+    List< T >& operator=(List<T>&&) noexcept;
     void swap(List& other) noexcept;
     bool isEmpty() const noexcept;
     void pushBack(const T& data);
     void pushFront(const T& data);
-    listIterator< T > begin() noexcept;
-    listIterator< T > end() noexcept;
-    constListIterator< T > constBegin() const noexcept;
-    constListIterator< T > constEnd() const noexcept;
-    const T& front() const;
-    const T& back() const;
+    listIterator< T > begin() const;
+    listIterator< T > end() const;
+    constListIterator< T > constBegin() const;
+    constListIterator< T > constEnd() const;
+    T& front() const;
+    T& back() const;
     size_t size() const noexcept;
     void popBack();
     void popFront();
-    void clear() noexcept;
+    void clear();
     ~List();
   private:
     Node< T >* head_;
@@ -37,15 +37,15 @@ namespace finaev
     size_t size_;
   };
 
-  template< class T >
+  template < class T >
   List< T >::List():
     head_(nullptr),
     tail_(nullptr),
     size_(0)
   {}
 
-  template< class T >
-  List< T >::List(const List< T >& other):
+  template < class T >
+  List< T >::List(const List< T >& other) :
     List()
   {
     for (constListIterator< T > i = other.constBegin(); i != other.constEnd(); ++i)
@@ -54,7 +54,7 @@ namespace finaev
     }
   }
 
-  template< class T >
+  template < class T >
   void List< T >::swap(List& other) noexcept
   {
     std::swap(head_, other.head_);
@@ -65,7 +65,7 @@ namespace finaev
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this == std::addressof(other))
+    if (this == &other)
     {
       return *this;
     }
@@ -74,7 +74,7 @@ namespace finaev
     return *this;
   }
 
-  template< class T >
+  template < class T >
   List< T >::List(List&& other) noexcept
   {
     head_ = other.head_;
@@ -85,10 +85,10 @@ namespace finaev
     other.size_ = 0;
   }
 
-  template< class T >
-  List< T >& List< T >::operator=(List< T >&& other) noexcept
+  template < class T >
+  List< T >& List<T>::operator=(List< T >&& other) noexcept
   {
-    if (this == std::addressof(other))
+    if (this == &other)
     {
       return *this;
     }
@@ -99,7 +99,7 @@ namespace finaev
     return *this;
   }
 
-  template< class T >
+  template < class T >
   void List< T >::pushBack(const T& data)
   {
     Node< T >* elem = new Node< T >(data);
@@ -117,7 +117,7 @@ namespace finaev
     ++size_;
   }
 
-  template< class T >
+  template < class T >
   void List< T >::pushFront(const T& data)
   {
     Node< T >* elem = new Node< T >(data);
@@ -135,14 +135,14 @@ namespace finaev
     ++size_;
   }
 
-  template< class T >
-  listIterator< T > List< T >::begin() noexcept
+  template < class T >
+  listIterator< T > List < T >::begin() const
   {
     return listIterator< T >(head_);
   }
 
-  template< class T >
-  listIterator< T > List< T >::end() noexcept
+  template < class T >
+  listIterator< T > List < T >::end() const
   {
     if (!tail_)
     {
@@ -151,14 +151,14 @@ namespace finaev
     return listIterator< T >(tail_->next);
   }
 
-  template< class T >
-  constListIterator< T > List< T >::constBegin() const noexcept
+  template < class T >
+  constListIterator< T > List< T >::constBegin() const
   {
     return constListIterator< T >(head_);
   }
 
-  template< class T >
-  constListIterator< T > List< T >::constEnd() const noexcept
+  template < class T >
+  constListIterator< T > List< T >::constEnd() const
   {
     if (!tail_)
     {
@@ -167,31 +167,31 @@ namespace finaev
     return constListIterator< T >(tail_->next);
   }
 
-  template< class T >
-  const T& List< T >::front() const
+  template < class T >
+  T& List< T >::front() const
   {
     return head_->data;
   }
 
-  template< class T >
-  const T& List< T >::back() const
+  template < class T >
+  T& List< T >::back() const
   {
     return tail_->data;
   }
 
-  template< class T >
+  template < class T >
   bool List< T >::isEmpty() const noexcept
   {
     return size_ == 0;
   }
 
-  template< class T >
+  template < class T >
   size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
-  template< class T >
+  template < class T >
   void List < T >::popBack()
   {
     Node< T >* toDelete = tail_;
@@ -204,7 +204,7 @@ namespace finaev
     --size_;
   }
 
-  template< class T >
+  template <typename T>
   void List< T >::popFront()
   {
     Node< T >* toDelete = head_;
@@ -224,10 +224,10 @@ namespace finaev
     --size_;
   }
 
-  template< class T >
-  void List< T >::clear() noexcept
+  template < class T >
+  void List< T >::clear()
   {
-    while (head_)
+    while(head_)
     {
       Node< T >* temp = head_;
       head_ = head_->next;
@@ -237,7 +237,7 @@ namespace finaev
     size_ = 0;
   }
 
-  template< class T >
+  template < class T >
   List< T >::~List()
   {
     clear();

@@ -4,7 +4,7 @@
 
 int main()
 {
-  finaev::List< std::pair< std::string, finaev::List< size_t > > > List;
+  finaev::List< std::pair<std::string, finaev::List<size_t>>> List;
   std::string str = "";
   while (std::cin >> str)
   {
@@ -21,18 +21,13 @@ int main()
     }
     std::cin.clear();
   }
-  finaev::List< std::string > listOfHeads;
+  finaev::List<std::string> listOfHeads;
   for (auto i = List.begin(); i != List.end(); ++i)
   {
     listOfHeads.pushBack((*i).first);
   }
-  if (listOfHeads.isEmpty())
-  {
-    std::cout << "0\n";
-    return 0;
-  }
   finaev::printList(listOfHeads, std::cout);
-  finaev::List< finaev::List< size_t > > listOfLists = finaev::createRightList(List);
+  finaev::List<finaev::List<size_t>> listOfLists = finaev::createRightList(List);
   if (listOfLists.size() == 0)
   {
     std::cout << 0 << "\n";
@@ -47,6 +42,6 @@ int main()
     std::cerr << "is overflow!\n";
     return 1;
   }
-  finaev::List< size_t > listOfSum = finaev::createListOfSum(listOfLists);
+  finaev::List<size_t> listOfSum = finaev::createListOfSum(listOfLists);
   finaev::printList(listOfSum, std::cout);
 }
