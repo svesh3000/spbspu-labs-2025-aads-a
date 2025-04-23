@@ -26,6 +26,11 @@ int main()
   {
     listOfHeads.pushBack((*i).first);
   }
+  if (listOfHeads.isEmpty())
+  {
+    std::cout << "0\n";
+    return 0;
+  }
   finaev::printList(listOfHeads, std::cout);
   finaev::List< finaev::List< size_t > > listOfLists = finaev::createRightList(List);
   if (listOfLists.size() == 0)
