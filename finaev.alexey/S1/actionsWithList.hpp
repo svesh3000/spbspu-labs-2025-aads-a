@@ -6,11 +6,11 @@
 
 namespace finaev
 {
-  finaev::List < finaev::List < size_t > > createRightList(finaev::List< std::pair< std::string, finaev::List < size_t > > > List);
-  void printList(finaev::List<size_t> list, std::ostream& out);
-  void printList(finaev::List<std::string> list, std::ostream& out);
-  bool isOverflow(finaev::List < finaev::List < size_t > > list);
-  finaev::List < size_t > createListOfSum(finaev::List < finaev::List < size_t > > list);
+  List< List< size_t > > createRightList(List< std::pair< std::string, List< size_t > > > List);
+  void printList(List< size_t > list, std::ostream& out);
+  void printList(const List< std::string >& list, std::ostream& out);
+  bool isOverflow(List< List< size_t > > list);
+  List< size_t > createListOfSum(List< List< size_t > > list);
 }
 
 #endif
