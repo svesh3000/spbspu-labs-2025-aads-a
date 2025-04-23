@@ -3,7 +3,7 @@
 
 namespace
 {
-  std::pair < finaev::List < size_t >, bool > listSumAndOverflow(finaev::List < finaev::List < size_t > > list)
+  std::pair< finaev::List< size_t >, bool > listSumAndOverflow(finaev::List< finaev::List< size_t > > list)
   {
     bool isOverflow = 0;
     finaev::List < size_t > listSum;
@@ -24,7 +24,7 @@ namespace
   }
 }
 
-finaev::List < finaev::List < size_t > > finaev::createRightList(finaev::List< std::pair< std::string, finaev::List < size_t > > > List)
+finaev::List< finaev::List< size_t > > finaev::createRightList(List< std::pair< std::string, List< size_t > > > List)
 {
   finaev::List<finaev::List<size_t>> listOfLists;
   size_t max_size = 0;
@@ -69,7 +69,7 @@ void finaev::printList(finaev::List< size_t > list, std::ostream& out)
   out << "\n";
 }
 
-void finaev::printList(finaev::List<std::string> list, std::ostream& out)
+void finaev::printList(const List< std::string >& list, std::ostream& out)
 {
   if (list.begin() == nullptr)
   {
@@ -83,12 +83,12 @@ void finaev::printList(finaev::List<std::string> list, std::ostream& out)
   out << "\n";
 }
 
-bool finaev::isOverflow(finaev::List < finaev::List < size_t > > list)
+bool finaev::isOverflow(List< finaev::List< size_t > > list)
 {
   return listSumAndOverflow(list).second;
 }
 
-finaev::List < size_t > finaev::createListOfSum(finaev::List < finaev::List < size_t > > list)
+finaev::List< size_t > finaev::createListOfSum(List< finaev::List< size_t > > list)
 {
   return listSumAndOverflow(list).first;
 }
