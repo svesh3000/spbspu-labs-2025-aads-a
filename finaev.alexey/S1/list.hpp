@@ -65,7 +65,7 @@ namespace finaev
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this == std::adressof(other))
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -88,7 +88,7 @@ namespace finaev
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
-    if (this == std::adressof(other))
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -136,7 +136,7 @@ namespace finaev
   }
 
   template< class T >
-  listIterator< T > List < T >::begin() noexcept
+  listIterator< T > List< T >::begin() noexcept
   {
     return listIterator< T >(head_);
   }

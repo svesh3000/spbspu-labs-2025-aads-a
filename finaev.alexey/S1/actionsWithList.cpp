@@ -71,12 +71,8 @@ void finaev::printList(finaev::List< size_t > list, std::ostream& out)
 
 void finaev::printList(const List< std::string >& list, std::ostream& out)
 {
-  if (list.begin() == nullptr)
-  {
-    return;
-  }
-  out << *list.begin();
-  for (auto i = ++list.begin(); i != list.end(); ++i)
+  out << *list.constBegin();
+  for (auto i = ++list.constBegin(); i != list.constEnd(); ++i)
   {
     out << " " << *i;
   }

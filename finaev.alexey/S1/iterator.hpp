@@ -13,8 +13,8 @@ namespace finaev
     listIterator();
     listIterator(Node< T >* node);
     ~listIterator() = default;
-    const T& operator*() const;
-    const T* operator->() const;
+    T& operator*();
+    T* operator->();
     this_t& operator++();
     this_t operator++(int);
     this_t& operator--();
@@ -36,13 +36,13 @@ namespace finaev
   {}
 
   template< class T >
-  const T& listIterator< T >::operator*() const
+  T& listIterator< T >::operator*() 
   {
     return node_->data;
   }
 
   template< class T >
-  const T* listIterator< T >::operator->() const
+  T* listIterator< T >::operator->()
   {
     return std::addressof(this->node_);
   }
