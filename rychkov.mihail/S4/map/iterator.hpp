@@ -9,7 +9,7 @@ class rychkov::MapIterator
 {
 public:
   using difference_type = ptrdiff_t;
-  using value_type = std::pair< Key, Mapped >;
+  using value_type = std::pair< const Key, Mapped >;
   using pointer = value_type*;
   using reference = value_type&;
   using iterator_category = std::bidirectional_iterator_tag;
@@ -37,6 +37,7 @@ public:
   MapIterator& operator++() noexcept
   {
     isReversed ? shiftLeft() : shiftRight();
+    return *this;
   }
   MapIterator operator++(int) noexcept
   {
@@ -47,6 +48,7 @@ public:
   MapIterator& operator--() noexcept
   {
     isReversed ? shiftLeft() : shiftRight();
+    return *this;
   }
   MapIterator operator--(int) noexcept
   {
@@ -79,11 +81,13 @@ private:
   friend class Map;
   friend class MapIterator< Key, Mapped, N, true, isReversed >;
 
+  static constexpr size_t node_capacity = N;
   using node_type = MapNode< Key, Mapped, N >;
+  using node_size_type = typename node_type::size_type;
   node_type* node_;
-  typename node_type::size_type pointed_;
+  node_size_type pointed_;
 
-  MapIterator(node_type* node, typename node_type::size_type pointed) noexcept:
+  MapIterator(node_type* node, node_size_type pointed) noexcept:
     node_(node),
     pointed_(pointed)
   {}
@@ -94,51 +98,60 @@ private:
 template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
 void rychkov::MapIterator< Key, Mapped, N, isConst, isReversed >::shiftLeft() noexcept
 {
-  /*if (node_->parent != nullptr)
+  if (node_->child(pointed_) == nullptr)
   {
-    if (node_->left != nullptr)
-  }
-  else
-  {
-    if (node_->left == nullptr)
+    if (pointed_ > 0)
     {
-      node_ = node_->parent;
-      isLeftActive_ = (node_ == nullptr) || (node_->second_part == nullptr);
-      return;
+      pointed_--;
     }
-    node_ = node_->left;
+    else
+    {
+      node_type* prev = node_;
+      node_ = node_->parent();
+      for (; !node_->isFake() && (node_->child(0) == prev); node_ = node_->parent())
+      {}
+      for (pointed_ = node_->size(); pointed_ > 0; pointed_--)
+      {
+        if (node_->child(pointed_) == prev)
+        {
+          break;
+        }
+      }
+    }
+    return;
   }
-  while (node_->second_part == nullptr ? node_->second_part->right != nullptr : node_->right != nullptr)
-  {
-    node_ = node_->second_part == nullptr ? node_->second_part->right : node_->right;
-  }*/
+  node_ = node_->child(pointed_);
+  for (; node_->child(node_->size()) != nullptr; node_ = node_->child(node_->size()))
+  {}
 }
 template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
 void rychkov::MapIterator< Key, Mapped, N, isConst, isReversed >::shiftRight() noexcept
 {
-  /*if (!isLeftActive_)
+  if (node_->child(pointed_ + 1) == nullptr)
   {
-    if (node_->second_part->right == nullptr)
+    if (pointed_ + 1 < node_->size())
     {
-      node_ = node_->parent;
-      isLeftActive_ = (node_ == nullptr) || (node_->second_part == nullptr);
-      return;
+      pointed_++;
     }
-    node_ = node_->right;
-  }
-  else
-  {
-    if (node_->right == nullptr)
+    else
     {
-      isLeftActive_ = true;
-      return;
+      node_type* prev = node_;
+      node_ = node_->parent();
+      for (; !node_->isFake() && (node_->child(node_->size()) == prev); node_ = node_->parent())
+      {}
+      for (pointed_ = 0; pointed_ < node_->size(); pointed_++)
+      {
+        if (node_->child(pointed_) == prev)
+        {
+          break;
+        }
+      }
     }
-    node_ = node_->left;
+    return;
   }
-  while (node_->left == nullptr)
-  {
-    node_ = node_->left;
-  }*/
+  node_ = node_->child(pointed_ + 1);
+  for (; node_->child(0) != nullptr; node_ = node_->child(0))
+  {}
 }
 
 #endif

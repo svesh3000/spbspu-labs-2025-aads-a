@@ -18,8 +18,12 @@ namespace rychkov
     using size_type = select_size_type_t< N >;
     static constexpr size_t node_capacity = N;
 
-    static_assert(N >= 1, "");
+    static_assert(N >= 2, "");
 
+    MapNode(MapNode* p = nullptr):
+      size_(0),
+      parent_(p)
+    {}
     ~MapNode()
     {
       for (size_type i = 0; i < size_; i++)
@@ -32,7 +36,7 @@ namespace rychkov
     {
       return *(reinterpret_cast< value_type* >(data_) + real_places_[i]);
     }
-    const value_type operator[](size_type i) const
+    const value_type& operator[](size_type i) const
     {
       return *(reinterpret_cast< value_type* >(data_) + real_places_[i]);
     }
@@ -40,19 +44,27 @@ namespace rychkov
     {
       return size_;
     }
-    MapNode*& getChild(size_type i) noexcept
+    bool full() const noexcept
+    {
+      return size_ < node_capacity;
+    }
+    bool isFake() const noexcept
+    {
+      return parent_ == nullptr;
+    }
+    MapNode*& child(size_type i) noexcept
     {
       return children_[real_places_[i]];
     }
-    MapNode*const& getChild(size_type i) const noexcept
+    MapNode*const& child(size_type i) const noexcept
     {
-      return children_[real_places_[i]];
+      return i >= size_ ? node_capacity : children_[real_places_[i]];
     }
-    MapNode*& getParent() noexcept
+    MapNode*& parent() noexcept
     {
       return parent_;
     }
-    MapNode*const& getParent() const noexcept
+    MapNode*const& parent() const noexcept
     {
       return parent_;
     }
@@ -74,7 +86,7 @@ namespace rychkov
           real_place = i;
         }
       }
-      new(reinterpret_cast< value_type* >(data_) + real_place) value_type(std::forward< Args >(args)...);
+      new(reinterpret_cast< value_type* >(data_) + real_place) value_type{std::forward< Args >(args)...};
       for (size_type i = size_; i > newPlace; i--)
       {
         real_places_[i] = real_places_[i - 1];

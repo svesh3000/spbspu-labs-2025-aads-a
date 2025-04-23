@@ -6,19 +6,33 @@
 template< class Key, class Value, class Compare, size_t N >
 rychkov::Map< Key, Value, Compare, N >::Map()
     noexcept(std::is_nothrow_default_constructible< value_compare >::value):
+  fake_size_(1),
+  fake_real_places_{0},
   fake_parent_(nullptr),
-  fake_children_{},
+  fake_children_{nullptr},
+  cached_begin_(fake_root()),
+  cached_rbegin_(fake_root()),
   size_(0),
   comp_()
 {}
 template< class Key, class Value, class Compare, size_t N >
 rychkov::Map< Key, Value, Compare, N >::Map(Map&& rhs)
     noexcept(std::is_nothrow_move_constructible< value_compare >::value):
+  fake_size_(1),
+  fake_real_places_{0},
   fake_parent_(std::exchange(rhs.fake_parent_, nullptr)),
-  fake_children_(rhs.fake_children_),
+  fake_children_{std::exchange(rhs.fake_children_[0], nullptr)},
+  cached_begin_(std::exchange(rhs.cached_begin_, rhs.fake_root())),
+  cached_rbegin_(std::exchange(rhs.cached_rbegin_, rhs.fake_root())),
   size_(std::exchange(rhs.size_, 0)),
   comp_(std::move(rhs.comp_))
-{}
+{
+  if (size_ == 0)
+  {
+    cached_begin_ = fake_root();
+    cached_rbegin_ = cached_begin_;
+  }
+}
 template< class Key, class Value, class Compare, size_t N >
 rychkov::Map< Key, Value, Compare, N >&
     rychkov::Map< Key, Value, Compare, N >::operator=(Map&& rhs) noexcept(noexcept(swap(std::declval< Map >())))
@@ -33,18 +47,30 @@ rychkov::Map< Key, Value, Compare, N >::~Map()
   clear();
 }
 template< class Key, class Value, class Compare, size_t N >
-void rychkov::Map< Key, Value, Compare, N >::swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_type >)
+void rychkov::Map< Key, Value, Compare, N >::swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_compare >)
 {
   std::swap(comp_, rhs.comp_);
   std::swap(fake_parent_, rhs.fake_parent_);
   std::swap(fake_children_[0], rhs.fake_children_[0]);
-  std::swap(fake_children_[node_capacity], rhs.fake_children_[node_capacity]);
+  std::swap(cached_begin_, rhs.cached_begin_);
+  std::swap(cached_rbegin_, rhs.cached_rbegin_);
   std::swap(size_, rhs.size_);
+  if (size_ == 0)
+  {
+    cached_begin_ = fake_root();
+    cached_rbegin_ = cached_begin_;
+  }
+  if (rhs.size_ == 0)
+  {
+    rhs.cached_begin_ = fake_root();
+    rhs.cached_rbegin_ = rhs.cached_begin_;
+  }
 }
 template< class Key, class Value, class Compare, size_t N >
 void rychkov::Map< Key, Value, Compare, N >::clear()
 {
-  destroy_subtree(fake_root());
+  destroy_subtree(fake_root()->parent_);
+  delete fake_children_[0];
 }
 template< class Key, class Value, class Compare, size_t N >
 void rychkov::Map< Key, Value, Compare, N >::destroy_subtree(node_type* node)
@@ -53,9 +79,9 @@ void rychkov::Map< Key, Value, Compare, N >::destroy_subtree(node_type* node)
   {
     return;
   }
-  for (typename node_type::size_type i = 0; i < node->size(); i++)
+  for (node_size_type i = 0; i <= node->size(); i++)
   {
-    node_type* child = node->getChild(i);
+    node_type* child = node->child(i);
     destroy_subtree(child);
     delete child;
   }

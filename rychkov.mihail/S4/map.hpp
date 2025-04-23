@@ -4,7 +4,7 @@
 #include "map/declaration.hpp"
 #include "map/iterator.hpp"
 #include "map/construct_destruct.hpp"
-//#include "map/insert.hpp"
+#include "map/insert.hpp"
 #include "map/access.hpp"
 
 #endif

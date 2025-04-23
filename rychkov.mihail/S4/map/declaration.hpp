@@ -9,16 +9,17 @@
 namespace rychkov
 {
   template< class Member, class Base >
-  size_t offsetOf(Member Base::* member)
+  size_t offsetOf(const Member Base::* member)
   {
-    return reinterpret_cast< char* >(std::addressof(static_cast< Base* >(nullptr)->*member))
-        - static_cast< char* >(nullptr);
+    return reinterpret_cast< const char* >(std::addressof(static_cast< Base* >(nullptr)->*member))
+        - static_cast< const char* >(nullptr);
   }
   template< class Member, class Base >
-  Base* getFakePointer(Member& fakeMember, Member Base::* member)
+  Base* getFakePointer(const Member& fakeMember, const Member Base::* member)
   {
     static size_t offset = offsetOf(member);
-    return reinterpret_cast< Base* >(reinterpret_cast< char* >(std::addressof(fakeMember)) - offset);
+    auto clear_p = const_cast< Member* >(std::addressof(fakeMember));
+    return reinterpret_cast< Base* >(reinterpret_cast< char* >(clear_p) - offset);
   }
 
   template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
@@ -79,29 +80,31 @@ namespace rychkov
     const_reverse_iterator crend() const noexcept;
 
     void clear();
-    void swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_type >);
+    void swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args... args);
     template< class... Args >
-    iterator emplace_hint(const_iterator hint, Args... args);
+    iterator emplace_hint(const_iterator hint, Args&&... args);
 
     key_compare key_comp() const;
     value_compare value_comp() const;
     static constexpr size_t node_capacity = N;
     using node_type = MapNode< key_type, mapped_type, node_capacity >;
-    node_type* fake_root() noexcept;
-    const node_type* fake_root() const noexcept;
+    using node_size_type = typename node_type::size_type;
+    node_type* fake_root() const noexcept;
   private:
-    typename node_type::size_type fake_size_ = 0;
-    typename node_type::size_type fake_real_places_[node_capacity];
+    const node_size_type fake_size_;
+    const node_size_type fake_real_places_[node_capacity];
     node_type* fake_parent_ = nullptr;
     node_type* fake_children_[node_capacity + 1];
+
+    node_type* cached_begin_ = nullptr;
+    node_type* cached_rbegin_ = nullptr;
     size_t size_;
     value_compare comp_;
 
     const_iterator find_hint(const key_type& key);
-    void place_node(const_iterator hint, node_type* node);
     void destroy_subtree(node_type* node);
   };
 }
