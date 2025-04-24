@@ -1,11 +1,12 @@
 #ifndef CITERATOR_HPP
 #define CITERATOR_HPP
+#include <iterator>
 #include "node.hpp"
 
 namespace abramov
 {
   template< class Key, class Value >
-  struct ConstIterator
+  struct ConstIterator: std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     ConstIterator();
     ConstIterator(Node< Key, Value > *node);
@@ -14,6 +15,8 @@ namespace abramov
     ConstIterator< Key, Value > &operator=(const ConstIterator< Key, Value > &c_iter) = default;
     ConstIterator< Key, Value > &operator++() noexcept;
     ConstIterator< Key, Value > operator++(int) noexcept;
+    ConstIterator< Key, Value > &operator--() noexcept;
+    ConstIterator< Key, Value > operator--(int) noexcept;
     bool operator==(const ConstIterator< Key, Value > &c_iter) const noexcept;
     bool operator!=(const ConstIterator< Key, Value > &c_iter) const noexcept;
     const std::pair< Key, Value > &operator*() const noexcept;
@@ -59,6 +62,36 @@ namespace abramov
   {
     ConstIterator< Key, Value > c_iter(*this);
     ++(*this);
+    return c_iter;
+  }
+
+  template< class Key, class Value >
+  ConstIterator< Key, Value > &ConstIterator< Key, Value >::operator--() noexcept
+  {
+    if (node_->left_)
+    {
+      node_ = node_->left_;
+      while (node_->right_)
+      {
+        node_ = node_->right;
+      }
+    }
+    else
+    {
+      while (node_->parent_ && node_->parent_->right != node_)
+      {
+        node_ = node_->parent_;
+      }
+      node_ = node_->parent_;
+    }
+    return *this;
+  }
+
+  template< class Key, class Value >
+  ConstIterator< Key, Value > ConstIterator< Key, Value >::operator--(int) noexcept
+  {
+    ConstIterator< Key, Value > c_iter(*this);
+    --(*this);
     return c_iter;
   }
 
