@@ -30,23 +30,36 @@ void printCommand(std::istream & in, const Dictionaries & dicts)
 {
   std::string dictName;
   in >> dictName;
-  auto it = dicts.find(dictName);
-  if (it == dicts.end() || it->second.empty())
+  auto dict = dicts.find(dictName)->second;
+  if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
     return;
   }
-  auto dict = it->second;
   std::cout << dictName;
-  for (auto it = dict.begin(); it != dict.end(); ++it)
+  for (auto it = dict.cbegin(); it != dict.cend(); ++it)
   {
     std::cout << ' ' << it->first << ' ' << it->second;
   }
   std::cout << '\n';
 }
 
-void complementCommand(std::istream & in, const Dictionaries & dicts)
-{}
+void complementCommand(std::istream & in, Dictionaries & dicts)
+{
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto dict1 = dicts.find(dictName1)->second;
+  auto dict2 = dicts.find(dictName2)->second;
+  std::map< int, std::string > result;
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
+  {
+    if (dict2.find(it->first) == dict2.cend())
+    {
+      result[it->first] = it->second; 
+    }
+  }
+  dicts[resultName] = result;
+}
 
 void intersectCommand(std::istream & in, const Dictionaries & dicts)
 {}
@@ -103,7 +116,7 @@ int main(int argc, char* argv[])
   }
   catch (const std::exception & e)
   {
-    std::cerr << e.what() << "\n";
+    std::cerr << e.what() << '\n';
     return 1;
   }
 }
