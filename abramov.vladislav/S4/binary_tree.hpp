@@ -7,14 +7,11 @@
 
 namespace abramov
 {
-  template< class Key, class Value >
-  struct Node;
-
   template< class Key, class Value, class Cmp = std::less< Key > >
   struct BinarySearchTree
   {
     BinarySearchTree();
-    void push(Key key, Value value);
+    void insert(const Key &key, const Value &value);
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
@@ -24,51 +21,79 @@ namespace abramov
     Node< Key, Value > *fake_;
     Cmp cmp_;
     size_t size_;
-    friend struct Node< Key, Value >;
 
     void clearNodes(Node< Key, Value > *root) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
   BinarySearchTree< Key, Value, Cmp >::BinarySearchTree():
-    root_(new Node< Key, Value >),
-    fake_(root_),
-    cmp_(std::less< Key >()),
+    root_(nullptr),
+    fake_(new Node< Key, Value >),
+    cmp_(Cmp()),
     size_(0)
   {}
 
   template< class Key, class Value, class Cmp >
-  void BinarySearchTree< Key, Value, Cmp >::push(Key key, Value value)
+  void BinarySearchTree< Key, Value, Cmp >::insert(const Key &key, const  Value &value)
   {
-    if (size_ == 0)
+    if (empty())
     {
-      std::pair< Key, Value > p(key, value);
-      root_ = new Node< Key, Value >(p, Node< Key, Value >{ p, nullptr, fake_, fake_ });
+      root_ = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_, 1);
       ++size_;
       return;
     }
-    Node< Key, Value > *node = root_;
-    while (root_->left != fake_ || root_->rigth != fake_)
+    Node< Key, Value > *root = root_;
+    Node< Key, Value > *node = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_, -1);
+    while (root->left != fake_ && root->right != fake_)
     {
-      if (cmp(key, root_->data_.first()))
+      if (cmp(key, root->data_)
       {
-        root_ = root_->left;
+        root = root->left;
       }
       else
       {
-        root_ = root_->rigth;
+        root = root->right;
       }
     }
-    std::pair< Key, Value > p(key, value);
-    Node< Key, Value > *leaf = new Node< Key, Value >(p, node);
-    if (cmp(key, root_->data.first()))
+    if (cmp(key, root->data))
     {
-      root_->left = leaf;
+      if (root->left != fake_)
+      {
+        root = root->left;
+        if (cmp(key, root->data)
+        {
+          root->left = node;
+        }
+        else
+        {
+          root->rigth = node;
+        }
+      }
+      else
+      {
+        root->left = node;
+      }
     }
     else
     {
-      root_->rigth = leaf;
+      if (root->right != fake_)
+      {
+        root = root->right;
+        if (cmp(key, root->data_)
+        {
+          root->left = node;
+        }
+        else
+        {
+          root->right = node;
+        }
+      }
+      else
+      {
+        root->right = node;
+      }
     }
+    node->parent = root;
     ++size_;
   }
 
