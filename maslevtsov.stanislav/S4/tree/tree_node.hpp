@@ -5,12 +5,12 @@ namespace maslevtsov {
   template< class T >
   struct TreeNode
   {
-    T data1_;
-    T data2_;
-    TreeNode* parent_;
-    TreeNode* left_;
-    TreeNode* middle_;
-    TreeNode* right_;
+    T data1;
+    T data2;
+    TreeNode* parent;
+    TreeNode* left;
+    TreeNode* middle;
+    TreeNode* right;
     bool is_two;
   };
 }

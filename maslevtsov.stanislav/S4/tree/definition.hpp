@@ -84,20 +84,20 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
 {
-  return {const_iterator::get_min_node(dummy_root_->left_), true};
+  return {const_iterator::get_min_node(dummy_root_->left), true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::begin() const
 {
-  return {const_iterator::get_min_node(dummy_root_->left_), true};
+  return {const_iterator::get_min_node(dummy_root_->left), true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::cbegin() const noexcept
 {
-  return {const_iterator::get_min_node(dummy_root_->left_), true};
+  return {const_iterator::get_min_node(dummy_root_->left), true};
 }
 
 template< class Key, class T, class Compare >
@@ -133,8 +133,8 @@ typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T
 template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
 {
-  clear_subtree(dummy_root_->left_);
-  dummy_root_->left_ = nullptr;
+  clear_subtree(dummy_root_->left);
+  dummy_root_->left = nullptr;
 }
 
 template< class Key, class T, class Compare >
@@ -213,9 +213,9 @@ void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
   if (!node) {
     return;
   }
-  clear_subtree(node->left_);
-  clear_subtree(node->middle_);
-  clear_subtree(node->right_);
+  clear_subtree(node->left);
+  clear_subtree(node->middle);
+  clear_subtree(node->right);
   delete node;
 }
 
@@ -225,20 +225,20 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
   if (empty()) {
     return end();
   }
-  Node* current = dummy_root_->left_;
+  Node* current = dummy_root_->left;
   while (current) {
-    if (!compare_(key, current->data1_.first) && !compare_(current->data1_.first, key)) {
+    if (!compare_(key, current->data1.first) && !compare_(current->data1.first, key)) {
       return {current, 1};
     }
-    if (!(current->is_two) && !compare_(key, current->data2_.first) && !compare_(current->data2_.first, key)) {
+    if (!(current->is_two) && !compare_(key, current->data2.first) && !compare_(current->data2.first, key)) {
       return {current, 0};
     }
-    if (compare_(key, current->data1_.first)) {
-      current = current->left_;
-    } else if (!(current->is_two) && compare_(key, current->data2_.first)) {
-      current = current->middle_;
+    if (compare_(key, current->data1.first)) {
+      current = current->left;
+    } else if (!(current->is_two) && compare_(key, current->data2.first)) {
+      current = current->middle;
     } else {
-      current = current->right_;
+      current = current->right;
     }
   }
   return end();
