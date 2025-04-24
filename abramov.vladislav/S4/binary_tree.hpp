@@ -18,6 +18,9 @@ namespace abramov
     Iterator< Key, Value > end();
     ConstIterator< Key, Value > cbegin() const;
     ConstIterator< Key, Value > cend() const;
+    Iterator< Key, Value > find(const Key &k) noexcept;
+    ConstIterator< Key, Value > find(const Key &k, bool b = true) noexcept;
+    size_t count(const Key &k) const noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
@@ -32,6 +35,7 @@ namespace abramov
     Node< Key, Value > *getMin(Node< Key, Value > *root) noexcept;
     Node< Key, Value > *rotateLeft(Node< Key, Value > *root) noexcept;
     Node< Key, Value > *rotateRight(Node< Key, Value > *root) noexcept;
+    Node< Key, Value > *findNode(const Key &k) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
@@ -133,6 +137,30 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
+  Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::find(const Key &k) noexcept
+  {
+    Node< Key, Value > *node = findNode(k);
+    return Iterator< Key, Value >(node);
+  }
+
+  template< class Key, class Value, class Cmp >
+  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::find(const Key &k, bool b) noexcept
+  {
+    Node< Key, Value > *node = findNode(k);
+    return ConstIterator< Key, Value >(node);
+  }
+
+  template< class Key, class Value, class Cmp >
+  size_t BinarySearchTree< Key, Value, Cmp >::count(const Key &k) const noexcept
+  {
+    if (find(k) != end())
+    {
+      return 1;
+    }
+    return 0;
+  }
+
+  template< class Key, class Value, class Cmp >
   size_t BinarySearchTree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
@@ -210,6 +238,28 @@ namespace abramov
     root->left_ = new_root->right_;
     new_root->right = root;
     return new_root;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::findNode(const Key &k) noexcept
+  {
+    Node< Key, Value > *root = root_;
+    while (root != fake_)
+    {
+      if (cmp(k, root->data_))
+      {
+        root = root->left;
+      }
+      else if (!cmp(k, root->data_))
+      {
+        root = root->right;
+      }
+      else
+      {
+        return root;
+      }
+    }
+    return fake_;
   }
 }
 #endif
