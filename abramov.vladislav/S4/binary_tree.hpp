@@ -5,6 +5,7 @@
 #include <functional>
 #include "node.hpp"
 #include "cIterator.hpp"
+#include "iterator.hpp"
 
 namespace abramov
 {
@@ -13,6 +14,8 @@ namespace abramov
   {
     BinarySearchTree();
     void insert(const Key &key, const Value &value);
+    Iterator< Key, Value > begin();
+    Iterator< Key, Value > end();
     ConstIterator< Key, Value > cbegin() const;
     ConstIterator< Key, Value > cend() const;
     size_t size() const noexcept;
@@ -99,6 +102,19 @@ namespace abramov
     }
     node->parent = root;
     ++size_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::begin()
+  {
+    Node< Key, Value > *node = getMin(root_);
+    return Iterator< Key, Value >(node);
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::end()
+  {
+    return Iterator< Key, Value >(fake_);
   }
 
   template< class Key, class Value, class Cmp >
