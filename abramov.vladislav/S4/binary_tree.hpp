@@ -12,6 +12,8 @@ namespace abramov
   {
     BinarySearchTree();
     void insert(const Key &key, const Value &value);
+    ConstIterator< Key, Value > cbegin() const;
+    ConstIterator< Key, Value > cend() const;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
@@ -23,6 +25,7 @@ namespace abramov
     size_t size_;
 
     void clearNodes(Node< Key, Value > *root) noexcept;
+    Node< Key, Value > *getMin(const Node< Key, Value > *root) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
@@ -98,6 +101,19 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
+  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::cbegin() const
+  {
+    Node< Key, Value > *node = getMin(root_);
+    return ConstIterator< Key, Value >(node);
+  }
+
+  template< class Key, class Value, class Cmp >
+  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp>::cend() const
+  {
+    return ConstIterator< Key, Value >(fake_);
+  }
+
+  template< class Key, class Value, class Cmp >
   size_t BinarySearchTree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
@@ -135,6 +151,16 @@ namespace abramov
     Node< Key, Value > *root = root_;
     clearNodes(root);
     delete fake_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::getMin(const Node< Key, Value > *root)
+  {
+    while (root->left_ != fake_)
+    {
+      root = root->left_;
+    }
+    return root;
   }
 }
 #endif

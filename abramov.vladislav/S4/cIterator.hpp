@@ -3,36 +3,36 @@
 
 namespace abramov
 {
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value >
   struct ConstIterator
   {
     ConstIterator();
     ConstIterator(const Node< Key, Value > *node);
-    ConstIterator(const ConstIterator< Key, Value, Cmp > &c_iter) = default;
+    ConstIterator(const ConstIterator< Key, Value > &c_iter) = default;
     ~ConstIterator() = default;
-    ConstIterator< Key, Value, Cmp > &operator=(const ConstIterator< Key, Value, Cmp > &c_iter) = default;
-    ConstIterator< Key, Value, Cmp > &operator++() noexcept;
-    ConstIterator< Key, Value, Cmp > operator++(int) noexcept;
-    bool operator==(const ConstIterator< Key, Value, Cmp > &c_iter) const noexcept;
-    bool operator!=(const ConstIterator< Key, Value, Cmp > &c_iter) const noexcept;
+    ConstIterator< Key, Value > &operator=(const ConstIterator< Key, Value > &c_iter) = default;
+    ConstIterator< Key, Value > &operator++() noexcept;
+    ConstIterator< Key, Value > operator++(int) noexcept;
+    bool operator==(const ConstIterator< Key, Value > &c_iter) const noexcept;
+    bool operator!=(const ConstIterator< Key, Value > &c_iter) const noexcept;
     const std::pair< Key, Value > &operator*() const noexcept;
     const std::pair< Key, Value > *operator->() const noexcept;
   private:
     Node< Key, Value > *node_;
   };
 
-  template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp >::ConstIterator():
+  template< class Key, class Value >
+  ConstIterator< Key, Value >::ConstIterator():
     node_(nullptr)
   {}
 
-  template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp >::ConstIterator(const Node< Key, Value > *node):
+  template< class Key, class Value >
+  ConstIterator< Key, Value >::ConstIterator(const Node< Key, Value > *node):
     node_(node)
   {}
 
-  template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp > &ConstIterator::operator++() noexcept
+  template< class Key, class Value >
+  ConstIterator< Key, Value > &ConstIterator::operator++() noexcept
   {
     if (node_->right_)
     {
@@ -53,34 +53,34 @@ namespace abramov
   }
   return *this;
 
-  template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp > ConstIterator::operator++(int) noexcept
+  template< class Key, class Value >
+  ConstIterator< Key, Value > ConstIterator::operator++(int) noexcept
   {
-    ConstIterator< Key, Value, Cmp > c_iter(*this):
+    ConstIterator< Key, Value > c_iter(*this):
     ++(*this);
     return c_iter;
   }
 
-  template< class Key, class Value, class Cmp >
-  bool ConstIterator< Key, Value, Cmp >::operator==(const ConstIterator< Key, Value, Cmp > &c_iter) const noexcept
+  template< class Key, class Value >
+  bool ConstIterator< Key, Value >::operator==(const ConstIterator< Key, Value > &c_iter) const noexcept
   {
     return node_ == c_iter.node_;
   }
 
-  template< class Key, class Value, class Cmp >
-  bool ConstIterator< Key, Value, Cmp >::operator!=(const ConstIterator< Key, Value, Cmp > &c_iter) const noexcept
+  template< class Key, class Value >
+  bool ConstIterator< Key, Value >::operator!=(const ConstIterator< Key, Value > &c_iter) const noexcept
   {
     return !(c_iter == *this);
   }
 
-  template< class Key, class Value, class Cmp >
-  const std::pair< Key, Value > &ConstIterator< Key, Value, Cmp >::operator*() const noexcept
+  template< class Key, class Value >
+  const std::pair< Key, Value > &ConstIterator< Key, Value >::operator*() const noexcept
   {
     return node_->data_;
   }
 
-  template< class Key, class Value, class Cmp >
-  const std::pair< Key, Value > *ConstIterator< Key, Value, Cmp >::operator->() const noexcept
+  template< class Key, class Value >
+  const std::pair< Key, Value > *ConstIterator< Key, Value >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }
