@@ -31,12 +31,13 @@ void printCommand(std::istream & in, const Dictionaries & dicts)
 {
   std::string dictName;
   in >> dictName;
-  auto dict = dicts.find(dictName)->second;
-  if (dict.empty())
+  auto it = dicts.find(dictName);
+  if (it == dicts.cend() || it->second.empty())
   {
     std::cout << "<EMPTY>\n";
     return;
   }
+  auto dict = it->second;
   std::cout << dictName;
   for (auto it = dict.cbegin(); it != dict.cend(); ++it)
   {
@@ -49,8 +50,15 @@ void complementCommand(std::istream & in, Dictionaries & dicts)
 {
   std::string resultName, dictName1, dictName2;
   in >> resultName >> dictName1 >> dictName2;
-  auto dict1 = dicts.find(dictName1)->second;
-  auto dict2 = dicts.find(dictName2)->second;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.cend() || it2 == dicts.cend())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
   std::map< int, std::string > result;
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
@@ -66,8 +74,15 @@ void intersectCommand(std::istream & in, Dictionaries & dicts)
 {
   std::string resultName, dictName1, dictName2;
   in >> resultName >> dictName1 >> dictName2;
-  auto dict1 = dicts.find(dictName1)->second;
-  auto dict2 = dicts.find(dictName2)->second;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.cend() || it2 == dicts.cend())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
   std::map< int, std::string > result;
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
@@ -83,8 +98,15 @@ void unionCommand(std::istream & in, Dictionaries & dicts)
 {
   std::string resultName, dictName1, dictName2;
   in >> resultName >> dictName1 >> dictName2;
-  auto dict1 = dicts.find(dictName1)->second;
-  auto dict2 = dicts.find(dictName2)->second;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.cend() || it2 == dicts.cend())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
   std::map< int, std::string > result;
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
