@@ -1,4 +1,4 @@
-#ifndef TREE_HPP
+/*#ifndef TREE_HPP
 #define TREE_HPP
 
 #include "node.hpp"
@@ -35,4 +35,4 @@ namespace maslov
     BiTreeNode< Key, T > * fakeLeaf_;
   };
 }
-#endif
+#endif*/

@@ -1,4 +1,4 @@
-#ifndef NODE_HPP
+/*#ifndef NODE_HPP
 #define NODE_HPP
 
 #include <iostream>
@@ -15,4 +15,4 @@ namespace maslov
   };
 }
 
-#endif
+#endif*/

@@ -119,16 +119,6 @@ void processCommand(std::istream & in, const std::string & command, Dictionaries
   }
 }
 
-void inputCommands(std::istream & in, Dictionaries & dicts)
-{
-  std::string command;
-  while (!std::cin.eof())
-  {
-    std::cin >> command;
-    processCommand(in, command, dicts);
-  }
-}
-
 int main(int argc, char* argv[])
 {
   if (argc != 2)
@@ -140,7 +130,12 @@ int main(int argc, char* argv[])
   {
     Dictionaries dicts;
     inputFile(argv[1], dicts);
-    inputCommands(std::cin, dicts);
+    std::string command;
+    while (!std::cin.eof())
+    {
+      std::cin >> command;
+      processCommand(std::cin, command, dicts);
+    }
   }
   catch (const std::exception & e)
   {
