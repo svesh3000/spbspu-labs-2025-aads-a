@@ -41,20 +41,20 @@ namespace shramko
     {
       unsigned long long current_sum = 0;
       bool first_element = true;
-      
+
       for (const auto& pair : pairs_list)
       {
         if (i < pair.second.size())
         {
           auto it = pair.second.begin();
           std::advance(it, i);
-          
+
           if (!first_element)
           {
             out << " ";
           }
           out << *it;
-          
+
           if (current_sum > std::numeric_limits<unsigned long long>::max() - *it)
           {
             throw std::overflow_error("Sum overflow");
@@ -82,7 +82,7 @@ namespace shramko
 int main()
 {
   using namespace shramko;
-  
+
   pairs_list_t pairsList;
   std::string listName;
 
@@ -90,12 +90,13 @@ int main()
   {
     list_t list;
     unsigned long long num;
-    
+
     std::cin.clear();
     while (std::cin >> num)
     {
       list.push_back(num);
     }
+
     pairsList.emplace_back(listName, list);
     std::cin.clear();
   }

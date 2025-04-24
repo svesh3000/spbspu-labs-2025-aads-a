@@ -9,7 +9,6 @@ namespace shramko
   public:
     T data_;
     FwdListNode< T >* next_;
-    
     explicit FwdListNode(const T& data);
     explicit FwdListNode(T&& data);
   };
