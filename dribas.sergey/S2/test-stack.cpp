@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(MoveAssignment)
   stack2 = std::move(stack1);
   BOOST_CHECK(stack2.size() == 1);
   BOOST_CHECK(stack2.top() == 10);
-  BOOST_CHECK(stack1.size() == 0);  
+  BOOST_CHECK(stack1.size() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(Swap)
