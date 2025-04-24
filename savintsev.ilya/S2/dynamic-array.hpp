@@ -41,7 +41,7 @@ namespace savintsev
   {
     std::swap(x.data_, y.data_);
     std::swap(x.size_, y.size_);
-    std::swap(x.start, y.start_);
+    std::swap(x.start_, y.start_);
     std::swap(x.capacity_, y.capacity_);
   }
 
@@ -55,16 +55,16 @@ namespace savintsev
 
   template< typename T >
   Array< T >::Array(const Array & rhs):
-    data_(new T[rhs.capacity_]),
+    data_(createExpandCopy(rhs.data_ + rhs.start_, rhs.size_, rhs.capacity_)),
     size_(rhs.size_),
-    start_(rhs.start_),
+    start_(0),
     capacity_(rhs.capacity_)
   {
     try
     {
       for (size_t i = 0; i < rhs.size_; ++i)
       {
-        data_[i] = rhs.data_[i];
+        data_[i] = rhs.data_[rhs.start_ + i];
       }
     }
     catch (...)
@@ -78,12 +78,9 @@ namespace savintsev
   Array< T >::Array(Array && rhs) noexcept:
     data_(rhs.data_),
     size_(rhs.size_),
+    start_(rhs.start_),
     capacity_(rhs.capacity_)
-  {
-    rhs.data_ = nullptr;
-    rhs.size_ = 0;
-    rhs.capacity_ = 0;
-  }
+  {}
 
   template< typename T >
   Array< T >::~Array()
@@ -118,13 +115,13 @@ namespace savintsev
   template< typename T >
   const T & Array< T >::back() const
   {
-    return data_[size_ - 1];
+    return data_[start_ + size_ - 1];
   }
 
   template< typename T >
   T & Array< T >::back()
   {
-    return data_[size_ - 1];
+    return data_[start_ + size_ - 1];
   }
 
   template< typename T >
@@ -137,7 +134,7 @@ namespace savintsev
       size_++;
       return;
     }
-    T * arr = createExpandCopy(data_ + start_, capacity_, capacity_ + capacity_);
+    T * arr = createExpandCopy(data_ + start_, size_, capacity_ + capacity_);
     try
     {
       arr[size_] = std::forward< U >(rhs);
