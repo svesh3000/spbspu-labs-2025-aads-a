@@ -36,11 +36,11 @@ namespace
   bool checkSubOverflow(long long int a, long long int b)
   {
     if (b < 0) {
-      if (a > std::numeric_limits< int >::max() + b) {
+      if (a > std::numeric_limits< long long int >::max() + b) {
         return true;
       };
     } else {
-      if (a < std::numeric_limits< int >::min() + b) {
+      if (a < std::numeric_limits< long long int >::min() + b) {
         return true;
       }
     }
@@ -50,11 +50,11 @@ namespace
   bool checkSumOverflow(long long int a, long long int b)
   {
     if (b > 0) {
-      if (a > std::numeric_limits< int >::max() - b) {
+      if (a > std::numeric_limits< long long int >::max() - b) {
         return true;
       }
     } else {
-      if (a < std::numeric_limits< int >::min() - b) {
+      if (a < std::numeric_limits< long long int >::min() - b) {
         return true;
       }
     }
@@ -63,7 +63,7 @@ namespace
 
   bool checkDivOverflow(long long int a, long long b)
   {
-    if (a == std::numeric_limits< int >::min() && b == -1) {
+    if (a == std::numeric_limits< long long int >::min() && b == -1) {
       return true;
     }
     return false;
