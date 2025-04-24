@@ -24,9 +24,9 @@ namespace shramko
     for (auto num : list)
     {
       if (sum > std::numeric_limits<unsigned long long>::max() - num)
-    {  
-      throw std::overflow_error("Sum overflow");
-    }
+      {
+        throw std::overflow_error("Sum overflow");
+      }
       sum += num;
     }
     return sum;
@@ -100,14 +100,14 @@ int main()
     std::cin.clear();
   }
 
-  try 
+  try
   {
     if (!pairsList.empty())
     {
       auto it = pairsList.begin();
       std::cout << it->first;
       while (++it != pairsList.end())
-      {  
+      {
         std::cout << " " << it->first;
       }
       std::cout << '\n';

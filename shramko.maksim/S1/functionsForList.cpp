@@ -57,20 +57,20 @@ namespace shramko
     {
       unsigned long long current_sum = 0;
       bool first_element = true;
-      
+
       for (const auto& pair : pairs)
       {
         if (i < pair.second.size())
         {
           auto it = pair.second.begin();
           std::advance(it, i);
-          
+
           if (!first_element)
           {
             out << " ";
           }
           out << *it;
-          
+
           if (isSumOverflow(current_sum, *it))
           {
             throw std::overflow_error("Sum overflow in sequence");

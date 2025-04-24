@@ -18,13 +18,13 @@ namespace shramko
     using this_t = FwdListIterator<T, is_const>;
     using node_type = typename std::conditional<is_const, const FwdListNode<T>, FwdListNode<T>>::type;
     using value_type = typename std::conditional<is_const, const T, T>::type;
-    
+
     FwdListIterator() noexcept = default;
     FwdListIterator(node_type* node) noexcept : node_(node) {}
     FwdListIterator(const this_t&) noexcept = default;
-    
+
     this_t& operator=(const this_t&) noexcept = default;
-    
+
     value_type& operator*() const noexcept
     {
       assert(node_ != nullptr);
