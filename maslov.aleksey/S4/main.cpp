@@ -55,7 +55,7 @@ void complementCommand(std::istream & in, Dictionaries & dicts)
   {
     if (dict2.find(it->first) == dict2.cend())
     {
-      result[it->first] = it->second; 
+      result[it->first] = it->second;
     }
   }
   dicts[resultName] = result;
@@ -72,7 +72,7 @@ void intersectCommand(std::istream & in, Dictionaries & dicts)
   {
     if (dict2.find(it->first) != dict2.cend())
     {
-      result[it->first] = it->second; 
+      result[it->first] = it->second;
     }
   }
   dicts[resultName] = result;
@@ -89,7 +89,7 @@ void unionCommand(std::istream & in, Dictionaries & dicts)
   {
     if (result.find(it->first) == result.cend())
     {
-      result[it->first] = it->second; 
+      result[it->first] = it->second;
     }
   }
   dicts[resultName] = result;
