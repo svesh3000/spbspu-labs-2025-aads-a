@@ -18,7 +18,7 @@ void inputFile(const std::string & filename, Dictionaries & dicts)
     std::map< int, std::string > dict;
     int key;
     std::string value;
-    while (file >> key && file >> value)
+    while ((file >> key) && (file >> value))
     {
       dict[key] = value;
     }
@@ -26,15 +26,73 @@ void inputFile(const std::string & filename, Dictionaries & dicts)
   }
 }
 
-void inputCommands(std::istream & in, Dictionaries & dicts)
+void printCommand(std::istream & in, const Dictionaries & dicts)
 {
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.end() || it->second.empty())
+  {
+    std::cout << "<EMPTY>\n";
+    return;
+  }
+  auto dict = it->second;
+  std::cout << dictName;
+  for (auto it = dict.begin(); it != dict.end(); ++it)
+  {
+    std::cout << ' ' << it->first << ' ' << it->second;
+  }
+  std::cout << '\n';
+}
+
+void complementCommand(std::istream & in, const Dictionaries & dicts)
+{}
+
+void intersectCommand(std::istream & in, const Dictionaries & dicts)
+{}
+
+void unionCommand(std::istream & in, const Dictionaries & dicts)
+{}
+
+void processCommand(std::istream & in, const std::string & command, const Dictionaries & dicts)
+{
+  if (command == "print")
+  {
+    printCommand(in, dicts);
+  }
+  else if (command == "complement")
+  {
+    complementCommand(in, dicts);
+  }
+  else if (command == "intersect")
+  {
+    intersectCommand(in, dicts);
+  }
+  else if (command == "union")
+  {
+    unionCommand(in, dicts);
+  }
+  else
+  {
+    std::cout << "<INVALID COMMAND>\n";
+  }
+}
+
+void inputCommands(std::istream & in, const Dictionaries & dicts)
+{
+  std::string command;
+  while (!std::cin.eof())
+  {
+    std::cin >> command;
+    processCommand(in, command, dicts);
+  }
 }
 
 int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    std::cerr << "ERROR: file\n";
+    std::cerr << "ERROR: wrong arguments\n";
     return 1;
   }
   try
