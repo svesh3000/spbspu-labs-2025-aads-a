@@ -9,8 +9,6 @@ namespace savintsev
   {
   public:
     Queue();
-    Queue(const Queue & rhs);
-    Queue(Queue && rhs) noexcept;
 
     bool empty() const noexcept;
 
@@ -20,10 +18,10 @@ namespace savintsev
 
     size_t size() const noexcept;
 
-    T & back() noexcept;
-    const T & back() const noexcept;
-    T & front() noexcept;
-    const T & front() const noexcept;
+    T & back();
+    const T & back() const;
+    T & front();
+    const T & front() const;
 
     template< typename U >
     friend void swap(Queue< U > & x, Queue< U > & y) noexcept;
@@ -40,16 +38,6 @@ namespace savintsev
   template< typename T >
   Queue< T >::Queue():
     queue_{2}
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(const Queue & rhs):
-    queue_(rhs.queue_)
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(Queue && rhs) noexcept:
-    queue_(std::move(rhs.queue_))
   {}
 
   template< typename T >
@@ -73,7 +61,7 @@ namespace savintsev
   template< typename T >
   void Queue< T >::push(T && rhs)
   {
-    queue_.push_back(rhs);
+    queue_.push_back(std::move(rhs));
   }
 
   template< typename T >
@@ -83,25 +71,25 @@ namespace savintsev
   }
 
   template< typename T >
-  T & Queue< T >::back() noexcept
+  T & Queue< T >::back()
   {
     return queue_.back();
   }
 
   template< typename T >
-  const T & Queue< T >::back() const noexcept
+  const T & Queue< T >::back() const
   {
     return queue_.back();
   }
 
   template< typename T >
-  T & Queue< T >::front() noexcept
+  T & Queue< T >::front()
   {
     return queue_.front();
   }
 
   template< typename T >
-  const T & Queue< T >::front() const noexcept
+  const T & Queue< T >::front() const
   {
     return queue_.front();
   }

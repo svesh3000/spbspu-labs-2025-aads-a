@@ -4,7 +4,7 @@
 
 namespace savintsev
 {
-  void io_postfix_results(std::istream & in);
+  void evaluate_postfix_stream(std::istream & in);
 }
 
 #endif

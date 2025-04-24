@@ -22,7 +22,8 @@ namespace savintsev
     const T & back() const noexcept;
     T & back() noexcept;
 
-    void push_back(T rhs);
+    template< typename U >
+    void push_back(U && rhs);
     void pop_front();
     void pop_back() noexcept;
 
@@ -55,20 +56,16 @@ namespace savintsev
     size_(rhs.size_),
     capacity_(rhs.capacity_)
   {
-    size_t created = 0;
     try
     {
-      for (; created < rhs.size_; ++created)
+      for (size_t i = 0; i < rhs.size_; ++i)
       {
-        data_[created] = rhs.data_[created];
+        data_[i] = rhs.data_[i];
       }
     }
-    catch (const std::exception & e)
+    catch (...)
     {
       delete[] data_;
-      data_ = nullptr;
-      size_ = 0;
-      capacity_ = 0;
       throw;
     }
   }
@@ -97,7 +94,7 @@ namespace savintsev
   }
 
   template< typename T >
-  size_t Array<T>::size() const noexcept
+  size_t Array< T >::size() const noexcept
   {
     return size_;
   }
@@ -127,20 +124,21 @@ namespace savintsev
   }
 
   template< typename T >
-  void Array< T >::push_back(T rhs)
+  template< typename U >
+  void Array< T >::push_back(U && rhs)
   {
     if (size_ < capacity_)
     {
-      data_[size_] = rhs;
+      data_[size_] = std::forward< U >(rhs);
       size_++;
       return;
     }
     T * arr = createExpandCopy(data_, capacity_, capacity_ + capacity_);
     try
     {
-      arr[size_] = rhs;
+      arr[size_] = std::forward< U >(rhs);
     }
-    catch (const std::exception & e)
+    catch (...)
     {
       delete[] arr;
       throw;

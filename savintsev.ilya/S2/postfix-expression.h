@@ -8,13 +8,11 @@ namespace savintsev
   class PostfixExpr
   {
   public:
-    PostfixExpr() = default;
-    PostfixExpr(const PostfixExpr & rhs);
-    PostfixExpr(PostfixExpr && rhs);
+    //PostfixExpr() = default;
 
     long long operator()() const;
 
-    PostfixExpr & operator=(const PostfixExpr & rhs);
+    //PostfixExpr & operator=(const PostfixExpr & rhs);
 
     PostfixExpr operator+(const PostfixExpr & rhs);
     PostfixExpr operator-(const PostfixExpr & rhs);

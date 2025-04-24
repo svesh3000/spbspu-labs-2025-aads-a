@@ -26,7 +26,7 @@ int main(int argc, char ** argv)
 
   try
   {
-    savintsev::io_postfix_results(*input);
+    savintsev::evaluate_postfix_stream(*input);
   }
   catch (const std::exception & e)
   {

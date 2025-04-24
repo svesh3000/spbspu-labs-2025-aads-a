@@ -9,18 +9,6 @@ namespace
   const long long MAX_LL = std::numeric_limits< long long >::max();
   const long long MIN_LL = std::numeric_limits< long long >::min();
 
-  bool is_token_number(std::string token)
-  {
-    for (size_t i = 0; i < token.size(); ++i)
-    {
-      if (!std::isdigit(token[i]))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
   int sign(long long val)
   {
     return (val > 0) ? 1 : ((val < 0) ? -1 : 0);
@@ -137,15 +125,6 @@ namespace
   }
 }
 
-savintsev::PostfixExpr::PostfixExpr(const PostfixExpr & rhs):
-  expr_(rhs.expr_)
-{}
-
-savintsev::PostfixExpr::PostfixExpr(PostfixExpr && rhs)
-{
-  swap(expr_, rhs.expr_);
-}
-
 savintsev::PostfixExpr savintsev::convert(const std::string & infix)
 {
   PostfixExpr postfix;
@@ -211,13 +190,9 @@ savintsev::PostfixExpr savintsev::convert(const std::string & infix)
       stack.pop();
       --was_bracket;
     }
-    else if (is_token_number(token))
-    {
-      postfix.expr_.push(token);
-    }
     else
     {
-      throw std::invalid_argument("ERROR: token unsupported");
+      postfix.expr_.push(token);
     }
   }
   while (!stack.empty())
@@ -242,12 +217,12 @@ long long savintsev::PostfixExpr::operator()() const
   {
     std::string token = expr.front();
     expr.pop();
-    if (is_token_number(token))
+    try
     {
       long long num = std::stoll(token);
       calc.push(num);
     }
-    else
+    catch (const std::invalid_argument & e)
     {
       if (calc.size() < 2)
       {
@@ -288,16 +263,6 @@ long long savintsev::PostfixExpr::operator()() const
     return calc.top();
   }
   throw std::invalid_argument("ERROR: invalid expression");
-}
-
-savintsev::PostfixExpr & savintsev::PostfixExpr::operator=(const PostfixExpr & rhs)
-{
-  if (std::addressof(rhs) != this)
-  {
-    auto tmp(rhs);
-    swap(expr_, tmp.expr_);
-  }
-  return *this;
 }
 
 savintsev::PostfixExpr & savintsev::PostfixExpr::use_operator(const std::string & op, PostfixExpr rhs)

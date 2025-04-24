@@ -9,8 +9,6 @@ namespace savintsev
   {
   public:
     Stack();
-    Stack(const Stack & rhs);
-    Stack(Stack && rhs) noexcept;
 
     bool empty() const noexcept;
 
@@ -20,8 +18,8 @@ namespace savintsev
 
     size_t size() const noexcept;
 
-    T & top() noexcept;
-    const T & top() const noexcept;
+    T & top();
+    const T & top() const;
   private:
     Array< T > stack_;
   };
@@ -29,16 +27,6 @@ namespace savintsev
   template< typename T >
   Stack< T >::Stack():
     stack_{2}
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(const Stack & rhs):
-    stack_(rhs.stack_)
-  {}
-
-  template< typename T >
-  Stack< T >::Stack(Stack && rhs) noexcept:
-    stack_(std::move(rhs.stack_))
   {}
 
   template< typename T >
@@ -62,7 +50,7 @@ namespace savintsev
   template< typename T >
   void Stack< T >::push(T && rhs)
   {
-    stack_.push_back(rhs);
+    stack_.push_back(std::move(rhs));
   }
 
   template< typename T >
@@ -72,13 +60,13 @@ namespace savintsev
   }
 
   template< typename T >
-  T & Stack< T >::top() noexcept
+  T & Stack< T >::top()
   {
     return stack_.back();
   }
 
   template< typename T >
-  const T & Stack< T >::top() const noexcept
+  const T & Stack< T >::top() const
   {
     return stack_.back();
   }

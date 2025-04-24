@@ -2,7 +2,7 @@
 #include "stack.hpp"
 #include "postfix-expression.h"
 
-void savintsev::io_postfix_results(std::istream & in)
+void savintsev::evaluate_postfix_stream(std::istream & in)
 {
   using namespace std;
 

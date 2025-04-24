@@ -16,7 +16,7 @@ namespace savintsev
         created[i] = old[i];
       }
     }
-    catch (const std::exception & e)
+    catch (...)
     {
       delete[] created;
       throw;
