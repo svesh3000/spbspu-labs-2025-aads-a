@@ -35,10 +35,12 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
+
   if (!result.empty()) {
     std::cout << result.top();
     result.pop();
   }
+
   while(!result.empty()) {
     std::cout << ' ' << result.top();
     result.pop();
