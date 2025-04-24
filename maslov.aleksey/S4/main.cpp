@@ -61,13 +61,41 @@ void complementCommand(std::istream & in, Dictionaries & dicts)
   dicts[resultName] = result;
 }
 
-void intersectCommand(std::istream & in, const Dictionaries & dicts)
-{}
+void intersectCommand(std::istream & in, Dictionaries & dicts)
+{
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto dict1 = dicts.find(dictName1)->second;
+  auto dict2 = dicts.find(dictName2)->second;
+  std::map< int, std::string > result;
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
+  {
+    if (dict2.find(it->first) != dict2.cend())
+    {
+      result[it->first] = it->second; 
+    }
+  }
+  dicts[resultName] = result;
+}
 
-void unionCommand(std::istream & in, const Dictionaries & dicts)
-{}
+void unionCommand(std::istream & in, Dictionaries & dicts)
+{
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto dict1 = dicts.find(dictName1)->second;
+  auto dict2 = dicts.find(dictName2)->second;
+  std::map< int, std::string > result;
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
+  {
+    if (result.find(it->first) == result.cend())
+    {
+      result[it->first] = it->second; 
+    }
+  }
+  dicts[resultName] = result;
+}
 
-void processCommand(std::istream & in, const std::string & command, const Dictionaries & dicts)
+void processCommand(std::istream & in, const std::string & command, Dictionaries & dicts)
 {
   if (command == "print")
   {
@@ -91,7 +119,7 @@ void processCommand(std::istream & in, const std::string & command, const Dictio
   }
 }
 
-void inputCommands(std::istream & in, const Dictionaries & dicts)
+void inputCommands(std::istream & in, Dictionaries & dicts)
 {
   std::string command;
   while (!std::cin.eof())
