@@ -9,7 +9,12 @@
 
 namespace abramov
 {
-  template< class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value >
+  using range_t = std::pair< Iterator< Key, Value >, Iterator< Key, Value > >;
+  template< class Key, class Value >
+  using crange_t = std::pair< ConstIterator< Key, Value >, ConstIterator< Key, Value > >;
+
+ template< class Key, class Value, class Cmp = std::less< Key > >
   struct BinarySearchTree
   {
     BinarySearchTree();
@@ -21,6 +26,8 @@ namespace abramov
     Iterator< Key, Value > find(const Key &k) noexcept;
     ConstIterator< Key, Value > find(const Key &k, bool b = true) noexcept;
     size_t count(const Key &k) const noexcept;
+    range_t< Key, Value > equal_range(const Key &k) noexcept;
+    crange_t< Key, Value > equal_range(const Key &k, bool b = true) noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
@@ -158,6 +165,28 @@ namespace abramov
       return 1;
     }
     return 0;
+  }
+
+  template< class Key, class Value, class Cmp >
+  range_t< Key, Value > BinarySearchTree< Key, Value, Cmp >::equal_range(const Key &k) noexcept
+  {
+    Iterator< Key, Value > iter = find(k);
+    if (iter == end())
+    {
+      return std::make_pair(iter, iter);
+    }
+    return std::make_pair(iter, ++iter);
+  }
+
+  template< class Key, class Value, class Cmp >
+  crange_t< Key, Value > BinarySearchTree< Key, Value, Cmp >::equal_range(const Key &k, bool b) noexcept
+  {
+    ConstIterator< Key, Value > c_iter = find(k);
+    if (c_iter == cend())
+    {
+      return std::make_pair(c_iter, c_iter);
+    }
+    return std::make_pair(c_iter, ++c_iter);
   }
 
   template< class Key, class Value, class Cmp >
