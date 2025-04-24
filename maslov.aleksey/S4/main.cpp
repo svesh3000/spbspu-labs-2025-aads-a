@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 using Dictionaries = std::map< std::string, std::map< int, std::string > >;
 
@@ -32,12 +33,17 @@ void printCommand(std::istream & in, const Dictionaries & dicts)
   std::string dictName;
   in >> dictName;
   auto it = dicts.find(dictName);
-  if (it == dicts.cend() || it->second.empty())
+  if (it == dicts.cend())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+  auto dict = it->second;
+  if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
     return;
   }
-  auto dict = it->second;
   std::cout << dictName;
   for (auto it = dict.cbegin(); it != dict.cend(); ++it)
   {
@@ -107,8 +113,8 @@ void unionCommand(std::istream & in, Dictionaries & dicts)
   }
   auto dict1 = it1->second;
   auto dict2 = it2->second;
-  std::map< int, std::string > result;
-  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
+  std::map< int, std::string > result = dict1;
+  for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
   {
     if (result.find(it->first) == result.cend())
     {
@@ -139,6 +145,8 @@ void processCommand(std::istream & in, const std::string & command, Dictionaries
   else
   {
     std::cout << "<INVALID COMMAND>\n";
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 }
 
