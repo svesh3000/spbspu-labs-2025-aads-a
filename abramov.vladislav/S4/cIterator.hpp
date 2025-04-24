@@ -8,7 +8,7 @@ namespace abramov
   struct ConstIterator
   {
     ConstIterator();
-    ConstIterator(const Node< Key, Value > *node);
+    ConstIterator(Node< Key, Value > *node);
     ConstIterator(const ConstIterator< Key, Value > &c_iter) = default;
     ~ConstIterator() = default;
     ConstIterator< Key, Value > &operator=(const ConstIterator< Key, Value > &c_iter) = default;
@@ -28,7 +28,7 @@ namespace abramov
   {}
 
   template< class Key, class Value >
-  ConstIterator< Key, Value >::ConstIterator(const Node< Key, Value > *node):
+  ConstIterator< Key, Value >::ConstIterator(Node< Key, Value > *node):
     node_(node)
   {}
 
