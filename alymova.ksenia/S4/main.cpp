@@ -33,8 +33,8 @@ int main(int argc, char** argv)
 
   try
   {
-    CompositeDataset_t dicts;
-    std::string dataset;
+    CompositeDataset_t dataset_comp = readDictionaryFile(file);
+    /*std::string dataset;
     while ((file >> dataset))
     {
       std::string params;
@@ -46,14 +46,14 @@ int main(int argc, char** argv)
     {
       std::cerr << "<INVALID COMMAND>\n";
       return 1;
-    }
+    }*/
     file.clear();
 
     CommandDataset_t dataset_commands = complectCommands();
     std::string command;
     while ((std::cin >> command))
     {
-      dataset_commands.at(command)(dicts);
+      dataset_commands.at(command)(dataset_comp);
       if (command == "print")
       {
         std::cout << '\n';

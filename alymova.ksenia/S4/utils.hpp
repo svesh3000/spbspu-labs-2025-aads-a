@@ -36,16 +36,8 @@ namespace alymova
     void operator()(CompositeDataset_t& dicts);
   };
 
-  Dataset_t readTree(const std::string& s);
+  CompositeDataset_t readDictionaryFile(std::istream& in);
   CommandDataset_t complectCommands();
-
-  /*void print(std::ostream& out, const CompositeDataset_t& dicts, const std::string& dataset);
-  Dataset_t complement(CompositeDataset_t& dicts, const std::string& newdataset,
-    const std::string& dataset1, const std::string& dataset2);
-  Dataset_t intersect(CompositeDataset_t& dicts, const std::string& newdataset,
-    const std::string& dataset1, const std::string& dataset2);
-  Dataset_t unionDict(CompositeDataset_t& dicts, const std::string& newdataset,
-    const std::string& dataset1, const std::string& dataset2);*/
 }
 
 #endif
