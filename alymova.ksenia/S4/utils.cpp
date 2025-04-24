@@ -69,7 +69,7 @@ void alymova::UnionCommand::operator()(CompositeDataset_t& dicts)
       dataset1[(*it).first] = (*it).second;
     }
   }
-  dicts[newname] = dataset1; 
+  dicts[newname] = dataset1;
 }
 
 alymova::Dataset_t alymova::readTree(const std::string& s)
