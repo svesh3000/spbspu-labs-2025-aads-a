@@ -124,31 +124,7 @@ long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
       long long a = operandStack.top();
       operandStack.pop();
       long long result = 0;
-
-      if (token == "+") {
-        if (checkSumOverflow(a, b)) {
-          throw std::overflow_error("Addition overflow");
-        }
-        result = a + b;
-      } else if (token == "-") {
-        if (checkSubOverflow(a, b)) {
-          throw std::overflow_error("Subtraction overflow");
-        }
-        result = a - b;
-      } else if (token == "*") {
-        if (checkMultiplyOverFLow(a, b)) {
-          throw std::overflow_error("Multiplication overflow");
-        }
-        result = a * b;
-      } else if (token == "/") {
-        if (b == 0) {
-          throw std::runtime_error("Division by zero");
-        }
-        if (checkDivOverflow(a, b)) {
-          throw std::overflow_error("Division overflow");
-        }
-        result = a / b;
-      } else if (token == "|") {
+      if (token == "|") {
         if (checkConcatinationOverflow(a, b)) {
           throw std::overflow_error("Concatenation overflow");
         }
@@ -162,6 +138,29 @@ long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
         } else {
           result = (b - std::abs(a % b)) % b;
         }
+      } else if (token == "*") {
+        if (checkMultiplyOverFLow(a, b)) {
+          throw std::overflow_error("Multiplication overflow");
+        }
+        result = a * b;
+      } else if (token == "/") {
+        if (b == 0) {
+          throw std::runtime_error("Division by zero");
+        }
+        if (checkDivOverflow(a, b)) {
+          throw std::overflow_error("Division overflow");
+        }
+        result = a / b;
+      } else if (token == "+") {
+        if (checkSumOverflow(a, b)) {
+          throw std::overflow_error("Addition overflow");
+        }
+        result = a + b;
+      } else if (token == "-") {
+        if (checkSubOverflow(a, b)) {
+          throw std::overflow_error("Subtraction overflow");
+        }
+        result = a - b;
       }
       operandStack.push(result);
     } else {
