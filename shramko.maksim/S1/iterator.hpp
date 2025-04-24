@@ -12,12 +12,12 @@ namespace shramko
   class FwdList;
 
   template< typename T, bool is_const >
-  class FwdListIterator : public std::iterator<std::forward_iterator_tag, T>
+  class FwdListIterator : public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    using this_t = FwdListIterator<T, is_const>;
-    using node_type = typename std::conditional<is_const, const FwdListNode<T>, FwdListNode<T>>::type;
-    using value_type = typename std::conditional<is_const, const T, T>::type;
+    using this_t = FwdListIterator< T, is_const >;
+    using node_type = typename std::conditional< is_const, const FwdListNode< T >, FwdListNode< T > >::type;
+    using value_type = typename std::conditional< is_const, const T, T >::type;
 
     FwdListIterator() noexcept = default;
     FwdListIterator(node_type* node) noexcept : node_(node) {}
@@ -62,7 +62,7 @@ namespace shramko
     }
 
   private:
-    friend class FwdList<T>;
+    friend class FwdList< T >;
     node_type* node_ = nullptr;
   };
 }

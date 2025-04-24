@@ -23,7 +23,7 @@ namespace shramko
     unsigned long long sum = 0;
     for (auto num : list)
     {
-      if (sum > std::numeric_limits<unsigned long long>::max() - num)
+      if (sum > std::numeric_limits< unsigned long long >::max() - num)
       {
         throw std::overflow_error("Sum overflow");
       }
@@ -55,7 +55,7 @@ namespace shramko
           }
           out << *it;
 
-          if (current_sum > std::numeric_limits<unsigned long long>::max() - *it)
+          if (current_sum > std::numeric_limits< unsigned long long >::max() - *it)
           {
             throw std::overflow_error("Sum overflow");
           }

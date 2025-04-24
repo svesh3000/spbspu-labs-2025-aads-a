@@ -19,6 +19,20 @@ namespace shramko
     out << '\n';
   }
 
+  unsigned long long getListElementSum(const list_t& list)
+  {
+    unsigned long long sum = 0;
+    for (auto num : list)
+    {
+      if (sum > std::numeric_limits< unsigned long long >::max() - num)
+      {
+        throw std::overflow_error("Sum overflow");
+      }
+      sum += num;
+    }
+    return sum;
+  }
+
   size_t maxPairSize(const pairs_list_t& list) noexcept
   {
     size_t max = 0;
@@ -29,23 +43,9 @@ namespace shramko
     return max;
   }
 
-  unsigned long long getListElementSum(const list_t& list)
-  {
-    unsigned long long sum = 0;
-    for (auto num : list)
-    {
-      if (sum > std::numeric_limits<unsigned long long>::max() - num)
-      {
-        throw std::overflow_error("Sum overflow");
-      }
-      sum += num;
-    }
-    return sum;
-  }
-
   bool isSumOverflow(size_t a, size_t b) noexcept
   {
-    return a > std::numeric_limits<size_t>::max() - b;
+    return a > std::numeric_limits< size_t >::max() - b;
   }
 
   void printSequences(const pairs_list_t& pairs, std::ostream& out)
