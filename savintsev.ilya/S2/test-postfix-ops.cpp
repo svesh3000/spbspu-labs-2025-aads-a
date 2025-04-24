@@ -3,11 +3,8 @@
 
 BOOST_AUTO_TEST_CASE(test_operator_plus)
 {
-  savintsev::PostfixExpr expr1;
-  savintsev::PostfixExpr expr2;
-
-  expr1 = savintsev::convert("2 * 2");
-  expr2 = savintsev::convert("6 / 3");
+  savintsev::PostfixExpr expr1 = savintsev::convert("2 * 2");
+  savintsev::PostfixExpr expr2 = savintsev::convert("6 / 3");
 
   BOOST_TEST(expr1() == 4);
   BOOST_TEST(expr2() == 2);
@@ -25,11 +22,8 @@ BOOST_AUTO_TEST_CASE(test_operator_plus)
 
 BOOST_AUTO_TEST_CASE(test_operator_minus)
 {
-  savintsev::PostfixExpr expr1;
-  savintsev::PostfixExpr expr2;
-
-  expr1 = savintsev::convert("4 * 2");
-  expr2 = savintsev::convert("12 / 3");
+  savintsev::PostfixExpr expr1 = savintsev::convert("4 * 2");
+  savintsev::PostfixExpr expr2 = savintsev::convert("12 / 3");
 
   BOOST_TEST(expr1() == 8);
   BOOST_TEST(expr2() == 4);
@@ -74,11 +68,8 @@ BOOST_AUTO_TEST_CASE(test_operator_mult)
 
 BOOST_AUTO_TEST_CASE(test_operator_div)
 {
-  savintsev::PostfixExpr expr1;
-  savintsev::PostfixExpr expr2;
-
-  expr1 = savintsev::convert("4 * 2");
-  expr2 = savintsev::convert("12 / 3");
+  savintsev::PostfixExpr expr1 = savintsev::convert("4 * 2");
+  savintsev::PostfixExpr expr2 = savintsev::convert("12 / 3");
 
   BOOST_TEST(expr1() == 8);
   BOOST_TEST(expr2() == 4);
@@ -96,11 +87,8 @@ BOOST_AUTO_TEST_CASE(test_operator_div)
 
 BOOST_AUTO_TEST_CASE(test_operator_rem)
 {
-  savintsev::PostfixExpr expr1;
-  savintsev::PostfixExpr expr2;
-
-  expr1 = savintsev::convert("3 * 3");
-  expr2 = savintsev::convert("12 / 3");
+  savintsev::PostfixExpr expr1 = savintsev::convert("3 * 3");
+  savintsev::PostfixExpr expr2 = savintsev::convert("12 / 3");
 
   BOOST_TEST(expr1() == 9);
   BOOST_TEST(expr2() == 4);
