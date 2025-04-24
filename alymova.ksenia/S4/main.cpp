@@ -18,8 +18,6 @@ int main(int argc, char** argv)
     std::less< std::string >
   >;
 
-  std::istream* input = &std::cin;
-  std::ostream* out = &std::cout;
   if (argc != 2)
   {
     std::cerr << "<INCORRECT ARGUMENTS>\n";
@@ -32,25 +30,24 @@ int main(int argc, char** argv)
     std::cerr << "<INCORRECT FILE>\n";
     return 1;
   }
-  input = &file;
 
   try
   {
     CompositeDataset_t dicts;
     std::string dataset;
-    while ((*input >> dataset))
+    while ((file >> dataset))
     {
       std::string params;
-      std::getline(*input, params, '\n');
+      std::getline(file, params, '\n');
       Dataset_t new_tree = readTree(params);
       dicts[dataset] = new_tree;
     }
-    if ((*input).fail() && !(*input).eof())
+    if ((file).fail() && !(file).eof())
     {
       std::cerr << "<INVALID COMMAND>\n";
       return 1;
     }
-    (*input).clear();
+    file.clear();
 
     CommandDataset_t dataset_commands = complectCommands();
     std::string command;
