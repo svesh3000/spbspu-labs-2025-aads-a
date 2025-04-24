@@ -1,5 +1,6 @@
 #ifndef CITERATOR_HPP
 #define CITERATOR_HPP
+#include "node.hpp"
 
 namespace abramov
 {
@@ -32,7 +33,7 @@ namespace abramov
   {}
 
   template< class Key, class Value >
-  ConstIterator< Key, Value > &ConstIterator::operator++() noexcept
+  ConstIterator< Key, Value > &ConstIterator< Key, Value >::operator++() noexcept
   {
     if (node_->right_)
     {
@@ -44,19 +45,19 @@ namespace abramov
     }
     else
     {
-      while (node_->parent_ && node_parent_->left_ != node_)
+      while (node_->parent_ && node_->parent_->left_ != node_)
       {
         node_ = node_->parent_;
       }
       node_ = node_->parent_;
     }
+    return *this;
   }
-  return *this;
 
   template< class Key, class Value >
-  ConstIterator< Key, Value > ConstIterator::operator++(int) noexcept
+  ConstIterator< Key, Value > ConstIterator< Key, Value >::operator++(int) noexcept
   {
-    ConstIterator< Key, Value > c_iter(*this):
+    ConstIterator< Key, Value > c_iter(*this);
     ++(*this);
     return c_iter;
   }

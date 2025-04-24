@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include "node.hpp"
+#include "cIterator.hpp"
 
 namespace abramov
 {
@@ -49,7 +50,7 @@ namespace abramov
     Node< Key, Value > *node = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_, -1);
     while (root->left != fake_ && root->right != fake_)
     {
-      if (cmp(key, root->data_)
+      if (cmp(key, root->data_))
       {
         root = root->left;
       }
@@ -63,7 +64,7 @@ namespace abramov
       if (root->left != fake_)
       {
         root = root->left;
-        if (cmp(key, root->data)
+        if (cmp(key, root->data))
         {
           root->left = node;
         }
@@ -82,7 +83,7 @@ namespace abramov
       if (root->right != fake_)
       {
         root = root->right;
-        if (cmp(key, root->data_)
+        if (cmp(key, root->data_))
         {
           root->left = node;
         }
@@ -154,7 +155,7 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
-  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::getMin(const Node< Key, Value > *root)
+  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::getMin(const Node< Key, Value > *root) noexcept
   {
     while (root->left_ != fake_)
     {
