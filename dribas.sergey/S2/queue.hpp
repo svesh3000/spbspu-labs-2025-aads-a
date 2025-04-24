@@ -2,8 +2,12 @@
 #define QUEUE_HPP
 
 #include <cstddef>
+#include <memory>
+#include <utility>
+#include <stdexcept>
 
-namespace dribas {
+namespace dribas
+{
   template < class T >
   class Queue {
   public:
@@ -16,10 +20,9 @@ namespace dribas {
     Queue& operator=(Queue&& other);
 
     T& front();
-    T& back();
+    const T& front() const;
 
     void push(const T& value);
-    void push(T&& value);
     void pop() noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -32,15 +35,16 @@ namespace dribas {
 
   template < class T >
   Queue< T >::Queue():
-    size_(0)
+    size_(0),
+    queue_(nullptr)
   {}
 
   template < class T >
   Queue< T >::Queue(const Queue< T >& other):
     size_(other.size_),
-    queue_(new T[size_])
+    queue_(size_ ? new T[size_] : nullptr)
   {
-    for  (size_t i = 0; i < size_; ++i) {
+    for (size_t i = 0; i < size_; ++i) {
       queue_[i] = other.queue_[i];
     }
   }
@@ -64,8 +68,8 @@ namespace dribas {
   Queue< T >& Queue< T >::operator=(const Queue& other)
   {
     if (this != std::addressof(other)) {
-      Queue cpy(other);
-      swap(cpy);
+      Queue tmp(other);
+      swap(tmp);
     }
     return *this;
   }
@@ -74,8 +78,11 @@ namespace dribas {
   Queue< T >& Queue< T >::operator=(Queue&& other)
   {
     if (this != std::addressof(other)) {
-      swap(other);
-      delete[] other.queue_;
+      delete[] queue_;
+      size_ = other.size_;
+      queue_ = other.queue_;
+      other.size_ = 0;
+      other.queue_ = nullptr;
     }
     return *this;
   }
@@ -83,48 +90,32 @@ namespace dribas {
   template < class T >
   void Queue< T >::push(const T& value)
   {
-    T* newQ = new T[size + 1];
-    for (size_t i = 0; i < size_; i++) {
-      newQ[i] = queue_;
+    T* new_queue = new T[size_ + 1];
+    for (size_t i = 0; i < size_; ++i) {
+      new_queue[i + 1] = queue_[i];
     }
     delete[] queue_;
-    newQ[size_++] = value;
-    queue_ = newQ;
-  }
-
-  template < class T >
-  void Queue< T >::push(T&& value)
-  {
-    T* newQ = new T[size_ + 1];
-    for (size_t i = 0; i < size_; i++) {
-      newQ[i] = queue_[i];
-    }
-    delete[] queue_;
-    newQ[size_++] = value;
-    queue_ = newQ;
-  }
-
-  template < class T >
-  T& Queue< T >::front()
-  {
-    return queue_[0];
-  }
-
-  template < class T >
-  T& Queue< T >::back()
-  {
-    return queue_[size_ - 1];
+    queue_ = new_queue;
+    queue_[0] = value;
+    size_++;
   }
 
   template < class T >
   void Queue< T >::pop() noexcept
   {
-    if (!empty()) {
-      for (size_t i = 1; i < size_; ++i) {
-      queue_[i-1] = std::move(queue_[i]);
-      }
-      --size_;
-    }
+    size_--;
+  }
+
+  template < class T >
+  T& Queue< T >::front()
+  {
+    return queue_[size_ - 1];
+  }
+
+  template < class T >
+  const T& Queue< T >::front() const
+  {
+    return queue_[size_ - 1];
   }
 
   template < class T >
@@ -146,6 +137,5 @@ namespace dribas {
     std::swap(queue_, other.queue_);
   }
 }
-
 
 #endif
