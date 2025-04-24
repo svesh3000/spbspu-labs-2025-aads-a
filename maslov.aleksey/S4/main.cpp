@@ -23,6 +23,7 @@ void inputFile(const std::string & filename, Dictionaries & dicts)
       dict[key] = value;
     }
     dicts[dataset] = dict;
+    file.clear();
   }
 }
 
@@ -134,6 +135,10 @@ int main(int argc, char* argv[])
     while (!std::cin.eof())
     {
       std::cin >> command;
+      if (std::cin.eof())
+      {
+        break;
+      }
       processCommand(std::cin, command, dicts);
     }
   }
