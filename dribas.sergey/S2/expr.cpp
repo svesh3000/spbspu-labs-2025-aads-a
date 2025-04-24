@@ -89,7 +89,7 @@ namespace
 
   bool isOperator(const std::string& in)
   {
-    return in == "+" || in == "-" || in == "/" || in == "|" || in == "*";
+    return in == "+" || in == "-" || in == "/" || in == "|" || in == "*" || in == "%";
   }
 
   int getPrecedence(const std::string& op)
@@ -99,13 +99,15 @@ namespace
     } else if (op == "*" || op == "/") {
       return 2;
     } else if (op == "|") {
+      return 4;
+    } else if (op == "%") {
       return 3;
     }
     return 0;
   }
 }
 
-long long dribas::evaluatePostfix(Queue<std::string>& postfixQueue)
+long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 {
   Stack<long long> operandStack;
 
@@ -147,9 +149,18 @@ long long dribas::evaluatePostfix(Queue<std::string>& postfixQueue)
         }
         result = a / b;
       } else if (token == "|") {
-        result = concatination(a, b);
-        if (checkConcatinationOverflow(a,b)) {
+        if (checkConcatinationOverflow(a, b)) {
           throw std::overflow_error("Concatenation overflow");
+        }
+        result = concatination(a, b);
+      } else if (token == "%") {
+        if (checkDivOverflow(a, b)) {
+          throw std::overflow_error("Division overflow");
+        }
+        if (a >= 0) {
+          result = a % b;
+        } else {
+          result = (b - std::abs(a % b)) % b;
         }
       }
       operandStack.push(result);
