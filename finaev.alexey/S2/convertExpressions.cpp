@@ -40,11 +40,26 @@ void finaev::countFinalResults(std::istream& in)
       continue;
     }
     finaev::Queue< std::string > inf;
-    std::istringstream iss(str);
-    std::string a;
-    while (iss >> a)
+    size_t start = 0;
+    size_t end = str.find(' ', start);
+    while (true)
     {
-      inf.push(a);
+      if (end == std::string::npos)
+      {
+        std::string substring = str.substr(start, str.size());
+        if (!substring.empty())
+        {
+          inf.push(substring);
+        }
+        break;
+      }
+      std::string substring = str.substr(start, end - start);
+      if (!substring.empty())
+      {
+        inf.push(substring);
+      }
+      start = end + 1;
+      end = str.find(' ', start);
     }
     finaev::Queue< std::string > post = fromInfToPost(inf);
     res.push(calculatePost(post));
