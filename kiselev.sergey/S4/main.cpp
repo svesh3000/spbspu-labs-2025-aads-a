@@ -51,10 +51,11 @@ int main(int argc, char** argv)
     return 1;
   }
   RBTree< std::string, std::function< void() > > commands;
-  commands.insert(std::make_pair("print", [&](){ print(std::cout, std::cin, dictionary); }));
-  commands.insert(std::make_pair("complement", [&](){ complement(std::cin, dictionary); }));
-  commands.insert(std::make_pair("intersect", [&](){ intersect(std::cin, dictionary); }));
-  commands.insert(std::make_pair("union", [&](){ unite(std::cin, dictionary); }));
+  using namespace std::placeholders;
+  commands.insert(std::make_pair("print", std::bind(print, std::ref(std::cout), std::ref(std::cin), std::ref(dictionary))));
+  commands.insert(std::make_pair("complement", std::bind(complement, std::ref(std::cin), std::ref(dictionary))));
+  commands.insert(std::make_pair("intersect", std::bind(intersect, std::ref(std::cin), std::ref(dictionary))));
+  commands.insert(std::make_pair("union", std::bind(unite, std::ref(std::cin), std::ref(dictionary))));
   std::string command;
   while (std::cin >> command)
   {
