@@ -3,12 +3,12 @@
 #include "queue.hpp"
 #include "stack.hpp"
 #include <iostream>
-#include <ostream>
 #include <string>
 
 namespace kiselev
 {
-  using queue = Queue< std::string >;
+  using Expr = Queue< std::string >;
+  using queue = Queue< Expr >;
   using stack = Stack< std::string >;
   using stackNumber = Stack< long long int >;
   queue convertExpr(queue& infix);

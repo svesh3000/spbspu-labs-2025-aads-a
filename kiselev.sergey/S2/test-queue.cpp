@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(moveQueue.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(operators)
+BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   kiselev::Queue< int > queue;
   kiselev::Queue< int > queue2;

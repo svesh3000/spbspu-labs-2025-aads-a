@@ -1,7 +1,5 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include <cstddef>
-#include <exception>
 #include "dynamicArr.hpp"
 namespace kiselev
 {
@@ -9,13 +7,6 @@ namespace kiselev
   class Queue
   {
   public:
-    Queue() = default;
-    Queue(const Queue< T >&);
-    Queue(Queue< T >&&) noexcept;
-    ~Queue() = default;
-
-    Queue< T >& operator=(const Queue< T >&);
-    Queue< T >& operator=(Queue< T >&&) noexcept;
 
     T& front();
     const T& front() const;
@@ -23,7 +14,7 @@ namespace kiselev
     const T& back() const;
 
     void pop() noexcept;
-    void push(T&);
+    void push(const T&);
     void push(T&&);
 
     size_t size() const noexcept;
@@ -31,34 +22,8 @@ namespace kiselev
     void clear() noexcept;
 
   private:
-
     DynamicArr< T > arr_;
-
   };
-
-  template< typename T >
-  Queue< T >::Queue(const Queue< T >& queue):
-    arr_(queue.arr_)
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(Queue< T >&& queue) noexcept:
-    arr_(std::move(queue.arr_))
-  {}
-
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(const Queue< T >& queue)
-  {
-    arr_ = queue.arr_;
-    return *this;
-  }
-
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(Queue< T >&& queue) noexcept
-  {
-    arr_ = std::move(queue.arr_);
-    return *this;
-  }
 
   template< typename T >
   T& Queue< T >::front()
@@ -91,7 +56,7 @@ namespace kiselev
   }
 
   template< typename T >
-  void Queue< T >::push(T& data)
+  void Queue< T >::push(const T& data)
   {
     arr_.push(data);
   }
@@ -99,7 +64,7 @@ namespace kiselev
   template< typename T >
   void Queue< T >::push(T&& data)
   {
-    arr_.push(data);
+    arr_.push(std::move(data));
   }
 
   template< typename T >
