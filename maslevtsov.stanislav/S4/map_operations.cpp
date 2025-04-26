@@ -31,7 +31,7 @@ void maslevtsov::print_set(std::istream& in, const setmap_t& map)
   set_t set;
   set = map.at(setname);
   if (set.empty()) {
-    std::cout << "<EMPTY>";
+    std::cout << "<EMPTY>\n";
     return;
   }
   std::cout << setname;
