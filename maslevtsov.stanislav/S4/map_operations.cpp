@@ -16,23 +16,35 @@ void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
   }
 }
 
-void maslevtsov::print_set(std::ostream& out, const setmap_t& map, const std::string& setname)
+void maslevtsov::fill_with_commands(commands_t& map)
 {
+  map.insert(std::make_pair("print", print_set));
+  map.insert(std::make_pair("complement", complement_sets));
+  map.insert(std::make_pair("intersect", intersect_sets));
+  map.insert(std::make_pair("union", union_sets));
+}
+
+void maslevtsov::print_set(std::istream& in, const setmap_t& map)
+{
+  std::string setname;
+  in >> setname;
   set_t set;
   set = map.at(setname);
   if (set.empty()) {
-    out << "<EMPTY>";
+    std::cout << "<EMPTY>";
     return;
   }
-  out << setname;
+  std::cout << setname;
   for (auto it = set.cbegin(); it != set.cend(); ++it) {
-    out << ' ' << it->first << ' ' << it->second;
+    std::cout << ' ' << it->first << ' ' << it->second;
   }
+  std::cout << '\n';
 }
 
-void maslevtsov::complement_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
-  const std::string& setname2)
+void maslevtsov::complement_sets(std::istream& in, setmap_t& map)
 {
+  std::string newname, setname1, setname2;
+  in >> newname >> setname1 >> setname2;
   set_t set1 = map.at(setname1), set2 = map.at(setname2);
   set_t newset;
   for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
@@ -43,9 +55,10 @@ void maslevtsov::complement_sets(setmap_t& map, const std::string& newname, cons
   map[newname] = newset;
 }
 
-void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
-  const std::string& setname2)
+void maslevtsov::intersect_sets(std::istream& in, setmap_t& map)
 {
+  std::string newname, setname1, setname2;
+  in >> newname >> setname1 >> setname2;
   set_t set1 = map.at(setname1), set2 = map.at(setname2);
   set_t newset;
   for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
@@ -56,9 +69,10 @@ void maslevtsov::intersect_sets(setmap_t& map, const std::string& newname, const
   map[newname] = newset;
 }
 
-void maslevtsov::union_sets(setmap_t& map, const std::string& newname, const std::string& setname1,
-  const std::string& setname2)
+void maslevtsov::union_sets(std::istream& in, setmap_t& map)
 {
+  std::string newname, setname1, setname2;
+  in >> newname >> setname1 >> setname2;
   set_t set1 = map.at(setname1), set2 = map.at(setname2);
   set_t newset;
   for (auto it = set1.cbegin(); it != set1.cend(); ++it) {
