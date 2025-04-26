@@ -178,7 +178,7 @@ template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find(const Key& key)
 {
   auto it = find_impl(key);
-  if (it != end()) {
+  if (it != end() && it->first == key) {
     return {it.node_, it.is_first_};
   }
   return end();
@@ -189,7 +189,7 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::find(const Key& key) const
 {
   auto it = find_impl(key);
-  if (it != end()) {
+  if (it != end() && it->first == key) {
     return {it.node_, it.is_first_};
   }
   return cend();
@@ -199,13 +199,28 @@ template< class Key, class T, class Compare >
 std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator,
   typename maslevtsov::Tree< Key, T, Compare >::iterator >
   maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key)
-{}
+{
+  auto first_it = find_impl(key);
+  auto second_it = first_it;
+  if (second_it != end()) {
+    ++second_it;
+  }
+  return std::make_pair(first_it, second_it);
+}
 
 template< class Key, class T, class Compare >
 std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
   typename maslevtsov::Tree< Key, T, Compare >::const_iterator >
   maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key) const
-{}
+{
+  auto it = find_impl(key);
+  auto first_it = const_iterator(it.node_, it.is_first_);
+  auto second_it = first_it;
+  if (second_it != cend()) {
+    ++second_it;
+  }
+  return {first_it, second_it};
+}
 
 template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
@@ -226,22 +241,32 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
     return end();
   }
   Node* current = dummy_root_->left;
+  Node* greater = nullptr;
+  bool greater_is_first = true;
   while (current) {
     if (!compare_(key, current->data1.first) && !compare_(current->data1.first, key)) {
-      return {current, 1};
+      return {current, true};
     }
-    if (!(current->is_two) && !compare_(key, current->data2.first) && !compare_(current->data2.first, key)) {
-      return {current, 0};
+    if (!current->is_two && !compare_(key, current->data2.first) && !compare_(current->data2.first, key)) {
+      return {current, false};
     }
     if (compare_(key, current->data1.first)) {
+      greater = current;
+      greater_is_first = true;
       current = current->left;
-    } else if (!(current->is_two) && compare_(key, current->data2.first)) {
+    } else if (!current->is_two && compare_(key, current->data2.first)) {
+      greater = current;
+      greater_is_first = false;
       current = current->middle;
     } else {
       current = current->right;
     }
   }
-  return end();
+  if (greater) {
+    return {greater, greater_is_first};
+  } else {
+    return end();
+  }
 }
 
 #endif
