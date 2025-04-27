@@ -99,7 +99,7 @@ namespace
       }
     }
     dicts.push(resultName, result);
-  } 
+  }
 }
 
 void maslov::processCommand(std::istream & in, const std::string & command, Dictionaries & dicts)
