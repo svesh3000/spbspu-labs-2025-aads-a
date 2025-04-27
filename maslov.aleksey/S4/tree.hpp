@@ -217,7 +217,7 @@ namespace maslov
     }
     return 1 + std::max(height(node->left), height(node->right));
   }
-  
+
   template< typename Key, typename T, typename Cmp >
   BiTreeNode< Key, T > * BiTree< Key, T, Cmp >::rotateRight(BiTreeNode< Key, T > * root)
   {
