@@ -24,6 +24,11 @@ int main()
     std::cout << pair.first << ' ' << pair.second << '\n';
   }
   std::cout << '\n';
-  std::cout << map.contains(0.0) << '\n';
+  std::cout << map.contains(0) << '\n';
   std::cout << map.contains(1) << '\n';
+  std::cout << map.contains(-100) << '\n';
+  std::cout << map.contains(100) << '\n';
+  std::cout << '\n';
+  std::cout << map[3] << '\n';
+  std::cout << map.at(4) << '\n';
 }

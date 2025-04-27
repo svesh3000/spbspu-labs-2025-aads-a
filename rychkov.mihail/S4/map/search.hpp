@@ -15,7 +15,8 @@ typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator
   const_iterator left = {fake_children_[0], 0}, right = end();
   while (true)
   {
-    for (node_size_type i = 0; i < left.node_->size(); i++)
+    node_size_type i = 0;
+    while (i < left.node_->size())
     {
       if (comp_.comp(key, left.node_->operator[](i).first))
       {
@@ -25,18 +26,20 @@ typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator
           return right;
         }
         left = {left.node_->children[i], 0};
-        i = -1;
+        i = 0;
+        continue;
       }
       else if (!comp_.comp(left.node_->operator[](i).first, key))
       {
         return {left.node_, i};
       }
+      i++;
     }
     if (left.node_->isleaf())
     {
       return right;
     }
-    left = {left.node_->children[node_capacity], 0};
+    left = {left.node_->children[i], 0};
   }
 }
 template< class Key, class Mapped, class Compare, size_t N >
@@ -121,6 +124,20 @@ bool rychkov::Map< Key, Mapped, Compare, N >::contains(const key_type& key) cons
   const_iterator temp = lower_bound(key);
   return (temp != end()) && !comp_.comp(key, temp->first);
 }
+template< class Key, class Mapped, class Compare, size_t N >
+std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::iterator,
+      typename rychkov::Map< Key, Mapped, Compare, N >::iterator >
+    rychkov::Map< Key, Mapped, Compare, N >::equal_range(const key_type& key)
+{
+  return {lower_bound(key), upper_bound(key)};
+}
+template< class Key, class Mapped, class Compare, size_t N >
+std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator,
+      typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator >
+    rychkov::Map< Key, Mapped, Compare, N >::equal_range(const key_type& key) const
+{
+  return {lower_bound(key), upper_bound(key)};
+}
 
 template< class Key, class Mapped, class Compare, size_t N >
 template< class K >
@@ -181,6 +198,24 @@ bool rychkov::Map< Key, Mapped, Compare, N >::contains
 {
   const_iterator temp = lower_bound(key);
   return (temp != end()) && !comp_.comp(key, temp->first);
+}
+template< class Key, class Mapped, class Compare, size_t N >
+template< class K >
+std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::iterator,
+      typename rychkov::Map< Key, Mapped, Compare, N >::iterator >
+    rychkov::Map< Key, Mapped, Compare, N >::equal_range
+    (std::enable_if_t< rychkov::is_transparent_v< Compare >, const K& > key)
+{
+  return {lower_bound(key), upper_bound(key)};
+}
+template< class Key, class Mapped, class Compare, size_t N >
+template< class K >
+std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator,
+      typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator >
+    rychkov::Map< Key, Mapped, Compare, N >::equal_range
+    (std::enable_if_t< rychkov::is_transparent_v< Compare >, const K& > key) const
+{
+  return {lower_bound(key), upper_bound(key)};
 }
 
 #endif

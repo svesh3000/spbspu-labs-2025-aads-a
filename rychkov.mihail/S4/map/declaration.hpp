@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <initializer_list>
 #include <type_traits.hpp>
 #include "node.hpp"
 #include "iterator.hpp"
@@ -64,6 +65,9 @@ namespace rychkov
     Map() noexcept(std::is_nothrow_default_constructible< value_compare >::value);
     Map(const Map& rhs);
     Map(Map&& rhs) noexcept(std::is_nothrow_move_constructible< value_compare >::value);
+    Map(std::initializer_list< value_type > init);
+    template< class InputIt >
+    Map(InputIt from, InputIt to);
     ~Map();
     Map& operator=(const Map& rhs);
     Map& operator=(Map&& rhs) noexcept(noexcept(swap(std::declval< Map >())));
@@ -88,6 +92,10 @@ namespace rychkov
 
     mapped_type& at(const key_type& key);
     const mapped_type& at(const key_type& key) const;
+    template< class K >
+    mapped_type& at(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
+    template< class K >
+    const mapped_type& at(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
     mapped_type& operator[](const key_type& key);
     mapped_type& operator[](key_type&& key);
 
@@ -98,6 +106,8 @@ namespace rychkov
     iterator find(const key_type& key);
     const_iterator find(const key_type& key) const;
     bool contains(const key_type& key) const;
+    std::pair< iterator, iterator > equal_range(const key_type& key);
+    std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
 
     template< class K >
     iterator lower_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
@@ -113,6 +123,11 @@ namespace rychkov
     const_iterator find(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
     template< class K >
     bool contains(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+    template< class K >
+    std::pair< iterator, iterator > equal_range(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
+    template< class K >
+    std::pair< const_iterator, const_iterator > equal_range
+        (std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
 
     void clear();
     void swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
@@ -126,20 +141,22 @@ namespace rychkov
     value_compare value_comp() const;
   private:
     static constexpr size_t node_capacity = N;
+    static constexpr size_t node_middle = (node_capacity + 1) / 2;
     using node_type = MapNode< value_type, node_capacity >;
     using node_size_type = typename node_type::size_type;
+
+    value_compare comp_;
+    node_type* cached_begin_ = nullptr;
+    node_type* cached_rbegin_ = nullptr;
+    size_t size_;
 
     node_type*const fake_parent_ = nullptr;
     node_type* fake_children_[node_capacity + 1];
     const node_size_type fake_size_;
 
-    node_type* cached_begin_ = nullptr;
-    node_type* cached_rbegin_ = nullptr;
-    size_t size_;
-    value_compare comp_;
-
     node_type* fake_root() const noexcept;
     void devide(node_type& left, node_type& right, node_size_type ins_point, node_type& to_insert);
+    void correct_emplace_result(node_type& left, node_type& right, node_size_type ins_point, const_iterator& hint);
     void destroy_subtree(node_type* node);
     template< class K >
     const_iterator lower_bound_impl(const K& key) const;
