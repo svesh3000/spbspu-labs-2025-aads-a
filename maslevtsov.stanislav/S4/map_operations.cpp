@@ -25,7 +25,7 @@ void maslevtsov::fill_with_commands(commands_t& map)
   map.insert(std::make_pair("union", union_sets));
 }
 
-void maslevtsov::print_set(std::istream& in, const setmap_t& map) noexcept
+void maslevtsov::print_set(std::istream& in, const setmap_t& map)
 {
   std::string setname;
   in >> setname;

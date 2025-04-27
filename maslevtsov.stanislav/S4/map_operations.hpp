@@ -14,7 +14,7 @@ namespace maslevtsov {
   void input_setmap(std::istream& in, setmap_t& map);
   void fill_with_commands(commands_t& map);
 
-  void print_set(std::istream& in, const setmap_t& map) noexcept;
+  void print_set(std::istream& in, const setmap_t& map);
   void complement_sets(std::istream& in, setmap_t& map);
   void intersect_sets(std::istream& in, setmap_t& map);
   void union_sets(std::istream& in, setmap_t& map);
