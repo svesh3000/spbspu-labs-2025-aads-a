@@ -37,7 +37,7 @@ int main()
     pairsList.push_front(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
   }
-  pairsList.reverse();  
+  pairsList.reverse();
 
   if (pairsList.empty())
   {
