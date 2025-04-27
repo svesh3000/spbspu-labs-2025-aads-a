@@ -146,6 +146,7 @@ int main(int argc, char** argv)
         break;
       case::CommandType::INVALID:
         std::cout << "<INVALID COMMAND>\n";
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         break;
       default:
         break;
