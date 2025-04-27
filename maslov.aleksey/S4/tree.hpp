@@ -18,8 +18,8 @@ namespace maslov
     BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > && rhs) noexcept;
 
     void push(const Key & key, const T & value);
-    /*T get(const Key & key);
-    T pop(const Key & key);*/
+    T get(const Key & key);
+    T pop(const Key & key);
 
     iterator begin() noexcept;
     cIterator cbegin() const noexcept;
@@ -47,8 +47,8 @@ namespace maslov
 
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp >::BiTree():
-    fakeRoot_(new BiTreeNode< Key, T >{std::pair< const Key, T >(), nullptr, nullptr, nullptr}),
-    fakeLeaf_(new BiTreeNode< Key, T >{std::pair< const Key, T >(), nullptr, nullptr, nullptr}),
+    fakeRoot_(new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, nullptr}),
+    fakeLeaf_(new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, nullptr}),
     size_(0),
     cmp_(Cmp())
   {
@@ -115,7 +115,7 @@ namespace maslov
     BiTreeNode< Key, T > * current;
     if (empty())
     {
-      BiTreeNode< Key, T > * newNode = new BiTreeNode< Key, T >{std::pair< const Key, T >(key, value), fakeLeaf_, fakeLeaf_, fakeRoot_};
+      BiTreeNode< Key, T > * newNode = new BiTreeNode< Key, T >{std::pair< Key, T >(key, value), fakeLeaf_, fakeLeaf_, fakeRoot_};
       fakeRoot_->left = newNode;
       size_++;
       return;
@@ -142,7 +142,7 @@ namespace maslov
         return;
       }
     }
-    BiTreeNode< Key, T > * newNode = new BiTreeNode< Key, T >{std::pair< const Key, T >(key, value), fakeLeaf_, fakeLeaf_, parent};
+    BiTreeNode< Key, T > * newNode = new BiTreeNode< Key, T >{std::pair< Key, T >(key, value), fakeLeaf_, fakeLeaf_, parent};
     if (cmp_(key, parent->data.first))
     {
       parent->left = newNode;
@@ -155,13 +155,106 @@ namespace maslov
     balance(newNode);
   }
 
-  /*template< typename Key, typename T, typename Cmp >
+  template< typename Key, typename T, typename Cmp >
   T BiTree< Key, T, Cmp >::get(const Key & key)
-  {}
+  {
+    BiTreeNode< Key, T > * current = fakeRoot_->left;
+    while (current != fakeLeaf_)
+    {
+      if (cmp_(key, current->data.first))
+      {
+        current = current->left;
+      }
+      else if (cmp_(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        return current->data.second;
+      }
+    }
+    throw std::out_of_range("ERROR: key not found\n");
+  }
 
   template< typename Key, typename T, typename Cmp >
   T BiTree< Key, T, Cmp >::pop(const Key & key)
-  {}*/
+  {
+    BiTreeNode< Key, T > * current = fakeRoot_->left;
+    //поиск. возможное дублирование
+    while (current != fakeLeaf_)
+    {
+      if (cmp_(key, current->data.first))
+      {
+        current = current->left;
+      }
+      else if (cmp_(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        break;
+      }
+    }
+    if (current == fakeLeaf_)
+    {
+      throw std::out_of_range("ERROR: key not found\n");
+    }
+    T value = current->data.second;
+    BiTreeNode< Key, T > * parent = current->parent;
+    if (current->left == fakeLeaf_ || current->right == fakeLeaf_)
+    {
+      BiTreeNode< Key, T > * child = nullptr;
+      if (current->left != fakeLeaf_)
+      {
+        child = current->left;
+      }
+      else
+      {
+        child = current->right;
+      }
+      if (parent->left == current)
+      {
+        parent->left = child;
+      }
+      else
+      {
+        parent->right = child;
+      }
+      if (child != fakeLeaf_)
+      {
+        child->parent = parent;
+      }
+      balance(parent);
+      delete current;
+    }
+    else
+    {
+      BiTreeNode< Key, T > * minNode = current->right;
+      while (minNode->left != fakeLeaf_)
+      {
+        minNode = minNode->left;
+      }
+      current->data = minNode->data;
+      if (minNode->parent->left == minNode)
+      {
+        minNode->parent->left = minNode->right;
+      }
+      else
+      {
+        minNode->parent->right = minNode->right;
+      }
+      if (minNode->right != fakeLeaf_)
+      {
+        minNode->right->parent = minNode->parent;
+      }
+      balance(current);
+      delete minNode;
+    }
+    size_--;
+    return value;
+  }
 
   template< typename Key, typename T, typename Cmp >
   void BiTree< Key, T, Cmp >::balance(BiTreeNode< Key, T > * node)

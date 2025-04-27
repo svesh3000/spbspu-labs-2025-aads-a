@@ -46,3 +46,24 @@ BOOST_AUTO_TEST_CASE(moreElements)
   printTree(out, tree);
   BOOST_TEST(out.str() == "1 first 2 second 3 third 4 fourth 5 fifth 6 sixth");
 }
+
+BOOST_AUTO_TEST_CASE(get)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  BOOST_TEST(tree.get(3) == "third");
+}
+
+BOOST_AUTO_TEST_CASE(pop)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  BOOST_TEST(tree.pop(2) == "second");
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "1 first 3 third");
+}

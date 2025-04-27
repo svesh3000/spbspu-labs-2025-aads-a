@@ -23,8 +23,8 @@ namespace maslov
     thisT & operator=(const thisT &) = default;
     thisT & operator++();
     thisT operator++(int);
-    std::pair< const Key, T > & operator*();
-    std::pair< const Key, T > * operator->();
+    std::pair< Key, T > & operator*();
+    std::pair< Key, T > * operator->();
     bool operator!=(const thisT &) const;
     bool operator==(const thisT &) const;
    private:
@@ -89,14 +89,14 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< const Key, T > & TreeIterator< Key, T, Cmp >::operator*()
+  std::pair< Key, T > & TreeIterator< Key, T, Cmp >::operator*()
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< const Key, T > * TreeIterator< Key, T, Cmp >::operator->()
+  std::pair< Key, T > * TreeIterator< Key, T, Cmp >::operator->()
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
@@ -127,8 +127,8 @@ namespace maslov
     thisT & operator=(const thisT &) = default;
     thisT & operator++();
     thisT operator++(int);
-    const std::pair< const Key, T > & operator*() const;
-    const std::pair< const Key, T > * operator->() const;
+    const std::pair< Key, T > & operator*() const;
+    const std::pair< Key, T > * operator->() const;
     bool operator==(const thisT & rhs) const;
     bool operator!=(const thisT & rhs) const;
    private:
@@ -193,14 +193,14 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
-  const std::pair< const Key, T > & TreeConstIterator< Key, T, Cmp >::operator*() const
+  const std::pair< Key, T > & TreeConstIterator< Key, T, Cmp >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
-  const std::pair< const Key, T > * TreeConstIterator< Key, T, Cmp >::operator->() const
+  const std::pair< Key, T > * TreeConstIterator< Key, T, Cmp >::operator->() const
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);

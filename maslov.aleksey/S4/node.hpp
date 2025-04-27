@@ -5,10 +5,10 @@
 
 namespace maslov
 {
-  template< class Key, class T >
+  template< typename Key, typename T >
   struct BiTreeNode
   {
-    std::pair< const Key, T > data;
+    std::pair< Key, T > data;
     BiTreeNode * left;
     BiTreeNode * right;
     BiTreeNode * parent;
