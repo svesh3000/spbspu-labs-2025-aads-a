@@ -11,7 +11,7 @@ namespace maslov
   struct BiTree;
 
   template< typename Key, typename T, typename Cmp >
-  struct TreeIterator final: public std::iterator< std::bidirectional_iterator_tag, std::pair< const Key, T > >
+  struct TreeIterator
   {
     friend struct BiTree< Key, T, Cmp >;
    public:
@@ -29,40 +29,53 @@ namespace maslov
     bool operator==(const thisT &) const;
    private:
     BiTreeNode< Key, T > * node_;
-    explicit TreeIterator(BiTreeNode< Key, T > * node);
+    BiTreeNode< Key, T > * fakeLeaf_;
+    explicit TreeIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf);
   };
 
   template< typename Key, typename T, typename Cmp >
   TreeIterator< Key, T, Cmp >::TreeIterator():
-    node_(nullptr)
+    node_(nullptr),
+    fakeLeaf_(nullptr)
   {}
 
   template< typename Key, typename T, typename Cmp >
-  TreeIterator< Key, T, Cmp >::TreeIterator(BiTreeNode< Key, T > * node):
-    node_(node)
+  TreeIterator< Key, T, Cmp >::TreeIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf):
+    node_(node),
+    fakeLeaf_(fakeLeaf)
   {}
 
   template< typename Key, typename T, typename Cmp >
   typename TreeIterator< Key, T, Cmp >::thisT & TreeIterator< Key, T, Cmp >::operator++()
   {
-    assert(node_ != nullptr);
-    if (node_->right)
+    if (node_ == fakeLeaf_)
+    {
+      return *this;
+    }
+    if (node_->right != fakeLeaf_)
     {
       node_ = node_->right;
-      while (node_->left)
+      while (node_->left != fakeLeaf_)
       {
         node_ = node_->left;
       }
     }
     else
     {
-      auto * parent = node_->parent;
-      while (parent && node_ == parent->right)
+      BiTreeNode< Key, T > * parent = node_->parent;
+      while ((parent != fakeLeaf_->parent) && (node_ == parent->right))
       {
         node_ = parent;
         parent = parent->parent;
       }
-      node_ = parent;
+      if (parent == fakeLeaf_->parent)
+      {
+        node_ = fakeLeaf_;
+      }
+      else
+      {
+        node_ = parent;
+      }
     }
     return *this;
   }
@@ -70,7 +83,6 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   typename TreeIterator< Key, T, Cmp >::thisT TreeIterator< Key, T, Cmp >::operator++(int)
   {
-    assert(node_ != nullptr);
     thisT tmp(*this);
     ++(*this);
     return tmp;
@@ -103,7 +115,7 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
-  struct TreeConstIterator final: public std::iterator< std::bidirectional_iterator_tag, const std::pair< const Key, T > >
+  struct TreeConstIterator
   {
     friend struct BiTree< Key, T, Cmp >;
    public:
@@ -121,40 +133,53 @@ namespace maslov
     bool operator!=(const thisT & rhs) const;
    private:
     BiTreeNode< Key, T > * node_;
-    explicit TreeConstIterator(BiTreeNode< Key, T > * node);
+    BiTreeNode< Key, T > * fakeLeaf_;
+    explicit TreeConstIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf);
   };
   
   template< typename Key, typename T, typename Cmp >
   TreeConstIterator< Key, T, Cmp >::TreeConstIterator():
-    node_(nullptr)
+    node_(nullptr),
+    fakeLeaf_(nullptr)
   {}
 
   template< typename Key, typename T, typename Cmp >
-  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(BiTreeNode< Key, T > * node):
-    node_(node)
+  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf):
+    node_(node),
+    fakeLeaf_(fakeLeaf)
   {}
 
   template< typename Key, typename T, typename Cmp >
   typename TreeConstIterator< Key, T, Cmp >::thisT & TreeConstIterator< Key, T, Cmp >::operator++()
   {
-    assert(node_ != nullptr);
-    if (node_->right)
+    if (node_ == fakeLeaf_)
+    {
+      return *this;
+    }
+    if (node_->right != fakeLeaf_)
     {
       node_ = node_->right;
-      while (node_->left)
+      while (node_->left != fakeLeaf_)
       {
         node_ = node_->left;
       }
     }
     else
     {
-      auto* parent = node_->parent;
-      while (parent && node_ == parent->right)
+      BiTreeNode< Key, T > * parent = node_->parent;
+      while ((parent != fakeLeaf_->parent) && (node_ == parent->right))
       {
         node_ = parent;
         parent = parent->parent;
       }
-      node_ = parent;
+      if (parent == fakeLeaf_->parent)
+      {
+        node_ = fakeLeaf_;
+      }
+      else
+      {
+        node_ = parent;
+      }
     }
     return *this;
   }
@@ -162,7 +187,6 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   typename TreeConstIterator< Key, T, Cmp >::thisT TreeConstIterator< Key, T, Cmp >::operator++(int)
   {
-    assert(node_ != nullptr);
     thisT tmp(*this);
     ++(*this);
     return tmp;
