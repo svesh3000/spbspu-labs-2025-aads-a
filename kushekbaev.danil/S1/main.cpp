@@ -37,7 +37,7 @@ int main()
     pairsList.push_front(std::make_pair(listNumber, inputValueList));
     std::cin.clear();
   }
-  pairsList.reverse();
+  pairsList.reverse();  
 
   if (pairsList.empty())
   {
@@ -99,11 +99,14 @@ int main()
     sumList.push_front(sum);
   }
 
-  sumList.reverse();
-  std::cout << *(sumList.begin());
-  for (auto it = ++(sumList.begin()); it != sumList.end(); ++it)
+  if (!sumList.empty())
   {
-    std::cout << " " << *it;
+    sumList.reverse();
+    std::cout << *(sumList.begin());
+    for (auto it = ++(sumList.begin()); it != sumList.end(); ++it)
+    {
+      std::cout << " " << *it;
+    }
   }
   std::cout << "\n";
   return 0;
