@@ -1,9 +1,9 @@
 #include <iostream>
 #include <map>
+#include <limits>
 #include <fstream>
 #include <algorithm>
 #include <string>
-#include <list>
 
 using map_t = std::map< std::string, std::map < int, std::string > >;
 
@@ -120,7 +120,6 @@ int main(int argc, char** argv)
     return 1;
   }
   std::ifstream input(argv[1]);
-
   std::map< std::string, std::map< int, std::string > > dictionaries{};
   getDictionaries(input, dictionaries);
 
@@ -129,25 +128,33 @@ int main(int argc, char** argv)
   while (!(std::cin >> command).eof())
   {
     CommandType cmdType = parseCommand(command);
-    switch (cmdType)
+    try
     {
-    case::CommandType::PRINT:
-      printDictionary(dictionaries);
-      break;
-    case::CommandType::COMPLEMENT:
-      complement(dictionaries);
-      break;
-    case::CommandType::INTERSECT:
-      intersect(dictionaries);
-      break;
-    case::CommandType::UNION:
-      merge(dictionaries);
-      break;
-    case::CommandType::INVALID:
+      switch (cmdType)
+      {
+      case::CommandType::PRINT:
+        printDictionary(dictionaries);
+        break;
+      case::CommandType::COMPLEMENT:
+        complement(dictionaries);
+        break;
+      case::CommandType::INTERSECT:
+        intersect(dictionaries);
+        break;
+      case::CommandType::UNION:
+        merge(dictionaries);
+        break;
+      case::CommandType::INVALID:
+        std::cout << "<INVALID COMMAND>\n";
+        break;
+      default:
+        break;
+      }
+    }
+    catch (...)
+    {
       std::cout << "<INVALID COMMAND>\n";
-      break;
-    default:
-      break;
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }
