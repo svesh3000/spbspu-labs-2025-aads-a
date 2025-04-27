@@ -1,6 +1,6 @@
 #include "command_processing.hpp"
 
-void lanovenko::merge(map_t &dictionaries)
+void lanovenko::merge(map_t& dictionaries)
 {
   std::string new_dataset, dataset_1, dataset_2;
   std::cin >> new_dataset >> dataset_1 >> dataset_2;
