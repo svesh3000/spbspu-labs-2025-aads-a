@@ -22,7 +22,10 @@ namespace
 
 int main(int argc, const char * const * argv)
 {
-  std::map< int, std::string, std::less< int > > tree;
+  using subtree_t = std::map< int, std::string, std::less< int > >;
+  using maintree_t = std::map< std::string, subtree_t >;
+  maintree_t tree;
+  subtree_t subtree;
   std::ifstream input(argv[1]);
   if (!checkArguments(argc))
   {
@@ -52,11 +55,16 @@ int main(int argc, const char * const * argv)
         input.clear();
         break;
       }
-      tree.insert(data);
+      subtree.insert({ data.first, data.second });
     }
+    tree.insert({ dataset, subtree });
   }
-  for (auto it = tree.begin(); it != tree.end(); ++it)
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
   {
-    std::cout << it->first << " => " << it->second << '\n';
+    std::cout << it->first << " dictionary:" << "\n";
+    for (auto sub_it = it->second.cbegin(); sub_it != it->second.cend(); ++sub_it)
+    {
+      std::cout << (*sub_it).first << " => " << (*sub_it).second << "\n";
+    }
   }
 }
