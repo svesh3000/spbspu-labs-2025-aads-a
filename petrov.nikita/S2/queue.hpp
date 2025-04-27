@@ -89,7 +89,7 @@ namespace petrov
   {
     if (this->empty())
     {
-      delete massive_[];
+      delete[] massive_;
       capacity_ = 5;
       massive_ = new T[capacity_];
       massive_[size_of_queue_++] = element;
