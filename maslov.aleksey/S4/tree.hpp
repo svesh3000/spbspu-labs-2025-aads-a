@@ -33,6 +33,9 @@ namespace maslov
 
     void clear();
     void swap(BiTree< Key, T, Cmp > & rhs) noexcept;
+
+    iterator find(const Key & key);
+    cIterator find(const Key & key) const;
    private:
     BiTreeNode< Key, T > * fakeRoot_;
     BiTreeNode< Key, T > * fakeLeaf_;
@@ -474,6 +477,49 @@ namespace maslov
   typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::cend() const noexcept
   {
     return cIterator(fakeLeaf_, fakeLeaf_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::find(const Key & key)
+  {
+    BiTreeNode< Key, T > * current = fakeRoot_->left;
+    while (current != fakeLeaf_)
+    {
+      if (cmp_(key, current->data.first))
+      {
+        current = current->left;
+      }
+      else if (cmp_(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        return iterator(current, fakeLeaf_);
+      }
+    }
+    return end();
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::find(const Key & key) const
+  {
+    const BiTreeNode< Key, T > * current = fakeRoot_->left;
+    while (current != fakeLeaf_)
+    {
+      if (cmp_(key, current->data.first))
+      {
+        current = current->left;
+      }
+      else if (cmp_(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        return cIterator(current, fakeLeaf_);
+      }
+    }
   }
 }
 

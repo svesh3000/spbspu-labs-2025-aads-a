@@ -124,3 +124,16 @@ BOOST_AUTO_TEST_CASE(moveOperator)
   BOOST_TEST(out.str() == "1 first 2 second 3 third");
   BOOST_TEST(tree.empty());
 }
+
+BOOST_AUTO_TEST_CASE(find)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  auto it1 = tree.find(1);
+  BOOST_TEST(it1->second == "first");
+  auto it2 = tree.find(4);
+  bool check = (it2 == tree.end());
+  BOOST_TEST(check);
+}
