@@ -16,7 +16,7 @@ namespace
   }
 }
 
-BOOST_AUTO_TEST_CASE(emptyTree)
+BOOST_AUTO_TEST_CASE(defaultConstructor)
 {
   maslov::BiTree< int, std::string, std::less< int > > tree;
   BOOST_TEST(tree.empty());
@@ -66,4 +66,61 @@ BOOST_AUTO_TEST_CASE(pop)
   std::ostringstream out;
   printTree(out, tree);
   BOOST_TEST(out.str() == "1 first 3 third");
+}
+
+BOOST_AUTO_TEST_CASE(copyConstructor)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  maslov::BiTree< int, std::string, std::less< int > > copy(tree);
+  std::ostringstream out;
+  printTree(out, copy);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+  tree.pop(2);
+  BOOST_TEST(copy.size() == 3);
+  BOOST_TEST(tree.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(moveConstructor)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  maslov::BiTree< int, std::string, std::less< int > > moved(std::move(tree));
+  std::ostringstream out;
+  printTree(out, moved);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+  BOOST_TEST(tree.empty());
+}
+
+BOOST_AUTO_TEST_CASE(copyOperator)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  maslov::BiTree< int, std::string, std::less< int > > copy;
+  copy = tree;
+  std::ostringstream out1;
+  printTree(out1, tree);
+  std::ostringstream out2;
+  printTree(out2, copy);
+  BOOST_TEST(out1.str() == out2.str());
+}
+
+BOOST_AUTO_TEST_CASE(moveOperator)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  maslov::BiTree< int, std::string, std::less< int > > moved;
+  moved = std::move(tree);
+  std::ostringstream out;
+  printTree(out, moved);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+  BOOST_TEST(tree.empty());
 }

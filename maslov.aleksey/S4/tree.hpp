@@ -12,10 +12,12 @@ namespace maslov
     using iterator = TreeIterator< Key, T, Cmp >;
 
     BiTree();
+    BiTree(const BiTree< Key, T, Cmp > & rhs);
+    BiTree(BiTree< Key, T, Cmp > && rhs);
     ~BiTree();
 
     BiTree< Key, T, Cmp > & operator=(const BiTree< Key, T, Cmp > & rhs);
-    BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > && rhs) noexcept;
+    BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > && rhs);
 
     void push(const Key & key, const T & value);
     T get(const Key & key);
@@ -31,7 +33,6 @@ namespace maslov
 
     void clear();
     void swap(BiTree< Key, T, Cmp > & rhs) noexcept;
-    BiTreeNode<Key, T>* getFakeLeaf() const { return fakeLeaf_; }
    private:
     BiTreeNode< Key, T > * fakeRoot_;
     BiTreeNode< Key, T > * fakeLeaf_;
@@ -52,8 +53,6 @@ namespace maslov
     size_(0),
     cmp_(Cmp())
   {
-    fakeLeaf_->left = fakeLeaf_;
-    fakeLeaf_->right = fakeLeaf_;
     fakeLeaf_->parent = fakeRoot_;
     fakeRoot_->left = fakeLeaf_;
     fakeRoot_->right = fakeLeaf_;
@@ -65,6 +64,60 @@ namespace maslov
     clear();
     delete fakeRoot_;
     delete fakeLeaf_;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp >::BiTree(const BiTree< Key, T, Cmp > & rhs):
+    BiTree()
+  {
+    for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+    {
+      push(it->first, it->second);
+    }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp >::BiTree(BiTree< Key, T, Cmp > && rhs):
+    fakeRoot_(rhs.fakeRoot_),
+    fakeLeaf_(rhs.fakeLeaf_),
+    size_(rhs.size_),
+    cmp_(std::move(rhs.cmp_))
+  {
+    rhs.fakeRoot_ = new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, nullptr};
+    rhs.fakeLeaf_ = new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, rhs.fakeRoot_};
+    rhs.fakeRoot_->left = rhs.fakeLeaf_;
+    rhs.fakeRoot_->right = rhs.fakeLeaf_;
+    rhs.size_ = 0;
+  }
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp > & BiTree< Key, T, Cmp >::operator=(const BiTree< Key, T, Cmp > & rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      BiTree temp(rhs);
+      swap(temp);
+    }
+    return *this;
+  }
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp > & BiTree< Key, T, Cmp >::operator=(BiTree< Key, T, Cmp > && rhs)
+  {
+    if (this != &rhs)
+    {
+      clear();
+      delete fakeRoot_;
+      delete fakeLeaf_;
+      fakeRoot_ = rhs.fakeRoot_;
+      fakeLeaf_ = rhs.fakeLeaf_;
+      size_ = rhs.size_;
+      cmp_ = std::move(rhs.cmp_);
+      rhs.fakeRoot_ = new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, nullptr};
+      rhs.fakeLeaf_ = new BiTreeNode< Key, T >{std::pair< Key, T >(), nullptr, nullptr, rhs.fakeRoot_ };
+      rhs.fakeRoot_->left = rhs.fakeLeaf_;
+      rhs.fakeRoot_->right = rhs.fakeLeaf_;
+      rhs.size_ = 0;
+    }
+    return *this;
   }
 
   template< typename Key, typename T, typename Cmp >
