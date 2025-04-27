@@ -520,6 +520,7 @@ namespace maslov
         return cIterator(current, fakeLeaf_);
       }
     }
+    return cend();
   }
 }
 
