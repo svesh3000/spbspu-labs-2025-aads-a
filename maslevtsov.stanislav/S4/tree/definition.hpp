@@ -55,16 +55,20 @@ typename maslevtsov::Tree< Key, T, Compare >::Tree& maslevtsov::Tree< Key, T, Co
 
 template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::operator[](const Key& key) noexcept
-{}
+{
+  return insert(std::make_pair(key, T())).first->second;
+}
 
 template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::operator[](Key&& key) noexcept
-{}
+{
+  return insert(std::make_pair(std::move(key), T())).first->second;
+}
 
 template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
 {
-  auto it = find(key);
+  iterator it = find(key);
   if (it != end()) {
     return it->second;
   }
@@ -74,7 +78,7 @@ T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
 template< class Key, class T, class Compare >
 const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 {
-  auto it = find(key);
+  const_iterator it = find(key);
   if (it != cend()) {
     return it->second;
   }
@@ -119,13 +123,13 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< K
 }
 
 template< class Key, class T, class Compare >
-bool maslevtsov::Tree< Key, T, Compare >::empty() const
+bool maslevtsov::Tree< Key, T, Compare >::empty() const noexcept
 {
   return size_ == 0;
 }
 
 template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::size() noexcept
+typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::size() const noexcept
 {
   return size_;
 }
@@ -138,27 +142,6 @@ void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
 }
 
 template< class Key, class T, class Compare >
-std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
-  maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
-{}
-
-template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::iterator
-  maslevtsov::Tree< Key, T, Compare >::erase(typename maslevtsov::Tree< Key, T, Compare >::iterator pos)
-{}
-
-template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::iterator
-  maslevtsov::Tree< Key, T, Compare >::erase(typename maslevtsov::Tree< Key, T, Compare >::const_iterator pos)
-{}
-
-template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::erase(const Key& key)
-{
-  return 0;
-}
-
-template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::swap(Tree& other) noexcept
 {
   std::swap(dummy_root_, other.dummy_root_);
@@ -166,7 +149,8 @@ void maslevtsov::Tree< Key, T, Compare >::swap(Tree& other) noexcept
 }
 
 template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T, Compare >::count(const Key& key) const
+typename maslevtsov::Tree< Key, T, Compare >::size_type
+  maslevtsov::Tree< Key, T, Compare >::count(const Key& key) const noexcept
 {
   if (find(key) != cend()) {
     return 1;
@@ -175,10 +159,11 @@ typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T
 }
 
 template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find(const Key& key)
+typename maslevtsov::Tree< Key, T, Compare >::iterator
+  maslevtsov::Tree< Key, T, Compare >::find(const Key& key) noexcept
 {
-  auto it = find_impl(key);
-  if (it != end() && it->first == key) {
+  iterator it = find_impl(key);
+  if (it->first == key) {
     return {it.node_, it.is_first_};
   }
   return end();
@@ -186,10 +171,10 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
-  maslevtsov::Tree< Key, T, Compare >::find(const Key& key) const
+  maslevtsov::Tree< Key, T, Compare >::find(const Key& key) const noexcept
 {
-  auto it = find_impl(key);
-  if (it != end() && it->first == key) {
+  iterator it = find_impl(key);
+  if (it->first == key) {
     return {it.node_, it.is_first_};
   }
   return cend();
@@ -200,8 +185,8 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator,
   typename maslevtsov::Tree< Key, T, Compare >::iterator >
   maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key)
 {
-  auto first_it = find_impl(key);
-  auto second_it = first_it;
+  iterator first_it = find_impl(key);
+  iterator second_it = first_it;
   if (second_it != end()) {
     ++second_it;
   }
@@ -213,13 +198,13 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
   typename maslevtsov::Tree< Key, T, Compare >::const_iterator >
   maslevtsov::Tree< Key, T, Compare >::equal_range(const Key& key) const
 {
-  auto it = find_impl(key);
-  auto first_it = const_iterator(it.node_, it.is_first_);
-  auto second_it = first_it;
+  iterator it = find_impl(key);
+  const_iterator first_it = const_iterator(it.node_, it.is_first_);
+  const_iterator second_it = first_it;
   if (second_it != cend()) {
     ++second_it;
   }
-  return {first_it, second_it};
+  return std::make_pair(first_it, second_it);
 }
 
 template< class Key, class T, class Compare >
@@ -235,10 +220,11 @@ void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
 }
 
 template< class Key, class T, class Compare >
-typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::find_impl(const Key& key)
+typename maslevtsov::Tree< Key, T, Compare >::iterator
+  maslevtsov::Tree< Key, T, Compare >::find_impl(const Key& key) const noexcept
 {
   if (empty()) {
-    return end();
+    return {dummy_root_, true};
   }
   Node* current = dummy_root_->left;
   Node* greater = nullptr;
@@ -265,7 +251,7 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
   if (greater) {
     return {greater, greater_is_first};
   } else {
-    return end();
+    return {dummy_root_, true};
   }
 }
 

@@ -34,8 +34,8 @@ namespace maslevtsov {
     bool is_first_;
 
     TreeIterator(TreeNode< T >* node, bool is_first_);
-    TreeIterator< T, is_const >* get_min_node(TreeNode< T >* node);
-    TreeIterator< T, is_const >* get_max_node(TreeNode< T >* node);
+    static TreeNode< T >* get_min_node(TreeNode< T >* node);
+    static TreeNode< T >* get_max_node(TreeNode< T >* node);
   };
 
   template< class T, bool is_const >
@@ -156,7 +156,7 @@ namespace maslevtsov {
   {}
 
   template< class T, bool is_const >
-  TreeIterator< T, is_const >* TreeIterator< T, is_const >::get_min_node(TreeNode< T >* node)
+  TreeNode< T >* TreeIterator< T, is_const >::get_min_node(TreeNode< T >* node)
   {
     TreeNode< T >* result = node;
     while (result && result->left) {
@@ -166,7 +166,7 @@ namespace maslevtsov {
   }
 
   template< class T, bool is_const >
-  TreeIterator< T, is_const >* TreeIterator< T, is_const >::get_max_node(TreeNode< T >* node)
+  TreeNode< T >* TreeIterator< T, is_const >::get_max_node(TreeNode< T >* node)
   {
     TreeNode< T >* result = node;
     while (result && result->right) {

@@ -1,5 +1,6 @@
 #include "map_operations.hpp"
 #include <iostream>
+#include "tree/definition.hpp"
 
 void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
 {
@@ -24,7 +25,7 @@ void maslevtsov::fill_with_commands(commands_t& map)
   map.insert(std::make_pair("union", union_sets));
 }
 
-void maslevtsov::print_set(std::istream& in, const setmap_t& map)
+void maslevtsov::print_set(std::istream& in, const setmap_t& map) noexcept
 {
   std::string setname;
   in >> setname;
