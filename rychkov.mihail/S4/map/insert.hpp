@@ -2,147 +2,174 @@
 #define INSERT_HPP
 
 #include "declaration.hpp"
-#include "iterator.hpp"
 #include <utility>
+#include <limits>
+#include <type_traits.hpp>
 
-/*template< class Key, class Value, class Compare >
-typename rychkov::Map< Key, Value, Compare >::const_iterator
-    rychkov::Map< Key, Value, Compare >::find_hint(const key_type& key)
-{
-  if (root_ == nullptr)
-  {
-    return {};
-  }
-  node_type* node = root_;
-  while (true)
-  {
-    if (comp_(key, node->data))
-    {
-      if (node->left == nullptr)
-      {
-        return {node, nullptr, true};
-      }
-      node = node->left;
-    }
-    else if (!comp_(node->data, key))
-    {
-      return {node, nullptr, true};
-    }
-    else if (node->second_part != nullptr)
-    {
-      if (comp_(key, node->second_part->data))
-      {
-        if (node->right == nullptr)
-        {
-          return {node, nullptr, false};
-        }
-        node = node->right;
-      }
-      else
-      {
-        if (node->second_part->right == nullptr)
-        {
-          return {node->second_part, nullptr, false};
-        }
-        node = node->second_part->right;
-      }
-    }
-    else
-    {
-      if (node->right == nullptr)
-      {
-        return {node, nullptr, false};
-      }
-      node = node->right;
-    }
-  }
-}*/
 template< class Key, class Value, class Compare, size_t N >
 template< class... Args >
 typename rychkov::Map< Key, Value, Compare, N >::iterator
     rychkov::Map< Key, Value, Compare, N >::emplace_hint(const_iterator hint, Args&&... args)
 {
-  if (hint.node_->isFake())
+  static_assert(std::is_nothrow_move_constructible< value_type >::value, "use of unready functional");
+
+  if (hint.node_->isfake())
   {
     if (size_ == 0)
     {
-      fake_children_[0] = new node_type{fake_root()};
+      fake_children_[0] = new node_type;
+      fake_children_[0]->parent = fake_root();
       cached_begin_ = fake_children_[0];
       cached_rbegin_ = fake_children_[0];
-      cached_begin_->emplace(0, std::forward< Args >(args)...);
+      cached_begin_->emplace_back(std::forward< Args >(args)...);
       size_++;
       return begin();
     }
     hint = {cached_rbegin_, cached_rbegin_->size()};
   }
-  return begin();
-  /*node_type* fake = fake_root();
-  node_type* newNode = new node_type;
-  try
+  if (!hint.node_->isleaf())
   {
-    newNode->emplace(0, std::forward< Args >(node)...);
-    while (hint.node_ != fake)
-    {
-      if (!hint.node_->full())
-      {
-        hint.node_->emplace(hint.pointed_, std::move((*newNode)[0]));
-        delete newNode;
-        return hint;
-      }
-      else
-      {
-        constexpr size_t left_half_len = (node_capacity + 1) / 2;
-        if (hint.pointed_ < left_half_len)
-        {
-          for (node_size_type i = 0; i < hint.pointed_; i++)
-          {
-            newNode->emplace(i, std::move((*hint.node_)[0]));
-            // child =
-            hint->node->erase(0);
-          }
-          for (node_size_type i = hint.pointed_ + 1; i < left_half_len; i++)
-          {
-            newNode->emplace(i, std::move((*hint.node_)[0]));
-            // child =
-            hint->node->erase(0);
-          }
-        }
-        else
-        {
-          for (node_size_type i = 0; i < left_half_len; i++)
-          {
-            newNode->emplace(i, std::move((*hint.node_)[0]));
-            // child =
-            hint->node->erase(0);
-          }
-        }
-        for ()
-
-        node_type* prev = hint.node_;
-        hint.node_ = hint.node_->parent_;
-        for (node_size_type i = 0; i <= node_capacity; i++)
-        {
-          if ((*hint.node_)[i] == prev)
-          {
-            hint.pointed_ = i;
-            break;
-          }
-        }
-      }
-    }
-    fake_parent_ = newNode;
-    if (size_ == 0)
-    {
-      fake_children_[0] = newNode;
-      fake_children_[1] = newNode;
-    }
-    size_++;
+    --hint;
   }
-  catch (...)
+  if (!hint.node_->full())
   {
-    delete newNode;
-    throw;
-  }*/
-}
+    hint.node_->emplace(hint.pointed_, std::forward< Args >(args)...);
+    size_++;
+    return {hint.node_, hint.pointed_};
+  }
 
+  node_type to_insert;
+  to_insert.emplace_back(std::forward< Args >(args)...);
+
+  constexpr size_t max_tree_depth = std::numeric_limits< size_t >::digits + 1;
+  struct MemSaver
+  {
+    node_type* data[max_tree_depth];
+    node_size_type ins_points[max_tree_depth];
+    size_t size = 0;
+    ~MemSaver()
+    {
+      while (size > 0)
+      {
+        delete data[--size];
+      }
+    }
+    void push(node_size_type pointed)
+    {
+      data[size] = new node_type;
+      ins_points[size++] = pointed;
+    }
+  };
+  MemSaver storage;
+  const_iterator temp = hint;
+  for (; temp.node_->full(); temp.move_up())
+  {
+    storage.push(temp.pointed_);
+  }
+  if (temp.node_->isfake())
+  {
+    storage.push(0);
+  }
+
+  node_type* caret = hint.node_;
+  for (size_type i = 0; caret->full(); caret = caret->parent, i++)
+  {
+    devide(*caret, *storage.data[i], storage.ins_points[i], to_insert);
+    if (cached_rbegin_ == caret)
+    {
+      cached_rbegin_ = storage.data[i];
+    }
+    storage.data[i] = nullptr;
+  }
+  if (caret->isfake())
+  {
+    node_type* root = storage.data[storage.size - 1];
+    to_insert.children[0]->parent = root;
+    to_insert.children[1]->parent = root;
+    caret->children[0] = root;
+    root->parent = caret;
+    root->emplace_back(to_insert[0]);
+    root->children[0] = to_insert.children[0];
+    root->children[1] = to_insert.children[1];
+    to_insert.pop_back();
+    storage.data[storage.size - 1] = nullptr;
+  }
+  else
+  {
+    caret->emplace(temp.pointed_, std::move(to_insert[0]));
+    caret->children[temp.pointed_] = to_insert.children[0];
+    caret->children[temp.pointed_ + 1] = to_insert.children[1];
+  }
+  storage.size = 0;
+  size_++;
+  return {hint.node_, hint.pointed_};
+}
+template< class Key, class Value, class Compare, size_t N >
+void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& right,
+      node_size_type ins_point, node_type& to_insert)
+{
+  constexpr size_t middle = (node_capacity + 1) / 2;
+  if (ins_point <= middle)
+  {
+    for (node_size_type i = middle; i < node_capacity; i++)
+    {
+      right.emplace_back(std::move(left[i]));
+      right.children[right.size()] = left.children[i + 1];
+    }
+    left.children[ins_point] = to_insert.children[0];
+    for (node_size_type i = middle; i < node_capacity; i++)
+    {
+      left.pop_back();
+    }
+    if (ins_point < middle)
+    {
+      right.children[0] = left.children[middle];
+      node_type* left_child = left.children[0];
+      to_insert.emplace_back(std::move(left[middle - 1]));
+      left.pop_back();
+      left.emplace(ins_point, std::move(to_insert[0]));
+      left.children[0] = left_child;
+      to_insert.erase(0);
+    }
+    else
+    {
+      right.children[0] = to_insert.children[1];
+      if (!to_insert.isleaf())
+      {
+        to_insert.children[1]->parent = &right;
+      }
+    }
+  }
+  else
+  {
+    to_insert.emplace_back(std::move(left[middle]));
+    for (node_size_type i = middle + 1; i < ins_point; i++)
+    {
+      right.emplace_back(std::move(left[i]));
+      right.children[right.size()] = left.children[i];
+    }
+    right.children[0] = left.children[middle + 1];
+    right.emplace_back(std::move(to_insert[0]));
+    right.children[right.size() - 1] = to_insert.children[0];
+    right.children[right.size()] = to_insert.children[1];
+    if (!to_insert.isleaf())
+    {
+      to_insert.children[0]->parent = &right;
+      to_insert.children[1]->parent = &right;
+    }
+    for (node_size_type i = ins_point; i < node_capacity; i++)
+    {
+      right.emplace_back(std::move(left[i]));
+      right.children[right.size()] = left.children[i];
+    }
+    for (node_size_type i = middle; i < node_capacity; i++)
+    {
+      left.pop_back();
+    }
+    to_insert.erase(0);
+  }
+  right.parent = left.parent;
+  to_insert.children[0] = &left;
+  to_insert.children[1] = &right;
+}
 #endif

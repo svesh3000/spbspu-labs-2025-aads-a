@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits.hpp>
 #include "node.hpp"
+#include "iterator.hpp"
 
 namespace rychkov
 {
@@ -22,9 +23,6 @@ namespace rychkov
     return reinterpret_cast< Base* >(reinterpret_cast< char* >(clear_p) - offset);
   }
 
-  template< class Key, class Mapped, size_t N, bool isConst, bool isReversed >
-  class MapIterator;
-
   template< class Key, class Mapped, class Compare = std::less<>, size_t N = 2 >
   class Map
   {
@@ -41,10 +39,10 @@ namespace rychkov
     using pointer = value_type*;
     using const_pointer = const value_type*;
 
-    using iterator = MapIterator< key_type, mapped_type, N, false, false >;
-    using const_iterator = MapIterator< key_type, mapped_type, N, true, false >;
-    using reverse_iterator = MapIterator< key_type, mapped_type, N, false, true >;
-    using const_reverse_iterator = MapIterator< key_type, mapped_type, N, true, true >;
+    using iterator = MapIterator< value_type, N, false, false >;
+    using const_iterator = MapIterator< value_type, N, true, false >;
+    using reverse_iterator = MapIterator< value_type, N, false, true >;
+    using const_reverse_iterator = MapIterator< value_type, N, true, true >;
 
     struct value_compare
     {
@@ -89,22 +87,22 @@ namespace rychkov
 
     key_compare key_comp() const;
     value_compare value_comp() const;
-    static constexpr size_t node_capacity = N;
-    using node_type = MapNode< key_type, mapped_type, node_capacity >;
-    using node_size_type = typename node_type::size_type;
-    node_type* fake_root() const noexcept;
   private:
-    const node_size_type fake_size_;
-    const node_size_type fake_real_places_[node_capacity];
-    node_type* fake_parent_ = nullptr;
+    static constexpr size_t node_capacity = N;
+    using node_type = MapNode< value_type, node_capacity >;
+    using node_size_type = typename node_type::size_type;
+
+    node_type*const fake_parent_ = nullptr;
     node_type* fake_children_[node_capacity + 1];
+    const node_size_type fake_size_;
 
     node_type* cached_begin_ = nullptr;
     node_type* cached_rbegin_ = nullptr;
     size_t size_;
     value_compare comp_;
 
-    const_iterator find_hint(const key_type& key);
+    node_type* fake_root() const noexcept;
+    void devide(node_type& left, node_type& right, node_size_type ins_point, node_type& to_insert);
     void destroy_subtree(node_type* node);
   };
 }

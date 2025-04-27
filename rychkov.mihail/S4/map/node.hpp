@@ -8,110 +8,102 @@
 
 namespace rychkov
 {
-  template< class Key, class Mapped, size_t N >
+  template< class Value, size_t N >
   class MapNode
   {
   public:
-    using key_type = Key;
-    using mapped_type = Mapped;
-    using value_type = std::pair< const Key, Mapped >;
+    using value_type = Value;
     using size_type = select_size_type_t< N >;
     static constexpr size_t node_capacity = N;
 
     static_assert(N >= 2, "");
 
-    MapNode(MapNode* p = nullptr):
-      size_(0),
-      parent_(p)
-    {}
+    MapNode* parent = nullptr;
+    MapNode* children[node_capacity + 1];
+
     ~MapNode()
     {
-      for (size_type i = 0; i < size_; i++)
+      while (!empty())
       {
-        operator[](i).~value_type();
+        pop_back();
       }
-      size_ = 0;
     }
     value_type& operator[](size_type i)
     {
-      return *(reinterpret_cast< value_type* >(data_) + real_places_[i]);
+      return *(reinterpret_cast< value_type* >(data_) + i);
     }
     const value_type& operator[](size_type i) const
     {
-      return *(reinterpret_cast< value_type* >(data_) + real_places_[i]);
+      return *(reinterpret_cast< value_type* >(data_) + i);
+    }
+    bool empty() const noexcept
+    {
+      return size_ == 0;
+    }
+    bool full() const noexcept
+    {
+      return size_ >= node_capacity;
     }
     size_type size() const noexcept
     {
       return size_;
     }
-    bool full() const noexcept
+    bool isfake() const noexcept
     {
-      return size_ < node_capacity;
+      return parent == nullptr;
     }
-    bool isFake() const noexcept
+    bool isleaf() const noexcept
     {
-      return parent_ == nullptr;
-    }
-    MapNode*& child(size_type i) noexcept
-    {
-      return children_[real_places_[i]];
-    }
-    MapNode*const& child(size_type i) const noexcept
-    {
-      return i >= size_ ? node_capacity : children_[real_places_[i]];
-    }
-    MapNode*& parent() noexcept
-    {
-      return parent_;
-    }
-    MapNode*const& parent() const noexcept
-    {
-      return parent_;
+      return children[0] == nullptr;
     }
 
     template< class... Args >
     void emplace(size_type newPlace, Args&&... args)
     {
-      newPlace = (newPlace <= size_ ? newPlace : size_);
-      bool ocupied[node_capacity]{};
-      for (size_type i = 0; i < size_; i++)
-      {
-        ocupied[real_places_[i]] = true;
-      }
-      size_type real_place = node_capacity - 1;
-      for (size_type i = 0; i < node_capacity - 1; i++)
-      {
-        if (!ocupied[i])
-        {
-          real_place = i;
-        }
-      }
-      new(reinterpret_cast< value_type* >(data_) + real_place) value_type{std::forward< Args >(args)...};
       for (size_type i = size_; i > newPlace; i--)
       {
-        real_places_[i] = real_places_[i - 1];
+        new(std::addressof(operator[](i))) value_type{std::move(operator[](i - 1))};
+        operator[](i - 1).~value_type();
+        children[i + 1] = children[i];
       }
-      real_places_[newPlace] = real_place;
-      children_[real_place] = nullptr;
+      new(std::addressof(operator[](newPlace))) value_type{std::forward< Args >(args)...};
+      if (newPlace == 0)
+      {
+        children[1] = (size_ == 0 ? nullptr : children[0]);
+        children[0] = nullptr;
+      }
+      else
+      {
+        children[newPlace + 1] = nullptr;
+      }
       size_++;
+    }
+    template< class... Args >
+    void emplace_back(Args&&... args)
+    {
+      emplace(size_, std::forward< Args >(args)...);
     }
     void erase(size_type i)
     {
       operator[](i).~value_type();
-      for (size_type j = i; j + 1 < size_; j++)
+      for (size_type j = i + 1; j < size_; j++)
       {
-        real_places_[j] = real_places_[j + 1];
+        new(std::addressof(operator[](j - 1))) value_type{std::move(operator[](j))};
+        operator[](j).~value_type();
+        children[j] = children[j + 1];
       }
+      size_--;
+    }
+    void pop_back()
+    {
+      operator[](--size_).~value_type();
     }
   private:
     template< class K, class M, class C, size_t N1 >
     friend class Map;
 
-    alignas(value_type) unsigned char data_[node_capacity * sizeof(value_type)];
     size_type size_ = 0;
-    size_type real_places_[node_capacity];
-    MapNode* parent_ = nullptr;
-    MapNode* children_[node_capacity + 1];
+    alignas(value_type) unsigned char data_[node_capacity * sizeof(value_type)];
   };
 }
 
