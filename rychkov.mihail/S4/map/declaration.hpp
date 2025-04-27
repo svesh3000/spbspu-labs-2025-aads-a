@@ -22,6 +22,14 @@ namespace rychkov
     auto clear_p = const_cast< Member* >(std::addressof(fakeMember));
     return reinterpret_cast< Base* >(reinterpret_cast< char* >(clear_p) - offset);
   }
+  template< class Cmp, class = void >
+  struct is_transparent: std::false_type
+  {};
+  template< class Cmp >
+  struct is_transparent< Cmp, void_t< typename Cmp::is_transparent > >: std::true_type
+  {};
+  template< class Cmp >
+  constexpr bool is_transparent_v = is_transparent< Cmp >::value;
 
   template< class Key, class Mapped, class Compare = std::less<>, size_t N = 2 >
   class Map
@@ -62,6 +70,7 @@ namespace rychkov
 
     bool empty() const noexcept;
     size_type size() const noexcept;
+    size_type maxsize() const noexcept;
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -77,11 +86,39 @@ namespace rychkov
     const_reverse_iterator rend() const noexcept;
     const_reverse_iterator crend() const noexcept;
 
+    mapped_type& at(const key_type& key);
+    const mapped_type& at(const key_type& key) const;
+    mapped_type& operator[](const key_type& key);
+    mapped_type& operator[](key_type&& key);
+
+    iterator lower_bound(const key_type& key);
+    const_iterator lower_bound(const key_type& key) const;
+    iterator upper_bound(const key_type& key);
+    const_iterator upper_bound(const key_type& key) const;
+    iterator find(const key_type& key);
+    const_iterator find(const key_type& key) const;
+    bool contains(const key_type& key) const;
+
+    template< class K >
+    iterator lower_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
+    template< class K >
+    const_iterator lower_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+    template< class K >
+    iterator upper_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
+    template< class K >
+    const_iterator upper_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+    template< class K >
+    iterator find(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
+    template< class K >
+    const_iterator find(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+    template< class K >
+    bool contains(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+
     void clear();
     void swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
 
     template< class... Args >
-    std::pair< iterator, bool > emplace(Args... args);
+    std::pair< iterator, bool > emplace(Args&&... args);
     template< class... Args >
     iterator emplace_hint(const_iterator hint, Args&&... args);
 
@@ -104,6 +141,10 @@ namespace rychkov
     node_type* fake_root() const noexcept;
     void devide(node_type& left, node_type& right, node_size_type ins_point, node_type& to_insert);
     void destroy_subtree(node_type* node);
+    template< class K >
+    const_iterator lower_bound_impl(const K& key) const;
+    template< class K >
+    const_iterator upper_bound_impl(const K& key) const;
   };
 }
 

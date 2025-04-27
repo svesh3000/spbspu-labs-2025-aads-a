@@ -172,4 +172,18 @@ void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& 
   to_insert.children[0] = &left;
   to_insert.children[1] = &right;
 }
+
+template< class Key, class Value, class Compare, size_t N >
+template< class... Args >
+std::pair< typename rychkov::Map< Key, Value, Compare, N >::iterator, bool >
+    rychkov::Map< Key, Value, Compare, N >::emplace(Args&&... args)
+{
+  value_type temp{std::forward< Args >(args)...};
+  iterator hint = lower_bound(temp.first);
+  if ((hint != end()) && !comp_(temp, *hint))
+  {
+    return {hint, false};
+  }
+  return {emplace_hint(hint, std::move(temp)), true};
+}
 #endif

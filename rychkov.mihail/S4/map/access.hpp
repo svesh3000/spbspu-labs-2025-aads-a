@@ -2,13 +2,42 @@
 #define ACCESS_HPP
 
 #include "declaration.hpp"
-#include <memory>
+#include <limits>
 
 template< class Key, class Mapped, class Compare, size_t N >
 typename rychkov::Map< Key, Mapped, Compare, N >::node_type*
     rychkov::Map< Key, Mapped, Compare, N >::fake_root() const noexcept
 {
   return getFakePointer(fake_parent_, &node_type::parent);
+}
+template< class Key, class Mapped, class Compare, size_t N >
+bool rychkov::Map< Key, Mapped, Compare, N >::empty() const noexcept
+{
+  return size_ == 0;
+}
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::size_type
+    rychkov::Map< Key, Mapped, Compare, N >::size() const noexcept
+{
+  return size_;
+}
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::size_type
+    rychkov::Map< Key, Mapped, Compare, N >::maxsize() const noexcept
+{
+  return std::numeric_limits< difference_type >::max();
+}
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::key_compare
+    rychkov::Map< Key, Mapped, Compare, N >::key_comp() const
+{
+  return comp_.comp;
+}
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::value_compare
+    rychkov::Map< Key, Mapped, Compare, N >::value_comp() const
+{
+  return comp_;
 }
 
 template< class Key, class Mapped, class Compare, size_t N >
