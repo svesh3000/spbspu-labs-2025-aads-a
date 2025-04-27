@@ -129,13 +129,13 @@ namespace petrov
   template< typename T >
   const T & Queue< T >::front() const
   {
-    
+
   }
 
   template< typename T >
   T & Queue< T >::back()
   {
-    
+
   }
 
   template< typename T >
