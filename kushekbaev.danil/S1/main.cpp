@@ -108,6 +108,10 @@ int main()
       std::cout << " " << *it;
     }
   }
+  else
+  {
+    std::cout << 0;
+  }
   std::cout << "\n";
   return 0;
 }
