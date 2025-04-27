@@ -22,13 +22,3 @@ namespace krylov
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-

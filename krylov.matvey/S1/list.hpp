@@ -1,6 +1,5 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include <iostream>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -94,7 +93,7 @@ namespace krylov
   }
 
   template< typename T >
-  List< T >::List(const size_t n, const T& value):
+  List< T >::List(size_t n, const T& value):
     head_(nullptr),
     tail_(nullptr),
     size_(0)
@@ -127,10 +126,11 @@ namespace krylov
       swap(temp);
     }
   }
+
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& other) noexcept
   {
-    if (this == &other || other.empty())
+    if (this == std::addressof(other) || other.empty())
     {
       return;
     }
@@ -160,7 +160,7 @@ namespace krylov
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > it) noexcept
   {
-    if (this == &other || it.current_ == nullptr)
+    if (this == std::addressof(other) || it.current_ == nullptr)
     {
       return;
     }
@@ -204,7 +204,7 @@ namespace krylov
   template< typename T >
   void List< T >::splice(ConstIterator< T > position, List< T >& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
-    if (this == &other || first == last)
+    if (this == std::addressof(other) || first == last)
     {
       return;
     }
@@ -297,7 +297,7 @@ namespace krylov
   template< typename T >
   List< T >& List< T >::operator=(const List< T >& other)
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -315,7 +315,7 @@ namespace krylov
   template< typename T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -434,7 +434,7 @@ namespace krylov
   template< typename T >
   Iterator< T > List< T >::begin() noexcept
   {
-    return Iterator< T >(head_);
+    return Iterator< T >(head_, this);
   }
 
   template< typename T >
@@ -446,7 +446,7 @@ namespace krylov
   template< typename T >
   ConstIterator< T > List< T >::cbegin() const noexcept
   {
-    return ConstIterator< T >(head_);
+    return ConstIterator< T >(head_, this);
   }
 
   template< typename T >

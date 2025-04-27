@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(test_iterator_increment)
 
 BOOST_AUTO_TEST_CASE(test_iterator_decrement)
 {
-  List<int> list;
+  List< int > list;
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);

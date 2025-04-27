@@ -19,8 +19,8 @@ namespace krylov
     Iterator();
     Iterator(Node< T >* node) noexcept;
     Iterator(Node< T >* node, const List< T >* list) noexcept;
-    T& operator*() const noexcept;
-    T* operator->() const noexcept;
+    T& operator*() noexcept;
+    T* operator->() noexcept;
     Iterator& operator++() noexcept;
     Iterator operator++(int) noexcept;
     Iterator& operator--() noexcept;
@@ -46,15 +46,15 @@ namespace krylov
   {}
 
   template< typename T >
-  T& Iterator< T >::operator*() const noexcept
+  T& Iterator< T >::operator*() noexcept
   {
     return current_->data_;
   }
 
   template< typename T >
-  T* Iterator< T >::operator->() const noexcept
+  T* Iterator< T >::operator->() noexcept
   {
-    return &(current_->data_);
+    return std::addressof(current_->data_);
   }
 
   template< typename T >

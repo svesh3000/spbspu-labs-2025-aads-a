@@ -54,7 +54,7 @@ namespace krylov
   template< typename T >
   const T* ConstIterator< T >::operator->() const noexcept
   {
-    return &(current_->data_);
+    return std::addressof(current_->data_);
   }
 
   template< typename T >
