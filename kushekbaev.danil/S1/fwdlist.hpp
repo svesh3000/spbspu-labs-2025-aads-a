@@ -23,9 +23,13 @@ namespace kushekbaev
     FwdList(FwdList&& other);
     ~FwdList();
 
-    FwdList& operator=(const FwdList& other) = default;
-    bool operator==(const FwdList& other) noexcept;
-    bool operator!=(FwdList&& other) noexcept;
+    FwdList& operator=(std::initializer_list< T > init);
+    bool operator==(const FwdList& other) const noexcept;
+    bool operator!=(const FwdList& other) const noexcept;
+    bool operator<(const FwdList& other) const noexcept;
+    bool operator>(const FwdList& other) const noexcept;
+    bool operator<=(const FwdList& other) const noexcept;
+    bool operator>=(const FwdList& other) const noexcept;
 
     Iterator< T > begin() const noexcept;
     Iterator< T > end() const noexcept;
@@ -42,7 +46,10 @@ namespace kushekbaev
     size_t size() const noexcept;
     bool empty() const noexcept;
 
+    template< typename InputIterator, typename = enableIf< InputIterator > >
+    void assign(InputIterator first, InputIterator last);
     void assign(size_t size, const T& value);
+    void assign(std::initializer_list< T > init);
     void push_front(const T& value);
     void pop_front() noexcept;
     void swap(FwdList& other) noexcept;
@@ -130,7 +137,14 @@ namespace kushekbaev
   }
 
   template< typename T >
-  bool FwdList< T >::operator==(const FwdList& other) noexcept
+  FwdList< T >& FwdList< T >::operator=(std::initializer_list< T > init)
+  {
+    assign(init);
+    return *this;
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator==(const FwdList& other) const noexcept
   {
     if (size() != other.size())
     {
@@ -151,9 +165,46 @@ namespace kushekbaev
   }
 
   template< typename T >
-  bool FwdList< T >::operator!=(FwdList&& other) noexcept
+  bool FwdList< T >::operator!=(const FwdList& other) const noexcept
   {
     return !(*this == other);
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator<(const FwdList& other) const noexcept
+  {
+    auto it1 = begin();
+    auto it2 = other.begin();
+    for (; it1 != end() && it2 != other.end(); ++it1, ++it2)
+    {
+      if (*it1 < *it2)
+      {
+        return true;
+      }
+      else if (*it2 < *it1)
+      {
+        return false;
+      }
+    }
+    return (it1 == end() && it2 != other.end());
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator>(const FwdList& other) const noexcept
+  {
+    return other < *this;
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator<=(const FwdList& other) const noexcept
+  {
+    return !(*this > other);
+  }
+
+  template< typename T >
+  bool FwdList< T >::operator>=(const FwdList& other) const noexcept
+  {
+    return !(*this < other);
   }
 
   template< typename T >
@@ -224,6 +275,21 @@ namespace kushekbaev
   }
 
   template< typename T >
+  template< typename InputIterator, typename >
+  void FwdList< T >::assign(InputIterator first, InputIterator last)
+  {
+    while (!empty())
+    {
+      pop_front();
+    }
+    for (auto it = first; it != last; ++it)
+    {
+      push_front(*it);
+    }
+    reverse();
+  }
+
+  template< typename T >
   void FwdList< T >::assign(size_t size, const T& value)
   {
     while (!empty())
@@ -235,6 +301,12 @@ namespace kushekbaev
       push_front(value);
     }
     reverse();
+  }
+
+  template< typename T >
+  void FwdList< T >::assign(std::initializer_list< T > init)
+  {
+    assign(init.begin(), init.end());
   }
 
   template< typename T >
