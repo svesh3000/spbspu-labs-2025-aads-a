@@ -399,14 +399,13 @@ void Tree< Key, Value, Compare >::clear()
   {
     destroy_tree(root);
   }
-  root = nullptr;
   size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::destroy_tree(NodeType* node)
 {
-  if (node)
+  if (node && node != fake_root)
   {
     destroy_tree(node->left);
     destroy_tree(node->right);
