@@ -319,7 +319,6 @@ Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other
   {
     root = fake_root;
     clear();
-    delete fake_root;
     root = other.root;
     fake_root = other.fake_root;
     comp = std::move(other.comp);
