@@ -137,7 +137,7 @@ Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
 template <class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(std::initializer_list< std::pair< const Key, Value > > init, const Compare& cmp):
   root(nullptr),
-  fake_root(new NodeType(Key(), Value())),
+  fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
@@ -152,7 +152,7 @@ template < class Key, class Value, class Compare >
 template < class InputIt >
 Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& cmp):
   root(nullptr),
-  fake_root(new NodeType(Key(), Value())),
+  fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
@@ -167,7 +167,10 @@ template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
   clear();
-  if (fake_root) delete fake_root;
+  if (fake_root)
+  {
+    delete fake_root;
+  }
 }
 
 template < class Key, class Value, class Compare >
@@ -314,6 +317,7 @@ Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other
 {
   if (this != &other)
   {
+    root = fake_root;
     clear();
     delete fake_root;
     root = other.root;
@@ -395,18 +399,18 @@ typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear()
 {
-  if (root)
+  if (root && root != fake_root)
   {
     destroy_tree(root);
   }
-  root = nullptr;
+  root = fake_root;
   size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::destroy_tree(NodeType* node)
 {
- if (node)
+ if (node && node != fake_root)
   {
     destroy_tree(node->left);
     destroy_tree(node->right);
