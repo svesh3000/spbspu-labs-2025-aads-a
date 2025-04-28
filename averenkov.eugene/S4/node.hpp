@@ -20,7 +20,8 @@ Node< Key, Value >::Node(const Key& k, const Value& v, Node* p):
   data(std::make_pair(k, v)),
   left(nullptr),
   right(nullptr),
-  parent(p)
+  parent(p),
+  height(1)
 {
 }
 
