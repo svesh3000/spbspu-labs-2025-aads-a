@@ -167,7 +167,7 @@ template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
   clear();
-  delete fake_root;
+  if (fake_root) delete fake_root;
 }
 
 template < class Key, class Value, class Compare >
