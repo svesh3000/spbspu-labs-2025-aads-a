@@ -21,13 +21,26 @@ namespace brevnov
     List< T > & operator=(List< T > && copy);
     List< T > & operator=(initializer_list<value_type> il);
 
+    Iterator begin() noexcept;
+    ConstIterator cbegin() const noexcept;
+    Iterator end() noexcept;
+    ConstIterator cend() const noexcept;
+
     T& front() noexcept;
     const T& front() noexcept const;
     T& back() noexcept;
     const T& back() noexcept const;
 
+    void pushBack(const T&);
+    void pushBack(T&&);
+    void pushFront(const T&);
+    void pushFront(T&&);
+
     void clear();
     void swap(List< T > & hl);
+
+    bool empty() const noexcept;
+    size_t size() const noexcept;
   private:
     Node< T > * head_;
     Node< T > * tail_;
@@ -136,6 +149,42 @@ namespace brevnov
   }
 
   template< typename T >
+  typename List< T >::Iterator List< T >::begin() noexcept
+  {
+    return Iterator(head_);
+  }
+
+  template< typename T >
+  typename List< T >::ConstIterator List< T >::cbegin() noexcept
+  {
+    return ConstIterator(head_);
+  }
+
+  template< typename T >
+  typename List< T >::Iterator List< T >::end() noexcept
+  {
+    return Iterator(tail_);
+  }
+
+  template< typename T >
+  typename List< T >::ConstIterator List< T >::cend() noexcept
+  {
+    return ConstIterator(head_);
+  }
+
+  template< typename T >
+  bool List< T >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename T >
+  size_t List< T >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< typename T >
   T& List< T >::front() noexcept
   {
     return head_->data;
@@ -159,6 +208,48 @@ namespace brevnov
     return tail_->data;
   }
 
-  
+  template< typename T >
+  void List< T >::push_back(const T& data)
+  {
+    if (!tail_)
+    {
+      head_ = new Node< T >{ data, nullptr, nullptr};
+      tail_ = head_;
+    }
+    else
+    {
+      tail_->next = new Node< T >{ data, tail_, nullptr};
+      tail_ = tail_->next;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  void List< T >::push_back(T&& data)
+  {
+    push_back(data);
+  }
+
+  template< typename T >
+  void List< T >::push_front(const T& data)
+  {
+    if (!head)
+    {
+      head_ = new Node< T >{ data, nullptr, nullptr};
+      tail_ = head;
+    }
+    else
+    {
+      head_->prev = new Node< T >{ data, nullptr, head_};
+      head_ = head_->prev;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  void List< T >::push_front(T&& data)
+  {
+    push_front(data);
+  }
 }  
 #endif
