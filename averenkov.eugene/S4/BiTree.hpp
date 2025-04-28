@@ -166,7 +166,7 @@ Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& c
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
-  destroy_tree(root);
+  clear();
   delete fake_root;
 }
 
