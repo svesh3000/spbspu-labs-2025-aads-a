@@ -200,7 +200,7 @@ namespace alymova
   {
     for (auto it = begin(); it != end(); it++)
     {
-      if (std::equal_to()< Key >(key, it->first))
+      if (std::equal_to< Key >()(key, it->first))
       {
         return it;
       }

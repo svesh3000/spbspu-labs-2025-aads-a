@@ -1,5 +1,5 @@
-#ifndef TREE_ITERATOR_HPP
-#define TREE_ITERATOR_HPP
+#ifndef TREE_CONST_ITERATOR_HPP
+#define TREE_CONST_ITERATOR_HPP
 #include <cassert>
 #include <iterator>
 #include "tree-2-3.hpp"
