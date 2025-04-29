@@ -27,8 +27,8 @@ namespace demehin
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
 
-    data_t& operator*() const;
-    data_t* operator->() const;
+    data_t& operator*() const noexcept;
+    data_t* operator->() const noexcept;
 
     bool operator==(const this_t&) const noexcept;
     bool operator!=(const this_t&) const noexcept;
@@ -38,7 +38,7 @@ namespace demehin
     stack_t stack_;
 
     explicit RnlIterator(node_t*) noexcept;
-  }
+  };
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   RnlIterator< Key, T, Cmp, isConst >::RnlIterator() noexcept:

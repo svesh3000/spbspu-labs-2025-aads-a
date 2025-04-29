@@ -1,0 +1,1 @@
+10 keyboard 12 monitor -5 mouse

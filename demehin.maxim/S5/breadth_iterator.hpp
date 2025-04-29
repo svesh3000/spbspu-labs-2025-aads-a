@@ -27,8 +27,8 @@ namespace demehin
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
 
-    data_t& operator*() const;
-    data_t* operator->() const;
+    data_t& operator*() const noexcept;
+    data_t* operator->() const noexcept;
 
     bool operator==(const this_t&) const noexcept;
     bool operator!=(const this_t&) const noexcept;
@@ -38,7 +38,7 @@ namespace demehin
     queue_t queue_;
 
     explicit BreadthIterator(node_t*) noexcept;
-  }
+  };
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator() noexcept:
@@ -61,14 +61,14 @@ namespace demehin
       return *this;
     }
     node_ = queue_.front();
-    queue.pop();
+    queue_.pop();
     if (node_->left != nullptr)
     {
-      queue.push(node_->left);
+      queue_.push(node_->left);
     }
     if (node_->right != nullptr)
     {
-      queue.push(node_->right);
+      queue_.push(node_->right);
     }
     return *this;
   }
