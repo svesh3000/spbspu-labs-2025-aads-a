@@ -2,7 +2,7 @@
 #define BREADTH_ITERATOR_HPP
 #include <cassert>
 #include <tree/node.hpp>
-#include <stack.hpp>
+#include <queue.hpp>
 
 namespace demehin
 {
@@ -19,7 +19,7 @@ namespace demehin
     using Node = demehin::TreeNode< Key, T >;
     using this_t = BreadthIterator< Key, T, Cmp, isConst >;
     using node_t = typename std::conditional< isConst, const Node, Node >::type;
-    using stack_t = typename std::conditional< isConst, Stack< const Node* >, Stack< Node* > >::type;
+    using queue_t = typename std::conditional< isConst, Queue< const Node* >, Queue< Node* > >::type;
     using data_t = typename std::conditional< isConst, const std::pair< Key, T >, std::pair< Key, T > >::type;
 
     BreadthIterator() noexcept;
@@ -35,7 +35,7 @@ namespace demehin
 
   private:
     node_t* node_;
-    stack_t stack_;
+    queue_t queue_;
 
     explicit BreadthIterator(node_t*) noexcept;
   }
@@ -43,13 +43,13 @@ namespace demehin
   template< typename Key, typename T, typename Cmp, bool isConst >
   BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator() noexcept:
     node_(nullptr),
-    stack_()
+    queue_()
   {}
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator(node_t* node) noexcept:
     node_(node),
-    stack_()
+    queue_()
   {}
 
   template< typename Key, typename T, typename Cmp, bool isConst >
