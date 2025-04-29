@@ -9,7 +9,7 @@ namespace alymova
 {
   template< class Key, class Value, class Comparator >
   struct TTTIterator:
-    public std::iterator< std::bidirectional_iterator_tag, T >
+    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
   public:
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
