@@ -19,7 +19,7 @@ namespace savintsev
     using value_type = std::pair< Key, Value >;
 
     template< typename K, typename V, typename C >
-    friend class TwoThreeTree; 
+    friend class TwoThreeTree;
     //friend class ConstIterator< T >;
   public:
     BidirectIterator():
@@ -53,8 +53,14 @@ namespace savintsev
     }
     BidirectIterator & operator--();
     BidirectIterator operator--(int);
-    bool operator!=(const BidirectIterator & rhs) const;
-    bool operator==(const BidirectIterator & rhs) const;
+    bool operator!=(const BidirectIterator & rhs) const
+    {
+      return !(*this == rhs);
+    }
+    bool operator==(const BidirectIterator & rhs) const
+    {
+      return node_ == rhs.node_ && pos_ == rhs.pos_;
+    }
   private:
     node_t< Key, Value > * node_;
     size_t pos_ = 0;
@@ -66,7 +72,7 @@ namespace savintsev
 
     BidirectIterator & next()
     {
-      if (!pos_ && node_.len_ == 2)
+      if (!pos_ && node_->len_ == 2)
       {
         pos_ = 1;
         return *this;
@@ -93,7 +99,7 @@ namespace savintsev
         while (node_->parent_)
         {
           auto prev = node_;
-          node_ = node_->parent;
+          node_ = node_->parent_;
           if (node_->left_ == prev)
           {
             return *this;

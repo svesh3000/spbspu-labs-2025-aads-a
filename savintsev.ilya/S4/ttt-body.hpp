@@ -40,6 +40,17 @@ namespace savintsev
   {}
 
   template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
+  {
+    node_t< K, V > * temp = root_;
+    while (temp->left_)
+    {
+      temp = temp->left_;
+    }
+    return iterator(temp, 0);
+  }
+
+  template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::end() noexcept
   {
     return iterator();
@@ -148,23 +159,63 @@ namespace savintsev
     }
     else if (current->len_ == 1)
     {
+      current->len_ = 2;
+      size_++;
       if (C{}(k, current->data_[0].first))
       {
         current->data_[1] = current->data_[0];
         current->data_[0] = {k, mapped_type{}};
+        return iterator(current, 0);
       }
       else
       {
         current->data_[1] = {k, mapped_type{}};
+        return iterator(current, 1);
       }
-      current->len_ = 2;
-      size_++;
-      return iterator(current, 1);
     }
     else
     {
-      // zdes probros naverh, poka shto throw =)
-      throw std::runtime_error("Node splitting not implemented");
+      if (!current->parent_)
+      {
+        node_t< K, V > * child1 = new node_t< K, V >{};
+        node_t< K, V > * child2 = new node_t< K, V >{};
+        auto result = iterator();
+        if (C{}(k, current->data_[0].first))
+        {
+          child1->data_[0] = {k, mapped_type{}};
+          child2->data_[0] = current->data_[1];
+          result = iterator(child1, 0);
+        }
+        else if (C{}(current->data_[1].first, k))
+        {
+          child1->data_[0] = current->data_[0];
+          child2->data_[0] = {k, mapped_type{}};
+          current->data_[0] = current->data_[1];
+          result = iterator(child2, 0);
+        }
+        else
+        {
+          child1->data_[0] = current->data_[0];
+          child2->data_[0] = current->data_[1];
+          current->data_[0] = {k, mapped_type{}};
+          result = iterator(current, 0);
+        }
+        current->len_--;
+        child1->parent_ = current;
+        child2->parent_ = current;
+        child1->len_ = 1;
+        child2->len_ = 1;
+        current->left_ = child1;
+        current->righ_ = child2;
+        current->len_ = 1;
+        current->sons_ = 2;
+        return result;
+      }
+      else
+      {
+        // zdes probros naverh, poka shto throw =)
+        throw std::runtime_error("Node splitting not implemented");
+      }
     }
   }
 }
