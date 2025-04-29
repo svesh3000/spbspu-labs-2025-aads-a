@@ -69,7 +69,7 @@ namespace demehin
       while (stack_.top()->right == node_)
       {
         node_ = stack_.top();
-        stack.pop();
+        stack_.pop();
         if (stack_.empty())
         {
           node_ = nullptr;
@@ -79,7 +79,7 @@ namespace demehin
       while (!stack_.empty() && stack_.top()->left == node_)
       {
         node_ = stack_.top();
-        stack_.pop()
+        stack_.pop();
       }
     }
 
