@@ -1,6 +1,7 @@
 #ifndef TREE_2_3_HPP
 #define TREE_2_3_HPP
 #include <cstddef>
+#include <cassert>
 #include <functional>
 #include "tree-node.hpp"
 
@@ -199,7 +200,7 @@ namespace alymova
   {
     for (auto it = begin(); it != end(); it++)
     {
-      if (std::equal< Key >(key, it->first))
+      if (std::equal_to()< Key >(key, it->first))
       {
         return it;
       }
