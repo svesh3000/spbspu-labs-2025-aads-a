@@ -1,5 +1,5 @@
-#ifndef RNL_ITERATOR_HPP
-#define RNL_ITERATOR_HPP
+#ifndef BREADTH_ITERATOR_HPP
+#define BREADTH_ITERATOR_HPP
 #include <cassert>
 #include <tree/node.hpp>
 #include <stack.hpp>
@@ -10,19 +10,19 @@ namespace demehin
   class Tree;
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  class RnlIterator
+  class BreadthIterator
   {
-    friend class RnlIterator< Key, T, Cmp, true >;
-    friend class RnlIterator< Key, T, Cmp, false >;
+    friend class BreadthIterator< Key, T, Cmp, true >;
+    friend class BreadthIterator< Key, T, Cmp, false >;
     friend class Tree< Key, T, Cmp >;
   public:
     using Node = demehin::TreeNode< Key, T >;
-    using this_t = RnlIterator< Key, T, Cmp, isConst >;
+    using this_t = BreadthIterator< Key, T, Cmp, isConst >;
     using node_t = typename std::conditional< isConst, const Node, Node >::type;
     using stack_t = typename std::conditional< isConst, Stack< const Node* >, Stack< Node* > >::type;
     using data_t = typename std::conditional< isConst, const std::pair< Key, T >, std::pair< Key, T > >::type;
 
-    RnlIterator() noexcept;
+    BreadthIterator() noexcept;
 
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
@@ -37,56 +37,28 @@ namespace demehin
     node_t* node_;
     stack_t stack_;
 
-    explicit RnlIterator(node_t*) noexcept;
+    explicit BreadthIterator(node_t*) noexcept;
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  RnlIterator< Key, T, Cmp, isConst >::RnlIterator() noexcept:
+  BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator() noexcept:
     node_(nullptr),
     stack_()
   {}
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  RnlIterator< Key, T, Cmp, isConst >::RnlIterator(node_t* node) noexcept:
+  BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator(node_t* node) noexcept:
     node_(node),
     stack_()
   {}
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  typename RnlIterator< Key, T, Cmp, isConst >::this_t& RnlIterator< Key, T, Cmp, isConst >::operator++() noexcept
+  typename BreadthIterator< Key, T, Cmp, isConst >::this_t& BreadthIterator< Key, T, Cmp, isConst >::operator++() noexcept
   {
-    if (node_->left != nullptr)
-    {
-      stack_.push(node_);
-      node_ = node_->left;
-      while (node_->right != nullptr)
-      {
-        stack_.push(node_);
-        node_ = node_->right;
-      }
-    }
-    else
-    {
-      while (stack_.top()->left == node_)
-      {
-        node_ = stack_.top();
-        stack_.pop();
-        if (stack_.empty())
-        {
-          node_ = nullptr;
-          return *this;
-        }
-      }
-      while (!stack_.empty() && stack_.top()->right == node_)
-      {
-        node_ = stack_.top();
-        stack_.pop();
-      }
-    }
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  typename RnlIterator< Key, T, Cmp, isConst >::this_t RnlIterator< Key, T, Cmp, isConst >::operator++(int) noexcept
+  typename BreadthIterator< Key, T, Cmp, isConst >::this_t BreadthIterator< Key, T, Cmp, isConst >::operator++(int) noexcept
   {
     this_t res(*this);
     ++(*this);
@@ -94,27 +66,27 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  typename RnlIterator< Key, T, Cmp, isConst >::data_t& RnlIterator< Key, T, Cmp, isConst >::operator*() const noexcept
+  typename BreadthIterator< Key, T, Cmp, isConst >::data_t& BreadthIterator< Key, T, Cmp, isConst >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  typename RnlIterator< Key, T, Cmp, isConst >::data_t* RnlIterator< Key, T, Cmp, isConst >::operator->() const noexcept
+  typename BreadthIterator< Key, T, Cmp, isConst >::data_t* BreadthIterator< Key, T, Cmp, isConst >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  bool RnlIterator< Key, T, Cmp, isConst >::operator==(const this_t& rhs) const noexcept
+  bool BreadthIterator< Key, T, Cmp, isConst >::operator==(const this_t& rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
-  bool RnlIterator< Key, T, Cmp, isConst >::operator!=(const this_t& rhs) const noexcept
+  bool BreadthIterator< Key, T, Cmp, isConst >::operator!=(const this_t& rhs) const noexcept
   {
     return !(*this == rhs);
   }
