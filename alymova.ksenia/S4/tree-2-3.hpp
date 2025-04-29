@@ -1,5 +1,6 @@
 #ifndef TREE_2_3_HPP
 #define TREE_2_3_HPP
+#include <cstddef>
 #include <functional>
 #include "tree-node.hpp"
 
@@ -100,7 +101,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::begin()
   {
-    TTTConstIterator tmp = cbegin();
+    ConstIterator tmp = cbegin();
     return {const_cast< Node* >(tmp.node_), tmp.point_};
   }
 
@@ -128,7 +129,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::end()
   {
-    TTTConstIterator tmp = cend();
+    ConstIterator tmp = cend();
     return {const_cast< Node* >(tmp.node_), tmp.point_};
   }
 
