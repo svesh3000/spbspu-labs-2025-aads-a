@@ -12,7 +12,7 @@ namespace alymova
     public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
   public:
-    using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
+    using Iterator = TTTIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value >;
     using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
 
