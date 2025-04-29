@@ -6,20 +6,20 @@
 
 namespace savintsev
 {
-  //template< typename Key, typename Value, typename Compare >
-  //class BinSearchTree;
+  template< typename Key, typename Value, typename Compare >
+  class TwoThreeTree;
 
   //template< typename Key, typename Value, typename Compare >
   //class ConstIterator;
 
   template< typename Key, typename Value >
   class BidirectIterator:
-    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value >>
+    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     using value_type = std::pair< Key, Value >;
 
-    //template< typename Compare >
-    //friend class BinSearchTree< Key, Value, Compare >;
+    template< typename K, typename V, typename C >
+    friend class TwoThreeTree; 
     //friend class ConstIterator< T >;
   public:
     BidirectIterator():
@@ -27,59 +27,155 @@ namespace savintsev
     {}
     value_type & operator*()
     {
-      node_->data_[node_->is_righ_];
+      return node_->data_[pos_];
     }
     value_type * operator->()
     {
-      return std::addressof(node_->data_[node_->is_righ_]);
+      return std::addressof(node_->data_[pos_]);
     }
     const value_type & operator*() const
     {
-      node_->data_[node_->is_righ_];
+      return node_->data_[pos_];
     }
     const value_type * operator->() const
     {
-      return std::addressof(node_->data_[node_->is_righ_]);
+      return std::addressof(node_->data_[pos_]);
     }
     BidirectIterator & operator++()
-    {}
-    BidirectIterator operator++(int);
+    {
+      return next();
+    }
+    BidirectIterator operator++(int)
+    {
+      BidirectIterator< Key, Value > result(*this);
+      ++(*this);
+      return result;
+    }
     BidirectIterator & operator--();
     BidirectIterator operator--(int);
     bool operator!=(const BidirectIterator & rhs) const;
     bool operator==(const BidirectIterator & rhs) const;
   private:
     node_t< Key, Value > * node_;
-    bool is_righ_ = false;
+    size_t pos_ = 0;
 
-    BidirectIterator(node_t< Key, Value > * rhs, bool is_right = false):
-      node_(rhs),
-      is_righ_(is_right)
+    BidirectIterator(node_t< Key, Value > * node, size_t pos = 0):
+      node_(node),
+      pos_(pos)
     {}
+
+    BidirectIterator & next()
+    {
+      if (!pos_ && node_.len_ == 2)
+      {
+        pos_ = 1;
+        return *this;
+      }
+      pos_ = 0;
+      if (node_->midd_)
+      {
+        node_ = node_->midd_;
+        while (node_->left_)
+        {
+          node_ = node_->left_;
+        }
+      }
+      else if (node_->righ_)
+      {
+        node_ = node_->righ_;
+        while (node_->left_)
+        {
+          node_ = node_->left_;
+        }
+      }
+      else
+      {
+        while (node_->parent_)
+        {
+          auto prev = node_;
+          node_ = node_->parent;
+          if (node_->left_ == prev)
+          {
+            return *this;
+          }
+          if (node_->midd_ == prev && node_->righ_)
+          {
+            node_ = node_->righ_;
+            while (node_->left_)
+            {
+              node_ = node_->left_;
+            }
+            return *this;
+          }
+        }
+        node_ = nullptr;
+      }
+      return *this;
+    }
+    BidirectIterator & prev()
+    {
+      //if (!node_)
+      //{
+      //  return rbegin();
+      //}
+      if (pos_)
+      {
+        pos_ = 0;
+        return *this;
+      }
+      if (node_->midd_)
+      {
+        node_ = node_->midd_;
+        while (node_->righ_)
+        {
+          node_ = node_->righ_;
+        }
+      }
+      else if (node_->left_)
+      {
+        node_ = node_->left_;
+        while (node_->righ_)
+        {
+          node_ = node_->righ_;
+        }
+      }
+      else
+      {
+        while (node_->parent_)
+        {
+          auto prev = node_;
+          node_ = node_->parent_;
+          if (node_->righ_ == prev)
+          {
+            if (node_->len_ == 2)
+            {
+              pos_ = 1;
+            }
+            return *this;
+          }
+          if (node_->midd_ == prev && node_->left_)
+          {
+            node_ = node_->left_;
+            while (node_->righ_)
+            {
+              node_ = node_->righ_;
+            }
+            if (node_->len_ == 2)
+            {
+              pos_ = 1;
+            }
+            return *this;
+          }
+        }
+        node_ = nullptr;
+      }
+      if (node_->len_ == 2)
+      {
+        pos_ = 1;
+      }
+      return *this;
+    }
   };
-/*
-  template< typename T >
-  class ConstIterator:
-    public std:: iterator< std::bidirectional_iterator_tag, T >
-  {
-    template< typename U >
-    friend class List;
-  public:
-    ConstIterator();
-    ConstIterator(Iterator< T > rhs);
-    const T & operator*() const;
-    const T * operator->() const;
-    ConstIterator & operator++();
-    ConstIterator operator++(int);
-    ConstIterator & operator--();
-    ConstIterator operator--(int);
-    bool operator!=(const ConstIterator & rhs) const;
-    bool operator==(const ConstIterator & rhs) const;
-  private:
-    ListNode< T > * node;
-    ConstIterator(ListNode< T > * rhs);
-  };
-*/
 }
 
 #endif
