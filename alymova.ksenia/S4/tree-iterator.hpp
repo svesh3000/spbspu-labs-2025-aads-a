@@ -1,0 +1,231 @@
+#ifndef TREE_ITERATOR_HPP
+#define TREE_ITERATOR_HPP
+#include "tree-2-3.hpp"
+#include "tree-node.hpp"
+
+namespace alymova
+{
+  template< class Key, class Value, class Comparator >
+  struct TTTIterator:
+    public std::iterator< std::bidirectional_iterator_tag, T >
+  {
+  public:
+    using Iterator = TTTIterator< Key, Value, Comparator >;
+    using Node = detail::TTTNode< Key, Value >;
+
+    TTTIterator();
+    Iterator& operator++() noexcept;
+    Iterator& operator++(int) noexcept;
+    Iterator& operator--() noexcept;
+    Iterator& operator--(int) noexcept;
+    bool operator==(const Iterator& other) const noexcept;
+    bool operator!=(const Iterator& other) const noexcept;
+    std::pair< Key, Value >& operator*() noexcept;
+    std::pair< Key, Value >* operator->() noexcept;
+  private:
+    Node* node_;
+    enum NodePoint {Empty, First, Second} point_;
+
+    TTTIterator(Node* node, NodePoint point);
+
+    friend class TwoThreeTree< Key, Value, Comparator >;
+  };
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >::TTTIterator():
+    node_(nullptr),
+    point_(NodePoint::Empty)
+  {}
+  
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >::TTTIterator(Node* node, NodePoint point):
+    node_(node),
+    point_(point)
+  {}
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator++() noexcept
+  {
+    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(node_->type != NodeType::Empty && "Incorrect node index");
+    assert(point_ != NodePoint::Empty && "Incorrect node index");
+
+    if (node_->type == NodeType::Double)
+    {
+      if (node_->right)
+      {
+        node_ = node_->right;
+        while (node_->left)
+        {
+          node_ = node_->left;
+        }
+        point_ = NodePoint::First;
+        return *this;
+      }
+    }
+    else if (node_->type == NodeType::Triple)
+    {
+      if (point_ == NodePoint::First)
+      {
+        if (node_->mid)
+        {
+          node_ = node_->mid;
+          while (node_->left)
+          {
+            node_ = node_->left;
+          }
+          return *this;
+        }
+        point_ = NodePoint::Second;
+        return *this;
+      }
+      else if (point_ == NodePoint::Second)
+      {
+        if (node_->right)
+        {
+          node_ = node_->right;
+          while (node_->left)
+          {
+            node_ = node_->left;
+          }
+          point_ = NodePoint::First;
+          return *this;
+        }
+      }
+    }
+    while (node_->parent)
+    {
+      if (node_->parent->left == node_)
+      {
+        node_ = node_->parent;
+        point_ = NodeType::First;
+        return *this;
+      }
+      if (node_->parent->mid == node_)
+      {
+        node_ = node_->parent;
+        point_ = NodePoint::Second;
+        return *this;
+      }
+      node_ = node_->parent;
+    }
+    node_ = nullptr;
+    point_ = NodePoint::Empty;
+    return *this;
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator++(int) noexcept
+  {
+    ConstIterator old = *this;
+    ++(*this);
+    return old;
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator--() noexcept
+  {
+    if (node_->type == NodeType::Double)
+    {
+      if (node_->left)
+      {
+        node_ = node_->left;
+        while (node_->right)
+        {
+          node_ = node_->right;
+        }
+        point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
+        return *this;
+      }
+    }
+    else if (node_->type == NodeType::Triple)
+    {
+      if (point_ == NodePoint::First)
+      {
+        if (node_->left)
+        {
+          node_ = node_->left;
+          while (node_->right)
+          {
+            node_ = node_->right;
+          }
+          point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
+          return *this;
+        }
+      }
+      else if (point_ == NodePoint::Second)
+      {
+        if (node_->mid)
+        {
+          node_ = node_->mid;
+          while (node_->right)
+          {
+            node_ = node_->right;
+          }
+          point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
+          return *this;
+        }
+        point_ = NodePoint::First;
+        return *this;
+      }
+    }
+    while (node_->parent)
+    {
+      if (node_->parent->right == node_)
+      {
+        node_ = node_->parent;
+        point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
+        return *this;
+      }
+      if (node_->parent->mid == node_)
+      {
+        node_ = node_->parent;
+        point_ = NodePoint::First;
+        return *this;
+      }
+      node_ = node_->parent;
+    }
+    node_ = nullptr;
+    point_ = NodePoint::Empty;
+    return *this;
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator--(int) noexcept
+  {
+    ConstIterator old = *this;
+    --(*this);
+    return old;
+  }
+
+  template< class Key, class Value, class Comparator >
+  bool TTTIterator< Key, Value, Comparator >::operator==(const Iterator& other) const noexcept
+  {
+    return node_ == other.node_;
+  }
+
+  template< class Key, class Value, class Comparator >
+  bool TTTIterator< Key, Value, Comparator >::operator!=(const Iterator& other) const noexcept
+  {
+    return node_ != other.node_;
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >& TTTIterator< Key, Value, Comparator >::operator*() noexcept
+  {
+    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(point_ != NodePoint::Empty && "Incorrect node index");
+
+    return node_->data[point_ - 1];
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >* TTTIterator< Key, Value, Comparator >::operator->() noexcept
+  {
+    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(point_ != NodePoint::Empty && "Incorrect node index");
+
+    return std::addressof(node_->data[point_ - 1]);
+  }
+}
+#endif

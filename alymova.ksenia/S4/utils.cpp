@@ -102,35 +102,6 @@ alymova::CompositeDataset_t alymova::readDictionaryFile(std::istream& in)
     throw std::logic_error("<INVALID COMMAND>");
   }
   return dataset_comp;
-  /*std::string s_local = s;
-  Dataset_t tree;
-  if (s.empty())
-  {
-    return tree;
-  }
-  s_local = s_local.substr(1);
-
-  while (!s_local.empty())
-  {
-    size_t tree_key;
-    std::string tree_value;
-    size_t space = s_local.find(" ");
-    if (space != std::string::npos)
-    {
-      tree_key = std::stoll(s_local.substr(0, space));
-    }
-    s_local = s_local.substr(space + 1);
-
-    space = s_local.find(" ");
-    tree_value = s_local.substr(0, space);
-    if (space == std::string::npos)
-    {
-      space = s_local.size() - 1;
-    }
-    s_local = s_local.substr(space + 1);
-    tree[tree_key] = tree_value;
-  }
-  return tree;*/
 }
 
 alymova::CommandDataset_t alymova::complectCommands()

@@ -5,7 +5,9 @@
 #include <map>
 #include <functional>
 #include "utils.hpp"
-#include "tree.hpp"
+#include "tree-2-3.hpp"
+#include "tree-node.hpp"
+#include "tree-const-iterator.hpp"
 
 int main(int argc, char** argv)
 {
@@ -34,19 +36,6 @@ int main(int argc, char** argv)
   try
   {
     CompositeDataset_t dataset_comp = readDictionaryFile(file);
-    /*std::string dataset;
-    while ((file >> dataset))
-    {
-      std::string params;
-      std::getline(file, params, '\n');
-      Dataset_t new_tree = readTree(params);
-      dicts[dataset] = new_tree;
-    }
-    if ((file).fail() && !(file).eof())
-    {
-      std::cerr << "<INVALID COMMAND>\n";
-      return 1;
-    }*/
     file.clear();
 
     CommandDataset_t dataset_commands = complectCommands();
@@ -64,4 +53,12 @@ int main(int argc, char** argv)
   {
     std::cout << "<INVALID COMMAND>\n";
   }
+  /*detail::TTTNode< size_t, std::string > n{1, "cat", 2, "dog"};
+  std::cout << n.data[0].first;
+  size_t index = 1;
+  TTTConstIterator< size_t, std::string, std::less< size_t > > it(&n, TTTConstIterator< size_t, std::string, std::less< size_t > >::NodePoint::Second);
+  std::cout << it->second;
+  enum type {Empty, Double, Triple};
+  type t = Double;
+  std::cout << t - 1;*/
 }
