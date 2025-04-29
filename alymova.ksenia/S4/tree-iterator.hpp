@@ -36,7 +36,7 @@ namespace alymova
     node_(nullptr),
     point_(NodePoint::Empty)
   {}
-  
+
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator >::TTTIterator(Node* node, NodePoint point):
     node_(node),

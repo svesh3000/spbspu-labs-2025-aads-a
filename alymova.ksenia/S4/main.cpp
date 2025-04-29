@@ -53,12 +53,4 @@ int main(int argc, char** argv)
   {
     std::cout << "<INVALID COMMAND>\n";
   }
-  /*detail::TTTNode< size_t, std::string > n{1, "cat", 2, "dog"};
-  std::cout << n.data[0].first;
-  size_t index = 1;
-  TTTConstIterator< size_t, std::string, std::less< size_t > > it(&n, TTTConstIterator< size_t, std::string, std::less< size_t > >::NodePoint::Second);
-  std::cout << it->second;
-  enum type {Empty, Double, Triple};
-  type t = Double;
-  std::cout << t - 1;*/
 }
