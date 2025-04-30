@@ -57,7 +57,7 @@ namespace demehin
   {
     if (queue_.empty())
     {
-      node_ == nullptr;
+      node_ = nullptr;
       return *this;
     }
     node_ = queue_.front();

@@ -16,6 +16,27 @@ namespace
       tree.insert(std::make_pair(key, val));
     }
   }
+
+  void traverseTree(Map& tree, demehin::KeySumm& res, const std::string& command)
+  {
+    if (command == "ascending")
+    {
+      res = tree.traverse_lnr(res);
+    }
+    else if (command == "descending")
+    {
+      res = tree.traverse_rnl(res);
+    }
+    else if (command == "breadth")
+    {
+      res = tree.traverse_breadth(res);
+    }
+    else
+    {
+      throw std::logic_error("unknown command");
+    }
+  }
+
 }
 
 int main(int argc, char* argv[])
@@ -27,9 +48,17 @@ int main(int argc, char* argv[])
 
   std::ifstream file(argv[2]);
   Map tree;
-  inputTree(file, tree);
+  demehin::KeySumm res;
+  try
+  {
+    inputTree(file, tree);
+    traverseTree(tree, res, argv[1]);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 
-  demehin::KeySumm sum;
-  sum = tree.traverse_lnr(sum);
-  std::cout << sum.val_res << " " << sum.str_res << "\n";
+  std::cout << res.val_res << " " << res.str_res << "\n";
 }
