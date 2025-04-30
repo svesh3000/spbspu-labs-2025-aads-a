@@ -3,15 +3,13 @@
 #include <cstddef>
 #include <cassert>
 #include <functional>
-#include "tree-node.hpp"
+#include <iostream>
+#include "tree-iterators.hpp"
+#include "tree-iterator-impl.hpp"
+#include "tree-const-iterator-impl.hpp"
 
 namespace alymova
 {
-  template< class Key, class Value, class Comapartor >
-  struct TTTIterator;
-  template< class Key, class Value, class Comapartor >
-  struct TTTConstIterator;
-
   template< class Key, class Value, class Comparator >
   class TwoThreeTree
   {
@@ -21,7 +19,9 @@ namespace alymova
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value >;
     using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
-    using NodePoint = typename TTTConstIterator< Key, Value, Comparator >::NodePoint;
+    using NodePoint = typename detail::NodePoint;
+
+    using T = std::pair< Key, Value >;
 
     TwoThreeTree();
     TwoThreeTree(const Tree& other);
@@ -41,16 +41,25 @@ namespace alymova
     bool empty() const;
     size_t size() const;
 
+    std::pair< ConstIterator, bool > insert(const T& value);
+    std::pair< ConstIterator, bool > insert(T&& value);
+    template < class InputIterator >
+    void insert(InputIterator first, InputIterator last);
+    void insert(std::initializer_list< T > il);
+    Iterator insert(Iterator hint, const T& value); //hint
+    Iterator insert(ConstIterator hint, const T& value); //hint
     void swap(Tree& other);
     void clear();
 
     Iterator find(const Key& key);
-    ConstIterator find(const Key& key) const;
+    ConstIterator cfind(const Key& key) const;
 
   private:
     Node* fake_;
     Node* root_;
     size_t size_;
+
+    void clear(Node* node);
   };
 
   template< class Key, class Value, class Comparator >
@@ -77,7 +86,10 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::~TwoThreeTree()
   {
-    clear();
+    if (size_)
+    {
+      clear(root_);
+    }
     delete fake_;
   }
 
@@ -102,8 +114,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::begin()
   {
-    ConstIterator tmp = cbegin();
-    return {const_cast< Node* >(tmp.node_), tmp.point_};
+    return Iterator(cbegin());
   }
 
   template< class Key, class Value, class Comparator >
@@ -115,23 +126,22 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cbegin() const noexcept
   {
-    if (root_ = nullptr)
+    if (root_ == fake_)
     {
-      return {};
+      return ConstIterator(fake_, NodePoint::Empty);
     }
     Node* tmp = root_;
     while (tmp->left)
     {
       tmp = tmp->left;
     }
-    return {tmp, NodePoint::First};
+    return ConstIterator(tmp, NodePoint::First);
   }
 
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::end()
   {
-    ConstIterator tmp = cend();
-    return {const_cast< Node* >(tmp.node_), tmp.point_};
+    return Iterator(cend());
   }
 
   template< class Key, class Value, class Comparator >
@@ -143,17 +153,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cend() const noexcept
   {
-    if (root_ = nullptr)
-    {
-      return {};
-    }
-    Node* tmp = root_;
-    while (tmp->right)
-    {
-      tmp = tmp->right;
-    }
-    auto point = (tmp->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
-    return {tmp, point};
+    return ConstIterator(fake_, NodePoint::Empty);
   }
 
   template< class Key, class Value, class Comparator >
@@ -169,6 +169,26 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  std::pair< TTTConstIterator< Key, Value, Comparator >, bool >
+    TwoThreeTree< Key, Value, Comparator >::insert(const T& value)
+  {
+    if (cfind(value.first) != cend())
+    {
+      return {cend(), false};
+    }
+    if (size_ == 0)
+    {
+      root_ = new Node{value.first, value.second};
+      ConstIterator tmp(root_, NodePoint::First);
+      Iterator tmpp(tmp);
+      std::cout << tmpp->first << '\n';
+      size_++;
+      return {tmp, true};
+    }
+    return {cend(), false};
+  }
+
+  template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other)
   {
     std::swap(root_, other.root_);
@@ -178,35 +198,42 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::clear()
   {
-    if (!root_)
-    {
-      return;
-    }
-    clear(root_->left);
-    clear(root_->mid);
-    clear(root_->right);
-    delete root_;
+    clear(root_);
   }
 
-  template< class Key, class Value, class Comparator >
+  /*template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key)
   {
-    ConstIterator tmp = find(key);
-    return {const_cast< Node* >(tmp.node_), tmp.point_};
-  }
+    TTTConstIterator< Key, Value, Comparator > tmp = cfind(key);
+    return Iterator(const_cast< detail::TTTNode< Key, Value >* >(tmp.node_), tmp.point_);
+  }*/
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const
+  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cfind(const Key& key) const
   {
-    for (auto it = begin(); it != end(); it++)
+    for (ConstIterator it = cbegin(); it != cend(); it++)
     {
       if (std::equal_to< Key >()(key, it->first))
       {
         return it;
       }
     }
+    return cend();
   }
 
+  template< class Key, class Value, class Comparator >
+  void TwoThreeTree< Key, Value, Comparator >::clear(Node* root)
+  {
+    if (!root)
+    {
+      return;
+    }
+    clear(root->left);
+    clear(root->mid);
+    clear(root->right);
+    delete root;
+    root = nullptr;
+  }
 }
 
 #endif

@@ -23,6 +23,8 @@ namespace alymova
       TTTNode(const Key& key1, const Value& value1, const Key& key2, const Value& value2);
     };
 
+    enum NodePoint {Empty, First, Second};
+
     template< class Key, class Value >
     TTTNode< Key, Value >::TTTNode():
       data{std::pair< Key, Value >(), std::pair< Key, Value >()},
@@ -46,7 +48,7 @@ namespace alymova
     template< class Key, class Value >
     TTTNode< Key, Value >::TTTNode(const Key& key1, const Value& value1, const Key& key2, const Value& value2):
       data{std::make_pair(key1, value1), std::make_pair(key2, value2)},
-      type(NodeType::Double),
+      type(NodeType::Triple),
       parent(nullptr),
       left(nullptr),
       mid(nullptr),

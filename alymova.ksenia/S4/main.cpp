@@ -7,12 +7,12 @@
 #include "utils.hpp"
 #include "tree-2-3.hpp"
 #include "tree-node.hpp"
-#include "tree-const-iterator.hpp"
+#include "tree-iterators.hpp"
 
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
+  /*using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
   using CompositeDataset_t = std::map< std::string, Dataset_t, std::less< std::string > >;
   using CommandDataset_t = std::map<
     std::string,
@@ -52,5 +52,11 @@ int main(int argc, char** argv)
   catch(const std::exception& e)
   {
     std::cout << "<INVALID COMMAND>\n";
-  }
+  }*/
+  TwoThreeTree< int, std::string, std::less< int > > tree;
+  std::pair< int, std::string > p(1, "cat");
+  auto pp = tree.insert(p);
+  auto it = tree.cfind(1);
+  std::cout << it->first << it->second << '\n';
+  std::cout << pp.first->first << pp.first->second << pp.second;
 }

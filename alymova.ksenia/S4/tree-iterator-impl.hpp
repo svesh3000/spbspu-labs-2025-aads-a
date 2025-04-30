@@ -1,53 +1,32 @@
-#ifndef TREE_CONST_ITERATOR_HPP
-#define TREE_CONST_ITERATOR_HPP
+#ifndef TREE_ITERATOR_HPP
+#define TREE_ITERATOR_HPP
 #include <cassert>
 #include <iterator>
-#include "tree-2-3.hpp"
 #include "tree-node.hpp"
+#include "tree-iterators.hpp"
 
 namespace alymova
 {
   template< class Key, class Value, class Comparator >
-  struct TTTConstIterator:
-    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
-  {
-  public:
-    using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
-    using Node = typename detail::TTTNode< Key, Value >;
-    using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
-
-    TTTConstIterator();
-    ConstIterator& operator++() noexcept;
-    ConstIterator& operator++(int) noexcept;
-    ConstIterator& operator--() noexcept;
-    ConstIterator& operator--(int) noexcept;
-    bool operator==(const ConstIterator& other) const noexcept;
-    bool operator!=(const ConstIterator& other) const noexcept;
-    const std::pair< Key, Value >& operator*() const noexcept;
-    const std::pair< Key, Value >* operator->() const noexcept;
-  private:
-    const Node* node_;
-    enum NodePoint {Empty, First, Second} point_;
-
-    TTTConstIterator(Node* node, NodePoint point);
-
-    friend class TwoThreeTree< Key, Value, Comparator >;
-  };
-
-  template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator >::TTTConstIterator():
+  TTTIterator< Key, Value, Comparator >::TTTIterator():
     node_(nullptr),
     point_(NodePoint::Empty)
   {}
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator >::TTTConstIterator(Node* node, NodePoint point):
+  TTTIterator< Key, Value, Comparator >::TTTIterator(Node* node, NodePoint point):
     node_(node),
     point_(point)
   {}
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator++() noexcept
+  TTTIterator< Key, Value, Comparator >::TTTIterator(TTTConstIterator< Key, Value, Comparator> citer):
+    node_(const_cast< Node* >(citer.node_)),
+    point_(citer.point_)
+  {}
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator++() noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     assert(node_->type != NodeType::Empty && "Incorrect node index");
@@ -101,7 +80,7 @@ namespace alymova
       if (node_->parent->left == node_)
       {
         node_ = node_->parent;
-        point_ = NodeType::First;
+        point_ = NodePoint::First;
         return *this;
       }
       if (node_->parent->mid == node_)
@@ -118,15 +97,15 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator++(int) noexcept
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator++(int) noexcept
   {
-    ConstIterator old = *this;
+    Iterator old = *this;
     ++(*this);
     return old;
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator--() noexcept
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator--() noexcept
   {
     if (node_->type == NodeType::Double)
     {
@@ -194,27 +173,27 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator--(int) noexcept
+  TTTIterator< Key, Value, Comparator>& TTTIterator< Key, Value, Comparator >::operator--(int) noexcept
   {
-    ConstIterator old = *this;
+    Iterator old = *this;
     --(*this);
     return old;
   }
 
   template< class Key, class Value, class Comparator >
-  bool TTTConstIterator< Key, Value, Comparator >::operator==(const ConstIterator& other) const noexcept
+  bool TTTIterator< Key, Value, Comparator >::operator==(const Iterator& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class Key, class Value, class Comparator >
-  bool TTTConstIterator< Key, Value, Comparator >::operator!=(const ConstIterator& other) const noexcept
+  bool TTTIterator< Key, Value, Comparator >::operator!=(const Iterator& other) const noexcept
   {
     return node_ != other.node_;
   }
 
   template< class Key, class Value, class Comparator >
-  const std::pair< Key, Value >& TTTConstIterator< Key, Value, Comparator >::operator*() const noexcept
+  std::pair< Key, Value >& TTTIterator< Key, Value, Comparator >::operator*() noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     assert(point_ != NodePoint::Empty && "Incorrect node index");
@@ -223,7 +202,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  const std::pair< Key, Value >* TTTConstIterator< Key, Value, Comparator >::operator->() const noexcept
+  std::pair< Key, Value >* TTTIterator< Key, Value, Comparator >::operator->() noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
     assert(point_ != NodePoint::Empty && "Incorrect node index");
