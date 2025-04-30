@@ -37,7 +37,7 @@ namespace duhanina
 
     void push(const Key& k, const Value& v);
     Value get(const Key& k) const;
-    Value drop(const Key& k);
+    Value drop(Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -221,7 +221,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value Tree< Key, Value, Compare >::drop(const Key& k)
+  Value Tree< Key, Value, Compare >::drop(Key& k)
   {
     Value value = get(k);
     setRoot(remove(getRoot(), k));
