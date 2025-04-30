@@ -1,4 +1,5 @@
 #include "key_summ.hpp"
+#include <calc_utils.hpp>
 
 demehin::KeySumm::KeySumm() noexcept:
   val_res(0),

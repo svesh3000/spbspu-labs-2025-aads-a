@@ -55,13 +55,11 @@ namespace demehin
   template< typename Key, typename T, typename Cmp, bool isConst >
   typename BreadthIterator< Key, T, Cmp, isConst >::this_t& BreadthIterator< Key, T, Cmp, isConst >::operator++() noexcept
   {
-    if (queue_.empty())
+    if (node_ == nullptr)
     {
-      node_ = nullptr;
       return *this;
     }
-    node_ = queue_.front();
-    queue_.pop();
+
     if (node_->left != nullptr)
     {
       queue_.push(node_->left);
@@ -69,6 +67,16 @@ namespace demehin
     if (node_->right != nullptr)
     {
       queue_.push(node_->right);
+    }
+
+    if (queue_.empty())
+    {
+      node_ = nullptr;
+    }
+    else
+    {
+      node_ = queue_.front();
+      queue_.pop();
     }
     return *this;
   }
