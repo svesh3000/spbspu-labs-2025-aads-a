@@ -37,7 +37,7 @@ namespace duhanina
 
     void push(const Key& k, const Value& v);
     Value get(const Key& k) const;
-    Value drop(Key& k);
+    Value drop(const Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -221,10 +221,15 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value Tree< Key, Value, Compare >::drop(Key& k)
+  Value Tree< Key, Value, Compare >::drop(const Key& k)
   {
-    Value value = get(k);
-    setRoot(remove(getRoot(), k));
+    if (!count(k))
+    {
+      throw std::out_of_range("Key not found");
+    }
+    Value value = find(getRoot(), k)->data.second;
+    Key keyCopy = k;
+    setRoot(remove(getRoot(), keyCopy));
     size_--;
     return value;
   }
