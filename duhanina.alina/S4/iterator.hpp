@@ -18,8 +18,8 @@ namespace duhanina
     Iterator();
     explicit Iterator(Node< Key, Value >* node);
 
-    std::pair< const Key, Value >& operator*() const;
-    std::pair< const Key, Value >* operator->() const;
+    std::pair< Key, Value >& operator*() const;
+    std::pair< Key, Value >* operator->() const;
 
     Iterator& operator++();
     Iterator operator++(int);
@@ -45,14 +45,14 @@ namespace duhanina
   {}
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< const Key, Value >& Iterator< Key, Value, Compare >::operator*() const
+  std::pair< Key, Value >& Iterator< Key, Value, Compare >::operator*() const
   {
     assert(current_ != nullptr);
     return current_->data;
   }
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< const Key, Value >* Iterator< Key, Value, Compare >::operator->() const
+  std::pair< Key, Value >* Iterator< Key, Value, Compare >::operator->() const
   {
     assert(current_ != nullptr);
     return std::addressof(current_->data);

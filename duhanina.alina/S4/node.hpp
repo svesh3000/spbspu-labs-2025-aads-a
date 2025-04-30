@@ -8,7 +8,7 @@ namespace duhanina
   template < typename Key, typename Value >
   struct Node
   {
-    std::pair< const Key, Value > data;
+    std::pair< Key, Value > data;
     Node* left;
     Node* right;
     Node* parent;
