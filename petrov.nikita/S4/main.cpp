@@ -25,7 +25,6 @@ int main(int argc, const char * const * argv)
   using subtree_t = std::map< int, std::string, std::less< int > >;
   using maintree_t = std::map< std::string, subtree_t >;
   maintree_t tree;
-  subtree_t subtree;
   std::ifstream input(argv[1]);
   if (!checkArguments(argc))
   {
@@ -35,6 +34,7 @@ int main(int argc, const char * const * argv)
   }
   while (!input.eof())
   {
+    subtree_t subtree;
     std::string dataset;
     input >> dataset;
     if (input.eof())
@@ -59,12 +59,181 @@ int main(int argc, const char * const * argv)
     }
     tree.insert({ dataset, subtree });
   }
-  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  std::string command_name;
+  while (!std::cin.eof())
   {
-    std::cout << it->first << " dictionary:" << "\n";
-    for (auto sub_it = it->second.cbegin(); sub_it != it->second.cend(); ++sub_it)
+    std::cin >> command_name;
+    if (std::cin.eof())
     {
-      std::cout << (*sub_it).first << " => " << (*sub_it).second << "\n";
+      continue;
+    }
+    try
+    {
+      if (command_name == "print")
+      {
+        std::string dataset_parameter;
+        std::cin >> dataset_parameter;
+        auto it = tree.find(dataset_parameter);
+        if (it == tree.end())
+        {
+          throw std::logic_error("<INVALID COMMAND>");
+        }
+        auto sub_it = it->second.cbegin();
+        std::cout << it->first << " ";
+        std::cout << sub_it->first << " " << (sub_it++)->second;
+        for (; sub_it != it->second.cend(); ++sub_it)
+        {
+          std::cout << " " << sub_it->first << " " << sub_it->second;
+        }
+        std::cout << "\n";
+      }
+      else if (command_name == "complement")
+      {
+        std::string new_dataset;
+        std::string first_dataset;
+        std::string second_dataset;
+        std::cin >> new_dataset;
+        std::cin >> first_dataset;
+        std::cin >> second_dataset;
+        auto first_it = tree.find(first_dataset);
+        auto second_it = tree.find(second_dataset);
+        if (first_it == tree.end() || second_it == tree.end())
+        {
+          throw std::logic_error("<INVALID COMMAND>");
+        }
+        auto first_sub_it = first_it->second.cbegin();
+        auto second_sub_it = second_it->second.cbegin();
+        subtree_t new_subtree;
+        while (first_sub_it != first_it->second.cend() && second_sub_it != second_it->second.cend())
+        {
+          if (first_sub_it->first == second_sub_it->first)
+          {
+            ++first_sub_it;
+            ++second_sub_it;
+          }
+          else if (first_sub_it->first < second_sub_it->first)
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+          }
+          else
+          {
+            new_subtree.insert({ second_sub_it->first, second_sub_it->second });
+            ++second_sub_it;
+          }
+        }
+        if (first_sub_it != first_it->second.cend())
+        {
+          while (first_sub_it != first_it->second.cend())
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+          }
+        }
+        else if (second_sub_it != second_it->second.cend())
+        {
+          while (second_sub_it != second_it->second.cend())
+          {
+            new_subtree.insert({ second_sub_it->first, second_sub_it->second });
+            ++second_sub_it;
+          }
+        }
+        tree.insert({ new_dataset, new_subtree });
+      }
+      else if (command_name == "intersect")
+      {
+        std::string new_dataset;
+        std::string first_dataset;
+        std::string second_dataset;
+        std::cin >> new_dataset;
+        std::cin >> first_dataset;
+        std::cin >> second_dataset;
+        auto first_it = tree.find(first_dataset);
+        auto second_it = tree.find(second_dataset);
+        if (first_it == tree.end() || second_it == tree.end())
+        {
+          throw std::logic_error("<INVALID COMMAND>");
+        }
+        auto first_sub_it = first_it->second.cbegin();
+        auto second_sub_it = second_it->second.cbegin();
+        subtree_t new_subtree;
+        while (first_sub_it != first_it->second.cend() && second_sub_it != second_it->second.cend())
+        {
+          if (first_sub_it->first == second_sub_it->first)
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+            ++second_sub_it;
+          }
+          else if (first_sub_it->first < second_sub_it->first)
+          {
+            ++first_sub_it;
+          }
+          else
+          {
+            ++second_sub_it;
+          }
+        }
+        tree.insert({ new_dataset, new_subtree });
+      }
+      else if (command_name == "union")
+      {
+        std::string new_dataset;
+        std::string first_dataset;
+        std::string second_dataset;
+        std::cin >> new_dataset;
+        std::cin >> first_dataset;
+        std::cin >> second_dataset;
+        auto first_it = tree.find(first_dataset);
+        auto second_it = tree.find(second_dataset);
+        if (first_it == tree.end() || second_it == tree.end())
+        {
+          throw std::logic_error("<INVALID COMMAND>");
+        }
+        auto first_sub_it = first_it->second.cbegin();
+        auto second_sub_it = second_it->second.cbegin();
+        subtree_t new_subtree;
+        while (first_sub_it != first_it->second.cend() && second_sub_it != second_it->second.cend())
+        {
+          if (first_sub_it->first == second_sub_it->first)
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+            ++second_sub_it;
+          }
+          else if (first_sub_it->first < second_sub_it->first)
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+          }
+          else
+          {
+            new_subtree.insert({ second_sub_it->first, second_sub_it->second });
+            ++second_sub_it;
+          }
+        }
+        if (first_sub_it != first_it->second.cend())
+        {
+          while (first_sub_it != first_it->second.cend())
+          {
+            new_subtree.insert({ first_sub_it->first, first_sub_it->second });
+            ++first_sub_it;
+          }
+        }
+        else if (second_sub_it != second_it->second.cend())
+        {
+          while (second_sub_it != second_it->second.cend())
+          {
+            new_subtree.insert({ second_sub_it->first, second_sub_it->second });
+            ++second_sub_it;
+          }
+        }
+        tree.insert({ new_dataset, new_subtree });
+      }
+    }
+    catch (const std::logic_error & e)
+    {
+      std::cout << e.what() << "\n";
     }
   }
 }
