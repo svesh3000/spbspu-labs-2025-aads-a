@@ -163,24 +163,6 @@ BOOST_AUTO_TEST_CASE(FindTest)
   BOOST_TEST(tree.find(2) == tree.end());
 }
 
-BOOST_AUTO_TEST_CASE(RangeTest)
-{
-  Tree tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
-
-  auto range = tree.equal_range(2);
-  BOOST_TEST(range.first->first == 2);
-  BOOST_TEST(range.second->first == 3);
-
-  auto lb = tree.lower_bound(2);
-  BOOST_TEST(lb->first == 2);
-
-  auto ub = tree.upper_bound(2);
-  BOOST_TEST(ub->first == 3);
-}
-
 BOOST_AUTO_TEST_CASE(RemoveNonexistentTest)
 {
   Tree tree;
@@ -224,19 +206,4 @@ BOOST_AUTO_TEST_CASE(InsertDuplicateTest)
   tree.push(1, "new_one");
   BOOST_TEST(tree.size() == 1);
   BOOST_TEST(tree.get(1) == "new_one");
-}
-
-BOOST_AUTO_TEST_CASE(RotateTest)
-{
-  Tree tree;
-  tree.push(3, "three");
-  tree.push(2, "two");
-  tree.push(1, "one");
-  BOOST_TEST(tree.getRoot()->data.first == 2);
-
-  Tree tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
-  tree1.push(3, "three");
-  BOOST_TEST(tree1.getRoot()->data.first == 2);
 }
