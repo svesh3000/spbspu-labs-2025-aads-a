@@ -8,7 +8,7 @@ namespace alymova
   class TwoThreeTree;
   template< class Key, class Value, class Comparator >
   struct TTTIterator;
-  
+
   template< class Key, class Value, class Comparator >
   struct TTTConstIterator:
     public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >

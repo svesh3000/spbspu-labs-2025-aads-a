@@ -41,8 +41,8 @@ namespace alymova
     bool empty() const;
     size_t size() const;
 
-    std::pair< ConstIterator, bool > insert(const T& value);
-    std::pair< ConstIterator, bool > insert(T&& value);
+    std::pair< Iterator, bool > insert(const T& value);
+    std::pair< Iterator, bool > insert(T&& value);
     template < class InputIterator >
     void insert(InputIterator first, InputIterator last);
     void insert(std::initializer_list< T > il);
@@ -52,7 +52,7 @@ namespace alymova
     void clear();
 
     Iterator find(const Key& key);
-    ConstIterator cfind(const Key& key) const;
+    ConstIterator find(const Key& key) const;
 
   private:
     Node* fake_;
@@ -169,23 +169,21 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  std::pair< TTTConstIterator< Key, Value, Comparator >, bool >
+  std::pair< TTTIterator< Key, Value, Comparator >, bool >
     TwoThreeTree< Key, Value, Comparator >::insert(const T& value)
   {
-    if (cfind(value.first) != cend())
+    if (find(value.first) != end())
     {
-      return {cend(), false};
+      return {end(), false};
     }
     if (size_ == 0)
     {
       root_ = new Node{value.first, value.second};
-      ConstIterator tmp(root_, NodePoint::First);
-      Iterator tmpp(tmp);
-      std::cout << tmpp->first << '\n';
+      Iterator tmp(root_, NodePoint::First);
       size_++;
       return {tmp, true};
     }
-    return {cend(), false};
+    return {end(), false};
   }
 
   template< class Key, class Value, class Comparator >
@@ -201,15 +199,15 @@ namespace alymova
     clear(root_);
   }
 
-  /*template< class Key, class Value, class Comparator >
+  template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key)
   {
-    TTTConstIterator< Key, Value, Comparator > tmp = cfind(key);
-    return Iterator(const_cast< detail::TTTNode< Key, Value >* >(tmp.node_), tmp.point_);
-  }*/
+    TTTConstIterator< Key, Value, Comparator > tmp = static_cast< const Tree& >(*this).find(key);
+    return Iterator(tmp);
+  }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cfind(const Key& key) const
+  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const
   {
     for (ConstIterator it = cbegin(); it != cend(); it++)
     {
