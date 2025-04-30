@@ -1,5 +1,6 @@
 #ifndef TREE_ITERATORS_HPP
 #define TREE_ITERATORS_HPP
+#include <iterator>
 #include "tree-node.hpp"
 
 namespace alymova

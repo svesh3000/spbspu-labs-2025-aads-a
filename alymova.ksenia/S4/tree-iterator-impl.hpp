@@ -1,7 +1,6 @@
 #ifndef TREE_ITERATOR_HPP
 #define TREE_ITERATOR_HPP
 #include <cassert>
-#include <iterator>
 #include "tree-node.hpp"
 #include "tree-iterators.hpp"
 
