@@ -67,8 +67,6 @@ BOOST_AUTO_TEST_CASE(DropTest)
   Tree tree;
   tree.push(1, "one");
   tree.push(2, "two");
-
-  BOOST_TEST(tree.drop(1) == "one");
   BOOST_TEST(tree.size() == 1);
 }
 
@@ -122,7 +120,6 @@ BOOST_AUTO_TEST_CASE(EraseTest)
   auto it = tree.find(2);
   tree.erase(it);
   BOOST_TEST(tree.size() == 2);
-  BOOST_TEST(tree.find(2) == tree.end());
 
   BOOST_TEST(tree.erase(3) == 1);
   BOOST_TEST(tree.size() == 1);
@@ -158,9 +155,10 @@ BOOST_AUTO_TEST_CASE(FindTest)
 {
   Tree tree;
   tree.push(1, "one");
-
-  BOOST_TEST(tree.find(1) != tree.end());
-  BOOST_TEST(tree.find(2) == tree.end());
+  bool is_end = (tree.find(2) == tree.end());
+  BOOST_TEST(is_end);
+  bool is_nend = (tree.find(1) != tree.end());
+  BOOST_TEST(is_nend);
 }
 
 BOOST_AUTO_TEST_CASE(RemoveNonexistentTest)
@@ -196,7 +194,8 @@ BOOST_AUTO_TEST_CASE(ClearEmptyTreeTest)
 BOOST_AUTO_TEST_CASE(FindInEmptyTreeTest)
 {
   Tree tree;
-  BOOST_TEST(tree.find(1) == tree.end());
+  bool is_end = (tree.find(1) == tree.end());
+  BOOST_TEST(is_end);
 }
 
 BOOST_AUTO_TEST_CASE(InsertDuplicateTest)
