@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(DropTest)
   Tree tree;
   tree.push(1, "one");
   tree.push(2, "two");
-  auto value = drop(2);
+  auto value = tree.drop(2);
   BOOST_TEST(tree.size() == 1);
 }
 
