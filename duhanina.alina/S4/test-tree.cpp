@@ -171,14 +171,14 @@ BOOST_AUTO_TEST_CASE(RangeTest)
   tree.push(3, "three");
 
   auto range = tree.equal_range(2);
-  BOOST_TEST(range.first->data.first == 2);
-  BOOST_TEST(range.second->data.first == 3);
+  BOOST_TEST(range.first->first == 2);
+  BOOST_TEST(range.second->first == 3);
 
   auto lb = tree.lower_bound(2);
-  BOOST_TEST(lb->data.first == 2);
+  BOOST_TEST(lb->first == 2);
 
   auto ub = tree.upper_bound(2);
-  BOOST_TEST(ub->data.first == 3);
+  BOOST_TEST(ub->first == 3);
 }
 
 BOOST_AUTO_TEST_CASE(RemoveNonexistentTest)
