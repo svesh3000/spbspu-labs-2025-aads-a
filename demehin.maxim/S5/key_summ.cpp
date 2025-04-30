@@ -8,5 +8,12 @@ demehin::KeySumm::KeySumm() noexcept:
 void demehin::KeySumm::operator()(const std::pair< const int, std::string >& data) noexcept
 {
   val_res += data.first;
-  str_res = str_res + " " + data.second;
+  if (str_res.size() == 0)
+  {
+    str_res = data.second;
+  }
+  else
+  {
+    str_res = str_res + " " + data.second;
+  }
 }

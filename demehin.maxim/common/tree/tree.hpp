@@ -24,7 +24,7 @@ namespace demehin
     using cLnrIter = LnrIterator< Key, T, Cmp, true >;
     using RnlIter = RnlIterator< Key, T, Cmp, false >;
     using cRnlIter = RnlIterator< Key, T, Cmp, true >;
-    using brIter = BreadthIterator< Key, T, Cmp, false >;
+    using BrIter = BreadthIterator< Key, T, Cmp, false >;
     using cBrIter = BreadthIterator< Key, T, Cmp, true >;
 
     Tree();
@@ -91,12 +91,30 @@ namespace demehin
     RnlIter rnlBegin() const noexcept;
     RnlIter rnlEnd() const noexcept;
     cRnlIter crnlBegin() const noexcept;
-    cRnlIter crnlEnd() const noexcept
+    cRnlIter crnlEnd() const noexcept;
 
     BrIter brBegin() const noexcept;
     BrIter brEnd() const noexcept;
     cBrIter cbrBegin() const noexcept;
     cBrIter cbrEnd() const noexcept;
+
+    template< typename F >
+    F traverse_lnr(F) const;
+
+    template< typename F >
+    F const_traverse_lnr(F) const;
+
+    template< typename F >
+    F traverse_rnl(F) const;
+
+    template< typename F >
+    F const_traverse_rnl(F) const;
+
+    template< typename F >
+    F traverse_breadth(F) const;
+
+    template< typename F >
+    F const_traverse_breadth(F) const;
 
   private:
     using Node = demehin::TreeNode< Key, T >;
@@ -113,6 +131,9 @@ namespace demehin
     void balanceUpper(Node*) noexcept;
     int getBalanceFactor(Node*) const noexcept;
     void updateHeight(Node*) noexcept;
+
+    template< typename Iterator, typename F >
+    F traverse(F, Iterator, Iterator) const;
   };
 
   template< typename Key, typename T, typename Cmp >
@@ -877,6 +898,59 @@ namespace demehin
   typename Tree< Key, T, Cmp >::cBrIter Tree< Key, T, Cmp >::cbrEnd() const noexcept
   {
     return cBrIter(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_lnr(F f) const
+  {
+    return traverse(f, lnrBegin(), lnrEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::const_traverse_lnr(F f) const
+  {
+    return traverse(f, clnrBegin(), clnrEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_rnl(F f) const
+  {
+    return traverse(f, rnlBegin(), rnlEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::const_traverse_rnl(F f) const
+  {
+    return traverse(f, crnlBegin(), crnlEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_breadth(F f) const
+  {
+    return traverse(f, brBegin(), brEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::const_traverse_breadth(F f) const
+  {
+    return traverse(f, cbrBegin(), cbrEnd());
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename Iterator, typename F >
+  F Tree< Key, T, Cmp >::traverse(F f, Iterator begin, Iterator end) const
+  {
+    for (auto it = begin; it != end; it++)
+    {
+      f(*it);
+    }
+    return f;
   }
 }
 
