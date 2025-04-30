@@ -131,7 +131,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::~Tree< Key, Value, Compare >()
+  Tree< Key, Value, Compare >::~Tree()
   {
     clear();
     delete fakeRoot_;
