@@ -5,6 +5,9 @@
 #include "iterator.hpp"
 #include "cIterator.hpp"
 #include "../../S5/lnr_iterator.hpp"
+#include "../../S5/rnl_iterator.hpp"
+#include "../../S5/breadth_iterator.hpp"
+
 
 namespace demehin
 {
@@ -19,6 +22,10 @@ namespace demehin
     using cIterPair = std::pair< cIter, cIter >;
     using LnrIter = LnrIterator< Key, T, Cmp, false >;
     using cLnrIter = LnrIterator< Key, T, Cmp, true >;
+    using RnlIter = RnlIterator< Key, T, Cmp, false >;
+    using cRnlIter = RnlIterator< Key, T, Cmp, true >;
+    using brIter = BreadthIterator< Key, T, Cmp, false >;
+    using cBrIter = BreadthIterator< Key, T, Cmp, true >;
 
     Tree();
     Tree(const Tree< Key, T, Cmp >&);
@@ -78,6 +85,18 @@ namespace demehin
 
     LnrIter lnrBegin() const noexcept;
     LnrIter lnrEnd() const noexcept;
+    cLnrIter clnrBegin() const noexcept;
+    cLnrIter clnrEnd() const noexcept;
+
+    RnlIter rnlBegin() const noexcept;
+    RnlIter rnlEnd() const noexcept;
+    cRnlIter crnlBegin() const noexcept;
+    cRnlIter crnlEnd() const noexcept
+
+    BrIter brBegin() const noexcept;
+    BrIter brEnd() const noexcept;
+    cBrIter cbrBegin() const noexcept;
+    cBrIter cbrEnd() const noexcept;
 
   private:
     using Node = demehin::TreeNode< Key, T >;

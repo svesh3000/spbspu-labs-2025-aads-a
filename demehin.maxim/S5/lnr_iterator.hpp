@@ -89,7 +89,6 @@ namespace demehin
       }
     }
     return *this;
-
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >

@@ -67,6 +67,11 @@ namespace demehin
     }
     else
     {
+      if (stack_.empty())
+      {
+        node_ = nullptr;
+        return *this;
+      }
       while (stack_.top()->left == node_)
       {
         node_ = stack_.top();
@@ -83,6 +88,7 @@ namespace demehin
         stack_.pop();
       }
     }
+    return *this;
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
