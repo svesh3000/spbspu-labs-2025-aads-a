@@ -60,5 +60,12 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::cout << res.val_res << " " << res.str_res << "\n";
+  if (res.val_res == 0 && res.str_res.size() == 0)
+  {
+    std::cout << "<EMPTY>\n";
+  }
+  else
+  {
+    std::cout << res.val_res << " " << res.str_res << "\n";
+  }
 }
