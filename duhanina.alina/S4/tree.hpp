@@ -199,6 +199,12 @@ namespace duhanina
   template < typename Key, typename Value, typename Compare >
   void Tree< Key, Value, Compare >::push(const Key& k, const Value& v)
   {
+    if (count(k))
+    {
+      Node_t* existing = find(getRoot(), k);
+      existing->data.second = v;
+      return;
+    }
     setRoot(insert(getRoot(), k, v, fakeRoot_));
     size_++;
   }
