@@ -800,6 +800,84 @@ namespace demehin
   {
     return LnrIter(nullptr);
   }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cLnrIter Tree< Key, T, Cmp >::clnrBegin() const noexcept
+  {
+    auto it = cLnrIter(root_);
+    while (it.node_->left != nullptr)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cLnrIter Tree< Key, T, Cmp >::clnrEnd() const noexcept
+  {
+    return cLnrIter(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::RnlIter Tree< Key, T, Cmp >::rnlBegin() const noexcept
+  {
+    auto it = RnlIter(root_);
+    while (it.node_->right != nullptr)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::RnlIter Tree< Key, T, Cmp >::rnlEnd() const noexcept
+  {
+    return RnlIter(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cRnlIter Tree< Key, T, Cmp >::crnlBegin() const noexcept
+  {
+    auto it = cRnlIter(root_);
+    while (it.node_->right != nullptr)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cRnlIter Tree< Key, T, Cmp >::crnlEnd() const noexcept
+  {
+    return cRnlIter(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::BrIter Tree< Key, T, Cmp >::brBegin() const noexcept
+  {
+    return BrIter(root_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::BrIter Tree< Key, T, Cmp >::brEnd() const noexcept
+  {
+    return BrIter(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cBrIter Tree< Key, T, Cmp >::cbrBegin() const noexcept
+  {
+    return cBrIter(root_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::cBrIter Tree< Key, T, Cmp >::cbrEnd() const noexcept
+  {
+    return cBrIter(nullptr);
+  }
 }
 
 #endif
