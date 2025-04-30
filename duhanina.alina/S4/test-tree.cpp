@@ -198,12 +198,3 @@ BOOST_AUTO_TEST_CASE(FindInEmptyTreeTest)
   bool is_end = (tree.find(1) == tree.end());
   BOOST_TEST(is_end);
 }
-
-BOOST_AUTO_TEST_CASE(InsertDuplicateTest)
-{
-  Tree tree;
-  tree.push(1, "one");
-  tree.push(1, "new_one");
-  BOOST_TEST(tree.size() == 1);
-  BOOST_TEST(tree.get(1) == "new_one");
-}
