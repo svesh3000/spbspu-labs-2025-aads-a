@@ -61,11 +61,17 @@ namespace demehin
       node_ = node_->right;
       while (node_->left != nullptr)
       {
+        stack_.push(node_);
         node_ = node_->left;
       }
     }
     else
     {
+      if (stack_.empty())
+      {
+        node_ = nullptr;
+        return *this;
+      }
       while (stack_.top()->right == node_)
       {
         node_ = stack_.top();
@@ -82,8 +88,8 @@ namespace demehin
         stack_.pop();
       }
     }
-
     return *this;
+
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >

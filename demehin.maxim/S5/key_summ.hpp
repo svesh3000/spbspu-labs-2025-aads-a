@@ -1,5 +1,7 @@
-#ifndef FUNCTOR_HPP
-#define FUNCTOR_HPP
+#ifndef KEY_SUMM_HPP
+#define KEY_SUMM_HPP
+#include <utility>
+#include <string>
 
 namespace demehin
 {
@@ -8,13 +10,10 @@ namespace demehin
     int val_res;
     std::string str_res;
 
-    KeySumm();
-    void operator()(const std::pair< const int, std::string >&);
+    KeySumm() noexcept;
+    void operator()(const std::pair< const int, std::string >&) noexcept;
 
   };
-
-  KeySumm::KeySumm():
-    val_res(0)
 }
 
 

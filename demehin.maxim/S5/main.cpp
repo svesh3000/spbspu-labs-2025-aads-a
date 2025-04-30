@@ -1,12 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <tree/tree.hpp>
+#include "key_summ.hpp"
 
 namespace
 {
   using Map = demehin::Tree< int, std::string >;
 
-  void inputTree(std::istream& in, Map tree)
+  void inputTree(std::istream& in, Map& tree)
   {
     int key;
     std::string val;
@@ -24,7 +25,17 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::ifstream file(argv[1]);
+  std::ifstream file(argv[2]);
   Map tree;
   inputTree(file, tree);
+  std::cout << tree.size() << "\n";
+
+  demehin::KeySumm sum;
+  for (auto it = tree.lnrBegin(); it != tree.lnrEnd(); it++)
+  {
+    sum(*it);
+  }
+
+  std::cout << (*tree.lnrBegin()).first << "\n" << (*(++tree.lnrBegin())).first << "\n" << (*(++(++tree.lnrBegin()))).first << "\n";
+  std::cout << sum.val_res << " " << sum.str_res << "\n";
 }

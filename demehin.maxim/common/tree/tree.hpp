@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "iterator.hpp"
 #include "cIterator.hpp"
+#include "../../S5/lnr_iterator.hpp"
 
 namespace demehin
 {
@@ -16,6 +17,8 @@ namespace demehin
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
     using cIterPair = std::pair< cIter, cIter >;
+    using LnrIter = LnrIterator< Key, T, Cmp, false >;
+    using cLnrIter = LnrIterator< Key, T, Cmp, true >;
 
     Tree();
     Tree(const Tree< Key, T, Cmp >&);
@@ -72,6 +75,9 @@ namespace demehin
     Iter emplace_hint(cIter, Args&&...);
 
     void swap(Tree< Key, T, Cmp >&) noexcept;
+
+    LnrIter lnrBegin() const noexcept;
+    LnrIter lnrEnd() const noexcept;
 
   private:
     using Node = demehin::TreeNode< Key, T >;
@@ -756,6 +762,24 @@ namespace demehin
   typename Tree< Key, T, Cmp >::IterPair Tree< Key, T, Cmp >::equal_range(const Key& key) noexcept
   {
     return std::make_pair(lower_bound(key), upper_bound(key));
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::LnrIter Tree< Key, T, Cmp >::lnrBegin() const noexcept
+  {
+    auto it = LnrIter(root_);
+    while (it.node_->left != nullptr)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::LnrIter Tree< Key, T, Cmp >::lnrEnd() const noexcept
+  {
+    return LnrIter(nullptr);
   }
 }
 
