@@ -28,7 +28,7 @@ int main(int argc, const char * const * argv)
   std::ifstream input(argv[1]);
   if (!checkArguments(argc))
   {
-    std::cerr << "ERROR: Incorrect number of arguments";
+    std::cerr << "ERROR: Incorrect number of arguments ";
     std::cerr << "\n";
     return 1;
   }
