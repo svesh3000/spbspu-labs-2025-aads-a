@@ -7,8 +7,12 @@
 namespace averenkov
 {
   template< class T >
+  class List;
+
+  template< class T >
   struct ConstListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
+    friend class List< T >;
   public:
     ConstListIterator() = default;
     ~ConstListIterator() = default;
