@@ -5,7 +5,8 @@
 #include "Stack.hpp"
 
 namespace {
-  bool is_operator(const std::string& str) {
+  bool is_operator(const std::string& str)
+  {
     return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
