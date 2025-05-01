@@ -45,12 +45,32 @@ namespace kiselev
   void DynamicArr< T >::reallocate()
   {
     size_t newCapacity = capacity_ * 2;
+    /*
     DynamicArr< T > newArr(newCapacity);
     for (size_t i = 0; i < size_; ++i)
     {
       newArr.push(*data_[i + begin_]);
     }
     swap(newArr);
+    */
+    T** newData = new T*[newCapacity];
+    try {
+      for (size_t i = 0; i < size_; ++i) {
+        newData[i] = new T(*data_[begin_ + i]);
+      }
+    } catch (...) {
+      for (size_t i = 0; i < size_; ++i) {
+        delete newData[i];
+      }
+      delete[] newData;
+      throw;
+    }
+
+    clear();
+    delete[] data_;
+    data_ = newData;
+    capacity_ = newCapacity;
+    begin_ = 0;
   }
 
   template< typename T >
