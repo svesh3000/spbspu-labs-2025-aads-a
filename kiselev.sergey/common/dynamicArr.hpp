@@ -125,6 +125,7 @@ namespace kiselev
   {
     clear();
     delete[] data_;
+    data_ = nullptr;
     capacity_ = 0;
   }
 
