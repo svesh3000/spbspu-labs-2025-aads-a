@@ -9,14 +9,17 @@ int main() {
   using ULL = unsigned long long;
 
   FwdList< std::pair< std::string, FwdList< ULL > > > listOfPairs{};
+  // std::cout << "1\n";
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
-  IteratorFwd< std::pair< std::string, FwdList< ULL > >  > cur_it = listOfPairs.begin();
+  auto cur_it = listOfPairs.begin();
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
+    // std::cout << "finish input numbers\n";
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
-    listOfPairs.insert(cur_it, {name, numbers});
+    std::pair< std::string, FwdList< ULL > > new_pair {name, numbers};
+    listOfPairs.insert(cur_it, new_pair);
     ++cur_it;
     ++numOfPairs;
   }
@@ -26,7 +29,7 @@ int main() {
     std::cout << "\n";
   }
 
-  FwdList< ULL > sums {};
+  FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
   } catch(const std::overflow_error& e) {
@@ -34,10 +37,10 @@ int main() {
     std::cerr << e.what();
     return 1;
   }
-
   if (maxLen == 0) {
     std::cout << "0" << "\n";
   } else {
     outFwdListULL(std::cout, sums);
   }
+ std::cout << "1\n";
 }
