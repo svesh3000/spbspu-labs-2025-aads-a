@@ -14,6 +14,7 @@ namespace gavrilova {
     ConstIteratorFwd(): node_(nullptr) {};
     ~ConstIteratorFwd() = default;
     ConstIteratorFwd(const this_t&) = default;
+    ConstIteratorFwd(IteratorFwd< T >& other): node_(other.node_) {};
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++();
@@ -28,7 +29,6 @@ namespace gavrilova {
     friend class FwdList< T >;
     friend class IteratorFwd< T >;
     explicit ConstIteratorFwd(NodeFwdList< T >* node): node_(node) {};
-    ConstIteratorFwd(IteratorFwd<T>& other): node_(other.node_) {};
   };
 }
 
@@ -40,7 +40,7 @@ gavrilova::ConstIteratorFwd< T >& gavrilova::ConstIteratorFwd< T >::operator++()
 }
 
 template< class T >
-gavrilova::ConstIteratorFwd<T> gavrilova::ConstIteratorFwd<T>::operator++(int)
+gavrilova::ConstIteratorFwd< T > gavrilova::ConstIteratorFwd< T >::operator++(int)
 {
   ConstIteratorFwd< T > result(*this);
   ++(*this);
@@ -48,26 +48,26 @@ gavrilova::ConstIteratorFwd<T> gavrilova::ConstIteratorFwd<T>::operator++(int)
 }
 
 template< class T >
-bool gavrilova::ConstIteratorFwd<T>::operator==(const this_t& rhs) const
+bool gavrilova::ConstIteratorFwd< T >::operator==(const this_t& rhs) const
 {
   return node_ == rhs.node_;
 }
 
 template< class T >
-bool gavrilova::ConstIteratorFwd<T>::operator!=(const this_t& rhs) const
+bool gavrilova::ConstIteratorFwd< T >::operator!=(const this_t& rhs) const
 {
   return !(rhs == *this);
 }
 
 template< class T >
-const T& gavrilova::ConstIteratorFwd<T>::operator*() const
+const T& gavrilova::ConstIteratorFwd< T >::operator*() const
 {
   assert(node_ != nullptr);
   return node_->data;
 }
 
 template< class T >
-const T* gavrilova::ConstIteratorFwd<T>::operator->() const
+const T* gavrilova::ConstIteratorFwd< T >::operator->() const
 {
   assert(node_ != nullptr);
   return std::addressof(node_->data);
