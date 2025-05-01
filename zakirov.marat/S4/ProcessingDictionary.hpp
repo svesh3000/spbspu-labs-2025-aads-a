@@ -1,6 +1,6 @@
-#ifndef LINEPROCESSING_HPP
-#define LINEPROCESSING_HPP
-#include <iostream>
+#ifndef PROCESSINGDICTIONARY_HPP
+#define PROCESSINGDICTIONARY_HPP
+#include <ostream>
 #include <map>
 #include <string>
 
@@ -17,4 +17,3 @@ namespace zakirov
 }
 
 #endif
-
