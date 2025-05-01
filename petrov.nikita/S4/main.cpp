@@ -22,16 +22,16 @@ namespace
 
 int main(int argc, const char * const * argv)
 {
-  using subtree_t = std::map< int, std::string, std::less< int > >;
-  using maintree_t = std::map< std::string, subtree_t >;
-  maintree_t tree;
-  std::ifstream input(argv[1]);
   if (!checkArguments(argc))
   {
     std::cerr << "ERROR: Incorrect number of arguments ";
     std::cerr << "\n";
     return 1;
   }
+  using subtree_t = std::map< int, std::string, std::less< int > >;
+  using maintree_t = std::map< std::string, subtree_t >;
+  maintree_t tree;
+  std::ifstream input(argv[1]);
   while (!input.eof())
   {
     subtree_t subtree;
@@ -78,14 +78,22 @@ int main(int argc, const char * const * argv)
         {
           throw std::logic_error("<INVALID COMMAND>");
         }
-        auto sub_it = it->second.cbegin();
-        std::cout << it->first << " ";
-        std::cout << sub_it->first << " " << (sub_it++)->second;
-        for (; sub_it != it->second.cend(); ++sub_it)
+        if (it->second.empty())
         {
-          std::cout << " " << sub_it->first << " " << sub_it->second;
+          std::cout << "<EMPTY>";
+          std::cout << "\n";
         }
-        std::cout << "\n";
+        else
+        {
+          auto sub_it = it->second.cbegin();
+          std::cout << it->first << " ";
+          std::cout << sub_it->first << " " << (sub_it++)->second;
+          for (; sub_it != it->second.cend(); ++sub_it)
+          {
+            std::cout << " " << sub_it->first << " " << sub_it->second;
+          }
+          std::cout << "\n";
+        }
       }
       else if (command_name == "complement")
       {
@@ -138,6 +146,11 @@ int main(int argc, const char * const * argv)
             ++second_sub_it;
           }
         }
+        auto check_existance_it = tree.find(new_dataset);
+        if (check_existance_it != tree.end())
+        {
+          tree.erase(new_dataset);
+        }
         tree.insert({ new_dataset, new_subtree });
       }
       else if (command_name == "intersect")
@@ -173,6 +186,11 @@ int main(int argc, const char * const * argv)
           {
             ++second_sub_it;
           }
+        }
+        auto check_existance_it = tree.find(new_dataset);
+        if (check_existance_it != tree.end())
+        {
+          tree.erase(new_dataset);
         }
         tree.insert({ new_dataset, new_subtree });
       }
@@ -228,7 +246,17 @@ int main(int argc, const char * const * argv)
             ++second_sub_it;
           }
         }
+        auto check_existance_it = tree.find(new_dataset);
+        if (check_existance_it != tree.end())
+        {
+          tree.erase(new_dataset);
+        }
         tree.insert({ new_dataset, new_subtree });
+      }
+      else
+      {
+        std::cin.ignore(1024, '\n');
+        std::cout << "<INVALID COMMAND>" << "\n";
       }
     }
     catch (const std::logic_error & e)
