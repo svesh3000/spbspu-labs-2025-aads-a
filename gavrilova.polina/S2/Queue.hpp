@@ -11,14 +11,14 @@ namespace gavrilova {
   class Queue {
   public:
     Queue() = default;
-    
+
     void push(const T& value);
     void push(T&& value);
     void pop();
 
     T& front();
     const T& front() const;
-    
+
     bool empty() const;
     size_t size() const;
     void swap(Queue& other) noexcept;
@@ -60,8 +60,7 @@ namespace gavrilova {
     if (empty()) {
       throw std::out_of_range("Stack is empty");
     }
-    if (++head_ >= buffer_.size())
-    {
+    if (++head_ >= buffer_.size()) {
       clear();
     }
   }

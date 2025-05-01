@@ -9,84 +9,78 @@ namespace {
     return str == "+" || str == "-" || str == "*" || str == "/" || str == "%";
   }
 
-  int precedence(const std::string& op) {
-    if (op == "+" || op == "-") {
-      return 1;
-    }
-    if (op == "*" || op == "/" || op == "%") {
-      return 2;
-    }
-    return 0;
-  }
-
-  bool is_number(const std::string& str)
+  bool has_higher_precedence(const std::string& op1, const std::string& op2)
   {
-    if (str.empty()) {
-      return false;
-    }
-    try {
-      std::stoull(str);
-      return true;
-    } catch (const std::invalid_argument& e) {
-      return false;
-    } catch (const std::out_of_range& e) {
-      return false;
-    }
+    auto get_precedence = [](const std::string& op) {
+      if (op == "+" || op == "-") return 1;
+      if (op == "*" || op == "/" || op == "%") return 2;
+      return 0;
+    };
+    return get_precedence(op1) >= get_precedence(op2);
   }
 
-  bool is_operand(const std::string& str) {
-    return is_number(str);
+  long long plus(long long a, long long b) {
+    if (a > LLONG_MAX - b) {
+      throw std::overflow_error("Overflow in addition");
+    }
+    return a + b;
+  }
+
+  long long subtract(long long a, long long b) {
+    if ((b > 0 && a < LLONG_MIN + b) || (b < 0 && a > LLONG_MAX + b)) {
+      throw std::overflow_error("Overflow in subtraction");
+    }
+    return a - b;
+  }
+
+  long long multiply(long long a, long long b) {
+    if (a > 0 && b > 0 && a > LLONG_MAX / b) {
+      throw std::overflow_error("Overflow in multiplication");
+    }
+    if (a < 0 && b < 0 && a < LLONG_MAX / b) {
+      throw std::overflow_error("Overflow in multiplication");
+    }
+    if (a > 0 && b < 0 && b < LLONG_MIN / a) {
+      throw std::overflow_error("Overflow in multiplication");
+    }
+    if (a < 0 && b > 0 && a < LLONG_MIN / b) {
+      throw std::overflow_error("Overflow in multiplication");
+    }
+    return a * b;
+  }
+
+  long long divide(long long a, long long b) {
+    if (b == 0) {
+      throw std::invalid_argument("Division by zero");
+    }
+    if (a == LLONG_MIN && b == -1) {
+      throw std::overflow_error("Overflow in division");
+    }
+    return a / b;
+  }
+
+  long long mod(long long a, long long b) {
+    if (b == 0) {
+      throw std::invalid_argument("Modulo by zero");
+    }
+    if (a < 0) {
+      return b - (-a) % b;
+    }
+    return a % b;
   }
 
   long long do_operation(long long first, long long second, std::string oper)
   {
     if (oper == "+") {
-
-      if (first > LLONG_MAX - second) {
-        throw std::overflow_error("Overflow occurred during addition.");
-      }
-      return first + second;
-
+      return plus(first, second);
     } else if (oper == "-") {
-
-      if (first < LLONG_MIN + second) {
-        throw std::overflow_error("Overflow occurred during subtraction.");
-      }
-      return first - second;
-
+      return subtract(first, second);
     } else if (oper == "*") {
-
-      if (first > 0 && second > 0 && first > LLONG_MAX / second) {
-        throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first < 0 && second < 0 && first < LLONG_MAX / second) {
-          throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first > 0 && second < 0 && second < LLONG_MIN / first) {
-          throw std::overflow_error("Overflow occurred during multiplication.");
-      } else if (first < 0 && second > 0 && first < LLONG_MIN / second) {
-          throw std::overflow_error("Overflow occurred during multiplication.");
-      }
-      return first * second;
-
+      return multiply(first, second);
     } else if (oper == "/") {
-
-      if (second == 0) {
-        throw std::invalid_argument("Division by zero is not allowed.");
-      }
-      if (first == LLONG_MIN && second == -1) {
-          throw std::overflow_error("Overflow occurred during division by -1.");
-      }
-      return first / second;
-
+      return divide(first, second);
     } else if (oper == "%") {
-
-      if (second == 0) {
-        throw std::invalid_argument("Modulo by zero is not allowed.");
-      }
-      if (first < 0) {
-        return second - (first * (-1)) % second;
-      }
-      return first % second;
-
+      return mod(first, second);
     } else {
       throw std::invalid_argument("Unknown operation");
     }
@@ -95,60 +89,60 @@ namespace {
 
 gavrilova::Queue< std::string > gavrilova::split(const std::string& line, const char& symb)
 {
-  std::string next;
   Queue< std::string > queue;
+  size_t start = 0;
+  size_t end = line.find(symb);
 
-  for (auto it = line.begin(); it != line.end(); ++it) {
-    if (*it == symb) {
-      if (!next.empty()) {
-        queue.push(next);
-        next.clear();
-      }
-    } else {
-      next += *it;
+  while (end != std::string::npos) {
+    if (end != start) {
+      queue.push(line.substr(start, end - start));
     }
+    start = end + 1;
+    end = line.find(symb, start);
   }
-  if (!next.empty()) {
-    queue.push(next);
+
+  if (start < line.length()) {
+    queue.push(line.substr(start));
   }
+
   return queue;
 }
 
 gavrilova::Queue< std::string > gavrilova::infix_to_postfix(Queue< std::string >& infix_q)
 {
-  Stack< std::string > stack;
-  Queue< std::string > postfix_q;
+  Stack<std::string> stack;
+  Queue<std::string> postfix_q;
 
   while (!infix_q.empty()) {
     std::string token = infix_q.front();
     infix_q.pop();
 
-    if (is_operand(token)) {
-      postfix_q.push(token);
-    } else if (token == "(") {
+    if (token == "(") {
       stack.push(token);
     } else if (token == ")") {
       while (!stack.empty() && stack.top() != "(") {
         postfix_q.push(stack.top());
         stack.pop();
       }
-      if (!stack.empty() && stack.top() == "(") {
-        stack.pop();
-      } else {
-        throw std::invalid_argument("Invalid placement of brackets in expression");
+      if (stack.empty()) {
+        throw std::invalid_argument("Mismatched parentheses");
       }
+      stack.pop();
     } else if (is_operator(token)) {
-      while (!stack.empty() && precedence(stack.top()) >= precedence(token)) {
+      while (!stack.empty() && stack.top() != "(" && has_higher_precedence(stack.top(), token)) {
         postfix_q.push(stack.top());
         stack.pop();
       }
       stack.push(token);
     } else {
-      throw std::invalid_argument("Invalid value in expression");
+      postfix_q.push(token);
     }
   }
 
   while (!stack.empty()) {
+    if (stack.top() == "(") {
+      throw std::invalid_argument("Mismatched parentheses");
+    }
     postfix_q.push(stack.top());
     stack.pop();
   }
@@ -163,9 +157,7 @@ long long gavrilova::calculate(Queue< std::string >& postfix_q)
     std::string token = postfix_q.front();
     postfix_q.pop();
 
-    if (is_operand(token)) {
-      stack.push(std::stoull(token));
-    } else if (is_operator(token)) {
+    if (is_operator(token)) {
       if (stack.size() < 2) {
         throw std::invalid_argument("Invalid expression: not enough operands");
       }
@@ -175,7 +167,11 @@ long long gavrilova::calculate(Queue< std::string >& postfix_q)
       stack.pop();
       stack.push(do_operation(first, second, token));
     } else {
-      throw std::invalid_argument("Invalid value in expression");
+      try {
+        stack.push(std::stoll(token));
+      } catch (...) {
+        throw std::invalid_argument("Invalid operand: " + token);
+      }
     }
   }
 
