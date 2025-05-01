@@ -20,7 +20,6 @@ namespace alymova
     using Node = typename detail::TTTNode< Key, Value >;
     using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
     using NodePoint = typename detail::NodePoint;
-
     using T = std::pair< Key, Value >;
 
     TwoThreeTree();
@@ -60,6 +59,8 @@ namespace alymova
     size_t size_;
 
     void clear(Node* node);
+    void split(Node* node);
+    void moveFake();
   };
 
   template< class Key, class Value, class Comparator >
@@ -128,7 +129,8 @@ namespace alymova
   {
     if (root_ == fake_)
     {
-      return ConstIterator(fake_, NodePoint::Empty);
+      return {};
+      //return ConstIterator(fake_, NodePoint::Empty);
     }
     Node* tmp = root_;
     while (tmp->left)
@@ -153,7 +155,8 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cend() const noexcept
   {
-    return ConstIterator(fake_, NodePoint::Empty);
+    return {};
+    //return ConstIterator(fake_, NodePoint::Empty);
   }
 
   template< class Key, class Value, class Comparator >
@@ -172,18 +175,44 @@ namespace alymova
   std::pair< TTTIterator< Key, Value, Comparator >, bool >
     TwoThreeTree< Key, Value, Comparator >::insert(const T& value)
   {
+    Comparator cmp;
     if (find(value.first) != end())
     {
       return {end(), false};
     }
     if (size_ == 0)
     {
-      root_ = new Node{value.first, value.second};
-      Iterator tmp(root_, NodePoint::First);
+      root_ = new Node(value);
+      Iterator it(root_, NodePoint::First);
       size_++;
-      return {tmp, true};
+      //moveFake();
+      return {it, true};
     }
-    return {end(), false};
+    Node* tmp = root_;
+    while (!tmp->isLeaf())
+    {
+      if (cmp(value.first, tmp->data[0].first))
+      {
+        tmp = tmp->left;
+      }
+      else if (tmp->type == NodeType::Triple && cmp(value.first, tmp->data[1].first))
+      {
+        tmp = tmp->mid;
+      }
+      else
+      {
+        tmp = tmp->right;
+      }
+    }
+    tmp->insert(value);
+    if (tmp->type == NodeType::Overflow)
+    {
+      split(tmp);
+    }
+    //moveFake();
+    Iterator it = find(value.first);
+    size_++;
+    return {it, true};
   }
 
   template< class Key, class Value, class Comparator >
@@ -231,6 +260,102 @@ namespace alymova
     clear(root->right);
     delete root;
     root = nullptr;
+  }
+
+  template< class Key, class Value, class Comparator >
+  void TwoThreeTree< Key, Value, Comparator >::split(Node* node)
+  {
+    Node* left_node = nullptr, *right_node = nullptr, *parent_node = nullptr;
+    try
+    {
+      left_node = new Node(node->data[0], node->parent, node->left, nullptr, node->mid, nullptr);
+      right_node = new Node(node->data[2], node->parent, node->right, nullptr, node->overflow, nullptr);
+      parent_node = node->parent;
+      if (left_node->left)
+      {
+        left_node->left->parent = left_node;
+      }
+      if (left_node->right)
+      {
+        left_node->right->parent = left_node;
+      }
+      if (right_node->left)
+      {
+        right_node->left->parent = right_node;
+      }
+      if (right_node->right)
+      {
+        right_node->right->parent = right_node;
+      }
+      if (!parent_node)
+      {
+        parent_node = new Node(node->data[1], nullptr, left_node, nullptr, right_node, nullptr);
+        left_node->parent = parent_node;
+        right_node->parent = parent_node;
+        root_ = parent_node;
+        delete node;
+        return;
+      }
+      parent_node->insert(node->data[1]);
+      if (parent_node->type == NodeType::Triple)
+      {
+        if (parent_node->right == node)
+        {
+          parent_node->mid = left_node;
+          parent_node->right = right_node;
+        }
+        else if (parent_node->left == node)
+        {
+          parent_node->left = left_node;
+          parent_node->mid = right_node;
+        }
+      }
+      else if (parent_node->type == NodeType::Overflow)
+      {
+        if (parent_node->right == node)
+        {
+          parent_node->right = left_node;
+          parent_node->overflow = right_node;
+        }
+        else if (parent_node->mid == node)
+        {
+          parent_node->mid = left_node;
+          parent_node->right = right_node;
+        }
+        else if (parent_node->left == node)
+        {
+          parent_node->left = left_node;
+          parent_node->mid = right_node;
+        }
+      }
+    }
+    catch (...)
+    {
+      delete left_node;
+      delete right_node;
+      delete parent_node;
+      throw;
+    }
+    if (node != root_)
+    {
+      delete node;
+    }
+    if (parent_node->type == NodeType::Overflow)
+    {
+      split(parent_node);
+    }
+  }
+
+  template< class Key, class Value, class Comparator >
+  void TwoThreeTree< Key, Value, Comparator >::moveFake()
+  {
+    Node* tmp = root_;
+    while (tmp->right)
+    {
+      tmp = tmp->right;
+    }
+    tmp->right = fake_;
+    fake_->parent = tmp;
   }
 }
 

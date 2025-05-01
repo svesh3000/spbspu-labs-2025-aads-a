@@ -1,29 +1,34 @@
 #ifndef TREE_NODE_HPP
 #define TREE_NODE_HPP
 #include <utility>
+#include <iostream>
 
 namespace alymova
 {
   namespace detail
   {
+    enum NodePoint {Empty, First, Second};
+
     template< class Key, class Value >
     struct TTTNode
     {
       using Node = TTTNode< Key, Value >;
 
-      std::pair< Key, Value > data[2];
-      enum NodeType {Empty, Double, Triple} type;
+      std::pair< Key, Value > data[3];
+      enum NodeType {Empty, Double, Triple, Overflow} type;
       Node* parent;
       Node* left;
       Node* mid;
       Node* right;
+      Node* overflow;
 
       TTTNode();
-      TTTNode(const Key& key, const Value& value);
-      TTTNode(const Key& key1, const Value& value1, const Key& key2, const Value& value2);
-    };
+      TTTNode(const std::pair< Key, Value >& pair);
+      TTTNode(const std::pair< Key, Value >& pair, Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
 
-    enum NodePoint {Empty, First, Second};
+      void insert(const std::pair< Key, Value >& value);
+      bool isLeaf();
+    };
 
     template< class Key, class Value >
     TTTNode< Key, Value >::TTTNode():
@@ -32,28 +37,69 @@ namespace alymova
       parent(nullptr),
       left(nullptr),
       mid(nullptr),
-      right(nullptr)
+      right(nullptr),
+      overflow(nullptr)
     {}
 
     template< class Key, class Value >
-    TTTNode< Key, Value >::TTTNode(const Key& key, const Value& value):
-      data{std::make_pair(key, value), std::pair< Key, Value >()},
+    TTTNode< Key, Value >::TTTNode(const std::pair< Key, Value>& pair):
+      data{pair, std::pair< Key, Value >()},
       type(NodeType::Double),
       parent(nullptr),
       left(nullptr),
       mid(nullptr),
-      right(nullptr)
+      right(nullptr),
+      overflow(nullptr)
     {}
 
     template< class Key, class Value >
-    TTTNode< Key, Value >::TTTNode(const Key& key1, const Value& value1, const Key& key2, const Value& value2):
-      data{std::make_pair(key1, value1), std::make_pair(key2, value2)},
-      type(NodeType::Triple),
-      parent(nullptr),
-      left(nullptr),
-      mid(nullptr),
-      right(nullptr)
+    TTTNode< Key, Value >::TTTNode(const std::pair< Key, Value >& pair,
+      Node* parent, Node* left, Node* mid, Node* right, Node* overflow):
+      data{pair, std::pair< Key, Value >()},
+      type(NodeType::Double),
+      parent(parent),
+      left(left),
+      mid(mid),
+      right(right),
+      overflow(overflow)
     {}
+
+    template< class Key, class Value >
+    void TTTNode< Key, Value >::insert(const std::pair< Key, Value >& value)
+    {
+      data[type] = value;
+      if (type == NodeType::Empty)
+      {
+        std::cout << data[type].first << data[type].second;
+        type = NodeType::Double;
+      }
+      else if (type == NodeType::Double)
+      {
+        if (data[1] < data[0])
+        {
+          std::swap(data[0], data[1]);
+        }
+        type = NodeType::Triple;
+      }
+      else if (type == NodeType::Triple)
+      {
+        if (data[2] < data[1])
+        {
+          std::swap(data[2], data[1]);
+        }
+        if (data[1] < data[0])
+        {
+          std::swap(data[1], data[0]);
+        }
+        type = NodeType::Overflow;
+      }
+    }
+
+    template< class Key, class Value >
+    bool TTTNode< Key, Value >::isLeaf()
+    {
+      return (!left && !mid && !right && !overflow);
+    }
   }
 }
 

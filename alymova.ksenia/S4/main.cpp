@@ -54,9 +54,22 @@ int main(int argc, char** argv)
     std::cout << "<INVALID COMMAND>\n";
   }
   /*TwoThreeTree< int, std::string, std::less< int > > tree;
-  std::pair< int, std::string > p(1, "cat");
-  auto pp = tree.insert(p);
-  auto it = tree.find(1);
-  std::cout << it->first << it->second << '\n';
-  std::cout << pp.first->first << pp.first->second << pp.second;*/
+  std::pair< int, std::string > p1(1, "cat");
+  std::pair< int, std::string > p2(2, "dog");
+  std::pair< int, std::string > p3(3, "fly");
+  std::pair< int, std::string > p4(4, "boo");
+  std::pair< int, std::string > p5(5, "grd");
+  std::pair< int, std::string > p6(6, "bread");
+  std::pair< int, std::string > p7(7, "kitten");
+  tree.insert(p1);
+  tree.insert(p2);
+  tree.insert(p3);
+  tree.insert(p4);
+  tree.insert(p5);
+  tree.insert(p6);
+  tree.insert(p7);
+  for (auto it = tree.begin(); it != tree.end(); it++)
+  {
+    std::cout << it->first << it->second << '\n';
+  }*/
 }
