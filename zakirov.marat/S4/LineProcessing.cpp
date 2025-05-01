@@ -38,12 +38,12 @@ void zakirov::complement_d(std::map< K, T > & result_d, const std::map< K, T > &
   {
     if (first_iter->first < second_iter->first)
     {
-      result_d.emplace(first_iter->first, first_iter->second);
+      result_d.insert({first_iter->first, first_iter->second});
       ++first_iter;
     }
     else if (first_iter->first > second_iter->first)
     {
-      result_d.emplace(second_iter->first, second_iter->second);
+      result_d.insert({second_iter->first, second_iter->second});
       ++second_iter;
     }
     else
@@ -51,6 +51,18 @@ void zakirov::complement_d(std::map< K, T > & result_d, const std::map< K, T > &
       ++second_iter;
       ++first_iter;
     }
+  }
+
+  while (first_iter != first_d.cend())
+  {
+    result_d.insert({first_iter->first, first_iter->second});
+    ++first_iter;
+  }
+
+  while (second_iter != second_d.cend())
+  {
+    result_d.insert({second_iter->first, second_iter->second});
+    ++second_iter;
   }
 }
 
@@ -78,7 +90,7 @@ void zakirov::intersect_d(std::map< K, T > & result_d, const std::map< K, T > & 
     }
     else
     {
-      result_d.emplace(first_iter->first, first_iter->second);
+      result_d.insert({first_iter->first, first_iter->second});
       ++second_iter;
       ++first_iter;
     }
@@ -88,5 +100,53 @@ void zakirov::intersect_d(std::map< K, T > & result_d, const std::map< K, T > & 
 template < class K, class T >
 void zakirov::union_d(std::map< K, T > & result_d, const std::map< K, T > & first_d, const std::map< K, T > & second_d)
 {
+  if (first_d.empty())
+  {
+    result_d = second_d;
+    return
+  }
+  else
+  {
+    result_d = first_d;
+    return
+  }
 
+  auto first_iter = first_d.cbegin();
+  auto second_iter = second_d.cbegin();
+
+  while (first_iter != first_d.cend() && second_iter != second_d.cend())
+  {
+    if (first_iter->first < second_iter->first)
+    {
+      result_d.insert({first_iter->first, first_iter->second});
+      ++first_iter;
+    }
+    else if (first_iter->first > second_iter->first)
+    {
+      if (second_iter->first != first_iter->first)
+      {
+        result_d.insert({second_iter->first, second_iter->second});
+      }
+
+      ++second_iter;
+    }
+    else if (first_iter->first == second_iter->first)
+    {
+      result_d.insert({first_iter->first, first_iter->second});
+      ++second_iter;
+      ++first_iter;
+    }
+  }
+
+  while (first_iter != first_d.cend())
+  {
+    result_d.insert({first_iter->first, first_iter->second});
+    ++first_iter;
+  }
+
+  while (second_iter != second_d.cend())
+  {
+    result_d.insert(second_iter->first, second_iter->second);
+    ++second_iter;
+  }
 }
