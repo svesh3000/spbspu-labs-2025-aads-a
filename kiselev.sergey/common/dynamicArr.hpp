@@ -56,13 +56,9 @@ namespace kiselev
   template< typename T >
   void DynamicArr< T >::clear() noexcept
   {
-    for (size_t i = 0; i < size_; ++i)
+    while (!empty())
     {
-      if (data_[begin_ + i])
-      {
-        delete data_[begin_ + i];
-        data_[begin_ + i] = nullptr;
-      }
+      popBack();
     }
     size_ = 0;
     begin_ = 0;
@@ -83,12 +79,12 @@ namespace kiselev
     size_(0),
     begin_(0)
   {
-    data_ = new T*[capacity_];
+    data_ = new T*[capacity_]();
   }
 
   template< typename T >
   DynamicArr< T >::DynamicArr(const DynamicArr< T >& arr):
-    data_(new T*[arr.capacity_]),
+    data_(new T*[arr.capacity_]()),
     capacity_(arr.capacity_),
     size_(arr.size_),
     begin_(arr.begin_)
@@ -118,7 +114,7 @@ namespace kiselev
 
   template< typename T >
   DynamicArr< T >::DynamicArr(size_t capacity):
-    data_(new T*[capacity]),
+    data_(new T*[capacity]()),
     capacity_(capacity),
     size_(0),
     begin_(0)
