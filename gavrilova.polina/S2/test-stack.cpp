@@ -76,12 +76,9 @@ BOOST_AUTO_TEST_CASE(TestSwapStack)
   gavrilova::Stack< int > stack1;
   stack1.push(1);
   stack1.push(2);
-
   gavrilova::Stack< int > stack2;
   stack2.push(3);
-
   stack1.swap(stack2);
-
   BOOST_TEST(stack1.top() == 3);
   BOOST_TEST(stack1.size() == 1);
   BOOST_TEST(stack2.top() == 2);
