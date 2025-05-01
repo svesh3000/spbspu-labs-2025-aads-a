@@ -3,8 +3,8 @@
 
 namespace {
   unsigned long long addition (unsigned long long first, unsigned long long second) {
-    unsigned long long MAX_OF_SIZET = std::numeric_limits<unsigned long long>::max();
-    if (first > MAX_OF_SIZET - second) {
+    unsigned long long MAX_OF_ULL = std::numeric_limits<unsigned long long>::max();
+    if (first > MAX_OF_ULL - second) {
       throw std::overflow_error("Overflow.\n");
     }
     return first + second;

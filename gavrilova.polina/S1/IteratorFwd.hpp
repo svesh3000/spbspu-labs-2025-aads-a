@@ -39,7 +39,7 @@ gavrilova::IteratorFwd< T >& gavrilova::IteratorFwd< T >::operator++()
 }
 
 template< class T >
-gavrilova::IteratorFwd<T> gavrilova::IteratorFwd<T>::operator++(int)
+gavrilova::IteratorFwd< T > gavrilova::IteratorFwd< T >::operator++(int)
 {
   IteratorFwd< T > result(*this);
   ++(*this);
@@ -47,26 +47,26 @@ gavrilova::IteratorFwd<T> gavrilova::IteratorFwd<T>::operator++(int)
 }
 
 template< class T >
-bool gavrilova::IteratorFwd<T>::operator==(const this_t& rhs) const
+bool gavrilova::IteratorFwd< T >::operator==(const this_t& rhs) const
 {
   return node_ == rhs.node_;
 }
 
 template< class T >
-bool gavrilova::IteratorFwd<T>::operator!=(const this_t& rhs) const
+bool gavrilova::IteratorFwd< T >::operator!=(const this_t& rhs) const
 {
   return !(rhs == *this);
 }
 
 template< class T >
-T& gavrilova::IteratorFwd<T>::operator*()
+T& gavrilova::IteratorFwd< T >::operator*()
 {
   assert(node_!=nullptr);
   return node_->data;
 }
 
 template< class T >
-T* gavrilova::IteratorFwd<T>::operator->()
+T* gavrilova::IteratorFwd< T >::operator->()
 {
   assert(node_!=nullptr);
   return std::addressof(node_->data);
