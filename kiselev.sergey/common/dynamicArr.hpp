@@ -184,6 +184,7 @@ namespace kiselev
       throw std::logic_error("Empty for popBack()");
     }
     delete data_[begin_ + size_ - 1];
+    data_[begin_ + size_ - 1] = nullptr;
     --size_;
   }
 
@@ -195,8 +196,13 @@ namespace kiselev
       throw std::logic_error("Empty for popFront()");
     }
     delete data_[begin_];
+    data_[begin_] = nullptr;
     ++begin_;
     --size_;
+    if (empty())
+    {
+      begin_ = 0;
+    }
   }
 
   template< typename T >
