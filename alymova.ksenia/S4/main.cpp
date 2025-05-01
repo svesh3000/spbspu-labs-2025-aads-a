@@ -72,6 +72,9 @@ int main(int argc, char** argv)
   for (auto it = tree1.begin(); it != tree1.end(); it++)
   {
     std::cout << it->first << it->second << '\n';
-  }*/
+  }
+  auto it = tree.find(2);
+  std::cout << it->second;
+  std::cout << tree.count(1);*/
 
 }

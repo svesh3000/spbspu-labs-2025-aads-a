@@ -57,6 +57,7 @@ namespace alymova
     void swap(Tree& other);
     void clear() noexcept;
 
+    size_t count(const Key& key) const noexcept;
     Iterator find(const Key& key) noexcept;
     ConstIterator find(const Key& key) const noexcept;
 
@@ -88,7 +89,7 @@ namespace alymova
     root_(std::exchange(other.root_, nullptr)),
     size_(std::exchange(other.size_, 0))
   {}
-  
+
   template< class Key, class Value, class Comparator >
   template< class InputIterator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree(InputIterator first, InputIterator last):
@@ -276,6 +277,16 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  size_t TwoThreeTree< Key, Value, Comparator >::count(const Key& key) const noexcept
+  {
+    if (find(key) != end())
+    {
+      return 1;
+    }
+    return 0;
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) noexcept
   {
     TTTConstIterator< Key, Value, Comparator > tmp = static_cast< const Tree& >(*this).find(key);
@@ -285,9 +296,10 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const noexcept
   {
+    Comparator cmp;
     for (ConstIterator it = cbegin(); it != cend(); it++)
     {
-      if (std::equal_to< Key >()(key, it->first))
+      if (!cmp(key, it->first) && !cmp(it->first, key))
       {
         return it;
       }
