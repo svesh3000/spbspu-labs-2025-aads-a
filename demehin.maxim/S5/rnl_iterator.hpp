@@ -55,6 +55,11 @@ namespace demehin
   template< typename Key, typename T, typename Cmp, bool isConst >
   typename RnlIterator< Key, T, Cmp, isConst >::this_t& RnlIterator< Key, T, Cmp, isConst >::operator++() noexcept
   {
+    if (node_ == nullptr)
+    {
+      return *this;
+    }
+
     if (node_->left != nullptr)
     {
       stack_.push(node_);
@@ -67,24 +72,14 @@ namespace demehin
     }
     else
     {
-      if (stack_.empty())
-      {
-        node_ = nullptr;
-        return *this;
-      }
-      while (stack_.top()->left == node_)
+      while (!stack_.empty() && stack_.top()->left == node_)
       {
         node_ = stack_.top();
         stack_.pop();
-        if (stack_.empty())
-        {
-          node_ = nullptr;
-          return *this;
-        }
       }
-      while (!stack_.empty() && stack_.top()->right == node_)
+      node_ = stack_.empty() ? nullptr : stack_.top();
+      if (!stack_.empty())
       {
-        node_ = stack_.top();
         stack_.pop();
       }
     }

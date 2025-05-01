@@ -1,1 +1,1 @@
-10 keyboard 12 monitor -5 mouse
+4 root 2 left 6 right 1 leftmost 3 middle 5 subright 7 subrightmost

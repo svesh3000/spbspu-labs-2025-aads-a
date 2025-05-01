@@ -3,6 +3,7 @@
 #include <cassert>
 #include <tree/node.hpp>
 #include <queue.hpp>
+#include <queue>
 
 namespace demehin
 {
@@ -19,7 +20,7 @@ namespace demehin
     using Node = demehin::TreeNode< Key, T >;
     using this_t = BreadthIterator< Key, T, Cmp, isConst >;
     using node_t = typename std::conditional< isConst, const Node, Node >::type;
-    using queue_t = typename std::conditional< isConst, Queue< const Node* >, Queue< Node* > >::type;
+    using queue_t = typename std::conditional< isConst, std::queue< const Node* >, std::queue< Node* > >::type;
     using data_t = typename std::conditional< isConst, const std::pair< Key, T >, std::pair< Key, T > >::type;
 
     BreadthIterator() noexcept;
@@ -42,33 +43,19 @@ namespace demehin
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator() noexcept:
-    node_(nullptr),
-    queue_()
+    node_(nullptr)
   {}
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   BreadthIterator< Key, T, Cmp, isConst >::BreadthIterator(node_t* node) noexcept:
-    node_(node),
-    queue_()
-  {}
+    node_(node)
+  {
+    queue_.push(node_);
+  }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
   typename BreadthIterator< Key, T, Cmp, isConst >::this_t& BreadthIterator< Key, T, Cmp, isConst >::operator++() noexcept
   {
-    if (node_ == nullptr)
-    {
-      return *this;
-    }
-
-    if (node_->left != nullptr)
-    {
-      queue_.push(node_->left);
-    }
-    if (node_->right != nullptr)
-    {
-      queue_.push(node_->right);
-    }
-
     if (queue_.empty())
     {
       node_ = nullptr;
@@ -76,9 +63,26 @@ namespace demehin
     else
     {
       node_ = queue_.front();
+      if (node_->left)
+      {
+        queue_.push(node_->left);
+      }
+      if (node_->right)
+      {
+        queue_.push(node_->right);
+      }
       queue_.pop();
+      if (queue_.empty())
+      {
+        node_ = nullptr;
+      }
+      else
+      {
+        node_ = queue_.front();
+      }
     }
     return *this;
+
   }
 
   template< typename Key, typename T, typename Cmp, bool isConst >
