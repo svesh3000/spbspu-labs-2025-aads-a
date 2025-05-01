@@ -90,6 +90,7 @@ ConstIterator< Key, Value, Compare >& ConstIterator< Key, Value, Compare >::oper
 template < class Key, class Value, class Compare >
 ConstIterator< Key, Value, Compare > ConstIterator< Key, Value, Compare >::operator++(int)
 {
+  assert(current != nullptr);
   ConstIterator tmp = *this;
   ++(*this);
   return tmp;
