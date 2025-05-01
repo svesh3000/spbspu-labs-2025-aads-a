@@ -3,6 +3,8 @@
 #include <initializer_list>
 #include <stdexcept>
 #include "iterator.hpp"
+#include "lnrIterator.hpp"
+#include "treeNode.hpp"
 
 namespace kiselev
 {
@@ -13,6 +15,8 @@ namespace kiselev
     using value = std::pair< Key, Value >;
     using Iterator = detail::Iterator< Key, Value, Cmp, false >;
     using ConstIterator = detail::Iterator< Key, Value, Cmp, true >;
+    using LnrIterator = detail::LnrIterator< Key, Value, Cmp, false >;
+    using ConstLnrIterator = detail::LnrIterator< Key, Value, Cmp, true >;
     using IteratorPair = std::pair< Iterator, Iterator >;
     using ConstIteratorPair = std::pair< ConstIterator, ConstIterator >;
 
@@ -40,6 +44,13 @@ namespace kiselev
     ConstIterator cbegin() const noexcept;
     Iterator end() noexcept;
     ConstIterator cend() const noexcept;
+    LnrIterator lnrBegin();
+    ConstLnrIterator lnrCbegin() const;
+    LnrIterator lnrEnd() noexcept;
+    ConstLnrIterator lnrCend() const noexcept;
+
+    template< typename F >
+    F traverse_lnr(F f) const;
 
     std::pair< Iterator, bool > insert(const value&);
     std::pair< Iterator, bool > insert(value&);
@@ -417,6 +428,60 @@ namespace kiselev
     return ConstIterator(nullptr);
   }
 
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp>::LnrIterator RBTree< Key, Value, Cmp >::lnrBegin()
+  {
+    if (empty())
+    {
+      return lnrEnd();
+    }
+    LnrIterator it = LnrIterator(root_);
+    while (it.node->left)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstLnrIterator RBTree< Key, Value, Cmp >::lnrCbegin() const
+  {
+    if (empty())
+    {
+      return lnrCend();
+    }
+    LnrIterator it = LnrIterator(root_);
+    while (it.node_->left)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::LnrIterator RBTree< Key, Value, Cmp >::lnrEnd() noexcept
+  {
+    return LnrIterator(nullptr);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstLnrIterator RBTree< Key, Value, Cmp >::lnrCend() const noexcept
+  {
+    return ConstLnrIterator(nullptr);
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename F >
+  F RBTree< Key, Value, Cmp >::traverse_lnr(F f) const
+  {
+    for (ConstLnrIterator it = lnrCbegin(); it != lnrCend(); ++it)
+    {
+      f(*(it));
+    }
+    return f;
+  }
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::find(const Key& key) noexcept
   {
