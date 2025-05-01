@@ -3,7 +3,6 @@
 #include <cassert>
 #include <iterator>
 #include <utility>
-#include <queue>
 #include "queue.hpp"
 #include "treeNode.hpp"
 
@@ -40,7 +39,7 @@ namespace kiselev
       bool operator!=(const BreadthIterator< Key, Value, Cmp, IsConst >&) const noexcept;
     private:
       Node* node_;
-      std::queue< Node* > queue_;
+      Queue< Node* > queue_;
       explicit BreadthIterator(Node*) noexcept;
       friend class BreadthIterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
