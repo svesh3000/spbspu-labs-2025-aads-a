@@ -52,6 +52,11 @@ int main(int argc, char* argv[])
   try
   {
     inputTree(file, tree);
+    if (tree.empty())
+    {
+      std::cout << "<EMPTY>\n";
+      return 0;
+    }
     traverseTree(tree, res, argv[1]);
   }
   catch (const std::exception& e)
@@ -60,12 +65,5 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  if (res.val_res == 0 && res.str_res.size() == 0)
-  {
-    std::cout << "<EMPTY>\n";
-  }
-  else
-  {
-    std::cout << res.val_res << " " << res.str_res << "\n";
-  }
+  std::cout << res.val_res << " " << res.str_res << "\n";
 }

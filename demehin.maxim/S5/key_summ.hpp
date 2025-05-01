@@ -11,7 +11,7 @@ namespace demehin
     std::string str_res;
 
     KeySumm() noexcept;
-    void operator()(const std::pair< const int, std::string >&) noexcept;
+    void operator()(const std::pair< const int, std::string >&);
 
   };
 }
