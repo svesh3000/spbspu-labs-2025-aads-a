@@ -11,7 +11,6 @@ namespace averenkov
   {
   public:
     ListIterator() noexcept;
-    explicit ListIterator(Node< T >* node) noexcept;
     ~ListIterator() = default;
 
     ListIterator< T >& operator++();
@@ -27,6 +26,7 @@ namespace averenkov
 
   private:
     Node< T >* node_;
+    explicit ListIterator(Node< T >* node) noexcept;
 
   };
 

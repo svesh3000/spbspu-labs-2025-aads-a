@@ -11,20 +11,20 @@ namespace averenkov
   {
   public:
     ConstListIterator() = default;
-    explicit ConstListIterator(Node< T >* node) noexcept;
     ~ConstListIterator() = default;
 
     ConstListIterator< T >& operator++();
     ConstListIterator< T > operator++(int);
 
-    T& operator*() const noexcept;
-    T* operator->() const noexcept;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
 
     bool operator==(const ConstListIterator< T >&) const;
     bool operator!=(const ConstListIterator< T >&) const;
 
   private:
     Node< T >* node_;
+    explicit ConstListIterator(Node< T >* node) noexcept;
 
   };
 
@@ -52,14 +52,14 @@ namespace averenkov
   }
 
   template< class T >
-  T& ConstListIterator< T >::operator*() const noexcept
+  const T& ConstListIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< class T >
-  T* ConstListIterator< T >::operator->() const noexcept
+  const T* ConstListIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
