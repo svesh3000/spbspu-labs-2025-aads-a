@@ -2,6 +2,7 @@
 #define CALC_UTILS_HPP
 #include <stdexcept>
 #include <algorithm>
+#include <limits>
 
 namespace
 {
