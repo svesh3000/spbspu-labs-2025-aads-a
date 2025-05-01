@@ -1,5 +1,5 @@
-#ifndef LNRITERATOR
-#define LNRITERATOR
+#ifndef LNRITERATOR_HPP
+#define LNRITERATOR_HPP
 
 #include <cassert>
 #include <iterator>

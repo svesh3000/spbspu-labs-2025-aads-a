@@ -21,4 +21,9 @@ BOOST_AUTO_TEST_CASE(traverse)
   iss.str("");
   iss << funRnl.sum << funRnl.str;
   BOOST_TEST(iss.str() == "45 c a e b d");
+  iss.str("");
+  KeySum funBreadth;
+  funBreadth = tree.traverse_breadth(funBreadth);
+  iss << funBreadth.sum << funBreadth.str;
+  BOOST_TEST(iss.str() == "45 a b c d e");
 }
