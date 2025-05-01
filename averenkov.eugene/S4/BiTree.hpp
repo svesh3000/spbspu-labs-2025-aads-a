@@ -167,7 +167,6 @@ template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
   clear();
-  delete fake_root;
 }
 
 template < class Key, class Value, class Compare >
@@ -395,7 +394,7 @@ typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear()
 {
-  if (root && root != fake_root)
+  if (root)
   {
     destroy_tree(root);
   }
@@ -406,7 +405,7 @@ void Tree< Key, Value, Compare >::clear()
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::destroy_tree(NodeType* node)
 {
- if (node && node != fake_root)
+ if (node)
   {
     destroy_tree(node->left);
     destroy_tree(node->right);
