@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "iterator.hpp"
 #include "lnrIterator.hpp"
+#include "rnlIterator.hpp"
 #include "treeNode.hpp"
 
 namespace kiselev
@@ -17,6 +18,8 @@ namespace kiselev
     using ConstIterator = detail::Iterator< Key, Value, Cmp, true >;
     using LnrIterator = detail::LnrIterator< Key, Value, Cmp, false >;
     using ConstLnrIterator = detail::LnrIterator< Key, Value, Cmp, true >;
+    using RnlIterator = detail::RnlIterator< Key, Value, Cmp, false >;
+    using ConstRnlIterator = detail::RnlIterator< Key, Value, Cmp, true >;
     using IteratorPair = std::pair< Iterator, Iterator >;
     using ConstIteratorPair = std::pair< ConstIterator, ConstIterator >;
 
@@ -44,13 +47,21 @@ namespace kiselev
     ConstIterator cbegin() const noexcept;
     Iterator end() noexcept;
     ConstIterator cend() const noexcept;
+
     LnrIterator lnrBegin();
     ConstLnrIterator lnrCbegin() const;
     LnrIterator lnrEnd() noexcept;
     ConstLnrIterator lnrCend() const noexcept;
 
+    RnlIterator rnlBegin();
+    ConstRnlIterator rnlCbegin() const;
+    RnlIterator rnlEnd() noexcept;
+    ConstRnlIterator rnlCend() const noexcept;
+
     template< typename F >
     F traverse_lnr(F f) const;
+    template< typename F >
+    F traverse_rnl(F f) const;
 
     std::pair< Iterator, bool > insert(const value&);
     std::pair< Iterator, bool > insert(value&);
@@ -435,7 +446,7 @@ namespace kiselev
     {
       return lnrEnd();
     }
-    LnrIterator it = LnrIterator(root_);
+    LnrIterator it(root_);
     while (it.node->left)
     {
       it.stack_.push(it.node_);
@@ -451,7 +462,7 @@ namespace kiselev
     {
       return lnrCend();
     }
-    LnrIterator it = LnrIterator(root_);
+    LnrIterator it(root_);
     while (it.node_->left)
     {
       it.stack_.push(it.node_);
@@ -473,6 +484,48 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::RnlIterator RBTree< Key, Value, Cmp >::rnlBegin()
+  {
+    if (empty())
+    {
+      return rnlEnd();
+    }
+    RnlIterator it(root_);
+    while (it.node_->right)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstRnlIterator RBTree< Key, Value, Cmp >::rnlCbegin() const
+  {
+    if (empty())
+    {
+      return rnlCend();
+    }
+    ConstRnlIterator it(root_);
+    while(it.node_->right)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::RnlIterator RBTree< Key, Value, Cmp >::rnlEnd() noexcept
+  {
+    return RnlIterator(nullptr);
+  }
+  template< typename Key, typename Value, typename Cmp >
+  typename RBTree< Key, Value, Cmp >::ConstRnlIterator RBTree< Key, Value, Cmp >::rnlCend() const noexcept
+  {
+    return ConstRnlIterator(nullptr);
+  }
+  template< typename Key, typename Value, typename Cmp >
   template< typename F >
   F RBTree< Key, Value, Cmp >::traverse_lnr(F f) const
   {
@@ -482,6 +535,18 @@ namespace kiselev
     }
     return f;
   }
+
+  template< typename Key, typename Value, typename Cmp >
+  template< typename F >
+  F RBTree< Key, Value, Cmp >::traverse_rnl(F f) const
+  {
+    for (ConstRnlIterator it = rnlCbegin(); it != rnlCend(); ++it)
+    {
+      f(*(it));
+    }
+    return f;
+  }
+
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::find(const Key& key) noexcept
   {

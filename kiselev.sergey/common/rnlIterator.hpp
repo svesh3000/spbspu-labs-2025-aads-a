@@ -1,5 +1,5 @@
-#ifndef LNRITERATOR
-#define LNRITERATOR
+#ifndef RNLITERATOR_HPP
+#define RNLITERATOR_HPP
 
 #include <cassert>
 #include <iterator>
@@ -7,6 +7,7 @@
 #include "iterator.hpp"
 #include "stack.hpp"
 #include "treeNode.hpp"
+
 namespace kiselev
 {
   template< typename Key, typename Value, typename Cmp >
@@ -15,7 +16,7 @@ namespace kiselev
   namespace detail
   {
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    class LnrIterator: public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
+    class RnlIterator: public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
     {
     public:
       using value = std::pair< Key, Value >;
@@ -23,81 +24,84 @@ namespace kiselev
       using pointer = std::conditional_t< IsConst, const value*, value* >;
       using Node = TreeNode< Key, Value >;
 
-      LnrIterator() noexcept;
+      RnlIterator() noexcept;
       template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-      LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst >&);
+      RnlIterator(const RnlIterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
       template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-      LnrIterator< Key, Value, Cmp, IsConst > operator=(const LnrIterator< Key, Value, Cmp, OtherIsConst >&);
+      RnlIterator< Key, Value, Cmp, IsConst >& operator=(const RnlIterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
 
-      LnrIterator< Key, Value, Cmp, IsConst > operator++();
-      LnrIterator< Key, Value, Cmp, IsConst > operator++(int);
-
+      RnlIterator< Key, Value, Cmp, IsConst > operator++();
+      RnlIterator< Key, Value, Cmp, IsConst > operator++(int);
 
       reference operator*() const noexcept;
       pointer operator->() const noexcept;
 
-      bool operator==(const LnrIterator< Key, Value, Cmp, IsConst >&) const noexcept;
-      bool operator!=(const LnrIterator< Key, Value, Cmp, IsConst >&) const noexcept;
+      bool operator==(const RnlIterator< Key, Value, Cmp, IsConst >&) const noexcept;
+      bool operator!=(const RnlIterator< Key, Value, Cmp, IsConst >&) const noexcept;
+
     private:
       Node* node_;
       Stack< Node* > stack_;
-      explicit LnrIterator(Node*) noexcept;
-      friend class LnrIterator< Key, Value, Cmp, !IsConst >;
+      explicit RnlIterator(Node*) noexcept;
+      friend class RnlIterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst >& oth):
-      node_(oth.node_),
-      stack_(oth.stack_)
-    {}
-
-    template< typename Key, typename Value, typename Cmp, bool IsConst >
-    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator() noexcept:
+    RnlIterator< Key, Value, Cmp, IsConst >::RnlIterator() noexcept:
       node_(nullptr),
       stack_()
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-    LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator=(
-      const LnrIterator< Key, Value, Cmp, OtherIsConst >& oth)
+    RnlIterator< Key, Value, Cmp, IsConst >::RnlIterator(const RnlIterator< Key, Value, Cmp, OtherIsConst >& oth) noexcept:
+      node_(oth.node_),
+      stack_(oth.stack_)
+    {}
+
+    template< typename Key, typename Value, typename Cmp, bool IsConst >
+    template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
+    RnlIterator< Key, Value, Cmp, IsConst >& RnlIterator< Key, Value, Cmp, IsConst >::operator=(
+      const RnlIterator< Key, Value, Cmp, OtherIsConst >& oth) noexcept
     {
       node_ = oth.node_;
       stack_ = oth.stack_;
+      return *this;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(Node* node) noexcept:
+    RnlIterator< Key, Value, Cmp, IsConst >::RnlIterator(Node* node) noexcept:
       node_(node),
       stack_()
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator++()
+    RnlIterator< Key, Value, Cmp, IsConst > RnlIterator< Key, Value, Cmp, IsConst >::operator++()
     {
       if (!node_)
       {
         return *this;
       }
-      if (node_->right)
+
+      if (node_->left)
       {
         stack_.push(node_);
-        node_ = node_->right;
-        while (node_->left)
+        node_ = node_->left;
+        while (node_->right)
         {
           stack_.push(node_);
-          node_ = node_->left;
+          node_ = node_->right;
         }
       }
       else
       {
-        if (!stack_.empty() && stack_.top()->right == node_)
+        while (!stack_.empty() && stack_.top()->left == node_)
         {
           node_ = stack_.top();
           stack_.pop();
         }
+
         if (stack_.empty())
         {
           node_ = nullptr;
@@ -112,35 +116,35 @@ namespace kiselev
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator++(int)
+    RnlIterator< Key, Value, Cmp, IsConst > RnlIterator< Key, Value, Cmp, IsConst >::operator++(int)
     {
-      LnrIterator< Key, Value, Cmp, IsConst > result(*this);
+      RnlIterator< Key, Value, Cmp, IsConst > result(*this);
       ++(*this);
       return result;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    typename LnrIterator< Key, Value, Cmp, IsConst >::reference LnrIterator< Key, Value, Cmp, IsConst >::operator*() const noexcept
+    typename RnlIterator< Key, Value, Cmp, IsConst >::reference RnlIterator< Key, Value, Cmp, IsConst >::operator*() const noexcept
     {
       assert(node_ != nullptr);
       return node_->data;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    typename LnrIterator< Key, Value, Cmp, IsConst >::pointer LnrIterator< Key, Value, Cmp, IsConst >::operator->() const noexcept
+    typename RnlIterator< Key, Value, Cmp, IsConst >::pointer RnlIterator< Key, Value, Cmp, IsConst >::operator->() const noexcept
     {
       assert(node_ != nullptr);
       return std::addressof(node_->data);
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    bool LnrIterator< Key, Value, Cmp, IsConst >::operator==(const LnrIterator<Key, Value, Cmp, IsConst>& oth) const noexcept
+    bool RnlIterator< Key, Value, Cmp, IsConst >::operator==(const RnlIterator< Key, Value, Cmp, IsConst >& oth) const noexcept
     {
       return node_ == oth.node_;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    bool LnrIterator< Key, Value, Cmp, IsConst >::operator!=(const LnrIterator<Key, Value, Cmp, IsConst>& oth) const noexcept
+    bool RnlIterator< Key, Value, Cmp, IsConst >::operator!=(const RnlIterator< Key, Value, Cmp, IsConst >& oth) const noexcept
     {
       return !(*this == oth);
     }
