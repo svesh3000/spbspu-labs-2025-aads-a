@@ -68,8 +68,10 @@ int main(int argc, char** argv)
   tree.insert(p5);
   tree.insert(p6);
   tree.insert(p7);
-  for (auto it = tree.begin(); it != tree.end(); it++)
+  TwoThreeTree< int, std::string, std::less< int > > tree1(tree);
+  for (auto it = tree1.begin(); it != tree1.end(); it++)
   {
     std::cout << it->first << it->second << '\n';
   }*/
+
 }

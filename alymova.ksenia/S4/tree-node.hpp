@@ -70,12 +70,11 @@ namespace alymova
       data[type] = value;
       if (type == NodeType::Empty)
       {
-        std::cout << data[type].first << data[type].second;
         type = NodeType::Double;
       }
       else if (type == NodeType::Double)
       {
-        if (data[1] < data[0])
+        if (data[1].first < data[0].first)
         {
           std::swap(data[0], data[1]);
         }
@@ -83,11 +82,11 @@ namespace alymova
       }
       else if (type == NodeType::Triple)
       {
-        if (data[2] < data[1])
+        if (data[2].first < data[1].first)
         {
           std::swap(data[2], data[1]);
         }
-        if (data[1] < data[0])
+        if (data[1].first < data[0].first)
         {
           std::swap(data[1], data[0]);
         }
@@ -98,7 +97,14 @@ namespace alymova
     template< class Key, class Value >
     bool TTTNode< Key, Value >::isLeaf()
     {
-      return (!left && !mid && !right && !overflow);
+      if (right)
+      {
+        if (right->type != NodeType::Empty)
+        {
+          return false;
+        }
+      }
+      return (!left && !mid && !overflow);
     }
   }
 }
