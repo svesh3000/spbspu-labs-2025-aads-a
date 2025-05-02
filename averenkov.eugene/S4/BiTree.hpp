@@ -124,6 +124,10 @@ Tree< Key, Value, Compare >::Tree(const Tree& other):
   {
     root = copy_tree(other.root, fake_root);
   }
+  else
+  {
+    root = fake_root;
+  }
   size_ = other.size_;
 }
 
@@ -139,6 +143,7 @@ Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
     root = fake_root;
   }
   other.root = other.fake_root;
+  other.fake_root = new NodeType(Key(), Value(), nullptr);
   other.size_ = 0;
 }
 
@@ -406,20 +411,20 @@ void Tree< Key, Value, Compare >::clear()
   if (root != fake_root)
   {
     clear(root);
-    root = fake_root;
   }
-  size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear(NodeType* node)
 {
-  if (node == fake_root || !node)
+  if (node->left != fake_root)
   {
-    return;
+    clear(node->left);
   }
-  clear(node->left);
-  clear(node->right);
+  if (node->right != fake_root)
+  {
+    clear(node->right);
+  }
   delete node;
 }
 
