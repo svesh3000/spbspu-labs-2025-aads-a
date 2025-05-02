@@ -6,7 +6,6 @@
 
 using Dictionary = Tree< int, std::string >;
 using DictionaryStorage = Tree< std::string, Dictionary >;
-
 using str = const std::string&;
 
 void loadDictionaries(str filename, DictionaryStorage& storage)
