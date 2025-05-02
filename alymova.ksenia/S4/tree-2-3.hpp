@@ -98,7 +98,7 @@ namespace alymova
     for (auto it = first; it != last; it++)
     {
       insert(*it);
-    } 
+    }
   }
 
   template< class Key, class Value, class Comparator >
