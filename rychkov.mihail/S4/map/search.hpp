@@ -2,6 +2,7 @@
 #define SEARCH_HPP
 
 #include "declaration.hpp"
+#include <iterator>
 
 template< class Key, class Mapped, class Compare, size_t N >
 template< class K >
@@ -138,6 +139,12 @@ std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator,
 {
   return {lower_bound(key), upper_bound(key)};
 }
+template< class Key, class Mapped, class Compare, size_t N >
+typename rychkov::Map< Key, Mapped, Compare, N >::size_type
+    rychkov::Map< Key, Mapped, Compare, N >::count(const key_type& key) const
+{
+  return contains(key);
+}
 
 template< class Key, class Mapped, class Compare, size_t N >
 template< class K >
@@ -216,6 +223,14 @@ std::pair< typename rychkov::Map< Key, Mapped, Compare, N >::const_iterator,
     (std::enable_if_t< rychkov::is_transparent_v< Compare >, const K& > key) const
 {
   return {lower_bound(key), upper_bound(key)};
+}
+template< class Key, class Mapped, class Compare, size_t N >
+template< class K >
+typename rychkov::Map< Key, Mapped, Compare, N >::size_type
+    rychkov::Map< Key, Mapped, Compare, N >::count
+    (std::enable_if_t< rychkov::is_transparent_v< Compare >, const K& > key) const
+{
+  return std::distance(lower_bound(key), upper_bound(key));
 }
 
 #endif

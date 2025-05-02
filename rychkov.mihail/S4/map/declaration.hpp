@@ -108,6 +108,7 @@ namespace rychkov
     bool contains(const key_type& key) const;
     std::pair< iterator, iterator > equal_range(const key_type& key);
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
+    size_type count(const key_type& key) const;
 
     template< class K >
     iterator lower_bound(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
@@ -128,9 +129,17 @@ namespace rychkov
     template< class K >
     std::pair< const_iterator, const_iterator > equal_range
         (std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
+    template< class K >
+    size_type count(std::enable_if_t< is_transparent_v< key_compare >, const K& > key) const;
 
     void clear();
     void swap(Map& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
+
+    iterator erase(const_iterator pos);
+    iterator erase(const_iterator from, const_iterator to);
+    size_type erase(const key_type& key);
+    template< class K >
+    size_type erase(const K& key);
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args&&... args);
