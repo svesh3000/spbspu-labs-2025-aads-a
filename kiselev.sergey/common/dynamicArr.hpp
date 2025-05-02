@@ -84,16 +84,16 @@ namespace kiselev
 
   template< typename T >
   DynamicArr< T >::DynamicArr(const DynamicArr< T >& arr):
-    data_(new T*[arr.capacity_]),
+    data_(new T*[arr.capacity_]()),
     capacity_(arr.capacity_),
-    size_(arr.size_),
-    begin_(arr.begin_)
+    size_(0),
+    begin_(0)
   {
     try
     {
-      for (size_t i = 0; i < size_; ++i)
+      for (; size_ < arr.size(); ++size_)
       {
-        data_[i] = new T(*arr.data_[i + begin_]);
+        data_[size_] = new T(*arr.data_[size_ + arr.begin_]);
       }
     }
     catch (...)
@@ -114,7 +114,7 @@ namespace kiselev
 
   template< typename T >
   DynamicArr< T >::DynamicArr(size_t capacity):
-    data_(new T*[capacity]),
+    data_(new T*[capacity]()),
     capacity_(capacity),
     size_(0),
     begin_(0)

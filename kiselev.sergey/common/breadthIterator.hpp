@@ -23,7 +23,6 @@ namespace kiselev
       using Node = TreeNode< Key, Value >;
 
       BreadthIterator() noexcept;
-      ~BreadthIterator() = default;
       template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
       BreadthIterator(const BreadthIterator< Key, Value, Cmp, OtherIsConst >&);
       template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
