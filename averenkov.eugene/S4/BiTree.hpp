@@ -72,7 +72,7 @@ private:
   size_t size_;
 
   NodeType* copy_tree(NodeType* node, NodeType* parent);
-  void destroy_tree(NodeType* NodeType);
+  void clear(NodeType* NodeType);
   NodeType* find_NodeType(const Key& key) const;
   NodeType* find_min(NodeType* NodeType) const;
   NodeType* find_max(NodeType* NodeType) const;
@@ -96,6 +96,8 @@ Tree< Key, Value, Compare >::Tree():
   comp(Compare()),
   size_(0)
 {
+  fake_root->left = fake_root;
+  fake_root->right = fake_root;
   root = fake_root;
 }
 
@@ -106,6 +108,8 @@ Tree< Key, Value, Compare >::Tree(const Compare& cmp):
   comp(cmp),
   size_(0)
 {
+  fake_root->left = fake_root;
+  fake_root->right = fake_root;
   root = fake_root;
 }
 
@@ -399,23 +403,24 @@ typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear()
 {
-  if (root && root != fake_root)
+  if (root != fake_root)
   {
-    destroy_tree(root);
+    clear(root);
+    root = fake_root;
   }
-  root = fake_root;
   size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
-void Tree< Key, Value, Compare >::destroy_tree(NodeType* node)
+void Tree< Key, Value, Compare >::clear(NodeType* node)
 {
- if (node && node != fake_root)
+  if (node == fake_root || !node)
   {
-    destroy_tree(node->left);
-    destroy_tree(node->right);
-    delete node;
+    return;
   }
+  clear(node->left);
+  clear(node->right);
+  delete node;
 }
 
 template < class Key, class Value, class Compare >
