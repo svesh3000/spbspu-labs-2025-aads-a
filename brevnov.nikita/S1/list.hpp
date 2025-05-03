@@ -47,7 +47,7 @@ namespace brevnov
   private:
     Node< T > * head_;
     Node< T > * tail_;
-    size_t size;
+    size_t size_;
   };
 
   template< typename T >

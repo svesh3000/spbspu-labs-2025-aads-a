@@ -33,7 +33,7 @@ namespace brevnov
     Node< T >* node_;
     explicit Iterator(Node< T >* node);
     friend class Iterator< T,  !isConst >;
-    friend class List< T >;
+    friend class List;
   };
 
   template< typename T, bool isConst >
