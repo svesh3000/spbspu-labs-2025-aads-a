@@ -34,10 +34,13 @@ namespace brevnov
     T& back() noexcept;
     const T& back() const noexcept;
 
-    void pushBack(const T&);
-    void pushBack(T&&);
-    void pushFront(const T&);
-    void pushFront(T&&);
+    void push_back(const T&);
+    void push_back(T&&);
+    void push_front(const T&);
+    void push_front(T&&);
+
+    void pop_front() noexcept;
+    void pop_back() noexcept;
 
     void clear();
     void swap(List< T > & hl);
@@ -68,9 +71,9 @@ namespace brevnov
   }
 
   template< typename T >
-  List< T >::List(const List< T > & copy)
+  List< T >::List(const List< T >& copy)
   {
-    for (ConstIter< T > it = copy.cbegin(); it != copy.cend(); ++it)
+    for (ConstIter it = copy.cbegin(); it != copy.cend(); ++it)
     {
       push_back(*it);
     }
@@ -99,7 +102,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List< T >::List(initializer_list<value_type> il):
+  List< T >::List(std::initializer_list< T > il):
     List(il.begin(), il.end())
   {}
 
@@ -115,7 +118,7 @@ namespace brevnov
   {
     while (!clear())
     {
-      popFront();
+      pop_front();
     }
   }
 
@@ -216,12 +219,12 @@ namespace brevnov
   {
     if (!tail_)
     {
-      head_ = new Node< T >{ data, nullptr, nullptr};
+      head_ = new Node< T >{data, nullptr, nullptr};
       tail_ = head_;
     }
     else
     {
-      tail_->next = new Node< T >{ data, tail_, nullptr};
+      tail_->next = new Node< T >{data, tail_, nullptr};
       tail_ = tail_->next;
     }
     size_++;
@@ -238,12 +241,12 @@ namespace brevnov
   {
     if (!head)
     {
-      head_ = new Node< T >{ data, nullptr, nullptr};
+      head_ = new Node< T >{data, nullptr, nullptr};
       tail_ = head;
     }
     else
     {
-      head_->prev = new Node< T >{ data, nullptr, head_};
+      head_->prev = new Node< T >{data, nullptr, head_};
       head_ = head_->prev;
     }
     size_++;
@@ -254,5 +257,26 @@ namespace brevnov
   {
     push_front(data);
   }
+
+  template< typeanme T >
+  void List< T >::pop_front()
+  {
+    assert(!empty());
+    Node< T > * help = tail_->prev;
+    help->next = nullptr;
+    delete tail_;
+    tail_ = help;
+  }
+
+  template< typename T >
+  void List< T >::pop_back()
+  {
+    assert(!empty());
+    Node< T > * help = head_->next;
+    help->prev = nullptr;
+    delete head_;
+    head_ = help;
+  }
+
 }
 #endif

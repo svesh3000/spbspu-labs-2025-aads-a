@@ -5,18 +5,18 @@ namespace brevnov
   template< typename T>
   struct Node
   {
-    T data_;
-    Node< T > * next_;
-    Node< T > * prev_;
+    T data;
+    Node< T > * next;
+    Node< T > * prev;
     Node():
-      data_(T()),
-      next_(nullptr),
-      prev_(nullptr)
+      data(T()),
+      next(nullptr),
+      prev(nullptr)
     {}
-    Node(const T& data):
-      data_(data),
-      next_(nullptr),
-      prev_(nullptr)
+    Node(const T& d):
+      data(d),
+      next(nullptr),
+      prev(nullptr)
     {}
   };
 }
