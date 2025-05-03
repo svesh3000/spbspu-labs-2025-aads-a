@@ -216,73 +216,65 @@ namespace brevnov
   template< typename T >
   void List< T >::push_back(const T& data)
   {
-    if (!tail_)
+    Node< T >* newnode = new Node< T >{data, nullptr, tail};
+    if (!tail)
     {
-      head_ = new Node< T >{data, nullptr, nullptr};
-      tail_ = head_;
+      head = newnode;
     }
     else
     {
-      tail_->next = new Node< T >{data, nullptr, tail_};
-      if (head_ == tail_)
-      {
-        head_->next = tail_->next;
-      }
-      tail_ = tail_->next;
+      tail->next = newnode;
     }
-    size_++;
+    tail = newnode;
+    size++;
   }
 
   template< typename T >
   void List< T >::push_back(T&& data)
   {
-    if (!tail_)
+    Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
+    if (!tail)
     {
-      head_ = new Node< T >{std::move(data), nullptr, nullptr};
-      tail_ = head_;
+      head = newnode;
     }
     else
     {
-      tail_->next = new Node< T >{std::move(data), nullptr, tail_};
-      tail_ = tail_->next;
+      tail->next = newnode;
     }
-    size_++;
+    tail = newnode;
+    size++;
   }
 
   template< typename T >
   void List< T >::push_front(const T& data)
   {
-    if (!head_)
+    Node< T >* newnode = new Node< T >{data, nullptr, tail};
+    if (!tail)
     {
-      head_ = new Node< T >{data, nullptr, nullptr};
-      tail_ = head_;
+      head = newnode;
     }
     else
     {
-      head_->prev = new Node< T >{data, head_, nullptr};
-      if (tail_ == head_)
-      {
-        tail_->prev = head_->prev;
-      }
-      head_ = head_->prev;
+      head->prev = newnode;
     }
-    size_++;
+    head = newnode;
+    size++;
   }
 
   template< typename T >
   void List< T >::push_front(T&& data)
   {
-    if (!head_)
+    Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
+    if (!tail)
     {
-      head_ = new Node< T >{std::move(data), nullptr, nullptr};
-      tail_ = head_;
+      head = newnode;
     }
     else
     {
-      head_->prev = new Node< T >{std::move(data), head_, nullptr};
-      head_ = head_->prev;
+      head->prev = newnode;
     }
-    size_++;
+    head = newnode;
+    size++;
   }
 
   template< typename T >
