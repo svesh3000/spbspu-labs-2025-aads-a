@@ -3,12 +3,24 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <utility>
 #include "tree.hpp"
 #include "keySum.hpp"
-int main(int argc, char** argv)
+namespace
 {
   using namespace kiselev;
   using Tree = RBTree< int, std::string >;
+  void input(std::istream& input, Tree& tree)
+  {
+    std::pair< int, std::string > pair;
+    while (input >> pair.first >> pair.second)
+    {
+      tree.insert(pair);
+    }
+  }
+}
+int main(int argc, char** argv)
+{
   if (argc != 3)
   {
     std::cerr << "Invalid parameters\n";
@@ -16,11 +28,7 @@ int main(int argc, char** argv)
   }
   std::ifstream file(argv[2]);
   Tree tree;
-  std::pair< int, std::string > value;
-  while (file >> value.first >> value.second)
-  {
-    tree.insert(value);
-  }
+  input(file, tree);
   if (!file.eof())
   {
     std::cerr << "Incorrect input\n";
@@ -29,6 +37,7 @@ int main(int argc, char** argv)
   if (tree.empty())
   {
     std::cout << "<EMPTY>\n";
+    return 0;
   }
   else
   {
@@ -49,5 +58,4 @@ int main(int argc, char** argv)
       return 1;
     }
   }
-  return 0;
 }
