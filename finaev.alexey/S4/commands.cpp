@@ -10,6 +10,7 @@ void finaev::printCMD(std::ostream& out, const mainDict& dict)
   if (current.empty())
   {
     std::cout << "<EMPTY>\n";
+    return;
   }
   out << name;
   for (auto i = current.cbegin(); i != current.cend(); ++i)
