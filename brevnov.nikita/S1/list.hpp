@@ -224,7 +224,7 @@ namespace brevnov
     }
     else
     {
-      tail_->next = new Node< T >{data, tail_, nullptr};
+      tail_->next = new Node< T >{data, nullptr, tail_};
       tail_ = tail_->next;
     }
     size_++;
@@ -246,7 +246,7 @@ namespace brevnov
     }
     else
     {
-      head_->prev = new Node< T >{data, nullptr, head_};
+      head_->prev = new Node< T >{data, head_, nullptr};
       head_ = head_->prev;
     }
     size_++;
