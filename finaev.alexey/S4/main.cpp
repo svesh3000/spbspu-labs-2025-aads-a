@@ -26,27 +26,35 @@ int main(int argc, char* argv[])
   {
     std::string command = "";
     std::cin >> command;
-    if (std::cin.eof())
+    try
     {
-      break;
+      if (std::cin.eof())
+      {
+        break;
+      }
+      else if (command == "print")
+      {
+        finaev::printCMD(std::cout, mainDict);
+      }
+      else if (command == "complement")
+      {
+        finaev::complementCMD(mainDict);
+      }
+      else if (command == "intersect")
+      {
+        finaev::intersectCMD(mainDict);
+      }
+      else if (command == "union")
+      {
+        finaev::unionCMD(mainDict);
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
-    else if (command == "print")
-    {
-      finaev::printCMD(std::cout, mainDict);
-    }
-    else if (command == "complement")
-    {
-      finaev::complementCMD(mainDict);
-    }
-    else if (command == "intersect")
-    {
-      finaev::intersectCMD(mainDict);
-    }
-    else if (command == "union")
-    {
-      finaev::unionCMD(mainDict);
-    }
-    else
+    catch(...)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
