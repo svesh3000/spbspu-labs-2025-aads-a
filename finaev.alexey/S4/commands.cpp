@@ -38,7 +38,7 @@ void finaev::complementCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  dict.insert({ name, temp });
+  dict[name] = temp;
 }
 
 void finaev::intersectCMD(mainDict& dict)
@@ -56,7 +56,7 @@ void finaev::intersectCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  dict.insert({ name, temp });
+  dict[name] = temp;
 }
 
 void finaev::unionCMD(mainDict& dict)
@@ -78,5 +78,5 @@ void finaev::unionCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  dict.insert({ name, temp });
+  dict[name] = temp;
 }
