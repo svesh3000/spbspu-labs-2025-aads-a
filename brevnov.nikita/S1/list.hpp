@@ -8,8 +8,8 @@ namespace brevnov
   class List
   {
   public:
-    using Iterator = brevnov::ListIterator< T, false >;
-    using ConstIterator = brevnov::ListIterator< T, true >;
+    using Iterator = Iterator< T, false >;
+    using ConstIterator = Iterator< T, true >;
 
     List();
     List(size_t n, const T& val);
@@ -17,12 +17,12 @@ namespace brevnov
     List(List< T > && del);
     template< typename InputIterator >
     List(InputIterator begin, InputIterator end);
-    List(initializer_list<value_type> il);
+    List(std::initializer_list< T > il);
     ~List();
 
     List< T > & operator=(const List< T > & copy);
     List< T > & operator=(List< T > && copy);
-    List< T > & operator=(initializer_list<value_type> il);
+    List< T > & operator=(std::initializer_list< T > il);
 
     Iterator begin() noexcept;
     ConstIterator cbegin() const noexcept;

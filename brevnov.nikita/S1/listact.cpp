@@ -29,7 +29,7 @@ namespace
 brevnov::numberList brevnov::calculateSum(const list& list)
 {
   auto it = list.cbegin();
-  brevnov::numberList listSum;
+  numberList listSum;
   for (size_t i = 0; i < searchMax(list); ++i)
   {
     unsigned long long sum = 0;
@@ -75,7 +75,7 @@ std::ostream& brevnov::outputNumbers(std::ostream& output, const list& list)
   for (size_t i = 0; i < searchMax(list); ++i)
   {
     it = list.cbegin();
-    brevnov::numberList numbers;
+    numberList numbers;
     for (; it != list.cend(); ++it)
     {
       auto nit = it->second.cbegin();
