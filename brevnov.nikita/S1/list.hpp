@@ -97,7 +97,7 @@ namespace brevnov
   {
     for (; begin != end; ++begin)
     {
-      push_back(begin);
+      push_back(*begin);
     }
   }
 
@@ -236,7 +236,17 @@ namespace brevnov
   template< typename T >
   void List< T >::push_back(T&& data)
   {
-    push_back(data);
+    if (!tail_)
+    {
+      head_ = new Node< T >{std::move(data), nullptr, nullptr};
+      tail_ = head_;
+    }
+    else
+    {
+      tail_->next = new Node< T >{std::move(data), nullptr, tail_};
+      tail_ = tail_->next;
+    }
+    size_++;
   }
 
   template< typename T >
@@ -262,27 +272,55 @@ namespace brevnov
   template< typename T >
   void List< T >::push_front(T&& data)
   {
-    push_front(data);
+    if (!head_)
+    {
+      head_ = new Node< T >{std::move(data), nullptr, nullptr};
+      tail_ = head_;
+    }
+    else
+    {
+      head_->prev = new Node< T >{std::move(data), head_, nullptr};
+      head_ = head_->prev;
+    }
+    size_++;
   }
 
   template< typename T >
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    Node< T > * help = tail_->prev;
-    delete tail_;
-    help->next = nullptr;
-    tail_ = help;
+    if (size_ == 1)
+    {
+      delete tail_;
+      head_ = tail_ = nullptr;
+    }
+    else
+    {
+      Node< T >* new_tail = tail_->prev;
+      delete tail_;
+      tail_ = new_tail;
+      tail_->next = nullptr;
+    }
+    size_--;
   }
 
   template< typename T >
   void List< T >::pop_front() noexcept
   {
     assert(!empty());
-    Node< T > * help = head_->next;
-    delete head_;
-    help->prev = nullptr;
-    head_ = help;
+    if (size_ == 1)
+    {
+      delete head_;
+      head_ = tail_ = nullptr;
+    }
+    else
+    {
+      Node< T >* new_head = head_->next;
+      delete head_;
+      head_ = new_head;
+      head_->prev = nullptr;
+    }
+    size_--;
   }
 
 }
