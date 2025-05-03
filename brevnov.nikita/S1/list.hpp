@@ -131,7 +131,7 @@ namespace brevnov
   }
 
   template< typename T >
-  void List< T >::swap(List< T > & hl):
+  void List< T >::swap(List< T > & hl)
   {
     std::swap(head_, hl.head_);
     std::swap(tail_, hl.tail_);
@@ -242,7 +242,7 @@ namespace brevnov
     if (!head_)
     {
       head_ = new Node< T >{data, nullptr, nullptr};
-      tail_ = head;
+      tail_ = head_;
     }
     else
     {
