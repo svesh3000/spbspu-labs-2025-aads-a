@@ -40,8 +40,8 @@ namespace alymova
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     std::pair< Iterator, bool > insert(const T& value);
     std::pair< Iterator, bool > insert(T&& value);
@@ -57,9 +57,15 @@ namespace alymova
     void swap(Tree& other);
     void clear() noexcept;
 
-    size_t count(const Key& key) const noexcept;
-    Iterator find(const Key& key) noexcept;
-    ConstIterator find(const Key& key) const noexcept;
+    size_t count(const Key& key) const;
+    Iterator find(const Key& key);
+    ConstIterator find(const Key& key) const;
+    std::pair< Iterator, Iterator > equal_range(const Key& key);
+    std::pair< ConstIterator, ConstIterator > equal_range(const Key& key) const;
+    Iterator lower_bound(const Key& key);
+    ConstIterator lower_bound(const Key& key) const;
+    Iterator upper_bound(const Key& key);
+    ConstIterator upper_bound(const Key& key) const;
 
   private:
     Node* fake_;
@@ -180,13 +186,13 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  size_t TwoThreeTree< Key, Value, Comparator >::size() const
+  size_t TwoThreeTree< Key, Value, Comparator >::size() const noexcept
   {
     return size_;
   }
 
   template< class Key, class Value, class Comparator >
-  bool TwoThreeTree< Key, Value, Comparator >::empty() const
+  bool TwoThreeTree< Key, Value, Comparator >::empty() const noexcept
   {
     return size_ == 0;
   }
@@ -219,6 +225,20 @@ namespace alymova
   void TwoThreeTree< Key, Value, Comparator >::insert(std::initializer_list< T > il)
   {
     insert(il.begin(), il.end());
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::insert(Iterator hint, const T& value)
+  {
+
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::insert(ConstIterator hint, const T& value)
+  {
+    
   }
 
   template< class Key, class Value, class Comparator >
@@ -264,6 +284,14 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  template <class... Args >
+  TTTIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::emplace_hint(ConstIterator hint, Args&&... args)
+  {
+
+  }
+
+  template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other)
   {
     std::swap(root_, other.root_);
@@ -277,7 +305,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  size_t TwoThreeTree< Key, Value, Comparator >::count(const Key& key) const noexcept
+  size_t TwoThreeTree< Key, Value, Comparator >::count(const Key& key) const
   {
     if (find(key) != end())
     {
@@ -287,19 +315,79 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) noexcept
+  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key)
   {
-    TTTConstIterator< Key, Value, Comparator > tmp = static_cast< const Tree& >(*this).find(key);
+    ConstIterator tmp = static_cast< const Tree& >(*this).find(key);
     return Iterator(tmp);
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const noexcept
+  TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const
   {
     Comparator cmp;
     for (ConstIterator it = cbegin(); it != cend(); it++)
     {
       if (!cmp(key, it->first) && !cmp(it->first, key))
+      {
+        return it;
+      }
+    }
+    return cend();
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< TTTIterator< Key, Value, Comparator >, TTTIterator< Key, Value, Comparator > >
+    TwoThreeTree< Key, Value, Comparator >::equal_range(const Key& key)
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< TTTConstIterator< Key, Value, Comparator >, TTTConstIterator< Key, Value, Comparator > >
+    TwoThreeTree< Key, Value, Comparator >::equal_range(const Key& key) const
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::lower_bound(const Key& key)
+  {
+    ConstIterator tmp = static_cast< const Tree& >(*this).lower_bound(key);
+    return Iterator(tmp);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::lower_bound(const Key& key) const
+  {
+    Comparator cmp;
+    for (auto it = cbegin(); it != cend(); it++)
+    {
+      if (!cmp(it->first, key))
+      {
+        return it;
+      }
+    }
+    return cend();
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::upper_bound(const Key& key)
+  {
+    ConstIterator tmp = static_cast< const Tree& >(*this).upper_bound(key);
+    return Iterator(tmp);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstIterator< Key, Value, Comparator >
+    TwoThreeTree< Key, Value, Comparator >::upper_bound(const Key& key) const
+  {
+    Comparator cmp;
+    for (auto it = cbegin(); it != cend(); it++)
+    {
+      if (cmp(key, it->first))
       {
         return it;
       }

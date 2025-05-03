@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   std::pair< int, std::string > p4(4, "boo");
   std::pair< int, std::string > p5(5, "grd");
   std::pair< int, std::string > p6(6, "bread");
-  std::pair< int, std::string > p7(7, "kitten");
+  std::pair< int, std::string > p7(10, "kitten");
   tree.insert(p1);
   tree.insert(p2);
   tree.insert(p3);
@@ -73,8 +73,6 @@ int main(int argc, char** argv)
   {
     std::cout << it->first << it->second << '\n';
   }
-  auto it = tree.find(2);
-  std::cout << it->second;
-  std::cout << tree.count(1);*/
-
+  TwoThreeTree< int, std::string, std::less< int > > tree2;
+  std::cout << (tree.upper_bound(1)->first);*/
 }
