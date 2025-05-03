@@ -10,15 +10,15 @@ int main()
       std::cout << "0\n";
       return 0;
     }
-    outputName(std::cout, listpair) << "\n";
+    brevnov::outputName(std::cout, listpair) << "\n";
     if (listpair.front().second.empty())
     {
       std::cout << "0\n";
       return 0;
     }
-    outputNumbers(std::cout, listpair);
-    brevnov::numberList sum = calculateSum(listpair);
-    outputNumber(std::cout, sum) << "\n";
+    brevnov::outputNumbers(std::cout, listpair);
+    brevnov::numbers sum = brevnov::calculateSum(listpair);
+    brevnov::outputNumber(std::cout, sum) << "\n";
     return 0;
   }
   catch (const std::exception& e)

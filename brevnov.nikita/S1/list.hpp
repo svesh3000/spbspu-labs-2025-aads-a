@@ -56,7 +56,7 @@ namespace brevnov
   template< typename T >
   List< T >::List():
     head_(nullptr),
-    tail_(new Node< T >(T())),
+    tail_(nullptr),
     size_(0)
   {}
 
@@ -86,7 +86,7 @@ namespace brevnov
     size_(del.size_)
   {
     del.head_ = nullptr;
-    del.tail_ = new Node< T >(T());
+    del.tail_ = nullptr;
     del.size_ = 0;
   }
 
