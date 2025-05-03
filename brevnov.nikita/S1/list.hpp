@@ -258,7 +258,7 @@ namespace brevnov
   }
 
   template< typename T >
-  void List< T >::pop_front() noexcept
+  void List< T >::pop_back() noexcept
   {
     assert(!empty());
     Node< T > * help = tail_->prev;
@@ -268,7 +268,7 @@ namespace brevnov
   }
 
   template< typename T >
-  void List< T >::pop_back() noexcept
+  void List< T >::pop_front() noexcept
   {
     assert(!empty());
     Node< T > * help = head_->next;
