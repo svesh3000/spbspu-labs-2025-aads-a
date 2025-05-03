@@ -12,7 +12,6 @@ namespace brevnov
     using ref = std::conditional_t< isConst, const T&, T& >;
     using point = std::conditional_t< isConst, const T*, T* >;
     Iterator();
-    Iterator();
     template< bool OtherisConst, std::enable_if_t< isConst && !OtherisConst, int > = 0 >
     Iterator(const Iterator< T, OtherisConst >& other): node_(other.node_) {}
     template< bool OtherisConst, std::enable_if_t< isConst && !OtherisConst, int > = 0 >

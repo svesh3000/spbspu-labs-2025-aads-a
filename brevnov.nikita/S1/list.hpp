@@ -8,6 +8,9 @@ namespace brevnov
   class List
   {
   public:
+    using Iterator = brevnov::ListIterator< T, false >;
+    using ConstIterator = brevnov::ListIterator< T, true >;
+
     List();
     List(size_t n, const T& val);
     List(const List< T > & copy);
