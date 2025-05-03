@@ -224,6 +224,10 @@ namespace brevnov
     else
     {
       tail_->next = new Node< T >{data, nullptr, tail_};
+      if (head_ == tail_)
+      {
+        head_->next = tail_->next;
+      }
       tail_ = tail_->next;
     }
     size_++;
@@ -246,6 +250,10 @@ namespace brevnov
     else
     {
       head_->prev = new Node< T >{data, head_, nullptr};
+      if (tail_ == head_)
+      {
+        tail->prev = head->prev;
+      }
       head_ = head_->prev;
     }
     size_++;
@@ -262,8 +270,8 @@ namespace brevnov
   {
     assert(!empty());
     Node< T > * help = tail_->prev;
-    help->next = nullptr;
     delete tail_;
+    help->next = nullptr;
     tail_ = help;
   }
 
@@ -272,8 +280,8 @@ namespace brevnov
   {
     assert(!empty());
     Node< T > * help = head_->next;
-    help->prev = nullptr;
     delete head_;
+    help->prev = nullptr;
     head_ = help;
   }
 
