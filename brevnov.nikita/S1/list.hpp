@@ -111,7 +111,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List< T >::clear()
+  void List< T >::clear()
   {
     while (!clear())
     {
