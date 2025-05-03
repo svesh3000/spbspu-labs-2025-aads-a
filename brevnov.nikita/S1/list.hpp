@@ -8,8 +8,8 @@ namespace brevnov
   class List
   {
   public:
-    using Iterator = Iterator< T, false >;
-    using ConstIterator = Iterator< T, true >;
+    using Iter = Iterator< T, false >;
+    using ConstIter = Iterator< T, true >;
 
     List();
     List(size_t n, const T& val);
@@ -24,15 +24,15 @@ namespace brevnov
     List< T > & operator=(List< T > && copy);
     List< T > & operator=(std::initializer_list< T > il);
 
-    Iterator begin() noexcept;
-    ConstIterator cbegin() const noexcept;
-    Iterator end() noexcept;
-    ConstIterator cend() const noexcept;
+    Iter begin() noexcept;
+    ConstIter cbegin() const noexcept;
+    Iter end() noexcept;
+    ConstIter cend() const noexcept;
 
     T& front() noexcept;
-    const T& front() noexcept const;
+    const T& front() const noexcept;
     T& back() noexcept;
-    const T& back() noexcept const;
+    const T& back() const noexcept;
 
     void pushBack(const T&);
     void pushBack(T&&);
@@ -61,7 +61,7 @@ namespace brevnov
   List< T >::List(size_t n, const T& val):
     List()
   {
-    for (size_t i = 0, i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
       push_back(val);
     }
@@ -70,7 +70,7 @@ namespace brevnov
   template< typename T >
   List< T >::List(const List< T > & copy)
   {
-    for (ConstIterator< T > it = copy.cbegin(); it != copy.cend(); ++it)
+    for (ConstIter< T > it = copy.cbegin(); it != copy.cend(); ++it)
     {
       push_back(*it);
     }
@@ -152,27 +152,27 @@ namespace brevnov
   }
 
   template< typename T >
-  typename List< T >::Iterator List< T >::begin() noexcept
+  typename List< T >::Iter List< T >::begin() noexcept
   {
     return Iterator(head_);
   }
 
   template< typename T >
-  typename List< T >::ConstIterator List< T >::cbegin() noexcept
+  typename List< T >::ConstIter List< T >::cbegin() noexcept
   {
-    return ConstIterator(head_);
+    return ConstIter(head_);
   }
 
   template< typename T >
-  typename List< T >::Iterator List< T >::end() noexcept
+  typename List< T >::Iter List< T >::end() noexcept
   {
     return Iterator(tail_);
   }
 
   template< typename T >
-  typename List< T >::ConstIterator List< T >::cend() noexcept
+  typename List< T >::ConstIter List< T >::cend() noexcept
   {
-    return ConstIterator(tail_);
+    return ConstIter(tail_);
   }
 
   template< typename T >
@@ -194,7 +194,7 @@ namespace brevnov
   }
 
   template< typename T >
-  const T& List< T >::front() noexcept const
+  const T& List< T >::front() const noexcept
   {
     return head_->data;
   }
@@ -206,7 +206,7 @@ namespace brevnov
   }
 
   template< typename T >
-  const T& back() noexcept const
+  const T& back() const noexcept
   {
     return tail_->data;
   }
