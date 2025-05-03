@@ -217,15 +217,15 @@ namespace brevnov
   void List< T >::push_back(const T& data)
   {
     Node< T >* newnode = new Node< T >{data, nullptr, tail};
-    if (!tail)
+    if (!tail_)
     {
-      head = newnode;
+      head_ = newnode;
     }
     else
     {
-      tail->next = newnode;
+      tail_->next = newnode;
     }
-    tail = newnode;
+    tail_ = newnode;
     size++;
   }
 
@@ -233,15 +233,15 @@ namespace brevnov
   void List< T >::push_back(T&& data)
   {
     Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
-    if (!tail)
+    if (!tail_)
     {
-      head = newnode;
+      head_ = newnode;
     }
     else
     {
-      tail->next = newnode;
+      tail_->next = newnode;
     }
-    tail = newnode;
+    tail_ = newnode;
     size++;
   }
 
@@ -249,15 +249,15 @@ namespace brevnov
   void List< T >::push_front(const T& data)
   {
     Node< T >* newnode = new Node< T >{data, nullptr, tail};
-    if (!tail)
+    if (!tail_)
     {
-      head = newnode;
+      head_ = newnode;
     }
     else
     {
-      head->prev = newnode;
+      head_->prev = newnode;
     }
-    head = newnode;
+    head_ = newnode;
     size++;
   }
 
@@ -265,15 +265,15 @@ namespace brevnov
   void List< T >::push_front(T&& data)
   {
     Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
-    if (!tail)
+    if (!tail_)
     {
-      head = newnode;
+      head_ = newnode;
     }
     else
     {
-      head->prev = newnode;
+      head_->prev = newnode;
     }
-    head = newnode;
+    head_ = newnode;
     size++;
   }
 
@@ -281,38 +281,36 @@ namespace brevnov
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    if (size_ == 1)
+    Node< T >* newtail = tail_->prev;
+    delete tail_;
+    if (new_tail)
     {
-      delete tail_;
-      head_ = tail_ = nullptr;
+      newtail->next = nullptr;
     }
     else
     {
-      Node< T >* new_tail = tail_->prev;
-      delete tail_;
-      tail_ = new_tail;
-      tail_->next = nullptr;
+      head_ = nullptr;
     }
-    size_--;
+    tail_ = newtail;
+    size--;
   }
 
   template< typename T >
   void List< T >::pop_front() noexcept
   {
     assert(!empty());
-    if (size_ == 1)
+    Node< T >* newhead = head_->next;
+    delete head_;
+    if (new_head)
     {
-      delete head_;
-      head_ = tail_ = nullptr;
+      newhead->prev = nullptr;
     }
     else
     {
-      Node< T >* new_head = head_->next;
-      delete head_;
-      head_ = new_head;
-      head_->prev = nullptr;
+      tail_ = nullptr;
     }
-    size_--;
+    head_ = newhead;
+    size--;
   }
 
 }
