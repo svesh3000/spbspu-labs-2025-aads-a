@@ -230,16 +230,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::insert(Iterator hint, const T& value)
-  {
-
-  }
+  {}
 
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::insert(ConstIterator hint, const T& value)
-  {
-    
-  }
+  {}
 
   template< class Key, class Value, class Comparator >
   template <class... Args >
@@ -287,9 +283,7 @@ namespace alymova
   template <class... Args >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::emplace_hint(ConstIterator hint, Args&&... args)
-  {
-
-  }
+  {}
 
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other)
