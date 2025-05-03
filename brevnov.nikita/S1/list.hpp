@@ -107,7 +107,7 @@ namespace brevnov
   List::~List()
   {
     clear();
-    delete tail;
+    delete tail_;
   }
 
   template< typename T >
@@ -172,7 +172,7 @@ namespace brevnov
   template< typename T >
   typename List< T >::ConstIterator List< T >::cend() noexcept
   {
-    return ConstIterator(head_);
+    return ConstIterator(tail_);
   }
 
   template< typename T >
