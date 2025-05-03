@@ -16,8 +16,8 @@ namespace brevnov
     List(const List< T > & copy);
     List(List< T > && del);
     template< typename InputIterator >
-    List< T >(InputIterator begin, InputIterator end);
-    List< T >(initializer_list<value_type> il);
+    List(InputIterator begin, InputIterator end);
+    List(initializer_list<value_type> il);
     ~List();
 
     List< T > & operator=(const List< T > & copy);
