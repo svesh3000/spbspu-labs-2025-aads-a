@@ -18,6 +18,6 @@ namespace brevnov
       next_(nullptr),
       prev_(nullptr)
     {}
-  }
+  };
 }
 #endif
