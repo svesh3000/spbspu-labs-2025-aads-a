@@ -168,13 +168,13 @@ namespace brevnov
   template< typename T >
   typename List< T >::Iter List< T >::end() noexcept
   {
-    return Iter(tail_);
+    return Iter(nullptr);
   }
 
   template< typename T >
   typename List< T >::ConstIter List< T >::cend() const noexcept
   {
-    return ConstIter(tail_);
+    return ConstIter(nullptr);
   }
 
   template< typename T >
