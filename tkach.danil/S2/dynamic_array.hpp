@@ -7,19 +7,24 @@
 namespace
 {
   template< typename T >
-  T* getDataFromOther(const T* data, const size_t size)
+  T* getDataFromOther(const T* data, const size_t begin, const size_t size, const size_t capacity)
   {
-    T* new_data = new T[size];
+    T* new_data = reinterpret_cast< T* >(new char[capacity * sizeof(T)]);
+    size_t i = 0;
     try
     {
-      for (size_t i = 0; i < size; ++i)
+      for (; i < size; ++i)
       {
-        new_data[i] = data[i];
+        new (new_data + i) T(data[i + begin]);
       }
     }
-    catch (...)
+    catch(...)
     {
-      delete[] new_data;
+      for (size_t j = 0; j < i; ++j)
+      {
+        new_data[j].~T();
+      }
+      delete [] reinterpret_cast< char* >(new_data);
       throw;
     }
     return new_data;
@@ -36,6 +41,8 @@ namespace tkach
     DynArray(const DynArray& other);
     DynArray(DynArray&& other) noexcept;
     ~DynArray();
+    DynArray< T >& operator=(DynArray< T >&&) noexcept;
+    DynArray< T >& operator=(const DynArray< T >&);
     void pushBack(T&& data);
     void pushBack(const T& data);
     void popBack();
@@ -49,28 +56,72 @@ namespace tkach
     void swap(DynArray& other) noexcept;
   private:
     size_t size_;
+    size_t capacity_;
+    size_t begin_;
     T* data_;
-    template< class Q>
-    void push(Q&& data);
+    template< class... Args >
+    void push(Args&&... data);
+    void realloc();
+    void clear();
   };
 
   template< typename T >
   DynArray< T >::DynArray():
     size_(0),
-    data_(nullptr)
+    capacity_(5),
+    begin_(0),
+    data_(reinterpret_cast< T* >(new char[capacity_ * sizeof(T)]))
   {}
+
+  template< typename T >
+  void DynArray< T >::clear()
+  {
+    if (data_ == nullptr)
+    {
+      return;
+    }
+    for (size_t i = 0; i < size_; ++i)
+    {
+      data_[i + begin_].~T();
+    }
+    if (data_)
+    {
+      delete [] reinterpret_cast< char* >(data_);
+    }
+    data_ = nullptr;
+  }
+
+  template< typename T >
+  void DynArray< T >::realloc()
+  {
+    T* temp = reinterpret_cast< T* >(new char[capacity_ * 2 * sizeof(T)]);
+    for (size_t i = 0; i < size_; ++i)
+    {
+      new (temp + i) T(std::move(data_[i + begin_]));
+    }
+    clear();
+    data_ = temp;
+    capacity_ *= 2;
+    begin_ = 0;
+  }
 
   template< typename T >
   DynArray< T >::DynArray(const DynArray& other):
     size_(other.size_),
-    data_(getDataFromOther(other.data_, other.size_))
+    capacity_(other.capacity_),
+    begin_(0),
+    data_(getDataFromOther(other.data_, other.begin_, other.size_, other.capacity_))
   {}
 
   template< typename T >
   DynArray< T >::DynArray(DynArray&& other) noexcept:
     size_(other.size_),
+    capacity_(other.capacity_),
+    begin_(other.begin_),
     data_(other.data_)
   {
+    other.capacity_ = 0;
+    other.begin_ = 0;
     other.size_ = 0;
     other.data_ = nullptr;
   }
@@ -78,7 +129,31 @@ namespace tkach
   template< typename T >
   DynArray< T >::~DynArray()
   {
-    delete[] data_;
+    clear();
+  }
+
+  template< typename T >
+  DynArray< T >& DynArray< T >::operator=(DynArray< T >&& other) noexcept
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    DynArray< T > temp(std::move(other));
+    swap(temp);
+    return *this;
+  }
+
+  template< typename T >
+  DynArray< T >& DynArray< T >::operator=(const DynArray< T >& other)
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+    DynArray< T > temp(other);
+    swap(temp);
+    return *this;
   }
 
   template< typename T >
@@ -94,26 +169,15 @@ namespace tkach
   }
 
   template< typename T >
-  template< class Q>
-  void DynArray< T >::push(Q&& data)
+  template< class... Args >
+  void DynArray< T >::push(Args&&... data)
   {
-    T* new_data = new T[size_ + 1];
-    try
+    if (size_ + begin_ == capacity_)
     {
-      for (size_t i = 0; i < size_; ++i)
-      {
-        new_data[i] = data_[i];
-      }
-      new_data[size_] = std::forward< Q >(data);
+      realloc();
     }
-    catch (...)
-    {
-      delete[] new_data;
-      throw;
-    }
-    delete[] data_;
+    new (data_ + size_ + begin_) T(std::forward< Args >(data)...);
     size_++;
-    data_ = new_data;
   }
 
   template< typename T >
@@ -133,6 +197,8 @@ namespace tkach
   {
     std::swap(data_, other.data_);
     std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(begin_, other.begin_);
   }
 
   template< typename T >
@@ -144,7 +210,7 @@ namespace tkach
   template< typename T >
   const T& DynArray< T >::back() const
   {
-    return data_[size_ - 1];
+    return data_[begin_ + size_ - 1];
   }
 
   template< typename T >
@@ -156,49 +222,22 @@ namespace tkach
   template< typename T >
   void DynArray< T >::popFront()
   {
-    T* new_data = new T[size_ - 1];;
-    try
-    {
-      for (size_t i = 1; i < size_; ++i)
-      {
-        new_data[i - 1] = data_[i];
-      }
-    }
-    catch (...)
-    {
-      delete[] new_data;
-      throw;
-    }
-    delete[] data_;
+    data_[begin_].~T();
     size_--;
-    data_ = new_data;
+    begin_++;
   }
 
   template< typename T >
   void DynArray< T >::popBack()
   {
-     T* new_data = new T[size_ - 1];;
-    try
-    {
-      for (size_t i = 0; i < size_ - 1; ++i)
-      {
-        new_data[i] = data_[i];
-      }
-    }
-    catch (...)
-    {
-      delete[] new_data;
-      throw;
-    }
-    delete[] data_;
+    data_[begin_ + size_ - 1].~T();
     size_--;
-    data_ = new_data;
   }
 
   template< typename T >
   const T& DynArray< T >::front() const
   {
-    return data_[0];
+    return data_[begin_];
   }
 
 }

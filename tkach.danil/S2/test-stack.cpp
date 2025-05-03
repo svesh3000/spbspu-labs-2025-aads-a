@@ -1,27 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include "stack.hpp"
-
+#include "print.hpp"
 using namespace tkach;
-
-namespace
-{
-  template< typename T >
-  void outputStack(std::ostream& out, Stack< T > stack)
-  {
-    if (stack.empty())
-    {
-      return;
-    }
-    out << stack.top();
-    stack.pop();
-    while (!stack.empty())
-    {
-      out << " " << stack.top();
-      stack.pop();
-    }
-  }
-}
 
 BOOST_AUTO_TEST_CASE(stack_basic_constructor_test)
 {

@@ -4,10 +4,11 @@
 #include <cstddef>
 #include "queue.hpp"
 #include "stack.hpp"
+#include "print.hpp"
 
 namespace
 {
-  int getPriority(std::string op)
+  int getPriority(const std::string& op)
   {
     if (op == "+" || op == "-")
     {
@@ -20,33 +21,12 @@ namespace
     return -1;
   }
 
-  bool isLowPriority(std::string op1, std::string op2)
+  bool isHighPriority(const std::string& op1, const std::string& op2)
   {
-    return getPriority(op1) < getPriority(op2);
+    return getPriority(op1) > getPriority(op2);
   }
 
-  bool isNumber(std::string& s)
-  {
-    if (s.empty())
-    {
-      return false;
-    }
-    size_t i = 0;
-    if (s[0] == '-' && s.size() != 1)
-    {
-      ++i;
-    }
-    for (; i < s.size(); ++i)
-    {
-      if (!std::isdigit(s[i]))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool isOperator(std::string& s)
+  bool isOperator(const std::string& s)
   {
     if (s.empty())
     {
@@ -61,34 +41,24 @@ namespace
 
   void inputInfix(std::istream& in, tkach::Queue< std::string >& queue)
   {
-    in >> std::noskipws;
     std::string infix = "";
     std::getline(in, infix);
     if (infix.empty())
     {
       return;
     }
+    size_t pos = 0, pos2 = 0;
     std::string temp = "";
-    for(char c : infix)
+    while (pos2 != std::string::npos)
     {
-      if (('0' <= c && '9' >= c) || c == '-')
+      pos2 = infix.find(' ', pos);
+      temp = infix.substr(pos, pos2 - pos);
+      if (!temp.empty())
       {
-        temp += c;
-      }
-      else if (c == ' ')
-      {
-        if (!temp.empty())
-        {
-          queue.push(temp);
-          temp.clear();
-        }
-      }
-      else
-      {
-        temp += c;
         queue.push(temp);
         temp.clear();
       }
+      pos = pos2 + 1;
     }
     if (!temp.empty())
     {
@@ -117,49 +87,53 @@ namespace
     while (!inf.empty())
     {
       std::string temp = inf.front();
-      if (isNumber(temp))
+      try
       {
+        std::stoll(temp);
         post_queue.push(temp);
       }
-      else if (temp == "(")
+      catch (...)
       {
-        stack.push(temp);
-      }
-      else if (temp == ")")
-      {
-        if (stack.empty())
+        if (temp == "(")
         {
-          throw std::logic_error("no open bracket");
+          stack.push(temp);
         }
-        std::string stack_temp = stack.top();
-        while (stack_temp != "(")
+        else if (temp == ")")
         {
-          post_queue.push(stack_temp);
-          stack.pop();
-          stack_temp = stack.top();
-        }
-        stack.pop();
-      }
-      else if (isOperator(temp))
-      {
-        while (!stack.empty())
-        {
+          if (stack.empty())
+          {
+            throw std::logic_error("no open bracket");
+          }
           std::string stack_temp = stack.top();
-          if (stack_temp != "(" || (isOperator(stack_temp) && !isLowPriority(stack_temp, temp)))
+          while (stack_temp != "(")
           {
             post_queue.push(stack_temp);
             stack.pop();
+            stack_temp = stack.top();
           }
-          else
-          {
-            break;
-          }
+          stack.pop();
         }
-        stack.push(temp);
-      }
-      else
-      {
-        throw std::logic_error("no that sign needed in expression");
+        else if (isOperator(temp))
+        {
+          while (!stack.empty() && stack.top() != "(")
+          {
+            std::string stack_temp = stack.top();
+            if (isOperator(stack_temp) && !isHighPriority(temp, stack_temp))
+            {
+              post_queue.push(stack_temp);
+              stack.pop();
+            }
+            else
+            {
+              break;
+            }
+          }
+          stack.push(temp);
+        }
+        else
+        {
+          throw std::logic_error("no that sign needed in expression");
+        }
       }
       inf.pop();
     }
@@ -177,74 +151,66 @@ namespace
     return ((a > 0 && b > 0) || ((a < 0) && (b < 0)));
   }
 
-  bool isOverflowed(std::string s, long long a, long long b)
+  bool isOverflowedAdd(long long a, long long b)
   {
     const long long max = std::numeric_limits< long long >::max();
     const long long min = std::numeric_limits< long long >::min();
-    if (s == "+" || s == "-")
+    if (a > 0 && b > 0)
     {
-      if (s == "-")
-      {
-        b *= (-1);
-      }
-      if (a > 0 && b > 0)
-      {
-        return (max - a < b);
-      }
-      if (a < 0 && b < 0)
-      {
-        return (min - a > b);
-      }
+      return (max - a < b);
     }
-    if (s == "*")
+    if (a < 0 && b < 0)
     {
-      if (b == 0 || a == 0)
+      return (min - a > b);
+    }
+    return false;
+  }
+
+  bool isOverflowedSubstr(long long a, long long b)
+  {
+    return isOverflowedAdd(a, -1 * b);
+  }
+
+  bool isOverflowedMult(long long a, long long b)
+  {
+    const long long max = std::numeric_limits< long long >::max();
+    const long long min = std::numeric_limits< long long >::min();
+    if (b == 0 || a == 0)
+    {
+      return false;
+    }
+    if ((a == min && b == (-1)) || (b == min && a == (-1)))
+    {
+      return true;
+    }
+    if (isSameSign(a,b))
+    {
+      if (b < 0)
       {
-        return false;
-      }
-      if ((a == min && b == (-1)) || (b == min && a == (-1)))
-      {
-        return true;
-      }
-      if (isSameSign(a,b))
-      {
-        if (b < 0)
-        {
-          return (a < max / b);
-        }
-        else
-        {
-          return (a > max / b);
-        }
+        return (a < max / b);
       }
       else
       {
-        if (b < 0)
-        {
-          return (b < min / a);
-        }
-        else
-        {
-          return (a < min / b);
-        }
+        return (a > max / b);
       }
     }
-    if (s == "/")
+    else
     {
-      if (b == 0)
+      if (b < 0)
       {
-        throw std::logic_error("division by zero");
+        return (b < min / a);
       }
-      return ((a == min && b == (-1)) || (b == min && a == (-1)));
-    }
-    if (s == "%")
-    {
-      if (b == 0)
+      else
       {
-        throw std::logic_error("mod by zero");
+        return (a < min / b);
       }
     }
-    return false;
+  }
+
+  bool isOverflowedDivide(long long a, long long b)
+  {
+    const long long min = std::numeric_limits< long long >::min();
+    return ((a == min && b == (-1)) || (b == min && a == (-1)));
   }
 
   long long calculateExpr(tkach::Queue< std::string > post)
@@ -253,73 +219,82 @@ namespace
     while (!post.empty())
     {
       std::string temp = post.front();
-      if (isNumber(temp))
+      try
       {
         stack.push(std::stoll(temp));
       }
-      else if (isOperator(temp))
+      catch (...)
       {
-        if (stack.size() < 2)
+        if (isOperator(temp))
         {
-          throw std::logic_error("Error: wrong postfix expression");
-        }
-        long long val1 = stack.top();
-        stack.pop();
-        long long val2 = stack.top();
-        stack.pop();
-        if (isOverflowed(temp, val2, val1))
-        {
-          throw std::overflow_error("overflow");
-        }
-        if (temp == "+")
-        {
-          stack.push(val1 + val2);
-        }
-        else if (temp == "-")
-        {
-          stack.push(val2 - val1);
-        }
-        else if (temp == "*")
-        {
-          stack.push(val2 * val1);
-        }
-        else if (temp == "/")
-        {
-          stack.push(val2 / val1);
-        }
-        else if (temp == "%")
-        {
-          long long result = val2 % val1;
-          if (val2 < 0)
+          if (stack.size() < 2)
           {
-            result += std::abs(val1);
+            throw std::logic_error("Error: wrong postfix expression");
           }
-          stack.push(result);
+          long long val1 = stack.top();
+          stack.pop();
+          long long val2 = stack.top();
+          stack.pop();
+          if (temp == "+")
+          {
+            if (isOverflowedAdd(val2, val1))
+            {
+              throw std::overflow_error("overflow/underflow with add");
+            }
+            stack.push(val1 + val2);
+          }
+          else if (temp == "-")
+          {
+            if (isOverflowedSubstr(val2, val1))
+            {
+              throw std::overflow_error("overflow/underflow with substract");
+            }
+            stack.push(val2 - val1);
+          }
+          else if (temp == "*")
+          {
+            if (isOverflowedMult(val2, val1))
+            {
+              throw std::overflow_error("overflow/underflow with multiply");
+            }
+            stack.push(val2 * val1);
+          }
+          else if (temp == "/")
+          {
+            if (val1 == 0)
+            {
+              throw std::logic_error("division by zero");
+            }
+            if (isOverflowedDivide(val2, val1))
+            {
+              throw std::overflow_error("overflow/underflow with divide");
+            }
+            stack.push(val2 / val1);
+          }
+          else if (temp == "%")
+          {
+            if (val1 == 0)
+            {
+              throw std::logic_error("division by zero");
+            }
+            long long result = val2 % val1;
+            if (val2 < 0)
+            {
+              result += std::abs(val1);
+            }
+            stack.push(result);
+          }
         }
-      }
-      else
-      {
-        throw std::invalid_argument("wrong posstfix expression");
+        else
+        {
+          throw std::invalid_argument("wrong posstfix expression");
+        }
       }
       post.pop();
     }
     return stack.top();
   }
 
-  void print(std::ostream& out, tkach::Stack< long long > stack)
-  {
-    if (stack.empty())
-    {
-      return;
-    }
-    out << stack.top();
-    stack.pop();
-    while (!stack.empty())
-    {
-      out << " " << stack.top();
-      stack.pop();
-    }
-  }
 }
 int main(const int argc, const char* const* const argv)
 {
@@ -358,7 +333,7 @@ int main(const int argc, const char* const* const argv)
     std::cerr << e.what() << "\n";
     return 1;
   }
-  print(std::cout, results);
+  outputStack(std::cout, results);
   std::cout << "\n";
   return 0;
 }

@@ -85,13 +85,12 @@ BOOST_AUTO_TEST_CASE(queue_pop_test)
   BOOST_TEST(out.str() == "2 3 4 5");
 }
 
-BOOST_AUTO_TEST_CASE(queue_front_back_size_test)
+BOOST_AUTO_TEST_CASE(queue_front_size_test)
 {
   Queue< size_t > que;
   que.push(2);
   que.push(3);
   BOOST_TEST(que.front() == 2);
-  BOOST_TEST(que.back() == 3);
   BOOST_TEST(que.size() == 2);
 }
 
@@ -134,6 +133,5 @@ BOOST_AUTO_TEST_CASE(queue_move_push_front_test)
   BOOST_TEST(que.front() == 1);
   que.push(2);
   BOOST_TEST(que.front() == 1);
-  BOOST_TEST(que.back() == 2);
   BOOST_TEST(que.size() == 2);
 }
