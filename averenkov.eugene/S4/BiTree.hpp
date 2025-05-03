@@ -417,6 +417,7 @@ void Tree< Key, Value, Compare >::clear()
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear(NodeType* node)
 {
+  if (!node) return;
   if (node == fake_root)
   {
     return;
