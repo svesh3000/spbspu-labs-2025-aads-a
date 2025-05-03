@@ -1,5 +1,6 @@
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include "tree.hpp"
@@ -7,13 +8,14 @@
 int main(int argc, char** argv)
 {
   using namespace kiselev;
+  using Tree = RBTree< int, std::string >;
   if (argc != 3)
   {
     std::cerr << "Invalid parameters\n";
     return 1;
   }
   std::ifstream file(argv[2]);
-  RBTree< int, std::string > tree;
+  Tree tree;
   std::pair< int, std::string > value;
   while (file >> value.first >> value.second)
   {
@@ -30,33 +32,22 @@ int main(int argc, char** argv)
   }
   else
   {
-    KeySum funct;
-    std::string direction(argv[1]);
+    RBTree< std::string, std::function< KeySum(KeySum) > > traverse;
+    using namespace std::placeholders;
+    traverse["ascending"] = std::bind(&Tree::traverse_lnr< KeySum >, std::ref(tree), _1);
+    traverse["descending"] = std::bind(&Tree::traverse_rnl< KeySum >, std::ref(tree), _1);
+    traverse["breadth"] = std::bind(&Tree::traverse_breadth< KeySum >, std::ref(tree), _1);
     try
     {
-      if (direction == "ascending")
-      {
-        funct = tree.traverse_lnr(funct);
-      }
-      else if (direction == "descending")
-      {
-        funct = tree.traverse_rnl(funct);
-      }
-      else if (direction == "breadth")
-      {
-        funct = tree.traverse_breadth(funct);
-      }
-      else
-      {
-        throw std::logic_error("Incorrect direction");
-      }
+      KeySum funct;
+      funct = traverse.at(argv[1])(funct);
+      std::cout << funct.sum << funct.str << "\n";
     }
     catch (const std::exception& e)
     {
       std::cerr << e.what() << "\n";
       return 1;
     }
-    std::cout << funct.sum << funct.str << "\n";
-    return 0;
   }
+  return 0;
 }
