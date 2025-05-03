@@ -251,5 +251,5 @@ namespace brevnov
   {
     push_front(data);
   }
-}  
+}
 #endif
