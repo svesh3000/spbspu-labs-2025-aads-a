@@ -179,6 +179,11 @@ Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& c
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
+  if (fake_root)
+  {
+    fake_root->left = nullptr;
+    fake_root->right = nullptr;
+  }
   clear();
   delete fake_root;
 }
@@ -327,7 +332,6 @@ Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other
 {
   if (this != &other)
   {
-    root = fake_root;
     clear();
     root = other.root;
     fake_root = other.fake_root;
@@ -408,29 +412,34 @@ typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear()
 {
-  if (root != fake_root)
+  if (root && root != fake_root)
   {
     clear(root);
+    root = fake_root;
   }
+  size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear(NodeType* node)
 {
-  if (!node) return;
-  if (node == fake_root)
+  if (!node || node == fake_root)
   {
     return;
   }
-  if (node->left != fake_root)
-  {
-    clear(node->left);
-  }
-  if (node->right != fake_root)
-  {
-    clear(node->right);
-  }
+  NodeType* left_child = (node->left != fake_root) ? node->left : nullptr;
+  NodeType* right_child = (node->right != fake_root) ? node->right : nullptr;
+  node->left = nullptr;
+  node->right = nullptr;
   delete node;
+  if (left_child)
+  {
+    clear(left_child);
+  }
+  if (right_child)
+  {
+    clear(right_child);
+  }
 }
 
 template < class Key, class Value, class Compare >
