@@ -110,7 +110,6 @@ namespace brevnov
   List< T >::~List()
   {
     clear();
-    delete tail_;
   }
 
   template< typename T >

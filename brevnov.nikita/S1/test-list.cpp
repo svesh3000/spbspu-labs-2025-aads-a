@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(size)
 {
   List< int > list;
   const int i = 1;
-  list.pushBack(i);
+  list.push_back(i);
   BOOST_TEST(list.size() == 1);
 }
 
@@ -110,8 +110,8 @@ BOOST_AUTO_TEST_CASE(back_and_push_back)
 {
   List< int > list;
   int i = 1;
-  list.pushBack(i);
-  list.pushBack(++i);
+  list.push_back(i);
+  list.push_back(++i);
   BOOST_TEST(list.back() == i);
 }
 
@@ -119,11 +119,11 @@ BOOST_AUTO_TEST_CASE(pop_back)
 {
   List< int > list;
   int i = 1;
-  list.pushBack(i);
-  list.pushBack(++i);
-  list.popBack();
+  list.push_back(i);
+  list.push_back(++i);
+  list.pop_back();
   BOOST_TEST(list.back() == --i);
-  list.popBack();
+  list.pop_back();
   BOOST_TEST(list.size() == 0);
 }
 
@@ -131,11 +131,11 @@ BOOST_AUTO_TEST_CASE(pop_front)
 {
   List< int > list;
   int i = 1;
-  list.pushFront(i);
-  list.pushBack(++i);
-  list.popFront();
+  list.push_front(i);
+  list.push_back(++i);
+  list.pop_front();
   BOOST_TEST(list.front() == i);
-  list.popFront();
+  list.pop_front();
   BOOST_TEST(list.size() == 0);
 }
 
@@ -151,11 +151,11 @@ BOOST_AUTO_TEST_CASE(swap)
 {
   List< int > list;
   int i = 0;
-  list.pushBack(i);
+  list.push_back(i);
   List< int > copyList(list);
   List< int > list2;
-  list2.pushBack(++i);
-  list2.pushFront(++i);
+  list2.push_back(++i);
+  list2.push_front(++i);
   list2.swap(list);
   BOOST_TEST(list2.size() == copyList.size());
 }
