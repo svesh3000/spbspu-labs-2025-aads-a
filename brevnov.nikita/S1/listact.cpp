@@ -108,7 +108,7 @@ brevnov::list brevnov::createList(std::istream& input)
       nums.push_back(number);
     }
     input.clear();
-    list.pushBack(pair(name, nums));
+    list.push_back(pair(name, nums));
   }
   return list;
 }

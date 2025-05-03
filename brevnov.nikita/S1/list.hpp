@@ -116,7 +116,7 @@ namespace brevnov
   template< typename T >
   void List< T >::clear()
   {
-    while (!clear())
+    while (!empty())
     {
       pop_front();
     }
@@ -239,7 +239,7 @@ namespace brevnov
   template< typename T >
   void List< T >::push_front(const T& data)
   {
-    if (!head)
+    if (!head_)
     {
       head_ = new Node< T >{data, nullptr, nullptr};
       tail_ = head;
