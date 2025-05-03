@@ -252,7 +252,7 @@ namespace brevnov
       head_->prev = new Node< T >{data, head_, nullptr};
       if (tail_ == head_)
       {
-        tail->prev = head->prev;
+        tail_->prev = head_->prev;
       }
       head_ = head_->prev;
     }
