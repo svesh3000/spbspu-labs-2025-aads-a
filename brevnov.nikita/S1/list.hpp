@@ -213,104 +213,84 @@ namespace brevnov
     return tail_->data;
   }
 
-  template< typename T >
-  void List< T >::push_back(const T& data)
+  template< class T >
+  void List< T >::pushBack(const T &data)
   {
-    Node< T >* newnode = new Node< T >{data, nullptr, tail};
-    if (!tail_)
+    Node< T > node = new Node< T >{ data };
+    if (empty())
     {
-      head_ = newnode;
+      head_ = node;
+      tail_ = node;
     }
     else
     {
-      tail_->next = newnode;
+      tail_->next = node;
+      node->prev = tail_;
+      tail_ = node;
     }
-    tail_ = newnode;
-    size++;
+    ++size;
   }
 
-  template< typename T >
-  void List< T >::push_back(T&& data)
+  template< class T >
+  void List< T >::pushFront(const T &data)
   {
-    Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
-    if (!tail_)
+    Node< T >node = new Node< T >{ data };
+    if (empty())
     {
-      head_ = newnode;
+      head_ = node;
+      tail_ = node;
     }
     else
     {
-      tail_->next = newnode;
+      head_->prev = node;
+      node->next = head_;
+      head_ = node;
     }
-    tail_ = newnode;
-    size++;
+    ++size;
   }
 
-  template< typename T >
-  void List< T >::push_front(const T& data)
+  template< class T >
+  void List< T >::popBack() noexcept
   {
-    Node< T >* newnode = new Node< T >{data, nullptr, tail};
-    if (!tail_)
+    if (!empty())
     {
-      head_ = newnode;
+      --size;
+      if (head_ == tail_)
+      {
+        delete tail_;
+        head_ = nullptr;
+        tail_ = nullptr;
+      }
+      else
+      {
+        Node< T > node_ = tail_->prev;
+        delete tail_;
+        tail_ = node;
+        tail_->next = nullptr;
+      }
     }
-    else
-    {
-      head_->prev = newnode;
-    }
-    head_ = newnode;
-    size++;
   }
 
-  template< typename T >
-  void List< T >::push_front(T&& data)
+  template< class T >
+  void List< T >::popFront() noexcept
   {
-    Node< T >* newnode = new Node< T >{std::move(data), nullptr, tail};
-    if (!tail_)
+    if (!empty())
     {
-      head_ = newnode;
+      --size;
+      if (head_ == tail_)
+      {
+        delete head_;
+        head_ = nullptr;
+        tail_ = nullptr;
+      }
+      else
+      {
+        Node< T >node = head_->next;
+        delete head_;
+        head_ = node;
+        head_->prev = nullptr;
+      }
     }
-    else
-    {
-      head_->prev = newnode;
-    }
-    head_ = newnode;
-    size++;
-  }
-
-  template< typename T >
-  void List< T >::pop_back() noexcept
-  {
-    assert(!empty());
-    Node< T >* newtail = tail_->prev;
-    delete tail_;
-    if (new_tail)
-    {
-      newtail->next = nullptr;
-    }
-    else
-    {
-      head_ = nullptr;
-    }
-    tail_ = newtail;
-    size--;
-  }
-
-  template< typename T >
-  void List< T >::pop_front() noexcept
-  {
-    assert(!empty());
-    Node< T >* newhead = head_->next;
-    delete head_;
-    if (new_head)
-    {
-      newhead->prev = nullptr;
-    }
-    else
-    {
-      tail_ = nullptr;
-    }
-    head_ = newhead;
-    size--;
   }
 
 }
