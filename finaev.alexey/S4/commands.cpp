@@ -6,22 +6,20 @@ void finaev::printCMD(std::ostream& out, const mainDict& dict)
 {
   std::string name = "";
   std::cin >> name;
-  if (dict.find(name) == dict.cend())
+  const std::map < int, std::string >& current = dict.at(name);
+  if (current.empty())
   {
-    out << "<EMPTY>\n";
+    std::cout << "<EMPTY>\n";
     return;
   }
-  else
+  out << name;
+  for (auto i = current.cbegin(); i != current.cend(); ++i)
   {
-    out << name;
-    const std::map < int, std::string >& current = dict.at(name);
-    for (auto i = current.cbegin(); i != current.cend(); ++i)
-    {
-      out << " " << (*i).first << " " << (*i).second;
-    }
-    out << "\n";
+    out << " " << (*i).first << " " << (*i).second;
   }
+  out << "\n";
 }
+
 
 void finaev::complementCMD(mainDict& dict)
 {
@@ -38,10 +36,7 @@ void finaev::complementCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  if (!temp.empty())
-  {
-    dict[name] = temp;
-  }
+  dict[name] = temp;
 }
 
 void finaev::intersectCMD(mainDict& dict)
@@ -59,10 +54,7 @@ void finaev::intersectCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  if (!temp.empty())
-  {
-    dict[name] = temp;
-  }
+  dict[name] = temp;
 }
 
 void finaev::unionCMD(mainDict& dict)
@@ -84,8 +76,5 @@ void finaev::unionCMD(mainDict& dict)
       temp.insert(*i);
     }
   }
-  if (!temp.empty())
-  {
-    dict[name] = temp;
-  }
+  dict[name] = temp;
 }
