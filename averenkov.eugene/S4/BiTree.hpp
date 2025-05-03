@@ -421,19 +421,17 @@ void Tree< Key, Value, Compare >::clear(NodeType* node)
   {
     return;
   }
-  NodeType* left = (node->left != fake_root) ? node->left : nullptr;
-  NodeType* right = (node->right != fake_root) ? node->right : nullptr;
-  node->left = nullptr;
-  node->right = nullptr;
+  if (node->left && node->left != fake_root)
+  {
+    clear(node->left);
+    node->left = nullptr;
+  }
+  if (node->right && node->right != fake_root)
+  {
+    clear(node->right);
+    node->right = nullptr;
+  }
   delete node;
-  if (left)
-  {
-    clear(left);
-  }
-  if (right)
-  {
-    clear(right);
-  }
 }
 
 template < class Key, class Value, class Compare >
