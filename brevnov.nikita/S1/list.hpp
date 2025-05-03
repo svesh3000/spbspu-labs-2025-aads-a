@@ -107,7 +107,7 @@ namespace brevnov
   {}
 
   template< typename T >
-  List::~List()
+  List< T >::~List()
   {
     clear();
     delete tail_;
@@ -147,7 +147,7 @@ namespace brevnov
   }
 
   template< typename T >
-  List< T > & List< T >::operator=(initializer_list<value_type> il)
+  List< T > & List< T >::operator=(std::initializer_list< T > il)
   {
     List< T > cpy(il);
     std::swap(cpy);
@@ -157,11 +157,11 @@ namespace brevnov
   template< typename T >
   typename List< T >::Iter List< T >::begin() noexcept
   {
-    return Iterator(head_);
+    return Iter(head_);
   }
 
   template< typename T >
-  typename List< T >::ConstIter List< T >::cbegin() noexcept
+  typename List< T >::ConstIter List< T >::cbegin() const noexcept
   {
     return ConstIter(head_);
   }
@@ -169,11 +169,11 @@ namespace brevnov
   template< typename T >
   typename List< T >::Iter List< T >::end() noexcept
   {
-    return Iterator(tail_);
+    return Iter(tail_);
   }
 
   template< typename T >
-  typename List< T >::ConstIter List< T >::cend() noexcept
+  typename List< T >::ConstIter List< T >::cend() const noexcept
   {
     return ConstIter(tail_);
   }
@@ -209,7 +209,7 @@ namespace brevnov
   }
 
   template< typename T >
-  const T& back() const noexcept
+  const T& List< T >::back() const noexcept
   {
     return tail_->data;
   }
@@ -258,8 +258,8 @@ namespace brevnov
     push_front(data);
   }
 
-  template< typeanme T >
-  void List< T >::pop_front()
+  template< typename T >
+  void List< T >::pop_front() noexcept
   {
     assert(!empty());
     Node< T > * help = tail_->prev;
@@ -269,7 +269,7 @@ namespace brevnov
   }
 
   template< typename T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     assert(!empty());
     Node< T > * help = head_->next;

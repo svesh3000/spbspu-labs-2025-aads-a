@@ -26,10 +26,10 @@ namespace
     return sum;
   }
 }
-brevnov::numberList brevnov::calculateSum(const list& list)
+brevnov::numbers brevnov::calculateSum(const list& list)
 {
   auto it = list.cbegin();
-  numberList listSum;
+  numbers listSum;
   for (size_t i = 0; i < searchMax(list); ++i)
   {
     unsigned long long sum = 0;
@@ -44,12 +44,12 @@ brevnov::numberList brevnov::calculateSum(const list& list)
       std::advance(nit, i);
       sum = checkedSum(sum, *nit);
     }
-    listSum.pushBack(sum);
+    listSum.push_back(sum);
   }
   return listSum;
 }
 
-std::ostream& brevnov::outputNumber(std::ostream& output, const numberList& list)
+std::ostream& brevnov::outputNumber(std::ostream& output, const numbers& list)
 {
   output << list.front();
   for (auto it = ++list.cbegin(); it != list.cend(); ++it)
@@ -75,7 +75,7 @@ std::ostream& brevnov::outputNumbers(std::ostream& output, const list& list)
   for (size_t i = 0; i < searchMax(list); ++i)
   {
     it = list.cbegin();
-    numberList numbers;
+    numbers nums;
     for (; it != list.cend(); ++it)
     {
       auto nit = it->second.cbegin();
@@ -84,9 +84,9 @@ std::ostream& brevnov::outputNumbers(std::ostream& output, const list& list)
         continue;
       }
       std::advance(nit, i);
-      numbers.pushBack(*nit);
+      nums.push_back(*nit);
     }
-    outputNumber(output, numbers) << "\n";
+    outputNumber(output, nums) << "\n";
   }
   return output;
 }
@@ -97,7 +97,7 @@ brevnov::list brevnov::createList(std::istream& input)
   list list;
   while (input >> name)
   {
-    numberList numbers;
+    numbers nums;
     unsigned long long number;
     while (input >> number)
     {
@@ -105,10 +105,10 @@ brevnov::list brevnov::createList(std::istream& input)
       {
         throw std::logic_error("Incorrect number");
       }
-      numbers.pushBack(number);
+      nums.push_back(number);
     }
     input.clear();
-    list.pushBack(pair(name, numbers));
+    list.pushBack(pair(name, nums));
   }
   return list;
 }
