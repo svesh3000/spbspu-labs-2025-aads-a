@@ -214,7 +214,7 @@ namespace brevnov
   }
 
   template< class T >
-  void List< T >::pushBack(const T &data)
+  void List< T >::push_back(const T &data)
   {
     Node< T > node = new Node< T >{ data };
     if (empty())
@@ -232,7 +232,7 @@ namespace brevnov
   }
 
   template< class T >
-  void List< T >::pushFront(const T &data)
+  void List< T >::push_front(const T &data)
   {
     Node< T >node = new Node< T >{ data };
     if (empty())
@@ -250,7 +250,7 @@ namespace brevnov
   }
 
   template< class T >
-  void List< T >::popBack() noexcept
+  void List< T >::pop_back() noexcept
   {
     if (!empty())
     {
@@ -272,7 +272,7 @@ namespace brevnov
   }
 
   template< class T >
-  void List< T >::popFront() noexcept
+  void List< T >::pop_front() noexcept
   {
     if (!empty())
     {
