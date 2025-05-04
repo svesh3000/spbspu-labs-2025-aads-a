@@ -62,7 +62,6 @@ void complement(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
-
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
@@ -70,38 +69,62 @@ void complement(DictionaryStorage& storage, str newName, str name1, str name2)
   }
 
   Dictionary result;
-  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  auto it1 = dict1->second.begin();
+  auto it2 = dict2->second.begin();
+  auto end1 = dict1->second.end();
+  auto end2 = dict2->second.end();
+  while (it1 != end1)
   {
-    if (dict2->second.find(it->first) == dict2->second.end())
+    if (it2 == end2 || it1->first < it2->first)
     {
-      result.insert(std::pair< const int, std::string >(it->first, it->second));
+      result.insert({it1->first, it1->second});
+      ++it1;
+    }
+    else if (it1->first > it2->first)
+    {
+      ++it2;
+    }
+    else
+    {
+      ++it1;
+      ++it2;
     }
   }
-
-  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
+  storage.insert({ newName, result });
 }
 
 void intersect(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
-
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
-
   Dictionary result;
-  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  auto it1 = dict1->second.begin();
+  auto it2 = dict2->second.begin();
+  auto end1 = dict1->second.end();
+  auto end2 = dict2->second.end();
+  while (it1 != end1 && it2 != end2)
   {
-    if (dict2->second.find(it->first) != dict2->second.end())
+    if (it1->first < it2->first)
     {
-      result.insert(std::pair< const int, std::string >(it->first, it->second));
+      ++it1;
+    }
+    else if (it1->first > it2->first)
+    {
+      ++it2;
+    }
+    else
+    {
+      result.insert({it1->first, it1->second});
+      ++it1;
+      ++it2;
     }
   }
-
-  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
+  storage.insert({ newName, result });
 }
 
 void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
@@ -115,16 +138,42 @@ void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
     return;
   }
 
-  Dictionary result = dict1->second;
-  for (auto it = dict2->second.begin(); it != dict2->second.end(); ++it)
+  Dictionary result;
+  auto it1 = dict1->second.begin();
+  auto it2 = dict2->second.begin();
+  auto end1 = dict1->second.end();
+  auto end2 = dict2->second.end();
+
+  while (it1 != end1 && it2 != end2)
   {
-    if (result.find(it->first) == result.end())
+    if (it1->first < it2->first)
     {
-      result.insert(std::pair< const int, std::string >(it->first, it->second));
+      result.insert({ it1->first, it1->second });
+      ++it1;
+    }
+    else if (it1->first > it2->first)
+    {
+      result.insert({ it2->first, it2->second });
+      ++it2;
+    }
+    else
+    {
+      result.insert({ it1->first, it1->second });
+      ++it1;
+      ++it2;
     }
   }
-
-  storage.insert(std::pair< const std::string, Dictionary >(newName, result));
+  while (it1 != end1)
+  {
+    result.insert({ it1->first, it1->second });
+    ++it1;
+  }
+  while (it2 != end2)
+  {
+    result.insert({ it2->first, it2->second });
+    ++it2;
+  }
+  storage.insert({ newName, result });
 }
 
 int main(int argc, char* argv[])
