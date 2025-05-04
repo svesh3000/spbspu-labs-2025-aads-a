@@ -41,7 +41,8 @@ public:
   Value& operator[](const Key& key);
   const Value& operator[](const Key& key) const;
 
-  std::pair< iterator, bool > insert(const std::pair< const Key, Value >& value);
+  iterator insert(const std::pair< const Key, Value >& value);
+  void push(const Key& key, const Value& value);
   template < class InputIt >
   void insert(InputIt first, InputIt last);
   void insert(std::initializer_list< std::pair< const Key, Value > > ilist);
@@ -71,6 +72,8 @@ private:
   Compare comp;
   size_t size_;
 
+  void setRoot(NodeType* root) noexcept;
+  NodeType* getRoot() const noexcept;
   NodeType* copy_tree(NodeType* node, NodeType* parent);
   void clear(NodeType* NodeType);
   NodeType* find_NodeType(const Key& key) const;
@@ -91,43 +94,33 @@ using NodeType = Node< Key, Value >;
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree():
-  root(nullptr),
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(Compare()),
   size_(0)
 {
   fake_root->left = fake_root;
   fake_root->right = fake_root;
-  root = fake_root;
+  setRoot(fake_root);
 }
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(const Compare& cmp):
-  root(nullptr),
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
   fake_root->left = fake_root;
   fake_root->right = fake_root;
-  root = fake_root;
+  setRoot(fake_root);
 }
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(const Tree& other):
-  root(nullptr),
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(other.comp),
   size_(0)
 {
-  if (other.root != other.fake_root)
-  {
-    root = copy_tree(other.root, fake_root);
-  }
-  else
-  {
-    root = fake_root;
-  }
+  setRoot(copy_tree(other.getRoot(), fake_root));
   size_ = other.size_;
 }
 
@@ -138,23 +131,21 @@ Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
   comp(std::move(other.comp)),
   size_(other.size_)
 {
-  if (other.root == other.fake_root)
+  if (other.getRoot() == other.fake_root)
   {
-    root = fake_root;
+    setRoot(fake_root);
   }
-  other.root = other.fake_root;
   other.fake_root = new NodeType(Key(), Value(), nullptr);
   other.size_ = 0;
 }
 
 template <class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(std::initializer_list< std::pair< const Key, Value > > init, const Compare& cmp):
-  root(nullptr),
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
-  root = fake_root;
+  setRoot(fake_root);
   for (const auto& item : init)
   {
     insert(item);
@@ -164,12 +155,11 @@ Tree< Key, Value, Compare >::Tree(std::initializer_list< std::pair< const Key, V
 template < class Key, class Value, class Compare >
 template < class InputIt >
 Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& cmp):
-  root(nullptr),
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
 {
-  root = fake_root;
+  setRoot(fake_root);
   for (; first != last; ++first)
   {
     insert(*first);
@@ -179,11 +169,6 @@ Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& c
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::~Tree()
 {
-  if (fake_root)
-  {
-    fake_root->left = nullptr;
-    fake_root->right = nullptr;
-  }
   clear();
   delete fake_root;
 }
@@ -191,7 +176,10 @@ Tree< Key, Value, Compare >::~Tree()
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::update_height(NodeType* NodeType)
 {
-  if (!NodeType || NodeType == fake_root) return;
+  if (!NodeType || NodeType == fake_root)
+  {
+    return;
+  }
   int left_height = NodeType->left ? NodeType->left->height : 0;
   int right_height = NodeType->right ? NodeType->right->height : 0;
   NodeType->height = 1 + std::max(left_height, right_height);
@@ -200,7 +188,10 @@ void Tree< Key, Value, Compare >::update_height(NodeType* NodeType)
 template < class Key, class Value, class Compare >
 int Tree< Key, Value, Compare >::balance_factor(NodeType* NodeType) const
 {
-  if (!NodeType || NodeType == fake_root) return 0;
+  if (!NodeType || NodeType == fake_root)
+  {
+    return 0;
+  }
   int left_height = NodeType->left ? NodeType->left->height : 0;
   int right_height = NodeType->right ? NodeType->right->height : 0;
   return left_height - right_height;
@@ -210,7 +201,10 @@ template < class Key, class Value, class Compare >
 class Tree< Key, Value, Compare >::NodeType*
 Tree< Key, Value, Compare >::rotate_right(NodeType* y)
 {
-  if (!y || y == fake_root) return y;
+  if (!y || y == fake_root)
+  {
+    return y;
+  }
 
   NodeType* x = y->left;
   y->left = x->right;
@@ -234,7 +228,10 @@ template < class Key, class Value, class Compare >
 class Tree< Key, Value, Compare >::NodeType*
 Tree< Key, Value, Compare >::rotate_left(NodeType* x)
 {
-  if (!x || x == fake_root) return x;
+  if (!x || x == fake_root)
+  {
+    return x;
+  }
 
   NodeType* y = x->right;
   x->right = y->left;
@@ -258,7 +255,10 @@ template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::NodeType*
 Tree< Key, Value, Compare >::balance(NodeType* NodeType)
 {
-  if (!NodeType || NodeType == fake_root) return NodeType;
+  if (!NodeType || NodeType == fake_root)
+  {
+    return NodeType;
+  }
 
   update_height(NodeType);
   int bf = balance_factor(NodeType);
@@ -283,10 +283,9 @@ Tree< Key, Value, Compare >::balance(NodeType* NodeType)
 
   return NodeType;
 }
-
 template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::NodeType*
-Tree< Key, Value, Compare >::rebalance_path(std::stack< NodeType* >& path)
+Tree<Key, Value, Compare>::rebalance_path(std::stack<NodeType*>& path)
 {
   NodeType* new_root = nullptr;
   while (!path.empty())
@@ -321,8 +320,9 @@ Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree& 
 {
   if (this != &other)
   {
-    Tree temp(other);
-    swap(temp);
+    clear();
+    setRoot(copy_tree(other.getRoot(), fake_root));
+    size_ = other.size_;
   }
   return *this;
 }
@@ -333,11 +333,10 @@ Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree&& other
   if (this != &other)
   {
     clear();
-    root = other.root;
+    delete fake_root;
     fake_root = other.fake_root;
-    comp = std::move(other.comp);
     size_ = other.size_;
-    other.root = other.fake_root;
+    other.fake_root = new NodeType(Key(), Value(), nullptr);
     other.size_ = 0;
   }
   return *this;
@@ -358,16 +357,11 @@ size_t Tree< Key, Value, Compare >::size() const
 template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::iterator Tree< Key, Value, Compare >::begin()
 {
-  if (!root || root == fake_root)
+  if (!getRoot() || getRoot() == fake_root)
   {
     return end();
   }
-  NodeType* min_NodeType = root;
-  while (min_NodeType->left)
-  {
-    min_NodeType = min_NodeType->left;
-  }
-  return iterator(min_NodeType);
+  return iterator(find_min(getRoot()));
 }
 
 template < class Key, class Value, class Compare >
@@ -379,16 +373,11 @@ typename Tree< Key, Value, Compare >::iterator Tree< Key, Value, Compare >::end(
 template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >::begin() const
 {
-  if (!root || root == fake_root)
+  if (!getRoot() || fake_root == getRoot())
   {
     return end();
   }
-  NodeType* min_NodeType = root;
-  while (min_NodeType->left)
-  {
-    min_NodeType = min_NodeType->left;
-  }
-  return const_iterator(min_NodeType);
+  return const_iterator(find_min(getRoot()));
 }
 
 template < class Key, class Value, class Compare >
@@ -412,10 +401,10 @@ typename Tree< Key, Value, Compare >::const_iterator Tree< Key, Value, Compare >
 template < class Key, class Value, class Compare >
 void Tree< Key, Value, Compare >::clear()
 {
-  if (root && root != fake_root)
+  if (getRoot() && getRoot() != fake_root)
   {
-    clear(root);
-    root = fake_root;
+    clear(getRoot());
+    setRoot(fake_root);
   }
   size_ = 0;
 }
@@ -427,26 +416,16 @@ void Tree< Key, Value, Compare >::clear(NodeType* node)
   {
     return;
   }
-  NodeType* left_child = (node->left != fake_root) ? node->left : nullptr;
-  NodeType* right_child = (node->right != fake_root) ? node->right : nullptr;
-  node->left = nullptr;
-  node->right = nullptr;
+  clear(node->left);
+  clear(node->right);
   delete node;
-  if (left_child)
-  {
-    clear(left_child);
-  }
-  if (right_child)
-  {
-    clear(right_child);
-  }
 }
 
 template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::NodeType*
 Tree< Key, Value, Compare >::find_NodeType(const Key& key) const
 {
-  NodeType* current = root;
+  NodeType* current = getRoot();
   while (current && current != fake_root)
   {
     if (comp(key, current->data.first))
@@ -515,7 +494,6 @@ void Tree< Key, Value, Compare >::swap(Tree< Key, Value, Compare >& other) noexc
 {
   if (this != &other)
   {
-    std::swap(root, other.root);
     std::swap(fake_root, other.fake_root);
     std::swap(comp, other.comp);
     std::swap(size_, other.size_);
@@ -570,7 +548,7 @@ template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::iterator
 Tree< Key, Value, Compare >::lower_bound(const Key& key)
 {
-  NodeType* current = root;
+  NodeType* current = getRoot();
   NodeType* result = fake_root;
 
   while (current && current != fake_root)
@@ -592,7 +570,7 @@ template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::const_iterator
 Tree< Key, Value, Compare >::lower_bound(const Key& key) const
 {
-  const NodeType* current = root;
+  const NodeType* current = getRoot();
   const NodeType* result = fake_root;
 
   while (current && current != fake_root)
@@ -614,7 +592,7 @@ template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::iterator
 Tree< Key, Value, Compare >::upper_bound(const Key& key)
 {
-  NodeType* current = root;
+  NodeType* current = getRoot();
   NodeType* result = fake_root;
 
   while (current && current != fake_root)
@@ -636,7 +614,7 @@ template < class Key, class Value, class Compare >
 typename Tree< Key, Value, Compare >::const_iterator
 Tree< Key, Value, Compare >::upper_bound(const Key& key) const
 {
-  const NodeType* current = root;
+  const NodeType* current = getRoot();
   const NodeType* result = fake_root;
 
   while (current && current != fake_root)
@@ -654,55 +632,61 @@ Tree< Key, Value, Compare >::upper_bound(const Key& key) const
   return const_iterator(result);
 }
 
-template < class Key, class Value, class Compare >
-std::pair< typename Tree< Key, Value, Compare >::iterator, bool >
-Tree< Key, Value, Compare >::insert(const std::pair< const Key, Value >& value)
+template <class Key, class Value, class Compare>
+void Tree<Key, Value, Compare>::push(const Key& key, const Value& value)
 {
-  if (root == fake_root)
-  {
-    root = new NodeType(value.first, value.second, fake_root);
-    size_ = 1;
-    return { iterator(root), true };
-  }
-
-  std::stack<NodeType*> path;
-  NodeType* current = root;
-  NodeType* parent = fake_root;
-
-  while (current && current != fake_root)
-  {
-    parent = current;
-    path.push(current);
-
-    if (comp(value.first, current->data.first))
+    NodeType* current = getRoot();
+    NodeType* parent = fake_root;
+    std::stack< NodeType* > path;
+    while (current != fake_root)
     {
-      current = current->left;
+      parent = current;
+      path.push(current);
+      if (comp(key, current->data.first))
+      {
+        current = current->left;
+      }
+      else if (comp(current->data.first, key))
+      {
+        current = current->right;
+      }
+      else
+      {
+        return;
+      }
     }
-    else if (comp(current->data.first, value.first))
+    NodeType* new_node = new NodeType(key, value, parent);
+    if (parent == fake_root)
     {
-      current = current->right;
+      fake_root->left = new_node;
+      fake_root->right = new_node;
+    }
+    else if (comp(key, parent->data.first))
+    {
+      parent->left = new_node;
     }
     else
     {
-      return { iterator(current), false };
+      parent->right = new_node;
     }
-  }
-  NodeType* new_NodeType = new NodeType(value.first, value.second, parent);
-  if (comp(value.first, parent->data.first))
-  {
-    parent->left = new_NodeType;
-  }
-  else
-  {
-    parent->right = new_NodeType;
-  }
-  path.push(new_NodeType);
-  root = rebalance_path(path) ? : root;
-  size_++;
-  return { iterator(new_NodeType), true };
+    path.push(new_node);
+    NodeType* new_root = rebalance_path(path);
+    if (new_root != nullptr)
+    {
+      fake_root->left = new_root;
+      new_root->parent = fake_root;
+    }
+    size_++;
+    return;
 }
 
-
+template < class Key, class Value, class Compare >
+typename Tree< Key, Value, Compare >::iterator
+Tree< Key, Value, Compare >::insert(const std::pair< const Key, Value >& value)
+{
+  push(value.first, value.second);
+  return iterator(find(value.first));
+}
 
 template < class Key, class Value, class Compare >
 template <typename InputIt>
@@ -722,75 +706,86 @@ void Tree< Key, Value, Compare >::insert(std::initializer_list< std::pair< const
     insert(item);
   }
 }
-template < class Key, class Value, class Compare >
-typename Tree< Key, Value, Compare >::iterator
-Tree< Key, Value, Compare >::erase(iterator pos)
+
+template <class Key, class Value, class Compare>
+typename Tree<Key, Value, Compare>::iterator
+Tree<Key, Value, Compare>::erase(iterator pos)
 {
-  if (pos == end())
+  if (pos == end() || pos.current == fake_root)
   {
     return end();
   }
-
-  NodeType* node = pos.current;
-  std::stack< NodeType* > path;
-
-  NodeType* current = node->parent;
-  while (current && current != fake_root)
+  NodeType* NodeTypeo_erase = pos.node;
+  NodeType* parent = NodeTypeo_erase->parent;
+  std::stack<NodeType*> path;
+  if (NodeTypeo_erase->left == fake_root && NodeTypeo_erase->right == fake_root)
   {
-    path.push(current);
-    current = current->parent;
+    if (parent->left == NodeTypeo_erase)
+    {
+      parent->left = fake_root;
+    }
+    else
+    {
+      parent->right = fake_root;
+    }
+    path.push(parent);
   }
-
-  NodeType* replacement = nullptr;
-
-  if (node->left == nullptr || node->left == fake_root)
+  else if (NodeTypeo_erase->left == fake_root || NodeTypeo_erase->right == fake_root)
   {
-    transplant(node, node->right);
-    replacement = node->right;
-  }
-  else if (node->right == nullptr || node->right == fake_root)
-  {
-    transplant(node, node->left);
-    replacement = node->left;
+    NodeType* child = nullptr;
+    if (NodeTypeo_erase->left == fake_root)
+    {
+      child = NodeTypeo_erase->right;
+    }
+    else
+    {
+      child = NodeTypeo_erase->left;
+    }
+    if (parent->left == NodeTypeo_erase)
+    {
+      parent->left = child;
+    }
+    else
+    {
+      parent->right = child;
+    }
+    child->parent = parent;
+    path.push(parent);
   }
   else
   {
-    NodeType* successor = find_min(node->right);
-    path.push(successor);
-
-    if (successor->parent != node)
+    NodeType* min_right = NodeTypeo_erase->right;
+    while (min_right->left != fake_root)
     {
-      path.push(successor->parent);
-      transplant(successor, successor->right);
-      successor->right = node->right;
-      successor->right->parent = successor;
+      min_right = min_right->left;
     }
-
-    transplant(node, successor);
-    successor->left = node->left;
-    successor->left->parent = successor;
-    replacement = successor;
+    NodeTypeo_erase->data = min_right->data;
+    parent = min_right->parent;
+    if (parent->left == min_right)
+    {
+      parent->left = (min_right->right != fake_root) ? min_right->right : fake_root;
+    }
+    else
+    {
+      parent->right = (min_right->right != fake_root) ? min_right->right : fake_root;
+    }
+    if (min_right->right != fake_root)
+    {
+      min_right->right->parent = parent;
+    }
+    path.push(parent);
+    NodeTypeo_erase = min_right;
   }
-
-  if (!path.empty())
+  NodeType* new_root = rebalance_path(path);
+  if (new_root != nullptr)
   {
-    root = rebalance_path(path) ? : root;
+    fake_root->left = new_root;
+    new_root->parent = fake_root;
   }
-  else if (root == node)
-  {
-    root = replacement == fake_root ? nullptr : replacement;
-  }
-
-  delete node;
+  delete NodeTypeo_erase;
   size_--;
-
-  if (replacement && replacement != fake_root)
-  {
-    return iterator(replacement);
-  }
-  return end();
+  return iterator(parent);
 }
-
 template < class Key, class Value, class Compare >
 size_t Tree< Key, Value, Compare >::erase(const Key& key)
 {
@@ -863,6 +858,23 @@ Tree< Key, Value, Compare >::copy_tree(NodeType* node, NodeType* parent)
   new_node->right = copy_tree(node->right, new_node);
   new_node->height = node->height;
   return balance(new_node);
+}
+
+template < class Key, class Value, class Compare >
+void Tree< Key, Value, Compare >::setRoot(NodeType* root) noexcept
+{
+  fake_root->left = root;
+  if (root)
+  {
+    root->parent = fake_root;
+  }
+}
+
+template < class Key, class Value, class Compare >
+typename Tree< Key, Value, Compare >::NodeType*
+Tree< Key, Value, Compare >::getRoot() const noexcept
+{
+  return fake_root->left;
 }
 
 #endif

@@ -5,6 +5,9 @@
 #include <iterator>
 #include <cassert>
 
+template< class Key, class Value, class Compare >
+class Tree;
+
 template < class Key, class Value, class Compare >
 class Iterator : public std::iterator< std::bidirectional_iterator_tag, std::pair< const Key, Value > >
 {
@@ -26,7 +29,7 @@ public:
 
 private:
   Node< Key, Value >* current;
-
+  friend class Tree< Key, Value, Compare >;
 };
 
 template < class Key, class Value, class Compare >
