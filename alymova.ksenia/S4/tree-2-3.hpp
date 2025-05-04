@@ -254,8 +254,8 @@ namespace alymova
     TwoThreeTree< Key, Value, Comparator >::emplace(Args&&... args)
   {
     std::pair< Key, Value > value(std::forward< Args >(args)...);
-    ConstIterator hint = lower_bound(value.first);
     size_t size_before = size();
+    ConstIterator hint = lower_bound(value.first);
     Iterator it = emplace_hint(hint, value);
     if (size_before == size())
     {
@@ -590,7 +590,7 @@ namespace alymova
     if (left_height < 0 || right_height < 0 || mid_height < 0)
     {
       return -1;
-    }    
+    }
     if (left_height != right_height)
     {
       return -1;

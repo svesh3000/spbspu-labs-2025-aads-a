@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   tree.insert(p5);
   tree.insert(p6);
   tree.insert(p7);
-  
+
   {
     TwoThreeTree< int, char, std::less< int > > map;
     auto it = map.cbegin();
