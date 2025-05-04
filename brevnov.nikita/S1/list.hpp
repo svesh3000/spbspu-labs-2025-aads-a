@@ -183,8 +183,11 @@ namespace brevnov
   template< typename T >
   List< T > & List< T >::operator=(std::initializer_list< T > il)
   {
-    List< T > cpy(il);
-    std::swap(cpy);
+    if (this != &copy)
+    {
+      List< T > cpy(il);
+      swap(cpy);
+    }
     return *this;
   }
 
