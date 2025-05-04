@@ -17,6 +17,7 @@ namespace zakirov
     TwoThreeNode< T, K > * right_;
     std::pair< T, K > first_value_;
     std::pair< T, K > second_value_;
+    bool second_exists_;
   };
 
   template< typename T, typename K >
@@ -25,7 +26,8 @@ namespace zakirov
     left_(nullptr),
     middle_(nullptr),
     right_(nullptr),
-    first_value_(data, key)
+    first_value_(data, key),
+    second_exists_(false)
   {}
 
   template< typename T, typename K >
@@ -35,7 +37,8 @@ namespace zakirov
     middle_(nullptr),
     right_(nullptr),
     first_value_(fdata, fkey),
-    second_value_(sdata, skey)
+    second_value_(sdata, skey),
+    second_exists_(true)
   {
     if (fkey > skey)
     {
