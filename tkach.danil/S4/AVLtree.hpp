@@ -213,6 +213,7 @@ namespace tkach
     auto it2 = it;
     it2++;
     root_ = eraseFrom(root_, it->first);
+    size_--;
     return it2;
   }
 
@@ -223,6 +224,7 @@ namespace tkach
     auto it2 = it;
     it2++;
     root_ = eraseFrom(root_, key);
+    size_--;
     return it2;
   }
 
@@ -465,8 +467,7 @@ namespace tkach
       return root;
     }
     fixHeight(root);
-    root = balance(root, key);
-    return root;
+    return balance(root, key);
   }
 
   template< class Key, class Value, class Cmp >

@@ -216,6 +216,7 @@ BOOST_AUTO_TEST_CASE(tree_erase_key_test)
   print(tree, out);
   BOOST_TEST(out.str() == "0 0 1 1 3 3 4 4 5 5");
   BOOST_TEST((it->first == 3 && it->second == "3"));
+  BOOST_TEST(tree.size() == 5);
 }
 
 BOOST_AUTO_TEST_CASE(tree_erase_it_test)
@@ -232,6 +233,7 @@ BOOST_AUTO_TEST_CASE(tree_erase_it_test)
   print(tree, out);
   BOOST_TEST(out.str() == "0 0 1 1 3 3 4 4 5 5");
   BOOST_TEST((it->first == 3 && it->second == "3"));
+  BOOST_TEST(tree.size() == 5);
 }
 
 BOOST_AUTO_TEST_CASE(tree_end_test)
