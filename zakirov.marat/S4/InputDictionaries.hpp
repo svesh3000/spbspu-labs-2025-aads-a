@@ -27,9 +27,9 @@ namespace zakirov
       }
 
       dictionaries.push_back({name, dict});
+      dict.clear();
     }
   }
 }
 
 #endif
-

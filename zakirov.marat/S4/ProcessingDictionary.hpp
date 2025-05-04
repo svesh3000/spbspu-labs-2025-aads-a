@@ -72,6 +72,10 @@ namespace zakirov
       union_d(dataset_new.second, find_d(dataset_1, dictionary), find_d(dataset_2, dictionary));
       dictionary.push_back(dataset_new);
     }
+    else if (in.eof())
+    {
+      return;
+    }
     else
     {
       throw std::logic_error("<INVALID ARGUMENT>");
@@ -99,14 +103,9 @@ namespace zakirov
   template < class K, class T >
   void complement_d(std::map< K, T > & result_d, const std::map< K, T > & first_d, const std::map< K, T > & second_d)
   {
-    if (first_d.empty())
+    if (first_d.empty() || second_d.empty())
     {
-      result_d = second_d;
-      return;
-    }
-    else
-    {
-      result_d = first_d;
+      result_d.clear();
       return;
     }
 
