@@ -41,6 +41,7 @@ public:
   Value& operator[](const Key& key);
   const Value& operator[](const Key& key) const;
 
+  Value get(const Key& k) const;
   iterator insert(const std::pair< const Key, Value >& value);
   NodeType* insert(NodeType* node, const Key& k, const Value& v, NodeType* par);
   void push(const Key& key, const Value& value);
@@ -443,6 +444,17 @@ void Tree< Key, Value, Compare >::clear(NodeType* node) noexcept
   clear(node->left);
   clear(node->right);
   delete node;
+}
+
+template < class Key, class Value, class Compare >
+Value Tree< Key, Value, Compare >::get(const Key& k) const
+{
+  NodeType* node = find(getRoot(), k);
+  if (!node)
+  {
+    throw std::out_of_range("Not found");
+  }
+  return node->data.second;
 }
 
 template < class Key, class Value, class Compare >
