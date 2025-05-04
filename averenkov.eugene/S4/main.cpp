@@ -1,145 +1,205 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
-#include <functional>
 #include "BiTree.hpp"
 
+using Dictionary = Tree<int, std::string>;
+using DictionaryStorage = Tree<std::string, Dictionary>;
+using str = const std::string&;
 
-using Dictionary = Tree< size_t, std::string, std::less< size_t > >;
-using DictionaryStorage = Tree< std::string, Dictionary, std::less< std::string > >;
-
-namespace
+void loadDictionaries(str filename, DictionaryStorage& storage)
 {
-  std::string readNextToken(const std::string& str, size_t& pos)
+  std::ifstream file(filename);
+  if (!file)
   {
-    std::string token;
-    while (pos < str.size() && str[pos] != ' ')
-    {
-      token += str[pos++];
-    }
-    pos++;
-    return token;
+    std::cerr << "file error\n";
+    return;
   }
 
-  bool loadData(const std::string& filename, DictionaryStorage& storage)
+  std::string line;
+  while (std::getline(file, line))
   {
-    std::ifstream file(filename);
-    if (!file)
+    if (line.empty())
     {
-      std::cerr << "Error file\n";
-      return false;
+      continue;
     }
-    std::string line;
-    while (std::getline(file, line))
+
+    std::istringstream iss(line);
+    std::string dictName;
+    iss >> dictName;
+
+    Dictionary dict;
+    int key;
+    std::string value;
+    while (iss >> key >> value)
     {
-      if (line.empty())
-      {
-        continue;
-      }
-      size_t pos = 0;
-      std::string name = readNextToken(line, pos);
-      Dictionary dict;
-      while (pos < line.size())
-      {
-        std::string key_str = readNextToken(line, pos);
-        std::string value = readNextToken(line, pos);
-        if (!key_str.empty() && !value.empty())
-        {
-          size_t key = std::stoul(key_str);
-          dict.push(key, value);
-        }
-      }
-      if (!name.empty())
-      {
-        storage.push(name, dict);
-      }
+      dict.push(key, value);
     }
-    return true;
+
+    storage.push(dictName, dict);
+  }
+}
+
+void printDictionary(const Dictionary& dict, str name)
+{
+  if (dict.empty())
+  {
+    std::cout << "<EMPTY>\n";
+    return;
   }
 
-  void printDict(const DictionaryStorage& storage, const std::string& name)
+  std::cout << name;
+  for (auto it = dict.begin(); it != dict.end(); ++it)
   {
-    try
+    std::cout << " " << it->first << " " << it->second;
+  }
+  std::cout << "\n";
+}
+
+void complement(DictionaryStorage& storage, str newName, str name1, str name2)
+{
+  auto dict1 = storage.find(name1);
+  auto dict2 = storage.find(name2);
+
+  if (dict1 == storage.end() || dict2 == storage.end())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  Dictionary result;
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  {
+    if (dict2->second.find(it->first) == dict2->second.end())
     {
-      Dictionary dict = storage.get(name);
-      if (dict.empty())
-      {
-        std::cout << "<EMPTY>\n";
-        return;
-      }
-      std::cout << name;
-      for (auto it = dict.begin(); it != dict.end(); ++it)
-      {
-        std::cout << " " << it->first << " " << it->second;
-      }
-      std::cout << "\n";
-    }
-    catch (...)
-    {
-      std::cout << "<INVALID COMMAND>\n";
+      result.push(it->first, it->second);
     }
   }
 
-  void processCommand(DictionaryStorage& storage, const std::string& cmd, const std::string& args)
+  storage.push(newName, result);
+}
+
+void intersect(DictionaryStorage& storage, str newName, str name1, str name2)
+{
+  auto dict1 = storage.find(name1);
+  auto dict2 = storage.find(name2);
+
+  if (dict1 == storage.end() || dict2 == storage.end())
   {
-    if (cmd == "print")
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  Dictionary result;
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  {
+    if (dict2->second.find(it->first) != dict2->second.end())
     {
-      printDict(storage, args);
+      result.push(it->first, it->second);
     }
-    else if (cmd == "complement" || cmd == "intersect" || cmd == "union")
+  }
+
+  storage.push(newName, result);
+}
+
+void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
+{
+  auto dict1 = storage.find(name1);
+  auto dict2 = storage.find(name2);
+
+  if (dict1 == storage.end() || dict2 == storage.end())
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  Dictionary result;
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  {
+    result.push(it->first, it->second);
+  }
+  for (auto it = dict2->second.begin(); it != dict2->second.end(); ++it)
+  {
+    if (result.find(it->first) == result.end())
     {
-      size_t pos = 0;
-      std::string newName = readNextToken(args, pos);
-      std::string name1 = readNextToken(args, pos);
-      std::string name2 = readNextToken(args, pos);
-      try
+      result.push(it->first, it->second);
+    }
+  }
+
+  storage.push(newName, result);
+}
+
+int main(int argc, char* argv[])
+{
+  if (argc != 2)
+  {
+    std::cerr << "Usage: " << argv[0] << " filename\n";
+    return 1;
+  }
+
+  DictionaryStorage dictionaries;
+  loadDictionaries(argv[1], dictionaries);
+
+  std::string line;
+  while (std::getline(std::cin, line))
+  {
+    std::istringstream iss(line);
+    std::string command;
+    iss >> command;
+
+    if (command == "print")
+    {
+      std::string dictName;
+      if (iss >> dictName)
       {
-        if (cmd == "complement")
+        auto dict = dictionaries.find(dictName);
+        if (dict != dictionaries.end())
         {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result;
-          for (auto it = dict1.begin(); it != dict1.end(); ++it)
-          {
-            if (!dict2.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
+          printDictionary(dict->second, dictName);
         }
-        else if (cmd == "intersect")
+        else
         {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result;
-
-          for (auto it = dict1.begin(); it != dict1.end(); ++it)
-          {
-            if (dict2.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
-        }
-        else if (cmd == "union")
-        {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result = dict1;
-
-          for (auto it = dict2.begin(); it != dict2.end(); ++it)
-          {
-            if (!result.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
+          std::cout << "<EMPTY>\n";
         }
       }
-      catch (...)
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    }
+    else if (command == "complement")
+    {
+      std::string newName, name1, name2;
+      if (iss >> newName >> name1 >> name2)
+      {
+        complement(dictionaries, newName, name1, name2);
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    }
+    else if (command == "intersect")
+    {
+      std::string newName, name1, name2;
+      if (iss >> newName >> name1 >> name2)
+      {
+        intersect(dictionaries, newName, name1, name2);
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+      }
+    }
+    else if (command == "union")
+    {
+      std::string newName, name1, name2;
+      if (iss >> newName >> name1 >> name2)
+      {
+        unionDicts(dictionaries, newName, name1, name2);
+      }
+      else
       {
         std::cout << "<INVALID COMMAND>\n";
       }
@@ -149,31 +209,6 @@ namespace
       std::cout << "<INVALID COMMAND>\n";
     }
   }
-}
 
-int main(int argc, char* argv[])
-{
-  if (argc != 2)
-  {
-    std::cerr << "Error parameters\n";
-    return 1;
-  }
-  DictionaryStorage storage;
-  if (!loadData(argv[1], storage))
-  {
-    return 1;
-  }
-  std::string line;
-  while (std::getline(std::cin, line))
-  {
-    if (line.empty())
-    {
-      continue;
-    }
-    size_t pos = 0;
-    std::string cmd = readNextToken(line, pos);
-    std::string args = line.substr(pos);
-    processCommand(storage, cmd, args);
-  }
   return 0;
 }

@@ -69,7 +69,6 @@ public:
   size_t size() const;
 
 private:
-  NodeType* root;
   NodeType* fake_root;
   Compare comp;
   size_t size_;
@@ -98,22 +97,14 @@ Tree< Key, Value, Compare >::Tree():
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(Compare()),
   size_(0)
-{
-  fake_root->left = fake_root;
-  fake_root->right = fake_root;
-  setRoot(fake_root);
-}
+{}
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(const Compare& cmp):
   fake_root(new NodeType(Key(), Value(), nullptr)),
   comp(cmp),
   size_(0)
-{
-  fake_root->left = fake_root;
-  fake_root->right = fake_root;
-  setRoot(fake_root);
-}
+{}
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(const Tree& other):
@@ -127,15 +118,10 @@ Tree< Key, Value, Compare >::Tree(const Tree& other):
 
 template < class Key, class Value, class Compare >
 Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
-  root(other.root),
   fake_root(other.fake_root),
   comp(std::move(other.comp)),
   size_(other.size_)
 {
-  if (other.getRoot() == other.fake_root)
-  {
-    setRoot(fake_root);
-  }
   other.fake_root = new NodeType(Key(), Value(), nullptr);
   other.size_ = 0;
 }
@@ -146,7 +132,6 @@ Tree< Key, Value, Compare >::Tree(std::initializer_list< std::pair< const Key, V
   comp(cmp),
   size_(0)
 {
-  setRoot(fake_root);
   for (const auto& item : init)
   {
     insert(item);
@@ -160,7 +145,6 @@ Tree< Key, Value, Compare >::Tree( InputIt first, InputIt last, const Compare& c
   comp(cmp),
   size_(0)
 {
-  setRoot(fake_root);
   for (; first != last; ++first)
   {
     insert(*first);
