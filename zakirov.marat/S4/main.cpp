@@ -7,7 +7,7 @@ int main(int argc, char * argv[])
 {
   if (argc != 2)
   {
-    std::cerr << "<INVALID PARAMETERS>" << '\n';
+    std::cout << "<INVALID PARAMETERS>" << '\n';
     return 1;
   }
 
@@ -22,7 +22,7 @@ int main(int argc, char * argv[])
     }
     catch(const std::exception & e)
     {
-      std::cerr << e.what() << '\n';
+      std::cout << e.what() << '\n';
     }
   }
 }
