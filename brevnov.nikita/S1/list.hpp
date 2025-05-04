@@ -216,7 +216,7 @@ namespace brevnov
   template< class T >
   void List< T >::push_back(const T &data)
   {
-    Node< T > node = new Node< T >{ data };
+    Node< T > * node = new Node< T >{data, nullptr, nullptr};
     if (empty())
     {
       head_ = node;
@@ -228,13 +228,19 @@ namespace brevnov
       node->prev = tail_;
       tail_ = node;
     }
-    ++size;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::push_back(T &&data)
+  {
+    push_back(data);
   }
 
   template< class T >
   void List< T >::push_front(const T &data)
   {
-    Node< T >node = new Node< T >{ data };
+    Node< T > * node = new Node< T >{data, nullptr, nullptr};
     if (empty())
     {
       head_ = node;
@@ -246,7 +252,13 @@ namespace brevnov
       node->next = head_;
       head_ = node;
     }
-    ++size;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::push_front(T &&data)
+  {
+    push_front(data);
   }
 
   template< class T >
@@ -254,7 +266,7 @@ namespace brevnov
   {
     if (!empty())
     {
-      --size;
+      --size_;
       if (head_ == tail_)
       {
         delete tail_;
@@ -263,7 +275,7 @@ namespace brevnov
       }
       else
       {
-        Node< T > node_ = tail_->prev;
+        Node< T > * node_ = tail_->prev;
         delete tail_;
         tail_ = node;
         tail_->next = nullptr;
@@ -276,7 +288,7 @@ namespace brevnov
   {
     if (!empty())
     {
-      --size;
+      --size_;
       if (head_ == tail_)
       {
         delete head_;
@@ -285,7 +297,7 @@ namespace brevnov
       }
       else
       {
-        Node< T >node = head_->next;
+        Node< T > * node = head_->next;
         delete head_;
         head_ = node;
         head_->prev = nullptr;
