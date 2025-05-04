@@ -34,6 +34,7 @@ namespace alymova
     NodePoint point_;
 
     TTTConstIterator(Node* node, NodePoint point);
+    TTTConstIterator(TTTIterator< Key, Value, Comparator > it);
 
     friend class TwoThreeTree< Key, Value, Comparator >;
     friend class TTTIterator< Key, Value, Comparator >;
@@ -62,10 +63,11 @@ namespace alymova
     Node* node_;
     NodePoint point_;
 
-    TTTIterator(TTTConstIterator< Key, Value, Comparator > citer);
+    TTTIterator(TTTConstIterator< Key, Value, Comparator > it);
     TTTIterator(Node* node, NodePoint point);
 
     friend class TwoThreeTree< Key, Value, Comparator >;
+    friend class TTTConstIterator< Key, Value, Comparator >;
   };
 }
 #endif

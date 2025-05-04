@@ -48,8 +48,8 @@ namespace alymova
     template < class InputIterator >
     void insert(InputIterator first, InputIterator last);
     void insert(std::initializer_list< T > il);
-    Iterator insert(Iterator hint, const T& value); //hint
-    Iterator insert(ConstIterator hint, const T& value); //hint
+    Iterator insert(Iterator hint, const T& value);
+    Iterator insert(ConstIterator hint, const T& value);
     template< class... Args >
     std::pair< Iterator, bool > emplace(Args&&... args);
     template< class... Args >
@@ -71,10 +71,16 @@ namespace alymova
     Node* fake_;
     Node* root_;
     size_t size_;
+    Comparator cmp;
 
     void clear(Node* node) noexcept;
     void split(Node* node);
-    void moveFake() noexcept;
+    void move_fake() noexcept;
+    Node* find_to_insert(const Key& key) const;
+    Node* find_to_insert(ConstIterator hint) const;
+    bool check_hint(ConstIterator hint, const Key& key);
+    bool is_balanced();
+    size_t find_height(Node* node);
   };
 
   template< class Key, class Value, class Comparator >
@@ -208,7 +214,7 @@ namespace alymova
   std::pair< TTTIterator< Key, Value, Comparator >, bool >
     TwoThreeTree< Key, Value, Comparator >::insert(T&& value)
   {
-    return emplace(value);
+    return emplace(std::forward< T >(value));
   }
 
   template< class Key, class Value, class Comparator >
@@ -217,7 +223,7 @@ namespace alymova
   {
     for (auto it = first; it != last; it++)
     {
-      emplace(*it);
+      insert(*it);
     }
   }
 
@@ -230,60 +236,81 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::insert(Iterator hint, const T& value)
-  {}
+  {
+    ConstIterator const_hint(hint);
+    return emplace_hint(const_hint, value);
+  }
 
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::insert(ConstIterator hint, const T& value)
-  {}
+  {
+    return emplace_hint(hint, value);
+  }
 
   template< class Key, class Value, class Comparator >
   template <class... Args >
   std::pair< TTTIterator< Key, Value, Comparator >, bool >
     TwoThreeTree< Key, Value, Comparator >::emplace(Args&&... args)
   {
-    Comparator cmp;
     std::pair< Key, Value > value(std::forward< Args >(args)...);
-    if (find(value.first) != end())
+    ConstIterator hint = lower_bound(value.first);
+    size_t size_before = size();
+    Iterator it = emplace_hint(hint, value);
+    if (size_before == size())
     {
-      return {end(), false};
+      return {it, false};
+    }
+    return {it, true};
+    /*auto it_value = find(value.first);
+    if (it_value != end())
+    {
+      return {it_value, false};
     }
     if (size_ == 0)
     {
       root_ = new Node();
     }
-    Node* tmp = root_;
-    while (!tmp->isLeaf())
-    {
-      if (cmp(value.first, tmp->data[0].first))
-      {
-        tmp = tmp->left;
-      }
-      else if (tmp->type == NodeType::Triple && cmp(value.first, tmp->data[1].first))
-      {
-        tmp = tmp->mid;
-      }
-      else
-      {
-        tmp = tmp->right;
-      }
-    }
+    Node* tmp = find_to_insert(value.first);
     tmp->insert(value);
     if (tmp->type == NodeType::Overflow)
     {
       split(tmp);
     }
-    moveFake();
+    move_fake();
     size_++;
     Iterator it = find(value.first);
-    return {it, true};
+    return {it, true};*/
   }
 
   template< class Key, class Value, class Comparator >
   template <class... Args >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::emplace_hint(ConstIterator hint, Args&&... args)
-  {}
+  {
+    std::pair< Key, Value > value(std::forward< Args >(args)...);
+    auto it_value = find(value.first);
+    if (it_value != end())
+    {
+      return it_value;
+    }
+    Node* tmp = find_to_insert(hint);
+    if (!check_hint(hint, value.first))
+    {
+      tmp = find_to_insert(value.first);
+    }
+    if (size_ == 0)
+    {
+      root_ = new Node();
+      tmp = root_;
+    }
+    tmp->insert(value);
+    split(tmp);
+    move_fake();
+    size_++;
+    Iterator it = find(value.first);
+    return it;
+  }
 
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other)
@@ -318,7 +345,6 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find(const Key& key) const
   {
-    Comparator cmp;
     for (ConstIterator it = cbegin(); it != cend(); it++)
     {
       if (!cmp(key, it->first) && !cmp(it->first, key))
@@ -355,7 +381,6 @@ namespace alymova
   TTTConstIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::lower_bound(const Key& key) const
   {
-    Comparator cmp;
     for (auto it = cbegin(); it != cend(); it++)
     {
       if (!cmp(it->first, key))
@@ -378,7 +403,6 @@ namespace alymova
   TTTConstIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::upper_bound(const Key& key) const
   {
-    Comparator cmp;
     for (auto it = cbegin(); it != cend(); it++)
     {
       if (cmp(key, it->first))
@@ -405,6 +429,10 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::split(Node* node)
   {
+    if (node->type != NodeType::Overflow)
+    {
+      return;
+    }
     Node* left_node = nullptr, *right_node = nullptr, *parent_node = nullptr;
     try
     {
@@ -482,7 +510,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::moveFake() noexcept
+  void TwoThreeTree< Key, Value, Comparator >::move_fake() noexcept
   {
     Node* tmp = root_;
     while (tmp->right && tmp->right != fake_)
@@ -491,6 +519,87 @@ namespace alymova
     }
     tmp->right = fake_;
     fake_->parent = tmp;
+  }
+
+  template< class Key, class Value, class Comparator >
+  detail::TTTNode< Key, Value >* TwoThreeTree< Key, Value, Comparator >::find_to_insert(const Key& key) const
+  {
+    Node* tmp = root_;
+    while (!tmp->isLeaf())
+    {
+      if (cmp(key, tmp->data[0].first))
+      {
+        tmp = tmp->left;
+      }
+      else if (tmp->type == NodeType::Triple && cmp(key, tmp->data[1].first))
+      {
+        tmp = tmp->mid;
+      }
+      else
+      {
+        tmp = tmp->right;
+      }
+    }
+    return tmp;
+  }
+
+  template< class Key, class Value, class Comparator >
+  detail::TTTNode< Key, Value >* TwoThreeTree< Key, Value, Comparator >::find_to_insert(ConstIterator hint) const
+  {
+    Iterator tmp = hint;
+    if (tmp == cbegin())
+    {
+      return root_;
+    }
+    return (--tmp).node_;
+  }
+
+  template< class Key, class Value, class Comparator >
+  bool TwoThreeTree< Key, Value, Comparator >::check_hint(ConstIterator hint, const Key& key)
+  {
+    if (hint != cend())
+    {
+      if (!cmp(key, hint->first))
+      {
+        return false;
+      }
+    }
+    if (hint != cbegin())
+    {
+      return cmp((--hint)->first, key);
+    }
+    return true;
+  }
+
+  template< class Key, class Value, class Comparator >
+  bool TwoThreeTree< Key, Value, Comparator >::is_balanced()
+  {
+    return find_height(root_) != -1;
+  }
+
+  template< class Key, class Value, class Comparator >
+  size_t TwoThreeTree< Key, Value, Comparator >::find_height(Node* node)
+  {
+    if (node == nullptr || node == fake_)
+    {
+      return 0;
+    }
+    size_t left_height = find_height(node->left);
+    size_t right_height = find_height(node->right);
+    size_t mid_height = find_height(node->mid);
+    if (left_height < 0 || right_height < 0 || mid_height < 0)
+    {
+      return -1;
+    }    
+    if (left_height != right_height)
+    {
+      return -1;
+    }
+    if (left_height != mid_height && node->type == NodeType::Triple)
+    {
+      return -1;
+    }
+    return left_height + 1;
   }
 }
 

@@ -68,11 +68,20 @@ int main(int argc, char** argv)
   tree.insert(p5);
   tree.insert(p6);
   tree.insert(p7);
-  TwoThreeTree< int, std::string, std::less< int > > tree1(tree);
-  for (auto it = tree1.begin(); it != tree1.end(); it++)
+  
   {
-    std::cout << it->first << it->second << '\n';
-  }
-  TwoThreeTree< int, std::string, std::less< int > > tree2;
-  std::cout << (tree.upper_bound(1)->first);*/
+    TwoThreeTree< int, char, std::less< int > > map;
+    auto it = map.cbegin();
+    for (int i = 5; i > 0; --i)
+    {
+      map.emplace_hint(it, i, 'd');
+      it = map.cend();
+    }
+    std::cout << map.size();
+    for (auto it = map.begin(); it != map.end(); it++)
+    {
+      std::cout << it->first << it->second << '\n';
+    }
+  }*/
+
 }

@@ -19,9 +19,8 @@ namespace alymova
   {}
 
   template< class Key, class Value, class Comparator >
-  TTTIterator< Key, Value, Comparator >::TTTIterator(TTTConstIterator< Key, Value, Comparator> citer):
-    node_(const_cast< Node* >(citer.node_)),
-    point_(citer.point_)
+  TTTIterator< Key, Value, Comparator >::TTTIterator(TTTConstIterator< Key, Value, Comparator> it):
+    Iterator(const_cast< Node* >(it.node_), it.point_)
   {}
 
   template< class Key, class Value, class Comparator >

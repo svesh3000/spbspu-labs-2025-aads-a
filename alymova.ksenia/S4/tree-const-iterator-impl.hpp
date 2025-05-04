@@ -19,6 +19,11 @@ namespace alymova
   {}
 
   template< class Key, class Value, class Comparator >
+  TTTConstIterator< Key, Value, Comparator >::TTTConstIterator(TTTIterator< Key, Value, Comparator> it):
+    ConstIterator(it.node_, it.point_)
+  {}
+
+  template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator++() noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond list's bounds");
