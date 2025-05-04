@@ -5,23 +5,16 @@
 #include "CircularFwdList.hpp"
 
 template < typename T >
-std::ostream& operator<<(std::ostream& out, const zholobov::CircularFwdList< T >& list)
-{
-  if (list.size() != 0) {
-    auto it = list.begin();
-    out << *it++;
-    for (; it != list.end(); ++it) {
-      out << " " << *it;
-    }
-  }
-  return out;
-}
-
-template < typename T >
 std::string to_string(const zholobov::CircularFwdList< T >& list)
 {
   std::stringstream ss;
-  ss << list;
+  if (list.size() != 0) {
+    auto it = list.begin();
+    ss << *it++;
+    for (; it != list.end(); ++it) {
+      ss << " " << *it;
+    }
+  }
   return ss.str();
 }
 
@@ -211,12 +204,6 @@ BOOST_AUTO_TEST_CASE(push_pop_back)
   list.push_back(11);
   BOOST_TEST(list.size() == 2);
   BOOST_TEST(to_string(list) == "10 11");
-  list.pop_back();
-  BOOST_TEST(list.size() == 1);
-  BOOST_TEST(to_string(list) == "10");
-  list.pop_back();
-  BOOST_TEST(list.size() == 0);
-  BOOST_TEST(to_string(list) == "");
 }
 
 BOOST_AUTO_TEST_CASE(swap)

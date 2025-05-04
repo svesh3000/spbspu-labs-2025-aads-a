@@ -59,7 +59,7 @@ namespace zholobov {
 
   private:
     explicit CircularFwdListConstIterator(FwdListNodeBase* const* node);
-    FwdListNodeBase* const* node_;
+    FwdListNodeBase** node_;
 
     friend class CircularFwdList< T >;
     friend class CircularFwdListIterator< T >;
@@ -123,8 +123,6 @@ bool zholobov::CircularFwdListIterator< T >::operator!=(const CircularFwdListIte
   return !(*this == other);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 template < typename T >
 zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator():
   node_(nullptr)
@@ -137,7 +135,7 @@ zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(const 
 
 template < typename T >
 zholobov::CircularFwdListConstIterator< T >::CircularFwdListConstIterator(FwdListNodeBase* const* node):
-  node_(node)
+  node_(const_cast< FwdListNodeBase** >(node))
 {}
 
 template < typename T >
