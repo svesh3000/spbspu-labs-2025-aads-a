@@ -8,10 +8,10 @@
 namespace zakirov
 {
   template < class K, class T >
-  void get_dictionaries(std::istream & in, std::list< std::pair< std::string, std::map< K, T > > > & dictionaries);
+  void get_dictionaries(std::istream & in, std::map< std::string, std::map< K, T > > & dictionaries);
 
   template < class K, class T >
-  void get_dictionaries(std::istream & in, std::list< std::pair < std::string, std::map< K, T > > > & dictionaries)
+  void get_dictionaries(std::istream & in, std::map< std::string, std::map< K, T > > & dictionaries)
   {
     std::string name;
     std::map< K, T > dict;
@@ -26,7 +26,7 @@ namespace zakirov
         dict.insert({key, value});
       }
 
-      dictionaries.push_back({name, dict});
+      dictionaries.insert({name, dict});
       dict.clear();
     }
   }

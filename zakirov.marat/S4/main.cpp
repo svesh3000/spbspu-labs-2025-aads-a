@@ -12,7 +12,7 @@ int main(int argc, char * argv[])
   }
 
   std::ifstream in(argv[1]);
-  std::list< std::pair< std::string, std::map< long long, std::string > > > dictionaries_list;
+  std::map< std::string, std::map< long long, std::string > > dictionaries_list;
   zakirov::get_dictionaries(in, dictionaries_list);
   while (!std::cin.eof())
   {
