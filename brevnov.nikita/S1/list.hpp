@@ -156,7 +156,7 @@ namespace brevnov
     if (this != &other)
     {
       List< T > cpy(copy);
-      std::swap(cpy);
+      swap(cpy);
     }
     return *this;
   }
@@ -175,7 +175,7 @@ namespace brevnov
     if (this != &other)
     {
       List< T > cpy(std::move(copy));
-      std::swap(cpy);
+      swap(cpy);
     }
     return *this;
   }
