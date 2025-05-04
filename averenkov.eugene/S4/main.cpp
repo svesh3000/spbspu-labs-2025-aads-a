@@ -45,7 +45,7 @@ void printDictionary(const Dictionary& dict, str name)
 {
   if (dict.empty())
   {
-    std::cout << "<EMPTY>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
