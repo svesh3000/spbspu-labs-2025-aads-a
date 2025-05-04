@@ -79,7 +79,10 @@ namespace brevnov
   }
 
   template< typename T >
-  List< T >::List(const List< T >& copy)
+  List< T >::List(const List< T >& copy):
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
   {
     try
     {
