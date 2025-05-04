@@ -18,6 +18,8 @@ namespace tkach
     ~AvlTree();
     AvlTree< Key, Value, Cmp >& operator=(const AvlTree< Key, Value, Cmp >& other);
     AvlTree< Key, Value, Cmp >& operator=(AvlTree< Key, Value, Cmp >&& other) noexcept;
+    Value& operator[](const Key& key);
+    const Value& operator[](const Key& key) const;
     void insert(const std::pair< Key, Value > & pair);
     void insert(std::pair< Key, Value > && pair);
     void clear();
@@ -29,6 +31,8 @@ namespace tkach
     Iterator< Key, Value, Cmp > begin();
     Citerator< Key, Value, Cmp > cend() const;
     Iterator< Key, Value, Cmp > end();
+    Iterator< Key, Value, Cmp > erase(Iterator< Key, Value, Cmp > it);
+    Iterator< Key, Value, Cmp > erase(const Key& key);
     bool empty();
     size_t size();
   private:
@@ -41,12 +45,15 @@ namespace tkach
     TreeNode< Key, Value >* insertCmp(TreeNode< Key, Value >* root, const Key& key, Args&&... args);
     void clearFrom(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* findMin(TreeNode< Key, Value >* node) const;
-    TreeNode< Key, Value >* rotateLeft( TreeNode< Key, Value >* const root);
-    TreeNode< Key, Value >* rotateRight( TreeNode< Key, Value >* const root);
+    TreeNode< Key, Value >* findMax(TreeNode< Key, Value >* node) const;
+    TreeNode< Key, Value >* rotateLeft(TreeNode< Key, Value >* const root);
+    TreeNode< Key, Value >* rotateRight(TreeNode< Key, Value >* const root);
     void fixHeight(TreeNode< Key, Value >* node);
     size_t height(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* makeTree(const AvlTree< Key, Value, Cmp >& other);
     void swap(AvlTree< Key, Value, Cmp >& other) noexcept;
+    TreeNode< Key, Value >* eraseFrom(TreeNode< Key, Value >* root, const Key& key);
+    TreeNode< Key, Value >* balance(TreeNode< Key, Value >* root, const Key& key);
   };
 
   template< class Key, class Value, class Cmp >
@@ -101,12 +108,51 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::eraseFrom(TreeNode< Key, Value >* root, const Key& key)
+  {
+    if (!root)
+    {
+      return nullptr;
+    }
+    if (cmp_(key, root->data.first))
+    {
+      root->left = eraseFrom(root->left, key);
+    }
+    else if (cmp_(root->data.first, key))
+    {
+      root->right = eraseFrom(root->right, key);
+    }
+    else
+    {
+      if (root->left != nullptr)
+      {
+        TreeNode< Key, Value >* max_tree = findMax(root->left);
+        root->data = max_tree->data;
+        root->left = eraseFrom(root->left, max_tree->data.first);
+      }
+      else if (root->right != nullptr)
+      {
+        TreeNode< Key, Value >* min_tree = findMin(root->right);
+        root->data = min_tree->data;
+        root->right = eraseFrom(root->right, min_tree->data.first);
+      }
+      else
+      {
+        delete root;
+        return nullptr;
+      }
+    }
+    fixHeight(root);
+    return balance(root, key);
+  }
+
+  template< class Key, class Value, class Cmp >
   TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::makeTree(const AvlTree< Key, Value, Cmp >& other)
   {
     AvlTree< Key, Value, Cmp > temp;
     for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      temp.insert(std::make_pair((*it).first, it->second));
+      temp.insert(std::make_pair(it->first, it->second));
     }
     TreeNode< Key, Value >* temp_r = temp.root_;
     temp.root_ = nullptr;
@@ -117,6 +163,25 @@ namespace tkach
   AvlTree< Key, Value, Cmp >::~AvlTree()
   {
     clear();
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::erase(Iterator< Key, Value, Cmp > it)
+  {
+    auto it2 = it;
+    it2++;
+    root_ = eraseFrom(root_, it->first);
+    return it2;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::erase(const Key& key)
+  {
+    auto it = find(key);
+    auto it2 = it;
+    it2++;
+    root_ = eraseFrom(root_, key);
+    return it2;
   }
 
   template< class Key, class Value, class Cmp >
@@ -149,7 +214,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateLeft( TreeNode< Key, Value >* const root)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateLeft(TreeNode< Key, Value >* const root)
   {
     if (root == nullptr || root->right == nullptr)
     {
@@ -181,7 +246,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateRight( TreeNode< Key, Value >* const root)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::rotateRight(TreeNode< Key, Value >* const root)
   {
     if (root == nullptr || root->left == nullptr)
     {
@@ -247,6 +312,16 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::findMax(TreeNode< Key, Value >* root) const
+  {
+    while (root != nullptr && root->right != nullptr)
+    {
+      root = root->right;
+    }
+    return root;
+  }
+
+  template< class Key, class Value, class Cmp >
   Value& AvlTree< Key, Value, Cmp >::at(const Key& key)
   {
     return const_cast< Value& >(static_cast< const AvlTree< Key, Value, Cmp >* >(this)->at(key));
@@ -255,12 +330,25 @@ namespace tkach
   template< class Key, class Value, class Cmp >
   const Value& AvlTree< Key, Value, Cmp >::at(const Key& key) const
   {
-   Citerator< Key, Value, Cmp > node = find(key);
+    Citerator< Key, Value, Cmp > node = find(key);
     if (node != cend())
     {
       return node->second;
     }
     throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  template< class Key, class Value, class Cmp >
+  Value& AvlTree< Key, Value, Cmp >::operator[](const Key& key)
+  {
+    Citerator< Key, Value, Cmp > node = find(key);
+    return node->second;
+  }
+
+  template< class Key, class Value, class Cmp >
+  const Value& AvlTree< Key, Value, Cmp >::operator[](const Key& key) const
+  {
+    return const_cast< Value& >(static_cast< const AvlTree< Key, Value, Cmp >* >(this)->operator[](key));
   }
 
   template< class Key, class Value, class Cmp >
@@ -281,6 +369,29 @@ namespace tkach
   {
     root_ = insertCmp(root_, key, std::forward< Args >(args)...);
     size_++;
+  }
+
+  template< class Key, class Value, class Cmp >
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::balance(TreeNode< Key, Value >* root, const Key& key)
+  {
+    int balance = height(root->left) - height(root->right);
+    if (balance > 1)
+    {
+      if (cmp_(root->right->data.first, key))
+      {
+        root->left = rotateLeft(root->left);
+      }
+      root = rotateRight(root);
+    }
+    if (balance < -1)
+    {
+      if (cmp_(key, root->right->data.first))
+      {
+        root->right = rotateRight(root->right);
+      }
+      root = rotateLeft(root);
+    }
+    return root;
   }
 
   template< class Key, class Value, class Cmp >
@@ -312,25 +423,7 @@ namespace tkach
       return root;
     }
     fixHeight(root);
-    int balance = height(root->left) - height(root->right);
-    if (balance > 1 && cmp_(key, root->right->data.first))
-    {
-      return rotateRight(root);
-    }
-    if (balance < -1 && cmp_(root->right->data.first, key))
-    {
-      return rotateLeft(root);
-    }
-    if (balance > 1 && cmp_(root->right->data.first, key))
-    {
-      root->left = rotateLeft(root->left);
-      return rotateRight(root);
-    }
-    if (balance < -1 && cmp_(key, root->right->data.first))
-    {
-      root->right = rotateRight(root->right);
-      return rotateLeft(root);
-    }
+    root = balance(root, key);
     return root;
   }
 

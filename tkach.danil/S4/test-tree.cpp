@@ -159,6 +159,14 @@ BOOST_AUTO_TEST_CASE(tree_at_test)
   {
     BOOST_TEST(tree.at(i) == std::to_string(i));
   }
+  try
+  {
+    BOOST_TEST(tree.at(6) == std::to_string(6));
+  }
+  catch (...)
+  {
+    BOOST_TEST(true);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(tree_at_const_test)
@@ -194,6 +202,36 @@ BOOST_AUTO_TEST_CASE(tree_cbegin_test)
   }
   Citerator< size_t, std::string > it = tree.cbegin();
   BOOST_TEST((it->first == 0 && it->second == "0"));
+}
+
+BOOST_AUTO_TEST_CASE(tree_erase_key_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 0; i <= 5; ++i)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  auto it = tree.erase(2);
+  std::ostringstream out;
+  print(tree, out);
+  BOOST_TEST(out.str() == "0 0 1 1 3 3 4 4 5 5");
+  BOOST_TEST((it->first == 3 && it->second == "3"));
+}
+
+BOOST_AUTO_TEST_CASE(tree_erase_it_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 0; i <= 5; ++i)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  auto it2 = ++tree.begin();
+  it2++;
+  auto it = tree.erase(it2);
+  std::ostringstream out;
+  print(tree, out);
+  BOOST_TEST(out.str() == "0 0 1 1 3 3 4 4 5 5");
+  BOOST_TEST((it->first == 3 && it->second == "3"));
 }
 
 BOOST_AUTO_TEST_CASE(tree_end_test)
