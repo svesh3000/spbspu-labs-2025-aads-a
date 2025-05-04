@@ -20,8 +20,9 @@ namespace zakirov
     while (in)
     {
       in >> name;
-      while (in && in >> key && in >> value && in.peek() != '\n')
+      while (in && in.peek() != '\n')
       {
+        in >> key >> value;
         dict.insert({key, value});
       }
 

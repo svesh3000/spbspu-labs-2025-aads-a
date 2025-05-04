@@ -92,6 +92,8 @@ namespace zakirov
     {
       out << ' ' << iter->first << ' ' << iter->second;
     }
+
+    out << '\n';
   }
 
   template < class K, class T >
