@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-          std::cout << "<EMPTY>\n";
+          std::cout << "<INVALID COMMAND>\n";
         }
       }
       else
