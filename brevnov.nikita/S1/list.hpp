@@ -24,6 +24,8 @@ namespace brevnov
     List< T > & operator=(List< T > && copy);
     List< T > & operator=(std::initializer_list< T > il);
 
+    bool operator==(const List< T >&) const;
+
     Iter begin() noexcept;
     ConstIter cbegin() const noexcept;
     Iter end() noexcept;
@@ -330,6 +332,25 @@ namespace brevnov
         head_->prev = nullptr;
       }
     }
+  }
+
+  template< typename T >
+  bool List< T >::operator==(const List< T >& list) const
+  {
+    if (size_ == list.size_)
+    {
+      ConstIter thisIt = cbegin();
+      ConstIter otherIt = list.cbegin();
+      for (; thisIt != cend(); ++thisIt, ++otherIt)
+      {
+        if (*thisIt != *otherIt)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
 }

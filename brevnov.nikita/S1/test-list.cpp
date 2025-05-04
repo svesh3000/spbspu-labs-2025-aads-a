@@ -11,13 +11,13 @@ void createList(List< int >& list, int count)
 {
   for (int i = 0; i < count; ++i)
   {
-    list.pushBack(i);
+    list.push_back(i);
   }
 }
 
 std::ostream& outputList(std::ostream& out, List< int >& list)
 {
-  for (List< int >::ConstIterator it = list.cbegin(); it != list.cend(); ++it)
+  for (List< int >::ConstIter it = list.cbegin(); it != list.cend(); ++it)
   {
     out << *it;
   }
@@ -102,8 +102,8 @@ BOOST_AUTO_TEST_CASE(front_and_push_front)
 {
   List< int > list;
   int i = 1;
-  list.pushFront(i);
-  list.pushFront(++i);
+  list.push_front(i);
+  list.push_front(++i);
   BOOST_TEST(list.front() == i);
 }
 
