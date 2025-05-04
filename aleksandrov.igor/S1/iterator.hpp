@@ -14,25 +14,32 @@ namespace aleksandrov
   class Iterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    Iterator():
-      node_(nullptr)
-    {}
-    Iterator(detail::Node< T >* node):
-      node_(node)
-    {}
+    Iterator();
 
     Iterator< T >& operator++();
     Iterator< T > operator++(int);
 
-    T& operator*() const;
-    T* operator->() const;
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
 
     bool operator!=(const Iterator< T >&) const noexcept;
     bool operator==(const Iterator< T >&) const noexcept;
   private:
     friend List< T >;
     detail::Node< T >* node_;
+
+    explicit Iterator(detail::Node< T >* node);
   };
+
+  template< typename T >
+  Iterator< T >::Iterator():
+    node_(nullptr)
+  {}
+
+  template< typename T >
+  Iterator< T >::Iterator(detail::Node< T >* node):
+     node_(node)
+  {}
 
   template< typename T >
   Iterator< T >& Iterator< T >::operator++()
@@ -52,14 +59,14 @@ namespace aleksandrov
   }
 
   template< typename T >
-  T& Iterator< T >::operator*() const
+  T& Iterator< T >::operator*() const noexcept
   {
     assert(node_);
     return node_->data;
   }
 
   template< typename T >
-  T* Iterator< T >::operator->() const
+  T* Iterator< T >::operator->() const noexcept
   {
     assert(node_);
     return std::addressof(node_->data);

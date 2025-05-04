@@ -1,8 +1,8 @@
 #ifndef LIST_UTILS_HPP
 #define LIST_UTILS_HPP
 
-#include "list.hpp"
 #include <ios>
+#include "list.hpp"
 
 namespace aleksandrov
 {
@@ -30,22 +30,6 @@ namespace aleksandrov
     }
     return (first1 == last1) && (first2 != last2);
   }
-
-  template< typename T >
-  class Equalizer
-  {
-  public:
-    Equalizer(const T& value):
-      value_(value)
-    {}
-
-    bool operator()(const T& rhs)
-    {
-      return rhs == value_;
-    }
-  private:
-    const T& value_;
-  };
 }
 
 #endif

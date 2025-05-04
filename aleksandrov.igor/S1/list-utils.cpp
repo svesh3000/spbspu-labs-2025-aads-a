@@ -59,14 +59,12 @@ namespace aleksandrov
         }
         catch (const std::bad_alloc&)
         {
-          numList.clear();
           throw;
         }
       }
     }
     catch (const std::bad_alloc&)
     {
-      list.clear();
       throw;
     }
   }
@@ -112,7 +110,6 @@ namespace aleksandrov
         }
         catch (const std::bad_alloc&)
         {
-          numList.clear();
           throw;
         }
         ++shift;
@@ -121,7 +118,6 @@ namespace aleksandrov
     }
     catch (const std::bad_alloc&)
     {
-      toTranspose.clear();
       throw;
     }
   }

@@ -1,74 +1,167 @@
 #include <boost/test/unit_test.hpp>
+#include <vector>
 #include "list.hpp"
 
-BOOST_AUTO_TEST_CASE(construction)
+using aleksandrov::List;
+
+BOOST_AUTO_TEST_SUITE(list_construction);
+
+BOOST_AUTO_TEST_CASE(default_construction)
 {
-  aleksandrov::List< int > list1;
-  BOOST_TEST(list1.empty());
-  aleksandrov::List< char > list2(52, '\0');
-  BOOST_TEST(list2.size() == 52);
-  aleksandrov::List< char > list3(list2);
-  BOOST_TEST(list3.size() == 52);
-  aleksandrov::List< char > list4(std::move(list2));
-  BOOST_TEST(list4.size() == 52);
-  aleksandrov::List< int > list5{0, 1, 2, 3, 4, 5};
-  BOOST_TEST(list5.size() == 6);
-  aleksandrov::List< int > list6(++list5.begin(), list5.end());
-  BOOST_TEST(list6.size() == 5);
+  List< std::vector< List < int > >* > list;
+  BOOST_TEST(list.size() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(assignment)
+BOOST_AUTO_TEST_CASE(copy_construction)
 {
-  aleksandrov::List< char > list1(2, 'a');
-  aleksandrov::List< char > list2;
-  list2 = list1;
-  BOOST_TEST(list2.size() == list1.size());
-  aleksandrov::List< char > list3;
-  list3 = std::move(list2);
-  BOOST_TEST(list3.size() == 2);
-  aleksandrov::List< char > list4;
-  list4 = {'a', 'b', 'c', 'd'};
-  BOOST_TEST(list4.size() == 4);
+  List< int > list{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  List< int > numbers(list);
+  BOOST_TEST(numbers.size() == 10);
 }
 
-BOOST_AUTO_TEST_CASE(begin_end)
+BOOST_AUTO_TEST_CASE(move_construction)
 {
-  aleksandrov::List< int > list{12, 34, 56};
-  BOOST_TEST(*list.begin() == 12);
-  BOOST_TEST(*list.cbegin() == 12);
+  List< std::vector< short > > list{{1, 2}, {3, 4, 5}};
+  List< std::vector< short > > numbers(std::move(list));
+  BOOST_TEST(numbers.size() == 2);
+  BOOST_TEST(numbers.front().size() == 2);
+  BOOST_TEST(numbers.back().size() == 3);
+  BOOST_TEST(list.empty());
 }
 
-BOOST_AUTO_TEST_CASE(front_back)
+BOOST_AUTO_TEST_CASE(fill_construction)
 {
-  aleksandrov::List< char > list;
-  list.pushBack('a');
-  list.pushFront('b');
-  list.pushFront('c');
-  BOOST_TEST(list.front() == 'c');
-  BOOST_TEST(list.back() == 'a');
+  List< std::string > strings(10, "fill");
+  BOOST_TEST(strings.size() == 10);
 }
+
+BOOST_AUTO_TEST_CASE(initializer_list_construction)
+{
+  List< std::pair< int, std::string > > pairs = {{1, "1"}, {2, "2"}, {3, "3"}};
+  BOOST_TEST(pairs.size() == 3);
+  BOOST_TEST(pairs.front().first == 1);
+  BOOST_TEST(pairs.back().second == "3");
+}
+
+BOOST_AUTO_TEST_CASE(range_construction)
+{
+  std::vector< char > vector{'+', '-', '*', '/', '%'};
+  List< char > operations(vector.begin() + 1, vector.end());
+  BOOST_TEST(operations.size() == 4);
+  BOOST_TEST(operations.front() == '-');
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_SUITE(list_assignment);
+
+BOOST_AUTO_TEST_CASE(copy_assignment)
+{
+  List< List< int > > matrix = {{1, 2}, {3, 4}};
+  List< List< int > > yaMatrix;
+  yaMatrix = matrix;
+  BOOST_TEST(yaMatrix.size() == 2);
+  BOOST_TEST(yaMatrix.front().front() == 1);
+  matrix.front().front() = 5;
+  BOOST_TEST(yaMatrix.front().front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(move_assignment)
+{
+  List< std::vector< int > > matrix{{1, 2}, {3, 4}};
+  List< std::vector< int > > newMatrix;
+  newMatrix = std::move(matrix);
+  BOOST_TEST(newMatrix.front()[0] == 1);
+  BOOST_TEST(matrix.empty());
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list_assignment)
+{
+  List< int > primes;
+  primes = {2, 3, 5, 7};
+  BOOST_TEST(primes.size() == 4);
+  BOOST_TEST(primes.back() == 7);
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_SUITE(iterators);
+
+BOOST_AUTO_TEST_CASE(begin)
+{
+  List< int > list;
+  list = {10, 20, 30};
+  BOOST_TEST(*list.cbegin() == 10);
+  *list.begin() = 30;
+  BOOST_TEST(*list.cbegin() == 30);
+
+  list.emplaceBack(40);
+  auto min = std::min_element(list.begin(), list.end());
+  BOOST_TEST(*min == 20);
+}
+
+BOOST_AUTO_TEST_CASE(end)
+{
+  List< int > list;
+  list = {11, 22, 33};
+  auto it = list.cbegin();
+  std::advance(it, 3);
+  BOOST_TEST(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_SUITE(list_element_access);
+
+BOOST_AUTO_TEST_CASE(front)
+{
+  List< std::string > strings(1, "Abcd");
+  BOOST_TEST(strings.front() == "Abcd");
+  strings.emplaceFront("Efgh");
+  BOOST_TEST(strings.front() == "Efgh");
+}
+
+BOOST_AUTO_TEST_CASE(back)
+{
+  List< std::string > strings(2, "ABC");
+  BOOST_TEST(strings.back() == "ABC");
+  strings.emplaceBack("DEF");
+  BOOST_TEST(strings.back() == "DEF");
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_SUITE(list_capacity)
 
 BOOST_AUTO_TEST_CASE(empty)
 {
-  aleksandrov::List< char > list;
-  BOOST_TEST(list.empty());
-  list = {'a'};
-  BOOST_TEST(!list.empty());
+  List< unsigned char > functions;
+  BOOST_TEST(functions.empty());
+  functions = {'x', 'y', 'z', 'w'};
+  BOOST_TEST(!functions.empty());
+  functions.clear();
+  BOOST_TEST(functions.empty());
 }
 
 BOOST_AUTO_TEST_CASE(size)
 {
-  aleksandrov::List< double > list;
+  List< double > list;
   BOOST_TEST(list.size() == 0);
-  list.pushFront(3.14159);
-  BOOST_TEST(list.size());
-  list.pushFront(2.71828);
+  list.emplaceFront(3.14159);
+  BOOST_TEST(list.size() != 0);
+  list.emplaceFront(2.71828);
   BOOST_TEST(list.size() == 2);
+  list.clear();
+  BOOST_TEST(list.size() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(pushFront)
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_SUITE(list_modifiers);
+
+BOOST_AUTO_TEST_CASE(push_front)
 {
-  aleksandrov::List< float > list;
+  List< float > list;
   float value = 1.0f;
   list.pushFront(value);
   BOOST_TEST(list.front() == 1.0f);
@@ -76,9 +169,21 @@ BOOST_AUTO_TEST_CASE(pushFront)
   BOOST_TEST(list.front() == 3.14f);
 }
 
-BOOST_AUTO_TEST_CASE(pushBack)
+BOOST_AUTO_TEST_CASE(emplace_front)
 {
-  aleksandrov::List< float > list;
+  List< std::pair< int, std::string > > list;
+  std::pair< int, std::string > pair(1, "banana");
+  list.emplaceFront(pair);
+  BOOST_TEST(list.front().first == 1);
+  BOOST_TEST(list.front().second == "banana");
+
+  list.emplaceFront(std::make_pair(2, "avocado"));
+  BOOST_TEST(list.front().first == 2);
+}
+
+BOOST_AUTO_TEST_CASE(push_back)
+{
+  List< float > list;
   float value = 2.5f;
   list.pushBack(value);
   BOOST_TEST(list.back() == 2.5f);
@@ -86,16 +191,27 @@ BOOST_AUTO_TEST_CASE(pushBack)
   BOOST_TEST(list.back() == 5.0f);
 }
 
-BOOST_AUTO_TEST_CASE(popFront)
+BOOST_AUTO_TEST_CASE(emplace_back)
 {
-  aleksandrov::List< int > list{123, 456};
+  List< std::pair< char, char > > list;
+  std::pair< char, char > pair('A', 'B');
+  list.emplaceBack(pair);
+  BOOST_TEST(list.front().first == 'A');
+  BOOST_TEST(list.front().second == 'B');
+  list.emplaceBack(std::make_pair('C', 'D'));
+  BOOST_TEST(list.back().first == 'C');
+}
+
+BOOST_AUTO_TEST_CASE(pop_front)
+{
+  List< int > list{123, 456};
   list.popFront();
   BOOST_TEST(list.front() == 456);
 }
 
-BOOST_AUTO_TEST_CASE(popBack)
+BOOST_AUTO_TEST_CASE(pop_back)
 {
-  aleksandrov::List< double > list{1000};
+  List< double > list{1000};
   list.popBack();
   BOOST_TEST(list.empty());
   list.pushBack(1);
@@ -106,102 +222,234 @@ BOOST_AUTO_TEST_CASE(popBack)
 
 BOOST_AUTO_TEST_CASE(swap)
 {
-  aleksandrov::List< int > list1{1, 2};
-  aleksandrov::List< int > list2{3};
-  list1.swap(list2);
-  BOOST_TEST(list1.front() == 3);
-  BOOST_TEST(list2.back() == 2);
+  List< int > a{1, 2};
+  List< int > b{3, 4, 5};
+  a.swap(b);
+  BOOST_TEST(a.size() == 3);
+  BOOST_TEST(b.size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(clear)
 {
-  aleksandrov::List< short > list;
-  list.clear();
-  list.clear();
-  list = {-1, -2};
-  list.clear();
-  BOOST_TEST(list.empty());
+  List< std::vector< char > > buffers;
+  buffers.clear();
+  buffers.clear();
+  buffers.pushBack({'a', 'b'});
+  buffers.clear();
+  BOOST_TEST(buffers.empty());
 }
 
-BOOST_AUTO_TEST_CASE(remove_if)
+BOOST_AUTO_TEST_CASE(assign_fill)
 {
-  aleksandrov::List< char > list(2, 'a');
-  list.remove('a');
-  BOOST_TEST(list.empty());
-}
-
-BOOST_AUTO_TEST_CASE(splice)
-{
-  aleksandrov::List< int > list1{1, 2, 3, 4, 5};
-  aleksandrov::List< int > list2{10, 20, 30, 40, 50};
-  auto it = list1.cbegin();
-  std::advance(it, 2);
-  list1.splice(it, std::move(list2));
-  BOOST_TEST(list2.empty());
-  BOOST_TEST(list1.size() == 10);
-  list2.splice(list2.cbegin(), list1, it, list1.cend());
-  BOOST_TEST(list1.size() == 7);
-  BOOST_TEST(list2.size() == 3);
-}
-
-BOOST_AUTO_TEST_CASE(assign)
-{
-  aleksandrov::List< char > list1(2, 'a');
+  List< char > list1(2, 'a');
   list1.assign(5, 'b');
   BOOST_TEST(list1.size() == 5);
+}
 
-  aleksandrov::List< char > list2(3, 'c');
-  list2.assign(list1.begin(), list1.end());
-  BOOST_TEST(list2.size() == 5);
+BOOST_AUTO_TEST_CASE(assign_range)
+{
+  std::vector< int > vec{5, 6, 7};
+  List< int > numbers;
+  numbers.assign(vec.cbegin(), vec.cend());
+  BOOST_TEST(numbers.size() == 3);
+}
 
-  aleksandrov::List< char > list3(1, 'd');
-  list3.assign({'e', 'f', 'g'});
-  BOOST_TEST(list3.size() == 3);
+BOOST_AUTO_TEST_CASE(assign_initializer_list)
+{
+  List< char > list(1, 'd');
+  list.assign({'e', 'f', 'g'});
+  BOOST_TEST(list.size() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(insert)
 {
-  aleksandrov::List< double > list{2.0, 3.0, 5.0};
-  double value = 4.0;
-  auto it = list.insertAfter(++list.cbegin(), value);
-  BOOST_TEST(*it == 4.0);
-  list.insertAfter(list.cend(), 1.0);
-  BOOST_TEST(list.front() == 1.0);
+  List< std::string > labels{"fine", "trash"};
+  auto it = labels.insertAfter(labels.cbegin(), "comedy artist");
+  BOOST_TEST(*it == "comedy artist");
+  labels.insertAfter(labels.cend(), "0/9");
+  BOOST_TEST(labels.front() == "0/9");
+}
+
+BOOST_AUTO_TEST_CASE(emplace)
+{
+  List< char > brackets{'(', '}', '['};
+  auto it = brackets.emplaceAfter(brackets.cbegin(), ')');
+  BOOST_TEST(*it == ')');
+  BOOST_TEST(brackets.front() == '(');
+  BOOST_TEST(brackets.size() == 4);
 }
 
 BOOST_AUTO_TEST_CASE(erase)
 {
-  aleksandrov::List< int > list{1, 2};
-  list.eraseAfter(list.cbegin());
-  BOOST_TEST(list.size() == 1);
-  for (int i = 2; i < 8; ++i)
-  {
-    list.pushBack(i);
-  }
-  auto first = std::next(list.cbegin());
-  auto last = std::next(first, 4);
-  auto it = list.eraseAfter(first, last);
-  BOOST_TEST(*it == 6);
-  BOOST_TEST(list.size() == 5);
+  List< int > list{1, 2, 3, 4, 5};
+  auto it = list.eraseAfter(list.cbegin());
+  BOOST_TEST(*it == 3);
+  BOOST_TEST(list.size() == 4);
+
+  auto first = list.cbegin();
+  auto last = std::next(first, 2);
+  it = list.eraseAfter(first, last);
+  BOOST_TEST(*it == 4);
+  BOOST_TEST(list.size() == 3);
+
+  it = list.eraseAfter(std::next(list.cbegin()));
+  BOOST_TEST(true);
 }
 
-BOOST_AUTO_TEST_CASE(bool_operators)
+BOOST_AUTO_TEST_SUITE_END();
+
+BOOST_AUTO_TEST_CASE(list_bool_operators)
 {
-  aleksandrov::List< unsigned char > list1{'x', 'y', 'z'};
-  aleksandrov::List< unsigned char > list2{'a', 'b', 'c'};
-  aleksandrov::List< unsigned char > list3{'x', 'y', 'z'};
-  BOOST_TEST(list1 != list2);
-  BOOST_TEST(list1 == list3);
-  BOOST_TEST(list2 < list1);
-  BOOST_TEST(list2 <= list1);
-  BOOST_TEST(list3 > list2);
-  BOOST_TEST(list3 >= list1);
+  List< int > empty;
+  List< int > nums1{1, 2, 3};
+  List< int > nums2{1, 2, 3};
+  List< int > nums3{1, 2};
+  List< int > nums4{1, 2, 4};
+  BOOST_TEST(empty != nums1);
+  BOOST_TEST(nums1 == nums2);
+  BOOST_TEST(nums3 < nums1);
+  BOOST_TEST(nums1 <= nums2);
+  BOOST_TEST(nums4 > nums1);
+  BOOST_TEST(nums1 >= nums3);
+}
+
+BOOST_AUTO_TEST_SUITE(list_operations);
+
+BOOST_AUTO_TEST_CASE(remove)
+{
+  List< unsigned int > list{1, 3, 3, 2, 3, 4};
+  list.remove(3);
+  BOOST_TEST(list.size() == 3);
+  BOOST_TEST(list.front() == 1);
+  BOOST_TEST(list.back() == 4);
+
+  list.remove(0);
+  BOOST_TEST(list.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(remove_if)
+{
+  List< unsigned int > list{1, 2, 4};
+  auto even = [](unsigned int value)
+  {
+    return value % 2 == 0;
+  };
+  list.removeIf(even);
+  BOOST_TEST(list.size() == 1);
+  BOOST_TEST(list.front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(splice)
+{
+  List< int > list1{1, 2};
+  List< int > list2{3, 4};
+  list1.spliceAfter(list1.cend(), list2);
+  BOOST_TEST(list1.size() == 4);
+  BOOST_TEST(list2.empty());
+
+  List< int > temp1{5, 6};
+  list1.spliceAfter(list1.cend(), std::move(temp1));
+  BOOST_TEST(list1.size() == 6);
+  BOOST_TEST(temp1.empty());
+
+  List< int > list3{7, 8};
+  list1.spliceAfter(list1.cend(), list3, list3.cbegin());
+  BOOST_TEST(list1.size() == 7);
+  BOOST_TEST(list3.size() == 1);
+
+  List< int > temp2{9, 10};
+  list1.spliceAfter(list1.cend(), std::move(temp2), temp2.cbegin());
+  BOOST_TEST(list1.size() == 8);
+  BOOST_TEST(temp2.size() == 1);
+
+  List< int > list4{11, 12, 13};
+  list1.spliceAfter(list1.cend(), list4, list4.cbegin(), std::next(list4.cbegin(), 2));
+  BOOST_TEST(list1.size() == 9);
+  BOOST_TEST(list4.size() == 2);
+
+  List< int > temp3{14, 15, 16};
+  list1.spliceAfter(list1.cend(), std::move(temp3), temp3.cbegin(), temp3.cend());
+  BOOST_TEST(list1.size() == 11);
+  BOOST_TEST(temp3.size() == 1);
+
+  std::vector< int > expected{15, 16, 12, 10, 8, 5, 6, 3, 4, 1, 2};
+  BOOST_TEST(std::equal(list1.begin(), list1.end(), expected.begin()));
 }
 
 BOOST_AUTO_TEST_CASE(reverse)
 {
-  aleksandrov::List< float > list{1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
-  list.reverse();
-  BOOST_TEST(list.front() == 5.0f);
+  List< std::pair< float, float > > coords{{1.0f, 1.0f}, {2.0f, 2.0f}, {3.0f, 3.0f}};
+  coords.reverse();
+  BOOST_TEST(coords.front().first == 3.0f);
+  coords.reverse();
+  BOOST_TEST(coords.back().first == 3.0f);
 }
+
+BOOST_AUTO_TEST_CASE(sort)
+{
+  List< double > numbers{3.0, 1.0, 4.0, 2.0};
+  numbers.sort();
+  std::vector< double > expected{1.0, 2.0, 3.0, 4.0};
+  BOOST_TEST(std::equal(numbers.begin(), numbers.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(sort_comp)
+{
+  struct LastDigitComparator
+  {
+    bool operator()(int a, int b) const
+    {
+      return (a % 10) < (b % 10);
+    }
+  };
+  List< int > list{25, 17, 32, 141, 59, 263, 178, 86, 94, 110};
+  list.sort(LastDigitComparator());
+  std::vector< int > expected{110, 141, 32, 263, 94, 25, 86, 17, 178, 59};
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(merge)
+{
+  List< int > list1{1, 3, 7};
+  List< int > list2{2, 4, 6};
+  list1.merge(list2);
+  BOOST_TEST(list2.empty());
+  std::vector< int > expected{1, 2, 3, 4, 6, 7};
+  BOOST_TEST(std::equal(list1.begin(), list1.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(merge_comp)
+{
+  List< int > list1{7, 3, 1};
+  List< int > list2{6, 4, 2};
+  list1.merge(list2, std::greater< int >());
+  BOOST_TEST(list2.empty());
+  std::vector< int > expected{7, 6, 4, 3, 2, 1};
+  BOOST_TEST(std::equal(list1.begin(), list1.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(unique)
+{
+  List< int > list{1, 1, 2, 3, 3, 3, 4};
+  list.unique();
+  std::vector< int > expected{1, 2, 3, 4};
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(unique_pred)
+{
+  struct EvenEqual
+  {
+    bool operator()(int a, int b) const
+    {
+      return (a % 2 == 0) && (b % 2 == 0);
+    }
+  };
+  List< int > numbers{1, 4, 2, 5, 7, 8, 10, 13};
+  numbers.unique(EvenEqual());
+  std::vector< int > expected{1, 4, 5, 7, 8, 13};
+  BOOST_TEST(std::equal(numbers.begin(), numbers.end(), expected.begin()));
+}
+
+BOOST_AUTO_TEST_SUITE_END();
 
