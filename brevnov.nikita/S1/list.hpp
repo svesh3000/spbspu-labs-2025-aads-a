@@ -64,18 +64,34 @@ namespace brevnov
   List< T >::List(size_t n, const T& val):
     List()
   {
-    for (size_t i = 0; i < n; i++)
+    try
     {
-      push_back(val);
+      for (size_t i = 0; i < n; i++)
+      {
+        push_back(val);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
 
   template< typename T >
   List< T >::List(const List< T >& copy)
   {
-    for (ConstIter it = copy.cbegin(); it != copy.cend(); ++it)
+    try
     {
-      push_back(*it);
+      for (ConstIter it = copy.cbegin(); it != copy.cend(); ++it)
+      {
+        push_back(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
 
@@ -95,9 +111,17 @@ namespace brevnov
   List< T >::List(InputIterator begin, InputIterator end):
     List()
   {
-    for (; begin != end; ++begin)
+    try
     {
-      push_back(*begin);
+      for (; begin != end; ++begin)
+      {
+        push_back(*begin);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
 
