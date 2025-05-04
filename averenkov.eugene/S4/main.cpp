@@ -43,9 +43,17 @@ void loadDictionaries(str filename, DictionaryStorage& storage)
 
 void printDictionary(const Dictionary& dict, str name)
 {
-  if (dict.empty())
+  auto dict_it = storage.find(name);
+  if (dict_it == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Dictionary& dict = dict_it->second;
+  if (dict.empty())
+  {
+    std::cout << "<EMPTY>\n";
     return;
   }
 
