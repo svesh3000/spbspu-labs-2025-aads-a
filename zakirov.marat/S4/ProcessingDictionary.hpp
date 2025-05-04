@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <limits>
 
 namespace zakirov
 {
@@ -27,6 +28,11 @@ namespace zakirov
     {
       std::string dataset;
       in >> dataset;
+      if (dictionary.find(dataset) == dictionary.end())
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+
       zakirov::print_d(out, dataset, dictionary[dataset]);
     }
     else if (command == "complement")
@@ -95,7 +101,8 @@ namespace zakirov
     }
     else
     {
-      throw std::logic_error("<INVALID ARGUMENT>");
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      throw std::logic_error("<INVALID COMMAND>");
     }
   }
 
