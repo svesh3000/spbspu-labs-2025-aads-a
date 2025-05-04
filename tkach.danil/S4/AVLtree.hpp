@@ -33,6 +33,8 @@ namespace tkach
     Iterator< Key, Value, Cmp > end();
     Iterator< Key, Value, Cmp > erase(Iterator< Key, Value, Cmp > it);
     Iterator< Key, Value, Cmp > erase(const Key& key);
+    Iterator< Key, Value, Cmp > lowerBound(const Key& key);
+    Iterator< Key, Value, Cmp > upperBound(const Key& key);
     bool empty();
     size_t size();
   private:
@@ -93,6 +95,46 @@ namespace tkach
     AvlTree< Key, Value, Cmp > temp(other);
     swap(temp);
     return *this;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::lowerBound(const Key& key)
+  {
+    TreeNode< Key, Value >* node = root_;
+    TreeNode< Key, Value >* result = nullptr;
+    while(node)
+    {
+      if (cmp_(node->data.first, key))
+      {
+        node = node->right;
+      }
+      else
+      {
+        result = node;
+        node = node->left;
+      }
+    }
+    return Iterator< Key, Value, Cmp >(result);
+  }
+
+  template< class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::upperBound(const Key& key)
+  {
+    TreeNode< Key, Value >* node = root_;
+    TreeNode< Key, Value >* result = nullptr;
+    while(node)
+    {
+      if (cmp_(key, node->data.first))
+      {
+        result = node;
+        node = node->left;
+      }
+      else
+      {
+        node = node->right;
+      }
+    }
+    return Iterator< Key, Value, Cmp >(result);
   }
 
   template< class Key, class Value, class Cmp >

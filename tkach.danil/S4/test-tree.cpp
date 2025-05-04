@@ -255,6 +255,19 @@ BOOST_AUTO_TEST_CASE(tree_end_test)
   BOOST_TEST(i == 6);
 }
 
+BOOST_AUTO_TEST_CASE(tree_upper_lowes_bound_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 1; i <= 7; i += 2)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  BOOST_TEST(tree.upperBound(5)->first == 7);
+  BOOST_TEST(tree.lowerBound(5)->first == 5);
+  BOOST_TEST(tree.upperBound(4)->first == 5);
+  BOOST_TEST(tree.lowerBound(4)->first == 5);
+}
+
 BOOST_AUTO_TEST_CASE(tree_cend_test)
 {
   AvlTree< size_t, std::string > tree;
