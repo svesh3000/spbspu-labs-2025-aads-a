@@ -275,7 +275,7 @@ namespace brevnov
       }
       else
       {
-        Node< T > * node_ = tail_->prev;
+        Node< T > * node = tail_->prev;
         delete tail_;
         tail_ = node;
         tail_->next = nullptr;
