@@ -172,22 +172,16 @@ namespace brevnov
   template< typename T >
   List< T > & List< T >::operator=(List< T > && copy)
   {
-    if (this != &copy)
-    {
-      List< T > cpy(std::move(copy));
-      swap(cpy);
-    }
+    List< T > cpy(std::move(copy));
+    swap(cpy);
     return *this;
   }
 
   template< typename T >
   List< T > & List< T >::operator=(std::initializer_list< T > il)
   {
-    if (this != &copy)
-    {
-      List< T > cpy(il);
-      swap(cpy);
-    }
+    List< T > cpy(il);
+    swap(cpy);
     return *this;
   }
 
