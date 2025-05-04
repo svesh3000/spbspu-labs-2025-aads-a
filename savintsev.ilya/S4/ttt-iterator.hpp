@@ -72,50 +72,59 @@ namespace savintsev
 
     BidirectIterator & next()
     {
-      if (!pos_ && node_->len_ == 2)
+      if (!node_)
       {
-        pos_ = 1;
         return *this;
       }
-      pos_ = 0;
-      if (node_->midd_)
+
+      if (pos_ == 0 && node_->len_ == 2 && node_->midd_)
       {
         node_ = node_->midd_;
         while (node_->left_)
         {
           node_ = node_->left_;
         }
+        pos_ = 0;
+        return *this;
       }
-      else if (node_->righ_)
+
+      if (pos_ == 0 && node_->len_ == 2)
+      {
+        pos_ = 1;
+        return *this;
+      }
+
+      pos_ = 0;
+      if (node_->righ_)
       {
         node_ = node_->righ_;
         while (node_->left_)
         {
           node_ = node_->left_;
         }
+        return *this;
       }
-      else
+
+      while (node_->parent_)
       {
-        while (node_->parent_)
+        auto prev = node_;
+        node_ = node_->parent_;
+        if (node_->left_ == prev)
         {
-          auto prev = node_;
-          node_ = node_->parent_;
-          if (node_->left_ == prev)
-          {
-            return *this;
-          }
-          if (node_->midd_ == prev && node_->righ_)
-          {
-            node_ = node_->righ_;
-            while (node_->left_)
-            {
-              node_ = node_->left_;
-            }
-            return *this;
-          }
+          return *this;
         }
-        node_ = nullptr;
+        if (node_->midd_ == prev)
+        {
+          if (node_->len_ == 2)
+          {
+            pos_ = 1;
+            return *this;
+          }
+          continue;
+        }
       }
+
+      node_ = nullptr;
       return *this;
     }
     BidirectIterator & prev()

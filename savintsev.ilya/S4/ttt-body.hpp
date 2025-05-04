@@ -177,6 +177,7 @@ namespace savintsev
     {
       if (!current->parent_)
       {
+        //not safe
         node_t< K, V > * child1 = new node_t< K, V >{};
         node_t< K, V > * child2 = new node_t< K, V >{};
         auto result = iterator();
@@ -213,8 +214,78 @@ namespace savintsev
       }
       else
       {
-        // zdes probros naverh, poka shto throw =)
-        throw std::runtime_error("Node splitting not implemented");
+        node_t< K, V > * parent = current->parent_;
+        node_t< K, V > * child = new node_t< K, V >{};
+        auto result = iterator();
+        //K temp;
+        if (parent->len_ == 1)
+        {
+          parent->len_ = 2;
+          if (C{}(k, current->data_[0].first)) // k data0 data1
+          {
+            child->data_[0] = current->data_[1];  //                           parent(data0)
+            if (C{}(current->data_[0].first, parent->data_[0].first)) // unknown current(k) child(data1)
+            {
+              parent->data_[1] = parent->data_[0];
+              parent->data_[0] = current->data_[0];
+            }
+            else
+            {
+              parent->data_[1] = current->data_[0];
+            }
+            current->data_[0] = {k, mapped_type{}};
+            result = iterator(current, 0);
+          }
+          else if (C{}(current->data_[1].first, k)) // data0 data1 k
+          {
+            child->data_[0] = {k, mapped_type{}};  //                         parent(data1)
+            if (C{}(current->data_[1].first, parent->data_[0].first)) // unknown current(data0) child(k)
+            {
+              parent->data_[1] = parent->data_[0];
+              parent->data_[0] = current->data_[1];
+            }
+            else
+            {
+              parent->data_[1] = current->data_[1];
+            }
+            result = iterator(child, 0);
+          }
+          else // data0 k data1
+          {
+            child->data_[0] = current->data_[1];  //      parent(k)
+            if (C{}(k, parent->data_[0].first)) // unknown current(data0) child(data1)
+            {
+              parent->data_[1] = parent->data_[0];
+              parent->data_[0] = {k, mapped_type{}};
+              result = iterator(parent, 0);
+            }
+            else
+            {
+              parent->data_[1] = {k, mapped_type{}};
+              result = iterator(parent, 1);
+            }
+          }
+          current->len_ = 1;
+          parent->len_ = 2;
+          if (parent->left_ == current)
+          {
+            parent->midd_ = child;
+          }
+          else
+          {
+            parent->midd_ = current;
+            parent->righ_ = child;
+          }
+          parent->sons_ = 3;
+          child->len_ = 1;
+          child->parent_ = parent;
+          return result;
+        }
+        else
+        {
+          // zdes probros naverh, poka shto throw =)
+          throw std::runtime_error("Node splitting not implemented");
+        }
       }
     }
   }
