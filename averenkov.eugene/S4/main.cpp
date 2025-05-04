@@ -4,8 +4,8 @@
 #include <string>
 #include "BiTree.hpp"
 
-using Dictionary = Tree< int, std::string >;
-using DictionaryStorage = Tree< std::string, Dictionary >;
+using Dictionary = Tree<int, std::string>;
+using DictionaryStorage = Tree<std::string, Dictionary>;
 using str = const std::string&;
 
 void loadDictionaries(str filename, DictionaryStorage& storage)
@@ -34,10 +34,10 @@ void loadDictionaries(str filename, DictionaryStorage& storage)
     std::string value;
     while (iss >> key >> value)
     {
-      dict.insert(std::pair< const int, std::string >(key, value));
+      dict.push(key, value);
     }
 
-    storage.insert(std::pair< const std::string, Dictionary >(dictName, dict));
+    storage.push(dictName, dict);
   }
 }
 
@@ -57,11 +57,11 @@ void printDictionary(const Dictionary& dict, str name)
   std::cout << "\n";
 }
 
-
 void complement(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
+
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
@@ -69,62 +69,38 @@ void complement(DictionaryStorage& storage, str newName, str name1, str name2)
   }
 
   Dictionary result;
-  auto it1 = dict1->second.begin();
-  auto it2 = dict2->second.begin();
-  auto end1 = dict1->second.end();
-  auto end2 = dict2->second.end();
-  while (it1 != end1)
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
   {
-    if (it2 == end2 || it1->first < it2->first)
+    if (dict2->second.find(it->first) == dict2->second.end())
     {
-      result.insert({it1->first, it1->second});
-      ++it1;
-    }
-    else if (it1->first > it2->first)
-    {
-      ++it2;
-    }
-    else
-    {
-      ++it1;
-      ++it2;
+      result.push(it->first, it->second);
     }
   }
-  storage.insert({ newName, result });
+
+  storage.push(newName, result);
 }
 
 void intersect(DictionaryStorage& storage, str newName, str name1, str name2)
 {
   auto dict1 = storage.find(name1);
   auto dict2 = storage.find(name2);
+
   if (dict1 == storage.end() || dict2 == storage.end())
   {
     std::cout << "<INVALID COMMAND>\n";
     return;
   }
+
   Dictionary result;
-  auto it1 = dict1->second.begin();
-  auto it2 = dict2->second.begin();
-  auto end1 = dict1->second.end();
-  auto end2 = dict2->second.end();
-  while (it1 != end1 && it2 != end2)
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
   {
-    if (it1->first < it2->first)
+    if (dict2->second.find(it->first) != dict2->second.end())
     {
-      ++it1;
-    }
-    else if (it1->first > it2->first)
-    {
-      ++it2;
-    }
-    else
-    {
-      result.insert({it1->first, it1->second});
-      ++it1;
-      ++it2;
+      result.push(it->first, it->second);
     }
   }
-  storage.insert({ newName, result });
+
+  storage.push(newName, result);
 }
 
 void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
@@ -139,41 +115,19 @@ void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
   }
 
   Dictionary result;
-  auto it1 = dict1->second.begin();
-  auto it2 = dict2->second.begin();
-  auto end1 = dict1->second.end();
-  auto end2 = dict2->second.end();
+  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
+  {
+    result.push(it->first, it->second);
+  }
+  for (auto it = dict2->second.begin(); it != dict2->second.end(); ++it)
+  {
+    if (result.find(it->first) == result.end())
+    {
+      result.push(it->first, it->second);
+    }
+  }
 
-  while (it1 != end1 && it2 != end2)
-  {
-    if (it1->first < it2->first)
-    {
-      result.insert({ it1->first, it1->second });
-      ++it1;
-    }
-    else if (it1->first > it2->first)
-    {
-      result.insert({ it2->first, it2->second });
-      ++it2;
-    }
-    else
-    {
-      result.insert({ it1->first, it1->second });
-      ++it1;
-      ++it2;
-    }
-  }
-  while (it1 != end1)
-  {
-    result.insert({ it1->first, it1->second });
-    ++it1;
-  }
-  while (it2 != end2)
-  {
-    result.insert({ it2->first, it2->second });
-    ++it2;
-  }
-  storage.insert({ newName, result });
+  storage.push(newName, result);
 }
 
 int main(int argc, char* argv[])
