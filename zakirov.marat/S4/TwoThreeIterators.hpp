@@ -41,6 +41,7 @@ namespace zakirov
   {
     return std::addressof(node_->data_);
   }
+
 /*
   template< typename T, typename K >
   TwoThreeIter< T, K > & TwoThreeIter< T, K >::operator++()
