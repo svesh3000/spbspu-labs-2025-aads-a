@@ -153,8 +153,11 @@ namespace brevnov
   template< typename T >
   List< T > & List< T >::operator=(const List< T > & copy)
   {
-    List< T > cpy(copy);
-    std::swap(cpy);
+    if (this != &other)
+    {
+      List< T > cpy(copy);
+      std::swap(cpy);
+    }
     return *this;
   }
 
@@ -169,8 +172,11 @@ namespace brevnov
   template< typename T >
   List< T > & List< T >::operator=(List< T > && copy)
   {
-    List< T > cpy(std::move(copy));
-    std::swap(cpy);
+    if (this != &other)
+    {
+      List< T > cpy(std::move(copy));
+      std::swap(cpy);
+    }
     return *this;
   }
 
