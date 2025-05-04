@@ -1,6 +1,6 @@
 #ifndef PROCESSINGDICTIONARY_HPP
 #define PROCESSINGDICTIONARY_HPP
-#include <ostream>
+#include <iostream>
 #include <map>
 #include <string>
 #include <list>
