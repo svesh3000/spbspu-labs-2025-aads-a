@@ -35,6 +35,11 @@ namespace zakirov
       std::string dataset_1;
       std::string dataset_2;
       in >> dataset_new.first >> dataset_1 >> dataset_2;
+      if (dictionary.find(dataset_1) == dictionary.end() || dictionary.find(dataset_2) == dictionary.end())
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+
       complement_d(dataset_new.second, dictionary[dataset_1], dictionary[dataset_2]);
       auto iterator_new = dictionary.find(dataset_new.first);
       if (iterator_new != dictionary.end())
@@ -50,6 +55,11 @@ namespace zakirov
       std::string dataset_1;
       std::string dataset_2;
       in >> dataset_new.first >> dataset_1 >> dataset_2;
+      if (dictionary.find(dataset_1) == dictionary.end() || dictionary.find(dataset_2) == dictionary.end())
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+
       intersect_d(dataset_new.second, dictionary[dataset_1], dictionary[dataset_2]);
       auto iterator_new = dictionary.find(dataset_new.first);
       if (iterator_new != dictionary.end())
@@ -65,6 +75,11 @@ namespace zakirov
       std::string dataset_1;
       std::string dataset_2;
       in >> dataset_new.first >> dataset_1 >> dataset_2;
+      if (dictionary.find(dataset_1) == dictionary.end() || dictionary.find(dataset_2) == dictionary.end())
+      {
+        throw std::logic_error("<INVALID COMMAND>");
+      }
+
       union_d(dataset_new.second, dictionary[dataset_1], dictionary[dataset_2]);
       auto iterator_new = dictionary.find(dataset_new.first);
       if (iterator_new != dictionary.end())
