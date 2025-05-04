@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <stack>
+#include <unordered_map>
 
 template < class Key, class Value, class Compare = std::less< Key > >
 class Tree
