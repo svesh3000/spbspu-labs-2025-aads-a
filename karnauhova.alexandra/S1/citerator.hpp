@@ -6,12 +6,12 @@
 namespace karnauhova
 {
   template< typename T >
-  struct ConstListIterator : public std::iterator<std::forward_iterator_tag, T>
+  struct ConstListIterator : public std::iterator< std::forward_iterator_tag, T >
   {
-    const NodeList<T>* node;
+    const NodeList< T >* node;
     using this_t = ConstListIterator< T >;
     ConstListIterator() : node(nullptr) {}
-    ConstListIterator(const NodeList<T>* element);
+    ConstListIterator(const NodeList< T >* element);
     ~ConstListIterator() = default;
     ConstListIterator(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
@@ -37,7 +37,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  ConstListIterator< T > ConstListIterator<T>::operator++(int)
+  ConstListIterator< T > ConstListIterator< T >::operator++(int)
   {
     ConstListIterator< T > result(*this);
     ++(*this);

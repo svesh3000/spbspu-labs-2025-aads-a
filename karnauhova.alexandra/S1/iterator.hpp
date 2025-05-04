@@ -38,7 +38,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  ListIterator< T > ListIterator<T>::operator++(int)
+  ListIterator< T > ListIterator< T >::operator++(int)
   {
     ListIterator< T > result(*this);
     ++(*this);

@@ -18,12 +18,12 @@ namespace karnauhova
     Fwd_list();
     Fwd_list(Iterator first, Iterator last);
     Fwd_list(size_t size, const T& value);
-    Fwd_list(std::initializer_list<T> Fwd_list);
+    Fwd_list(std::initializer_list< T > Fwd_list);
     Fwd_list(const Fwd_list< T >& other);
     Fwd_list(Fwd_list< T > &&other) noexcept;
     ~Fwd_list();
 
-    Fwd_list< T >& operator=(std::initializer_list<T> list);
+    Fwd_list< T >& operator=(std::initializer_list< T > list);
     Fwd_list< T >& operator=(const Fwd_list< T >& other);
     Fwd_list< T >& operator=(Fwd_list &&other) noexcept;
     bool empty() const noexcept;
@@ -92,7 +92,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  Fwd_list< T >::Fwd_list(std::initializer_list<T> Fwd_list)
+  Fwd_list< T >::Fwd_list(std::initializer_list< T > Fwd_list)
   {
     assign(Fwd_list);
   }
@@ -104,7 +104,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  Fwd_list< T >& Fwd_list< T >::operator=(std::initializer_list<T> list)
+  Fwd_list< T >& Fwd_list< T >::operator=(std::initializer_list< T > list)
   {
     assign(list);
     return *this;
@@ -219,25 +219,25 @@ namespace karnauhova
   }
 
   template< typename T >
-  typename Fwd_list<T>::Iterator Fwd_list< T >::begin() noexcept
+  typename Fwd_list< T >::Iterator Fwd_list< T >::begin() noexcept
   {
     return Iterator(fake_->next);
   }
 
   template< typename T >
-  typename Fwd_list<T>::CIterator Fwd_list< T >::cbegin() const noexcept
+  typename Fwd_list< T >::CIterator Fwd_list< T >::cbegin() const noexcept
   {
     return CIterator(fake_->next);
   }
 
   template< typename T >
-  typename Fwd_list<T>::CIterator Fwd_list< T >::cend() const noexcept
+  typename Fwd_list< T >::CIterator Fwd_list< T >::cend() const noexcept
   {
     return CIterator(fake_);
   }
 
   template< typename T >
-  typename Fwd_list<T>::Iterator Fwd_list< T >::end() noexcept
+  typename Fwd_list< T >::Iterator Fwd_list< T >::end() noexcept
   {
     return Iterator(fake_);
   }
@@ -339,10 +339,10 @@ namespace karnauhova
     reverse();
   }
 
-  template<typename T>
-  typename Fwd_list<T>::Iterator Fwd_list<T>::erase(Fwd_list<T>::CIterator pos) noexcept
+  template< typename T >
+  typename Fwd_list< T >::Iterator Fwd_list< T >::erase(Fwd_list< T >::CIterator pos) noexcept
   {
-    Node* todelete = const_cast<Node*>(pos.node);
+    Node* todelete = const_cast< Node* >(pos.node);
     if (pos == cend())
     {
       return end();
