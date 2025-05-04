@@ -8,7 +8,7 @@ namespace zakirov
   class TwoThreeTree
   {
   public:
-    
+
   private:
     TwoThreeNode< T, K > * head_;
     size_t size_;
