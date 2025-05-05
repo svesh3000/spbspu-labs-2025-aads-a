@@ -409,14 +409,6 @@ namespace petrov
     {
       return;
     }
-    if (size() == 1)
-    {
-      if (head_->data == val)
-      {
-        pop_front();
-      }
-      return;
-    }
     auto subhead = head_;
     auto prev_subhead = tail_;
     while (subhead != tail_ && size() != 1)
