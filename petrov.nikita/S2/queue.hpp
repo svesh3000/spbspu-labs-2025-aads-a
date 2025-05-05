@@ -54,7 +54,7 @@ namespace petrov
   Queue< T >::Queue(this_t && rhs):
     massive_(nullptr),
     capacity_(rhs.capacity_),
-    size_of_queue_(rhs.size_of_queue)
+    size_of_queue_(rhs.size_of_queue_)
   {
     massive_ = new T[rhs.size_of_queue_];
     for (size_t i = 0; i < rhs.size_of_queue_; i++)
