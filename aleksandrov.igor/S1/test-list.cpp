@@ -115,18 +115,18 @@ BOOST_AUTO_TEST_SUITE(list_element_access);
 
 BOOST_AUTO_TEST_CASE(front)
 {
-  List< std::string > strings(1, "Abcd");
-  BOOST_TEST(strings.front() == "Abcd");
-  strings.emplaceFront("Efgh");
-  BOOST_TEST(strings.front() == "Efgh");
+  List< std::string > labels(1, "comedy artist");
+  BOOST_TEST(labels.front() == "comedy artist");
+  labels.emplaceFront("9/9");
+  BOOST_TEST(labels.front() == "9/9");
 }
 
 BOOST_AUTO_TEST_CASE(back)
 {
-  List< std::string > strings(2, "ABC");
-  BOOST_TEST(strings.back() == "ABC");
-  strings.emplaceBack("DEF");
-  BOOST_TEST(strings.back() == "DEF");
+  List< std::string > labels(2, "fine");
+  BOOST_TEST(labels.back() == "fine");
+  labels.emplaceBack("trash");
+  BOOST_TEST(labels.back() == "trash");
 }
 
 BOOST_AUTO_TEST_SUITE_END();
@@ -248,9 +248,9 @@ BOOST_AUTO_TEST_CASE(assign_fill)
 
 BOOST_AUTO_TEST_CASE(assign_range)
 {
-  std::vector< int > vec{5, 6, 7};
+  List< int > list{5, 6, 7};
   List< int > numbers;
-  numbers.assign(vec.cbegin(), vec.cend());
+  numbers.assign(list.cbegin(), list.cend());
   BOOST_TEST(numbers.size() == 3);
 }
 
@@ -263,11 +263,41 @@ BOOST_AUTO_TEST_CASE(assign_initializer_list)
 
 BOOST_AUTO_TEST_CASE(insert)
 {
-  List< std::string > labels{"fine", "trash"};
-  auto it = labels.insertAfter(labels.cbegin(), "comedy artist");
-  BOOST_TEST(*it == "comedy artist");
-  labels.insertAfter(labels.cend(), "0/9");
-  BOOST_TEST(labels.front() == "0/9");
+  List< int > list{100};
+
+  const int value1 = 200;
+  auto it1 = list.insertAfter(list.cbegin(), value1);
+  BOOST_TEST(*it1 == 200);
+
+  auto it2 = list.insertAfter(std::next(list.cbegin(), 1), 300);
+  BOOST_TEST(*it2 == 300);
+
+  auto it3 = list.insertAfter(list.cbegin(), 2ull, 150);
+  BOOST_TEST(*it3 == 150);
+
+  List< int > numbers{175, 225};
+  auto it4 = list.insertAfter(std::next(list.cbegin(), 3), numbers.begin(), numbers.end());
+  BOOST_TEST(*it4 == 225);
+
+  auto it5 = list.insertAfter(std::next(list.cbegin(), 5), {250, 275});
+  BOOST_TEST(*it5 == 275);
+
+  List< int > empty;
+  auto it6 = list.insertAfter(list.cbegin(), empty.begin(), empty.end());
+  BOOST_TEST(*it6 == list.front());
+
+  auto it7 = list.insertAfter(list.cbegin(), {});
+  BOOST_TEST(*it7 == list.front());
+
+  auto it8 = list.insertAfter(std::next(list.cbegin(), 5), 400);
+  BOOST_TEST(*it8 == 400);
+
+  auto it9 = list.insertAfter(list.cbegin(), 0ull, 999);
+  BOOST_TEST(*it9 == list.front());
+
+  std::vector< int > expected{100, 150, 150, 200, 175, 225, 300, 250, 275, 400};
+  BOOST_TEST(list.size() == expected.size());
+  BOOST_TEST(std::equal(list.begin(), list.end(), expected.begin()));
 }
 
 BOOST_AUTO_TEST_CASE(emplace)
@@ -281,19 +311,29 @@ BOOST_AUTO_TEST_CASE(emplace)
 
 BOOST_AUTO_TEST_CASE(erase)
 {
-  List< int > list{1, 2, 3, 4, 5};
-  auto it = list.eraseAfter(list.cbegin());
-  BOOST_TEST(*it == 3);
-  BOOST_TEST(list.size() == 4);
+  List< int > list1{1, 2, 3, 4, 5};
+  auto it1 = list1.eraseAfter(list1.cbegin());
+  BOOST_TEST(*it1 == 3);
+  BOOST_TEST(list1.size() == 4);
 
-  auto first = list.cbegin();
+  auto first = list1.cbegin();
   auto last = std::next(first, 2);
-  it = list.eraseAfter(first, last);
-  BOOST_TEST(*it == 4);
-  BOOST_TEST(list.size() == 3);
+  it1 = list1.eraseAfter(first, last);
+  BOOST_TEST(*it1 == 4);
+  BOOST_TEST(list1.size() == 3);
 
-  it = list.eraseAfter(std::next(list.cbegin()));
-  BOOST_TEST(true);
+  List< int > list2{6, 7, 8, 9};
+  list2.eraseAfter(std::next(list2.cbegin(), 3));
+  BOOST_TEST(list2.size() == 4);
+
+  List< int > list3{10, 11, 12, 13, 14};
+  auto it3 = list3.eraseAfter(list3.cbegin(), std::next(list3.cbegin(), 4));
+  BOOST_TEST(*it3 == 14);
+  BOOST_TEST(list3.size() == 3);
+
+  List< int > list4{15, 16};
+  list4.eraseAfter(list4.cbegin());
+  BOOST_TEST(list4.size() == 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

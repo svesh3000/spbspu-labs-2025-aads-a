@@ -1,9 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <initializer_list>
-#include <cassert>
 #include <cstdlib>
+#include <cassert>
+#include <initializer_list>
 #include "node.hpp"
 #include "iterator.hpp"
 #include "const-iterator.hpp"
@@ -15,8 +15,6 @@ namespace aleksandrov
   class Iterator;
   template< typename T >
   class ConstIterator;
-  template< typename T >
-  class Equalizer;
 
   template< typename T>
   class List
@@ -39,10 +37,12 @@ namespace aleksandrov
     ConstIterator< T > cbegin() const noexcept;
     Iterator< T > end() const noexcept;
     ConstIterator< T > cend() const noexcept;
+
     T& front() noexcept;
     const T& front() const noexcept;
     T& back() noexcept;
     const T& back() const noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -52,18 +52,21 @@ namespace aleksandrov
     void pushBack(T&&);
     void popFront() noexcept;
     void popBack() noexcept;
+
     void swap(List< T >&) noexcept;
     void clear() noexcept;
 
     void remove(const T&) noexcept;
     template< typename UnaryPredicate >
-    void removeIf(UnaryPredicate);
-    void spliceAfter(ConstIterator< T >, List&);
-    void spliceAfter(ConstIterator< T >, List&&);
-    void spliceAfter(ConstIterator< T >, List&, ConstIterator< T >);
-    void spliceAfter(ConstIterator< T >, List&&, ConstIterator< T >);
-    void spliceAfter(ConstIterator< T >, List&, ConstIterator< T >, ConstIterator< T >);
-    void spliceAfter(ConstIterator< T >, List&&, ConstIterator< T >, ConstIterator< T >);
+    void removeIf(UnaryPredicate) noexcept;
+
+    void spliceAfter(ConstIterator< T >, List&) noexcept;
+    void spliceAfter(ConstIterator< T >, List&&) noexcept;
+    void spliceAfter(ConstIterator< T >, List&, ConstIterator< T >) noexcept;
+    void spliceAfter(ConstIterator< T >, List&&, ConstIterator< T >) noexcept;
+    void spliceAfter(ConstIterator< T >, List&, ConstIterator< T >, ConstIterator< T >) noexcept;
+    void spliceAfter(ConstIterator< T >, List&&, ConstIterator< T >, ConstIterator< T >) noexcept;
+
     void assign(size_t, const T&);
     template< class InputIt >
     void assign(InputIt, InputIt);
@@ -71,25 +74,34 @@ namespace aleksandrov
 
     Iterator< T > insertAfter(ConstIterator< T >, const T&);
     Iterator< T > insertAfter(ConstIterator< T >, T&&);
+    Iterator< T > insertAfter(ConstIterator< T >, size_t, const T&);
+    template< class InputIt >
+    Iterator< T > insertAfter(ConstIterator< T >, InputIt, InputIt);
+    Iterator< T > insertAfter(ConstIterator< T >, std::initializer_list< T >);
+
     Iterator< T > eraseAfter(ConstIterator< T >);
     Iterator< T > eraseAfter(ConstIterator< T >, ConstIterator< T >);
 
     void reverse() noexcept;
     template< class... Args >
+
     void emplaceBack(Args&&...);
     template< class... Args >
     void emplaceFront(Args&&...);
     template< class... Args >
     Iterator< T > emplaceAfter(ConstIterator< T >, Args&&...);
+
     void unique();
     template< class BinaryPredicate >
     void unique(BinaryPredicate);
+
     void merge(List&);
     void merge(List&&);
     template< class Compare >
     void merge(List&, Compare);
     template< class Compare >
     void merge(List&&, Compare);
+
     void sort();
     template< class Compare >
     void sort(Compare);
@@ -107,11 +119,12 @@ namespace aleksandrov
     size_t size_;
 
     template< typename U >
-    void spliceAfterImpl(ConstIterator< T >, U&&);
+    void spliceAfterImpl(ConstIterator< T >, U&&) noexcept;
     template< typename U >
-    void spliceAfterImpl(ConstIterator< T >, U&&, ConstIterator< T >);
+    void spliceAfterImpl(ConstIterator< T >, U&&, ConstIterator< T >) noexcept;
     template< typename U >
-    void spliceAfterImpl(ConstIterator< T >, U&&, ConstIterator< T >, ConstIterator< T >);
+    void spliceAfterImpl(ConstIterator< T >, U&&, ConstIterator< T >, ConstIterator< T >) noexcept;
+
     template< typename U, class Compare >
     void mergeImpl(U&&, Compare);
   };
@@ -131,7 +144,7 @@ namespace aleksandrov
   {
     for (auto it = rhs.begin(); it != rhs.end(); ++it)
     {
-      pushBack(*it);
+      emplaceBack(*it);
     }
   }
 
@@ -152,7 +165,7 @@ namespace aleksandrov
   {
     for (size_t i = 0; i < count; ++i)
     {
-      pushBack(value);
+      emplaceBack(value);
     }
   }
 
@@ -163,7 +176,7 @@ namespace aleksandrov
   {
     for (auto it = first; it != last; ++it)
     {
-      pushBack(*it);
+      emplaceBack(*it);
     }
   }
 
@@ -309,11 +322,11 @@ namespace aleksandrov
   template< typename T >
   void List< T >::popBack() noexcept
   {
-    auto beforeTail = fake_->next;
-    if (!beforeTail)
+    if (empty())
     {
       return;
     }
+    auto beforeTail = fake_->next;
     while (beforeTail->next != tail_)
     {
       beforeTail = beforeTail->next;
@@ -356,7 +369,6 @@ namespace aleksandrov
       Equalizer(const T& value):
         value_(value)
       {}
-
       bool operator()(const T& rhs)
       {
         return rhs == value_;
@@ -369,7 +381,7 @@ namespace aleksandrov
 
   template< typename T >
   template< typename UnaryPredicate >
-  void List< T >::removeIf(UnaryPredicate p)
+  void List< T >::removeIf(UnaryPredicate p) noexcept
   {
     for (ConstIterator< T > beforeIt(fake_), it = cbegin(); it.node_ != fake_;)
     {
@@ -386,9 +398,9 @@ namespace aleksandrov
 
   template< typename T >
   template< typename U >
-  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other)
+  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other) noexcept
   {
-    if (this == &other || other.empty())
+    if (other.empty())
     {
       return;
     }
@@ -405,24 +417,24 @@ namespace aleksandrov
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List& other)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List& other) noexcept
   {
     spliceAfterImpl(pos, other);
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List&& other)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List&& other) noexcept
   {
     spliceAfterImpl(pos, std::move(other));
   }
 
   template< typename T >
   template< typename U >
-  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other, ConstIterator< T > it)
+  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other, ConstIterator< T > it) noexcept
   {
     assert(it.node_);
     assert(pos.node_);
-    if (this == &other || it.node_ == other.tail_ || !it.node_->next)
+    if (it.node_ == other.tail_ || !it.node_->next)
     {
       return;
     }
@@ -443,20 +455,20 @@ namespace aleksandrov
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List& other, ConstIterator< T > it)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List& other, ConstIterator< T > it) noexcept
   {
     spliceAfterImpl(pos, other, it);
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List< T >&& other, ConstIterator< T > it)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List< T >&& other, ConstIterator< T > it) noexcept
   {
     spliceAfterImpl(pos, std::move(other), it);
   }
 
   template< typename T >
   template< typename U >
-  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::spliceAfterImpl(ConstIterator< T > pos, U&& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
    assert(first.node_ != other.tail_);
     if ((first == last && first != other.cend()) || first.node_->next == last.node_ || other.empty())
@@ -512,13 +524,13 @@ namespace aleksandrov
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List& other, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     spliceAfterImpl(pos, other, first, last);
   }
 
   template< typename T >
-  void List< T >::spliceAfter(ConstIterator< T > pos, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last)
+  void List< T >::spliceAfter(ConstIterator< T > pos, List< T >&& other, ConstIterator< T > first, ConstIterator< T > last) noexcept
   {
     spliceAfterImpl(pos, std::move(other), first, last);
   }
@@ -559,51 +571,95 @@ namespace aleksandrov
   }
 
   template< typename T >
+  Iterator< T > List< T >::insertAfter(ConstIterator< T > pos, size_t count, const T& value)
+  {
+    assert(pos.node_ != nullptr);
+    if (!count)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    auto lastInserted = emplaceAfter(pos, value);
+    for (size_t i = 1; i < count; ++i)
+    {
+      lastInserted = emplaceAfter(pos, value);
+    }
+    return lastInserted;
+  }
+
+  template< typename T >
+  template< class InputIt >
+  Iterator< T > List< T >::insertAfter(ConstIterator< T > pos, InputIt first, InputIt last)
+  {
+    assert(pos.node_ != nullptr);
+    if (first == last)
+    {
+      return Iterator< T >(pos.node_);
+    }
+    auto lastInserted = emplaceAfter(pos, *first);
+    for (auto it = ++first; it != last; ++it)
+    {
+      lastInserted = emplaceAfter(pos, *it);
+    }
+    return lastInserted;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::insertAfter(ConstIterator< T > pos, std::initializer_list< T > ilist)
+  {
+    assert(pos.node_ != nullptr);
+    if (!ilist.size())
+    {
+      return Iterator< T >(pos.node_);
+    }
+    return insertAfter(pos, ilist.begin(), ilist.end());
+  }
+
+  template< typename T >
   Iterator< T > List< T >::eraseAfter(ConstIterator< T > pos)
   {
     assert(pos.node_ != nullptr);
-    assert(pos.node_ != tail_);
-    Node* posPtr = pos.node_;
-    Node* toDelete = posPtr->next;
-    posPtr->next = toDelete->next;
+    if (pos.node_ == tail_)
+    {
+      return end();
+    }
+    Node* toDelete = pos.node_->next;
+    pos.node_->next = toDelete->next;
     if (toDelete == tail_)
     {
-      tail_ = posPtr;
+      tail_ = pos.node_;
     }
     delete toDelete;
     --size_;
-    return Iterator< T >(posPtr->next);
+    return Iterator< T >(pos.node_->next);
   }
 
   template< typename T >
   Iterator< T > List< T >::eraseAfter(ConstIterator< T > first, ConstIterator< T > last)
   {
     assert(first != last);
-    ConstIterator< T > it = first;
+    auto it = first;
     for (; it != last; ++it)
     {
       eraseAfter(it);
     }
-    return Iterator< T >(it.node_);
+    return Iterator< T >(last.node_);
   }
 
   template< typename T >
   bool List< T >::operator==(const List< T >& rhs) const noexcept
   {
-    if (size() != rhs.size())
+    if (size_ != rhs.size_)
     {
       return false;
     }
-    auto it = begin();
-    auto rhsIt = rhs.begin();
-    while (it != end())
+    auto it = cbegin();
+    auto rhsIt = rhs.cbegin();
+    while (it != cend())
     {
-      if (*it != *rhsIt)
+      if (*(it++) != *(rhsIt++))
       {
         return false;
       }
-      ++it;
-      ++rhsIt;
     }
     return true;
   }
@@ -665,7 +721,6 @@ namespace aleksandrov
   {
     Node* newNode = new Node(std::forward< Args >(args)...);
     newNode->next = fake_;
-
     if (!empty())
     {
       tail_->next = newNode;
@@ -683,10 +738,9 @@ namespace aleksandrov
   void List< T >::emplaceFront(Args&&... args)
   {
     Node* newNode = new Node(std::forward< Args >(args)...);
-    bool wasEmpty = empty();
+    const bool wasEmpty = empty();
     newNode->next = fake_->next;
     fake_->next = newNode;
-
     if (wasEmpty)
     {
       tail_ = newNode;
@@ -763,7 +817,7 @@ namespace aleksandrov
   template< typename U, class Compare >
   void List< T >::mergeImpl(U&& other, Compare comp)
   {
-    if (this == &other || other.empty())
+    if (other.empty())
     {
       return;
     }
@@ -820,7 +874,6 @@ namespace aleksandrov
     {
       return;
     }
-
     for (auto pos1 = begin(); pos1 != end(); ++pos1)
     {
       auto minNode = pos1;
