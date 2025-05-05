@@ -1,5 +1,8 @@
 #include <stdexcept>
 #include <iostream>
+#include <random>
+#include <chrono>
+#include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <mem_checker.hpp>
 #include "map.hpp"
@@ -66,30 +69,52 @@ BOOST_AUTO_TEST_CASE(access_test)
   BOOST_CHECK(map[1] == '6');
   BOOST_CHECK(map[3] == '2');
 }
+BOOST_AUTO_TEST_CASE(random_test)
+{
+  std::mt19937 engine;
+  engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
+  constexpr size_t input_size = 1024;
+  int data[input_size];
+  rychkov::Map< int, char > map;
+  for (int& i: data)
+  {
+    i = engine();
+    map.emplace(i, '\0');
+  }
+  std::sort(data, data + input_size);
+  size_t size = std::unique(data, data + input_size) - data;
+  struct equal_to_key
+  {
+    bool operator()(const std::pair< int, char >& lhs, const int& rhs)
+    {
+      return lhs.first == rhs;
+    }
+  };
+  BOOST_TEST(std::equal(map.begin(), map.end(), data, equal_to_key{}));
+  for (; size > 0; size--)
+  {
+    std::uniform_int_distribution< size_t > range(0, size - 1);
+    size_t key = range(engine);
+    map.erase(data[key]);
+    std::remove(data, data + size, data[key]);
+    BOOST_TEST(std::equal(map.begin(), map.end(), data, equal_to_key{}));
+  }
+}
 BOOST_AUTO_TEST_CASE(erase_test)
 {
   rychkov::Map< int, char > map = {{0, '1'}, {2, '2'}, {1, '3'}, {5, '4'}, {-3, '5'}, {4, '6'}, {-2, '7'}};
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(0);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(2);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(-1);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(4);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(1);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(5);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(-3);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   map.erase(-2);
-  print(std::cout, map.root()) << "--------\n" << std::flush;
   for (auto i: map)
   {
     std::cout << i.first << '\n';
-  }/**/
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

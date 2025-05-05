@@ -139,7 +139,7 @@ namespace rychkov
     iterator erase(const_iterator from, const_iterator to);
     size_type erase(const key_type& key);
     template< class K >
-    size_type erase(const K& key);
+    size_type erase(std::enable_if_t< is_transparent_v< key_compare >, const K& > key);
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args&&... args);
