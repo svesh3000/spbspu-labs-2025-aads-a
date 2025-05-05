@@ -5,6 +5,8 @@
 #include "node_tree.hpp"
 #include "c_iterator.hpp"
 #include "iterator.hpp"
+#include "stack.hpp"
+#include "queue.hpp"
 
 namespace tkach
 {
@@ -35,6 +37,18 @@ namespace tkach
     Iterator< Key, Value, Cmp > erase(const Key& key);
     Iterator< Key, Value, Cmp > lowerBound(const Key& key);
     Iterator< Key, Value, Cmp > upperBound(const Key& key);
+    template< typename F >
+    F traverseLnr(F f) const;
+    template< typename F >
+    F traverseRnl(F f) const;
+    template< typename F >
+    F traverseBreadth(F f) const;
+    template< typename F >
+    F traverseLnr(F f);
+    template< typename F >
+    F traverseRnl(F f);
+    template< typename F >
+    F traverseBreadth(F f);
     bool empty();
     size_t size();
   private:
@@ -523,6 +537,158 @@ namespace tkach
       clearFrom(root->right);
       delete root;
     }
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseLnr(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< const TreeNode< int, std::string >* > stack;
+    const TreeNode< int, std::string >* temp = root_;
+    while (!stack.empty() || temp)
+    {
+      while (temp)
+      {
+        stack.push(temp);
+        temp = temp->left;
+      }
+      temp = stack.top();
+      stack.pop();
+      f(temp->data);
+      temp = temp->right;
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseRnl(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< const TreeNode< int, std::string >* > stack;
+    const TreeNode< int, std::string >* temp = root_;
+    while (!stack.empty() || temp)
+    {
+      while (temp)
+      {
+        stack.push(temp);
+        temp = temp->right;
+      }
+      temp = stack.top();
+      stack.pop();
+      f(temp->data);
+      temp = temp->left;
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseBreadth(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Queue< const TreeNode< int, std::string >* > queue;
+    queue.push(root_);
+    while (!queue.empty())
+    {
+      const TreeNode< int, std::string >* temp = queue.front();
+      f(temp->data);
+      if (temp->left)
+      {
+        queue.push(temp->left);
+      }
+      if (temp->right)
+      {
+        queue.push(temp->right);
+      }
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseLnr(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< TreeNode< int, std::string >* > stack;
+    TreeNode< int, std::string >* temp = root_;
+    while (!stack.empty() || temp)
+    {
+      while (temp)
+      {
+        stack.push(temp);
+        temp = temp->left;
+      }
+      temp = stack.top();
+      stack.pop();
+      f(temp->data);
+      temp = temp->right;
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseRnl(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< TreeNode< int, std::string >* > stack;
+    TreeNode< int, std::string >* temp = root_;
+    while (!stack.empty() || temp)
+    {
+      while (temp)
+      {
+        stack.push(temp);
+        temp = temp->right;
+      }
+      temp = stack.top();
+      stack.pop();
+      f(temp->data);
+      temp = temp->left;
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< typename F >
+  F AvlTree< Key, Value, Cmp >::traverseBreadth(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Queue< TreeNode< int, std::string >* > queue;
+    queue.push(root_);
+    while (!queue.empty())
+    {
+      TreeNode< int, std::string >* temp = queue.front();
+      f(temp->data);
+      if (temp->left)
+      {
+        queue.push(temp->left);
+      }
+      if (temp->right)
+      {
+        queue.push(temp->right);
+      }
+    }
+    return f;
   }
 }
 

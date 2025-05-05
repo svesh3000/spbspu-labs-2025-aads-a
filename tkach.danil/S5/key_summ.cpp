@@ -26,11 +26,11 @@ void tkach::KeySumm::operator()(const std::pair< int, std::string >& key_value)
 {
   if (isOverflow(key_sum, key_value.first))
   {
-    throw std::overflow_error("overflow"); 
+    throw std::overflow_error("overflow");
   }
   else if (isUnderflow(key_sum, key_value.first))
   {
-    throw std::overflow_error("underflow"); 
+    throw std::overflow_error("underflow");
   }
   key_sum += key_value.first;
   values += ' ' + key_value.second;

@@ -1,10 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <AVLtree.hpp>
-namespace
-{
-
-}
+#include "key_summ.hpp"
 
 int main(const int argc, const char* const* const argv)
 {
@@ -34,23 +31,24 @@ int main(const int argc, const char* const* const argv)
   }
   if (tree.empty())
   {
-    std::cout << "EMPTY\n";
+    std::cout << "<EMPTY>\n";
     return 0;
   }
   std::string cmd = argv[1];
+  KeySumm res;
   try
   {
-    if (command == "ascending")
+    if (cmd == "ascending")
     {
-
+      res = tree.traverseLnr(res);
     }
-    else if (command == "ascending")
+    else if (cmd == "ascending")
     {
-
+      res = tree.traverseRnl(res);
     }
-    else if (command == "ascending")
+    else if (cmd == "ascending")
     {
-
+      res = tree.traverseBreadth(res);
     }
     else
     {
@@ -58,4 +56,11 @@ int main(const int argc, const char* const* const argv)
       return 1;
     }
   }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
+  std::cout << res.key_sum << " " << res.values << "\n";
+  return 0;
 }
