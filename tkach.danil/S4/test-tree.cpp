@@ -2,6 +2,8 @@
 #include <sstream>
 #include <string>
 #include <AVLtree.hpp>
+#include "c_iterator.hpp"
+#include "iterator.hpp"
 
 using namespace tkach;
 template< class Key, class Value >
