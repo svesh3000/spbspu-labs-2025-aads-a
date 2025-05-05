@@ -1,7 +1,40 @@
 #include <stdexcept>
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <mem_checker.hpp>
 #include "map.hpp"
+
+template< class Value, size_t N >
+std::ostream& print(std::ostream& out, rychkov::MapNode< Value, N >* node, size_t level = 0)
+{
+  if (node == nullptr)
+  {
+    return out;
+  }
+  using node_type = rychkov::MapNode< Value, N >;
+  for (typename node_type::size_type i = 0; i < node->size(); i++)
+  {
+    print(out, node->children[i], level + 1);
+    for (size_t j = 0; j < level; j++)
+    {
+      out << '\t';
+    }
+    out << node->operator[](i).first;
+    if (!node->parent->isfake())
+    {
+      out << " (" << node->parent->operator[](0).first << ')';
+    }
+    out << '\n';
+  }
+  print(out, node->children[node->size()], level + 1);
+  return out;
+}
+template< class Key, class Mapped, class Compare, size_t N >
+rychkov::MapNode< typename rychkov::Map< Key, Mapped, Compare, N >::value_type, N >*
+    rychkov::Map< Key, Mapped, Compare, N >::root() noexcept
+{
+  return fake_children_[0];
+}
 
 BOOST_AUTO_TEST_SUITE(S4_map_test)
 
@@ -32,6 +65,31 @@ BOOST_AUTO_TEST_CASE(access_test)
   map[1] = '6';
   BOOST_CHECK(map[1] == '6');
   BOOST_CHECK(map[3] == '2');
+}
+BOOST_AUTO_TEST_CASE(erase_test)
+{
+  rychkov::Map< int, char > map = {{0, '1'}, {2, '2'}, {1, '3'}, {5, '4'}, {-3, '5'}, {4, '6'}, {-2, '7'}};
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(0);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(2);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(-1);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(4);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(1);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(5);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(-3);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  map.erase(-2);
+  print(std::cout, map.root()) << "--------\n" << std::flush;
+  for (auto i: map)
+  {
+    std::cout << i.first << '\n';
+  }/**/
 }
 
 BOOST_AUTO_TEST_SUITE_END()

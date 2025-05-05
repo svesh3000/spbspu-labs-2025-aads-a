@@ -148,6 +148,8 @@ namespace rychkov
 
     key_compare key_comp() const;
     value_compare value_comp() const;
+
+    MapNode< value_type, N >* root() noexcept;
   private:
     static constexpr size_t node_capacity = N;
     static constexpr size_t node_middle = (node_capacity + 1) / 2;

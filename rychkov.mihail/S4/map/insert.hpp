@@ -30,6 +30,7 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
   if (!hint.node_->isleaf())
   {
     --hint;
+    hint.pointed_++;
   }
   if (!hint.node_->full())
   {
@@ -129,11 +130,11 @@ void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& 
     if (ins_point < node_middle)
     {
       right.children[0] = left.children[node_middle];
-      node_type* left_child = left.children[0];
       to_insert.emplace_back(std::move(left[node_middle - 1]));
       left.pop_back();
       left.emplace(ins_point, std::move(to_insert[0]));
-      left.children[0] = left_child;
+      left.children[ins_point] = to_insert.children[0];
+      left.children[ins_point + 1] = to_insert.children[1];
       to_insert.erase(0);
     }
     else
@@ -173,6 +174,14 @@ void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& 
     }
     to_insert.erase(0);
   }
+  if (!right.isleaf())
+  {
+    for (node_size_type i = 0; i < right.size() + 1; i++)
+    {
+      right.children[i]->parent = &right;
+    }
+  }
+
   right.parent = left.parent;
   to_insert.children[0] = &left;
   to_insert.children[1] = &right;

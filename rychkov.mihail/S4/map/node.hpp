@@ -83,6 +83,12 @@ namespace rychkov
     {
       emplace(size_, std::forward< Args >(args)...);
     }
+    template< class... Args >
+    void replace(size_type i, Args&&... args)
+    {
+      operator[](i).~value_type();
+      new(std::addressof(operator[](i))) value_type{std::forward< Args >(args)...};
+    }
     void erase(size_type i)
     {
       operator[](i).~value_type();

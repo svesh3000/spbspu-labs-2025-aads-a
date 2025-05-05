@@ -8,5 +8,6 @@
 #include "map/insert.hpp"
 #include "map/access.hpp"
 #include "map/search.hpp"
+#include "map/erase.hpp"
 
 #endif
