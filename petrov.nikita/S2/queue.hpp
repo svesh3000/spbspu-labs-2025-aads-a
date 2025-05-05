@@ -89,7 +89,7 @@ namespace petrov
   {
     if (this->empty())
     {
-      delete massive_[];
+      delete[] massive_;
       capacity_ = 5;
       massive_ = new T[capacity_];
       massive_[size_of_queue_++] = element;
@@ -118,30 +118,6 @@ namespace petrov
   void Queue< T >::pop()
   {
     size_of_queue_--;
-  }
-
-  template< typename T >
-  T & Queue< T >::front()
-  {
-    return massive_[size_of_queue_ - 1];
-  }
-
-  template< typename T >
-  const T & Queue< T >::front() const
-  {
-    
-  }
-
-  template< typename T >
-  T & Queue< T >::back()
-  {
-    
-  }
-
-  template< typename T >
-  const T & Queue< T >::back() const
-  {
-
   }
 
   template< typename T >
