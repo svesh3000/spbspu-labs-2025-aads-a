@@ -678,6 +678,7 @@ namespace tkach
     while (!queue.empty())
     {
       TreeNode< int, std::string >* temp = queue.front();
+      queue.pop();
       f(temp->data);
       if (temp->left)
       {
