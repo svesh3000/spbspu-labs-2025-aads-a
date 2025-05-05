@@ -18,10 +18,19 @@ int main(int argc, char** argv)
     return 1;
   }
   setmap_t data_map;
-  input_setmap(fin, data_map);
-
+  try {
+    input_setmap(fin, data_map);
+  } catch (const std::bad_alloc&) {
+    std::cerr << "<INPUT ERROR>\n";
+    return 1;
+  }
   commands_t commands;
-  fill_with_commands(commands);
+  try {
+    fill_with_commands(commands);
+  } catch (const std::bad_alloc&) {
+    std::cerr << "<COMMANDS REGISTRATION ERROR>\n";
+    return 1;
+  }
   std::string command;
   while (std::cin) {
     std::cin >> command;
