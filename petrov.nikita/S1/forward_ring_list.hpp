@@ -417,25 +417,9 @@ namespace petrov
       }
       return;
     }
-    size_t size = this->size();
-    size_t count = 0;
-    auto it = cbegin();
-    do
-    {
-      if (*it == val)
-      {
-        count++;
-      }
-    }
-    while (it++ != cend());
-    if (count == size)
-    {
-      clear();
-      return;
-    }
     auto subhead = head_;
     auto prev_subhead = tail_;
-    do
+    while (subhead != tail_ && size() != 1)
     {
       if (subhead->data == val)
       {
@@ -460,7 +444,39 @@ namespace petrov
         subhead = subhead->next;
       }
     }
-    while (subhead != head_);
+    if (size() == 1)
+    {
+      if (head_->data == val)
+      {
+        pop_front();
+      }
+    }
+    else
+    {
+      if (subhead->data == val)
+      {
+        auto todelete = subhead;
+        subhead = todelete->next;
+        prev_subhead->next = subhead;
+        if (todelete == head_)
+        {
+          head_ = subhead;
+        }
+        else if (todelete == tail_)
+        {
+          tail_ = prev_subhead;
+        }
+        delete todelete;
+        todelete = nullptr;
+        size_--;
+      }
+      else
+      {
+        prev_subhead = subhead;
+        subhead = subhead->next;
+      }
+    }
+    return;
   }
 
   template< typename T >
