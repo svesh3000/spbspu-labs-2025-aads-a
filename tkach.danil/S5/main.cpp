@@ -61,6 +61,6 @@ int main(const int argc, const char* const* const argv)
     std::cerr << e.what() << "\n";
     return 1;
   }
-  std::cout << res.key_sum << res.values << "\n";
+  std::cout << res.key_sum << " " << res.values << "\n";
   return 0;
 }

@@ -33,5 +33,12 @@ void tkach::KeySumm::operator()(const std::pair< int, std::string >& key_value)
     throw std::overflow_error("underflow");
   }
   key_sum += key_value.first;
-  values += ' ' + key_value.second;
+  if (values.empty())
+  {
+    values += key_value.second;
+  }
+  else
+  {
+    values += ' ' + key_value.second;
+  }
 }
