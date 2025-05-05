@@ -11,11 +11,11 @@ namespace tkach
   {
   public:
     Queue() = default;
-    Queue(const Queue< T >&);
-    Queue(Queue< T >&&) noexcept;
+    Queue(const Queue< T >&) = default;
+    Queue(Queue< T >&&) noexcept = default;
     ~Queue() = default;
-    Queue< T >& operator=(Queue< T >&&);
-    Queue< T >& operator=(const Queue< T >&) noexcept;
+    Queue< T >& operator=(Queue< T >&&) noexcept = default;
+    Queue< T >& operator=(const Queue< T >&) = default;
     void pop();
     void push(const T& data);
     void push(T&& data);
@@ -27,40 +27,6 @@ namespace tkach
   private:
     DynArray< T > array_;
   };
-
-  template< typename T >
-  Queue< T >::Queue(const Queue< T >& other):
-    array_(other.array_)
-  {}
-
-  template< typename T >
-  Queue< T >::Queue(Queue< T >&& other):
-    array_(std::move(other.array_))
-  {}
-
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(Queue< T >&& other) noexcept
-  {
-    if (this == std::addressof(other))
-    {
-      return *this;
-    }
-    Queue< T > temp(std::move(other));
-    swap(temp);
-    return *this;
-  }
-
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(const Queue< T >& other) noexcept
-  {
-    if (this == std::addressof(other))
-    {
-      return *this;
-    }
-    Queue< T > temp(other);
-    swap(temp);
-    return *this;
-  }
 
   template< typename T >
   void Queue< T >::pop()

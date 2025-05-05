@@ -10,7 +10,7 @@ namespace tkach
   class List;
 
   template< typename T >
-  class Citerator: public std::iterator< std::forward_iterator_tag, T>
+  class Citerator: public std::iterator< std::forward_iterator_tag, T >
   {
     friend class List < T >;
   public:
