@@ -9,13 +9,15 @@ namespace savintsev
   struct node_t
   {
     using value_type = std::pair< Key, Value >;
-    value_type data_;
+    value_type data_[2];
 
     node_t * left_ = nullptr;
-    node_t * right_ = nullptr;
+    node_t * midd_ = nullptr;
+    node_t * righ_ = nullptr;
     node_t * parent_ = nullptr;
 
-    size_t height_ = 1;
+    size_t len_ = 0;
+    size_t sons_ = 0;
   };
 }
 
