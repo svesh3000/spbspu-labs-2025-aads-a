@@ -11,6 +11,7 @@ namespace
   {
     while (!in.eof())
     {
+      in.clear();
       std::map< int, std::string > temp;
       std::string name;
       in >> name;
@@ -52,11 +53,11 @@ int main(int argc, char * argv[])
         std::cin >> name;
         print(std::cout, name, dicts);
       }
-      else if (command == "comlement")
+      else if (command == "complement")
       {
         std::string newDict, dict1, dict2;
         std::cin >> newDict >> dict1 >> dict2;
-        comlement(newDict, dict1, dict2, dicts);
+        complement(newDict, dict1, dict2, dicts);
       }
       else if (command == "intersect")
       {

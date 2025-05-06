@@ -17,7 +17,7 @@ void mozhegova::print(std::ostream & out, std::string name, const dictionaries &
   out << '\n';
 }
 
-void mozhegova::comlement(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
+void mozhegova::complement(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
 {
   std::map< int, std::string > dict1 = dicts.at(dictName1);
   std::map< int, std::string > dict2 = dicts.at(dictName2);
