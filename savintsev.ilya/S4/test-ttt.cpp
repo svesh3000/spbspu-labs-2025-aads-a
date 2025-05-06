@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "two-three-tree.h"
+#include "AVL-tree.h"
 
 using namespace savintsev;
 

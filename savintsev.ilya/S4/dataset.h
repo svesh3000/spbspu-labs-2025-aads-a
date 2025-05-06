@@ -3,10 +3,13 @@
 #include <map>
 #include <string>
 #include <functional>
+#include "AVL-tree.h"
 
-using Dataset = std::map< int, std::string >;
-using DatasetCollection = std::map< std::string, Dataset >;
-using DatasetCommands = std::map< std::string, std::function< void(DatasetCollection &) > >;
+using namespace savintsev;
+
+using Dataset = AVLTree< int, std::string >;
+using DatasetCollection = AVLTree< std::string, Dataset >;
+using DatasetCommands = AVLTree< std::string, std::function< void(DatasetCollection &) > >;
 
 namespace savintsev
 {

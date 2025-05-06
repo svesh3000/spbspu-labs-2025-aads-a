@@ -1,13 +1,13 @@
-#ifndef TTT_BODY_HPP
-#define TTT_BODY_HPP
+#ifndef AVL_BODY_HPP
+#define AVL_BODY_HPP
 
 #include <functional>
 #include <initializer_list>
 #include <utility>
 #include <iterator>
 #include <type_traits>
-#include "ttt-node.hpp"
-#include "ttt-iterator.hpp"
+#include "avl-node.hpp"
+#include "avl-iterator.hpp"
 
 namespace savintsev
 {
@@ -84,6 +84,16 @@ namespace savintsev
       }
       insert({key, mapped_type{}});
       return find_node(key)->data_.second;
+    }
+
+    mapped_type & at(const key_type & key) const
+    {
+      node_type * node = find_node(key);
+      if (node)
+      {
+        return node->data_.second;
+      }
+      throw std::out_of_range("ERROR: Key not exist");
     }
 
     bool empty() const

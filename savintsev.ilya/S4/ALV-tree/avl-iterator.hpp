@@ -1,7 +1,7 @@
-#ifndef TTT_ITERATOR_H
-#define TTT_ITERATOR_H
+#ifndef AVL_ITERATOR_H
+#define AVL_ITERATOR_H
 #include <utility>
-#include "ttt-node.hpp"
+#include "avl-node.hpp"
 
 namespace savintsev
 {
