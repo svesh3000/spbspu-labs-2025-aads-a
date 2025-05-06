@@ -180,7 +180,7 @@ namespace savintsev
       for (const auto& key : keys_to_remove) {
         remove(key);
       }
-
+      
       return last;
     }
 
@@ -387,7 +387,7 @@ namespace savintsev
       {
         return nullptr;
       }
-
+      
       if (comp_(key, node->data_.first))
       {
         node->left_ = remove_recursive(node->left_, key, removed);
@@ -406,24 +406,30 @@ namespace savintsev
 
           if (!child)
           {
+            // No child case
             delete node;
             return nullptr;
           }
           else
           {
+            // One child case
             child->parent_ = node->parent_;
             node_type* temp = node;
-            node = child;
+            node = child;  // Move child up
             delete temp;
             return node;
           }
         }
         else
         {
+          // Two children case
+          // Find the in-order successor (smallest in right subtree)
           node_type * successor = find_min(node->right_);
-
+          
+          // Copy successor data (not the entire node!)
           node->data_ = successor->data_;
-
+          
+          // Remove the successor
           bool dummy = false;
           node->right_ = remove_recursive(node->right_, successor->data_.first, dummy);
         }
