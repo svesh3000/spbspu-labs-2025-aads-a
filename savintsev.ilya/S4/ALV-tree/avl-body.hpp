@@ -6,7 +6,6 @@
 #include <utility>
 #include <iterator>
 #include <type_traits>
-#include <vector>
 #include "avl-node.hpp"
 #include "avl-iterator.hpp"
 
@@ -152,17 +151,10 @@ namespace savintsev
 
     iterator erase(iterator pos)
     {
-      if (pos == end())
-      {
-        return end();
-      }
-
       key_type key = pos->first;
-      iterator next = pos;
-      ++next;
-
+      ++pos;
       remove(key);
-      return next;
+      return pos;
     }
 
     size_t erase(const key_type & key)
@@ -172,15 +164,10 @@ namespace savintsev
 
     iterator erase(iterator first, iterator last)
     {
-      std::vector< key_type > keys_to_remove;
-      for (iterator it = first; it != last; ++it)
+      while (first != last)
       {
-        keys_to_remove.push_back(it->first);
+        first = erase(first);
       }
-      for (const auto& key : keys_to_remove) {
-        remove(key);
-      }
-      
       return last;
     }
 
@@ -201,7 +188,7 @@ namespace savintsev
 
     std::pair< iterator, iterator > equal_range(const key_type & key)
     {
-      return {lower_bound(key), upper_bound(key)};
+      return { lower_bound(key), upper_bound(key) };
     }
 
     iterator lower_bound(const key_type & key)
@@ -364,12 +351,16 @@ namespace savintsev
       }
       else
       {
-        // FIX: Update value for existing key
         node->data_.second = data.second;
         inserted = false;
       }
 
-      return balance(node);
+      node_type * balanced = balance(node);
+      if (!balanced->parent_ && parent == nullptr)
+      {
+        root_ = balanced;
+      }
+      return balanced;
     }
 
     node_type * find_min(node_type * node) const
@@ -387,7 +378,6 @@ namespace savintsev
       {
         return nullptr;
       }
-      
       if (comp_(key, node->data_.first))
       {
         node->left_ = remove_recursive(node->left_, key, removed);
@@ -406,30 +396,19 @@ namespace savintsev
 
           if (!child)
           {
-            // No child case
             delete node;
             return nullptr;
           }
-          else
-          {
-            // One child case
-            child->parent_ = node->parent_;
-            node_type* temp = node;
-            node = child;  // Move child up
-            delete temp;
-            return node;
-          }
+
+          child->parent_ = node->parent_;
+          delete node;
+          return child;
         }
         else
         {
-          // Two children case
-          // Find the in-order successor (smallest in right subtree)
           node_type * successor = find_min(node->right_);
-          
-          // Copy successor data (not the entire node!)
           node->data_ = successor->data_;
-          
-          // Remove the successor
+
           bool dummy = false;
           node->right_ = remove_recursive(node->right_, successor->data_.first, dummy);
         }
