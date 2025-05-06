@@ -73,7 +73,7 @@ namespace mozhegova
   TreeIterator< Key, T, Cmp > TreeIterator< Key, T, Cmp >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
-    TreeConstIterator< Key, T, Cmp > result(*this);
+    TreeIterator< Key, T, Cmp > result(*this);
     ++(*this);
     return result;
   }
@@ -105,7 +105,7 @@ namespace mozhegova
   TreeIterator< Key, T, Cmp > TreeIterator< Key, T, Cmp >::operator--(int) noexcept
   {
     assert(node_ != nullptr);
-    TreeConstIterator< Key, T, Cmp > result(*this);
+    TreeIterator< Key, T, Cmp > result(*this);
     --(*this);
     return result;
   }
