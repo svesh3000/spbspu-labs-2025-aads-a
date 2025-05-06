@@ -1,195 +1,82 @@
 #ifndef TTT_ITERATOR_H
 #define TTT_ITERATOR_H
-#include <iterator>
 #include <utility>
 #include "ttt-node.hpp"
 
 namespace savintsev
 {
-  template< typename Key, typename Value, typename Compare >
-  class TwoThreeTree;
-
-  //template< typename Key, typename Value, typename Compare >
-  //class ConstIterator;
-
   template< typename Key, typename Value >
-  class BidirectIterator:
-    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
+  class BidirectIterator
   {
-    using value_type = std::pair< Key, Value >;
-
-    template< typename K, typename V, typename C >
-    friend class TwoThreeTree;
-    //friend class ConstIterator< T >;
   public:
-    BidirectIterator():
-      node_(nullptr)
+    using node_type = node_t< Key, Value >;
+    using value_type = typename node_type::value_type;
+
+    BidirectIterator() = default;
+
+    explicit BidirectIterator(node_type * node):
+      node_(node)
     {}
-    value_type & operator*()
+
+    value_type & operator*() const
     {
-      return node_->data_[pos_];
+      return node_->data_;
     }
-    value_type * operator->()
+
+    value_type* operator->() const
     {
-      return std::addressof(node_->data_[pos_]);
+      return & node_->data_;
     }
-    const value_type & operator*() const
-    {
-      return node_->data_[pos_];
-    }
-    const value_type * operator->() const
-    {
-      return std::addressof(node_->data_[pos_]);
-    }
+
     BidirectIterator & operator++()
     {
-      return next();
+      node_ = next(node_);
+      return *this;
     }
+
     BidirectIterator operator++(int)
     {
-      BidirectIterator< Key, Value > result(*this);
+      BidirectIterator tmp = * this;
       ++(*this);
-      return result;
+      return tmp;
     }
-    BidirectIterator & operator--();
-    BidirectIterator operator--(int);
-    bool operator!=(const BidirectIterator & rhs) const
+
+    bool operator==(const BidirectIterator & other) const
     {
-      return !(*this == rhs);
+      return node_ == other.node_;
     }
-    bool operator==(const BidirectIterator & rhs) const
+
+    bool operator!=(const BidirectIterator & other) const
     {
-      return node_ == rhs.node_ && pos_ == rhs.pos_;
+      return node_ != other.node_;
     }
+
   private:
-    node_t< Key, Value > * node_;
-    size_t pos_ = 0;
+    node_type * node_ = nullptr;
 
-    BidirectIterator(node_t< Key, Value > * node, size_t pos = 0):
-      node_(node),
-      pos_(pos)
-    {}
-
-    BidirectIterator & next()
+    node_type * next(node_type * node)
     {
-      if (!node_)
+      if (!node) return nullptr;
+
+      if (node->right_)
       {
-        return *this;
+        node = node->right_;
+        while (node->left_)
+          node = node->left_;
+        return node;
       }
 
-      if (pos_ == 0 && node_->len_ == 2 && node_->midd_)
+      node_type * parent = node->parent_;
+      while (parent && node == parent->right_)
       {
-        node_ = node_->midd_;
-        while (node_->left_)
-        {
-          node_ = node_->left_;
-        }
-        pos_ = 0;
-        return *this;
+        node = parent;
+        parent = parent->parent_;
       }
 
-      if (pos_ == 0 && node_->len_ == 2)
-      {
-        pos_ = 1;
-        return *this;
-      }
-
-      pos_ = 0;
-      if (node_->righ_)
-      {
-        node_ = node_->righ_;
-        while (node_->left_)
-        {
-          node_ = node_->left_;
-        }
-        return *this;
-      }
-
-      while (node_->parent_)
-      {
-        auto prev = node_;
-        node_ = node_->parent_;
-        if (node_->left_ == prev)
-        {
-          return *this;
-        }
-        if (node_->midd_ == prev)
-        {
-          if (node_->len_ == 2)
-          {
-            pos_ = 1;
-            return *this;
-          }
-          continue;
-        }
-      }
-
-      node_ = nullptr;
-      return *this;
+      return parent;
     }
-    BidirectIterator & prev()
-    {
-      //if (!node_)
-      //{
-      //  return rbegin();
-      //}
-      if (pos_)
-      {
-        pos_ = 0;
-        return *this;
-      }
-      if (node_->midd_)
-      {
-        node_ = node_->midd_;
-        while (node_->righ_)
-        {
-          node_ = node_->righ_;
-        }
-      }
-      else if (node_->left_)
-      {
-        node_ = node_->left_;
-        while (node_->righ_)
-        {
-          node_ = node_->righ_;
-        }
-      }
-      else
-      {
-        while (node_->parent_)
-        {
-          auto prev = node_;
-          node_ = node_->parent_;
-          if (node_->righ_ == prev)
-          {
-            if (node_->len_ == 2)
-            {
-              pos_ = 1;
-            }
-            return *this;
-          }
-          if (node_->midd_ == prev && node_->left_)
-          {
-            node_ = node_->left_;
-            while (node_->righ_)
-            {
-              node_ = node_->righ_;
-            }
-            if (node_->len_ == 2)
-            {
-              pos_ = 1;
-            }
-            return *this;
-          }
-        }
-        node_ = nullptr;
-      }
-      if (node_->len_ == 2)
-      {
-        pos_ = 1;
-      }
-      return *this;
-    }
+    template< typename, typename, typename >
+    friend class AVLTree;
   };
 }
 

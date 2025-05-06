@@ -1,294 +1,444 @@
 #ifndef TTT_BODY_HPP
 #define TTT_BODY_HPP
+
 #include <functional>
+#include <initializer_list>
+#include <utility>
+#include <iterator>
+#include <type_traits>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
 
 namespace savintsev
 {
   template< typename Key, typename Value, typename Compare = std::less< Key > >
-  class TwoThreeTree
+  class AVLTree
   {
-  public:
+  private:
+    using node_type = node_t< Key, Value >;
+    using value_type = typename node_type::value_type;
     using key_type = Key;
     using mapped_type = Value;
 
+  public:
     using iterator = BidirectIterator< Key, Value >;
+    using const_iterator = BidirectIterator< Key, Value >;
 
-    TwoThreeTree();
-
-    iterator begin() noexcept;
-    iterator end() noexcept;
-    //const_iterator begin() const noexcept;
-    //const_iterator end() const noexcept;
-    iterator find(const key_type & k);
-    //const_iterator find(const key_type & k) const;
-    mapped_type & operator[](const key_type & k);
-    mapped_type & operator[](key_type && k);
   private:
-    node_t< Key, Value > * root_;
-    size_t size_;
+    node_type * root_ = nullptr;
+    size_t size_ = 0;
+    Compare comp_;
 
-    iterator lazy_find(const key_type & k);
-    iterator create_node(iterator it, const key_type & k);
+  public:
+    AVLTree() = default;
+
+    AVLTree(std::initializer_list< value_type > init)
+    {
+      for (const auto & item : init)
+      {
+        insert(item);
+      }
+    }
+
+    template< typename InputIt,
+    typename std::enable_if< !std::is_integral< InputIt >::value, int >::type = 0 >
+    void insert(InputIt first, InputIt last)
+    {
+      for (; first != last; ++first)
+      {
+        insert(*first);
+      }
+    }
+
+    ~AVLTree()
+    {
+      clear();
+    }
+
+    iterator begin()
+    {
+      return iterator(find_min(root_));
+    }
+
+    const_iterator begin() const
+    {
+      return const_iterator(find_min(root_));
+    }
+
+    iterator end()
+    {
+      return iterator(nullptr);
+    }
+
+    const_iterator end() const
+    {
+      return const_iterator(nullptr);
+    }
+
+    mapped_type & operator[](const key_type & key)
+    {
+      node_type * node = find_node(key);
+      if (node)
+      {
+        return node->data_.second;
+      }
+      insert({key, mapped_type{}});
+      return find_node(key)->data_.second;
+    }
+
+    bool empty() const
+    {
+      return root_ == nullptr;
+    }
+
+    size_t size() const
+    {
+      return size_;
+    }
+
+    void clear()
+    {
+      clear_recursive(root_);
+      root_ = nullptr;
+      size_ = 0;
+    }
+
+    void swap(AVLTree & other)
+    {
+      std::swap(root_, other.root_);
+      std::swap(size_, other.size_);
+      std::swap(comp_, other.comp_);
+    }
+
+    template< typename... Args >
+    std::pair< iterator, bool > emplace(Args &&... args)
+    {
+      value_type val(std::forward< Args >(args)...);
+      auto result = insert(val);
+      return {result.first, result.second};
+    }
+
+    template< typename... Args >
+    iterator emplace_hint(iterator, Args &&... args)
+    {
+      value_type val(std::forward< Args >(args)...);
+      insert(val);
+      return iterator(find_node(val.first));
+    }
+
+    std::pair< iterator, bool > insert(const value_type & val)
+    {
+      bool inserted = false;
+      root_ = insert_recursive(root_, nullptr, val, inserted);
+      return { iterator(find_node(val.first)), inserted };
+    }
+
+    iterator insert(iterator, const value_type & val)
+    {
+      insert(val);
+      return iterator(find_node(val.first));
+    }
+
+    iterator erase(iterator pos)
+    {
+      key_type key = pos->first;
+      ++pos;
+      remove(key);
+      return pos;
+    }
+
+    size_t erase(const key_type & key)
+    {
+      return remove(key) ? 1 : 0;
+    }
+
+    iterator erase(iterator first, iterator last)
+    {
+      while (first != last)
+      {
+        first = erase(first);
+      }
+      return last;
+    }
+
+    size_t count(const key_type & key) const
+    {
+        return find(key) != end() ? 1 : 0;
+    }
+
+    iterator find(const key_type & key)
+    {
+      return iterator(find_node(key));
+    }
+
+    const_iterator find(const key_type & key) const
+    {
+      return const_iterator(find_node(key));
+    }
+
+    std::pair< iterator, iterator > equal_range(const key_type & key)
+    {
+      return { lower_bound(key), upper_bound(key) };
+    }
+
+    iterator lower_bound(const key_type & key)
+    {
+      node_type * current = root_;
+      node_type * result = nullptr;
+      while (current)
+      {
+        if (!comp_(current->data_.first, key))
+        {
+          result = current;
+          current = current->left_;
+        }
+        else
+        {
+          current = current->right_;
+        }
+      }
+      return iterator(result);
+    }
+
+    iterator upper_bound(const key_type & key)
+    {
+      node_type * current = root_;
+      node_type * result = nullptr;
+      while (current)
+      {
+        if (comp_(key, current->data_.first))
+        {
+          result = current;
+          current = current->left_;
+        }
+        else
+        {
+          current = current->right_;
+        }
+      }
+      return iterator(result);
+    }
+
+  private:
+    bool remove(const key_type & key)
+    {
+      bool removed = false;
+      root_ = remove_recursive(root_, key, removed);
+      if (removed)
+      {
+        size_--;
+      }
+      return removed;
+    }
+
+    size_t get_height(node_type * node) const
+    {
+      return node ? node->height_ : 0;
+    }
+
+    int get_balance_factor(node_type * node) const
+    {
+      return node ? get_height(node->left_) - get_height(node->right_) : 0;
+    }
+
+    void update_height(node_type * node)
+    {
+      if (node)
+      {
+        node->height_ = 1 + std::max(get_height(node->left_), get_height(node->right_));
+      }
+    }
+
+    node_type * rotate_right(node_type * y)
+    {
+      node_type * x = y->left_;
+      node_type * T2 = x->right_;
+
+      x->parent_ = y->parent_;
+      y->parent_ = x;
+      if (T2)
+      {
+        T2->parent_ = y;
+      }
+      x->right_ = y;
+      y->left_ = T2;
+
+      update_height(y);
+      update_height(x);
+
+      return x;
+    }
+
+    node_type * rotate_left(node_type * x)
+    {
+      node_type * y = x->right_;
+      node_type * T2 = y->left_;
+
+      y->parent_ = x->parent_;
+      x->parent_ = y;
+      if (T2)
+      {
+        T2->parent_ = x;
+      }
+      y->left_ = x;
+      x->right_ = T2;
+
+      update_height(x);
+      update_height(y);
+
+      return y;
+    }
+
+    node_type * balance(node_type * node)
+    {
+      if (!node)
+      {
+        return nullptr;
+      }
+      update_height(node);
+
+      int balance = get_balance_factor(node);
+
+      if (balance > 1)
+      {
+        if (get_balance_factor(node->left_) < 0)
+        {
+          node->left_ = rotate_left(node->left_);
+        }
+        return rotate_right(node);
+      }
+
+      if (balance < -1)
+      {
+        if (get_balance_factor(node->right_) > 0)
+        {
+          node->right_ = rotate_right(node->right_);
+        }
+        return rotate_left(node);
+      }
+
+      return node;
+    }
+
+    node_type * insert_recursive(node_type * node, node_type * parent, const value_type & data, bool & inserted)
+    {
+      if (!node)
+      {
+        inserted = true;
+        size_++;
+        node_type * new_node = new node_type{data};
+        new_node->parent_ = parent;
+        return new_node;
+      }
+
+      if (comp_(data.first, node->data_.first))
+      {
+        node->left_ = insert_recursive(node->left_, node, data, inserted);
+      }
+      else if (comp_(node->data_.first, data.first))
+      {
+        node->right_ = insert_recursive(node->right_, node, data, inserted);
+      }
+      else
+      {
+        node->data_.second = data.second;
+        inserted = false;
+      }
+
+      node_type * balanced = balance(node);
+      if (!balanced->parent_ && parent == nullptr)
+      {
+        root_ = balanced;
+      }
+      return balanced;
+    }
+
+    node_type * find_min(node_type * node) const
+    {
+      while (node && node->left_)
+      {
+        node = node->left_;
+      }
+      return node;
+    }
+
+    node_type * remove_recursive(node_type * node, const key_type & key, bool& removed)
+    {
+      if (!node)
+      {
+        return nullptr;
+      }
+      if (comp_(key, node->data_.first))
+      {
+        node->left_ = remove_recursive(node->left_, key, removed);
+      }
+      else if (comp_(node->data_.first, key))
+      {
+        node->right_ = remove_recursive(node->right_, key, removed);
+      }
+      else
+      {
+        removed = true;
+
+        if (!node->left_ || !node->right_)
+        {
+          node_type * child = node->left_ ? node->left_ : node->right_;
+
+          if (!child)
+          {
+            delete node;
+            return nullptr;
+          }
+
+          child->parent_ = node->parent_;
+          delete node;
+          return child;
+        }
+        else
+        {
+          node_type * successor = find_min(node->right_);
+          node->data_ = successor->data_;
+
+          bool dummy = false;
+          node->right_ = remove_recursive(node->right_, successor->data_.first, dummy);
+        }
+      }
+
+      return balance(node);
+    }
+
+    node_type * find_node(const key_type & key) const
+    {
+      node_type * current = root_;
+      while (current)
+      {
+        if (comp_(key, current->data_.first))
+        {
+          current = current->left_;
+        }
+        else if (comp_(current->data_.first, key))
+        {
+          current = current->right_;
+        }
+        else
+        {
+          return current;
+        }
+      }
+      return nullptr;
+    }
+
+    void clear_recursive(node_type * node)
+    {
+      if (!node)
+      {
+        return;
+      }
+      clear_recursive(node->left_);
+      clear_recursive(node->right_);
+      delete node;
+    }
   };
-
-  template< typename Key, typename Value, typename Compare >
-  TwoThreeTree< Key, Value, Compare >::TwoThreeTree():
-    root_(nullptr),
-    size_(0)
-  {}
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
-  {
-    node_t< K, V > * temp = root_;
-    while (temp->left_)
-    {
-      temp = temp->left_;
-    }
-    return iterator(temp, 0);
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::end() noexcept
-  {
-    return iterator();
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::find(const key_type & k)
-  {
-    iterator temp = lazy_find(k);
-    if (!temp || k != temp.node_->data_[temp.pos_].first)
-    {
-      return end();
-    }
-    return temp;
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](const key_type & k)
-  {
-    iterator temp = lazy_find(k);
-    if (!temp.node_ || k != temp.node_->data_[temp.pos_].first)
-    {
-      temp = create_node(temp, k);
-    }
-    return temp.node_->data_[temp.pos_].second;
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](key_type && k)
-  {
-    iterator temp = lazy_find(k);
-    if (!temp.node_ || k != temp.node_->data_[temp.pos_].first)
-    {
-      temp = create_node(temp, k);
-    }
-    return temp.node_->data_[temp.pos_].second;
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
-  {
-    if (!root_)
-    {
-      return iterator{nullptr};
-    }
-    node_t< K, V > * temp = root_;
-    C comp;
-    while (temp->data_[0].first != k)
-    {
-      if (temp->len_ == 2)
-      {
-        if (temp->data_[1].first == k)
-        {
-          return iterator{temp, true};
-        }
-
-        if (!temp->sons_)
-        {
-          return iterator{temp, true};
-        }
-
-        if (comp(k, temp->data_[0].first))
-        {
-          temp = temp->left_;
-        }
-        else if (comp(k, temp->data_[1].first))
-        {
-          temp = temp->midd_;
-        }
-        else
-        {
-          temp = temp->righ_;
-        }
-      }
-      else if (temp->len_ == 1)
-      {
-        if (!temp->sons_)
-        {
-          return iterator{temp};
-        }
-
-        if (comp(k, temp->data_[0].first))
-        {
-          temp = temp->left_;
-        }
-        else
-        {
-          temp = temp->righ_;
-        }
-      }
-    }
-    return iterator{temp};
-  }
-
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::create_node(iterator it, const key_type & k)
-  {
-    node_t< K, V > * current = it.node_;
-    if (!current)
-    {
-      root_ = new node_t< K, V >{};
-      root_->data_[0] = {k, mapped_type{}};
-      root_->len_ = 1;
-      size_++;
-      return iterator(root_);
-    }
-    else if (current->len_ == 1)
-    {
-      current->len_ = 2;
-      size_++;
-      if (C{}(k, current->data_[0].first))
-      {
-        current->data_[1] = current->data_[0];
-        current->data_[0] = {k, mapped_type{}};
-        return iterator(current, 0);
-      }
-      else
-      {
-        current->data_[1] = {k, mapped_type{}};
-        return iterator(current, 1);
-      }
-    }
-    else
-    {
-      if (!current->parent_)
-      {
-        //not safe
-        node_t< K, V > * child1 = new node_t< K, V >{};
-        node_t< K, V > * child2 = new node_t< K, V >{};
-        auto result = iterator();
-        if (C{}(k, current->data_[0].first))
-        {
-          child1->data_[0] = {k, mapped_type{}};
-          child2->data_[0] = current->data_[1];
-          result = iterator(child1, 0);
-        }
-        else if (C{}(current->data_[1].first, k))
-        {
-          child1->data_[0] = current->data_[0];
-          child2->data_[0] = {k, mapped_type{}};
-          current->data_[0] = current->data_[1];
-          result = iterator(child2, 0);
-        }
-        else
-        {
-          child1->data_[0] = current->data_[0];
-          child2->data_[0] = current->data_[1];
-          current->data_[0] = {k, mapped_type{}};
-          result = iterator(current, 0);
-        }
-        current->len_--;
-        child1->parent_ = current;
-        child2->parent_ = current;
-        child1->len_ = 1;
-        child2->len_ = 1;
-        current->left_ = child1;
-        current->righ_ = child2;
-        current->len_ = 1;
-        current->sons_ = 2;
-        return result;
-      }
-      else
-      {
-        node_t< K, V > * parent = current->parent_;
-        node_t< K, V > * child = new node_t< K, V >{};
-        auto result = iterator();
-        //K temp;
-        if (parent->len_ == 1)
-        {
-          parent->len_ = 2;
-          if (C{}(k, current->data_[0].first)) // k data0 data1
-          {
-            child->data_[0] = current->data_[1];  //                           parent(data0)
-            if (C{}(current->data_[0].first, parent->data_[0].first)) // unknown current(k) child(data1)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = current->data_[0];
-            }
-            else
-            {
-              parent->data_[1] = current->data_[0];
-            }
-            current->data_[0] = {k, mapped_type{}};
-            result = iterator(current, 0);
-          }
-          else if (C{}(current->data_[1].first, k)) // data0 data1 k
-          {
-            child->data_[0] = {k, mapped_type{}};  //                         parent(data1)
-            if (C{}(current->data_[1].first, parent->data_[0].first)) // unknown current(data0) child(k)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = current->data_[1];
-            }
-            else
-            {
-              parent->data_[1] = current->data_[1];
-            }
-            result = iterator(child, 0);
-          }
-          else // data0 k data1
-          {
-            child->data_[0] = current->data_[1];  //      parent(k)
-            if (C{}(k, parent->data_[0].first)) // unknown current(data0) child(data1)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = {k, mapped_type{}};
-              result = iterator(parent, 0);
-            }
-            else
-            {
-              parent->data_[1] = {k, mapped_type{}};
-              result = iterator(parent, 1);
-            }
-          }
-          current->len_ = 1;
-          parent->len_ = 2;
-          if (parent->left_ == current)
-          {
-            parent->midd_ = child;
-          }
-          else
-          {
-            parent->midd_ = current;
-            parent->righ_ = child;
-          }
-          parent->sons_ = 3;
-          child->len_ = 1;
-          child->parent_ = parent;
-          return result;
-        }
-        else
-        {
-          // zdes probros naverh, poka shto throw =)
-          throw std::runtime_error("Node splitting not implemented");
-        }
-      }
-    }
-  }
 }
 
 #endif
