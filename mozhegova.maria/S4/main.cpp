@@ -76,6 +76,10 @@ int main(int argc, char * argv[])
         std::cout << "<INVALID COMMAND>\n";
       }
     }
+    catch (const std::out_of_range &)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+    }
     catch (const std::exception & e)
     {
       std::cerr << e.what() << '\n';
