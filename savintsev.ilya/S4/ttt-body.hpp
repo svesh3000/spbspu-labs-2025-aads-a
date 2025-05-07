@@ -122,7 +122,8 @@ namespace savintsev
   }
 */
   template< typename K, typename V, typename C >
-  typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool > TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
+  typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool >
+  TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
   {
     if (!root_)
     {
@@ -135,30 +136,30 @@ namespace savintsev
     {
       if (node->data_[0].first == k)
       {
-        return {iterator(node), true};
+        return {iterator(node, 0), true};
       }
-      else if (node->len_ != 1 && node->data_[1].first == k)
+
+      if (node->len_ == 2 && node->data_[1].first == k)
       {
         return {iterator(node, 1), true};
       }
-      if (!node->sons_)
+
+      if (!node->kids_[0] && !node->kids_[1] && !node->kids_[2])
       {
-        return {iterator(node), false};
+        return {iterator(node, node->len_ == 2 ? 1 : 0), false};
       }
+
       if (C{}(k, node->data_[0].first))
       {
         node = node->kids_[0];
       }
+      else if (node->len_ == 1 || C{}(k, node->data_[1].first))
+      {
+        node = node->kids_[1];
+      }
       else
       {
-        if (node->len_ == 1 || C{}(k, node->data_[1].first))
-        {
-          node = node->kids_[1];
-        }
-        else
-        {
-          node = node->kids_[2];
-        }
+        node = node->kids_[2];
       }
     }
   }
@@ -190,10 +191,10 @@ namespace savintsev
       {
         left->kids_[i]->parent_ = left;
       }
-      right->kids_[i + 2] = node->kids_[i + 2];
-      if (right->kids_[i + 2])
+      right->kids_[i] = node->kids_[i + 2];
+      if (right->kids_[i])
       {
-        right->kids_[i + 2]->parent_ = right;
+        right->kids_[i]->parent_ = right;
       }
     }
     insert_data_in_node(left, node->data_[0]);
@@ -205,24 +206,25 @@ namespace savintsev
 
       insert_data_in_node(parent, node->data_[1]);
 
-      for (size_t i = 0; i < 4; ++i)
+      if (parent->kids_[0] == node)
       {
-        if (parent->kids_[i] == node)
-        {
-          for (size_t j = 3; j > i + 1; --j)
-          {
-            parent->kids_[j] = parent->kids_[j - 1];
-          }
-          parent->kids_[i] = left;
-          parent->kids_[i + 1] = right;
-          break;
-        }
+        parent->kids_[3] = parent->kids_[2];
+        parent->kids_[2] = parent->kids_[1];
+        parent->kids_[1] = right;
+        parent->kids_[0] = left;
+      }
+      else if (parent->kids_[1] == node)
+      {
+        parent->kids_[3] = parent->kids_[2];
+        parent->kids_[2] = right;
+        parent->kids_[1] = left;
+      }
+      else
+      {
+        parent->kids_[3] = right;
+        parent->kids_[2] = left;
       }
 
-      left->parent_ = parent;
-      right->parent_ = parent;
-      parent->sons_++;
-  
       delete node;
       return parent;
     }
@@ -236,7 +238,6 @@ namespace savintsev
       node->kids_[2] = nullptr;
       node->kids_[3] = nullptr;
       node->len_ = 1;
-      node->sons_ = 2;
       return node;
     }
   }
@@ -248,10 +249,8 @@ namespace savintsev
 
     if (result.second)
     {
-      //std::cout << "Found " << val.first << "\n";
       return {result.first, false};
     }
-    //std::cout << "Cant find " << val.first << "\n";
     node_type * current = result.first.node_;
 
     if (!current)
@@ -275,11 +274,25 @@ namespace savintsev
 
     root_ = current;
     size_++;
-    //std::cout << "in head: " << root_->data_[0].first << '\n';
-    //if (root_->len_ == 2)
-    //{
-    //  std::cout << "in head: " << root_->data_[1].first << '\n';
-    //}
+
+    /*
+    node_type * node = root_;
+    std::cout << "HEAD: " << node->data_[0].first << '|' <<node->data_[0].second << '\n';
+    std::cout << '\n' << "kids: ";
+    for (size_t i = 0; i < 4; ++i)
+    {
+      std::cout << i << ") " << ((node->kids_[i]) ? node->kids_[i]->data_[0].first : 0) << "|" << ((node->kids_[i]) ? node->kids_[i]->data_[0].second : 0);
+      if (node->kids_[i])
+      {
+        for (size_t j = 0; j < 4; ++j)
+        {
+          std::cout << "[ " << ((node->kids_[i]->kids_[j]) ? node->kids_[i]->kids_[j]->data_[0].first : 0) << '|' << ((node->kids_[i]->kids_[j]) ? node->kids_[i]->kids_[j]->data_[0].second : 0) << " ]";
+        }
+      }
+      std::cout << " ";
+    }
+    std::cout << '\n';
+    */
     return {lazy_find(val.first).first, true};
   }
 }

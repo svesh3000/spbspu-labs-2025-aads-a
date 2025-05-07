@@ -14,7 +14,6 @@ namespace savintsev
     node_t * parent_ = nullptr;
 
     size_t len_ = 0;
-    size_t sons_ = 0;
   };
 }
 
