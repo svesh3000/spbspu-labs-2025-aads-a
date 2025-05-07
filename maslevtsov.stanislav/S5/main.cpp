@@ -25,5 +25,4 @@ int main(int argc, char** argv)
     std::cerr << "<INPUT ERROR>\n";
     return 1;
   }
-  
 }
