@@ -6,6 +6,7 @@
 #include <tuple>
 #include <utility>
 #include "internal/map-node.hpp"
+#include "type-utils.hpp"
 
 namespace kizhin {
   template < typename Key, typename T, typename Comparator = std::less< Key > >
@@ -33,11 +34,15 @@ namespace kizhin {
     class value_compare;
 
   private:
-    static constexpr bool is_nothrow_default_constructible = true;
-    static constexpr bool is_nothrow_move_constructible = true;
-    static constexpr bool is_nothrow_copy_constructible = true;
-    static constexpr bool is_nothrow_swappable = true;
-    static constexpr bool is_nothrow_move_assignable = true;
+    static constexpr bool is_nothrow_default_constructible =
+        is_nothrow_default_constructible_v< key_compare >;
+    static constexpr bool is_nothrow_move_constructible =
+        is_nothrow_move_constructible_v< key_compare >;
+    static constexpr bool is_nothrow_copy_constructible =
+        is_nothrow_copy_constructible_v< key_compare >;
+    static constexpr bool is_nothrow_move_assignable =
+        is_nothrow_move_assignable_v< key_compare >;
+    static constexpr bool is_nothrow_swappable = is_nothrow_swappable_v< key_compare >;
 
   public:
     Map() noexcept(is_nothrow_default_constructible) = default;
@@ -539,12 +544,13 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   if (valuePtr != target->end) {
     return std::make_pair(iterator(target, valuePtr), false);
   }
+  const key_type key = value.first;
   detail::emplace(target, valueComp(), std::move(value));
   ++size_;
   while (detail::size(target) > 2) {
     target = split(target);
   }
-  return std::make_pair(find(value.first), true);
+  return std::make_pair(find(key), true);
 }
 
 template < typename K, typename T, typename C >
