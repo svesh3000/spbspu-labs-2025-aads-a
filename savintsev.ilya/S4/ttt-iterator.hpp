@@ -17,6 +17,7 @@ namespace savintsev
     public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     using value_type = std::pair< Key, Value >;
+    using node_type = node_t< value_type >;
 
     template< typename K, typename V, typename C >
     friend class TwoThreeTree;
@@ -62,10 +63,10 @@ namespace savintsev
       return node_ == rhs.node_ && pos_ == rhs.pos_;
     }
   private:
-    node_t< Key, Value > * node_;
+    node_type * node_;
     size_t pos_ = 0;
 
-    BidirectIterator(node_t< Key, Value > * node, size_t pos = 0):
+    BidirectIterator(node_type * node, size_t pos = 0):
       node_(node),
       pos_(pos)
     {}
@@ -77,12 +78,12 @@ namespace savintsev
         return *this;
       }
 
-      if (pos_ == 0 && node_->len_ == 2 && node_->midd_)
+      if (pos_ == 0 && node_->len_ == 2 && node_->kids_[1])
       {
-        node_ = node_->midd_;
-        while (node_->left_)
+        node_ = node_->kids_[1];
+        while (node_->kids_[0])
         {
-          node_ = node_->left_;
+          node_ = node_->kids_[0];
         }
         pos_ = 0;
         return *this;
@@ -95,12 +96,12 @@ namespace savintsev
       }
 
       pos_ = 0;
-      if (node_->righ_)
+      if (node_->kids_[2])
       {
-        node_ = node_->righ_;
-        while (node_->left_)
+        node_ = node_->kids_[2];
+        while (node_->kids_[0])
         {
-          node_ = node_->left_;
+          node_ = node_->kids_[0];
         }
         return *this;
       }
@@ -109,11 +110,11 @@ namespace savintsev
       {
         auto prev = node_;
         node_ = node_->parent_;
-        if (node_->left_ == prev)
+        if (node_->kids_[0] == prev)
         {
           return *this;
         }
-        if (node_->midd_ == prev)
+        if (node_->kids_[1] == prev)
         {
           if (node_->len_ == 2)
           {
@@ -138,20 +139,20 @@ namespace savintsev
         pos_ = 0;
         return *this;
       }
-      if (node_->midd_)
+      if (node_->kids_[1])
       {
-        node_ = node_->midd_;
-        while (node_->righ_)
+        node_ = node_->kids_[1];
+        while (node_->kids_[2])
         {
-          node_ = node_->righ_;
+          node_ = node_->kids_[2];
         }
       }
-      else if (node_->left_)
+      else if (node_->kids_[0])
       {
-        node_ = node_->left_;
-        while (node_->righ_)
+        node_ = node_->kids_[0];
+        while (node_->kids_[2])
         {
-          node_ = node_->righ_;
+          node_ = node_->kids_[2];
         }
       }
       else
@@ -160,7 +161,7 @@ namespace savintsev
         {
           auto prev = node_;
           node_ = node_->parent_;
-          if (node_->righ_ == prev)
+          if (node_->kids_[2] == prev)
           {
             if (node_->len_ == 2)
             {
@@ -168,12 +169,12 @@ namespace savintsev
             }
             return *this;
           }
-          if (node_->midd_ == prev && node_->left_)
+          if (node_->kids_[1] == prev && node_->kids_[0])
           {
-            node_ = node_->left_;
-            while (node_->righ_)
+            node_ = node_->kids_[0];
+            while (node_->kids_[2])
             {
-              node_ = node_->righ_;
+              node_ = node_->kids_[2];
             }
             if (node_->len_ == 2)
             {

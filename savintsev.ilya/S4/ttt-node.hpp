@@ -5,15 +5,12 @@
 
 namespace savintsev
 {
-  template< typename Key, typename Value >
+  template< typename T >
   struct node_t
   {
-    using value_type = std::pair< Key, Value >;
-    value_type data_[2];
+    T data_[3];
 
-    node_t * left_ = nullptr;
-    node_t * midd_ = nullptr;
-    node_t * righ_ = nullptr;
+    node_t * kids_[4] = {nullptr, nullptr, nullptr, nullptr};
     node_t * parent_ = nullptr;
 
     size_t len_ = 0;

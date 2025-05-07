@@ -12,6 +12,8 @@ namespace savintsev
   public:
     using key_type = Key;
     using mapped_type = Value;
+    using value_type = std::pair< Key, Value >;
+    using node_type = node_t< value_type >;
 
     using iterator = BidirectIterator< Key, Value >;
 
@@ -19,18 +21,45 @@ namespace savintsev
 
     iterator begin() noexcept;
     iterator end() noexcept;
-    //const_iterator begin() const noexcept;
-    //const_iterator end() const noexcept;
+
     iterator find(const key_type & k);
-    //const_iterator find(const key_type & k) const;
+
     mapped_type & operator[](const key_type & k);
-    mapped_type & operator[](key_type && k);
+    //mapped_type & operator[](key_type && k);
+
+    std::pair< iterator, bool > insert(const value_type & val);
   private:
-    node_t< Key, Value > * root_;
+    node_type * root_;
     size_t size_;
 
-    iterator lazy_find(const key_type & k);
-    iterator create_node(iterator it, const key_type & k);
+    std::pair< iterator, bool > lazy_find(const key_type & k);
+
+    node_type * split_node(node_type * node);
+    void sort_node(node_type * node)
+    {
+      if (node->len_ < 2)
+      {
+        return;
+      }
+      for (size_t i = 1; i < node->len_; ++i)
+      {
+        value_type tmp = node->data_[i];
+        int j = i - 1;
+        while (j >= 0 && Compare{}(tmp.first, node->data_[j].first))
+        {
+          node->data_[j + 1] = node->data_[j];
+          --j;
+        }
+        node->data_[j + 1] = tmp;
+      }
+    }
+
+    void insert_data_in_node(node_type * node, const value_type & val)
+    {
+      node->data_[node->len_] = val;
+      node->len_++;
+      sort_node(node);
+    }
   };
 
   template< typename Key, typename Value, typename Compare >
@@ -42,10 +71,10 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
   {
-    node_t< K, V > * temp = root_;
-    while (temp->left_)
+    node_type * temp = root_;
+    while (temp->kids_[0])
     {
-      temp = temp->left_;
+      temp = temp->kids_[0];
     }
     return iterator(temp, 0);
   }
@@ -70,14 +99,10 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](const key_type & k)
   {
-    iterator temp = lazy_find(k);
-    if (!temp.node_ || k != temp.node_->data_[temp.pos_].first)
-    {
-      temp = create_node(temp, k);
-    }
-    return temp.node_->data_[temp.pos_].second;
+    return insert(std::make_pair(k, mapped_type{})).first->second;
   }
 
+  /*
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](key_type && k)
   {
@@ -88,206 +113,158 @@ namespace savintsev
     }
     return temp.node_->data_[temp.pos_].second;
   }
-
+*/
   template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
+  typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool > TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
   {
     if (!root_)
     {
-      return iterator{nullptr};
+      return {iterator(), false};
     }
-    node_t< K, V > * temp = root_;
+
+    node_type * temp = root_;
     C comp;
-    while (temp->data_[0].first != k)
+
+    while (true)
     {
-      if (temp->len_ == 2)
+      if (temp->data_[0].first == k)
       {
-        if (temp->data_[1].first == k)
-        {
-          return iterator{temp, true};
-        }
-
-        if (!temp->sons_)
-        {
-          return iterator{temp, true};
-        }
-
-        if (comp(k, temp->data_[0].first))
-        {
-          temp = temp->left_;
-        }
-        else if (comp(k, temp->data_[1].first))
-        {
-          temp = temp->midd_;
-        }
-        else
-        {
-          temp = temp->righ_;
-        }
+        return {iterator{temp, false}, true};
       }
-      else if (temp->len_ == 1)
-      {
-        if (!temp->sons_)
-        {
-          return iterator{temp};
-        }
 
-        if (comp(k, temp->data_[0].first))
-        {
-          temp = temp->left_;
-        }
-        else
-        {
-          temp = temp->righ_;
-        }
+      if (temp->len_ == 2 && temp->data_[1].first == k)
+      {
+        return {iterator{temp, true}, true};
       }
-    }
-    return iterator{temp};
-  }
 
-  template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::create_node(iterator it, const key_type & k)
-  {
-    node_t< K, V > * current = it.node_;
-    if (!current)
-    {
-      root_ = new node_t< K, V >{};
-      root_->data_[0] = {k, mapped_type{}};
-      root_->len_ = 1;
-      size_++;
-      return iterator(root_);
-    }
-    else if (current->len_ == 1)
-    {
-      current->len_ = 2;
-      size_++;
-      if (C{}(k, current->data_[0].first))
+      if (temp->sons_ == 0)
       {
-        current->data_[1] = current->data_[0];
-        current->data_[0] = {k, mapped_type{}};
-        return iterator(current, 0);
+        return {iterator{temp, temp->len_ == 2}, false};
+      }
+
+      if (comp(k, temp->data_[0].first))
+      {
+        temp = temp->kids_[0];
+      }
+      else if (temp->len_ == 2 && comp(k, temp->data_[1].first))
+      {
+        temp = temp->kids_[1];
       }
       else
       {
-        current->data_[1] = {k, mapped_type{}};
-        return iterator(current, 1);
+        temp = temp->kids_[2];
       }
+    }
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  typename TwoThreeTree< Key, Value, Compare >::node_type * TwoThreeTree< Key, Value, Compare >::split_node(node_type * node)
+  {
+    if (node->len_ < 3)
+    {
+      return node;
+    }
+    node_type * left = new node_type{};
+    node_type * right = new node_type{};
+    left->parent_ = node->parent_;
+    right->parent_ = node->parent_;
+    for (size_t i = 0; i < 2; ++i)
+    {
+      left->kids_[i] = node->kids_[i];
+      if (left->kids_[i])
+      {
+        left->kids_[i]->parent_ = left;
+      }
+      right->kids_[i + 2] = node->kids_[i + 2];
+      if (right->kids_[i + 2])
+      {
+        right->kids_[i + 2]->parent_ = right;
+      }
+    }
+    insert_data_in_node(left, node->data_[0]);
+    insert_data_in_node(right, node->data_[2]);
+
+    if (node->parent_)
+    {
+      node_type * parent = node->parent_;
+
+      insert_data_in_node(parent, node->data_[1]);
+
+      for (size_t i = 0; i < 4; ++i)
+      {
+        if (parent->kids_[i] == node)
+        {
+          for (size_t j = 3; j > i + 1; --j)
+          {
+            parent->kids_[j] = parent->kids_[j - 1];
+          }
+          parent->kids_[i] = left;
+          parent->kids_[i + 1] = right;
+          break;
+        }
+      }
+
+      left->parent_ = parent;
+      right->parent_ = parent;
+      parent->sons_++;
+  
+      delete node;
+      return parent;
     }
     else
     {
-      if (!current->parent_)
-      {
-        //not safe
-        node_t< K, V > * child1 = new node_t< K, V >{};
-        node_t< K, V > * child2 = new node_t< K, V >{};
-        auto result = iterator();
-        if (C{}(k, current->data_[0].first))
-        {
-          child1->data_[0] = {k, mapped_type{}};
-          child2->data_[0] = current->data_[1];
-          result = iterator(child1, 0);
-        }
-        else if (C{}(current->data_[1].first, k))
-        {
-          child1->data_[0] = current->data_[0];
-          child2->data_[0] = {k, mapped_type{}};
-          current->data_[0] = current->data_[1];
-          result = iterator(child2, 0);
-        }
-        else
-        {
-          child1->data_[0] = current->data_[0];
-          child2->data_[0] = current->data_[1];
-          current->data_[0] = {k, mapped_type{}};
-          result = iterator(current, 0);
-        }
-        current->len_--;
-        child1->parent_ = current;
-        child2->parent_ = current;
-        child1->len_ = 1;
-        child2->len_ = 1;
-        current->left_ = child1;
-        current->righ_ = child2;
-        current->len_ = 1;
-        current->sons_ = 2;
-        return result;
-      }
-      else
-      {
-        node_t< K, V > * parent = current->parent_;
-        node_t< K, V > * child = new node_t< K, V >{};
-        auto result = iterator();
-        //K temp;
-        if (parent->len_ == 1)
-        {
-          parent->len_ = 2;
-          if (C{}(k, current->data_[0].first)) // k data0 data1
-          {
-            child->data_[0] = current->data_[1];  //                           parent(data0)
-            if (C{}(current->data_[0].first, parent->data_[0].first)) // unknown current(k) child(data1)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = current->data_[0];
-            }
-            else
-            {
-              parent->data_[1] = current->data_[0];
-            }
-            current->data_[0] = {k, mapped_type{}};
-            result = iterator(current, 0);
-          }
-          else if (C{}(current->data_[1].first, k)) // data0 data1 k
-          {
-            child->data_[0] = {k, mapped_type{}};  //                         parent(data1)
-            if (C{}(current->data_[1].first, parent->data_[0].first)) // unknown current(data0) child(k)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = current->data_[1];
-            }
-            else
-            {
-              parent->data_[1] = current->data_[1];
-            }
-            result = iterator(child, 0);
-          }
-          else // data0 k data1
-          {
-            child->data_[0] = current->data_[1];  //      parent(k)
-            if (C{}(k, parent->data_[0].first)) // unknown current(data0) child(data1)
-            {
-              parent->data_[1] = parent->data_[0];
-              parent->data_[0] = {k, mapped_type{}};
-              result = iterator(parent, 0);
-            }
-            else
-            {
-              parent->data_[1] = {k, mapped_type{}};
-              result = iterator(parent, 1);
-            }
-          }
-          current->len_ = 1;
-          parent->len_ = 2;
-          if (parent->left_ == current)
-          {
-            parent->midd_ = child;
-          }
-          else
-          {
-            parent->midd_ = current;
-            parent->righ_ = child;
-          }
-          parent->sons_ = 3;
-          child->len_ = 1;
-          child->parent_ = parent;
-          return result;
-        }
-        else
-        {
-          // zdes probros naverh, poka shto throw =)
-          throw std::runtime_error("Node splitting not implemented");
-        }
-      }
+      node_type * new_root = new node_type{};
+
+      new_root->data_[0] = node->data_[1];
+      new_root->len_ = 1;
+
+      new_root->kids_[0] = left;
+      new_root->kids_[1] = right;
+      new_root->sons_ = 2;
+
+      left->parent_ = new_root;
+      right->parent_ = new_root;
+
+      delete node;
+      return new_root;
     }
+  }
+
+  template< typename K, typename V, typename C >
+  std::pair< typename TwoThreeTree< K, V, C >::iterator, bool > TwoThreeTree< K, V, C >::insert(const value_type & val)
+  {
+    auto result = lazy_find(val.first);
+
+    if (result.second)
+    {
+      return {result.first, false};
+    }
+
+    node_type * current = result.first.node_;
+
+    if (!current)
+    {
+      root_ = new node_type{};
+      insert_data_in_node(root_, val);
+      size_++;
+      return {iterator(root_), true};
+    }
+
+    insert_data_in_node(current, val);
+
+    while (current && current->len_ == 3)
+    {
+      current = split_node(current);
+    }
+    while (current->parent_)
+    {
+      current = current->parent_;
+    }
+
+    root_ = current;
+    size_++;
+
+    return {lazy_find(val.first).first, true};
   }
 }
 
