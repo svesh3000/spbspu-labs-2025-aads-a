@@ -2,6 +2,7 @@
 #include <fstream>
 #include <tree/tree.hpp>
 #include "key_summ.hpp"
+#include <limits>
 
 namespace
 {
@@ -52,6 +53,11 @@ int main(int argc, char* argv[])
   try
   {
     inputTree(file, tree);
+    if (!file.eof())
+    {
+      std::cerr << "incorrect input\n";
+      return 1;
+    }
     if (tree.empty())
     {
       std::cout << "<EMPTY>\n";
