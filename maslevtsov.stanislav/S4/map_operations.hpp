@@ -7,9 +7,9 @@
 #include <tree/declaration.hpp>
 
 namespace maslevtsov {
-  using set_t = maslevtsov::Tree< int, std::string >;
-  using setmap_t = maslevtsov::Tree< std::string, set_t >;
-  using commands_t = maslevtsov::Tree< std::string, std::function< void(std::istream&, setmap_t&) > >;
+  using set_t = std::map< int, std::string >;
+  using setmap_t = std::map< std::string, set_t >;
+  using commands_t = std::map< std::string, std::function< void(std::istream&, setmap_t&) > >;
 
   void input_setmap(std::istream& in, setmap_t& map);
   void fill_with_commands(commands_t& map);
