@@ -41,9 +41,9 @@ BOOST_AUTO_TEST_CASE(traversal_overflow_test)
   demehin::KeySumm res;
   try
   {
-    res = tree.traverse_lnr(res);
+    res = tree.traverse_breadth(res);
   }
-  catch (const std::overflow_error&)
+  catch (const std::logic_error&)
   {
     out << "error";
   }

@@ -4,9 +4,11 @@
 
 namespace
 {
-  bool isOverflow(int a, int b)
+  bool isOverflow(const int a, const int b)
   {
-    if ((b > 0 && a > std::numeric_limits< int >::max() - b) || (b < 0 && a < std::numeric_limits< int >::min() - b))
+    int max = std::numeric_limits< int >::max();
+    int min = std::numeric_limits< int >::min();
+    if ((b > 0 && a > max - b) || (b < 0 && a < min - b))
     {
       return true;
     }
@@ -23,7 +25,7 @@ void demehin::KeySumm::operator()(const std::pair< const int, std::string >& dat
 {
   if (isOverflow(val_res, data.first))
   {
-    throw std::overflow_error("overflow");
+    throw std::logic_error("overflow");
   }
   val_res += data.first;
   if (str_res.size() == 0)
