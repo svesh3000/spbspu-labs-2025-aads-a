@@ -24,8 +24,8 @@ namespace maslevtsov {
     Tree& operator=(const Tree& rhs);
     Tree& operator=(Tree&& rhs) noexcept;
 
-    T& operator[](const Key& key) noexcept;
-    T& operator[](Key&& key) noexcept;
+    T& operator[](const Key& key);
+    T& operator[](Key&& key);
     T& at(const Key& key);
     const T& at(const Key& key) const;
 
@@ -73,7 +73,7 @@ namespace maslevtsov {
     Compare compare_;
 
     void clear_subtree(Node* node) noexcept;
-    iterator find_impl(const Key& key) const noexcept;
+    std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };
 }
 
