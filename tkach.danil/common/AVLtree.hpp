@@ -49,7 +49,7 @@ namespace tkach
     F traverseRnl(F f);
     template< typename F >
     F traverseBreadth(F f);
-    bool empty();
+    bool empty() const noexcept;
     size_t size();
   private:
     TreeNode< Key, Value >* root_;
@@ -88,7 +88,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  bool AvlTree< Key, Value, Cmp >::empty()
+  bool AvlTree< Key, Value, Cmp >::empty() const noexcept
   {
     return size_ == 0;
   }
@@ -547,8 +547,8 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Stack< const TreeNode< int, std::string >* > stack;
-    const TreeNode< int, std::string >* temp = root_;
+    Stack< const TreeNode< Key, Value >* > stack;
+    const TreeNode< Key, Value >* temp = root_;
     while (!stack.empty() || temp)
     {
       while (temp)
@@ -572,8 +572,8 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Stack< const TreeNode< int, std::string >* > stack;
-    const TreeNode< int, std::string >* temp = root_;
+    Stack< const TreeNode< Key, Value >* > stack;
+    const TreeNode< Key, Value >* temp = root_;
     while (!stack.empty() || temp)
     {
       while (temp)
@@ -597,11 +597,12 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Queue< const TreeNode< int, std::string >* > queue;
+    Queue< const TreeNode< Key, Value >* > queue;
     queue.push(root_);
     while (!queue.empty())
     {
-      const TreeNode< int, std::string >* temp = queue.front();
+      const TreeNode< Key, Value >* temp = queue.front();
+      queue.pop();
       f(temp->data);
       if (temp->left)
       {
@@ -615,6 +616,7 @@ namespace tkach
     return f;
   }
 
+
   template< class Key, class Value, class Cmp >
   template< typename F >
   F AvlTree< Key, Value, Cmp >::traverseLnr(F f)
@@ -623,8 +625,8 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Stack< TreeNode< int, std::string >* > stack;
-    TreeNode< int, std::string >* temp = root_;
+    Stack< TreeNode< Key, Value >* > stack;
+    TreeNode< Key, Value >* temp = root_;
     while (!stack.empty() || temp)
     {
       while (temp)
@@ -648,8 +650,8 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Stack< TreeNode< int, std::string >* > stack;
-    TreeNode< int, std::string >* temp = root_;
+    Stack< TreeNode< Key, Value >* > stack;
+    TreeNode< Key, Value >* temp = root_;
     while (!stack.empty() || temp)
     {
       while (temp)
@@ -673,11 +675,11 @@ namespace tkach
     {
       throw std::logic_error("<EMPTY>");
     }
-    Queue< TreeNode< int, std::string >* > queue;
+    Queue< TreeNode< Key, Value >* > queue;
     queue.push(root_);
     while (!queue.empty())
     {
-      TreeNode< int, std::string >* temp = queue.front();
+      TreeNode< Key, Value >* temp = queue.front();
       queue.pop();
       f(temp->data);
       if (temp->left)
@@ -692,6 +694,5 @@ namespace tkach
     return f;
   }
 }
-
 
 #endif
