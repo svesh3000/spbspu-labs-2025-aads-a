@@ -1,1 +1,1 @@
-4 root 2 left 6 right 1 leftmost 3 middle 5 subright 7 subrightmost
+2147483646 max 1 one
