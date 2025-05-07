@@ -37,20 +37,27 @@ namespace savintsev
     node_type * split_node(node_type * node);
     void sort_node(node_type * node)
     {
-      if (node->len_ < 2)
+      if (node->len_ == 2)
       {
-        return;
-      }
-      for (size_t i = 1; i < node->len_; ++i)
-      {
-        value_type tmp = node->data_[i];
-        int j = i - 1;
-        while (j >= 0 && Compare{}(tmp.first, node->data_[j].first))
+        if (!Compare{}(node->data_[0].first, node->data_[1].first))
         {
-          node->data_[j + 1] = node->data_[j];
-          --j;
+          std::swap(node->data_[0], node->data_[1]);
         }
-        node->data_[j + 1] = tmp;
+      }
+      if (node->len_ == 3)
+      {
+        if (!Compare{}(node->data_[0].first, node->data_[1].first))
+        {
+          std::swap(node->data_[0], node->data_[1]);
+        }
+        if (!Compare{}(node->data_[1].first, node->data_[2].first))
+        {
+          std::swap(node->data_[1], node->data_[2]);
+        }
+        if (!Compare{}(node->data_[0].first, node->data_[1].first))
+        {
+          std::swap(node->data_[0], node->data_[1]);
+        }
       }
     }
 
@@ -122,37 +129,36 @@ namespace savintsev
       return {iterator(), false};
     }
 
-    node_type * temp = root_;
-    C comp;
+    node_type * node = root_;
 
     while (true)
     {
-      if (temp->data_[0].first == k)
+      if (node->data_[0].first == k)
       {
-        return {iterator{temp, false}, true};
+        return {iterator(node), true};
       }
-
-      if (temp->len_ == 2 && temp->data_[1].first == k)
+      else if (node->len_ != 1 && node->data_[1].first == k)
       {
-        return {iterator{temp, true}, true};
+        return {iterator(node, 1), true};
       }
-
-      if (temp->sons_ == 0)
+      if (!node->sons_)
       {
-        return {iterator{temp, temp->len_ == 2}, false};
+        return {iterator(node), false};
       }
-
-      if (comp(k, temp->data_[0].first))
+      if (C{}(k, node->data_[0].first))
       {
-        temp = temp->kids_[0];
-      }
-      else if (temp->len_ == 2 && comp(k, temp->data_[1].first))
-      {
-        temp = temp->kids_[1];
+        node = node->kids_[0];
       }
       else
       {
-        temp = temp->kids_[2];
+        if (node->len_ == 1 || C{}(k, node->data_[1].first))
+        {
+          node = node->kids_[1];
+        }
+        else
+        {
+          node = node->kids_[2];
+        }
       }
     }
   }
@@ -165,7 +171,16 @@ namespace savintsev
       return node;
     }
     node_type * left = new node_type{};
-    node_type * right = new node_type{};
+    node_type * right = nullptr;
+    try
+    {
+      right = new node_type{};
+    }
+    catch (const std::bad_alloc & e)
+    {
+      delete left;
+      throw;
+    }
     left->parent_ = node->parent_;
     right->parent_ = node->parent_;
     for (size_t i = 0; i < 2; ++i)
@@ -213,20 +228,16 @@ namespace savintsev
     }
     else
     {
-      node_type * new_root = new node_type{};
-
-      new_root->data_[0] = node->data_[1];
-      new_root->len_ = 1;
-
-      new_root->kids_[0] = left;
-      new_root->kids_[1] = right;
-      new_root->sons_ = 2;
-
-      left->parent_ = new_root;
-      right->parent_ = new_root;
-
-      delete node;
-      return new_root;
+      left->parent_ = node;
+      right->parent_ = node;
+      node->data_[0] = node->data_[1];
+      node->kids_[0] = left;
+      node->kids_[1] = right;
+      node->kids_[2] = nullptr;
+      node->kids_[3] = nullptr;
+      node->len_ = 1;
+      node->sons_ = 2;
+      return node;
     }
   }
 
@@ -237,9 +248,10 @@ namespace savintsev
 
     if (result.second)
     {
+      //std::cout << "Found " << val.first << "\n";
       return {result.first, false};
     }
-
+    //std::cout << "Cant find " << val.first << "\n";
     node_type * current = result.first.node_;
 
     if (!current)
@@ -263,7 +275,11 @@ namespace savintsev
 
     root_ = current;
     size_++;
-
+    //std::cout << "in head: " << root_->data_[0].first << '\n';
+    //if (root_->len_ == 2)
+    //{
+    //  std::cout << "in head: " << root_->data_[1].first << '\n';
+    //}
     return {lazy_find(val.first).first, true};
   }
 }
