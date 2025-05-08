@@ -141,3 +141,17 @@ void demehin::cut(std::ostream& out, std::istream& in, MapOfGraphs& graphs)
     return;
   }
 }
+
+void demehin::create(std::ostream& out, std::istream& in, MapOfGraphs& graphs)
+{
+  std::string gr_name;
+  in >> gr_name;
+
+  if (graphs.find(gr_name) != graphs.end())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  graphs[gr_name];
+}
