@@ -64,3 +64,37 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
   }
   return res;
 }
+
+bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, unsigned int weight)
+{
+  auto key = std::make_pair(from, to);
+  auto edgeIt = edges.find(key);
+
+  if (edgeIt == edges.end())
+  {
+    return false;
+  }
+
+  auto& weights = edgeIt->second;
+  bool isDeleted = false;
+  for (auto it = weights.cbegin(); it != weights.cend();)
+  {
+    if (*it == weight)
+    {
+      it = weights.erase(it);
+      isDeleted = true;
+    }
+    else
+    {
+      it++;
+    }
+  }
+
+  if (weights.empty())
+  {
+    edges.erase(edgeIt);
+    return true;
+  }
+
+  return isDeleted;
+}

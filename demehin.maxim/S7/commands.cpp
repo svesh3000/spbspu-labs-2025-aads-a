@@ -120,3 +120,24 @@ void demehin::bind(std::ostream& out, std::istream& in, MapOfGraphs& graphs)
     out << "<INVALID COMMAND>\n";
   }
 }
+
+void demehin::cut(std::ostream& out, std::istream& in, MapOfGraphs& graphs)
+{
+  std::string gr_name, from, to;
+  unsigned int weight;
+  in >> gr_name >> from >> to >> weight;
+  Graph gr;
+  try
+  {
+    if (!(graphs.at(gr_name).deleteEdge(from, to, weight)))
+    {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+  }
+  catch (const std::logic_error&)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+}

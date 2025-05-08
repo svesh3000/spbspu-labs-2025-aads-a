@@ -21,6 +21,7 @@ namespace demehin
   {
   public:
     void addEdge(const std::string&, const std::string&, unsigned int);
+    bool deleteEdge(const std::string&, const std::string&, unsigned int);
     Tree< std::string, std::string > getVrts() const;
     Tree< std::string, Tree< unsigned int, size_t > > getOutbounds(const std::string&) const;
     Tree< std::string, Tree< unsigned int, size_t > > getInbounds(const std::string&) const;

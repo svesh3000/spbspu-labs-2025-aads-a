@@ -13,6 +13,7 @@ namespace demehin
   void printOutbounds(std::ostream&, std::istream&, const MapOfGraphs&);
   void printInbounds(std::ostream&, std::istream&, const MapOfGraphs&);
   void bind(std::ostream&, std::istream&, MapOfGraphs&);
+  void cut(std::ostream&, std::istream&, MapOfGraphs&);
 }
 
 #endif
