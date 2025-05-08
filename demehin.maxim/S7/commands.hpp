@@ -12,6 +12,7 @@ namespace demehin
   void printVertexesNames(std::ostream&, std::istream&, const MapOfGraphs&);
   void printOutbounds(std::ostream&, std::istream&, const MapOfGraphs&);
   void printInbounds(std::ostream&, std::istream&, const MapOfGraphs&);
+  void bind(std::ostream&, std::istream&, MapOfGraphs&);
 }
 
 #endif
