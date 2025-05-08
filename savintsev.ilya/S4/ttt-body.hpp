@@ -16,7 +16,7 @@ namespace savintsev
     using node_type = node_t< value_type >;
 
     using iterator = BidirectIterator< Key, Value >;
-    using const_iterator = BidirectIterator< Key, Value >;
+    using const_iterator = BidirectConstIterator< Key, Value >;
 
     using size_type = size_t;
 
