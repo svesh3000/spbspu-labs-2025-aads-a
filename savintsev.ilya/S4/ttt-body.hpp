@@ -118,7 +118,7 @@ namespace savintsev
   {
     if (other.root_)
     {
-      root_ = clone(other.root_);//no deep
+      root_ = clone(other.root_);
       size_ = other.size_;
     }
   }
@@ -304,6 +304,30 @@ namespace savintsev
         node = node->kids_[2];
       }
     }
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  typename TwoThreeTree< Key, Value, Compare >::node_type * TwoThreeTree< Key, Value, Compare >::clone(node_type * other)
+  {
+    if (!other)
+    {
+      return nullptr;
+    }
+    node_type * root = new node_type{};
+    for (size_t i = 0; i < 2; ++i)
+    {
+      root->data_[i] = other->data_[i];
+    }
+    root->len_ = other->len_;
+    for (size_t i = 0; i < 3; ++i)
+    {
+      if (other->kids_[i])
+      {
+        root->kids_[i] = clone(other->kids_[i]);
+        root->kids_[i]->parent_ = root;
+      }
+    }
+    return root;
   }
 
   template< typename Key, typename Value, typename Compare >
