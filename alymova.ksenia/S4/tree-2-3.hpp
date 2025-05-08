@@ -109,7 +109,7 @@ namespace alymova
   {
     for (auto it = first; it != last; it++)
     {
-      insert(*it);
+      emplace(*it);
     }
   }
 
@@ -254,7 +254,7 @@ namespace alymova
     TwoThreeTree< Key, Value, Comparator >::emplace(Args&&... args)
   {
     std::pair< Key, Value > value(std::forward< Args >(args)...);
-    size_t size_before = size();
+    size_t size_before = size_;
     ConstIterator hint = lower_bound(value.first);
     Iterator it = emplace_hint(hint, value);
     if (size_before == size())
@@ -262,25 +262,6 @@ namespace alymova
       return {it, false};
     }
     return {it, true};
-    /*auto it_value = find(value.first);
-    if (it_value != end())
-    {
-      return {it_value, false};
-    }
-    if (size_ == 0)
-    {
-      root_ = new Node();
-    }
-    Node* tmp = find_to_insert(value.first);
-    tmp->insert(value);
-    if (tmp->type == NodeType::Overflow)
-    {
-      split(tmp);
-    }
-    move_fake();
-    size_++;
-    Iterator it = find(value.first);
-    return {it, true};*/
   }
 
   template< class Key, class Value, class Comparator >
@@ -294,22 +275,21 @@ namespace alymova
     {
       return it_value;
     }
-    Node* tmp = find_to_insert(hint);
+    Node* to_insert = find_to_insert(hint);
     if (!check_hint(hint, value.first))
     {
-      tmp = find_to_insert(value.first);
+      to_insert = find_to_insert(value.first);
     }
     if (size_ == 0)
     {
       root_ = new Node();
-      tmp = root_;
+      to_insert = root_;
     }
-    tmp->insert(value);
-    split(tmp);
+    to_insert->insert(value);
+    split(to_insert);
     move_fake();
     size_++;
-    Iterator it = find(value.first);
-    return it;
+    return find(value.first);
   }
 
   template< class Key, class Value, class Comparator >
@@ -499,14 +479,8 @@ namespace alymova
       delete parent_node;
       throw;
     }
-    if (node != root_)
-    {
-      delete node;
-    }
-    if (parent_node->type == NodeType::Overflow)
-    {
-      split(parent_node);
-    }
+    delete node;
+    split(parent_node);
   }
 
   template< class Key, class Value, class Comparator >
@@ -547,7 +521,7 @@ namespace alymova
   detail::TTTNode< Key, Value >* TwoThreeTree< Key, Value, Comparator >::find_to_insert(ConstIterator hint) const
   {
     Iterator tmp = hint;
-    if (tmp == cbegin())
+    if (hint == cbegin())
     {
       return root_;
     }
