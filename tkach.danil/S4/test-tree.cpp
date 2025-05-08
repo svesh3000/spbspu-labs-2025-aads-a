@@ -21,6 +21,42 @@ BOOST_AUTO_TEST_CASE(basic_contructor_test)
   BOOST_TEST(tree.size() == 0);
 }
 
+BOOST_AUTO_TEST_CASE(init_list_contructor_test)
+{
+  AvlTree< size_t, std::string > tree{std::make_pair(1, "first"), std::make_pair(2, "second"), std::make_pair(3, "third")};
+  std::ostringstream out;
+  print(tree, out);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+}
+
+BOOST_AUTO_TEST_CASE(iter_contructor_test)
+{
+  AvlTree< size_t, std::string > tree1{std::make_pair(1, "first"), std::make_pair(2, "second"), std::make_pair(3, "third")};
+  AvlTree< size_t, std::string > tree2{tree1.begin(), tree1.end()};
+  std::ostringstream out;
+  print(tree2, out);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+}
+
+BOOST_AUTO_TEST_CASE(tree_insert_range_test)
+{
+  AvlTree< size_t, std::string > tree1{std::make_pair(1, "first"), std::make_pair(2, "second"), std::make_pair(3, "third")};
+  AvlTree< size_t, std::string > tree2;
+  tree2.insert(tree1.begin(), tree1.end());
+  std::ostringstream out;
+  print(tree2, out);
+  BOOST_TEST(out.str() == "1 first 2 second 3 third");
+}
+
+BOOST_AUTO_TEST_CASE(tree_erase_range_test)
+{
+  AvlTree< size_t, std::string > tree1{std::make_pair(1, "first"), std::make_pair(2, "second"), std::make_pair(3, "third")};
+  tree1.erase(tree1.begin(), ++tree1.begin());
+  std::ostringstream out;
+  print(tree1, out);
+  BOOST_TEST(out.str() == "2 second 3 third");
+}
+
 BOOST_AUTO_TEST_CASE(tree_insert_rvalue_test)
 {
   AvlTree< size_t, std::string > tree;
@@ -29,7 +65,8 @@ BOOST_AUTO_TEST_CASE(tree_insert_rvalue_test)
   BOOST_TEST(tree.size() == 1);
   tree.insert(std::make_pair(1, "first"));
   BOOST_TEST(tree.size() == 2);
-  tree.insert(std::make_pair(3, "third"));
+  auto it = tree.insert(std::make_pair(3, "third"));
+  BOOST_TEST((it->first == 3 && it->second == "third"));
   BOOST_TEST(tree.size() == 3);
   std::ostringstream out;
   print(tree, out);
@@ -47,7 +84,8 @@ BOOST_AUTO_TEST_CASE(tree_insert_lvalue_test)
   tree.insert(pair);
   BOOST_TEST(tree.size() == 2);
   pair = std::make_pair(3, "third");
-  tree.insert(pair);
+  auto it = tree.insert(pair);
+  BOOST_TEST((it->first == 3 && it->second == "third"));
   BOOST_TEST(tree.size() == 3);
   std::ostringstream out;
   print(tree, out);
@@ -142,8 +180,8 @@ BOOST_AUTO_TEST_CASE(tree_const_find_test)
   {
     tree.insert(std::make_pair(i, std::to_string(i)));
   }
-  BOOST_TEST((static_cast< const AvlTree< size_t, std::string > >(tree).find(6) == tree.cend()));
-  BOOST_TEST((static_cast< const AvlTree< size_t, std::string > >(tree).find(5) != tree.cend()));
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).find(6) == tree.cend()));
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).find(5) != tree.cend()));
 }
 
 BOOST_AUTO_TEST_CASE(tree_at_test)
@@ -176,7 +214,7 @@ BOOST_AUTO_TEST_CASE(tree_at_const_test)
   }
   for (size_t i = 0; i <= 5; ++i)
   {
-    BOOST_TEST((static_cast< const AvlTree< size_t, std::string > >(tree).at(i) == std::to_string(i)));
+    BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).at(i) == std::to_string(i)));
   }
 }
 
@@ -255,7 +293,7 @@ BOOST_AUTO_TEST_CASE(tree_end_test)
   BOOST_TEST(i == 6);
 }
 
-BOOST_AUTO_TEST_CASE(tree_upper_lowes_bound_test)
+BOOST_AUTO_TEST_CASE(tree_upper_lower_bound_test)
 {
   AvlTree< size_t, std::string > tree;
   for (size_t i = 1; i <= 7; i += 2)
@@ -266,6 +304,50 @@ BOOST_AUTO_TEST_CASE(tree_upper_lowes_bound_test)
   BOOST_TEST(tree.lowerBound(5)->first == 5);
   BOOST_TEST(tree.upperBound(4)->first == 5);
   BOOST_TEST(tree.lowerBound(4)->first == 5);
+}
+
+BOOST_AUTO_TEST_CASE(tree_upper_lower_bound_const_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 1; i <= 7; i += 2)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).upperBound(5))->first == 7);
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).lowerBound(5))->first == 5);
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).upperBound(4))->first == 5);
+  BOOST_TEST((static_cast< const AvlTree< size_t, std::string >& >(tree).lowerBound(4))->first == 5);
+}
+
+BOOST_AUTO_TEST_CASE(tree_count_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 1; i <= 7; i += 2)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  BOOST_TEST(tree.count(1) == 1);
+  BOOST_TEST(tree.count(3) == 1);
+}
+
+BOOST_AUTO_TEST_CASE(tree_range_notconst_const_test)
+{
+  AvlTree< size_t, std::string > tree;
+  for (size_t i = 1; i <= 7; i += 2)
+  {
+    tree.insert(std::make_pair(i, std::to_string(i)));
+  }
+  std::pair< Iterator< size_t, std::string >, Iterator< size_t, std::string > > range = tree.equalRange(2);
+  using pair_t = std::pair< Citerator< size_t, std::string >, Citerator< size_t, std::string > >;
+  pair_t crange = (static_cast< const AvlTree< size_t, std::string >& >(tree).equalRange(2));
+  BOOST_TEST(range.first->first == range.second->first);
+  BOOST_TEST(crange.first->first == crange.second->first);
+  std::pair< Iterator< size_t, std::string >, Iterator< size_t, std::string > > range2 = tree.equalRange(3);
+  pair_t crange2 = (static_cast< const AvlTree< size_t, std::string >& >(tree).equalRange(3));
+  BOOST_TEST(range2.first->first == 3);
+  BOOST_TEST(crange2.first->first == 3);
+  BOOST_TEST(range2.first->second == "3");
+  BOOST_TEST(crange2.first->second == "3");
 }
 
 BOOST_AUTO_TEST_CASE(tree_cend_test)

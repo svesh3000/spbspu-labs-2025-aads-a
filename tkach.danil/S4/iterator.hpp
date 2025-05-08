@@ -9,7 +9,7 @@ namespace tkach
   class AvlTree;
 
   template< class Key, class Value, class Cmp = std::less< Key > >
-  class Iterator
+  class Iterator: public std::iterator< std::forward_iterator_tag, Value >
   {
     friend class AvlTree< Key, Value, Cmp >;
   public:
