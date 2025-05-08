@@ -6,12 +6,16 @@
 #include "c_iterator.hpp"
 #include "iterator.hpp"
 
+namespace
+{
+  template< class Key, class Value >
+  using pair_t = std::pair< tkach::TreeNode< Key, Value >*, tkach::TreeNode< Key, Value >* >;
+}
 namespace tkach
 {
   template< class Key, class Value, class Cmp = std::less< Key > >
   class AvlTree
   {
-    using tnode = TreeNode< Key, Value >;
   public:
     AvlTree();
     AvlTree(const AvlTree< Key, Value, Cmp >& other);
@@ -57,7 +61,7 @@ namespace tkach
     template< class... Args >
     Iterator< Key, Value, Cmp > insertSingle(const Key& key, Args&&... args);
     template< class... Args >
-    std::pair< tnode*, tnode* > insertCmp(tnode* root, const Key& key, Args&&... args);
+    pair_t< Key, Value > insertCmp(TreeNode< Key, Value >* root, const Key& key, Args&&... args);
     void clearFrom(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* findMin(TreeNode< Key, Value >* node) const;
     TreeNode< Key, Value >* findMax(TreeNode< Key, Value >* node) const;
@@ -530,7 +534,7 @@ namespace tkach
 
   template< class Key, class Value, class Cmp >
   template< class... Args >
-  std::pair< TreeNode< Key, Value >*, TreeNode< Key, Value >* > AvlTree< Key, Value, Cmp >::insertCmp(tnode* root, const Key& key, Args&&... args)
+  pair_t< Key, Value > AvlTree< Key, Value, Cmp >::insertCmp(TreeNode< Key, Value >* root, const Key& key, Args&&... args)
   {
     TreeNode< Key, Value >* inserted = nullptr;
     if (root == nullptr)
