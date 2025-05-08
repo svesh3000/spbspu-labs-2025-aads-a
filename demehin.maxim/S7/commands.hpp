@@ -9,6 +9,7 @@ namespace demehin
   using MapOfGraphs = demehin::Tree< std::string, Graph >;
 
   void printGraphsNames(std::ostream&, const MapOfGraphs);
+  void printVertexesNames(std::ostream&, std::istream&, const MapOfGraphs);
 }
 
 #endif

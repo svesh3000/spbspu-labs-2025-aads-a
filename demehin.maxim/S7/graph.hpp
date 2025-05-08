@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <dynamic_array.hpp>
+#include <tree/tree.hpp>
 
 namespace demehin
 {
@@ -18,7 +19,7 @@ namespace demehin
   {
   public:
     void addEdge(const std::string&, const std::string&, unsigned int);
-    void print() const;
+    Tree< std::string, std::string > getVrts() const;
 
   private:
     std::unordered_map< std::pair< std::string, std::string >, DynamicArray< unsigned int >, PairHash > edges;
