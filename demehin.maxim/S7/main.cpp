@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include "graph.hpp"
+#include "commands.hpp"
 #include <tree/tree.hpp>
 
 namespace
@@ -9,13 +10,12 @@ namespace
 
   void inputGraphs(std::istream& in, MapOfGraphs& graphs)
   {
-    while (!in.eof())
+    std::string name;
+    while (in >> name)
     {
-      in.clear();
-      std::string name;
       size_t cnt;
       demehin::Graph gr;
-      in >> name >> cnt;
+      in >> cnt;
       for (size_t i = 0; i < cnt; i++)
       {
         std::string from, to;
@@ -39,6 +39,6 @@ int main(int argc, char* argv[])
   MapOfGraphs mapOfGraphs;
   inputGraphs(file, mapOfGraphs);
 
-  mapOfGraphs["gr1"].print();
+  demehin::printGraphsNames(std::cout, mapOfGraphs);
   std::cout << "\n";
 }
