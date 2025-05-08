@@ -16,18 +16,42 @@ namespace savintsev
     using node_type = node_t< value_type >;
 
     using iterator = BidirectIterator< Key, Value >;
+    using const_iterator = BidirectIterator< Key, Value >;
+
+    using size_type = size_t;
 
     TwoThreeTree();
+    TwoThreeTree(const TwoThreeTree & other);
+    TwoThreeTree(TwoThreeTree && other) noexcept;
 
     iterator begin() noexcept;
     iterator end() noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+
+    void clear() noexcept;
+    bool empty() const noexcept;
+    size_type size() const noexcept;
+    size_type count(const key_type & k) const;
+
+    void swap(TwoThreeTree & other) noexcept;
 
     iterator find(const key_type & k);
+    const_iterator find (const key_type & k) const;
+
+    mapped_type & at(const key_type & k);
+    const mapped_type & at(const key_type & k) const;
 
     mapped_type & operator[](const key_type & k);
-    //mapped_type & operator[](key_type && k);
+    mapped_type & operator[](key_type && k);
 
     std::pair< iterator, bool > insert(const value_type & val);
+
+    iterator erase(const_iterator position);
+    size_type erase(const key_type & k);
+
+    std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
+    std::pair< iterator, iterator> equal_range(const key_type & k);
   private:
     node_type * root_;
     size_t size_;
@@ -60,12 +84,23 @@ namespace savintsev
         }
       }
     }
-
     void insert_data_in_node(node_type * node, const value_type & val)
     {
       node->data_[node->len_] = val;
       node->len_++;
       sort_node(node);
+    }
+    void clear_nodes(node_type * node)
+    {
+      if (!node)
+      {
+        return;
+      }
+      for (size_t i = 0; i < 3; ++i)
+      {
+        clear_nodes(node->kids_[i]);
+      }
+      delete node;
     }
   };
 
@@ -74,6 +109,27 @@ namespace savintsev
     root_(nullptr),
     size_(0)
   {}
+
+  template< typename Key, typename Value, typename Compare >
+  TwoThreeTree< Key, Value, Compare >::TwoThreeTree(const TwoThreeTree & other):
+    root_(nullptr),
+    size_(0)
+  {
+    if (other.root_)
+    {
+      root_ = new node_type(*other.root_, nullptr); //no deep
+      size_ = other.size_;
+    }
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  TwoThreeTree< Key, Value, Compare >::TwoThreeTree(TwoThreeTree && other) noexcept:
+    root_(other.root_),
+    size_(other.size_)
+  {
+    other.root_ = nullptr;
+    other.size_ = 0;
+  }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
@@ -93,14 +149,82 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::begin() const noexcept
+  {
+    node_type * temp = root_;
+    if (!temp)
+    {
+      return const_iterator();
+    }
+    while (temp->kids_[0])
+    {
+      temp = temp->kids_[0];
+    }
+    return const_iterator(temp, 0);
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::end() const noexcept
+  {
+    return const_iterator();
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  void TwoThreeTree< Key, Value, Compare >::clear() noexcept
+  {
+    clear_nodes(root_);
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::size_type TwoThreeTree< K, V, C >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::size_type TwoThreeTree< K, V, C >::count(const key_type & k) const
+  {
+    auto result = lazy_find(k);
+    if (result.second)
+    {
+      return 1;
+    }
+    return 0;
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  void TwoThreeTree< Key, Value, Compare >::swap(TwoThreeTree & other) noexcept
+  {
+    std::swap(root_, other.root_);
+    std::swap(size_, other.size_);
+  }
+
+  template< typename K, typename V, typename C >
+  bool TwoThreeTree< K, V, C >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::find(const key_type & k)
   {
-    iterator temp = lazy_find(k);
-    if (!temp || k != temp.node_->data_[temp.pos_].first)
+    auto result = lazy_find(k);
+    if (result.second)
     {
-      return end();
+      return result.first;
     }
-    return temp;
+    return end();
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::find(const key_type & k) const
+  {
+    auto result = lazy_find(k);
+    if (result.second)
+    {
+      return result.first;
+    }
+    return end();
   }
 
   template< typename K, typename V, typename C >
@@ -109,18 +233,35 @@ namespace savintsev
     return insert(std::make_pair(k, mapped_type{})).first->second;
   }
 
-  /*
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](key_type && k)
   {
-    iterator temp = lazy_find(k);
-    if (!temp.node_ || k != temp.node_->data_[temp.pos_].first)
-    {
-      temp = create_node(temp, k);
-    }
-    return temp.node_->data_[temp.pos_].second;
+    return insert(std::make_pair(std::move(k), mapped_type{})).first->second;
   }
-*/
+
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::at(const key_type & k)
+  {
+    auto it_pair = lazy_find(k);
+    if (!it_pair.second)
+    {
+      throw std::out_of_range("ERROR: Key not found");
+    }
+    return it_pair.first->second;
+  }
+
+  template< typename K, typename V, typename C >
+  const typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::at(const key_type & k) const
+  {
+    auto it_pair = lazy_find(k);
+    if (!it_pair.second)
+    {
+      throw std::out_of_range("ERROR: Key not found");
+    }
+    return it_pair.first->second;
+  }
+
   template< typename K, typename V, typename C >
   typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool >
   TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
@@ -274,10 +415,13 @@ namespace savintsev
 
     root_ = current;
     size_++;
-
     /*
     node_type * node = root_;
-    std::cout << "HEAD: " << node->data_[0].first << '|' <<node->data_[0].second << '\n';
+    std::cout << "HEAD: " << node->data_[0].first << '|' << node->data_[0].second;
+    if (node->len_ == 2)
+    {
+      std::cout << ", " << node->data_[1].first << '|' << node->data_[1].second;
+    }
     std::cout << '\n' << "kids: ";
     for (size_t i = 0; i < 4; ++i)
     {

@@ -71,16 +71,16 @@ namespace savintsev
       pos_(pos)
     {}
 
-    BidirectIterator & next()
+    BidirectIterator& next()
     {
       if (!node_)
       {
         return *this;
       }
 
-      if (pos_ == 0 && node_->len_ == 2 && node_->kids_[1])
+      if (pos_ < node_->len_ && node_->kids_[pos_ + 1])
       {
-        node_ = node_->kids_[1];
+        node_ = node_->kids_[pos_ + 1];
         while (node_->kids_[0])
         {
           node_ = node_->kids_[0];
@@ -89,106 +89,70 @@ namespace savintsev
         return *this;
       }
 
-      if (pos_ == 0 && node_->len_ == 2)
+      if (pos_ < node_->len_ - 1)
       {
-        pos_ = 1;
-        return *this;
-      }
-
-      pos_ = 0;
-      if (node_->kids_[2])
-      {
-        node_ = node_->kids_[2];
-        while (node_->kids_[0])
-        {
-          node_ = node_->kids_[0];
-        }
+        ++pos_;
         return *this;
       }
 
       while (node_->parent_)
       {
-        auto prev = node_;
-        node_ = node_->parent_;
-        if (node_->kids_[0] == prev)
+        size_t parent_pos = 0;
+        while (parent_pos <= node_->parent_->len_ && node_->parent_->kids_[parent_pos] != node_)
         {
+          ++parent_pos;
+        }
+        node_ = node_->parent_;
+        if (parent_pos < node_->len_)
+        {
+          pos_ = parent_pos;
           return *this;
         }
-        if (node_->kids_[1] == prev)
-        {
-          if (node_->len_ == 2)
-          {
-            pos_ = 1;
-            return *this;
-          }
-          continue;
-        }
       }
-
       node_ = nullptr;
       return *this;
     }
     BidirectIterator & prev()
     {
-      //if (!node_)
-      //{
-      //  return rbegin();
-      //}
-      if (pos_)
+      if (!node_)
       {
-        pos_ = 0;
         return *this;
       }
-      if (node_->kids_[1])
+
+      if (pos_ > 0 && node_->kids_[pos_])
       {
-        node_ = node_->kids_[1];
-        while (node_->kids_[2])
+        node_ = node_->kids_[pos_];
+        while (node_->kids_[node_->len_])
         {
-          node_ = node_->kids_[2];
+          node_ = node_->kids_[node_->len_];
+        }
+        pos_ = node_->len_ - 1;
+        return *this;
+      }
+
+      if (pos_ > 0)
+      {
+        --pos_;
+        return *this;
+      }
+
+      while (node_->parent_)
+      {
+        size_t parent_pos = 0;
+        while (parent_pos <= node_->parent_->len_ && node_->parent_->kids_[parent_pos] != node_)
+        {
+          ++parent_pos;
+        }
+
+        node_ = node_->parent_;
+        if (parent_pos > 0)
+        {
+          pos_ = parent_pos - 1;
+          return *this;
         }
       }
-      else if (node_->kids_[0])
-      {
-        node_ = node_->kids_[0];
-        while (node_->kids_[2])
-        {
-          node_ = node_->kids_[2];
-        }
-      }
-      else
-      {
-        while (node_->parent_)
-        {
-          auto prev = node_;
-          node_ = node_->parent_;
-          if (node_->kids_[2] == prev)
-          {
-            if (node_->len_ == 2)
-            {
-              pos_ = 1;
-            }
-            return *this;
-          }
-          if (node_->kids_[1] == prev && node_->kids_[0])
-          {
-            node_ = node_->kids_[0];
-            while (node_->kids_[2])
-            {
-              node_ = node_->kids_[2];
-            }
-            if (node_->len_ == 2)
-            {
-              pos_ = 1;
-            }
-            return *this;
-          }
-        }
-        node_ = nullptr;
-      }
-      if (node_->len_ == 2)
-      {
-        pos_ = 1;
-      }
+
+      node_ = nullptr;
       return *this;
     }
   };

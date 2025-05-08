@@ -13,6 +13,10 @@ BOOST_AUTO_TEST_CASE(test_iterator)
   map[8] = 80;
   map[18] = 180;
   map[20] = 200;
+  map[0] = 11;
+  map[-1] = -10;
+  map[6] = 60;
+  map[7] = 70;
   BOOST_TEST(map[1] == 111);
   BOOST_TEST(map[2] == 20);
   BOOST_TEST(map[10] == 100);
@@ -20,10 +24,8 @@ BOOST_AUTO_TEST_CASE(test_iterator)
   BOOST_TEST(map[8] == 80);
   BOOST_TEST(map[18] == 180);
   BOOST_TEST(map[20] == 200);
-  //BOOST_TEST(map[0] == 5);
-  //BOOST_TEST(map[4] == 40);
-  //for (auto it = map.begin(); it != map.end(); ++it)
-  //{
-  //  std::cout << it->first << " " << it->second << std::endl;
-  //}
+  BOOST_TEST(map[0] == 11);
+  BOOST_TEST(map[-1] == -10);
+  BOOST_TEST(map[6] == 60);
+  BOOST_TEST(map[7] == 70);
 }
