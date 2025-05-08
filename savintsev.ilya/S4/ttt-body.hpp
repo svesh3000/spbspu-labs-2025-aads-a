@@ -56,7 +56,7 @@ namespace savintsev
     node_type * root_;
     size_t size_;
 
-    std::pair< iterator, bool > lazy_find(const key_type & k);
+    std::pair< iterator, bool > lazy_find(const key_type & k) const;
 
     node_type * split_node(node_type * node);
     void sort_node(node_type * node)
@@ -102,6 +102,7 @@ namespace savintsev
       }
       delete node;
     }
+    node_type * clone(node_type * other);
   };
 
   template< typename Key, typename Value, typename Compare >
@@ -117,7 +118,7 @@ namespace savintsev
   {
     if (other.root_)
     {
-      root_ = new node_type(*other.root_, nullptr); //no deep
+      root_ = clone(other.root_);//no deep
       size_ = other.size_;
     }
   }
@@ -264,7 +265,7 @@ namespace savintsev
 
   template< typename K, typename V, typename C >
   typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool >
-  TwoThreeTree< K, V, C >::lazy_find(const key_type & k)
+  TwoThreeTree< K, V, C >::lazy_find(const key_type & k) const
   {
     if (!root_)
     {
