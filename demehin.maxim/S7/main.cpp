@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
   cmds["graphs"] = std::bind(demehin::printGraphsNames, std::ref(std::cout), std::cref(mapOfGraphs));
   cmds["vertexes"] = std::bind(demehin::printVertexesNames, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
   cmds["outbound"]  = std::bind(demehin::printOutbounds, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
+  cmds["inbound"] = std::bind(demehin::printInbounds, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
 
   std::string command;
   while (std::cin >> command)

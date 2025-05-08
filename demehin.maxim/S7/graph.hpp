@@ -23,6 +23,7 @@ namespace demehin
     void addEdge(const std::string&, const std::string&, unsigned int);
     Tree< std::string, std::string > getVrts() const;
     Tree< std::string, Tree< unsigned int, size_t > > getOutbounds(const std::string&) const;
+    Tree< std::string, Tree< unsigned int, size_t > > getInbounds(const std::string&) const;
     bool hasVrt(const std::string&) const;
 
   private:

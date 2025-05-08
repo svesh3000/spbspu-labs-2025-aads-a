@@ -46,3 +46,21 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
   }
   return res;
 }
+
+demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Graph::getInbounds(const std::string& vrt) const
+{
+  Tree< std::string, Tree< unsigned int, size_t > > res;
+
+  for (const auto& edge : edges)
+  {
+    if (edge.first.second == vrt)
+    {
+      std::string target = edge.first.first;
+      for (auto weight : edge.second)
+      {
+        res[target][weight]++;
+      }
+    }
+  }
+  return res;
+}

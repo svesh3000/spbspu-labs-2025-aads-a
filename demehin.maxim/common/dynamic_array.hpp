@@ -18,9 +18,6 @@ namespace demehin
     DynamicArray< T >& operator=(const DynamicArray< T >&);
     DynamicArray< T >& operator=(DynamicArray< T >&&);
 
-    T& operator[](size_t);
-    const T& operator[](size_t) const;
-
     ~DynamicArray();
 
     void push(const T& rhs);
@@ -211,18 +208,6 @@ namespace demehin
     T* newData = details::copyData(data_, capacity_);
     delete[] data_;
     data_ = newData;
-  }
-
-  template< typename T >
-  T& DynamicArray< T >::operator[](size_t ind)
-  {
-    return data_[ind + begin_];
-  }
-
-  template< typename T >
-  const T& DynamicArray< T >::operator[](size_t ind) const
-  {
-    return data_[ind + begin_];
   }
 }
 

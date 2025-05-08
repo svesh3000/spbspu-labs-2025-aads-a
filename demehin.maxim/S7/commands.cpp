@@ -1,6 +1,28 @@
 #include "commands.hpp"
 
-void demehin::printGraphsNames(std::ostream& out, const MapOfGraphs graphs)
+namespace
+{
+  using demehin::Tree;
+
+  void printBounds(std::ostream& out, const Tree< std::string, Tree< unsigned int, size_t > > bounds)
+  {
+    for (auto it = bounds.begin(); it != bounds.end(); it++)
+    {
+      out << (*it).first;
+      auto weights_it = (*it).second.begin();
+      for(; weights_it != (*it).second.end(); weights_it++)
+      {
+        for (size_t i = 0; i < (*weights_it).second; i++)
+        {
+          out << " " << (*weights_it).first;
+        }
+      }
+      out << "\n";
+    }
+  }
+}
+
+void demehin::printGraphsNames(std::ostream& out, const MapOfGraphs& graphs)
 {
   for (auto it = graphs.begin(); it != graphs.end(); it++)
   {
@@ -8,7 +30,7 @@ void demehin::printGraphsNames(std::ostream& out, const MapOfGraphs graphs)
   }
 }
 
-void demehin::printVertexesNames(std::ostream& out, std::istream& in, const MapOfGraphs graphs)
+void demehin::printVertexesNames(std::ostream& out, std::istream& in, const MapOfGraphs& graphs)
 {
   std::string gr_name;
   in >> gr_name;
@@ -30,7 +52,7 @@ void demehin::printVertexesNames(std::ostream& out, std::istream& in, const MapO
   }
 }
 
-void demehin::printOutbounds(std::ostream& out, std::istream& in, const MapOfGraphs graphs)
+void demehin::printOutbounds(std::ostream& out, std::istream& in, const MapOfGraphs& graphs)
 {
   std::string gr_name, vrt_name;
   in >> gr_name >> vrt_name;
@@ -53,17 +75,31 @@ void demehin::printOutbounds(std::ostream& out, std::istream& in, const MapOfGra
   }
 
   auto outbounds = gr.getOutbounds(vrt_name);
-  for (auto it = outbounds.begin(); it != outbounds.end(); it++)
+  printBounds(out, outbounds);
+}
+
+void demehin::printInbounds(std::ostream& out, std::istream& in, const MapOfGraphs& graphs)
+{
+  std::string gr_name, vrt_name;
+  in >> gr_name >> vrt_name;
+
+  Graph gr;
+  try
   {
-    out << (*it).first;
-    auto weights_it = (*it).second.begin();
-    for(; weights_it != (*it).second.end(); weights_it++)
-    {
-      for (size_t i = 0; i < (*weights_it).second; i++)
-      {
-        out << " " << (*weights_it).first;
-      }
-    }
-    out << "\n";
+    gr = graphs.at(gr_name);
   }
+  catch (const std::logic_error&)
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  if (!gr.hasVrt(vrt_name))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  auto inbounds = gr.getInbounds(vrt_name);
+  printBounds(out, inbounds);
 }
