@@ -45,9 +45,10 @@ int main(int argc, char* argv[])
   cmds["vertexes"] = std::bind(demehin::printVertexesNames, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
   cmds["outbound"]  = std::bind(demehin::printOutbounds, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
   cmds["inbound"] = std::bind(demehin::printInbounds, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfGraphs));
-  cmds["bind"] = std::bind(demehin::bind, std::ref(std::cout), std::ref(std::cin), std::ref(mapOfGraphs));
-  cmds["cut"] = std::bind(demehin::cut, std::ref(std::cout), std::ref(std::cin), std::ref(mapOfGraphs));
-  cmds["create"] = std::bind(demehin::create, std::ref(std::cout), std::ref(std::cin), std::ref(mapOfGraphs));
+  cmds["bind"] = std::bind(demehin::bind, std::ref(std::cin), std::ref(mapOfGraphs));
+  cmds["cut"] = std::bind(demehin::cut, std::ref(std::cin), std::ref(mapOfGraphs));
+  cmds["create"] = std::bind(demehin::create, std::ref(std::cin), std::ref(mapOfGraphs));
+  cmds["merge"] = std::bind(demehin::merge, std::ref(std::cin), std::ref(mapOfGraphs));
 
   std::string command;
   while (std::cin >> command)

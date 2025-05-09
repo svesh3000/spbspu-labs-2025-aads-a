@@ -2,10 +2,8 @@
 #define GRAPH_HPP
 #include <string>
 #include <unordered_map>
-//#include <dynamic_array.hpp>
 #include <list/list.hpp>
 #include <tree/tree.hpp>
-//#include <list/list.hpp>
 
 namespace demehin
 {
@@ -20,15 +18,19 @@ namespace demehin
   class Graph
   {
   public:
+    using PairOfStr = std::pair< std::string, std::string >;
+    using Edges = std::unordered_map< PairOfStr, List< unsigned int >, PairHash >;
+
     void addEdge(const std::string&, const std::string&, unsigned int);
     bool deleteEdge(const std::string&, const std::string&, unsigned int);
+    const Edges& getEdges() const;
     Tree< std::string, std::string > getVrts() const;
     Tree< std::string, Tree< unsigned int, size_t > > getOutbounds(const std::string&) const;
     Tree< std::string, Tree< unsigned int, size_t > > getInbounds(const std::string&) const;
     bool hasVrt(const std::string&) const;
 
   private:
-    std::unordered_map< std::pair< std::string, std::string >, List< unsigned int >, PairHash > edges;
+    Edges edges;
   };
 }
 

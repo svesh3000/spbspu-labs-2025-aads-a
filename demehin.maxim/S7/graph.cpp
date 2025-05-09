@@ -98,3 +98,9 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
 
   return isDeleted;
 }
+
+
+const demehin::Graph::Edges& demehin::Graph::getEdges() const
+{
+  return edges;
+}
