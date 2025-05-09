@@ -41,9 +41,17 @@ namespace maslov
     size_(rhs.size_),
     data_(new T[capacity_])
   {
-    for (size_t i = 0; i < size_; ++i)
+    try
     {
-      data_[i] = rhs.data_[i];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        data_[i] = rhs.data_[i];
+      }
+    }
+    catch (const std::exception &)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
@@ -108,14 +116,24 @@ namespace maslov
   {
     if (size_ == capacity_)
     {
-      capacity_ *= 2;
-      T * newData = new T[capacity_];
-      for (size_t i = 0; i < size_; ++i)
+      T * newData = nullptr;
+      try
       {
-        newData[i] = data_[i];
+        size_t newCapacity = capacity_ * 2;
+        newData = new T[newCapacity];
+        for (size_t i = 0; i < size_; ++i)
+        {
+          newData[i] = data_[i];
+        }
+        delete[] data_;
+        data_ = newData;
+        capacity_ = newCapacity;
       }
-      delete[] data_;
-      data_ = newData;
+      catch (const std::exception &)
+      {
+        delete[] newData;
+        throw;
+      }
     }
     data_[size_++] = data;
   }

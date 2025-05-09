@@ -6,26 +6,15 @@ namespace
 {
   void splitExpression(const std::string & str, maslov::Queue< std::string > & infixQueue)
   {
-    std::string element;
     char separator = ' ';
-    for (size_t i = 0; i < str.length(); ++i)
+    size_t begin = str.find_first_not_of(separator);
+    size_t end = 0;
+    while (begin != std::string::npos)
     {
-      if (str[i] != separator)
-      {
-        element += str[i];
-      }
-      else
-      {
-        if (!element.empty())
-        {
-          infixQueue.push(element);
-          element.clear();
-        }
-      }
-    }
-    if (!element.empty())
-    {
+      end = str.find(separator, begin);
+      std::string element = str.substr(begin, end - begin);
       infixQueue.push(element);
+      begin = str.find_first_not_of(separator, end);
     }
   }
 

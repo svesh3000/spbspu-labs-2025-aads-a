@@ -3,19 +3,6 @@
 
 namespace
 {
-  bool isNumber(const std::string & element)
-  {
-    try
-    {
-      std::stoll(element);
-    }
-    catch (const std::exception &)
-    {
-      return false;
-    }
-    return true;
-  }
-
   bool isOperator(const std::string & el)
   {
     return (el == "+" || el == "-" || el == "*" || el == "/" || el == "%");
@@ -34,64 +21,102 @@ namespace
     return 0;
   }
 
-  long long int calculateOperation(long long int op1, long long int op2, const std::string & el)
+  bool isHighPrecedence(const std::string & op1, const std::string & op2)
+  {
+    return getPrecedence(op1) >= getPrecedence(op2);
+  }
+
+  void checkAddOverflow(long long int op1, long long int op2)
+  {
+    const long long int max = std::numeric_limits< long long int >::max();
+    const long long int min = std::numeric_limits< long long int >::min();
+    if ((op2 > 0) && (op1 > max - op2))
+    {
+      throw std::runtime_error("ERROR: addition overflow");
+    }
+    if ((op2 < 0) && (op1 < min - op2))
+    {
+      throw std::runtime_error("ERROR: addition underflow");
+    }
+  }
+
+  void checkSubOverflow(long long int op1, long long int op2)
+  {
+    const long long int max = std::numeric_limits< long long int >::max();
+    const long long int min = std::numeric_limits< long long int >::min();
+    if ((op2 > 0) && (op1 < min + op2))
+    {
+      throw std::runtime_error("ERROR: subtraction underflow");
+    }
+    if ((op2 < 0) && (op1 > max + op2))
+    {
+      throw std::runtime_error("ERROR: subtraction overflow");
+    }
+  }
+
+  void checkMulOverflow(long long int op1, long long int op2)
+  {
+    const long long int max = std::numeric_limits< long long int >::max();
+    const long long int min = std::numeric_limits< long long int >::min();
+    if (op2 != 0)
+    {
+      if (op1 > max / op2)
+      {
+        throw std::runtime_error("ERROR: multiplication overflow");
+      }
+      if (op1 < min / op2)
+      {
+        throw std::runtime_error("ERROR: multiplication underflow");
+      }
+    }
+  }
+
+  void checkDivOverflow(long long int op1, long long int op2)
   {
     const long long int min = std::numeric_limits< long long int >::min();
-    const long long int max = std::numeric_limits< long long int >::max();
+    if (op2 == 0)
+    {
+      throw std::runtime_error("ERROR: division by zero");
+    }
+    if (op1 == min && op2 == -1)
+    {
+      throw std::runtime_error("ERROR: division overflow");
+    }
+  }
+
+  void checkModByZero(long long int op2)
+  {
+    if (op2 == 0)
+    {
+      throw std::runtime_error("ERROR: division by zero");
+    }
+  }
+
+  long long int calculateOperation(long long int op1, long long int op2, const std::string & el)
+  {
     if (el == "+")
     {
-      if ((op2 > 0) && (op1 > (max - op2)))
-      {
-        throw std::runtime_error("ERROR: addition overflow");
-      }
-      if ((op2 < 0) && (op1 < (min - op2)))
-      {
-        throw std::runtime_error("ERROR: addition underflow");
-      }
+      checkAddOverflow(op1, op2);
       return op1 + op2;
     }
     else if (el == "-")
     {
-      if ((op2 > 0) && (op1 < (min + op2)))
-      {
-        throw std::runtime_error("ERROR: subtraction underflow");
-      }
-      if ((op2 < 0) && (op1 > (max + op2)))
-      {
-        throw std::runtime_error("ERROR: subtraction overflow");
-      }
+      checkSubOverflow(op1, op2);
       return op1 - op2;
     }
     else if (el == "*")
     {
-      if ((op2 != 0) && (op1 > (max / op2)))
-      {
-        throw std::runtime_error("ERROR: multiplication overflow");
-      }
-      if ((op2 != 0) && (op1 < (min / op2)))
-      {
-        throw std::runtime_error("ERROR: multiplication underflow");
-      }
+      checkMulOverflow(op1, op2);
       return op1 * op2;
     }
     else if (el == "/")
     {
-      if (op2 == 0)
-      {
-        throw std::runtime_error("ERROR: division by zero");
-      }
-      if ((op1 == min) && (op2 == -1))
-      {
-        throw std::runtime_error("ERROR: division overflow");
-      }
+      checkDivOverflow(op1, op2);
       return op1 / op2;
     }
     else if (el == "%")
     {
-      if (op2 == 0)
-      {
-        throw std::runtime_error("ERROR: division by zero");
-      }
+      checkModByZero(op2);
       return (op1 % op2 + op2) % op2;
     }
     else
@@ -108,11 +133,18 @@ long long int maslov::calculatePostfix(Queue< std::string > postfixQueue)
   {
     std::string element = postfixQueue.front();
     postfixQueue.pop();
-    if (isNumber(element))
+    if (!isOperator(element))
     {
-      stack.push(std::stoll(element));
+      try
+      {
+        stack.push(std::stoll(element));
+      }
+      catch (const std::exception &)
+      {
+        throw std::runtime_error("ERROR: invalid number\n");
+      }
     }
-    else if (isOperator(element))
+    else
     {
       if (stack.size() < 2)
       {
@@ -141,10 +173,6 @@ maslov::Queue< std::string > maslov::infixToPostfix(Queue< std::string > infixQu
     {
       stack.push(element);
     }
-    else if (isNumber(element))
-    {
-      postfixQueue.push(element);
-    }
     else if (element == ")")
     {
       while (!stack.empty() && stack.top() != "(")
@@ -163,8 +191,7 @@ maslov::Queue< std::string > maslov::infixToPostfix(Queue< std::string > infixQu
     }
     else if (isOperator(element))
     {
-      int elPrecedence = getPrecedence(element);
-      while (!stack.empty() && elPrecedence <= getPrecedence(stack.top()))
+      while (!stack.empty() && isHighPrecedence(stack.top(), element))
       {
         postfixQueue.push(stack.top());
         stack.pop();
@@ -173,7 +200,7 @@ maslov::Queue< std::string > maslov::infixToPostfix(Queue< std::string > infixQu
     }
     else
     {
-      throw std::runtime_error("ERROR: invalid element");
+      postfixQueue.push(element);
     }
     infixQueue.pop();
   }
