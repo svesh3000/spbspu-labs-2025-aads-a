@@ -19,14 +19,13 @@ namespace maslov
     bool empty() const noexcept;
     void push(const T & data);
     void pop();
-    T & back();
-    const T & back() const;
     T & front();
     const T & front() const;
     void swap(Queue< T > & rhs) noexcept;
    private:
     size_t capacity_;
     size_t size_;
+    size_t head_;
     T * data_;
   };
 
@@ -34,6 +33,7 @@ namespace maslov
   Queue< T >::Queue():
     capacity_(20),
     size_(0),
+    head_(0),
     data_(new T[capacity_])
   {}
 
@@ -41,11 +41,20 @@ namespace maslov
   Queue< T >::Queue(const Queue< T > & rhs):
     capacity_(rhs.capacity_),
     size_(rhs.size_),
+    head_(rhs.head_),
     data_(new T[rhs.capacity_])
   {
-    for (size_t i = 0; i < size_; ++i)
+    try
     {
-      data_[i] = rhs.data_[i];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        data_[i] = rhs.data_[i];
+      }
+    }
+    catch (const std::exception &)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
@@ -53,10 +62,12 @@ namespace maslov
   Queue< T >::Queue(Queue< T > && rhs) noexcept:
     capacity_(rhs.capacity_),
     size_(rhs.size_),
+    head_(rhs.head_),
     data_(rhs.data_)
   {
     rhs.capacity_ = 0;
     rhs.size_ = 0;
+    rhs.head_ = 0;
     rhs.data_ = nullptr;
   }
 
@@ -85,9 +96,11 @@ namespace maslov
       delete[] data_;
       capacity_ = rhs.capacity_;
       size_ = rhs.size_;
+      head_ = rhs.head_;
       data_ = rhs.data_;
       rhs.capacity_ = 0;
       rhs.size_ = 0;
+      rhs.head_ = 0;
       rhs.data_ = nullptr;
     }
     return *this;
@@ -110,14 +123,24 @@ namespace maslov
   {
     if (size_ == capacity_)
     {
-      capacity_ *= 2;
-      T * newData = new T[capacity_];
-      for (size_t i = 0; i < size_; ++i)
+      T * newData = nullptr;
+      try
       {
-        newData[i] = data_[i];
+        size_t newCapacity = capacity_ * 2;
+        newData = new T[newCapacity];
+        for (size_t i = 0; i < size_; ++i)
+        {
+          newData[i] = data_[i];
+        }
+        delete[] data_;
+        data_ = newData;
+        capacity_ = newCapacity;
       }
-      delete[] data_;
-      data_ = newData;
+      catch (const std::exception &)
+      {
+        delete[] newData;
+        throw;
+      }
     }
     data_[size_++] = data;
   }
@@ -129,27 +152,8 @@ namespace maslov
     {
       throw std::runtime_error("ERROR: empty queue, cannot pop");
     }
-    for (size_t i = 1; i < size_; ++i)
-    {
-      data_[i - 1] = data_[i];
-    }
+    head_ = head_ + 1;
     --size_;
-  }
-
-  template< typename T >
-  T & Queue< T >::back()
-  {
-    return const_cast< T & >(static_cast< const Queue< T > & >(*this).back());
-  }
-
-  template< typename T >
-  const T & Queue< T >::back() const
-  {
-    if (empty())
-    {
-      throw std::runtime_error("ERROR: empty queue, cannot back");
-    }
-    return data_[size_ - 1];
   }
 
   template< typename T >
@@ -165,7 +169,7 @@ namespace maslov
     {
       throw std::runtime_error("ERROR: empty queue, cannot front");
     }
-    return data_[0];
+    return data_[head_];
   }
 
   template< typename T >
@@ -173,6 +177,7 @@ namespace maslov
   {
     std::swap(capacity_, rhs.capacity_);
     std::swap(size_, rhs.size_);
+    std::swap(head_, rhs.head_);
     std::swap(data_, rhs.data_);
   }
 }
