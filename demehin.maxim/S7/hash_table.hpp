@@ -1,8 +1,8 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 #include <functional>
-#include <dynamic_array.hpp>
-
+//#include <dynamic_array.hpp>
+#include <vector>
 
 namespace demehin
 {
@@ -10,6 +10,9 @@ namespace demehin
   class HashTable
   {
   public:
+    HashTable() noexcept;
+    
+
   private:
     enum class SlotState
     {
@@ -24,12 +27,18 @@ namespace demehin
       SlotState state = SlotState::EMPTY;
     };
 
-    DynamicArray< Slot > slots;
-    size_t item_cnt;
-    Hash hasher;
-    Equal equal;
-    constexpr double max_load_factor = 0.7;
-  }
+    std::vector< Slot > slots_;
+    size_t item_cnt_;
+    Hash hasher_;
+    Equal equal_;
+    static constexpr double max_load_factor_ = 0.7;
+  };
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  HashTable< Key, T, Hash, Equal >::HashTable() noexcept:
+    slots_(16),
+    item_cnt_(0)
+  {}
 }
 
 #endif
