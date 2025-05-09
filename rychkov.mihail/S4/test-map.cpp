@@ -61,13 +61,24 @@ BOOST_AUTO_TEST_CASE(access_test)
   BOOST_TEST((map.begin() != map.end()));
   BOOST_CHECK_THROW(map.at(7), std::out_of_range);
   BOOST_CHECK_THROW(map.at(1), std::out_of_range);
-  BOOST_CHECK(map.lower_bound(2)->first == 2);
-  BOOST_CHECK(map.upper_bound(2)->first == 3);
+  BOOST_TEST(map.at(3) == '2');
+  BOOST_TEST(map.lower_bound(2)->first == 2);
+  BOOST_TEST(map.upper_bound(2)->first == 3);
   map[9] = '5';
-  BOOST_CHECK(map[9] == '5');
+  BOOST_TEST(map[9] == '5');
   map[1] = '6';
-  BOOST_CHECK(map[1] == '6');
-  BOOST_CHECK(map[3] == '2');
+  BOOST_TEST(map[1] == '6');
+  BOOST_TEST(map[3] == '2');
+}
+BOOST_AUTO_TEST_CASE(erase_test)
+{
+  rychkov::Map< int, char > map = {{0, '1'}, {2, '2'}, {1, '3'}, {5, '4'}, {-3, '5'}, {4, '6'}, {-2, '7'}};
+  BOOST_TEST(map.erase(map.find(0))->first == 1);
+  BOOST_TEST(map.erase(2) == 1);
+  BOOST_TEST(map.erase(-1) == 0);
+  BOOST_TEST(map.erase(4) == 1);
+  BOOST_TEST(map.erase(1) == 1);
+  BOOST_TEST((map.erase(map.begin(), map.end()) == map.end()));
 }
 BOOST_AUTO_TEST_CASE(random_test)
 {
@@ -94,26 +105,19 @@ BOOST_AUTO_TEST_CASE(random_test)
   for (; size > 0; size--)
   {
     std::uniform_int_distribution< size_t > range(0, size - 1);
-    size_t key = range(engine);
-    map.erase(data[key]);
-    std::remove(data, data + size, data[key]);
+    size_t id = range(engine);
+    decltype(map)::iterator next = map.erase(map.find(data[id]));
+    std::remove(data, data + size, data[id]);
+    if (id == size - 1)
+    {
+      BOOST_TEST((next == map.end()));
+    }
+    else
+    {
+      BOOST_TEST(next->first == data[id]);
+    }
     BOOST_TEST(std::equal(map.begin(), map.end(), data, equal_to_key{}));
-  }
-}
-BOOST_AUTO_TEST_CASE(erase_test)
-{
-  rychkov::Map< int, char > map = {{0, '1'}, {2, '2'}, {1, '3'}, {5, '4'}, {-3, '5'}, {4, '6'}, {-2, '7'}};
-  map.erase(0);
-  map.erase(2);
-  map.erase(-1);
-  map.erase(4);
-  map.erase(1);
-  map.erase(5);
-  map.erase(-3);
-  map.erase(-2);
-  for (auto i: map)
-  {
-    std::cout << i.first << '\n';
+    BOOST_TEST(map.size() == size - 1);
   }
 }
 

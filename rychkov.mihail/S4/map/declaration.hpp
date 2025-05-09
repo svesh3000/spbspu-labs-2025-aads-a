@@ -146,6 +146,35 @@ namespace rychkov
     template< class... Args >
     iterator emplace_hint(const_iterator hint, Args&&... args);
 
+    template< class... Args >
+    std::pair< iterator, bool > try_emplace(const key_type& key, Args&&... args);
+    template< class... Args >
+    std::pair< iterator, bool > try_emplace(key_type&& key, Args&&... args);
+    template< class K, class... Args >
+    std::enable_if_t< is_transparent_v< key_compare >, std::pair< iterator, bool > >
+        try_emplace(K&& key, Args&&... args);
+    template< class... Args >
+    iterator try_emplace(const_iterator hint, const key_type& key, Args&&... args);
+    template< class... Args >
+    iterator try_emplace(const_iterator hint, key_type&& key, Args&&... args);
+    template< class K, class... Args >
+    std::enable_if_t< is_transparent_v< key_compare >, iterator >
+        try_emplace(const_iterator hint, K&& key, Args&&... args);
+
+    std::pair< iterator, bool > insert(const value_type& value);
+    std::pair< iterator, bool > insert(value_type&& value);
+    template< class T >
+    std::enable_if_t< std::is_constructible< value_type, T&& >::value, std::pair< iterator, bool > >
+        insert(T&& value);
+    iterator insert(const_iterator hint, const value_type& value);
+    iterator insert(const_iterator hint, value_type&& value);
+    template< class T >
+    std::enable_if_t< std::is_constructible< value_type, T&& >::value, iterator >
+        insert(const_iterator hint, T&& value);
+    template< class InputIter >
+    void insert(InputIter from, InputIter to);
+    void insert(std::initializer_list< value_type > list);
+
     key_compare key_comp() const;
     value_compare value_comp() const;
 
@@ -167,12 +196,18 @@ namespace rychkov
 
     node_type* fake_root() const noexcept;
     void devide(node_type& left, node_type& right, node_size_type ins_point, node_type& to_insert);
-    void correct_emplace_result(node_type& left, node_type& right, node_size_type ins_point, const_iterator& hint);
+    static void correct_emplace_result(node_type& left, node_type& right,
+        node_size_type ins_point, const_iterator& hint);
+    static void correct_erase_result(const_iterator to, const_iterator from, iterator& result, bool will_be_replaced);
     void destroy_subtree(node_type* node);
     template< class K >
     const_iterator lower_bound_impl(const K& key) const;
     template< class K >
     const_iterator upper_bound_impl(const K& key) const;
+    template< class... Args >
+    iterator emplace_hint_impl(const_iterator hint, Args&&... args);
+    template< class K, class... Args >
+    std::pair< iterator, bool > try_emplace_impl(const_iterator hint, K&& key, Args&&... args);
   };
 }
 

@@ -5,6 +5,7 @@
 #include "map/iterator.hpp"
 #include "map/declaration.hpp"
 #include "map/construct_destruct.hpp"
+#include "map/emplace_impl.hpp"
 #include "map/insert.hpp"
 #include "map/access.hpp"
 #include "map/search.hpp"

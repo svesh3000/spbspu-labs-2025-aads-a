@@ -2,15 +2,19 @@
 #define ERASE_HPP
 
 #include "declaration.hpp"
+#include <iterator>
 #include <type_traits.hpp>
 
 template< class Key, class Value, class Compare, size_t N >
 typename rychkov::Map< Key, Value, Compare, N >::iterator
     rychkov::Map< Key, Value, Compare, N >::erase(const_iterator pos)
 {
-  static_assert(std::is_nothrow_move_constructible< value_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< key_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< mapped_type >::value, "use of unready functional");
+
   size_--;
   iterator result{pos.node_, pos.pointed_};
+  ++result;
   if (!pos.node_->isleaf())
   {
     const_iterator erased = pos;
@@ -19,11 +23,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
   }
   if (pos.node_->size() > 1)
   {
-    if (pos.pointed_ == pos.node_->size() - 1)
-    {
-      ++result;
-    }
     pos.node_->erase(pos.pointed_);
+    correct_erase_result(pos, pos, result, false);
     return result;
   }
   while (true)
@@ -36,7 +37,7 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
         cached_begin_ = fake_root();
         cached_rbegin_ = cached_begin_;
         delete pos.node_;
-        return end();
+        return result;
       }
       fake_children_[0] = pos.node_->children[0];
       fake_children_[0]->parent = fake_root();
@@ -57,6 +58,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
       {
         erased.node_->emplace_back(std::move(parent.node_->operator[](parent.pointed_)));
         parent.node_->replace(parent.pointed_, std::move(src->operator[](src->size() - 1)));
+        correct_erase_result(erased, parent, result, true);
+        correct_erase_result(parent, const_iterator(src, src->size() - 1), result, false);
         erased.node_->children[1] = erased_subtree;
         erased.node_->children[0] = src->children[src->size()];
         if (!src->isleaf())
@@ -70,6 +73,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
       {
         erased.node_->emplace_back(std::move(src->operator[](0)));
         erased.node_->emplace_back(std::move(parent.node_->operator[](parent.pointed_)));
+        correct_erase_result(erased, {src, 0}, result, false);
+        correct_erase_result({erased.node_, 1}, parent, result, false);
         erased.node_->children[2] = erased_subtree;
         erased.node_->children[1] = src->children[1];
         erased.node_->children[0] = src->children[0];
@@ -95,6 +100,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
       {
         erased.node_->emplace_back(std::move(parent.node_->operator[](pos.pointed_)));
         parent.node_->replace(pos.pointed_, std::move(src->operator[](0)));
+        correct_erase_result(erased, pos, result, true);
+        correct_erase_result(pos, {src, 0}, result, false);
         erased.node_->children[0] = erased_subtree;
         erased.node_->children[1] = src->children[0];
         if (!src->isleaf())
@@ -109,6 +116,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
       {
         erased.node_->emplace_back(std::move(parent.node_->operator[](parent.pointed_)));
         erased.node_->emplace_back(std::move(src->operator[](0)));
+        correct_erase_result(erased, parent, result, false);
+        correct_erase_result({erased.node_, 1}, {src, 0}, result, false);
         erased.node_->children[0] = erased_subtree;
         erased.node_->children[1] = src->children[0];
         erased.node_->children[2] = src->children[1];
@@ -129,10 +138,29 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
     if (parent.node_->size() > 1)
     {
       parent.node_->erase(pos.pointed_);
+      correct_erase_result(pos, pos, result, false);
       return result;
     }
   }
   return result;
+}
+template< class Key, class Value, class Compare, size_t N >
+void rychkov::Map< Key, Value, Compare, N >::correct_erase_result(const_iterator to,
+    const_iterator from, iterator& result, bool will_be_replaced)
+{
+  if ((from.node_ != result.node_) || (result.pointed_ < from.pointed_))
+  {
+    return;
+  }
+  if (from.pointed_ == result.pointed_)
+  {
+    result = {to.node_, to.pointed_};
+    return;
+  }
+  if (!will_be_replaced)
+  {
+    result.pointed_--;
+  }
 }
 
 template< class Key, class Value, class Compare, size_t N >
@@ -159,6 +187,17 @@ typename rychkov::Map< Key, Value, Compare, N >::size_type
   }
   erase(iter);
   return 1;
+}
+template< class Key, class Value, class Compare, size_t N >
+typename rychkov::Map< Key, Value, Compare, N >::iterator
+    rychkov::Map< Key, Value, Compare, N >::erase(const_iterator from, const_iterator to)
+{
+
+  for (size_type len = std::distance(from, to); len > 0; len--)
+  {
+    from = erase(from);
+  }
+  return {from.node_, from.pointed_};
 }
 
 #endif

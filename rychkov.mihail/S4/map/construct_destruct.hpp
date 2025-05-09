@@ -21,7 +21,7 @@ rychkov::Map< Key, Value, Compare, N >::Map(Map&& rhs)
   cached_begin_(std::exchange(rhs.cached_begin_, rhs.fake_root())),
   cached_rbegin_(std::exchange(rhs.cached_rbegin_, rhs.fake_root())),
   size_(std::exchange(rhs.size_, 0)),
-  fake_parent_(std::exchange(rhs.fake_parent_, nullptr)),
+  fake_parent_(nullptr),
   fake_children_{std::exchange(rhs.fake_children_[0], nullptr)},
   fake_size_(0)
 {
