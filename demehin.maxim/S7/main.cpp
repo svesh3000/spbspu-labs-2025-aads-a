@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
   cmds["cut"] = std::bind(demehin::cut, std::ref(std::cin), std::ref(mapOfGraphs));
   cmds["create"] = std::bind(demehin::create, std::ref(std::cin), std::ref(mapOfGraphs));
   cmds["merge"] = std::bind(demehin::merge, std::ref(std::cin), std::ref(mapOfGraphs));
+  cmds["extract"] = std::bind(demehin::extract, std::ref(std::cin), std::ref(mapOfGraphs));
 
   std::string command;
   while (std::cin >> command)

@@ -124,7 +124,8 @@ void demehin::merge(std::istream& in, MapOfGraphs& graphs)
 {
   std::string new_gr_name, gr1_name, gr2_name;
   in >> new_gr_name >> gr1_name >> gr2_name;
-  if (graphs.find(gr1_name) == graphs.end() || graphs.find(gr2_name) == graphs.end() || graphs.find(new_gr_name) != graphs.end())
+  auto end = graphs.end();
+  if (graphs.find(gr1_name) == end || graphs.find(gr2_name) == end || graphs.find(new_gr_name) != end)
   {
     throw std::logic_error("incorrect parameters");
   }
@@ -140,4 +141,58 @@ void demehin::merge(std::istream& in, MapOfGraphs& graphs)
   addEdges(res, edges2);
 
   graphs[new_gr_name] = res;
+}
+
+void demehin::extract(std::istream& in, MapOfGraphs& graphs)
+{
+  std::string new_gr_name, gr_name;
+  size_t vrt_cnt;
+  in >> new_gr_name >> gr_name >> vrt_cnt;
+  if (graphs.find(new_gr_name) != graphs.end() || graphs.find(gr_name) == graphs.end())
+  {
+    throw std::logic_error("incorrect parameters");
+  }
+
+  List< std::string > vrts;
+  auto gr = graphs.at(gr_name);
+  for (size_t i = 0; i < vrt_cnt; i++)
+  {
+    std::string vrt;
+    in >> vrt;
+    if (!gr.hasVrt(vrt))
+    {
+      throw std::logic_error("incorrect parameters");
+    }
+    vrts.push_back(vrt);
+  }
+
+  Graph new_gr;
+
+  for (auto edge : gr.getEdges())
+  {
+    std::string from = edge.first.first;
+    std::string to = edge.first.second;
+    bool from_found = false;
+    bool to_found = false;
+    for (auto v : vrts)
+    {
+      if (v == from)
+      {
+        from_found = true;
+      }
+      if (v == to)
+      {
+        to_found = true;
+      }
+    }
+
+    if (from_found && to_found)
+    {
+      for (unsigned w : edge.second)
+      {
+        new_gr.addEdge(from, to, w);
+      }
+    }
+  }
+  graphs[new_gr_name] = new_gr;
 }

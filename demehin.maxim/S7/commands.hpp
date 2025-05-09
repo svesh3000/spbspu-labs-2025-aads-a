@@ -16,6 +16,7 @@ namespace demehin
   void cut(std::istream&, MapOfGraphs&);
   void create(std::istream&, MapOfGraphs&);
   void merge(std::istream&, MapOfGraphs&);
+  void extract(std::istream&, MapOfGraphs&);
 }
 
 #endif
