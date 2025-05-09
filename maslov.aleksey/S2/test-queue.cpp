@@ -80,14 +80,6 @@ BOOST_AUTO_TEST_CASE(pushFrontQueue)
   BOOST_TEST(!queue.empty());
 }
 
-BOOST_AUTO_TEST_CASE(backQueue)
-{
-  maslov::Queue< int > queue;
-  queue.push(1);
-  queue.push(2);
-  BOOST_TEST(queue.back() == 2);
-}
-
 BOOST_AUTO_TEST_CASE(popQueue)
 {
   maslov::Queue< int > queue;

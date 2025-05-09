@@ -23,7 +23,7 @@ namespace
 
   bool isHighPrecedence(const std::string & op1, const std::string & op2)
   {
-    return getPrecedence(op1) > getPrecedence(op2);
+    return getPrecedence(op1) >= getPrecedence(op2);
   }
 
   void checkAddOverflow(long long int op1, long long int op2)
