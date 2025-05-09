@@ -140,13 +140,13 @@ namespace savintsev
     {
       temp = temp->kids_[0];
     }
-    return iterator(temp, 0);
+    return iterator(root_, temp, 0);
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::end() noexcept
   {
-    return iterator();
+    return iterator(root_);
   }
 
   template< typename K, typename V, typename C >
@@ -155,19 +155,19 @@ namespace savintsev
     node_type * temp = root_;
     if (!temp)
     {
-      return const_iterator();
+      return const_iterator(root_);
     }
     while (temp->kids_[0])
     {
       temp = temp->kids_[0];
     }
-    return const_iterator(temp, 0);
+    return const_iterator(root_, temp, 0);
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::end() const noexcept
   {
-    return const_iterator();
+    return const_iterator(root_);
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -269,7 +269,7 @@ namespace savintsev
   {
     if (!root_)
     {
-      return {iterator(), false};
+      return {iterator(root_), false};
     }
 
     node_type * node = root_;
@@ -278,17 +278,17 @@ namespace savintsev
     {
       if (node->data_[0].first == k)
       {
-        return {iterator(node, 0), true};
+        return {iterator(root_, node, 0), true};
       }
 
       if (node->len_ == 2 && node->data_[1].first == k)
       {
-        return {iterator(node, 1), true};
+        return {iterator(root_, node, 1), true};
       }
 
       if (!node->kids_[0] && !node->kids_[1] && !node->kids_[2])
       {
-        return {iterator(node, node->len_ == 2 ? 1 : 0), false};
+        return {iterator(root_, node, node->len_ == 2 ? 1 : 0), false};
       }
 
       if (C{}(k, node->data_[0].first))

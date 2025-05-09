@@ -22,11 +22,9 @@ namespace savintsev
     template< typename K, typename V, typename C >
     friend class TwoThreeTree;
   public:
-    BidirectConstIterator():
-      node_(nullptr)
-    {}
-
+    BidirectConstIterator() = default;
     BidirectConstIterator(const BidirectIterator< Key, Value > & it):
+      root_(it.root_),
       node_(it.node_),
       pos_(it.pos_)
     {}
@@ -55,6 +53,10 @@ namespace savintsev
 
     BidirectConstIterator & operator--()
     {
+      if (!node_)
+      {
+        return rbegin();
+      }
       return prev();
     }
 
@@ -76,15 +78,33 @@ namespace savintsev
     }
 
   private:
-    node_type * node_;
+    node_type * root_ = nullptr;
+    node_type * node_ = nullptr;
     size_t pos_ = 0;
 
-    BidirectConstIterator(node_type * node, size_t pos = 0):
+    node_type * rbegin(node_type * node)
+    {
+      while (root_->kids_[1] || root_->kids_[2])
+      {
+        if (root_->kids_[2])
+        {
+          root_ = root_->kids_[2];
+        }
+        else if (root_->kids_[1])
+        {
+          root_ = root_->kids_[1];
+        }
+      }
+      return root_;
+    }
+
+    BidirectConstIterator(node_type * root, node_type * node = nullptr, size_t pos = 0):
+      root_(root),
       node_(node),
       pos_(pos)
     {}
 
-    BidirectConstIterator& next()
+    BidirectConstIterator & next()
     {
       if (!node_)
       {
@@ -182,9 +202,7 @@ namespace savintsev
     friend class TwoThreeTree;
     friend class BidirectConstIterator< Key, Value >;
   public:
-    BidirectIterator():
-      node_(nullptr)
-    {}
+    BidirectIterator() = default;
     value_type & operator*()
     {
       return node_->data_[pos_];
@@ -211,8 +229,20 @@ namespace savintsev
       ++(*this);
       return result;
     }
-    BidirectIterator & operator--();
-    BidirectIterator operator--(int);
+    BidirectIterator & operator--()
+    {
+      if (!node_)
+      {
+        return rbegin();
+      }
+      return prev();
+    }
+    BidirectIterator operator--(int)
+    {
+      BidirectIterator< Key, Value > result(*this);
+      --(*this);
+      return result;
+    }
     bool operator!=(const BidirectIterator & rhs) const
     {
       return !(*this == rhs);
@@ -222,15 +252,33 @@ namespace savintsev
       return node_ == rhs.node_ && pos_ == rhs.pos_;
     }
   private:
-    node_type * node_;
+    node_type * root_ = nullptr;
+    node_type * node_ = nullptr;
     size_t pos_ = 0;
 
-    BidirectIterator(node_type * node, size_t pos = 0):
+    node_type * rbegin(node_type * node)
+    {
+      while (root_->kids_[1] || root_->kids_[2])
+      {
+        if (root_->kids_[2])
+        {
+          root_ = root_->kids_[2];
+        }
+        else if (root_->kids_[1])
+        {
+          root_ = root_->kids_[1];
+        }
+      }
+      return root_;
+    }
+
+    BidirectIterator(node_type * root, node_type * node = nullptr, size_t pos = 0):
+      root_(root),
       node_(node),
       pos_(pos)
     {}
 
-    BidirectIterator& next()
+    BidirectIterator & next()
     {
       if (!node_)
       {
