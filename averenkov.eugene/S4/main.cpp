@@ -54,6 +54,7 @@ void printDictionary(const Dictionary& dict, str name)
   {
     std::cout << " " << it->first << " " << it->second;
   }
+
   std::cout << "\n";
 }
 
