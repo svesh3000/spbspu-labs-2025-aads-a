@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(equalRange)
   BOOST_TEST(range.second->first == 5);
 }
 
-BOOST_AUTO_TEST_CASE(count) 
+BOOST_AUTO_TEST_CASE(count)
 {
   maslov::BiTree< int, std::string, std::less< int > > tree;
   tree.push(1, "first");
