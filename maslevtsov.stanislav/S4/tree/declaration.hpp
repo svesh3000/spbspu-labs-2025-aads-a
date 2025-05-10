@@ -9,7 +9,7 @@ namespace maslevtsov {
   class Tree
   {
   public:
-    using value_type = std::pair< const Key, T >;
+    using value_type = std::pair< Key, T >;
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
@@ -59,7 +59,7 @@ namespace maslevtsov {
     size_type size_;
     Compare compare_;
 
-    void clear_subtree(Node* node) noexcept;
+    void split_nodes(Node* node, value_type (&values)[3]);
     std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };
 }
