@@ -89,9 +89,27 @@ BOOST_AUTO_TEST_CASE(moveOperator)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-/*BOOST_AUTO_TEST_SUITE(elementAccess)
+BOOST_AUTO_TEST_SUITE(elementAccess)
 
-BOOST_AUTO_TEST_SUITE_END()*/
+BOOST_AUTO_TEST_CASE(operatorSquareBrackets)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree[2] = "second";
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "2 second");
+}
+
+BOOST_AUTO_TEST_CASE(at_test)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  BOOST_TEST(tree.at(1) == "first");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(modifiers)
 

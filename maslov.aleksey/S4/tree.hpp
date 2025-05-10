@@ -18,6 +18,10 @@ namespace maslov
 
     BiTree< Key, T, Cmp > & operator=(const BiTree< Key, T, Cmp > & rhs);
     BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > && rhs);
+    T & at(const Key & key);
+    const T & at(const Key & key) const;
+    T & operator[](const Key & key);
+    const T & operator[](const Key & key) const;
 
     void push(const Key & key, const T & value);
     T get(const Key & key);
@@ -420,6 +424,41 @@ namespace maslov
       }
     }
     return rotateNode;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  T & BiTree< Key, T, Cmp >::operator[](const Key & key)
+  {
+    auto pair = insert({key, T{}});
+    return pair.first->second;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  const T & BiTree< Key, T, Cmp >::operator[](const Key & key) const
+  {
+    at(key);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  T & BiTree< Key, T, Cmp >::at(const Key & key)
+  {
+    auto it = find(key);
+    if (it == end())
+    {
+      throw std::out_of_range("ERROR: Key not found");
+    }
+    return it->second;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  const T & BiTree< Key, T, Cmp >::at(const Key & key) const
+  {
+    auto it = find(key);
+    if (it == cend())
+    {
+      throw std::out_of_range("ERROR: Key not found");
+    }
+    return it->second;
   }
 
   template< typename Key, typename T, typename Cmp >
