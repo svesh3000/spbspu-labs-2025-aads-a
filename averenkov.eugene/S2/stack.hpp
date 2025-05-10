@@ -41,7 +41,7 @@ namespace averenkov
   template< class T >
   Stack< T >& Stack< T >::operator=(const Stack& rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       arr_ = rhs.arr_;
     }

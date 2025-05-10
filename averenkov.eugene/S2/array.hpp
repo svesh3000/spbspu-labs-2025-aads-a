@@ -12,7 +12,7 @@ namespace averenkov
   public:
     Array();
     Array(const Array &rhs);
-    Array(Array &&rhs) noexcept;
+    Array(Array &&rhs) noexcept = default;
     Array &operator=(const Array &rhs);
     ~Array();
 
@@ -45,36 +45,45 @@ namespace averenkov
 
   template< class T >
   Array< T >::Array(const Array& rhs):
-    data_(new T[rhs.capacity_]),
+    data_(nullptr),
     size_(rhs.size_),
     capacity_(rhs.capacity_)
   {
-    for (size_t i = 0; i < size_; ++i)
+    T* temp = nullptr;
+    try
     {
-      data_[i] = rhs.data_[i];
+      temp = new T[rhs.capacity_];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        temp[i] = rhs.data_[i];
+      }
     }
-  }
-
-  template< class T >
-  Array< T >::Array(Array&& rhs) noexcept:
-    data_(rhs.data_),
-    size_(rhs.size_),
-    capacity_(rhs.capacity_)
-  {
-    rhs.data_ = nullptr;
-    rhs.size_ = 0;
-    rhs.capacity_ = 0;
+    catch (...)
+    {
+      delete[] temp;
+      temp = nullptr;
+    }
+    std::swap(temp, data_);
   }
 
   template< class T >
   Array< T >& Array< T >::operator=(const Array& rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
-      T* new_data = new T[rhs.capacity_];
-      for (size_t i = 0; i < rhs.size_; ++i)
+      T* new_data = nullptr;
+      try
       {
-        new_data[i] = rhs.data_[i];
+        new_data = new T[rhs.capacity_];
+        for (size_t i = 0; i < rhs.size_; ++i)
+        {
+          new_data[i] = rhs.data_[i];
+        }
+      }
+      catch (...)
+      {
+        delete[] new_data;
+        return *this;
       }
       delete[] data_;
       data_ = new_data;
@@ -163,10 +172,19 @@ namespace averenkov
   void Array< T >::resize()
   {
     size_t new_capacity = capacity_ * 2;
-    T* new_data = new T[new_capacity];
-    for (size_t i = 0; i < size_; ++i)
+    T* new_data = nullptr;
+    try
     {
-      new_data[i] = data_[i];
+      new_data = new T[new_capacity];
+      for (size_t i = 0; i < size_; ++i)
+      {
+        new_data[i] = data_[i];
+      }
+    }
+    catch (...)
+    {
+      delete[] new_data;
+      return;
     }
     delete[] data_;
     data_ = new_data;

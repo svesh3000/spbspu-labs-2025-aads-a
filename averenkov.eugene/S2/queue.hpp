@@ -41,7 +41,7 @@ namespace averenkov
   template< class T >
   Queue< T > &Queue< T >::operator=(const Queue &rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       arr_ = rhs.arr_;
     }
@@ -85,7 +85,7 @@ namespace averenkov
   }
 
   template< class T >
-  void Queue< T >::push(T rhs)
+  void Queue< T >::push(T rhs) noexcept
   {
     arr_.push_back(rhs);
   }

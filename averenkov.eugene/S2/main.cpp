@@ -11,6 +11,36 @@
 
 using namespace averenkov;
 
+bool isOverflow(long long a, long, long b)
+{
+  if (a == 0 || b == 0)
+  {
+    return false;
+  }
+  if (a > 0)
+  {
+    if (b > 0)
+    {
+      return a > LLONG_MAX / b;
+    }
+    else
+    {
+      return b < LLONG_MIN / a;
+    }
+  }
+  else
+  {
+    if (b > 0)
+    {
+      return a < LLONG_MIN / b;
+    }
+    else
+    {
+      return a < LLONG_MAX / b;
+    }
+  }
+}
+
 bool isOperator(char c)
 {
   return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
@@ -18,8 +48,14 @@ bool isOperator(char c)
 
 int precedence(char op)
 {
-  if (op == '+' || op == '-') return 1;
-  if (op == '*' || op == '/' || op == '%') return 2;
+  if (op == '+' || op == '-')
+  {
+    return 1;
+  }
+  if (op == '*' || op == '/' || op == '%')
+  {
+    return 2;
+  }
   return 0;
 }
 
@@ -155,13 +191,11 @@ long long evaluatePostfix(const std::string& postfix)
             result = a - b;
             break;
           case '*':
-            if ((a > 0 && b > 0 && a > LLONG_MAX / b) ||
-                (a > 0 && b < 0 && b < LLONG_MIN / a) ||
-                (a < 0 && b > 0 && a < LLONG_MIN / b) ||
-                (a < 0 && b < 0 && a < LLONG_MAX / b))
+            if (isOverflow(a, b))
             {
               throw std::runtime_error("overflow error");
-            }            result = a * b;
+            }
+            result = a * b;
             break;
           case '/':
             if (b == 0)
