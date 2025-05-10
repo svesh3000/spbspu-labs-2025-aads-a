@@ -9,19 +9,19 @@ void demehin::Graph::addEdge(const std::string& from, const std::string& to, uns
 demehin::Tree< std::string, std::string > demehin::Graph::getVrts() const
 {
   Tree< std::string, std::string > vrts;
-  for (const auto& edge : edges)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
-    vrts[edge.first.first];
-    vrts[edge.first.second];
+    vrts[it->first.first];
+    vrts[it->first.second];
   }
   return vrts;
 }
 
 bool demehin::Graph::hasVrt(const std::string& vrt) const
 {
-  for (const auto& edge : edges)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
-    if (edge.first.first == vrt || edge.first.second == vrt)
+    if (it->first.first == vrt || it->first.second == vrt)
     {
       return true;
     }
@@ -33,12 +33,12 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
 {
   Tree< std::string, Tree< unsigned int, size_t > > res;
 
-  for (const auto& edge : edges)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
-    if (edge.first.first == vrt)
+    if (it->first.first == vrt)
     {
-      std::string target = edge.first.second;
-      for (auto weight : edge.second)
+      std::string target = it->first.second;
+      for (auto weight : it->second)
       {
         res[target][weight]++;
       }
@@ -51,12 +51,12 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
 {
   Tree< std::string, Tree< unsigned int, size_t > > res;
 
-  for (const auto& edge : edges)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
-    if (edge.first.second == vrt)
+    if (it->first.second == vrt)
     {
-      std::string target = edge.first.first;
-      for (auto weight : edge.second)
+      std::string target = it->first.first;
+      for (auto weight : it->second)
       {
         res[target][weight]++;
       }

@@ -1,6 +1,8 @@
 #ifndef HASH_TABLE_ITERATOR
 #define HASH_TABLE_ITERATOR
-#include "hash_table.hpp"
+#include <type_traits>
+#include <cstddef>
+#include <utility>
 
 namespace demehin
 {
@@ -15,14 +17,20 @@ namespace demehin
     friend class HashTIterator< Key, T, Hash, Equal, false >;
   public:
     using this_t = HashTIterator< Key, T, Hash, Equal, isConst >;
-    using Val = typename std::conditional_t< isConst, const std::pair< Key, T >, std::pair< Key, T > >;
-    using Ref = typename std::conditional_t< isConst, const std::pair< Key, T >&, std::pair< Key, T >& >;
-    using Ptr = typename std::conditional_t< isConst, const std::pair< Key, T >*, std::pair< Key, T >* >;
-    using Table = HashTable< Key, T, Hash, Equal >;
+    using Val = typename std::conditional< isConst, const std::pair< Key, T >, std::pair< Key, T > >::type;
+    using Ref = typename std::conditional< isConst, const std::pair< Key, T >&, std::pair< Key, T >& >::type;
+    using Ptr = typename std::conditional< isConst, const std::pair< Key, T >*, std::pair< Key, T >* >::type;
+    using Table = typename std::conditional< isConst, const HashTable< Key, T, Hash, Equal >, HashTable< Key, T, Hash, Equal > >::type;
 
     HashTIterator() noexcept:
       table_(nullptr),
       index_(0)
+    {}
+
+    template< bool OtherConst, typename = std::enable_if_t< isConst || !OtherConst > >
+    HashTIterator(const HashTIterator< Key, T, Hash, Equal, OtherConst >& other) noexcept:
+      table_(other.table_),
+      index_(other.index_)
     {}
 
     this_t& operator++() noexcept
@@ -69,7 +77,7 @@ namespace demehin
 
     void skipEmpty() noexcept
     {
-      while (index_ < table_->slots_.size() && table_->slots_[index_].state_ != HashTable< Key, T, Hash, Equal >::SlotState::OCCUPIED)
+      while (index_ < table_->slots_.size() && table_->slots_[index_].state != HashTable< Key, T, Hash, Equal >::SlotState::OCCUPIED)
       {
         ++index_;
       }
