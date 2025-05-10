@@ -523,9 +523,9 @@ namespace averenkov
     {
       return end();
     }
-    NodeType* NodeTypeo_erase = pos.node;
+    NodeType* NodeTypeo_erase = pos.current;
     NodeType* parent = NodeTypeo_erase->parent;
-    std::stack<NodeType*> path;
+    std::stack< NodeType* > path;
     if (NodeTypeo_erase->left == fake_root && NodeTypeo_erase->right == fake_root)
     {
       if (parent->left == NodeTypeo_erase)
@@ -567,7 +567,7 @@ namespace averenkov
       {
         min_right = min_right->left;
       }
-      NodeTypeo_erase->data = min_right->data;
+      NodeTypeo_erase = min_right;
       parent = min_right->parent;
       if (parent->left == min_right)
       {
@@ -584,7 +584,7 @@ namespace averenkov
       path.push(parent);
       NodeTypeo_erase = min_right;
     }
-    NodeType* new_root = rebalance_path(path);
+    NodeType* new_root = path.top();
     if (new_root != nullptr)
     {
       fake_root->left = new_root;
@@ -594,6 +594,7 @@ namespace averenkov
     size_--;
     return iterator(parent);
   }
+
   template < class Key, class Value, class Compare >
   size_t Tree< Key, Value, Compare >::erase(const Key& key)
   {
@@ -620,7 +621,7 @@ namespace averenkov
   template < class Key, class Value, class Compare >
   Value& Tree< Key, Value, Compare >::at(const Key& key)
   {
-    NodeType* NodeType = find_NodeType(key);
+    NodeType* NodeType = find(key).current;
     if (!NodeType || NodeType == fake_root)
     {
       throw std::out_of_range("not found");
@@ -631,7 +632,7 @@ namespace averenkov
   template < class Key, class Value, class Compare >
   const Value& Tree< Key, Value, Compare >::at(const Key& key) const
   {
-    const NodeType* NodeType = find_NodeType(key);
+    const NodeType* NodeType = find(key);
     if (!NodeType || NodeType == fake_root)
     {
       throw std::out_of_range("not found");
@@ -643,7 +644,7 @@ namespace averenkov
   Value& Tree< Key, Value, Compare >::operator[](const Key& key)
   {
     auto result = insert(std::make_pair(key, Value()));
-    return result.first->second;
+    return result.current->data.second;
   }
 
   template < class Key, class Value, class Compare >
