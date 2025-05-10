@@ -137,3 +137,48 @@ BOOST_AUTO_TEST_CASE(find)
   bool check = (it2 == tree.end());
   BOOST_TEST(check);
 }
+
+BOOST_AUTO_TEST_CASE(insert)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  auto pair1 = tree.insert({1, "first"});
+  BOOST_TEST(pair1.second == true);
+  std::ostringstream out1;
+  printTree(out1, tree);
+  BOOST_TEST(out1.str() == "1 first");
+
+  auto pair2 = tree.insert({1, "second"});
+  BOOST_TEST(pair2.second == false);
+  std::ostringstream out2;
+  printTree(out2, tree);
+  BOOST_TEST(out2.str() == out1.str());
+}
+
+BOOST_AUTO_TEST_CASE(eraseKey)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  size_t erased = tree.erase(2);
+  BOOST_TEST(erased == 1);
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "1 first 3 third");
+
+  erased = tree.erase(999);
+  BOOST_TEST(erased == 0);
+}
+
+BOOST_AUTO_TEST_CASE(eraseIterator)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  auto it = tree.find(2);
+  auto next = tree.erase(it);
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "1 first 3 third");
+}

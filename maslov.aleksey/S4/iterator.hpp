@@ -134,7 +134,7 @@ namespace maslov
    private:
     BiTreeNode< Key, T > * node_;
     BiTreeNode< Key, T > * fakeLeaf_;
-    explicit TreeConstIterator(const BiTreeNode< Key, T > * node, const BiTreeNode< Key, T > * fakeLeaf);
+    explicit TreeConstIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf);
   };
 
   template< typename Key, typename T, typename Cmp >
@@ -144,9 +144,9 @@ namespace maslov
   {}
 
   template< typename Key, typename T, typename Cmp >
-  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(const BiTreeNode< Key, T > * node, const BiTreeNode< Key, T > * fakeLeaf):
-    node_(const_cast< BiTreeNode< Key, T > * >(node)),
-    fakeLeaf_(const_cast< BiTreeNode< Key, T > * >(fakeLeaf))
+  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(BiTreeNode< Key, T > * node, BiTreeNode< Key, T > * fakeLeaf):
+    node_(node),
+    fakeLeaf_(fakeLeaf)
   {}
 
   template< typename Key, typename T, typename Cmp >

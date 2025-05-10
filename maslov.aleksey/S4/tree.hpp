@@ -22,6 +22,10 @@ namespace maslov
     void push(const Key & key, const T & value);
     T get(const Key & key);
     T pop(const Key & key);
+    std::pair< iterator, bool > insert(const std::pair< Key, T > & value);
+    iterator erase(iterator pos);
+    iterator erase(cIterator pos);
+    size_t erase(const Key & key);
 
     iterator begin() noexcept;
     cIterator cbegin() const noexcept;
@@ -47,6 +51,7 @@ namespace maslov
     int height(BiTreeNode< Key, T > * node);
     BiTreeNode< Key, T > * rotateLeft(BiTreeNode< Key, T > * root);
     BiTreeNode< Key, T > * rotateRight(BiTreeNode< Key, T > * root);
+    BiTreeNode< Key, T > * findNode(const Key & key) const;
   };
 
   template< typename Key, typename T, typename Cmp >
@@ -105,7 +110,7 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp > & BiTree< Key, T, Cmp >::operator=(BiTree< Key, T, Cmp > && rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       clear();
       delete fakeRoot_;
@@ -214,45 +219,18 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   T BiTree< Key, T, Cmp >::get(const Key & key)
   {
-    BiTreeNode< Key, T > * current = fakeRoot_->left;
-    while (current != fakeLeaf_)
+    BiTreeNode< Key, T > * node = findNode(key);
+    if (node == fakeLeaf_)
     {
-      if (cmp_(key, current->data.first))
-      {
-        current = current->left;
-      }
-      else if (cmp_(current->data.first, key))
-      {
-        current = current->right;
-      }
-      else
-      {
-        return current->data.second;
-      }
+      throw std::out_of_range("ERROR: key not found\n");
     }
-    throw std::out_of_range("ERROR: key not found\n");
+    return node->data.second;
   }
 
   template< typename Key, typename T, typename Cmp >
   T BiTree< Key, T, Cmp >::pop(const Key & key)
   {
-    BiTreeNode< Key, T > * current = fakeRoot_->left;
-    //поиск. возможное дублирование
-    while (current != fakeLeaf_)
-    {
-      if (cmp_(key, current->data.first))
-      {
-        current = current->left;
-      }
-      else if (cmp_(current->data.first, key))
-      {
-        current = current->right;
-      }
-      else
-      {
-        break;
-      }
-    }
+    BiTreeNode< Key, T > * current = findNode(key);
     if (current == fakeLeaf_)
     {
       throw std::out_of_range("ERROR: key not found\n");
@@ -482,6 +460,30 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::find(const Key & key)
   {
+    return iterator(findNode(key), fakeLeaf_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::find(const Key & key) const
+  {
+    return cIterator(findNode(key), fakeLeaf_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  std::pair< typename BiTree< Key, T, Cmp >::iterator, bool > BiTree< Key, T, Cmp >::insert(const std::pair< Key, T > & value)
+  {
+    auto it = find(value.first);
+    if (it != end())
+    {
+      return std::make_pair(it, false);
+    }
+    push(value.first, value.second);
+    return std::make_pair(find(value.first), true);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  BiTreeNode< Key, T > * BiTree< Key, T, Cmp >::findNode(const Key & key) const
+  {
     BiTreeNode< Key, T > * current = fakeRoot_->left;
     while (current != fakeLeaf_)
     {
@@ -495,32 +497,54 @@ namespace maslov
       }
       else
       {
-        return iterator(current, fakeLeaf_);
+        return current;
       }
     }
-    return end();
+    return fakeLeaf_;
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::find(const Key & key) const
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::erase(iterator pos)
   {
-    const BiTreeNode< Key, T > * current = fakeRoot_->left;
-    while (current != fakeLeaf_)
+    if (pos == end())
     {
-      if (cmp_(key, current->data.first))
-      {
-        current = current->left;
-      }
-      else if (cmp_(current->data.first, key))
-      {
-        current = current->right;
-      }
-      else
-      {
-        return cIterator(current, fakeLeaf_);
-      }
+      return end();
     }
-    return cend();
+    BiTreeNode< Key, T > * node = pos.node_;
+    Key key = node->data.first;
+    iterator next = pos;
+    ++next;
+    pop(key);
+    return next;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::erase(cIterator pos)
+  {
+    if (pos == cend())
+    {
+      return end();
+    }
+    BiTreeNode< Key, T > * node = pos.node_;
+    Key key = node->data.first;
+    cIterator next = pos;
+    ++next;
+    pop(key);
+    return iterator(next.node_, next.fakeLeaf_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  size_t BiTree< Key, T, Cmp >::erase(const Key & key)
+  {
+    try
+    {
+      pop(key);
+      return 1;
+    }
+    catch (const std::exception &)
+    {
+      return 0;
+    }
   }
 }
 
