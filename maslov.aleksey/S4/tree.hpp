@@ -26,6 +26,13 @@ namespace maslov
     iterator erase(iterator pos);
     iterator erase(cIterator pos);
     size_t erase(const Key & key);
+    std::pair< iterator, iterator > equalRange(const Key & key);
+    std::pair< cIterator, cIterator > equalRange(const Key & key) const;
+    size_t count(const Key & key) const;
+    iterator lowerBound(const Key & key);
+    cIterator lowerBound(const Key & key) const;
+    iterator upperBound(const Key & key);
+    cIterator upperBound(const Key & key) const;
 
     iterator begin() noexcept;
     cIterator cbegin() const noexcept;
@@ -475,10 +482,10 @@ namespace maslov
     auto it = find(value.first);
     if (it != end())
     {
-      return std::make_pair(it, false);
+      return {it, false};
     }
     push(value.first, value.second);
-    return std::make_pair(find(value.first), true);
+    return {find(value.first), true};
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -511,10 +518,8 @@ namespace maslov
       return end();
     }
     BiTreeNode< Key, T > * node = pos.node_;
-    Key key = node->data.first;
     iterator next = pos;
-    ++next;
-    pop(key);
+    pop(node->data.first);
     return next;
   }
 
@@ -526,10 +531,8 @@ namespace maslov
       return end();
     }
     BiTreeNode< Key, T > * node = pos.node_;
-    Key key = node->data.first;
     cIterator next = pos;
-    ++next;
-    pop(key);
+    pop(node->data.first);
     return iterator(next.node_, next.fakeLeaf_);
   }
 
@@ -542,6 +545,81 @@ namespace maslov
       return 1;
     }
     catch (const std::exception &)
+    {
+      return 0;
+    }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::lowerBound(const Key & key)
+  {
+    iterator it = begin();
+    iterator endIt = end();
+    while ((it != endIt) && cmp_(it.node_->data.first, key))
+    {
+      ++it;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::lowerBound(const Key & key) const
+  {
+    cIterator it = cbegin();
+    cIterator endIt = cend();
+    while ((it != endIt) && cmp_(it.node_->data.first, key))
+    {
+      ++it;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::upperBound(const Key & key)
+  {
+    iterator it = begin();
+    iterator endIt = end();
+    while ((it != endIt) && !cmp_(key, it.node_->data.first))
+    {
+      ++it;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::cIterator BiTree< Key, T, Cmp >::upperBound(const Key & key) const
+  {
+    cIterator it = cbegin();
+    cIterator endIt = cend();
+    while ((it != endIt) && !cmp_(key, it.node_->data.first))
+    {
+      ++it;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  std::pair< TreeIterator< Key, T, Cmp >, TreeIterator< Key, T, Cmp > >
+      BiTree< Key, T, Cmp >::equalRange(const Key & key)
+  {
+    return {lowerBound(key), upperBound(key)};
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  std::pair< TreeConstIterator< Key, T, Cmp >, TreeConstIterator< Key, T, Cmp > >
+      BiTree< Key, T, Cmp >::equalRange(const Key & key) const
+  {
+    return {lowerBound(key), upperBound(key)};
+  }
+
+  template < typename Key, typename T, typename Cmp >
+  size_t BiTree< Key, T, Cmp >::count(const Key & key) const
+  {
+    if (find(key) != cend())
+    {
+      return 1;
+    }
+    else
     {
       return 0;
     }
