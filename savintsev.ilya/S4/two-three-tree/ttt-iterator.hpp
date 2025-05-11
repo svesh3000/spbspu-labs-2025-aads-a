@@ -13,15 +13,18 @@ namespace savintsev
   class BidirectIterator;
 
   template< typename Key, typename Value >
-  class BidirectConstIterator:
-    public std::iterator< std::bidirectional_iterator_tag, const std::pair< Key, Value > >
+  class BidirectConstIterator
   {
-    using value_type = const std::pair< Key, Value >;
-    using node_type = node_t< std::pair< Key, Value > >;
-
     template< typename K, typename V, typename C >
     friend class TwoThreeTree;
   public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = std::pair< Key, Value >;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const value_type *;
+    using reference = const value_type &;
+    using node_type = node_t< value_type >;
+
     BidirectConstIterator() = default;
     BidirectConstIterator(const BidirectIterator< Key, Value > & it):
       root_(it.root_),
@@ -29,12 +32,12 @@ namespace savintsev
       pos_(it.pos_)
     {}
 
-    value_type & operator*() const
+    reference operator*() const
     {
       return node_->data_[pos_];
     }
 
-    value_type * operator->() const
+    pointer operator->() const
     {
       return std::addressof(node_->data_[pos_]);
     }
@@ -192,30 +195,33 @@ namespace savintsev
   };
 
   template< typename Key, typename Value >
-  class BidirectIterator:
-    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
+  class BidirectIterator
   {
-    using value_type = std::pair< Key, Value >;
-    using node_type = node_t< value_type >;
-
     template< typename K, typename V, typename C >
     friend class TwoThreeTree;
     friend class BidirectConstIterator< Key, Value >;
   public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = std::pair< Key, Value >;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type *;
+    using reference = value_type &;
+    using node_type = node_t< value_type >;
+
     BidirectIterator() = default;
-    value_type & operator*()
+    reference operator*()
     {
       return node_->data_[pos_];
     }
-    value_type * operator->()
+    pointer operator->()
     {
       return std::addressof(node_->data_[pos_]);
     }
-    const value_type & operator*() const
+    reference operator*() const
     {
       return node_->data_[pos_];
     }
-    const value_type * operator->() const
+    pointer operator->() const
     {
       return std::addressof(node_->data_[pos_]);
     }

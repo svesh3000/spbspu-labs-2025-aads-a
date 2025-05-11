@@ -1,33 +1,45 @@
 #include <boost/test/unit_test.hpp>
 #include "two-three-tree.h"
+#include <iterator>
 
-BOOST_AUTO_TEST_CASE(operator_squared)
+savintsev::TwoThreeTree< int, std::string > create_tree()
+{
+  savintsev::TwoThreeTree< int, std::string > t;
+  t.insert({1, "one"});
+  return t;
+}
+
+BOOST_AUTO_TEST_CASE(test_valid_tree)
 {
   savintsev::TwoThreeTree< int, int > map;
-  //map.insert({1, 10});
-  //BOOST_CHECK(map[1] == 10);
-  map[1] = 111;
+  map[1] = 10;
   map[2] = 20;
-  map[10] = 100;
-  map[5] = 50;
-  map[8] = 80;
-  map[18] = 180;
-  map[20] = 200;
-  map[0] = 11;
-  map[-1] = -10;
   map[6] = 60;
+  map[3] = 30;
   map[7] = 70;
-  BOOST_CHECK(map[1] == 111);
-  BOOST_CHECK(map[2] == 20);
-  BOOST_CHECK(map[10] == 100);
-  BOOST_CHECK(map[5] == 50);
-  BOOST_CHECK(map[8] == 80);
-  BOOST_CHECK(map[18] == 180);
-  BOOST_CHECK(map[20] == 200);
-  BOOST_CHECK(map[0] == 11);
-  BOOST_CHECK(map[-1] == -10);
-  BOOST_CHECK(map[6] == 60);
-  BOOST_CHECK(map[7] == 70);
+  map[8] = 80;
+  map[9] = 90;
+  map[0] = 0;
+  map[-1] = -10;
+  map[4] = 40;
+  map[5] = 50;
+  for (int i = -1; i < 10; ++i)
+  {
+    BOOST_CHECK(map[i] == i * 10);
+  }
+  for (int i = -1; i < 10; ++i)
+  {
+    map.erase(i);
+  }
+  BOOST_CHECK(map.empty());
+  for (int i = -1; i < 10; ++i)
+  {
+    map[i] = i * 10;
+  }
+  for (int i = -1; i < 10; ++i)
+  {
+    BOOST_CHECK(map[i] == i * 10);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(default_constructor)
@@ -196,20 +208,20 @@ BOOST_AUTO_TEST_CASE(erase_operation)
   tree.insert({2, "two"});
   tree.insert({3, "three"});
 
-  //auto it = tree.find(2);
-  //auto next_it = tree.erase(it);
-  //BOOST_CHECK(next_it->first == 3);
-  //BOOST_CHECK(tree.size() == 2);
-  //BOOST_CHECK(tree.count(2) == 0);
+  auto it = tree.find(2);
+  auto next_it = tree.erase(it);
+  BOOST_CHECK(next_it->first == 3);
+  BOOST_CHECK(tree.size() == 2);
+  BOOST_CHECK(tree.count(2) == 0);
 
   size_t erased = tree.erase(1);
   BOOST_CHECK(erased == 1);
-  BOOST_CHECK(tree.size() == 2);
+  BOOST_CHECK(tree.size() == 1);
 
   erased = tree.erase(4);
   BOOST_CHECK(erased == 0);
 }
-/*
+
 BOOST_AUTO_TEST_CASE(equal_range_operation)
 {
   savintsev::TwoThreeTree< int, std::string > tree;
@@ -218,21 +230,18 @@ BOOST_AUTO_TEST_CASE(equal_range_operation)
   tree.insert({4, "four"});
 
   auto range1 = tree.equal_range(2);
-  //BOOST_CHECK(std::distance(range1.first, range1.second) == 1);
+  int dist = std::distance(range1.first, range1.second);
+  BOOST_CHECK(dist == 1);
   BOOST_CHECK(range1.first->first == 2);
 
   auto range2 = tree.equal_range(3);
   BOOST_CHECK(range2.first == range2.second);
   BOOST_CHECK(range2.first->first == 4);
 }
-*/
+
 BOOST_AUTO_TEST_CASE(const_methods)
 {
-  const savintsev::TwoThreeTree< int, std::string > tree = [](){
-      savintsev::TwoThreeTree< int, std::string > t;
-      t.insert({1, "one"});
-      return t;
-  }();
+  const auto tree = create_tree();
 
   BOOST_CHECK(tree.size() == 1);
   BOOST_CHECK(!tree.empty());

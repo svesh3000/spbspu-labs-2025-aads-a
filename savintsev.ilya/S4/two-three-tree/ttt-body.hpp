@@ -47,7 +47,7 @@ namespace savintsev
 
     std::pair< iterator, bool > insert(const value_type & val);
 
-    //iterator erase(const_iterator position);
+    iterator erase(const_iterator position);
     size_type erase(const key_type & k);
 
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
@@ -693,6 +693,28 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::erase(const_iterator position)
+  {
+    if (!position.node_)
+    {
+      return end();
+    }
+    node_type * target = position.node_;
+    node_type * closest = search_min(target->kids_[position.pos_ + 1]);
+
+    const key_type k = (++position)->first;
+    if (closest)
+    {
+      std::swap(target->data_[position.pos_], closest->data_[0]);
+      target = closest;
+    }
+    remove_data_from_node(target, k);
+    root_ = fix_nodes_properties(target);
+    size_--;
+    return find(k);
+  }
+
+  template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::size_type TwoThreeTree< K, V, C >::erase(const key_type & k)
   {
     std::pair< iterator, bool > result = lazy_find(k);
@@ -711,6 +733,42 @@ namespace savintsev
     root_ = fix_nodes_properties(target);
     size_--;
     return 1ull;
+  }
+
+  template< typename K, typename V, typename C >
+  std::pair< typename TwoThreeTree< K, V, C >::iterator, typename TwoThreeTree< K, V, C >::iterator >
+  TwoThreeTree< K, V, C >::equal_range(const key_type & k)
+  {
+    auto found = lazy_find(k);
+
+    if (found.second)
+    {
+      iterator next = found.first;
+      ++next;
+      return {found.first, next};
+    }
+    else
+    {
+      return {found.first, found.first};
+    }
+  }
+
+  template< typename K, typename V, typename C >
+  std::pair< typename TwoThreeTree< K, V, C >::const_iterator, typename TwoThreeTree< K, V, C >::const_iterator >
+  TwoThreeTree< K, V, C >::equal_range(const key_type & k) const
+  {
+    auto found = lazy_find(k);
+
+    if (found.second)
+    {
+      const_iterator next = found.first;
+      ++next;
+      return {found.first, next};
+    }
+    else
+    {
+      return {found.first, found.first};
+    }
   }
 
   template< typename K, typename V, typename C >
