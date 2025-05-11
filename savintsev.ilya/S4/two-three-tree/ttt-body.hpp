@@ -777,7 +777,7 @@ namespace savintsev
   <
     typename TwoThreeTree< K, V, C >::iterator,
     typename TwoThreeTree< K, V, C >::iterator
-  > 
+  >
   TwoThreeTree< K, V, C >::equal_range(const key_type & k)
   {
     auto found = lazy_find(k);
@@ -799,7 +799,7 @@ namespace savintsev
   <
     typename TwoThreeTree< K, V, C >::const_iterator,
     typename TwoThreeTree< K, V, C >::const_iterator
-  > 
+  >
   TwoThreeTree< K, V, C >::equal_range(const key_type & k) const
   {
     auto found = lazy_find(k);
