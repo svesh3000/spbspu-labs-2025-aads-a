@@ -22,7 +22,7 @@ namespace brevnov
     void clear() noexcept;
 
   private:
-    DynamicArr< T > array_;
+    Dynamic_array< T > array_;
   };
 
   template< typename T >
