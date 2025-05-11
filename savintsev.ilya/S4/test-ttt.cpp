@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(move_operations)
 {
   savintsev::TwoThreeTree< int, std::string > tree1;
   tree1.insert({1, "one"});
-  
+
   auto tree2 = std::move(tree1);
   BOOST_CHECK(tree1.empty());
   BOOST_CHECK(tree2.at(1) == "one");
