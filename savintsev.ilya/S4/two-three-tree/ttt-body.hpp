@@ -53,8 +53,8 @@ namespace savintsev
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
     std::pair< iterator, iterator> equal_range(const key_type & k);
   private:
-    node_type * root_;
-    size_t size_;
+    node_type * root_ = nullptr;
+    size_t size_ = 0;
 
     std::pair< iterator, bool > lazy_find(const key_type & k) const;
     node_type * split_node(node_type * node);
@@ -197,9 +197,9 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](key_type && k)
   {
-    return insert({std::move(k), mapped_type{}}).first->second;
+    std::pair< K, V > inserted = {k, mapped_type{}};
+    return insert(inserted).first->second;
   }
-
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::at(const key_type & k)
@@ -832,7 +832,7 @@ namespace savintsev
       root_ = new node_type{};
       insert_data_in_node(root_, val);
       size_++;
-      return {iterator(root_), true};
+      return {iterator(root_, root_), true};
     }
 
     insert_data_in_node(current, val);

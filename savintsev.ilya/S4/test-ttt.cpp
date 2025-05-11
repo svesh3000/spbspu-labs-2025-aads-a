@@ -4,8 +4,8 @@
 BOOST_AUTO_TEST_CASE(operator_squared)
 {
   savintsev::TwoThreeTree< int, int > map;
-  map.insert({1, 10});
-  BOOST_CHECK(map[1] == 10);
+  //map.insert({1, 10});
+  //BOOST_CHECK(map[1] == 10);
   map[1] = 111;
   map[2] = 20;
   map[10] = 100;

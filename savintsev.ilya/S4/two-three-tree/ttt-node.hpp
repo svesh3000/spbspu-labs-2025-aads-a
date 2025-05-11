@@ -2,6 +2,7 @@
 #define TTT_NODE_H
 #include <cstddef>
 #include <utility>
+#include <vector>
 
 namespace savintsev
 {
