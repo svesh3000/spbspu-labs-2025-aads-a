@@ -16,14 +16,31 @@ namespace demehin
     using Iter = HashTIterator< Key, T, Hash, Equal, false >;
     using cIter = HashTIterator< Key, T, Hash, Equal, true >;
 
-    HashTable() noexcept;
+    HashTable();
 
-    std::pair< Iter, bool > insert(const std::pair< Key, T >&);
+    template< typename InputIt >
+    HashTable(InputIt, InputIt);
+
+    explicit HashTable(std::initializer_list< std::pair< Key, T > >);
 
     T& operator[](const Key&);
 
-    size_t erase(const Key&);
-    Iter erase(cIter);
+    std::pair< Iter, bool > insert(const std::pair< Key, T >&);
+    Iter insert(cIter, const Key&);
+
+    template< typename InputIt >
+    void insert(InputIt, InputIt);
+
+    template< typename... Args >
+    std::pair< Iter, bool > emplace(Args&&...);
+
+    size_t erase(const Key&) noexcept;
+    Iter erase(cIter) noexcept;
+    Iter erase(cIter, cIter) noexcept;
+
+    void clear() noexcept;
+
+    void swap(HashTable&) noexcept;
 
     T& at(const Key&);
     const T& at(const Key&) const;
@@ -32,7 +49,9 @@ namespace demehin
     cIter find(const Key&) const;
 
     void rehash(size_t);
-    double load_factor() const noexcept;
+    float load_factor() const noexcept;
+    float max_load_factor() const noexcept;
+    void max_load_factor(float);
 
     Iter begin() noexcept;
     Iter end() noexcept;
@@ -60,7 +79,7 @@ namespace demehin
     size_t item_cnt_;
     Hash hasher_;
     Equal equal_;
-    static constexpr double max_load_factor_ = 0.7;
+    static constexpr float max_load_factor_ = 0.7;
 
     size_t findKey(const Key&) const;
     size_t findSlot(const Key&) const;
@@ -69,10 +88,31 @@ namespace demehin
   };
 
   template< typename Key, typename T, typename Hash, typename Equal >
-  HashTable< Key, T, Hash, Equal >::HashTable() noexcept:
+  HashTable< Key, T, Hash, Equal >::HashTable():
     slots_(16),
     item_cnt_(0)
   {}
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  template< typename InputIt >
+  HashTable< Key, T, Hash, Equal >::HashTable(InputIt first, InputIt last):
+    HashTable()
+  {
+    for (auto it = first; it != last; it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  HashTable< Key, T, Hash, Equal >::HashTable(std::initializer_list< std::pair< Key, T > > ilist):
+    HashTable()
+  {
+    for (auto it = ilist.begin(); it != ilist.end(); it++)
+    {
+      insert(*it);
+    }
+  }
 
   template< typename Key, typename T, typename Hash, typename Equal >
   size_t HashTable< Key, T, Hash, Equal >::findKey(const Key& key) const
@@ -170,9 +210,25 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
-  double HashTable< Key, T, Hash, Equal >::load_factor() const noexcept
+  float HashTable< Key, T, Hash, Equal >::load_factor() const noexcept
   {
-    return static_cast< double >(item_cnt_) / slots_.size();
+    return static_cast< float >(item_cnt_) / slots_.size();
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  float HashTable< Key, T, Hash, Equal >::max_load_factor() const noexcept
+  {
+    return max_load_factor_;
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  void HashTable< Key, T, Hash, Equal >::max_load_factor(float ml)
+  {
+    max_load_factor_ = ml;
+    if (load_factor() > max_load_factor_)
+    {
+      rehash(slots_.size() * 2);
+    }
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
@@ -190,21 +246,46 @@ namespace demehin
   template< typename Key, typename T, typename Hash, typename Equal >
   std::pair< typename HashTable< Key, T, Hash, Equal >::Iter, bool > HashTable< Key, T, Hash, Equal >::insert(const std::pair< Key, T >& val)
   {
+    return emplace(val);
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  template< typename InputIt >
+  void HashTable< Key, T, Hash, Equal >::insert(InputIt first, InputIt last)
+  {
+    HashTable< Key, T, Hash, Equal > temp(*this);
+    for (auto it = first; it != last; it++)
+    {
+      temp.insert(*it);
+    }
+    swap(temp);
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  template< typename... Args >
+  std::pair< typename HashTable< Key, T, Hash, Equal >::Iter, bool > HashTable< Key, T, Hash, Equal >::emplace(Args&&... args)
+  {
+    std::pair<Key, T> tempPair(std::forward<Args>(args)...);
+    const Key& key = tempPair.first;
+
     if (load_factor() >= max_load_factor_)
     {
       rehash(slots_.size() * 2);
     }
 
-    size_t ind = findSlot(val.first);
-    if (slots_[ind].state == SlotState::OCCUPIED)
+    size_t index = findSlot(key);
+    Slot& slot = slots_[index];
+
+    if (slot.state == SlotState::OCCUPIED)
     {
-      return std::make_pair(Iter(this, ind), false);
+      return { Iter(this, index), false };
     }
 
-    slots_[ind].pair = val;
-    slots_[ind].state = SlotState::OCCUPIED;
+    new (&slot.pair) std::pair<Key, T>(std::move(tempPair));
+    slot.state = SlotState::OCCUPIED;
     item_cnt_++;
-    return std::make_pair(Iter(this, ind), true);
+
+    return { Iter(this, index), true };
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
@@ -277,26 +358,49 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
-  size_t HashTable< Key, T, Hash, Equal >::erase(const Key& key)
+  size_t HashTable< Key, T, Hash, Equal >::erase(const Key& key) noexcept
   {
-    size_t ind = findKey(key);
-    if (ind == slots_.size())
+    cIter it = find(key);
+    if (it != end())
     {
-      return 0;
+      erase(it);
+      return 1;
     }
-
-    slots_[ind].state = SlotState::DELETED;
-    item_cnt_--;
-    return 1;
+    return 0;
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
-  typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::erase(cIter pos)
+  typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::erase(cIter pos) noexcept
   {
     slots_[pos.index_].state = SlotState::DELETED;
     item_cnt_--;
     Iter next(this, pos.index_);
     return ++next;
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::erase(cIter first, cIter last) noexcept
+  {
+    for (auto it = first; it != last; it++)
+    {
+      it = erase(it);
+    }
+    return Iter(this, first.index_);
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  void HashTable< Key, T, Hash, Equal >::clear() noexcept
+  {
+    erase(cbegin(), cend());
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  void HashTable< Key, T, Hash, Equal >::swap(HashTable& other) noexcept
+  {
+    std::swap(slots_, other.slots);
+    std::swap(item_cnt_, other.item_cnt_);
+    std::swap(hasher_, other.hasher_);
+    std::swap(equal_, other.equal_);
   }
 }
 
