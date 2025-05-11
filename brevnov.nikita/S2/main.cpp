@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
       brevnov::input_example(std::cin, example_index);
     }
     brevnov::queue postfix_example = brevnov::convert_example(example_index);
-    brevnov::stackNumber results = brevnov::calculation_example(postfix_example);
+    brevnov::stack_number results = brevnov::calculation_example(postfix_example);
     brevnov::output_results(std::cout, results) << "\n";
   }
   catch (const std::exception& e)
