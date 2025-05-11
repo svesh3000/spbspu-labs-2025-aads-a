@@ -62,8 +62,20 @@ namespace savintsev
     {
       if (!node_)
       {
-        return rbegin();
+        if (!root_)
+        {
+          return *this;
+        }
+
+        node_ = root_;
+        while (node_->kids_[node_->len_])
+        {
+          node_ = node_->kids_[node_->len_];
+        }
+        pos_ = node_->len_ - 1;
+        return *this;
       }
+
       return prev();
     }
 
@@ -251,14 +263,28 @@ namespace savintsev
       ++(*this);
       return result;
     }
+
     BidirectIterator & operator--()
     {
       if (!node_)
       {
-        return rbegin();
+        if (!root_)
+        {
+          return *this;
+        }
+        
+        node_ = root_;
+        while (node_->kids_[node_->len_])
+        {
+          node_ = node_->kids_[node_->len_];
+        }
+        pos_ = node_->len_ - 1;
+        return *this;
       }
+
       return prev();
     }
+
     BidirectIterator operator--(int)
     {
       BidirectIterator< Key, Value > result(*this);
@@ -304,7 +330,9 @@ namespace savintsev
       root_(root),
       node_(node),
       pos_(pos)
-    {}
+    {
+      assert(root_ != nullptr);
+    }
 
     BidirectIterator & next()
     {

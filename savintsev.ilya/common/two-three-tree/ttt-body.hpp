@@ -1045,16 +1045,14 @@ namespace savintsev
     {
       throw std::logic_error("Tree is empty");
     }
-    auto it_end = end();
-    it_end--;
-    auto it_begin = begin();
-    while (it_end != it_begin)
+
+    for (auto it = end(); it != begin();)
     {
-      f(*it_end);
-      it_end--;
+      assert(it != end());
+      --it;
+      f(*it);
     }
-    f(*it_end);
-    it_end--;
+
     return f;
   }
 
