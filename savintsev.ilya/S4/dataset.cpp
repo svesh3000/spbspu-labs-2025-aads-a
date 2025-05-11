@@ -24,8 +24,15 @@ namespace savintsev
       std::string value;
       while (file.peek() != '\n' && file)
       {
-        file >> key >> value;
-        values[key] = value;
+        if (file >> key >> value)
+        {
+          values[key] = value;
+        }
+        else
+        {
+          file.clear();
+          break;
+        }
       }
       datasets[label] = std::move(values);
     }
@@ -36,8 +43,7 @@ namespace savintsev
   {
     std::string label;
     std::cin >> label;
-    Dataset values;
-    values = datasets.at(label);
+    const Dataset & values = datasets.at(label);
     if (values.empty())
     {
       std::cout << "<EMPTY>\n";

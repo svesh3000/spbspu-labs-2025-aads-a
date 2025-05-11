@@ -167,8 +167,20 @@ BOOST_AUTO_TEST_CASE(at_operation)
 {
   savintsev::TwoThreeTree< int, std::string > tree;
   tree.insert({1, "one"});
+  tree.insert({12, "twelve"});
+  tree.insert({24, "big"});
+  tree.insert({3, "three"});
+  tree.insert({7, "seven"});
+
 
   BOOST_CHECK(tree.at(1) == "one");
+  tree.erase(1);
+  BOOST_CHECK(tree.at(12) == "twelve");
+  BOOST_CHECK(tree.at(3) == "three");
+  tree.erase(3);
+  BOOST_CHECK(tree.at(7) == "seven");
+  BOOST_CHECK(tree.at(12) == "twelve");
+  BOOST_CHECK(tree.at(24) == "big");
   BOOST_CHECK_THROW(tree.at(2), std::out_of_range);
 }
 
@@ -222,19 +234,76 @@ BOOST_AUTO_TEST_CASE(erase_operation)
   BOOST_CHECK(erased == 0);
 }
 
-BOOST_AUTO_TEST_CASE(equal_range_operation)
+BOOST_AUTO_TEST_CASE(erase_root)
+{
+  savintsev::TwoThreeTree< int, std::string > tree;
+  tree.insert({5, "root"});
+  tree.erase(5);
+  BOOST_CHECK(tree.empty());
+  BOOST_CHECK_THROW(tree.at(5), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_CASE(reuse_after_clear)
 {
   savintsev::TwoThreeTree< int, std::string > tree;
   tree.insert({1, "one"});
+  tree.clear();
   tree.insert({2, "two"});
-  tree.insert({4, "four"});
+  BOOST_CHECK(tree.at(2) == "two");
+}
 
-  auto range1 = tree.equal_range(2);
+BOOST_AUTO_TEST_CASE(move_operations)
+{
+  savintsev::TwoThreeTree< int, std::string > tree1;
+  tree1.insert({1, "one"});
+  
+  auto tree2 = std::move(tree1);
+  BOOST_CHECK(tree1.empty());
+  BOOST_CHECK(tree2.at(1) == "one");
+}
+
+BOOST_AUTO_TEST_CASE(nonexistent_keys)
+{
+  savintsev::TwoThreeTree< int, std::string > tree;
+  BOOST_CHECK(tree.find(999) == tree.end());
+  BOOST_CHECK_THROW(tree.at(999), std::out_of_range);
+  BOOST_CHECK(tree.count(999) == 0);
+}
+
+BOOST_AUTO_TEST_CASE(stress_test)
+{
+  savintsev::TwoThreeTree< int, int > tree;
+  for (int i = 0; i < 10000; ++i)
+  {
+    tree.insert({i, i * 10});
+  }
+  for (int i = 0; i < 10000; ++i)
+  {
+    BOOST_CHECK(tree.at(i) == i * 10);
+  }
+  for (int i = 0; i < 10000; i += 2)
+  {
+    tree.erase(i);
+  }
+  for (int i = 1; i < 10000; i += 2)
+  {
+    BOOST_CHECK(tree.at(i) == i * 10);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(equal_range_operation)
+{
+  savintsev::TwoThreeTree< int, std::string > tree1;
+  tree1.insert({1, "one"});
+  tree1.insert({2, "two"});
+  tree1.insert({4, "four"});
+
+  auto range1 = tree1.equal_range(2);
   int dist = std::distance(range1.first, range1.second);
   BOOST_CHECK(dist == 1);
   BOOST_CHECK(range1.first->first == 2);
 
-  auto range2 = tree.equal_range(3);
+  auto range2 = tree1.equal_range(3);
   BOOST_CHECK(range2.first == range2.second);
   BOOST_CHECK(range2.first->first == 4);
 }

@@ -1,6 +1,7 @@
 #ifndef TTT_BODY_HPP
 #define TTT_BODY_HPP
 #include <functional>
+#include <iostream>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
 
@@ -20,7 +21,8 @@ namespace savintsev
 
     using size_type = size_t;
 
-    TwoThreeTree();
+    ~TwoThreeTree();
+    TwoThreeTree() = default;
     TwoThreeTree(const TwoThreeTree & other);
     TwoThreeTree(TwoThreeTree && other) noexcept;
     TwoThreeTree & operator=(const TwoThreeTree & other);
@@ -64,22 +66,22 @@ namespace savintsev
     void insert_data_in_node(node_type * node, const value_type & val);
     void remove_data_from_node(node_type * node, const value_type & val);
     void remove_data_from_node(node_type * node, const key_type & k);
-    void clear_nodes(node_type * node);
+    node_type * clear_nodes(node_type * node);
     node_type * clone_nodes(node_type * other);
-    node_type * search_min(node_type * root);
+    node_type * search_min(node_type * root) const;
     node_type * fix_nodes_properties(node_type * leaf);
     node_type * redistribute_nodes(node_type * leaf);
     node_type * merge_nodes(node_type * leaf);
   };
 
   template< typename Key, typename Value, typename Compare >
-  TwoThreeTree< Key, Value, Compare >::TwoThreeTree():
-    root_(nullptr),
-    size_(0)
-  {}
+  TwoThreeTree< Key, Value, Compare >::~TwoThreeTree()
+  {
+    clear();
+  }
 
-  template< typename Key, typename Value, typename Compare >
-  TwoThreeTree< Key, Value, Compare >::TwoThreeTree(const TwoThreeTree & other):
+  template <typename Key, typename Value, typename Compare>
+  TwoThreeTree<Key, Value, Compare>::TwoThreeTree(const TwoThreeTree & other):
     root_(nullptr),
     size_(0)
   {
@@ -91,7 +93,7 @@ namespace savintsev
       }
       catch (const std::bad_alloc & e)
       {
-        clear_nodes(root_);
+        root_ = clear_nodes(root_);
         throw;
       }
       size_ = other.size_;
@@ -123,7 +125,7 @@ namespace savintsev
   {
     if (this != &other)
     {
-      clear_nodes(root_);
+      root_ = clear_nodes(root_);
       root_ = other.root_;
       size_ = other.size_;
       other.root_ = nullptr;
@@ -166,7 +168,7 @@ namespace savintsev
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::clear() noexcept
   {
-    clear_nodes(root_);
+    root_ = clear_nodes(root_);
     size_ = 0;
   }
 
@@ -239,7 +241,7 @@ namespace savintsev
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::at(const key_type & k)
   {
     auto it_pair = lazy_find(k);
-    if (!it_pair.second)
+    if (it_pair.first == end() || !it_pair.second)
     {
       throw std::out_of_range("ERROR: Key not found");
     }
@@ -268,24 +270,20 @@ namespace savintsev
     {
       return {iterator(root_), false};
     }
-
     node_type * node = root_;
-
-    while (true)
+    while (node)
     {
-      if (node->data_[0].first == k)
+      for (size_t i = 0; i < node->len_; ++i)
       {
-        return {iterator(root_, node, 0), true};
+        if (node->data_[i].first == k)
+        {
+          return {iterator(root_, node, i), true};
+        }
       }
 
-      if (node->len_ == 2 && node->data_[1].first == k)
+      if (!node->kids_[0])
       {
-        return {iterator(root_, node, 1), true};
-      }
-
-      if (!node->kids_[0] && !node->kids_[1] && !node->kids_[2])
-      {
-        return {iterator(root_, node, node->len_ == 2 ? 1 : 0), false};
+        return std::make_pair(iterator(root_, node, 0), false);
       }
 
       if (C{}(k, node->data_[0].first))
@@ -301,6 +299,7 @@ namespace savintsev
         node = node->kids_[2];
       }
     }
+    return {iterator(root_), false};
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -320,6 +319,7 @@ namespace savintsev
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::remove_data_from_node(node_type * node, const key_type & k)
   {
+    if (node->len_ == 0) return;
     if (node->len_ >= 1 && node->data_[0].first == k)
     {
       node->data_[0] = node->data_[1];
@@ -333,18 +333,19 @@ namespace savintsev
     }
   }
 
-  template< typename Key, typename Value, typename Compare >
-  void TwoThreeTree< Key, Value, Compare >::clear_nodes(node_type * node)
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::clear_nodes(node_type * node)
   {
     if (!node)
     {
-      return;
+      return nullptr;
     }
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
-      clear_nodes(node->kids_[i]);
+      node->kids_[i] = clear_nodes(node->kids_[i]);
     }
     delete node;
+    return nullptr;
   }
 
   template< typename K, typename V, typename C >
@@ -372,7 +373,7 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::search_min(node_type * root)
+  typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::search_min(node_type * root) const
   {
     node_type * temp = root;
     if (!temp)
@@ -737,9 +738,14 @@ namespace savintsev
       return end();
     }
     node_type * target = position.node_;
-    node_type * closest = search_min(target->kids_[position.pos_ + 1]);
+    node_type * closest = nullptr;
+    if (position.pos_ + 1 < 3 && target->kids_[position.pos_ + 1])
+    {
+      closest = search_min(target->kids_[position.pos_ + 1]);
+    }
 
-    const key_type k = (++position)->first;
+    const key_type k = position->first;
+    const key_type k_next = (++position)->first;
     if (closest)
     {
       std::swap(target->data_[position.pos_], closest->data_[0]);
@@ -748,7 +754,7 @@ namespace savintsev
     remove_data_from_node(target, k);
     root_ = fix_nodes_properties(target);
     size_--;
-    return find(k);
+    return find(k_next);
   }
 
   template< typename K, typename V, typename C >
@@ -925,7 +931,6 @@ namespace savintsev
   std::pair< typename TwoThreeTree< K, V, C >::iterator, bool > TwoThreeTree< K, V, C >::insert(const value_type & val)
   {
     auto result = lazy_find(val.first);
-
     if (result.second)
     {
       return {result.first, false};
@@ -934,7 +939,8 @@ namespace savintsev
 
     if (!current)
     {
-      root_ = new node_type{};
+      node_type * root = new node_type{};
+      root_ = root;
       insert_data_in_node(root_, val);
       size_++;
       return {iterator(root_, root_), true};
