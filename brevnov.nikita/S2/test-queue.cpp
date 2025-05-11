@@ -3,7 +3,7 @@
 #include <boost/test/unit_test_suite.hpp>
 #include "queue.hpp"
 
-BOOST_AUTO_TEST_SUITE()
+BOOST_AUTO_TEST_SUITE(queue)
 
 BOOST_AUTO_TEST_CASE(constructors)
 {
@@ -49,15 +49,13 @@ BOOST_AUTO_TEST_CASE(push_and_pop)
   test_queue.push(4);
   test_queue.push(8);
   BOOST_TEST(test_queue.back() == 8);
-  test_queue.popFront();
+  test_queue.pop();
   BOOST_TEST(test_queue.front() == 4);
-  test_queue.popBack();
-  BOOST_TEST(test_queue.back() == 4);
 }
 
 BOOST_AUTO_TEST_CASE(empty_size_clear)
 {
-  brevnov::Queue< int > arr;
+  brevnov::Queue< int > test_queue;
   for (int i = 0; i < 15; ++i)
   {
     test_queue.push(i);

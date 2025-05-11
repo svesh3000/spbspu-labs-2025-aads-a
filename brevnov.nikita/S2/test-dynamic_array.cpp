@@ -3,7 +3,7 @@
 #include <boost/test/unit_test_suite.hpp>
 #include "dynamic_array.hpp"
 
-BOOST_AUTO_TEST_SUITE()
+BOOST_AUTO_TEST_SUITE(dynamic_array)
 
 BOOST_AUTO_TEST_CASE(constructors)
 {
