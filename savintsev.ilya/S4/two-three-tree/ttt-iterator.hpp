@@ -34,11 +34,15 @@ namespace savintsev
 
     reference operator*() const
     {
+      assert(node_ != nullptr);
+      assert(pos_ < node_->len_);
       return node_->data_[pos_];
     }
 
     pointer operator->() const
     {
+      assert(node_ != nullptr);
+      assert(pos_ < node_->len_);
       return std::addressof(node_->data_[pos_]);
     }
 
@@ -77,6 +81,10 @@ namespace savintsev
 
     bool operator==(const BidirectConstIterator & rhs) const
     {
+      if (node_ == nullptr && rhs.node_ == nullptr)
+      {
+        return true;
+      }
       return node_ == rhs.node_ && pos_ == rhs.pos_;
     }
 
@@ -85,20 +93,22 @@ namespace savintsev
     node_type * node_ = nullptr;
     size_t pos_ = 0;
 
-    node_type * rbegin(node_type * node)
+    BidirectConstIterator & rbegin()
     {
-      while (root_->kids_[1] || root_->kids_[2])
+      if (!root_)
       {
-        if (root_->kids_[2])
-        {
-          root_ = root_->kids_[2];
-        }
-        else if (root_->kids_[1])
-        {
-          root_ = root_->kids_[1];
-        }
+        node_ = nullptr;
+        return *this;
       }
-      return root_;
+
+      node_ = root_;
+      while (node_->kids_[node_->len_])
+      {
+        node_ = node_->kids_[node_->len_];
+      }
+
+      pos_ = node_->len_ - 1;
+      return *this;
     }
 
     BidirectConstIterator(node_type * root, node_type * node = nullptr, size_t pos = 0):
@@ -211,14 +221,20 @@ namespace savintsev
     BidirectIterator() = default;
     reference operator*()
     {
+      assert(node_ != nullptr);
+      assert(pos_ < node_->len_);
       return node_->data_[pos_];
     }
     pointer operator->()
     {
+      assert(node_ != nullptr);
+      assert(pos_ < node_->len_);
       return std::addressof(node_->data_[pos_]);
     }
     reference operator*() const
     {
+      assert(node_ != nullptr);
+      assert(pos_ < node_->len_);
       return node_->data_[pos_];
     }
     pointer operator->() const
@@ -255,6 +271,10 @@ namespace savintsev
     }
     bool operator==(const BidirectIterator & rhs) const
     {
+      if (node_ == nullptr && rhs.node_ == nullptr)
+      {
+        return true;
+      }
       return node_ == rhs.node_ && pos_ == rhs.pos_;
     }
   private:
@@ -262,20 +282,22 @@ namespace savintsev
     node_type * node_ = nullptr;
     size_t pos_ = 0;
 
-    node_type * rbegin(node_type * node)
+    BidirectIterator & rbegin()
     {
-      while (root_->kids_[1] || root_->kids_[2])
+      if (!root_)
       {
-        if (root_->kids_[2])
-        {
-          root_ = root_->kids_[2];
-        }
-        else if (root_->kids_[1])
-        {
-          root_ = root_->kids_[1];
-        }
+        node_ = nullptr;
+        return *this;
       }
-      return root_;
+
+      node_ = root_;
+      while (node_->kids_[node_->len_])
+      {
+        node_ = node_->kids_[node_->len_];
+      }
+
+      pos_ = node_->len_ - 1;
+      return *this;
     }
 
     BidirectIterator(node_type * root, node_type * node = nullptr, size_t pos = 0):

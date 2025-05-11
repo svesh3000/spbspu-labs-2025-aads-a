@@ -27,10 +27,20 @@ BOOST_AUTO_TEST_CASE(test_valid_tree)
   {
     BOOST_CHECK(map[i] == i * 10);
   }
-  for (int i = -1; i < 10; ++i)
+  int j = -1;
+  for (auto it = map.begin(); it != map.end(); ++it)
+  {
+    BOOST_CHECK(it->first == j);
+    ++j;
+  }
+  for (int i = -1; i < 9; ++i)
   {
     map.erase(i);
   }
+  auto it = map.end();
+  --it;
+  BOOST_CHECK(it->first == 9);
+  map.erase(9);
   BOOST_CHECK(map.empty());
   for (int i = -1; i < 10; ++i)
   {

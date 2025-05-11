@@ -2,6 +2,7 @@
 #define TTT_BODY_HPP
 #include <functional>
 #include <iostream>
+#include <cassert>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
 
@@ -56,10 +57,10 @@ namespace savintsev
 
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
     std::pair< iterator, iterator> equal_range(const key_type & k);
-  private:
+
     node_type * root_ = nullptr;
     size_t size_ = 0;
-
+  private:
     std::pair< iterator, bool > lazy_find(const key_type & k) const;
     node_type * split_node(node_type * node);
     void sort_node(node_type * node);
@@ -80,8 +81,8 @@ namespace savintsev
     clear();
   }
 
-  template <typename Key, typename Value, typename Compare>
-  TwoThreeTree<Key, Value, Compare>::TwoThreeTree(const TwoThreeTree & other):
+  template< typename Key, typename Value, typename Compare >
+  TwoThreeTree< Key, Value, Compare >::TwoThreeTree(const TwoThreeTree & other):
     root_(nullptr),
     size_(0)
   {
@@ -138,15 +139,22 @@ namespace savintsev
   {
     if (!root_)
     {
-      return iterator(root_);
+      return end();
     }
-    return iterator(root_, search_min(root_), 0);
+
+    node_type * min_node = search_min(root_);
+    if (!min_node || min_node->len_ == 0)
+    {
+      return end();
+    }
+
+    return iterator(root_, min_node, 0);
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::end() noexcept
   {
-    return iterator(root_);
+    return iterator(root_, nullptr, 0);
   }
 
   template< typename K, typename V, typename C >
@@ -154,15 +162,22 @@ namespace savintsev
   {
     if (!root_)
     {
-      return const_iterator(root_);
+      return end();
     }
-    return const_iterator(root_, search_min(root_), 0);
+
+    node_type * min_node = search_min(root_);
+    if (!min_node || min_node->len_ == 0)
+    {
+      return end();
+    }
+
+    return const_iterator(root_, min_node, 0);
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::end() const noexcept
   {
-    return const_iterator(root_);
+    return const_iterator(root_, nullptr, 0);
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -273,6 +288,7 @@ namespace savintsev
     node_type * node = root_;
     while (node)
     {
+      assert(node->len_ <= 3);
       for (size_t i = 0; i < node->len_; ++i)
       {
         if (node->data_[i].first == k)
@@ -306,6 +322,7 @@ namespace savintsev
   void TwoThreeTree< Key, Value, Compare >::insert_data_in_node(node_type * node, const value_type & val)
   {
     node->data_[node->len_] = val;
+    assert(node->len_ < 3);
     node->len_++;
     sort_node(node);
   }
@@ -356,7 +373,7 @@ namespace savintsev
       return nullptr;
     }
     node_type * root = new node_type{};
-    for (size_t i = 0; i < 2; ++i)
+    for (size_t i = 0; i < other->len_; ++i)
     {
       root->data_[i] = other->data_[i];
     }
@@ -378,20 +395,39 @@ namespace savintsev
     node_type * temp = root;
     if (!temp)
     {
-      return temp;
+      return nullptr;
     }
+
     while (temp->kids_[0])
     {
       temp = temp->kids_[0];
     }
-    return temp;
+
+    return (temp->len_ == 0 ? nullptr : temp);
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::fix_nodes_properties(node_type * leaf)
   {
-    if (leaf->len_ == 0 && !leaf->parent_)
+
+    if (!leaf)
+    return nullptr;
+
+    assert(leaf->len_ <= 2);
+    if (!leaf->parent_ && leaf->len_ == 0)
     {
+      // проверить, остались ли дети
+      for (size_t i = 0; i < 4; ++i)
+      {
+        if (leaf->kids_[i])
+        {
+          leaf->kids_[i]->parent_ = nullptr;
+          node_type* new_root = leaf->kids_[i];
+          delete leaf;
+          return new_root;
+        }
+      }
+      // действительно пустой — удалить
       delete leaf;
       return nullptr;
     }
