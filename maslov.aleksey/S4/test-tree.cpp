@@ -54,6 +54,37 @@ BOOST_AUTO_TEST_CASE(moveConstructor)
   BOOST_TEST(tree.empty());
 }
 
+BOOST_AUTO_TEST_CASE(rangeConstructor)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree1;
+  tree1.push(1, "first");
+  tree1.push(2, "second");
+  tree1.push(3, "third");
+  auto first = tree1.find(1);
+  auto last = tree1.end();
+  maslov::BiTree< int, std::string, std::less< int > > tree2(first, last);
+  std::ostringstream out1;
+  printTree(out1, tree1);
+  std::ostringstream out2;
+  printTree(out2, tree2);
+  BOOST_TEST(out1.str() == out2.str());
+}
+
+BOOST_AUTO_TEST_CASE(initializerListconstructor)
+{
+  std::initializer_list< std::pair< int, std::string > > il{{1, "first"}, {2, "second"}, {3, "third"}};
+  maslov::BiTree< int, std::string, std::less< int > > tree1(il);
+  maslov::BiTree< int, std::string, std::less< int > > tree2;
+  tree2.push(1, "first");
+  tree2.push(2, "second");
+  tree2.push(3, "third");
+  std::ostringstream out1;
+  printTree(out1, tree1);
+  std::ostringstream out2;
+  printTree(out2, tree2);
+  BOOST_TEST(out1.str() == out2.str());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(operators)

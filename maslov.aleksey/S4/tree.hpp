@@ -12,19 +12,23 @@ namespace maslov
     using iterator = TreeIterator< Key, T, Cmp >;
 
     BiTree();
+    template< typename InputIt >
+    BiTree(InputIt firstIt, InputIt lastIt);
+    BiTree(std::initializer_list< std::pair< Key, T > > init);
     BiTree(const BiTree< Key, T, Cmp > & rhs);
     BiTree(BiTree< Key, T, Cmp > && rhs);
     ~BiTree();
 
     BiTree< Key, T, Cmp > & operator=(const BiTree< Key, T, Cmp > & rhs);
     BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > && rhs);
+
     T & at(const Key & key);
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
     const T & operator[](const Key & key) const;
 
     void push(const Key & key, const T & value);
-    T get(const Key & key);
+    T get(const Key & key) const;
     T pop(const Key & key);
     std::pair< iterator, bool > insert(const std::pair< Key, T > & value);
     template< typename InputIt >
@@ -34,6 +38,7 @@ namespace maslov
     size_t erase(const Key & key);
     iterator erase(iterator firstIt, iterator lastIt);
     iterator erase(cIterator firstIt, cIterator lastIt);
+
     std::pair< iterator, iterator > equalRange(const Key & key);
     std::pair< cIterator, cIterator > equalRange(const Key & key) const;
     size_t count(const Key & key) const;
@@ -41,6 +46,10 @@ namespace maslov
     cIterator lowerBound(const Key & key) const;
     iterator upperBound(const Key & key);
     cIterator upperBound(const Key & key) const;
+    iterator find(const Key & key);
+    cIterator find(const Key & key) const;
+    void clear() noexcept;
+    void swap(BiTree< Key, T, Cmp > & rhs) noexcept;
 
     iterator begin() noexcept;
     cIterator cbegin() const noexcept;
@@ -49,12 +58,6 @@ namespace maslov
 
     bool empty() const noexcept;
     size_t size() const noexcept;
-
-    void clear();
-    void swap(BiTree< Key, T, Cmp > & rhs) noexcept;
-
-    iterator find(const Key & key);
-    cIterator find(const Key & key) const;
    private:
     BiTreeNode< Key, T > * fakeRoot_;
     BiTreeNode< Key, T > * fakeLeaf_;
@@ -80,6 +83,19 @@ namespace maslov
     fakeRoot_->left = fakeLeaf_;
     fakeRoot_->right = fakeLeaf_;
   }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename InputIt >
+  BiTree< Key, T, Cmp >::BiTree(InputIt firstIt, InputIt lastIt):
+    BiTree()
+  {
+    insert(firstIt, lastIt);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp >::BiTree(std::initializer_list< std::pair< Key, T > > init):
+    BiTree(init.begin(), init.end())
+  {}
 
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp >::~BiTree()
@@ -144,7 +160,7 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
-  void BiTree< Key, T, Cmp >::clear()
+  void BiTree< Key, T, Cmp >::clear() noexcept
   {
     clearTree(fakeRoot_->left);
     clearTree(fakeRoot_->right);
@@ -232,7 +248,7 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
-  T BiTree< Key, T, Cmp >::get(const Key & key)
+  T BiTree< Key, T, Cmp >::get(const Key & key) const
   {
     BiTreeNode< Key, T > * node = findNode(key);
     if (node == fakeLeaf_)
