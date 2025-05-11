@@ -108,12 +108,11 @@ namespace savintsev
 
   DatasetCommands register_commands()
   {
-    return
-    {
-      {"print", print_dataset},
-      {"complement", complement_datasets},
-      {"intersect", intersect_datasets},
-      {"union", union_datasets}
-    };
+    DatasetCommands commands;
+    commands.insert({"print", print_dataset});
+    commands.insert({"complement", complement_datasets});
+    commands.insert({"intersect", intersect_datasets});
+    commands.insert({"union", union_datasets});
+    return commands;
   }
 }

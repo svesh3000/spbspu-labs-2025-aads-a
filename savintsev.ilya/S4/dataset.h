@@ -3,10 +3,11 @@
 #include <map>
 #include <string>
 #include <functional>
+#include "two-three-tree.h"
 
-using Dataset = std::map< int, std::string >;
-using DatasetCollection = std::map< std::string, Dataset >;
-using DatasetCommands = std::map< std::string, std::function< void(DatasetCollection &) > >;
+using Dataset = savintsev::TwoThreeTree< int, std::string >;
+using DatasetCollection = savintsev::TwoThreeTree< std::string, Dataset >;
+using DatasetCommands = savintsev::TwoThreeTree< std::string, std::function< void(DatasetCollection &) > >;
 
 namespace savintsev
 {

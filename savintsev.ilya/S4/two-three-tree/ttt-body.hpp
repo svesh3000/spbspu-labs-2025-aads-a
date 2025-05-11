@@ -23,6 +23,8 @@ namespace savintsev
     TwoThreeTree();
     TwoThreeTree(const TwoThreeTree & other);
     TwoThreeTree(TwoThreeTree && other) noexcept;
+    TwoThreeTree & operator=(const TwoThreeTree & other);
+    TwoThreeTree & operator=(TwoThreeTree && other);
 
     iterator begin() noexcept;
     iterator end() noexcept;
@@ -96,6 +98,17 @@ namespace savintsev
     }
   }
 
+  template< typename K, typename V, typename C >
+  TwoThreeTree< K, V, C > & TwoThreeTree< K, V, C >::operator=(const TwoThreeTree & other)
+  {
+    if (this != &other)
+    {
+        TwoThreeTree temp(other);
+        swap(temp);
+    }
+    return *this;
+  }
+
   template< typename Key, typename Value, typename Compare >
   TwoThreeTree< Key, Value, Compare >::TwoThreeTree(TwoThreeTree && other) noexcept:
     root_(other.root_),
@@ -105,6 +118,19 @@ namespace savintsev
     other.size_ = 0;
   }
 
+  template< typename K, typename V, typename C >
+  TwoThreeTree< K, V, C > & TwoThreeTree< K, V, C >::operator=(TwoThreeTree && other)
+  {
+    if (this != &other)
+    {
+      clear_nodes(root_);
+      root_ = other.root_;
+      size_ = other.size_;
+      other.root_ = nullptr;
+      other.size_ = 0;
+    }
+    return *this;
+  }
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
   {
@@ -232,7 +258,10 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  typename std::pair< typename TwoThreeTree< K, V, C >::iterator, bool >
+  std::pair<
+    typename TwoThreeTree< K, V, C >::iterator,
+    bool
+  >
   TwoThreeTree< K, V, C >::lazy_find(const key_type & k) const
   {
     if (!root_)
@@ -318,8 +347,8 @@ namespace savintsev
     delete node;
   }
 
-  template< typename Key, typename Value, typename Compare >
-  typename TwoThreeTree< Key, Value, Compare >::node_type * TwoThreeTree< Key, Value, Compare >::clone_nodes(node_type * other)
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::clone_nodes(node_type * other)
   {
     if (!other)
     {
@@ -744,7 +773,11 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  std::pair< typename TwoThreeTree< K, V, C >::iterator, typename TwoThreeTree< K, V, C >::iterator >
+  std::pair
+  <
+    typename TwoThreeTree< K, V, C >::iterator,
+    typename TwoThreeTree< K, V, C >::iterator
+  > 
   TwoThreeTree< K, V, C >::equal_range(const key_type & k)
   {
     auto found = lazy_find(k);
@@ -762,7 +795,11 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  std::pair< typename TwoThreeTree< K, V, C >::const_iterator, typename TwoThreeTree< K, V, C >::const_iterator >
+  std::pair
+  <
+    typename TwoThreeTree< K, V, C >::const_iterator,
+    typename TwoThreeTree< K, V, C >::const_iterator
+  > 
   TwoThreeTree< K, V, C >::equal_range(const key_type & k) const
   {
     auto found = lazy_find(k);
