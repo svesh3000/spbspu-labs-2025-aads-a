@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(constructors)
 {
   brevnov::Stack< int > test_stack;
   test_stack.push(6);
-  brevnov::Stack< int > test_copy_Stack(test_stack);
+  brevnov::Stack< int > test_copy_stack(test_stack);
   BOOST_TEST(test_copy_stack.top() == 6);
   brevnov::Stack< int > test_move_stack(std::move(test_copy_stack));
   BOOST_TEST(test_move_stack.top() == 6);
