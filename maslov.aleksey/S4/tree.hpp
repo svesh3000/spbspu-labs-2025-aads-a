@@ -27,9 +27,13 @@ namespace maslov
     T get(const Key & key);
     T pop(const Key & key);
     std::pair< iterator, bool > insert(const std::pair< Key, T > & value);
+    template< typename InputIt >
+    void insert(InputIt firstIt, InputIt lastIt);
     iterator erase(iterator pos);
     iterator erase(cIterator pos);
     size_t erase(const Key & key);
+    iterator erase(iterator firstIt, iterator lastIt);
+    iterator erase(cIterator firstIt, cIterator lastIt);
     std::pair< iterator, iterator > equalRange(const Key & key);
     std::pair< cIterator, cIterator > equalRange(const Key & key) const;
     size_t count(const Key & key) const;
@@ -556,10 +560,10 @@ namespace maslov
     {
       return end();
     }
-    BiTreeNode< Key, T > * node = pos.node_;
     iterator next = pos;
-    pop(node->data.first);
-    return next;
+    Key key = ++next->first;
+    pop(pos->first);
+    return find(key);
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -569,10 +573,10 @@ namespace maslov
     {
       return end();
     }
-    BiTreeNode< Key, T > * node = pos.node_;
     cIterator next = pos;
-    pop(node->data.first);
-    return iterator(next.node_, next.fakeLeaf_);
+    Key key = ++next->first;
+    pop(pos->first);
+    return find(key);
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -662,6 +666,38 @@ namespace maslov
     {
       return 0;
     }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename InputIt >
+  void BiTree< Key, T, Cmp >::insert(InputIt firstIt, InputIt lastIt)
+  {
+    for (; firstIt != lastIt; ++firstIt)
+    {
+      insert(*firstIt);
+    }
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::erase(iterator firstIt, iterator lastIt)
+  {
+    Key key = lastIt->first;
+    while (firstIt->first != key)
+    {
+      firstIt = erase(firstIt);
+    }
+    return firstIt;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename BiTree< Key, T, Cmp >::iterator BiTree< Key, T, Cmp >::erase(cIterator firstIt, cIterator lastIt)
+  {
+    Key key = lastIt->first;
+    while (firstIt->first != key)
+    {
+      firstIt = erase(firstIt);
+    }
+    return firstIt;
   }
 }
 

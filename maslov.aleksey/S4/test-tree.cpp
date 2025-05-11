@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(operatorSquareBrackets)
   BOOST_TEST(out.str() == "2 second");
 }
 
-BOOST_AUTO_TEST_CASE(at_test)
+BOOST_AUTO_TEST_CASE(at)
 {
   maslov::BiTree< int, std::string, std::less< int > > tree;
   tree.push(1, "first");
@@ -173,6 +173,23 @@ BOOST_AUTO_TEST_CASE(insert)
   BOOST_TEST(out2.str() == out1.str());
 }
 
+BOOST_AUTO_TEST_CASE(insertRange)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree1;
+  maslov::BiTree< int, std::string, std::less< int > > tree2;
+  tree1.push(1, "first");
+  tree1.push(2, "second");
+  tree1.push(3, "third");
+  tree1.push(4, "fourth");
+  tree1.push(5, "fifth");    
+  auto first = tree1.find(2);
+  auto last = tree1.find(4);
+  tree2.insert(first, last);
+  std::ostringstream out;
+  printTree(out, tree2);
+  BOOST_TEST(out.str() == "2 second 3 third");
+}
+
 BOOST_AUTO_TEST_CASE(eraseKey)
 {
   maslov::BiTree< int, std::string, std::less< int > > tree;
@@ -184,7 +201,6 @@ BOOST_AUTO_TEST_CASE(eraseKey)
   std::ostringstream out;
   printTree(out, tree);
   BOOST_TEST(out.str() == "1 first 3 third");
-
   erased = tree.erase(999);
   BOOST_TEST(erased == 0);
 }
@@ -201,6 +217,23 @@ BOOST_AUTO_TEST_CASE(eraseIterator)
   std::ostringstream out;
   printTree(out, tree);
   BOOST_TEST(out.str() == "1 first 3 third");
+}
+
+BOOST_AUTO_TEST_CASE(eraseRange)
+{
+  maslov::BiTree< int, std::string, std::less< int > > tree;
+  tree.push(1, "first");
+  tree.push(2, "second");
+  tree.push(3, "third");
+  tree.push(4, "fourth");
+  tree.push(5, "fifth");    
+  auto first = tree.find(2);
+  auto last = tree.find(4);
+  auto it = tree.erase(first, last);
+  BOOST_TEST(it->first == 4);
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "1 first 4 fourth 5 fifth");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
