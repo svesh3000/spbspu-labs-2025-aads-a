@@ -83,7 +83,15 @@ namespace savintsev
   {
     if (other.root_)
     {
-      root_ = clone_nodes(other.root_);
+      try
+      {
+        root_ = clone_nodes(other.root_);
+      }
+      catch (const std::bad_alloc & e)
+      {
+        clear_nodes(root_);
+        throw;
+      }
       size_ = other.size_;
     }
   }
@@ -376,7 +384,7 @@ namespace savintsev
       {
         leaf = redistribute_nodes(leaf);
       }
-      else 
+      else
       {
         leaf = merge_nodes(leaf);
       }
@@ -410,7 +418,7 @@ namespace savintsev
         {
           parent->kids_[0]->kids_[0] = leaf->kids_[1];
         }
-        if (parent->kids_[0]->kids_[0]) 
+        if (parent->kids_[0]->kids_[0])
         {
           parent->kids_[0]->kids_[0]->parent_ = parent->kids_[0];
         }
@@ -429,7 +437,7 @@ namespace savintsev
         {
           first->kids_[2] = leaf->kids_[1];
         }
-        if (first->kids_[2]) 
+        if (first->kids_[2])
         {
           first->kids_[2]->parent_ = first;
         }
@@ -908,28 +916,7 @@ namespace savintsev
 
     root_ = current;
     size_++;
-    /*
-    node_type * node = root_;
-    std::cout << "HEAD: " << node->data_[0].first << '|' << node->data_[0].second;
-    if (node->len_ == 2)
-    {
-      std::cout << ", " << node->data_[1].first << '|' << node->data_[1].second;
-    }
-    std::cout << '\n' << "kids: ";
-    for (size_t i = 0; i < 4; ++i)
-    {
-      std::cout << i << ") " << ((node->kids_[i]) ? node->kids_[i]->data_[0].first : 0) << "|" << ((node->kids_[i]) ? node->kids_[i]->data_[0].second : 0);
-      if (node->kids_[i])
-      {
-        for (size_t j = 0; j < 4; ++j)
-        {
-          std::cout << "[ " << ((node->kids_[i]->kids_[j]) ? node->kids_[i]->kids_[j]->data_[0].first : 0) << '|' << ((node->kids_[i]->kids_[j]) ? node->kids_[i]->kids_[j]->data_[0].second : 0) << " ]";
-        }
-      }
-      std::cout << " ";
-    }
-    std::cout << '\n';
-    */
+
     return {lazy_find(val.first).first, true};
   }
 }
