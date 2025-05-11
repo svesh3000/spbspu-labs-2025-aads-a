@@ -81,20 +81,18 @@ namespace savintsev
     std::string newset, set1, set2;
     std::cin >> newset >> set1 >> set2;
 
-    Dataset values = datasets.at(set1);
-    for (auto it = values.begin(); it != values.end();)
+    Dataset result;
+    const Dataset & set2_ref = datasets.at(set2);
+
+    for (auto it = datasets.at(set1).begin(); it != datasets.at(set1).end(); ++it)
     {
-      if (!datasets.at(set2).count(it->first))
+      if (set2_ref.count(it->first))
       {
-        it = values.erase(it);
-      }
-      else
-      {
-        ++it;
+        result[it->first] = it->second;
       }
     }
 
-    datasets[newset] = std::move(values);
+    datasets[newset] = std::move(result);
   }
 
   void union_datasets(DatasetCollection & datasets)
