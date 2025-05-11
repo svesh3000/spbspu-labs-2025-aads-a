@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(push_and_pop)
 
 BOOST_AUTO_TEST_CASE(empty_size_clear)
 {
-  brevnov::Dynamic_array< int > arr;
+  brevnov::Dynamic_array< int > test_array;
   for (int i = 0; i < 15; ++i)
   {
     test_array.push(i);
