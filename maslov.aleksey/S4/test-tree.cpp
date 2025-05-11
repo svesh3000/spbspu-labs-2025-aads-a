@@ -6,7 +6,7 @@
 namespace
 {
  template< typename Key, typename Value, typename Cmp >
-  void printTree(std::ostream & out, const maslov::BiTree< Key, Value, Cmp> & biTree)
+  void printTree(std::ostream & out, const maslov::BiTree< Key, Value, Cmp > & biTree)
   {
     out << biTree.cbegin()->first << ' ' << biTree.cbegin()->second;
     for (auto it = ++biTree.cbegin(); it != biTree.cend(); ++it)
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(insertRange)
   tree1.push(2, "second");
   tree1.push(3, "third");
   tree1.push(4, "fourth");
-  tree1.push(5, "fifth");    
+  tree1.push(5, "fifth");
   auto first = tree1.find(2);
   auto last = tree1.find(4);
   tree2.insert(first, last);
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(eraseRange)
   tree.push(2, "second");
   tree.push(3, "third");
   tree.push(4, "fourth");
-  tree.push(5, "fifth");    
+  tree.push(5, "fifth");
   auto first = tree.find(2);
   auto last = tree.find(4);
   auto it = tree.erase(first, last);
