@@ -1,7 +1,6 @@
-#ifndef TREE_CONST_ITERATOR_HPP
-#define TREE_CONST_ITERATOR_HPP
+#ifndef TREE_CONST_ITERATOR_IMPL_HPP
+#define TREE_CONST_ITERATOR_IMPL_HPP
 #include <cassert>
-#include "tree-node.hpp"
 #include "tree-iterators.hpp"
 
 namespace alymova
@@ -26,7 +25,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator++() noexcept
   {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
     assert(node_->type != NodeType::Empty && "Incorrect node index");
     assert(point_ != NodePoint::Empty && "Incorrect node index");
 
@@ -90,7 +89,7 @@ namespace alymova
       node_ = node_->parent;
     }
     node_ = nullptr;
-    point_ = NodePoint::Empty;
+    point_ = NodePoint::Fake;
     return *this;
   }
 
@@ -166,7 +165,7 @@ namespace alymova
       node_ = node_->parent;
     }
     node_ = nullptr;
-    point_ = NodePoint::Empty;
+    point_ = NodePoint::Fake;
     return *this;
   }
 
@@ -181,19 +180,23 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   bool TTTConstIterator< Key, Value, Comparator >::operator==(const ConstIterator& other) const noexcept
   {
-    return node_ == other.node_;
+    if (point_ == NodePoint::Fake && other.point_ == NodePoint::Fake)
+    {
+      return true;
+    }
+    return (node_ == other.node_) && (point_ == other.point_);
   }
 
   template< class Key, class Value, class Comparator >
   bool TTTConstIterator< Key, Value, Comparator >::operator!=(const ConstIterator& other) const noexcept
   {
-    return node_ != other.node_;
+    return !(*this == other);
   }
 
   template< class Key, class Value, class Comparator >
   const std::pair< Key, Value >& TTTConstIterator< Key, Value, Comparator >::operator*() const noexcept
   {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
     assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     return node_->data[point_ - 1];
@@ -202,7 +205,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   const std::pair< Key, Value >* TTTConstIterator< Key, Value, Comparator >::operator->() const noexcept
   {
-    assert(node_ != nullptr && "You are trying to access beyond list's bounds");
+    assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
     assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     return std::addressof(node_->data[point_ - 1]);

@@ -7,15 +7,15 @@ namespace alymova
 {
   namespace detail
   {
-    enum NodePoint {Empty, First, Second};
+    enum NodePoint {Empty, First, Second, Fake};
 
-    template< class Key, class Value >
+    template< class Key, class Value, class Comparator >
     struct TTTNode
     {
-      using Node = TTTNode< Key, Value >;
+      using Node = TTTNode< Key, Value, Comparator >;
 
       std::pair< Key, Value > data[3];
-      enum NodeType {Empty, Double, Triple, Overflow} type;
+      enum NodeType {Empty, Double, Triple, Overflow, Fake} type;
       Node* parent;
       Node* left;
       Node* mid;
@@ -23,15 +23,16 @@ namespace alymova
       Node* overflow;
 
       TTTNode();
-      TTTNode(const std::pair< Key, Value >& pair);
       TTTNode(const std::pair< Key, Value >& pair, Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
+      TTTNode(Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
 
       void insert(const std::pair< Key, Value >& value);
+      void remove(NodePoint point);
       bool isLeaf();
     };
 
-    template< class Key, class Value >
-    TTTNode< Key, Value >::TTTNode():
+    template< class Key, class Value, class Comparator >
+    TTTNode< Key, Value, Comparator >::TTTNode():
       data{std::pair< Key, Value >(), std::pair< Key, Value >()},
       type(NodeType::Empty),
       parent(nullptr),
@@ -41,19 +42,19 @@ namespace alymova
       overflow(nullptr)
     {}
 
-    template< class Key, class Value >
-    TTTNode< Key, Value >::TTTNode(const std::pair< Key, Value>& pair):
-      data{pair, std::pair< Key, Value >()},
-      type(NodeType::Double),
-      parent(nullptr),
-      left(nullptr),
-      mid(nullptr),
-      right(nullptr),
-      overflow(nullptr)
+    template< class Key, class Value, class Comparator >
+    TTTNode< Key, Value, Comparator >::TTTNode(Node* parent, Node* left, Node* mid, Node* right, Node* overflow):
+      data{std::pair< Key, Value >(), std::pair< Key, Value >()},
+      type(NodeType::Empty),
+      parent(parent),
+      left(left),
+      mid(mid),
+      right(right),
+      overflow(overflow)
     {}
 
-    template< class Key, class Value >
-    TTTNode< Key, Value >::TTTNode(const std::pair< Key, Value >& pair,
+    template< class Key, class Value, class Comparator >
+    TTTNode< Key, Value, Comparator >::TTTNode(const std::pair< Key, Value >& pair,
       Node* parent, Node* left, Node* mid, Node* right, Node* overflow):
       data{pair, std::pair< Key, Value >()},
       type(NodeType::Double),
@@ -64,9 +65,10 @@ namespace alymova
       overflow(overflow)
     {}
 
-    template< class Key, class Value >
-    void TTTNode< Key, Value >::insert(const std::pair< Key, Value >& value)
+    template< class Key, class Value, class Comparator >
+    void TTTNode< Key, Value, Comparator >::insert(const std::pair< Key, Value >& value)
     {
+      Comparator cmp;
       data[type] = value;
       if (type == NodeType::Empty)
       {
@@ -74,7 +76,7 @@ namespace alymova
       }
       else if (type == NodeType::Double)
       {
-        if (data[1].first < data[0].first)
+        if (cmp(data[1].first, data[0].first))
         {
           std::swap(data[0], data[1]);
         }
@@ -82,11 +84,11 @@ namespace alymova
       }
       else if (type == NodeType::Triple)
       {
-        if (data[2].first < data[1].first)
+        if (cmp(data[2].first, data[1].first))
         {
           std::swap(data[2], data[1]);
         }
-        if (data[1].first < data[0].first)
+        if (cmp(data[1].first, data[0].first))
         {
           std::swap(data[1], data[0]);
         }
@@ -94,12 +96,29 @@ namespace alymova
       }
     }
 
-    template< class Key, class Value >
-    bool TTTNode< Key, Value >::isLeaf()
+    template< class Key, class Value, class Comparator >
+    void TTTNode< Key, Value, Comparator >::remove(NodePoint point)
+    {
+      assert(type != NodeType::Empty && "Removing from empty node");
+      if (type == NodeType::Double)
+      {
+        type = NodeType::Empty;
+        return;
+      }
+      if (point == NodePoint::First)
+      {
+        std::swap(data[0], data[1]);
+      }
+      type = NodeType::Double;
+      return;
+    }
+
+    template< class Key, class Value, class Comparator >
+    bool TTTNode< Key, Value, Comparator >::isLeaf()
     {
       if (right)
       {
-        if (right->type != NodeType::Empty)
+        if (right->type != NodeType::Fake)
         {
           return false;
         }

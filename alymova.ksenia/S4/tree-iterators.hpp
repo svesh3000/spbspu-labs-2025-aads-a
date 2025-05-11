@@ -16,8 +16,8 @@ namespace alymova
   {
   public:
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
-    using Node = typename detail::TTTNode< Key, Value >;
-    using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
+    using Node = typename detail::TTTNode< Key, Value, Comparator >;
+    using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;
 
     TTTConstIterator();
@@ -46,8 +46,8 @@ namespace alymova
   {
   public:
     using Iterator = TTTIterator< Key, Value, Comparator >;
-    using Node = typename detail::TTTNode< Key, Value >;
-    using NodeType = typename detail::TTTNode< Key, Value >::NodeType;
+    using Node = typename detail::TTTNode< Key, Value, Comparator >;
+    using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;
 
     TTTIterator();
