@@ -83,14 +83,14 @@ namespace alymova
 
     void clear(Node* node) noexcept;
     void move_fake() noexcept;
-    void split(Node* node);
+    void split_insert(Node* node);
     Node* find_to_insert(const Key& key) const;
     Node* find_to_insert(ConstIterator hint) const;
     bool check_hint(ConstIterator hint, const Key& key);
     Iterator find_to_erase(Iterator pos);
     bool have_triple_neighbor(Iterator pos);
-    void distribute(Iterator pos);
-    void merge(Iterator pos);
+    void distribute_erase(Iterator pos);
+    void merge_erase(Iterator pos);
 
     bool is_balanced();
     size_t find_height(Node* node);
@@ -301,7 +301,7 @@ namespace alymova
       to_insert = root_;
     }
     to_insert->insert(value);
-    split(to_insert);
+    split_insert(to_insert);
     move_fake();
     size_++;
     return find(value.first);
@@ -340,17 +340,20 @@ namespace alymova
     pos_instead.node_->remove(pos_instead.point_);
     if (pos_instead.node_->type == NodeType::Double)
     {
-      size_--;
-      return pos_next;
+      //size_--;
+      //return pos_next;
     }
     else if (have_triple_neighbor(pos_instead))
     {
-      distribute(pos_instead);
+      std::cout << "distribute\n";
+      distribute_erase(pos_instead);
     }
     else
     {
-      merge(pos_instead);
+      std::cout << "merge\n";
+      merge_erase(pos_instead);
     }
+    move_fake();
     size_--;
     return pos_next;
   }
@@ -472,7 +475,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::split(Node* node)
+  void TwoThreeTree< Key, Value, Comparator >::split_insert(Node* node)
   {
     if (node->type != NodeType::Overflow)
     {
@@ -500,7 +503,6 @@ namespace alymova
       {
         right->left = nullptr;
       }
-
       parent->insert(node->data[1]);
       {
         if (parent->type == NodeType::Double)
@@ -538,7 +540,7 @@ namespace alymova
       throw;
     }
     delete node;
-    split(parent);
+    split_insert(parent);
   }
 
   template< class Key, class Value, class Comparator >
@@ -626,7 +628,7 @@ namespace alymova
       if (node_instead->right && node_instead->right != fake_)
       {
         node_instead = node_instead->right;
-        while (node_instead->left->type != NodeType::Fake)
+        while (node_instead->left)
         {
           node_instead = node_instead->left;
         }
@@ -660,7 +662,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::distribute(Iterator pos)
+  void TwoThreeTree< Key, Value, Comparator >::distribute_erase(Iterator pos)
   {
     Node* node = pos.node_;
     Node* parent = node->parent;
@@ -669,99 +671,228 @@ namespace alymova
     Node* right = parent->right;
     if (parent->type == NodeType::Double)
     {
-      Node* brother;
-      NodePoint point;
       if (left == node)
       {
-        brother = right;
-        point = NodePoint::First;
+        node->insert(parent->data[0]);
+        parent->remove(NodePoint::First);
+        if (!node->left)
+        {
+          std::swap(node->left, node->right);
+        }
+        parent->insert(right->data[0]);
+        right->remove(NodePoint::First);
+        node->right = right->left;
+        if (node->right)
+        {
+          node->right->parent = node;
+        }
+        right->left = right->mid;
+        right->mid = nullptr;
+        /*brother = right;
+        point = NodePoint::First;*/
       }
       else
       {
-        brother = left;
-        point = NodePoint::Second;
+        node->insert(parent->data[0]);
+        parent->remove(NodePoint::First);
+        if (!node->right)
+        {
+          std::swap(node->left, node->right);
+        }
+        parent->insert(left->data[1]);
+        left->remove(NodePoint::Second);
+        node->left = left->right;
+        if (node->left)
+        {
+          node->left->parent = node;
+        }
+        left->right = right->mid;
+        right->mid = nullptr;
+        /*brother = left;
+        point = NodePoint::Second;*/
       }
-      node->insert(parent->data[0]);
+      /*node->insert(parent->data[0]);
       parent->remove(NodePoint::First);
       parent->insert(brother->data[point - 1]);
-      brother->remove(point);
+      brother->remove(point);*/
       return;
     }
     if (left == node)
     {
       node->insert(parent->data[0]);
       parent->remove(NodePoint::First);
+      if (!node->left)
+      {
+        std::swap(node->left, node->right);
+      }
       if (mid->type == NodeType::Triple)
       {
         parent->insert(mid->data[0]);
         mid->remove(NodePoint::First);
+        node->right = mid->left;
+        if (node->right)
+        {
+          node->right->parent = node;
+        }
+        mid->right = mid->mid;
+        mid->mid = nullptr;
         return;
       }
       node->insert(mid->data[0]);
+      node->mid = mid->left;
+      if (node->mid)
+      {
+        node->mid->parent = node;
+      }
+      node->right = mid->right;
+      if (node->right)
+      {
+        node->right->parent = node;
+      }
+      mid->clear();
       delete mid;
-      mid = nullptr;
+      parent->mid = nullptr;
       return;
     }
     if (mid == node)
     {
       node->insert(parent->data[0]);
       parent->remove(NodePoint::First);
+      if (!node->right)
+      {
+        std::swap(node->left, node->right);
+      }
       if (left->type == NodeType::Triple)
       {
         parent->insert(left->data[1]);
         left->remove(NodePoint::Second);
+        node->left = left->right;
+        if (node->left)
+        {
+          node->left->parent = node;
+        }
+        left->right = left->mid;
+        left->mid = nullptr;
         return;
       }
       node->insert(left->data[0]);
-      std::swap(left, mid);
-      delete mid;
-      mid = nullptr;
+      node->mid = left->right;
+      if (node->mid)
+      {
+        node->mid->parent = node;
+      }
+      node->left = left->left;
+      if (node->left)
+      {
+        node->left->parent = node;
+      }
+      left->clear();
+      delete left;
+      parent->left = nullptr;
+      std::swap(parent->left, parent->mid);
       return;
     }
     if (right == node)
     {
       node->insert(parent->data[1]);
       parent->remove(NodePoint::Second);
+      if (!node->right)
+      {
+        std::swap(node->right, node->left);
+      }
       if (mid->type == NodeType::Triple)
       {
         parent->insert(mid->data[1]);
         mid->remove(NodePoint::Second);
+        node->left = mid->right;
+        if (node->left)
+        {
+          node->left->parent = node;
+        }
+        mid->right = mid->mid;
+        mid->mid = nullptr;
         return;
       }
       node->insert(mid->data[0]);
+      node->mid = mid->right;
+      if (node->mid)
+      {
+        node->mid->parent = node;
+      }
+      node->left = mid->left;
+      if (node->left)
+      {
+        node->left->parent = node;
+      }
+      mid->clear();
       delete mid;
-      mid = nullptr;
+      parent->mid = nullptr;
       return;
     }
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::merge(Iterator pos)
+  void TwoThreeTree< Key, Value, Comparator >::merge_erase(Iterator pos)
   {
     Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
     Node* mid = parent->mid;
     Node* right = parent->right;
-    Node* node_merge, *deleted;
+    Node* node_merge;
     if (left == node)
     {
       node_merge = right;
+      right->insert(parent->data[0]);
+      parent->remove(NodePoint::First);
+      std::swap(right->mid, right->left);
+      if (node->right)
+      {
+        right->left = node->right;
+        right->left->parent = right;
+      }
+      if (node->left)
+      {
+        right->left = node->left;
+        right->left->parent = right;
+      }
+      node->clear();
+      delete node;
+      parent->left = nullptr;
     }
     else
     {
       node_merge = left;
+      left->insert(parent->data[0]);
+      parent->remove(NodePoint::First);
+      std::swap(left->mid, left->right);
+      if (node->right)
+      {
+        left->right = node->right;
+        left->right->parent = left;
+      }
+      if (node->left)
+      {
+        left->right = node->left;
+        left->right->parent = right;
+      }
+      node->clear();
+      delete node;
+      parent->right = nullptr;
     }
-    node_merge->insert(parent->data[0]);
-    parent->remove(NodePoint::First);
-    delete node;
-    deleted = parent;
-    parent = deleted->parent;
-    if (!parent)
+    if (!parent->parent)
     {
-      delete deleted;
+      parent->clear();
+      delete parent;
       root_ = node_merge;
+      return;
     }
+    if (have_triple_neighbor({parent, NodePoint::First}))
+    {
+      distribute_erase({parent, NodePoint::First});
+      return;
+    }
+    merge_erase({parent, NodePoint::First});
   }
 
   template< class Key, class Value, class Comparator >

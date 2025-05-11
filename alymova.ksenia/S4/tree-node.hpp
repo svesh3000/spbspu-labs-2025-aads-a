@@ -24,11 +24,11 @@ namespace alymova
 
       TTTNode();
       TTTNode(const std::pair< Key, Value >& pair, Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
-      TTTNode(Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
 
       void insert(const std::pair< Key, Value >& value);
       void remove(NodePoint point);
       bool isLeaf();
+      void clear();
     };
 
     template< class Key, class Value, class Comparator >
@@ -40,17 +40,6 @@ namespace alymova
       mid(nullptr),
       right(nullptr),
       overflow(nullptr)
-    {}
-
-    template< class Key, class Value, class Comparator >
-    TTTNode< Key, Value, Comparator >::TTTNode(Node* parent, Node* left, Node* mid, Node* right, Node* overflow):
-      data{std::pair< Key, Value >(), std::pair< Key, Value >()},
-      type(NodeType::Empty),
-      parent(parent),
-      left(left),
-      mid(mid),
-      right(right),
-      overflow(overflow)
     {}
 
     template< class Key, class Value, class Comparator >
@@ -124,6 +113,16 @@ namespace alymova
         }
       }
       return (!left && !mid && !overflow);
+    }
+
+    template< class Key, class Value, class Comparator >
+    void TTTNode< Key, Value, Comparator >::clear()
+    {
+      parent = nullptr;
+      left = nullptr;
+      mid = nullptr;
+      right = nullptr;
+      overflow = nullptr;
     }
   }
 }

@@ -38,7 +38,7 @@ namespace alymova
         {
           node_ = node_->left;
         }
-        point_ = NodePoint::First;
+        point_ = (node_->type == NodeType::Fake) ? NodePoint::Fake : NodePoint::First;
         return *this;
       }
     }
@@ -67,7 +67,7 @@ namespace alymova
           {
             node_ = node_->left;
           }
-          point_ = NodePoint::First;
+          point_ = (node_->type == NodeType::Fake) ? NodePoint::Fake : NodePoint::First;
           return *this;
         }
       }

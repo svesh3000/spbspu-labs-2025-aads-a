@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   tree.insert(p9);
   tree.insert(p10);
   tree.insert(p11);
-  //tree.erase(tree.find(13));
+  tree.erase(tree.find(13));
   for (auto it = tree.begin(); it != tree.end(); it++)
   {
     std::cout << it->first << it->second << '\n';
@@ -89,11 +89,10 @@ int main(int argc, char** argv)
       map.emplace_hint(it, i, 'd');
       it = map.cend();
     }
-    std::cout << map.size();
-    for (auto it = map.begin(); it != map.end(); it++)
+    /*for (auto it = map.begin(); it != map.end(); it++)
     {
       std::cout << it->first << it->second << '\n';
-    }
+    }*/
   }
 
 }
