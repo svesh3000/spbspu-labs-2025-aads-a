@@ -1,7 +1,32 @@
 #include <fstream>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
 #include <two-three-tree.h>
-#include "key-adder.hpp"
+
+namespace savintsev
+{
+  struct KeyAdder
+  {
+    void operator()(const std::pair< long long, std::string > val)
+    {
+      if (val.first > 0 && result_ > std::numeric_limits< long long >::max() - val.first)
+      {
+        throw std::overflow_error("Key sum overflow (positive)");
+      }
+      else if (val.first < 0 && result_ < std::numeric_limits< long long >::min() - val.first)
+      {
+        throw std::overflow_error("Key sum overflow (negative)");
+      }
+
+      result_ += val.first;
+      values_ += " " + val.second;
+    }
+
+    long long result_ = 0;
+    std::string values_;
+  };
+}
 
 int main(int argc, char * argv[])
 {
@@ -44,15 +69,15 @@ int main(int argc, char * argv[])
 
     if (treverse_mode == "ascending")
     {
-      //tree.traverse_lnr(summator);
+      summator = tree.traverse_lnr(summator);
     }
     else if (treverse_mode == "descending")
     {
-      //tree.traverse_rnl(summator);
+      summator = tree.traverse_rnl(summator);
     }
     else if (treverse_mode == "breadth")
     {
-      //tree.traverse_breadth(summator);
+      summator = tree.traverse_breadth(summator);
     }
     else
     {
@@ -66,5 +91,10 @@ int main(int argc, char * argv[])
   {
     std::cerr << "ERROR: " << e.what() << "\n";
     return 1;
+  }
+  catch (const std::logic_error & e)
+  {
+    std::cout << "<EMPTY>\n";
+    return 0;
   }
 }

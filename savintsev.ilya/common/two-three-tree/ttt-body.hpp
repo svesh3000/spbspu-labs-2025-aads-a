@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <cassert>
+#include <queue>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
 
@@ -56,7 +57,20 @@ namespace savintsev
     size_type erase(const key_type & k);
 
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
-    std::pair< iterator, iterator> equal_range(const key_type & k);
+    std::pair< iterator, iterator > equal_range(const key_type & k);
+
+    template < typename F >
+    F traverse_lnr(F f) const;
+    template < typename F >
+    F traverse_lnr(F f);
+    template < typename F >
+    F traverse_rnl(F f) const;
+    template < typename F >
+    F traverse_rnl(F f);
+    template < typename F >
+    F traverse_breadth(F f) const;
+    template < typename F >
+    F traverse_breadth(F f);
   private:
     node_type * root_ = nullptr;
     size_t size_ = 0;
@@ -995,6 +1009,103 @@ namespace savintsev
     size_++;
 
     return {lazy_find(val.first).first, true};
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_lnr(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Tree is empty");
+    }
+    auto it_begin = begin();
+    auto it_end = end();
+    while (it_begin != it_end)
+    {
+      f(*it_begin);
+      it_begin++;
+    }
+    return f;
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_lnr(F f)
+  {
+    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
+    return copy.traverse_lnr(f);
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_rnl(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Tree is empty");
+    }
+    auto it_end = end();
+    it_end--;
+    auto it_begin = begin();
+    while (it_end != it_begin)
+    {
+      f(*it_end);
+      it_end--;
+    }
+    f(*it_end);
+    it_end--;
+    return f;
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_rnl(F f)
+  {
+    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
+    return copy.traverse_rnl(f);
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_breadth(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Tree is empty");
+    }
+
+    std::queue< node_type * > queue;
+    queue.push(root_);
+
+    while (!queue.empty())
+    {
+      node_type * current = queue.front();
+      queue.pop();
+
+      for (size_t i = 0; i < current->len_; ++i)
+      {
+        f(current->data_[i]);
+      }
+
+      for (size_t i = 0; i <= current->len_; ++i)
+      {
+        if (current->kids_[i])
+        {
+          queue.push(current->kids_[i]);
+        }
+      }
+    }
+
+    return f;
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_breadth(F f)
+  {
+    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
+    return copy.traverse_rnl(f);
   }
 }
 
