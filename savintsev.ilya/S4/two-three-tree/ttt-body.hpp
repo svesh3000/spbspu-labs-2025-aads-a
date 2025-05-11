@@ -57,10 +57,10 @@ namespace savintsev
 
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
     std::pair< iterator, iterator> equal_range(const key_type & k);
-
+  private:
     node_type * root_ = nullptr;
     size_t size_ = 0;
-  private:
+
     std::pair< iterator, bool > lazy_find(const key_type & k) const;
     node_type * split_node(node_type * node);
     void sort_node(node_type * node);
@@ -409,14 +409,13 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::fix_nodes_properties(node_type * leaf)
   {
-
     if (!leaf)
-    return nullptr;
+    {
+      return nullptr;
+    }
 
-    assert(leaf->len_ <= 2);
     if (!leaf->parent_ && leaf->len_ == 0)
     {
-      // проверить, остались ли дети
       for (size_t i = 0; i < 4; ++i)
       {
         if (leaf->kids_[i])
@@ -427,7 +426,6 @@ namespace savintsev
           return new_root;
         }
       }
-      // действительно пустой — удалить
       delete leaf;
       return nullptr;
     }
