@@ -65,7 +65,7 @@ namespace savintsev
     void clear_nodes(node_type * node);
     node_type * clone_nodes(node_type * other);
     node_type * search_min(node_type * root);
-    void restore_properties(node_type * leaf);
+    node_type * fix_nodes_properties(node_type * leaf);
     node_type * redistribute_nodes(node_type * leaf);
     node_type * merge_nodes(node_type * leaf);
   };
@@ -349,19 +349,21 @@ namespace savintsev
     return temp;
   }
 
-  template< typename Key, typename Value, typename Compare >
-  void TwoThreeTree< Key, Value, Compare >::restore_properties(node_type * leaf)
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::fix_nodes_properties(node_type * leaf)
   {
     if (leaf->len_ == 0 && !leaf->parent_)
     {
       delete leaf;
+      return nullptr;
     }
-    else if (leaf->len_ != 0)
+    if (leaf->len_ != 0)
     {
       if (leaf->parent_)
       {
-        restore_properties(leaf->parent_);
+        return fix_nodes_properties(leaf->parent_);
       }
+      return leaf;
     }
     else
     {
@@ -378,7 +380,7 @@ namespace savintsev
       {
         leaf = merge_nodes(leaf);
       }
-      restore_properties(leaf);
+      return fix_nodes_properties(leaf);
     }
   }
 
@@ -706,7 +708,7 @@ namespace savintsev
       target = closest;
     }
     remove_data_from_node(target, k);
-    restore_properties(target);
+    root_ = fix_nodes_properties(target);
     size_--;
     return 1ull;
   }
