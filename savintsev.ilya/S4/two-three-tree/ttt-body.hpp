@@ -5,6 +5,7 @@
 #include <cassert>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
+#include "ttt-const-iterator.hpp"
 
 namespace savintsev
 {

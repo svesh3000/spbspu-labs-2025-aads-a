@@ -33,6 +33,11 @@ BOOST_AUTO_TEST_CASE(test_valid_tree)
     BOOST_CHECK(it->first == j);
     ++j;
   }
+  for (auto it = --map.end(); it != map.begin(); --it)
+  {
+    --j;
+    BOOST_CHECK(it->first == j);
+  }
   for (int i = -1; i < 9; ++i)
   {
     map.erase(i);
