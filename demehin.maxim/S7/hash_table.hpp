@@ -34,6 +34,9 @@ namespace demehin
     template< typename... Args >
     std::pair< Iter, bool > emplace(Args&&...);
 
+    template< typename... Args >
+    Iter emplace_hint(cIter, Args&&...);
+
     size_t erase(const Key&) noexcept;
     Iter erase(cIter) noexcept;
     Iter erase(cIter, cIter) noexcept;
@@ -250,6 +253,12 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
+  typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::insert(cIter hint, const Key& key)
+  {
+    return emplace_hint(hint, key);
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
   template< typename InputIt >
   void HashTable< Key, T, Hash, Equal >::insert(InputIt first, InputIt last)
   {
@@ -265,7 +274,7 @@ namespace demehin
   template< typename... Args >
   std::pair< typename HashTable< Key, T, Hash, Equal >::Iter, bool > HashTable< Key, T, Hash, Equal >::emplace(Args&&... args)
   {
-    std::pair<Key, T> tempPair(std::forward<Args>(args)...);
+    std::pair< Key, T > tempPair(std::forward< Args >(args)...);
     const Key& key = tempPair.first;
 
     if (load_factor() >= max_load_factor_)
@@ -281,11 +290,32 @@ namespace demehin
       return { Iter(this, index), false };
     }
 
-    new (&slot.pair) std::pair<Key, T>(std::move(tempPair));
+    new (&slot.pair) std::pair< Key, T >(std::move(tempPair));
     slot.state = SlotState::OCCUPIED;
     item_cnt_++;
 
     return { Iter(this, index), true };
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  template< typename... Args >
+  typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::emplace_hint(cIter hint, Args&&... args)
+  {
+    std::pair< Key, T > tempPair(std::forward< Args >(args)...);
+    const Key& key = tempPair.first;
+
+    if (hint != cend() && hint.table_ == this)
+    {
+      size_t hint_ind = hint.index_;
+      Slot& hint_slot = slots_[hint_ind];
+
+      if (hint_slot.state == SlotState::OCCUPIED && equal_(hint_slot.pair.first, key))
+      {
+        return hint;
+      }
+    }
+
+    return emplace(std::move(tempPair)).first;
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
