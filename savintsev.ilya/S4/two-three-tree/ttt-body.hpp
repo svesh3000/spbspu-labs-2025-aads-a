@@ -34,6 +34,8 @@ namespace savintsev
     iterator end() noexcept;
     const_iterator begin() const noexcept;
     const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
     void clear() noexcept;
     bool empty() const noexcept;
@@ -167,6 +169,24 @@ namespace savintsev
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::end() const noexcept
+  {
+    return const_iterator(root_, nullptr, 0);
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::cbegin() const noexcept
+  {
+    if (!root_ || root_->len_ == 0)
+    {
+      return end();
+    }
+
+    node_type * min_node = search_min(root_);
+    return const_iterator(root_, min_node, 0);
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::cend() const noexcept
   {
     return const_iterator(root_, nullptr, 0);
   }
