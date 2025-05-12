@@ -2,6 +2,7 @@
 #define TTT_ITERATOR_H
 #include <iterator>
 #include <utility>
+#include <iostream>
 #include "ttt-node.hpp"
 
 namespace savintsev
@@ -178,7 +179,7 @@ namespace savintsev
         return *this;
       }
 
-      if (pos_ > 0 && node_->kids_[pos_])
+      if (node_->kids_[pos_])
       {
         node_ = node_->kids_[pos_];
         while (node_->kids_[node_->len_])
@@ -234,19 +235,16 @@ namespace savintsev
     reference operator*()
     {
       assert(node_ != nullptr);
-      assert(pos_ < node_->len_);
       return node_->data_[pos_];
     }
     pointer operator->()
     {
       assert(node_ != nullptr);
-      assert(pos_ < node_->len_);
       return std::addressof(node_->data_[pos_]);
     }
     reference operator*() const
     {
       assert(node_ != nullptr);
-      assert(pos_ < node_->len_);
       return node_->data_[pos_];
     }
     pointer operator->() const
@@ -266,6 +264,7 @@ namespace savintsev
 
     BidirectIterator & operator--()
     {
+      std::cout << "tut_nonconst\n";
       if (!node_)
       {
         if (!root_)
@@ -330,9 +329,7 @@ namespace savintsev
       root_(root),
       node_(node),
       pos_(pos)
-    {
-      assert(root_ != nullptr);
-    }
+    {}
 
     BidirectIterator & next()
     {

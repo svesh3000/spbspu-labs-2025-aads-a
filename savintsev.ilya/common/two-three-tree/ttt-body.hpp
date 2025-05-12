@@ -151,17 +151,12 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
   {
-    if (!root_)
+    if (!root_ || root_->len_ == 0)
     {
       return end();
     }
 
     node_type * min_node = search_min(root_);
-    if (!min_node || min_node->len_ == 0)
-    {
-      return end();
-    }
-
     return iterator(root_, min_node, 0);
   }
 
@@ -174,17 +169,12 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::begin() const noexcept
   {
-    if (!root_)
+    if (!root_ || root_->len_ == 0)
     {
       return end();
     }
 
     node_type * min_node = search_min(root_);
-    if (!min_node || min_node->len_ == 0)
-    {
-      return end();
-    }
-
     return const_iterator(root_, min_node, 0);
   }
 
@@ -297,7 +287,7 @@ namespace savintsev
   {
     if (!root_)
     {
-      return {iterator(root_), false};
+      return {iterator(root_, nullptr), false};
     }
     node_type * node = root_;
     while (node)
@@ -329,7 +319,7 @@ namespace savintsev
         node = node->kids_[2];
       }
     }
-    return {iterator(root_), false};
+    return {iterator(root_, nullptr), false};
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -1048,8 +1038,9 @@ namespace savintsev
 
     for (auto it = end(); it != begin();)
     {
-      assert(it != end());
       --it;
+      assert(it != end());
+      std::cout << "key: " << it->first << '\n';
       f(*it);
     }
 
