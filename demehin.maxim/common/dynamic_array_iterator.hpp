@@ -4,8 +4,12 @@
 namespace demehin
 {
   template< typename T >
+  class DynamicArray;
+
+  template< typename T >
   class DynamicArrayIterator
   {
+    friend class DynamicArray< T >;
   public:
 
     T& operator*() const noexcept;
