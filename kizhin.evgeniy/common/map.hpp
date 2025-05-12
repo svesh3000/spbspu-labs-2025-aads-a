@@ -13,7 +13,7 @@ namespace kizhin {
   class Map final
   {
   public:
-    using value_type = std::pair< Key, T >; /* TODO: Must be const Key */
+    using value_type = std::pair< const Key, T >;
     using reference = value_type&;
     using const_reference = const value_type&;
     using pointer = value_type*;
@@ -49,14 +49,9 @@ namespace kizhin {
     Map(const Map&);
     Map(Map&&) noexcept(is_nothrow_move_constructible);
     explicit Map(const key_compare&) noexcept(is_nothrow_copy_constructible);
-
     template < typename InputIt >
-    Map(InputIt, InputIt);
-    template < typename InputIt >
-    Map(InputIt, InputIt, const key_compare&);
-
-    explicit Map(std::initializer_list< value_type >);
-    Map(std::initializer_list< value_type >, const key_compare&);
+    Map(InputIt, InputIt, const key_compare& = key_compare{});
+    Map(std::initializer_list< value_type >, const key_compare& = key_compare{});
     ~Map();
 
     Map& operator=(const Map&);
@@ -119,6 +114,9 @@ namespace kizhin {
 
     void deallocate() noexcept;
 
+    template < typename... Args >
+    [[nodiscard]] Node* emplaceToNode(Node*, Args&&...);
+
     Node* split(Node*);
     std::tuple< Node*, Node* > splitInTwo(const Node*) const;
     void splitChildren(const Node* src, Node* left, Node* right) const noexcept;
@@ -126,7 +124,6 @@ namespace kizhin {
     pointer findKey(const Node*, const key_type&) const;
     Node* findTarget(Node*, const key_type&) const;
     Node* validateHint(Node*, const key_type&) const;
-    Node* updateParent(Node*) noexcept;
   };
 
   template < typename K, typename T, typename C >
@@ -328,25 +325,12 @@ kizhin::Map< K, T, C >::Map(const key_compare& comparator) noexcept(
 
 template < typename K, typename T, typename C >
 template < typename InputIt >
-kizhin::Map< K, T, C >::Map(const InputIt first, const InputIt last):
-  Map()
-{
-  insert(first, last);
-}
-
-template < typename K, typename T, typename C >
-template < typename InputIt >
 kizhin::Map< K, T, C >::Map(const InputIt first, const InputIt last,
     const key_compare& comparator):
   Map(comparator)
 {
   insert(first, last);
 }
-
-template < typename K, typename T, typename C >
-kizhin::Map< K, T, C >::Map(std::initializer_list< value_type > init):
-  Map(init.begin(), init.end())
-{}
 
 template < typename K, typename T, typename C >
 kizhin::Map< K, T, C >::Map(std::initializer_list< value_type > init,
@@ -545,7 +529,7 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
     return std::make_pair(iterator(target, valuePtr), false);
   }
   const key_type key = value.first;
-  detail::emplace(target, valueComp(), std::move(value));
+  target = emplaceToNode(target, std::move(value));
   ++size_;
   while (detail::size(target) > 2) {
     target = split(target);
@@ -662,6 +646,22 @@ void kizhin::Map< K, T, C >::deallocate() noexcept
 }
 
 template < typename K, typename T, typename C >
+template < typename... Args >
+[[nodiscard]] typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T,
+    C >::emplaceToNode(Node* node, Args&&... args)
+{
+  assert(node && "emplaceToNode: nullptr given");
+  std::unique_ptr< Node > result = std::make_unique< Node >();
+  detail::emplace(node, result.get(), valueComp(), std::forward< Args >(args)...);
+  detail::relink(node, result.get());
+  if (node == root_) {
+    root_ = result.get();
+  }
+  delete node;
+  return result.release();
+}
+
+template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
 {
   /* TODO: Must be strong exception safety */
@@ -679,20 +679,20 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
     parent->children[0] = node;
     root_ = parent;
   }
-  detail::emplace(parent, valueComp(), *(node->begin + 1));
+  parent = emplaceToNode(parent, *(node->begin + 1));
   auto& parChildren = parent->children;
   *std::remove(parChildren.begin(), parChildren.end(), node) = nullptr;
   delete node;
 
   auto it = std::remove(parChildren.begin(), parChildren.end(), nullptr);
-  *(it++) = updateParent(left);
-  *(it++) = updateParent(right);
+  *(it++) = detail::updateParent(left);
+  *(it++) = detail::updateParent(right);
   const auto pred = [this](const Node* lhs, const Node* rhs) -> bool
   {
     return valueComp()(*(lhs->begin), *(rhs->begin));
   }; /* TODO: Remove lambdas */
   std::sort(parChildren.begin(), it, pred);
-  return updateParent(parent);
+  return detail::updateParent(parent);
 }
 
 template < typename K, typename T, typename C >
@@ -700,8 +700,8 @@ std::tuple< typename kizhin::Map< K, T, C >::Node*,
     typename kizhin::Map< K, T, C >::Node* >
 kizhin::Map< K, T, C >::splitInTwo(const Node* node) const
 {
-  assert(node && "Attempt to devide nullptr node");
-  assert(detail::size(node) == 3 && "Cannot devide this node");
+  assert(node && "splitInTwo: nullptr node given");
+  assert(detail::size(node) == 3 && "splitInTwo: node must be filled");
   std::unique_ptr< Node > left = std::make_unique< Node >();
   std::unique_ptr< Node > right = std::make_unique< Node >();
 
@@ -765,7 +765,7 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::validateHint(Node
     return root_;
   }
   bool isValid = true;
-  Node* current = hint;
+  const Node* current = hint;
   while (current->parent && isValid) {
     const key_type& parFirst = current->parent->begin->first;
     const key_type& parLast = (current->parent->end - 1)->first;
@@ -780,19 +780,6 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::validateHint(Node
     current = current->parent;
   }
   return isValid ? hint : root_;
-}
-
-template < typename K, typename T, typename C >
-typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::updateParent(
-    Node* parent) noexcept
-{
-  assert(parent && "Attempt to update nullptr parent");
-  for (Node* child: parent->children) {
-    if (child) {
-      child->parent = parent;
-    }
-  }
-  return parent;
 }
 
 template < typename K, typename T, typename C >

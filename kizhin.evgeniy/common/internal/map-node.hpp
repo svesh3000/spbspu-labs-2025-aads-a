@@ -26,81 +26,73 @@ namespace kizhin {
       Node& operator=(const Node&) = delete;
     };
 
-    template < typename T >
-    bool isEmpty(const Node< T >*) noexcept;
-    template < typename T >
-    std::size_t size(const Node< T >*) noexcept;
+    template < typename NodePtr >
+    std::size_t size(NodePtr) noexcept;
+    template < typename NodePtr >
+    bool isEmpty(NodePtr) noexcept;
 
-    template < typename T >
-    bool isLeaf(const Node< T >*) noexcept;
+    template < typename NodePtr >
+    bool isLeaf(NodePtr) noexcept;
+    template < typename NodePtr >
+    bool isLeft(NodePtr) noexcept;
+    template < typename NodePtr >
+    bool isMiddle(NodePtr) noexcept;
+    template < typename NodePtr >
+    bool isRight(NodePtr) noexcept;
 
-    template < typename T >
-    bool isLeft(const Node< T >*) noexcept;
-    template < typename T >
-    bool isMiddle(const Node< T >*) noexcept;
-    template < typename T >
-    bool isRight(const Node< T >*) noexcept;
+    template < typename NodePtr >
+    NodePtr treeMin(NodePtr) noexcept;
+    template < typename NodePtr >
+    NodePtr treeMax(NodePtr) noexcept;
 
-    template < typename T >
-    const Node< T >* treeMin(const Node< T >*) noexcept;
-    template < typename T >
-    Node< T >* treeMin(Node< T >*) noexcept;
+    template < typename NodePtr >
+    NodePtr updateParent(NodePtr) noexcept;
+    template < typename NodePtr >
+    void relink(NodePtr, NodePtr) noexcept;
 
-    template < typename T >
-    const Node< T >* treeMax(const Node< T >*) noexcept;
-    template < typename T >
-    Node< T >* treeMax(Node< T >*) noexcept;
+    template < typename NodePtr, typename ValPtr >
+    std::tuple< NodePtr, ValPtr > nextIter(NodePtr, ValPtr);
+    template < typename NodePtr, typename ValPtr >
+    std::tuple< NodePtr, ValPtr > prevIter(NodePtr, ValPtr);
 
-    template < typename T >
-    std::tuple< Node< T >*, T* > nextIter(Node< T >*, T*);
-    template < typename T >
-    std::tuple< Node< T >*, const T* > nextIter(Node< T >*, const T*);
-
-    template < typename T >
-    std::tuple< Node< T >*, T* > prevIter(Node< T >*, T*);
-    template < typename T >
-    std::tuple< Node< T >*, const T* > prevIter(Node< T >*, const T*);
-
-    template < typename T >
-    void popBack(Node< T >*) noexcept;
-    template < typename T >
-    void popFront(Node< T >*) noexcept;
-    template < typename T >
-    void popMiddle(Node< T >*) noexcept; /* TODO: Implement */
-
-    template < typename T, typename... Args >
-    T* emplaceBack(Node< T >*, Args&&...);
-    template < typename T, typename... Args >
-    T* emplaceFront(Node< T >*, Args&&...);
-    template < typename T, typename Cmp, typename... Args >
-    T* emplace(Node< T >*, const Cmp&, Args&&...);
+    template < typename NodePtr, typename... Args >
+    void emplaceBack(NodePtr, Args&&...);
+    template < typename NodePtr, typename Cmp, typename... Args >
+    void emplace(NodePtr src, NodePtr dest, Cmp, Args&&...);
   }
 }
 
-template < typename T >
-bool kizhin::detail::isLeaf(const Node< T >* node) noexcept
+template < typename NodePtr >
+std::size_t kizhin::detail::size(NodePtr node) noexcept
 {
-  assert(node && "Attempt to check is nullptr node a leaf");
-  return node->children[0] == nullptr;
+  assert(node && "Attempt to check is nullptr node empty");
+  return node->end - node->begin;
 }
 
-template < typename T >
-bool kizhin::detail::isEmpty(const Node< T >* node) noexcept
+template < typename NodePtr >
+bool kizhin::detail::isEmpty(NodePtr node) noexcept
 {
   assert(node && "Attempt to check is nullptr node empty");
   return node->end == node->begin;
 }
 
-template < typename T >
-bool kizhin::detail::isLeft(const Node< T >* node) noexcept
+template < typename NodePtr >
+bool kizhin::detail::isLeaf(NodePtr node) noexcept
+{
+  assert(node && "Attempt to check is nullptr node a leaf");
+  return node->children[0] == nullptr;
+}
+
+template < typename NodePtr >
+bool kizhin::detail::isLeft(NodePtr node) noexcept
 {
   assert(node && "Attempt to check nullptr");
   assert(node->parent && "Attempt to check node without parent");
   return node == node->parent->children[0];
 }
 
-template < typename T >
-bool kizhin::detail::isMiddle(const Node< T >* node) noexcept
+template < typename NodePtr >
+bool kizhin::detail::isMiddle(NodePtr node) noexcept
 {
   assert(node && "Attempt to check nullptr");
   assert(node->parent && "Attempt to check node without parent");
@@ -108,27 +100,20 @@ bool kizhin::detail::isMiddle(const Node< T >* node) noexcept
   return isParentThree && node == node->parent->children[1];
 }
 
-template < typename T >
-bool kizhin::detail::isRight(const Node< T >* node) noexcept
+template < typename NodePtr >
+bool kizhin::detail::isRight(NodePtr node) noexcept
 {
   assert(node && "Attempt to check nullptr");
   assert(node->parent && "Attempt to check node without parent");
-  const Node< T >* parent = node->parent;
+  NodePtr parent = node->parent;
   const size_t parentSz = size(parent);
   const bool checkTwo = parentSz == 1 && node == parent->children[1];
   const bool checkThree = parentSz == 2 && node == parent->children[2];
   return checkTwo || checkThree;
 }
 
-template < typename T >
-std::size_t kizhin::detail::size(const Node< T >* node) noexcept
-{
-  assert(node && "Attempt to check is nullptr node empty");
-  return node->end - node->begin;
-}
-
-template < typename T >
-const kizhin::detail::Node< T >* kizhin::detail::treeMin(const Node< T >* root) noexcept
+template < typename NodePtr >
+NodePtr kizhin::detail::treeMin(NodePtr root) noexcept
 {
   assert(root && "Root cannot be nullptr");
   while (root->children[0]) {
@@ -137,15 +122,8 @@ const kizhin::detail::Node< T >* kizhin::detail::treeMin(const Node< T >* root) 
   return root;
 }
 
-template < typename T >
-kizhin::detail::Node< T >* kizhin::detail::treeMin(Node< T >* root) noexcept
-{
-  const Node< T >* constRoot = root;
-  return const_cast< Node< T >* >(treeMin(constRoot));
-}
-
-template < typename T >
-const kizhin::detail::Node< T >* kizhin::detail::treeMax(const Node< T >* root) noexcept
+template < typename NodePtr >
+NodePtr kizhin::detail::treeMax(NodePtr root) noexcept
 {
   assert(root && "Root cannot be nullptr");
   while (!isLeaf(root)) {
@@ -154,20 +132,46 @@ const kizhin::detail::Node< T >* kizhin::detail::treeMax(const Node< T >* root) 
   return root;
 }
 
-template < typename T >
-kizhin::detail::Node< T >* kizhin::detail::treeMax(Node< T >* root) noexcept
+template < typename NodePtr >
+NodePtr kizhin::detail::updateParent(NodePtr parent) noexcept
 {
-  const Node< T >* constRoot = root;
-  return const_cast< Node< T >* >(treeMax(constRoot));
+  assert(parent && "Attempt to update nullptr parent");
+  for (auto child: parent->children) {
+    if (child) {
+      child->parent = parent;
+    }
+  }
+  return parent;
 }
 
-template < typename T >
-std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::nextIter(
-    Node< T >* node, const T* valuePtr)
+template < typename NodePtr >
+void kizhin::detail::relink(NodePtr lhs, NodePtr rhs) noexcept
+{
+  assert(lhs && rhs && "Attempt to relink nullptr nodes");
+  if (lhs->parent) {
+    auto& children = lhs->parent->children;
+    auto pos = std::find(children.begin(), children.end(), lhs);
+    assert(pos != children.end() && *pos == lhs);
+    *pos = rhs;
+  }
+  if (rhs->parent) {
+    auto& children = rhs->parent->children;
+    auto pos = std::find(children.begin(), children.end(), lhs);
+    assert(pos != children.end() && *pos == rhs);
+    *pos = lhs;
+  }
+  std::swap(lhs->parent, rhs->parent);
+  std::swap(lhs->children, rhs->children);
+  updateParent(lhs);
+  updateParent(rhs);
+}
+
+template < typename NodePtr, typename ValPtr >
+std::tuple< NodePtr, ValPtr > kizhin::detail::nextIter(NodePtr node, ValPtr valuePtr)
 {
   assert(node && valuePtr && "Incrementing empty iterator");
   if (!isLeaf(node)) {
-    Node< T >* rightSibling = node->children[(valuePtr - node->begin) + 1];
+    NodePtr rightSibling = node->children[(valuePtr - node->begin) + 1];
     node = treeMin(rightSibling);
     return std::make_tuple(node, node->begin);
   }
@@ -175,7 +179,7 @@ std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::nextIter(
     return std::make_tuple(node, ++valuePtr);
   }
   while (node->parent) {
-    Node< T >* parent = node->parent;
+    NodePtr parent = node->parent;
     if (isLeft(node) || (size(parent) == 2 && isMiddle(node))) {
       valuePtr = isLeft(node) ? parent->begin : parent->begin + 1;
       node = parent;
@@ -186,22 +190,12 @@ std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::nextIter(
   return std::make_tuple(nullptr, nullptr);
 }
 
-template < typename T >
-std::tuple< kizhin::detail::Node< T >*, T* > kizhin::detail::nextIter(Node< T >* node,
-    T* valuePtr)
-{
-  const T* constValuePtr = valuePtr;
-  std::tie(node, constValuePtr) = nextIter(node, constValuePtr);
-  return make_tuple(node, const_cast< T* >(constValuePtr));
-}
-
-template < typename T >
-std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::prevIter(
-    Node< T >* node, const T* valuePtr)
+template < typename NodePtr, typename ValPtr >
+std::tuple< NodePtr, ValPtr > kizhin::detail::prevIter(NodePtr node, ValPtr valuePtr)
 {
   assert(node && valuePtr && "Decrementing empty iterator");
   if (!isLeaf(node)) {
-    Node< T >* leftSibling = node->children[valuePtr - node->begin];
+    NodePtr leftSibling = node->children[valuePtr - node->begin];
     node = treeMax(leftSibling);
     return std::make_tuple(node, node->end - 1);
   }
@@ -209,7 +203,7 @@ std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::prevIter(
     return std::make_tuple(node, --valuePtr);
   }
   while (node->parent) {
-    Node< T >* parent = node->parent;
+    NodePtr parent = node->parent;
     if (!isLeft(node)) {
       const bool useBegin = !(size(parent) == 1 || isMiddle(node));
       return std::make_tuple(parent, parent->begin + useBegin);
@@ -219,79 +213,32 @@ std::tuple< kizhin::detail::Node< T >*, const T* > kizhin::detail::prevIter(
   return std::make_tuple(nullptr, nullptr);
 }
 
-template < typename T >
-std::tuple< kizhin::detail::Node< T >*, T* > kizhin::detail::prevIter(Node< T >* node,
-    T* valuePtr)
+template < typename NodePtr, typename... Args >
+void kizhin::detail::emplaceBack(NodePtr node, Args&&... args)
 {
-  const T* constValuePtr = valuePtr;
-  std::tie(node, constValuePtr) = prevIter(node, constValuePtr);
-  return make_tuple(node, const_cast< T* >(constValuePtr));
-}
-
-template < typename T >
-void kizhin::detail::popBack(Node< T >* node) noexcept
-{
-  assert(node && "Attempt to pop from nullptr node");
-  assert(isEmpty(node) && "Attempt to pop from empty node");
-  --node->end;
-  node->end->~T();
-}
-
-template < typename T >
-void kizhin::detail::popFront(Node< T >* node) noexcept
-{
-  assert(node && "Attempt to pop from nullptr node");
-  assert(isEmpty(node) && "Attempt to pop from empty node");
-  node->begin->~T();
-  --node->begin;
-}
-
-template < typename T, typename... Args >
-T* kizhin::detail::emplaceBack(Node< T >* node, Args&&... args)
-{
-  /* NOTE: Basic safety */
   assert(node && "Attempt to emplace in nullptr node");
   assert(size(node) < maxValues && "Node already filled");
-  const T* const realEnd = reinterpret_cast< T* >(node->buffer) + maxValues;
-  if (node->end == realEnd) {
-    std::move(node->begin, node->end, node->begin - 1);
-    --node->begin;
-    --node->end;
-  }
-  T* result = new (node->end) T(std::forward< Args >(args)...);
+  using value_type = std::remove_reference_t< decltype(*(node->begin)) >;
+  new (node->end) value_type(std::forward< Args >(args)...);
   ++node->end;
-  return result;
 }
 
-template < typename T, typename... Args >
-T* kizhin::detail::emplaceFront(Node< T >* node, Args&&... args)
+template < typename NodePtr, typename Cmp, typename... Args >
+void kizhin::detail::emplace(NodePtr src, NodePtr dest, Cmp cmp, Args&&... args)
 {
-  /* NOTE: Basic safety */
-  assert(node && "Attempt to emplace in nullptr node");
-  assert(size(node) < maxValues && "Node already filled");
-  const T* const realBegin = reinterpret_cast< T* >(node->buffer);
-  if (node->begin == realBegin) {
-    std::move_backward(node->begin, node->end, node->begin + 1);
-    ++node->begin;
-    ++node->end;
+  assert(src && "Attempt to emplace in nullptr src");
+  assert(size(src) < maxValues && "Src already filled");
+  assert(isEmpty(dest) && "Dest must be empty node");
+  using value_type = std::remove_reference_t< decltype(*(src->begin)) >;
+  value_type val(std::forward< Args >(args)...);
+  auto i = src->begin;
+  while (i != src->end && cmp(*i, val)) {
+    emplaceBack(dest, std::move_if_noexcept(*(i++)));
   }
-  T* result = new (node->begin - 1) T(std::forward< Args >(args)...);
-  --node->begin;
-  return result;
-}
-
-template < typename T, typename Cmp, typename... Args >
-T* kizhin::detail::emplace(Node< T >* node, const Cmp& cmp, Args&&... args)
-{
-  /*
-   * TODO: Cannot use std::sort & std::move with const Key
-   * Create a new node with ordered values, then swap with old node in the tree
-   */
-  assert(node && "Attempt to emplace in nullptr node");
-  assert(size(node) < maxValues && "Node already filled");
-  T* result = emplaceBack(node, std::forward< Args >(args)...);
-  std::sort(node->begin, node->end, cmp);
-  return result;
+  emplaceBack(dest, std::move(val));
+  while (i != src->end) {
+    emplaceBack(dest, std::move_if_noexcept(*(i++)));
+  }
 }
 
 #endif
