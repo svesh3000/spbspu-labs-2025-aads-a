@@ -12,11 +12,15 @@ namespace demehin
   {
   public:
     DynamicArray();
+    explicit DynamicArray(size_t);
     DynamicArray(const DynamicArray&);
     DynamicArray(DynamicArray&&) noexcept;
 
     DynamicArray< T >& operator=(const DynamicArray< T >&);
     DynamicArray< T >& operator=(DynamicArray< T >&&);
+
+    T& operator[](size_t) noexcept;
+    const T& operator[](size_t) const noexcept;
 
     ~DynamicArray();
 
@@ -57,6 +61,14 @@ namespace demehin
   }
 
   template< typename T >
+  DynamicArray< T >::DynamicArray(size_t size):
+    data_(new T[size]),
+    size_(size),
+    capacity_(size),
+    begin_(0)
+  {}
+
+  template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
     data_(details::copyData(other.data_, other.size_)),
     size_(other.size_),
@@ -92,6 +104,18 @@ namespace demehin
       swap(temp);
     }
     return *this;
+  }
+
+  template< typename T >
+  T& DynamicArray< T >::operator[](size_t pos) noexcept
+  {
+    return data_[pos + begin_];
+  }
+
+  template< typename T >
+  const T& DynamicArray< T >::operator[](size_t pos) const noexcept
+  {
+    return data_[pos + begin_];
   }
 
   template< typename T >
