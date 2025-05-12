@@ -7,6 +7,7 @@
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
 #include "ttt-const-iterator.hpp"
+#include "queue.hpp"
 
 namespace savintsev
 {
@@ -1081,7 +1082,7 @@ namespace savintsev
       throw std::logic_error("Tree is empty");
     }
 
-    std::queue< node_type * > queue;
+    Queue< node_type * > queue;
     queue.push(root_);
 
     while (!queue.empty())
