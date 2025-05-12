@@ -1,8 +1,8 @@
-#ifndef TTT_ITERATOR_H
-#define TTT_ITERATOR_H
+#ifndef TTT_CONST_ITERATOR_H
+#define TTT_CONST_ITERATOR_H
 #include <iterator>
+#include <cassert>
 #include "ttt-node.hpp"
-#include "ttt-const-iterator.hpp"
 
 namespace savintsev
 {
@@ -10,91 +10,81 @@ namespace savintsev
   class TwoThreeTree;
 
   template< typename Key, typename Value >
-  class BidirectIterator
+  class BidirectIterator;
+
+  template< typename Key, typename Value >
+  class BidirectConstIterator
   {
     template< typename K, typename V, typename C >
     friend class TwoThreeTree;
-    friend class BidirectConstIterator< Key, Value >;
   public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = std::pair< Key, Value >;
     using difference_type = std::ptrdiff_t;
-    using pointer = value_type *;
-    using reference = value_type &;
+    using pointer = const value_type *;
+    using reference = const value_type &;
     using node_type = node_t< value_type >;
 
-    BidirectIterator() = default;
-    reference operator*();
-    pointer operator->();
+    BidirectConstIterator() = default;
+    BidirectConstIterator(const BidirectIterator< Key, Value > & it);
+
     reference operator*() const;
     pointer operator->() const;
 
-    BidirectIterator & operator++();
-    BidirectIterator operator++(int);
+    BidirectConstIterator & operator++();
+    BidirectConstIterator operator++(int);
 
-    BidirectIterator & operator--();
-    BidirectIterator operator--(int);
-    bool operator!=(const BidirectIterator & rhs) const;
-    bool operator==(const BidirectIterator & rhs) const;
+    BidirectConstIterator & operator--();
+    BidirectConstIterator operator--(int);
+
+    bool operator!=(const BidirectConstIterator & rhs) const;
+    bool operator==(const BidirectConstIterator & rhs) const;
 
   private:
     node_type * root_ = nullptr;
     node_type * node_ = nullptr;
     size_t pos_ = 0;
 
-    BidirectIterator(node_type * root, node_type * node = nullptr, size_t pos = 0):
-      root_(root),
-      node_(node),
-      pos_(pos)
-    {}
+    BidirectConstIterator(node_type * root, node_type * node = nullptr, size_t pos = 0);
 
-    BidirectIterator & rbegin();
-    BidirectIterator & next();
-    BidirectIterator & prev();
+    BidirectConstIterator & next();
+    BidirectConstIterator & prev();
   };
 
   template< typename Key, typename Value >
-  typename BidirectIterator< Key, Value >::reference BidirectIterator< Key, Value >::operator*()
+  BidirectConstIterator< Key, Value >::BidirectConstIterator(const BidirectIterator< Key, Value > & it):
+    root_(it.root_),
+    node_(it.node_),
+    pos_(it.pos_)
+  {}
+  template< typename Key, typename Value >
+  typename BidirectConstIterator< Key, Value >::reference BidirectConstIterator< Key, Value >::operator*() const
   {
     assert(node_ != nullptr);
     assert(pos_ < node_->len_);
     return node_->data_[pos_];
   }
   template< typename Key, typename Value >
-  typename BidirectIterator< Key, Value >::pointer BidirectIterator< Key, Value >::operator->()
-  {
-    assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return std::addressof(node_->data_[pos_]);
-  }
-    template< typename Key, typename Value >
-  typename BidirectIterator< Key, Value >::reference BidirectIterator< Key, Value >::operator*() const
-  {
-    assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return node_->data_[pos_];
-  }
-  template< typename Key, typename Value >
-  typename BidirectIterator< Key, Value >::pointer BidirectIterator< Key, Value >::operator->() const
+  typename BidirectConstIterator< Key, Value >::pointer BidirectConstIterator< Key, Value >::operator->() const
   {
     assert(node_ != nullptr);
     assert(pos_ < node_->len_);
     return std::addressof(node_->data_[pos_]);
   }
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::operator++()
+  BidirectConstIterator< Key, Value > & BidirectConstIterator< Key, Value >::operator++()
   {
     return next();
   }
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > BidirectIterator< Key, Value >::operator++(int)
+  BidirectConstIterator< Key, Value > BidirectConstIterator< Key, Value >::operator++(int)
   {
-    BidirectIterator< Key, Value > result(*this);
+    BidirectConstIterator< Key, Value > result(*this);
     ++(*this);
     return result;
   }
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::operator--()
+  BidirectConstIterator< Key, Value > & BidirectConstIterator< Key, Value >::operator--()
   {
     if (!node_)
     {
@@ -110,19 +100,19 @@ namespace savintsev
     return prev();
   }
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > BidirectIterator< Key, Value >::operator--(int)
+  BidirectConstIterator< Key, Value > BidirectConstIterator< Key, Value >::operator--(int)
   {
-    BidirectIterator< Key, Value > result(*this);
+    BidirectConstIterator< Key, Value > result(*this);
     --(*this);
     return result;
   }
   template< typename Key, typename Value >
-  bool BidirectIterator< Key, Value >::operator!=(const BidirectIterator & rhs) const
+  bool BidirectConstIterator< Key, Value >::operator!=(const BidirectConstIterator & rhs) const
   {
     return !(*this == rhs);
   }
   template< typename Key, typename Value >
-  bool BidirectIterator< Key, Value >::operator==(const BidirectIterator & rhs) const
+  bool BidirectConstIterator< Key, Value >::operator==(const BidirectConstIterator & rhs) const
   {
     if (node_ == nullptr && rhs.node_ == nullptr)
     {
@@ -130,26 +120,14 @@ namespace savintsev
     }
     return node_ == rhs.node_ && pos_ == rhs.pos_;
   }
+  template< typename K, typename V >
+  BidirectConstIterator< K, V >::BidirectConstIterator(node_type * root, node_type * node, size_t pos):
+    root_(root),
+    node_(node),
+    pos_(pos)
+  {}
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::rbegin()
-  {
-    if (!root_)
-    {
-      node_ = nullptr;
-      return *this;
-    }
-
-    node_ = root_;
-    while (node_->kids_[node_->len_])
-    {
-      node_ = node_->kids_[node_->len_];
-    }
-
-    pos_ = node_->len_ - 1;
-    return *this;
-  }
-  template< typename Key, typename Value >
-  BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::next()
+  BidirectConstIterator< Key, Value > & BidirectConstIterator< Key, Value >::next()
   {
     if (!node_)
     {
@@ -191,7 +169,7 @@ namespace savintsev
     return *this;
   }
   template< typename Key, typename Value >
-  BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::prev()
+  BidirectConstIterator< Key, Value > & BidirectConstIterator< Key, Value >::prev()
   {
     assert(node_ != nullptr);
 

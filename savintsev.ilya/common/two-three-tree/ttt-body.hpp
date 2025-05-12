@@ -6,6 +6,7 @@
 #include <queue>
 #include "ttt-node.hpp"
 #include "ttt-iterator.hpp"
+#include "ttt-const-iterator.hpp"
 
 namespace savintsev
 {
@@ -34,6 +35,8 @@ namespace savintsev
     iterator end() noexcept;
     const_iterator begin() const noexcept;
     const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
     void clear() noexcept;
     bool empty() const noexcept;
@@ -184,6 +187,24 @@ namespace savintsev
     return const_iterator(root_, nullptr, 0);
   }
 
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::cbegin() const noexcept
+  {
+    if (!root_ || root_->len_ == 0)
+    {
+      return end();
+    }
+
+    node_type * min_node = search_min(root_);
+    return const_iterator(root_, min_node, 0);
+  }
+
+  template< typename K, typename V, typename C >
+  typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::cend() const noexcept
+  {
+    return const_iterator(root_, nullptr, 0);
+  }
+
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::clear() noexcept
   {
@@ -287,7 +308,7 @@ namespace savintsev
   {
     if (!root_)
     {
-      return {iterator(root_, nullptr), false};
+      return {iterator(root_), false};
     }
     node_type * node = root_;
     while (node)
@@ -319,7 +340,7 @@ namespace savintsev
         node = node->kids_[2];
       }
     }
-    return {iterator(root_, nullptr), false};
+    return {iterator(root_), false};
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -1009,12 +1030,9 @@ namespace savintsev
     {
       throw std::logic_error("Tree is empty");
     }
-    auto it_begin = begin();
-    auto it_end = end();
-    while (it_begin != it_end)
+    for (auto it = begin(); it != end(); ++it)
     {
-      f(*it_begin);
-      it_begin++;
+      f(*it);
     }
     return f;
   }
@@ -1040,7 +1058,6 @@ namespace savintsev
     {
       --it;
       assert(it != end());
-      std::cout << "key: " << it->first << '\n';
       f(*it);
     }
 
