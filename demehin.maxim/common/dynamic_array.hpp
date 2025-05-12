@@ -4,6 +4,7 @@
 #include <utility>
 #include <stdexcept>
 #include "data_utils.hpp"
+#include "dynamic_array_iterator.hpp"
 
 namespace demehin
 {
@@ -11,6 +12,8 @@ namespace demehin
   class DynamicArray
   {
   public:
+    using Iter = DynamicArrayIterator< T >;
+
     DynamicArray();
     explicit DynamicArray(size_t);
     DynamicArray(const DynamicArray&);
@@ -33,6 +36,9 @@ namespace demehin
     T& front();
     const T& back() const;
     T& back();
+
+    Iter begin() const noexcept;
+    Iter end() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -193,6 +199,18 @@ namespace demehin
       throw std::logic_error("empty");
     }
     return data_[begin_ + size_ - 1];
+  }
+
+  template< typename T >
+  typename DynamicArray< T >::Iter DynamicArray< T >::begin() const noexcept
+  {
+    return Iter(data_ + begin_);
+  }
+
+  template< typename T >
+  typename DynamicArray< T >::Iter DynamicArray< T >::end() const noexcept
+  {
+    return Iter(data_ + begin_ + size_);
   }
 
   template< typename T >
