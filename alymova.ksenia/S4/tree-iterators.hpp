@@ -6,8 +6,12 @@
 namespace alymova
 {
   namespace detail
-  {}
+  {
+    enum NodePoint {Empty, First, Second, Fake};
 
+    template< class Key, class Value, class Comparator >
+    struct TTTNode;
+  }
   template< class Key, class Value, class Comparator >
   class TwoThreeTree;
   template< class Key, class Value, class Comparator >
@@ -19,9 +23,9 @@ namespace alymova
   {
   public:
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
-    using Node = typename detail::TTTNode< Key, Value, Comparator >;
-    using NodeType = typename Node::NodeType;
-    using NodePoint = typename detail::NodePoint;
+    using Node = detail::TTTNode< Key, Value, Comparator >;
+    using NodeType = Node::NodeType;
+    using NodePoint = detail::NodePoint;
 
     TTTConstIterator();
     ConstIterator& operator++() noexcept;
