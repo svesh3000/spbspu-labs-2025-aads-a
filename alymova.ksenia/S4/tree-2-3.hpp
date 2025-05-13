@@ -99,6 +99,35 @@ namespace alymova
     size_t find_height(Node* node);
   };
 
+  template< class T, class Value, class Comparator >
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+
+  template< class T, class Value, class Comparator >
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+
+  template< class T, class Value, class Comparator >
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  {
+    if (lhs.size() != rhs.size())
+    {
+      return false;
+    }
+    for (auto it_lhs = lhs.cbegin(), it_rhs = rhs.cbegin(); it_lhs != lhs.cend(); ++it_lhs, ++it_rhs)
+    {
+      if ((*it_lhs) != (*it_rhs))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template< class T, class Value, class Comparator >
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  {
+    return (!(lhs == rhs));
+  }
+
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
@@ -623,7 +652,7 @@ namespace alymova
     TwoThreeTree< Key, Value, Comparator >::find_to_insert(ConstIterator hint) const
   {
     Iterator tmp = hint;
-    if (hint == cend() || !tmp.node_->isLeaf())
+    if ((hint == cend() && !empty()) || !tmp.node_->isLeaf())
     {
       return (--tmp).node_;
     }

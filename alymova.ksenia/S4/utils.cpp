@@ -30,12 +30,12 @@ void alymova::ComplementCommand::operator()(CompositeDataset_t& dicts)
 
   Dataset_t dataset1 = dicts.at(name1);
   Dataset_t dataset2 = dicts.at(name2);
-
   for (auto it = dataset1.begin(); it != dataset1.end(); it++)
   {
     if (dataset2.find(it->first) == dataset2.end())
     {
-      dataset2[it->first] = it->second;
+      dataset2.insert({it->first, it->second});
+      //dataset2[it->first] = it->second;
     }
     else
     {
