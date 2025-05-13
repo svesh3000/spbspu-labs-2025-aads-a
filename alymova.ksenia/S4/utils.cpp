@@ -34,8 +34,8 @@ void alymova::ComplementCommand::operator()(CompositeDataset_t& dicts)
   {
     if (dataset2.find(it->first) == dataset2.end())
     {
-      dataset2.insert({it->first, it->second});
-      //dataset2[it->first] = it->second;
+      //dataset2.insert({it->first, it->second});
+      dataset2[it->first] = it->second;
     }
     else
     {
