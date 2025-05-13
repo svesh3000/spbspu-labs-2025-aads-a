@@ -6,15 +6,20 @@
 
 namespace duhanina
 {
+  template< typename U >
+  class Queue;
+
   template < typename T >
   class DynamicArray
   {
+    friend class Queue< T >;
   public:
     DynamicArray() noexcept;
     ~DynamicArray();
 
     DynamicArray(const DynamicArray& other);
     DynamicArray(DynamicArray&& other) noexcept;
+    DynamicArray& operator=(const DynamicArray&);
     DynamicArray& operator=(DynamicArray&& other) noexcept;
 
     void push_back(const T& value);
@@ -68,9 +73,6 @@ namespace duhanina
     catch (...)
     {
       delete[] data_;
-      data_ = nullptr;
-      length_ = 0;
-      capacity_ = 0;
       throw;
     }
   }
@@ -87,9 +89,35 @@ namespace duhanina
   }
 
   template < typename T >
+  DynamicArray< T >& DynamicArray< T >::operator=(const DynamicArray& other)
+  {
+    if (this != std::addressof(other))
+    {
+      T* new_data = new T[other.capacity_];
+      try
+      {
+        for (size_t i = 0; i < other.length_; ++i)
+        {
+          new_data[i] = other.data_[i];
+        }
+      }
+      catch (...)
+      {
+        delete[] new_data;
+        throw;
+      }
+      delete[] data_;
+      data_ = new_data;
+      capacity_ = other.capacity_;
+      length_ = other.length_;
+    }
+    return *this;
+  }
+
+  template < typename T >
   DynamicArray< T >& DynamicArray< T >::operator=(DynamicArray&& other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       delete[] data_;
       data_ = other.data_;
@@ -105,14 +133,24 @@ namespace duhanina
   template < typename T >
   void DynamicArray< T >::resize()
   {
-    capacity_ *= 2;
-    T* new_data = new T[capacity_];
-    for (size_t i = 0; i < length_; ++i)
+    size_t new_capacity = capacity_ * 2;
+    T* new_data = nullptr;
+    try
     {
-      new_data[i] = data_[i];
+      new_data = new T[new_capacity];
+      for (size_t i = 0; i < length_; ++i)
+      {
+        new_data[i] = data_[i];
+      }
+    }
+    catch (...)
+    {
+      delete[] new_data;
+      throw;
     }
     delete[] data_;
     data_ = new_data;
+    capacity_ = new_capacity;
   }
 
   template < typename T >

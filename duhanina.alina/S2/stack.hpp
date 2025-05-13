@@ -12,9 +12,10 @@ namespace duhanina
     Stack() = default;
     ~Stack() = default;
 
-    Stack(const Stack& other);
-    Stack(Stack&& other) noexcept;
-    Stack& operator=(const Stack& other);
+    Stack(const Stack& other) = default;
+    Stack(Stack&& other) noexcept = default;
+    Stack& operator=(const Stack& other) = default;
+    Stack& operator=(Stack&&) noexcept = default;
 
     bool empty() const noexcept;
 
@@ -29,26 +30,6 @@ namespace duhanina
   private:
     DynamicArray< T > array_;
   };
-
-  template < typename T >
-  Stack< T >::Stack(const Stack& other):
-    array_(other.array_)
-  {}
-
-  template < typename T >
-  Stack< T >::Stack(Stack&& other) noexcept:
-    array_(std::move(other.array_))
-  {}
-
-  template < typename T >
-  Stack< T >& Stack< T >::operator=(const Stack& other)
-  {
-    if (this != &other)
-    {
-      array_ = other.array_;
-    }
-    return *this;
-  }
 
   template < typename T >
   bool Stack< T >::empty() const noexcept

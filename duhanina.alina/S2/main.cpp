@@ -14,17 +14,13 @@ namespace
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
   }
 
-  int precedence(char op)
+  bool higherEqualPrecedence(char op1, char op2)
   {
-    if (op == '+' || op == '-')
+    if ((op1 == '+' || op1 == '-') && (op2 == '*' || op2 == '/' || op2 == '%'))
     {
-      return 1;
+      return false;
     }
-    if (op == '*' || op == '/' || op == '%')
-    {
-      return 2;
-    }
-    return 0;
+    return true;
   }
 
   duhanina::Queue< std::string > infixToPostfix(const std::string& infix)
@@ -61,7 +57,7 @@ namespace
       }
       else if (isOperator(token[0]))
       {
-        while (!operators.empty() && precedence(operators.top()) >= precedence(token[0]))
+        while (!operators.empty() && higherEqualPrecedence(operators.top(), token[0]))
         {
           output.push(std::string(1, operators.top()));
           operators.pop();
@@ -85,6 +81,74 @@ namespace
     return output;
   }
 
+  long long checkedAdd(long long a, long long b)
+  {
+    if ((b > 0 && a > LLONG_MAX - b) || (b < 0 && a < LLONG_MIN - b))
+    {
+      throw std::runtime_error("Overflow");
+    }
+    return a + b;
+  }
+
+  long long checkedSub(long long a, long long b)
+  {
+    if ((b > 0 && a < LLONG_MIN + b) || (b < 0 && a > LLONG_MAX + b))
+    {
+      throw std::runtime_error("Overflow");
+    }
+    return a - b;
+  }
+
+  long long checkedMul(long long a, long long b)
+  {
+    if (a > 0)
+    {
+      if (b > 0 && a > LLONG_MAX / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+      if (b < 0 && b < LLONG_MIN / a)
+      {
+        throw std::runtime_error("Overflow");
+      }
+    }
+    else
+    {
+      if (b > 0 && a < LLONG_MIN / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+      if (b < 0 && a < LLONG_MAX / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+    }
+    return a * b;
+  }
+
+  long long checkedDiv(long long a, long long b)
+  {
+    if (b == 0)
+    {
+      throw std::runtime_error("Division by zero");
+    }
+    return a / b;
+  }
+
+ long long checkedMod(long long a, long long b)
+ {
+    if (b == 0)
+    {
+      throw std::runtime_error("Modulus by zero");
+    }
+    long long result = a % b;
+    if (result < 0)
+    {
+      return result + b;
+    }
+    return result;
+  }
+
   long long calcPostfix(duhanina::Queue< std::string >& postfix)
   {
     duhanina::Stack< long long > operands;
@@ -105,58 +169,19 @@ namespace
         switch (token[0])
         {
         case '+':
-          if ((operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX - operand2) ||
-              (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MIN - operand2))
-          {
-            throw std::runtime_error("Overflow in addition");
-          }
-          operands.push(operand1 + operand2);
+          operands.push(checkedAdd(operand1, operand2));
           break;
         case '-':
-          if ((operand2 > 0 && operand1 < LLONG_MIN + operand2) ||
-              (operand2 < 0 && operand1 > LLONG_MAX + operand2))
-          {
-            throw std::runtime_error("Overflow in subtraction");
-          }
-          operands.push(operand1 - operand2);
+          operands.push(checkedSub(operand1, operand2));
           break;
         case '*':
-          if (operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MAX / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 > 0 && operand2 < 0 && operand2 < LLONG_MIN / operand1)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 < 0 && operand2 > 0 && operand1 < LLONG_MIN / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          operands.push(operand1 * operand2);
+          operands.push(checkedMul(operand1, operand2));
           break;
         case '/':
-          if (operand2 == 0)
-          {
-            throw std::runtime_error("Division by zero");
-          }
-          operands.push(operand1 / operand2);
+          operands.push(checkedDiv(operand1, operand2));
           break;
         case '%':
-          if (operand2 == 0)
-          {
-            throw std::runtime_error("Modulus by zero");
-          }
-          if (operand1 % operand2 < 0)
-          {
-            operands.push(operand1 % operand2 + operand2);
-            break;
-          }
-          operands.push(operand1 % operand2);
+          operands.push(checkedMod(operand1, operand2));
           break;
         default:
           throw std::runtime_error("Invalid operator");
