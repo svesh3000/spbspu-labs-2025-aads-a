@@ -36,6 +36,9 @@ namespace alymova
     TTTConstIterator(Node* node, NodePoint point);
     TTTConstIterator(TTTIterator< Key, Value, Comparator > it);
 
+    void fall_left();
+    void fall_right();
+
     friend class TwoThreeTree< Key, Value, Comparator >;
     friend class TTTIterator< Key, Value, Comparator >;
   };
@@ -65,6 +68,9 @@ namespace alymova
 
     TTTIterator(TTTConstIterator< Key, Value, Comparator > it);
     TTTIterator(Node* node, NodePoint point);
+
+    void fall_left();
+    void fall_right();
 
     friend class TwoThreeTree< Key, Value, Comparator >;
     friend class TTTConstIterator< Key, Value, Comparator >;

@@ -11,10 +11,17 @@
 
 int main(int argc, char** argv)
 {
+  //using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
+  //using CompositeDataset_t = std::map< std::string, Dataset_t, std::less< std::string > >;
+  /*using CommandDataset_t = std::map<
+    std::string,
+    std::function< void(CompositeDataset_t&) >,
+    std::less< std::string >
+  >;*/
   using namespace alymova;
-  /*using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
-  using CompositeDataset_t = std::map< std::string, Dataset_t, std::less< std::string > >;
-  using CommandDataset_t = std::map<
+  using Dataset_t = TwoThreeTree< size_t, std::string, std::less< size_t > >;
+  using CompositeDataset_t = TwoThreeTree< std::string, Dataset_t, std::less< std::string > >;
+  using CommandDataset_t = TwoThreeTree<
     std::string,
     std::function< void(CompositeDataset_t&) >,
     std::less< std::string >
@@ -52,8 +59,8 @@ int main(int argc, char** argv)
   catch(const std::exception& e)
   {
     std::cout << "<INVALID COMMAND>\n";
-  }*/
-  TwoThreeTree< int, std::string, std::less< int > > tree;
+  }
+  /*TwoThreeTree< int, std::string, std::less< int > > tree;
   std::pair< int, std::string > p1(1, "cat");
   std::pair< int, std::string > p2(2, "dog");
   std::pair< int, std::string > p3(3, "fly");
@@ -65,6 +72,7 @@ int main(int argc, char** argv)
   std::pair< int, std::string > p9(11, "march");
   std::pair< int, std::string > p10(12, "april");
   std::pair< int, std::string > p11(13, "may");
+  std::pair< int, std::string > p12(7, "maaaaaay");
   tree.insert(p1);
   tree.insert(p2);
   tree.insert(p3);
@@ -76,23 +84,20 @@ int main(int argc, char** argv)
   tree.insert(p9);
   tree.insert(p10);
   tree.insert(p11);
-  tree.erase(tree.find(13));
+  tree.insert(p12);
+  tree[7] = "friendship";
+  tree.erase(tree.begin(), tree.end());
+
+  for (size_t i = 0; i < 8; i++)
+  {
+    tree.erase(i);
+  }
+  for (size_t i = 10; i < 14; i++)
+  {
+    tree.erase(i);
+  }
   for (auto it = tree.begin(); it != tree.end(); it++)
   {
     std::cout << it->first << it->second << '\n';
-  }
-  {
-    TwoThreeTree< int, char, std::less< int > > map;
-    auto it = map.cbegin();
-    for (int i = 5; i > 0; --i)
-    {
-      map.emplace_hint(it, i, 'd');
-      it = map.cend();
-    }
-    /*for (auto it = map.begin(); it != map.end(); it++)
-    {
-      std::cout << it->first << it->second << '\n';
-    }*/
-  }
-
+  }*/
 }

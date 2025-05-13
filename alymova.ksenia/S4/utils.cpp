@@ -1,7 +1,9 @@
+#include "utils.hpp"
 #include <string>
 #include <iostream>
 #include <exception>
-#include "utils.hpp"
+
+using namespace alymova;
 
 void alymova::PrintCommand::operator()(const CompositeDataset_t& dicts)
 {

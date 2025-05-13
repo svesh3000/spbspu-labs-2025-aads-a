@@ -34,10 +34,7 @@ namespace alymova
       if (node_->right)
       {
         node_ = node_->right;
-        while (node_->left)
-        {
-          node_ = node_->left;
-        }
+        fall_left();
         point_ = (node_->type == NodeType::Fake) ? NodePoint::Fake : NodePoint::First;
         return *this;
       }
@@ -49,10 +46,7 @@ namespace alymova
         if (node_->mid)
         {
           node_ = node_->mid;
-          while (node_->left)
-          {
-            node_ = node_->left;
-          }
+          fall_left();
           return *this;
         }
         point_ = NodePoint::Second;
@@ -63,10 +57,7 @@ namespace alymova
         if (node_->right)
         {
           node_ = node_->right;
-          while (node_->left)
-          {
-            node_ = node_->left;
-          }
+          fall_left();
           point_ = (node_->type == NodeType::Fake) ? NodePoint::Fake : NodePoint::First;
           return *this;
         }
@@ -109,10 +100,7 @@ namespace alymova
       if (node_->left)
       {
         node_ = node_->left;
-        while (node_->right)
-        {
-          node_ = node_->right;
-        }
+        fall_right();
         point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
         return *this;
       }
@@ -124,10 +112,7 @@ namespace alymova
         if (node_->left)
         {
           node_ = node_->left;
-          while (node_->right)
-          {
-            node_ = node_->right;
-          }
+          fall_right();
           point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
           return *this;
         }
@@ -137,10 +122,7 @@ namespace alymova
         if (node_->mid)
         {
           node_ = node_->mid;
-          while (node_->right)
-          {
-            node_ = node_->right;
-          }
+          fall_right();
           point_ = (node_->type == NodeType::Double) ? NodePoint::First : NodePoint::Second;
           return *this;
         }
@@ -209,6 +191,24 @@ namespace alymova
     assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     return std::addressof(node_->data[point_ - 1]);
+  }
+
+  template< class Key, class Value, class Comparator >
+  void TTTConstIterator< Key, Value, Comparator >::fall_left()
+  {
+    while (node_->left)
+    {
+      node_ = node_->left;
+    }
+  }
+
+  template< class Key, class Value, class Comparator >
+  void TTTConstIterator< Key, Value, Comparator >::fall_right()
+  {
+    while (node_->right)
+    {
+      node_ = node_->right;
+    }
   }
 }
 #endif
