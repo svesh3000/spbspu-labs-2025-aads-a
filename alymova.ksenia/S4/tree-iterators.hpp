@@ -22,9 +22,9 @@ namespace alymova
 
     TTTConstIterator();
     ConstIterator& operator++() noexcept;
-    ConstIterator& operator++(int) noexcept;
+    ConstIterator operator++(int) noexcept;
     ConstIterator& operator--() noexcept;
-    ConstIterator& operator--(int) noexcept;
+    ConstIterator operator--(int) noexcept;
     bool operator==(const ConstIterator& other) const noexcept;
     bool operator!=(const ConstIterator& other) const noexcept;
     const std::pair< Key, Value >& operator*() const noexcept;
@@ -55,9 +55,9 @@ namespace alymova
 
     TTTIterator();
     Iterator& operator++() noexcept;
-    Iterator& operator++(int) noexcept;
+    Iterator operator++(int) noexcept;
     Iterator& operator--() noexcept;
-    Iterator& operator--(int) noexcept;
+    Iterator operator--(int) noexcept;
     bool operator==(const Iterator& other) const noexcept;
     bool operator!=(const Iterator& other) const noexcept;
     std::pair< Key, Value >& operator*() noexcept;

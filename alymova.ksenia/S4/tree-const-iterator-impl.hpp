@@ -85,7 +85,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator++(int) noexcept
+  TTTConstIterator< Key, Value, Comparator> TTTConstIterator< Key, Value, Comparator >::operator++(int) noexcept
   {
     ConstIterator old = *this;
     ++(*this);
@@ -152,7 +152,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator--(int) noexcept
+  TTTConstIterator< Key, Value, Comparator> TTTConstIterator< Key, Value, Comparator >::operator--(int) noexcept
   {
     ConstIterator old = *this;
     --(*this);
