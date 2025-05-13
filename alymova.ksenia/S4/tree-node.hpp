@@ -8,7 +8,7 @@ namespace alymova
 {
   namespace detail
   {
-    enum NodePoint {Empty, First, Second, Fake};
+    enum NodePoint: int {Empty, First, Second, Fake};
 
     template< class Key, class Value, class Comparator >
     struct TTTNode
