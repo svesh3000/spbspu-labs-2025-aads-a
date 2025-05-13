@@ -871,7 +871,6 @@ namespace alymova
     Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
-    Node* mid = parent->mid;
     Node* right = parent->right;
     Node* node_merge;
 

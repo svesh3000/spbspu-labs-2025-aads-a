@@ -5,6 +5,9 @@
 
 namespace alymova
 {
+  namespace detail
+  {}
+
   template< class Key, class Value, class Comparator >
   class TwoThreeTree;
   template< class Key, class Value, class Comparator >
