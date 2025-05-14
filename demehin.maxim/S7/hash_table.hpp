@@ -2,7 +2,6 @@
 #define HASH_TABLE_HPP
 #include <functional>
 #include <dynamic_array.hpp>
-//#include <vector>
 #include "hash_table_iterator.hpp"
 
 namespace demehin
@@ -78,12 +77,11 @@ namespace demehin
       SlotState state = SlotState::EMPTY;
     };
 
-    //std::vector< Slot > slots_;
     DynamicArray< Slot > slots_;
     size_t item_cnt_;
     Hash hasher_;
     Equal equal_;
-    static constexpr float max_load_factor_ = 0.7;
+    float max_load_factor_ = 0.7;
 
     size_t findKey(const Key&) const;
     size_t findSlot(const Key&) const;
@@ -405,14 +403,21 @@ namespace demehin
   {
     slots_[pos.index_].state = SlotState::DELETED;
     item_cnt_--;
-    Iter next(this, pos.index_);
-    return ++next;
+
+    size_t next_ind = pos.index_ + 1;
+    while (next_ind < slots_.size() && slots_[next_ind].state != SlotState::OCCUPIED)
+    {
+      next_ind++;
+    }
+
+    return Iter(this, next_ind);
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
   typename HashTable< Key, T, Hash, Equal >::Iter HashTable< Key, T, Hash, Equal >::erase(cIter first, cIter last) noexcept
   {
-    for (auto it = first; it != last; it++)
+    auto it = first;
+    while (it != last)
     {
       it = erase(it);
     }
