@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   Tree tree2(tree1);
   BOOST_TEST(tree1 == tree2);
 
-  Tree tree3(std::move(Tree()));
+  Tree tree3(Tree({}));
   BOOST_TEST(tree3 == tree1);
 
   Tree tree4({});
@@ -228,4 +228,35 @@ BOOST_AUTO_TEST_CASE(test_empace_hint)
   tree.emplace_hint(tree.cend(), 18, "w");
   tree.emplace_hint(tree.cend(), 19, "q");
   BOOST_TEST((--tree.end())->first == 19);
+}
+BOOST_AUTO_TEST_CASE(test_emplace_insert)
+{
+  using Tree = alymova::TwoThreeTree< int, std::string, std::less< int > >;
+  using Iterator = alymova::TTTIterator< int, std::string, std::less< int > >;
+
+  Tree tree;
+  std::pair< Iterator, bool > res = tree.emplace(1, "a");
+  BOOST_TEST(tree.size() == 1);
+  BOOST_TEST(res.second);
+  BOOST_TEST(res.first->first == 1);
+
+  res = tree.emplace(1, "b");
+  BOOST_TEST(tree.size() == 1);
+  BOOST_TEST(!res.second);
+  BOOST_TEST(res.first->second == "a");
+
+  tree.insert({2, "b"});
+  BOOST_TEST(tree.size() == 2);
+
+  Tree tree1({{10, "ee"}, {20, "rr"}});
+  tree.insert(tree1.begin(), tree1.end());
+  BOOST_TEST(tree.size() == 4);
+  BOOST_TEST((--tree.end())->first == 20);
+
+  tree.insert({{30, "tt"}, {40, "yy"}});
+  BOOST_TEST(tree.size() == 6);
+  BOOST_TEST((--tree.end())->first == 40);
+
+  tree.insert(tree.begin(), {0, "oo"});
+  BOOST_TEST(tree.begin()->first == 0);
 }
