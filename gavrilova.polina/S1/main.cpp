@@ -9,14 +9,12 @@ int main() {
   using ULL = unsigned long long;
 
   FwdList< std::pair< std::string, FwdList< ULL > > > listOfPairs{};
-  // std::cout << "1\n";
   size_t numOfPairs = 0;
   std::string name;
   size_t maxLen = 0;
   auto cur_it = listOfPairs.begin();
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
-    // std::cout << "finish input numbers\n";
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
     std::pair< std::string, FwdList< ULL > > new_pair {name, numbers};
     listOfPairs.insert(cur_it, new_pair);
@@ -42,5 +40,4 @@ int main() {
   } else {
     outFwdListULL(std::cout, sums);
   }
- std::cout << "1\n";
 }
