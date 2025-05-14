@@ -440,6 +440,7 @@ namespace alymova
   void TwoThreeTree< Key, Value, Comparator >::clear() noexcept
   {
     clear(root_);
+    size_ = 0;
   }
 
   template< class Key, class Value, class Comparator >
@@ -589,15 +590,23 @@ namespace alymova
           parent->right = left;
           parent->overflow = right;
         }
-        else if (parent->mid == node)
-        {
-          parent->mid = left;
-          parent->right = right;
-        }
-        else if (parent->left == node)
+        else if (parent->left == node && parent->type == NodeType::Triple)
         {
           parent->left = left;
           parent->mid = right;
+        }
+        else if (parent->left == node && parent->type == NodeType::Overflow)
+        {
+          parent->overflow = parent->right;
+          parent->right = parent->mid;
+          parent->mid = right;
+          parent->left = left;
+        }
+        else if (parent->mid == node)
+        {
+          parent->overflow = parent->right;
+          parent->mid = left;
+          parent->right = right;
         }
       }
     }

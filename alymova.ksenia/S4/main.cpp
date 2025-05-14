@@ -11,13 +11,6 @@
 
 int main(int argc, char** argv)
 {
-  //using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
-  //using CompositeDataset_t = std::map< std::string, Dataset_t, std::less< std::string > >;
-  /*using CommandDataset_t = std::map<
-    std::string,
-    std::function< void(CompositeDataset_t&) >,
-    std::less< std::string >
-  >;*/
   using namespace alymova;
   using Dataset_t = TwoThreeTree< size_t, std::string, std::less< size_t > >;
   using CompositeDataset_t = TwoThreeTree< std::string, Dataset_t, std::less< std::string > >;
@@ -60,44 +53,4 @@ int main(int argc, char** argv)
   {
     std::cout << "<INVALID COMMAND>\n";
   }
-  /*TwoThreeTree< int, std::string, std::less< int > > tree;
-  std::pair< int, std::string > p1(1, "cat");
-  std::pair< int, std::string > p2(2, "dog");
-  std::pair< int, std::string > p3(3, "fly");
-  std::pair< int, std::string > p4(4, "boo");
-  std::pair< int, std::string > p5(5, "grd");
-  std::pair< int, std::string > p6(6, "bread");
-  std::pair< int, std::string > p7(10, "kitten");
-  std::pair< int, std::string > p8(0, "000");
-  std::pair< int, std::string > p9(11, "march");
-  std::pair< int, std::string > p10(12, "april");
-  std::pair< int, std::string > p11(13, "may");
-  std::pair< int, std::string > p12(7, "maaaaaay");
-  tree.insert(p1);
-  tree.insert(p2);
-  tree.insert(p3);
-  tree.insert(p4);
-  tree.insert(p5);
-  tree.insert(p6);
-  tree.insert(p7);
-  tree.insert(p8);
-  tree.insert(p9);
-  tree.insert(p10);
-  tree.insert(p11);
-  tree.insert(p12);
-  tree[7] = "friendship";
-  tree.erase(tree.begin(), tree.end());
-
-  for (size_t i = 0; i < 8; i++)
-  {
-    tree.erase(i);
-  }
-  for (size_t i = 10; i < 14; i++)
-  {
-    tree.erase(i);
-  }
-  for (auto it = tree.begin(); it != tree.end(); it++)
-  {
-    std::cout << it->first << it->second << '\n';
-  }*/
 }

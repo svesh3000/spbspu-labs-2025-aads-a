@@ -32,10 +32,9 @@ void alymova::ComplementCommand::operator()(CompositeDataset_t& dicts)
   Dataset_t dataset2 = dicts.at(name2);
   for (auto it = dataset1.begin(); it != dataset1.end(); it++)
   {
-    if (dataset2.find(it->first) == dataset2.end())
+    if (dataset2.count(it->first) == 0)
     {
-      //dataset2.insert({it->first, it->second});
-      dataset2[it->first] = it->second;
+      dataset2.insert({it->first, it->second});
     }
     else
     {
@@ -75,9 +74,9 @@ void alymova::UnionCommand::operator()(CompositeDataset_t& dicts)
   Dataset_t dataset2 = dicts.at(name2);
   for (auto it = dataset2.begin(); it != dataset2.end(); it++)
   {
-    if (dataset1.find(it->first) == dataset1.end())
+    if (dataset1.count(it->first) == 0)
     {
-      dataset1[it->first] = it->second;
+      dataset1.insert({it->first, it->second});
     }
   }
   dicts[newname] = dataset1;

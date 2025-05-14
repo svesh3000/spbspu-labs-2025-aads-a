@@ -7,13 +7,6 @@
 
 namespace alymova
 {
-  /*using Dataset_t = std::map< size_t, std::string, std::less< size_t > >;
-  using CompositeDataset_t = std::map< std::string, Dataset_t, std::less< std::string > >;
-  using CommandDataset_t = std::map<
-    std::string,
-    std::function< void(CompositeDataset_t&) >,
-    std::less< std::string >
-  >;*/
   using Dataset_t = TwoThreeTree< size_t, std::string, std::less< size_t > >;
   using CompositeDataset_t = TwoThreeTree< std::string, Dataset_t, std::less< std::string > >;
   using CommandDataset_t = TwoThreeTree<
