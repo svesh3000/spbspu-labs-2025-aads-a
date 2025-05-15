@@ -765,7 +765,7 @@ namespace alymova
       return;
     }
     Node* new_node = merge_erase(node);
-    fix(node);
+    fix(new_node);
   }
 
   template< class Key, class Value, class Comparator >
