@@ -12,7 +12,7 @@ namespace savintsev
 
     bool empty() const noexcept;
 
-    void pop();
+    void pop() noexcept;
     void push(const T & rhs);
     void push(T && rhs);
 

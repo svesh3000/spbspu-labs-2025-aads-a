@@ -14,6 +14,9 @@ namespace savintsev
     Array(Array && rhs) noexcept;
     ~Array();
 
+    Array & operator=(const Array & rhs);
+    Array & operator=(Array && rhs) noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -24,7 +27,7 @@ namespace savintsev
 
     template< typename U >
     void push_back(U && rhs);
-    void pop_front();
+    void pop_front() noexcept;
     void pop_back() noexcept;
 
     template< typename U >
@@ -59,20 +62,7 @@ namespace savintsev
     size_(rhs.size_),
     start_(0),
     capacity_(rhs.capacity_)
-  {
-    try
-    {
-      for (size_t i = 0; i < rhs.size_; ++i)
-      {
-        data_[i] = rhs.data_[rhs.start_ + i];
-      }
-    }
-    catch (...)
-    {
-      delete[] data_;
-      throw;
-    }
-  }
+  {}
 
   template< typename T >
   Array< T >::Array(Array && rhs) noexcept:
@@ -86,6 +76,29 @@ namespace savintsev
   Array< T >::~Array()
   {
     delete[] data_;
+  }
+
+  template< typename T >
+  Array< T > & Array< T >::operator=(const Array & rhs)
+  {
+    T * data = createExpandCopy(rhs.data_ + rhs.start_, rhs.size_, rhs.capacity_);
+    delete[] data_;
+    data_ = data;
+    size_ = rhs.size_;
+    start_ = 0;
+    capacity_ = rhs.capacity_;
+    return *this;
+  }
+
+  template< typename T >
+  Array< T > & Array< T >::operator=(Array && rhs) noexcept
+  {
+    delete[] data_;
+    data_ = rhs.data_;
+    size_ = rhs.size_;
+    start_ = rhs.start_;
+    capacity_ = rhs.capacity_;
+    return *this;
   }
 
   template< typename T >
@@ -158,7 +171,7 @@ namespace savintsev
   }
 
   template< typename T >
-  void Array< T >::pop_front()
+  void Array< T >::pop_front() noexcept
   {
     ++start_;
     --size_;

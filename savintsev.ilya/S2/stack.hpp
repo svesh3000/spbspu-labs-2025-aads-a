@@ -12,7 +12,7 @@ namespace savintsev
 
     bool empty() const noexcept;
 
-    void pop();
+    void pop() noexcept;
     void push(const T & rhs);
     void push(T && rhs);
 
@@ -20,9 +20,18 @@ namespace savintsev
 
     T & top();
     const T & top() const;
+
+    template< typename U >
+    friend void swap(Stack< U > & x, Stack< U > & y) noexcept;
   private:
     Array< T > stack_;
   };
+
+  template< typename U >
+  void swap(Stack< U > & x, Stack< U > & y) noexcept
+  {
+    swap(x.stack_, y.stack_);
+  }
 
   template< typename T >
   Stack< T >::Stack():
