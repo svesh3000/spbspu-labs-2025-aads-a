@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(test_erase)
   BOOST_TEST(it->first == 2);
 
   {
-    tree.emplace(1, "a");
+    tree.emplace(1, "merge");
     for (size_t i = 3; i < 8; i++)
     {
       tree.emplace(i * 10, "merge");
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE(test_erase)
     BOOST_TEST(it->first == 2);
     BOOST_TEST(tree.begin()->first == 2);
 
-    tree.emplace(1, "a");
+    tree.emplace(1, "merge");
     it = tree.erase(tree.find(30));
     BOOST_TEST(tree.size() == 6);
     BOOST_TEST(it->first == 40);
@@ -335,5 +335,36 @@ BOOST_AUTO_TEST_CASE(test_erase)
     it = tree.erase(tree.find(30));
     BOOST_TEST(tree.size() == 8);
     BOOST_TEST(it->first == 40);
+
+    tree.emplace(30, "distr");
+    it = tree.erase(tree.begin());
+    BOOST_TEST(tree.size() == 8);
+    BOOST_TEST(it->first == 2);
+
+    tree.emplace(1, "distr");
+    tree.emplace(35, "distr");
+    it = tree.erase(tree.begin());
+    BOOST_TEST(tree.size() == 9);
+    BOOST_TEST(it->first == 2);
+
+    tree.emplace(5, "distr");
+    tree.emplace(10, "distr");
+    it = tree.erase(tree.find(10));
+    BOOST_TEST(tree.size() == 10);
+    BOOST_TEST(it->first == 30);
+
+    tree.emplace(10, "distr");
+    tree.emplace(52, "distr");
+    tree.emplace(55, "distr");
+    it = tree.erase(tree.begin());
+    BOOST_TEST(tree.size() == 12);
+    BOOST_TEST(it->first == 5);
+
+
+    for (auto it = tree.begin(); it != tree.end(); it++)
+    {
+      std::cout << it->first << '\n';
+    }
+    std::cout << "-----------\n";
   }
 }
