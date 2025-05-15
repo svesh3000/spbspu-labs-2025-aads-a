@@ -1,16 +1,16 @@
-#ifndef ERASE_HPP
-#define ERASE_HPP
+#ifndef MAP_BASE_ERASE_HPP
+#define MAP_BASE_ERASE_HPP
 
 #include "declaration.hpp"
+
 #include <iterator>
 #include <type_traits.hpp>
 
-template< class Key, class Value, class Compare, size_t N >
-typename rychkov::Map< Key, Value, Compare, N >::iterator
-    rychkov::Map< Key, Value, Compare, N >::erase(const_iterator pos)
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const_iterator pos)
 {
-  static_assert(std::is_nothrow_move_constructible< key_type >::value, "use of unready functional");
-  static_assert(std::is_nothrow_move_constructible< mapped_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "use of unready functional");
 
   size_--;
   iterator result{pos.node_, pos.pointed_};
@@ -144,8 +144,8 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
   }
   return result;
 }
-template< class Key, class Value, class Compare, size_t N >
-void rychkov::Map< Key, Value, Compare, N >::correct_erase_result(const_iterator to,
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::correct_erase_result(const_iterator to,
     const_iterator from, iterator& result, bool will_be_replaced)
 {
   if ((from.node_ != result.node_) || (result.pointed_ < from.pointed_))
@@ -163,34 +163,31 @@ void rychkov::Map< Key, Value, Compare, N >::correct_erase_result(const_iterator
   }
 }
 
-template< class Key, class Value, class Compare, size_t N >
-typename rychkov::Map< Key, Value, Compare, N >::size_type
-    rychkov::Map< Key, Value, Compare, N >::erase(const key_type& key)
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const key_type& key)
 {
-  const_iterator iter = find(key);
-  if (iter == end())
-  {
-    return 0;
-  }
-  erase(iter);
-  return 1;
+  size_type result = 0;
+  const_iterator iter = lower_bound(key);
+  for (; (iter != end()) && !compare_with_key(key, *iter); iter = erase(iter), result++)
+  {}
+  return result;
 }
-template< class Key, class Value, class Compare, size_t N >
-template< class K >
-typename rychkov::Map< Key, Value, Compare, N >::size_type
-    rychkov::Map< Key, Value, Compare, N >::erase(std::enable_if_t< is_transparent_v< key_compare >, const K& > key)
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+template< class K1 >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+    < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type, K1 >
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const K1& key)
 {
-  const_iterator iter = find(key);
-  if (iter == end())
-  {
-    return 0;
-  }
-  erase(iter);
-  return 1;
+  size_type result = 0;
+  const_iterator iter = lower_bound(key);
+  for (; (iter != end()) && !compare_with_key(key, *iter); iter = erase(iter), result++)
+  {}
+  return result;
 }
-template< class Key, class Value, class Compare, size_t N >
-typename rychkov::Map< Key, Value, Compare, N >::iterator
-    rychkov::Map< Key, Value, Compare, N >::erase(const_iterator from, const_iterator to)
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const_iterator from, const_iterator to)
 {
 
   for (size_type len = std::distance(from, to); len > 0; len--)

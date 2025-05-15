@@ -1,5 +1,5 @@
-#ifndef NODE_HPP
-#define NODE_HPP
+#ifndef MAP_BASE_NODE_HPP
+#define MAP_BASE_NODE_HPP
 
 #include <cstddef>
 #include <utility>
@@ -9,7 +9,7 @@
 namespace rychkov
 {
   template< class Value, size_t N >
-  class MapNode
+  class MapBaseNode
   {
   public:
     using value_type = Value;
@@ -18,10 +18,10 @@ namespace rychkov
 
     static_assert(N >= 2, "");
 
-    MapNode* parent = nullptr;
-    MapNode* children[node_capacity + 1];
+    MapBaseNode* parent = nullptr;
+    MapBaseNode* children[node_capacity + 1];
 
-    ~MapNode()
+    ~MapBaseNode()
     {
       while (!empty())
       {
@@ -105,9 +105,6 @@ namespace rychkov
       operator[](--size_).~value_type();
     }
   private:
-    template< class K, class M, class C, size_t N1 >
-    friend class Map;
-
     size_type size_ = 0;
     alignas(value_type) unsigned char data_[node_capacity * sizeof(value_type)];
   };

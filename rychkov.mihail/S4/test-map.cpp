@@ -6,40 +6,23 @@
 #include <boost/test/unit_test.hpp>
 #include <mem_checker.hpp>
 #include "map.hpp"
-
-template< class Value, size_t N >
-std::ostream& print(std::ostream& out, rychkov::MapNode< Value, N >* node, size_t level = 0)
-{
-  if (node == nullptr)
-  {
-    return out;
-  }
-  using node_type = rychkov::MapNode< Value, N >;
-  for (typename node_type::size_type i = 0; i < node->size(); i++)
-  {
-    print(out, node->children[i], level + 1);
-    for (size_t j = 0; j < level; j++)
-    {
-      out << '\t';
-    }
-    out << node->operator[](i).first;
-    if (!node->parent->isfake())
-    {
-      out << " (" << node->parent->operator[](0).first << ')';
-    }
-    out << '\n';
-  }
-  print(out, node->children[node->size()], level + 1);
-  return out;
-}
-template< class Key, class Mapped, class Compare, size_t N >
-rychkov::MapNode< typename rychkov::Map< Key, Mapped, Compare, N >::value_type, N >*
-    rychkov::Map< Key, Mapped, Compare, N >::root() noexcept
-{
-  return fake_children_[0];
-}
+#include "set.hpp"
 
 BOOST_AUTO_TEST_SUITE(S4_map_test)
+
+BOOST_AUTO_TEST_CASE(multimap_test)
+{
+  rychkov::MultiMap< int, int > multimap;
+  for (int i = 10; i > 0; i--)
+  {
+    multimap.try_emplace(i);
+  }
+  for (int i = 10; i > 0; i--)
+  {
+    multimap.try_emplace(i);
+  }
+  multimap.erase(2);
+}
 
 BOOST_AUTO_TEST_CASE(empty_test)
 {
@@ -86,7 +69,7 @@ BOOST_AUTO_TEST_CASE(random_test)
   engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
   constexpr size_t input_size = 1024;
   int data[input_size];
-  rychkov::Map< int, char > map;
+  rychkov::MapBase< int, char, std::less<>, 2, false, false > map;
   for (int& i: data)
   {
     i = engine();

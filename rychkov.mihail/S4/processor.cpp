@@ -19,7 +19,23 @@ bool rychkov::S4ParseProcessor::init(ParserContext& context, int argc, char** ar
   std::string name;
   while (file >> name)
   {
-    // std::pair< outer_map::iterator, bool > ins_result = map.insert(name);
+    //inner_map& link = map[name];
+    if (context.eol())
+    {
+      break;
+    }
+    int key = 0;
+    std::string str;
+    if (!context.in >> key)
+    {
+      return true;
+    }
+    if (!(context.in >> str))
+    {
+      context.err << "failed to read string for key\n";
+      return false;
+    }
+    //link.try_emplace(key, std::move(str));
   }
   return true;
 }
@@ -48,11 +64,11 @@ bool rychkov::S4ParseProcessor::print(ParserContext& context)
   context.out << '\n';
   return true;
 }
-bool rychkov::S4ParseProcessor::make_complement(ParserContext& context)
+bool rychkov::S4ParseProcessor::make_complement(ParserContext&)
 {
   return true;
 }
-bool rychkov::S4ParseProcessor::make_intersect(ParserContext& context)
+bool rychkov::S4ParseProcessor::make_intersect(ParserContext&)
 {
   return true;
 }

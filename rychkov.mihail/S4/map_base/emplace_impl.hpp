@@ -1,32 +1,35 @@
-#ifndef EMPLACE_IMPL_HPP
-#define EMPLACE_IMPL_HPP
+#ifndef MAP_BASE_EMPLACE_IMPL_HPP
+#define MAP_BASE_EMPLACE_IMPL_HPP
 
 #include "declaration.hpp"
+
 #include <utility>
 #include <limits>
-#include <type_traits.hpp>
+#include <type_traits>
 
-template< class Key, class Value, class Compare, size_t N >
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class... Args >
-typename rychkov::Map< Key, Value, Compare, N >::iterator
-    rychkov::Map< Key, Value, Compare, N >::emplace_hint_impl(const_iterator hint, Args&&... args)
+std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bool >
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::emplace_hint_impl(std::pair< const_iterator, bool > hint_pair,
+      Args&&... args)
 {
-  static_assert(std::is_nothrow_move_constructible< key_type >::value, "use of unready functional");
-  static_assert(std::is_nothrow_move_constructible< mapped_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "use of unready functional");
 
-  if (hint.node_->isfake())
+  const_iterator hint = hint_pair.first;
+  if (!hint_pair.second)
   {
-    if (size_ == 0)
-    {
-      fake_children_[0] = new node_type;
-      fake_children_[0]->parent = fake_root();
-      cached_begin_ = fake_children_[0];
-      cached_rbegin_ = fake_children_[0];
-      cached_begin_->emplace_back(std::forward< Args >(args)...);
-      size_++;
-      return begin();
-    }
-    hint = {cached_rbegin_, cached_rbegin_->size()};
+    return {{hint.node_, hint.pointed_}, false};
+  }
+
+  if (size_ == 0)
+  {
+    fake_children_[0] = new node_type;
+    fake_children_[0]->parent = fake_root();
+    cached_begin_ = fake_children_[0];
+    cached_rbegin_ = fake_children_[0];
+    cached_begin_->emplace_back(std::forward< Args >(args)...);
+    size_++;
+    return {begin(), true};
   }
   if (!hint.node_->isleaf())
   {
@@ -37,7 +40,7 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
   {
     hint.node_->emplace(hint.pointed_, std::forward< Args >(args)...);
     size_++;
-    return {hint.node_, hint.pointed_};
+    return {{hint.node_, hint.pointed_}, true};
   }
 
   node_type to_insert;
@@ -110,10 +113,10 @@ typename rychkov::Map< Key, Value, Compare, N >::iterator
   }
   storage.size = 0;
   size_++;
-  return {hint.node_, hint.pointed_};
+  return {{hint.node_, hint.pointed_}, true};
 }
-template< class Key, class Value, class Compare, size_t N >
-void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& right,
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::devide(node_type& left, node_type& right,
       node_size_type ins_point, node_type& to_insert)
 {
   if (ins_point <= node_middle)
@@ -187,8 +190,8 @@ void rychkov::Map< Key, Value, Compare, N >::devide(node_type& left, node_type& 
   to_insert.children[0] = &left;
   to_insert.children[1] = &right;
 }
-template< class Key, class Value, class Compare, size_t N >
-void rychkov::Map< Key, Value, Compare, N >::correct_emplace_result(node_type& left, node_type& right,
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::correct_emplace_result(node_type& left, node_type& right,
     node_size_type ins_point, const_iterator& hint)
 {
   if ((hint.pointed_ > node_middle) && (ins_point != node_middle))
