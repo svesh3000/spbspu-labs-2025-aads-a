@@ -8,14 +8,6 @@ namespace maslevtsov {
   class Stack
   {
   public:
-    Stack() noexcept = default;
-    Stack(const Stack& rhs) = default;
-    Stack(Stack&& rhs) noexcept = default;
-    ~Stack() = default;
-
-    Stack& operator=(const Stack& rhs) = default;
-    Stack& operator=(Stack&& rhs) noexcept = default;
-
     T& top() noexcept;
     const T& top() const noexcept;
 
@@ -65,7 +57,7 @@ void maslevtsov::Stack< T >::push(const T& value)
 template< class T >
 void maslevtsov::Stack< T >::push(T&& value)
 {
-  stack_base_.push(value);
+  stack_base_.push(std::move(value));
 }
 
 template< class T >

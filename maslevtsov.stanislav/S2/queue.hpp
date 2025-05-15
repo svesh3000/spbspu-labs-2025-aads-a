@@ -8,14 +8,6 @@ namespace maslevtsov {
   class Queue
   {
   public:
-    Queue() noexcept = default;
-    Queue(const Queue& rhs) = default;
-    Queue(Queue&& rhs) noexcept = default;
-    ~Queue() = default;
-
-    Queue& operator=(const Queue& rhs) = default;
-    Queue& operator=(Queue&& rhs) noexcept = default;
-
     T& front() noexcept;
     const T& front() const noexcept;
 
@@ -65,7 +57,7 @@ void maslevtsov::Queue< T >::push(const T& value)
 template< class T >
 void maslevtsov::Queue< T >::push(T&& value)
 {
-  queue_base_.push(value);
+  queue_base_.push(std::move(value));
 }
 
 template< class T >
