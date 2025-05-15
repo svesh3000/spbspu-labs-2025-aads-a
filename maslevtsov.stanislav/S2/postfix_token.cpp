@@ -34,11 +34,16 @@ maslevtsov::PostfixToken::PostfixToken(const std::string& infix_token):
   token_()
 {
   Stack< std::string > dump;
-  std::string element = "";
-  std::istringstream iss(infix_token);
-  while (iss >> element) {
-    if (element == "") {
-      continue;
+  std::size_t start = 0;
+  while (start < infix_token.length()) {
+    std::size_t end = infix_token.find(' ', start);
+    std::string element = "";
+    if (end == std::string::npos) {
+      element = infix_token.substr(start);
+      start = infix_token.length();
+    } else {
+      element = infix_token.substr(start, end - start);
+      start = end + 1;
     }
     if (element == "(") {
       dump.push(element);
@@ -58,7 +63,6 @@ maslevtsov::PostfixToken::PostfixToken(const std::string& infix_token):
       }
       dump.pop();
     } else {
-      std::stoll(element);
       token_.push(element);
     }
   }
@@ -118,7 +122,12 @@ long long maslevtsov::PostfixToken::operator()() const
       dump.push(checked_operation(operand1, operand2, exp.front()));
       exp.pop();
     } else {
-      dump.push(std::stoll(exp.front()));
+      std::size_t pos = 0;
+      long long operand = std::stoll(exp.front(), &pos);
+      if (pos != exp.front().length()) {
+        throw std::invalid_argument("invalid operand");
+      }
+      dump.push(operand);
       exp.pop();
     }
   }

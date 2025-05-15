@@ -88,7 +88,7 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
 {
-  return {const_iterator::get_min_node(dummy_root_->left), true};
+  return {iterator::get_min_node(dummy_root_->left), true};
 }
 
 template< class Key, class T, class Compare >
@@ -107,19 +107,19 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::cend() const noexcept
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
@@ -205,8 +205,26 @@ typename maslevtsov::Tree< Key, T, Compare >::size_type maslevtsov::Tree< Key, T
 template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
 {
-  clear_subtree(dummy_root_->left);
-  dummy_root_->left = nullptr;
+  Node* current = iterator::get_min_node(dummy_root_);
+  while (current && current != dummy_root_) {
+    Node* cur_parent = current->parent;
+    Node* next = nullptr;
+    if (cur_parent->left == current) {
+      if (cur_parent->middle) {
+        next = cur_parent->middle;
+      } else {
+        next = cur_parent->right;
+      }
+      next = iterator::get_min_node(next);
+    } else if (cur_parent->middle == current) {
+      next = iterator::get_min_node(cur_parent->right);
+    } else {
+      next = cur_parent;
+    }
+    delete current;
+    current = next;
+  }
+  size_ = 0;
 }
 
 template< class Key, class T, class Compare >
@@ -214,16 +232,49 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
 {
   if (empty()) {
-    Node* n = new Node{value, value, dummy_root_, nullptr, nullptr, nullptr, true};
-    dummy_root_->left = n;
+    Node* new_node = new Node{value, value, dummy_root_, nullptr, nullptr, nullptr, true};
+    dummy_root_->left = new_node;
     ++size_;
-    return {iterator(n, true), true};
+    return {iterator(new_node, true), true};
   }
-  auto result = find_impl(value.first);
+  std::pair< iterator, bool > result = find_impl(value.first);
   if (result.second) {
     return result;
   }
-  return result;
+  Node* current = dummy_root_->left;
+  while (current->left || current->middle || (!current->is_two && current->right)) {
+    if (current->is_two) {
+      if (compare_(value.first, current->data1.first)) {
+        current = current->left;
+      } else {
+        current = current->right;
+      }
+    } else {
+      if (compare_(value.first, current->data1.first)) {
+        current = current->left;
+      } else if (compare_(value.first, current->data2.first)) {
+        current = current->middle;
+      } else {
+        current = current->right;
+      }
+    }
+  }
+  if (current->is_two) {
+    if (compare_(value.first, current->data1.first)) {
+      current->data1 = value;
+      current->is_two = false;
+      ++size_;
+      return {iterator(current, true), true};
+    }
+    current->data2 = value;
+    current->is_two = false;
+    ++size_;
+    return {iterator(current, false), true};
+  }
+  value_type to_insert(value);
+  split_nodes(current, to_insert);
+  ++size_;
+  return find_impl(value.first);
 }
 
 template< class Key, class T, class Compare >
@@ -293,15 +344,89 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
 }
 
 template< class Key, class T, class Compare >
-void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
+void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to_insert, Node* left_child,
+  Node* right_child)
 {
-  if (!node) {
-    return;
+  value_type values_to_split[3] = {node->data1, node->data2, to_insert};
+  if (compare_(values_to_split[2].first, values_to_split[0].first)) {
+    std::swap(values_to_split[2], values_to_split[0]);
   }
-  clear_subtree(node->left);
-  clear_subtree(node->middle);
-  clear_subtree(node->right);
-  delete node;
+  if (compare_(values_to_split[1].first, values_to_split[0].first)) {
+    std::swap(values_to_split[1], values_to_split[0]);
+  }
+  if (compare_(values_to_split[2].first, values_to_split[1].first)) {
+    std::swap(values_to_split[2], values_to_split[1]);
+  }
+  Node* left_node = new Node{values_to_split[0], values_to_split[0], nullptr, nullptr, nullptr, nullptr, true};
+  Node* right_node = nullptr;
+  try {
+    right_node = new Node{values_to_split[2], values_to_split[2], nullptr, nullptr, nullptr, nullptr, true};
+  } catch (const std::bad_alloc&) {
+    delete left_node;
+    throw;
+  }
+  if (node->left) {
+    Node* kids[4] = {node->left, node->middle, node->right, nullptr};
+    if (compare_(to_insert.first, node->data1.first)) {
+      kids[3] = kids[2];
+      kids[2] = kids[1];
+      kids[0] = left_child;
+      kids[1] = right_child;
+    } else if (compare_(node->data2.first, to_insert.first)) {
+      kids[3] = right_child;
+      kids[2] = left_child;
+    } else {
+      kids[3] = kids[2];
+      kids[2] = right_child;
+      kids[1] = left_child;
+    }
+    left_node->left = kids[0];
+    if (kids[0]) {
+      kids[0]->parent = left_node;
+    }
+    left_node->right = kids[1];
+    if (kids[1]) {
+      kids[1]->parent = left_node;
+    }
+    right_node->left = kids[2];
+    if (kids[2]) {
+      kids[2]->parent = right_node;
+    }
+    right_node->right = kids[3];
+    if (kids[3]) {
+      kids[3]->parent = right_node;
+    }
+  }
+  Node* parent = node->parent;
+  if (parent == dummy_root_) {
+    node->data1 = values_to_split[1];
+    node->data2 = values_to_split[1];
+    node->left = left_node;
+    left_node->parent = node;
+    node->right = right_node;
+    right_node->parent = node;
+    node->middle = nullptr;
+    node->is_two = true;
+    return;
+  } else if (parent->is_two) {
+    if (compare_(values_to_split[1].first, parent->data1.first)) {
+      parent->data2 = parent->data1;
+      parent->data1 = values_to_split[1];
+      parent->left = left_node;
+      parent->middle = right_node;
+    } else {
+      parent->data2 = values_to_split[1];
+      parent->middle = left_node;
+      parent->right = right_node;
+    }
+    parent->is_two = false;
+    left_node->parent = parent;
+    right_node->parent = parent;
+    delete node;
+    return;
+  } else {
+    return split_nodes(parent, values_to_split[1], left_node, right_node);
+  }
 }
 
 template< class Key, class T, class Compare >
@@ -309,7 +434,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::find_impl(const Key& key) const noexcept
 {
   if (empty()) {
-    return {iterator(dummy_root_, true), true};
+    return {iterator(dummy_root_, true), false};
   }
   Node* current = dummy_root_->left;
   Node* greater = nullptr;
