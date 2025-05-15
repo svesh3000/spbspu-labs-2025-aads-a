@@ -8,21 +8,31 @@
 #include "map.hpp"
 #include "set.hpp"
 
-BOOST_AUTO_TEST_SUITE(S4_map_test)
-
-BOOST_AUTO_TEST_CASE(multimap_test)
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::debug_print() const
 {
-  rychkov::MultiMap< int, int > multimap;
-  for (int i = 10; i > 0; i--)
-  {
-    multimap.try_emplace(i);
-  }
-  for (int i = 10; i > 0; i--)
-  {
-    multimap.try_emplace(i);
-  }
-  multimap.erase(2);
+  debug_print(fake_children_[0], 0);
 }
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::debug_print(node_type* node, size_t offset) const
+{
+  if (node == nullptr)
+  {
+    return;
+  }
+  for (node_size_type i = 0; i < node->size(); i++)
+  {
+    debug_print(node->children[i], offset + 1);
+    for (size_t j = 0; j < offset; j++)
+    {
+      std::cout << '\t';
+    }
+    std::cout << node->operator[](i) << '\n';
+  }
+  debug_print(node->children[node->size()], offset + 1);
+}
+
+BOOST_AUTO_TEST_SUITE(S4_map_test)
 
 BOOST_AUTO_TEST_CASE(empty_test)
 {
@@ -33,7 +43,7 @@ BOOST_AUTO_TEST_CASE(empty_test)
   BOOST_TEST((map.begin() == map.end()));
   BOOST_CHECK_THROW(map.at(0), std::out_of_range);
 }
-BOOST_AUTO_TEST_CASE(access_test)
+BOOST_AUTO_TEST_CASE(map_test)
 {
   rychkov::Map< int, char > map = {{0, '1'}, {3, '2'}, {-1, '3'}, {2, '4'}};
   BOOST_TEST(map.size() == 4);
@@ -55,52 +65,49 @@ BOOST_AUTO_TEST_CASE(access_test)
 }
 BOOST_AUTO_TEST_CASE(erase_test)
 {
-  rychkov::Map< int, char > map = {{0, '1'}, {2, '2'}, {1, '3'}, {5, '4'}, {-3, '5'}, {4, '6'}, {-2, '7'}};
-  BOOST_TEST(map.erase(map.find(0))->first == 1);
-  BOOST_TEST(map.erase(2) == 1);
-  BOOST_TEST(map.erase(-1) == 0);
-  BOOST_TEST(map.erase(4) == 1);
-  BOOST_TEST(map.erase(1) == 1);
-  BOOST_TEST((map.erase(map.begin(), map.end()) == map.end()));
+  rychkov::Set< int > set = {0, 2, 1, 5, -3, 4, -2};
+  BOOST_TEST(*set.erase(set.find(0)) == 1);
+  BOOST_TEST(set.erase(2) == 1);
+  BOOST_TEST(set.erase(-1) == 0);
+  BOOST_TEST(set.erase(4) == 1);
+  BOOST_TEST(set.erase(1) == 1);
+  BOOST_TEST((set.erase(set.begin(), set.end()) == set.end()));
+  BOOST_TEST(set.empty());
 }
 BOOST_AUTO_TEST_CASE(random_test)
 {
   std::mt19937 engine;
   engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
-  constexpr size_t input_size = 1024;
+  constexpr size_t input_size = 8192;
   int data[input_size];
-  rychkov::MapBase< int, char, std::less<>, 2, false, false > map;
+  rychkov::MultiSet< int, std::less<>, 10 > set;
+  size_t size = 0;
   for (int& i: data)
   {
+    std::uniform_int_distribution< size_t > range(0, size - 1);
+    decltype(set)::iterator wrong_hint = (size == 0 ? set.begin() : set.lower_bound(data[range(engine)]));
     i = engine();
-    map.emplace(i, '\0');
+    set.insert(wrong_hint, i);
   }
   std::sort(data, data + input_size);
-  size_t size = std::unique(data, data + input_size) - data;
-  struct equal_to_key
-  {
-    bool operator()(const std::pair< int, char >& lhs, const int& rhs)
-    {
-      return lhs.first == rhs;
-    }
-  };
-  BOOST_TEST(std::equal(map.begin(), map.end(), data, equal_to_key{}));
+  size = input_size;
+  BOOST_TEST(std::equal(set.begin(), set.end(), data));
   for (; size > 0; size--)
   {
     std::uniform_int_distribution< size_t > range(0, size - 1);
     size_t id = range(engine);
-    decltype(map)::iterator next = map.erase(map.find(data[id]));
+    decltype(set)::iterator next = set.erase(set.find(data[id]));
     std::remove(data, data + size, data[id]);
     if (id == size - 1)
     {
-      BOOST_TEST((next == map.end()));
+      BOOST_TEST((next == set.end()));
     }
     else
     {
-      BOOST_TEST(next->first == data[id]);
+      BOOST_TEST(*next == data[id]);
     }
-    BOOST_TEST(std::equal(map.begin(), map.end(), data, equal_to_key{}));
-    BOOST_TEST(map.size() == size - 1);
+    BOOST_TEST(std::equal(set.begin(), set.end(), data));
+    BOOST_TEST(set.size() == size - 1);
   }
 }
 

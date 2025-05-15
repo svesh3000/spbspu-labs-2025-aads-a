@@ -32,7 +32,8 @@ rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(MapBase&& rhs)
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 rychkov::MapBase< K, T, C, N, IsSet, IsMulti >&
-    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::operator=(MapBase&& rhs) noexcept(noexcept(swap(std::declval< MapBase& >())))
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::operator=(MapBase&& rhs)
+    noexcept(noexcept(swap(std::declval< MapBase& >())))
 {
   MapBase temp = std::move(*this);
   swap(rhs);
@@ -58,7 +59,8 @@ rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::~MapBase()
   clear();
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::swap(MapBase& rhs) noexcept(is_nothrow_swappable_v< value_compare >)
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::swap(MapBase& rhs)
+    noexcept(is_nothrow_swappable_v< value_compare >)
 {
   std::swap(comp_, rhs.comp_);
   std::swap(cached_begin_, rhs.cached_begin_);

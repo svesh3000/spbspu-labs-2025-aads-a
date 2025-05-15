@@ -31,11 +31,6 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bo
     size_++;
     return {begin(), true};
   }
-  if (!hint.node_->isleaf())
-  {
-    --hint;
-    hint.pointed_++;
-  }
   if (!hint.node_->full())
   {
     hint.node_->emplace(hint.pointed_, std::forward< Args >(args)...);
@@ -156,21 +151,16 @@ void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::devide(node_type& left, nod
     for (node_size_type i = node_middle + 1; i < ins_point; i++)
     {
       right.emplace_back(std::move(left[i]));
-      right.children[right.size()] = left.children[i];
+      right.children[right.size()] = left.children[i + 1];
     }
     right.children[0] = left.children[node_middle + 1];
     right.emplace_back(std::move(to_insert[0]));
     right.children[right.size() - 1] = to_insert.children[0];
     right.children[right.size()] = to_insert.children[1];
-    if (!to_insert.isleaf())
-    {
-      to_insert.children[0]->parent = &right;
-      to_insert.children[1]->parent = &right;
-    }
     for (node_size_type i = ins_point; i < node_capacity; i++)
     {
       right.emplace_back(std::move(left[i]));
-      right.children[right.size()] = left.children[i];
+      right.children[right.size()] = left.children[i + 1];
     }
     for (node_size_type i = node_middle; i < node_capacity; i++)
     {

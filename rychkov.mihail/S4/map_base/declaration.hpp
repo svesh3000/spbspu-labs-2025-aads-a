@@ -189,12 +189,14 @@ namespace rychkov
     template< bool IsSet2 = IsSet, class K1, class... Args >
     std::enable_if_t< !IsSet && !IsSet2 && is_transparent_v< key_compare >, iterator >
         try_emplace(const_iterator hint, K1&& key, Args&&... args);
+void debug_print() const;
   private:
     static constexpr size_t node_capacity = N;
     static constexpr size_t node_middle = (node_capacity + 1) / 2;
     using node_type = MapBaseNode< real_value_type, node_capacity >;
     using node_size_type = typename node_type::size_type;
 
+void debug_print(node_type* node, size_t level = 0) const;
     value_compare comp_;
     node_type* cached_begin_ = nullptr;
     node_type* cached_rbegin_ = nullptr;
@@ -219,6 +221,8 @@ namespace rychkov
     std::pair< const_iterator, bool > find_hint_pair(const K1& key) const;
     template< class K1 >
     std::pair< const_iterator, bool > correct_hint(const_iterator hint, const K1& key) const;
+    template< class K1 >
+    std::pair< const_iterator, bool > correct_hint(const_reverse_iterator hint, const K1& key) const;
 
     template< class... Args >
     std::pair< iterator, bool > emplace_hint_impl(std::pair< const_iterator, bool > hint, Args&&... args);

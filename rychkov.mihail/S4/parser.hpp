@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include <cctype>
 #include "map.hpp"
 
 namespace rychkov
@@ -15,19 +14,7 @@ namespace rychkov
     std::ostream& out;
     std::ostream& err;
 
-    bool eol()
-    {
-      char c;
-      while (in.peek() != '\n')
-      {
-        c = in.get();
-        if (!std::isspace(c))
-        {
-          return false;
-        }
-      }
-      return true;
-    }
+    bool eol();
   };
   template< class Proc >
   class Parser
