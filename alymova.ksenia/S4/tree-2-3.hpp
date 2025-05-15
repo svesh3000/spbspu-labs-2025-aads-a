@@ -373,8 +373,8 @@ namespace alymova
       }
       throw;
     }
-    move_fake();
     size_++;
+    move_fake();
     return find(value.first);
   }
 
@@ -394,13 +394,17 @@ namespace alymova
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::erase(Iterator pos)
   {
     assert(pos != end() && "Removing from empty map");
-    if (size_ == 1)
+    Key key_next;
+    NodePoint point_next = NodePoint::Empty;
+    Iterator pos_next = (++pos);
+    if (pos_next == end())
     {
-      delete pos.node_;
-      size_--;
-      return end();
+      point_next = NodePoint::Fake;
     }
-    Key key_next = (++pos)->first;
+    else
+    {
+      key_next = (pos_next)->first;
+    }
     --pos;
     Iterator pos_instead = find_to_erase(pos);
     std::swap(*pos, *pos_instead);
@@ -408,18 +412,10 @@ namespace alymova
     if (pos_instead.node_->type == NodeType::Empty)
     {
       fix(pos_instead.node_);
-      /*if (have_triple_neighbor(pos_instead))
-      {
-        distribute_erase(pos_instead);
-      }
-      else
-      {
-        merge_erase(pos_instead);
-      }*/
     }
     move_fake();
     size_--;
-    return find(key_next);
+    return (point_next == NodePoint::Fake) ? end() : find(key_next);
   }
 
   template< class Key, class Value, class Comparator >
@@ -634,6 +630,11 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::move_fake() const noexcept
   {
+    if (empty())
+    {
+      fake_->parent = nullptr;
+      return;
+    }
     Node* tmp = root_;
     while (tmp->right && tmp->right != fake_)
     {
@@ -755,6 +756,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::fix(Node* node)
   {
+    if (size_ == 1)
+    {
+      delete root_;
+      root_ = fake_;
+      return;
+    }
     if (!node->parent)
     {
       return;
@@ -771,7 +778,6 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::distribute_erase(Node* node)
   {
-    //Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
     Node* mid = parent->mid;
@@ -798,9 +804,9 @@ namespace alymova
       }
       else
       {
-        if (!node->right)
+        if (!node->right || node->right == fake_)
         {
-          std::swap(node->left, node->right);
+          node->right = std::exchange(node->left, nullptr);
         }
         parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
@@ -809,8 +815,8 @@ namespace alymova
         {
           node->left->parent = node;
         }
-        left->right = right->mid;
-        right->mid = nullptr;
+        left->right = left->mid;
+        left->mid = nullptr;
       }
       return;
     }
@@ -931,7 +937,6 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   detail::TTTNode< Key, Value, Comparator >* TwoThreeTree< Key, Value, Comparator >::merge_erase(Node* node)
   {
-    //Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
     Node* right = parent->right;
@@ -983,13 +988,6 @@ namespace alymova
       return root_;
     }
     return parent;
-    /*Iterator new_pos(parent, NodePoint::First);
-    if (have_triple_neighbor(new_pos))
-    {
-      distribute_erase(new_pos);
-      return;
-    }
-    merge_erase(new_pos);*/
   }
 
   template< class Key, class Value, class Comparator >

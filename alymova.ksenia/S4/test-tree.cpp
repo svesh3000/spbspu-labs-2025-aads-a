@@ -265,8 +265,75 @@ BOOST_AUTO_TEST_CASE(test_erase)
   using Tree = alymova::TwoThreeTree< int, std::string, std::less< int > >;
   using Iterator = alymova::TTTIterator< int, std::string, std::less< int > >;
 
-  Tree tree1;
-  tree1.emplace(1, "a");
-  Iterator it = tree1.erase(tree1.begin());
-  BOOST_TEST((it == tree1.end()));
+  Tree tree;
+  tree.emplace(1, "a");
+  Iterator it = tree.erase(tree.begin());
+  BOOST_TEST(tree.size() == 0);
+  BOOST_TEST((it == tree.end()));
+
+  tree.emplace(1, "a");
+  tree.emplace(2, "b");
+  it = tree.erase(--tree.end());
+  BOOST_TEST(tree.size() == 1);
+  BOOST_TEST((it == tree.end()));
+
+  tree.emplace(2, "b");
+  it = tree.erase(tree.begin());
+  BOOST_TEST(tree.size() == 1);
+  BOOST_TEST(it->first == 2);
+
+  {
+    tree.emplace(1, "a");
+    for (size_t i = 3; i < 8; i++)
+    {
+      tree.emplace(i * 10, "merge");
+    }
+    it = tree.erase(tree.begin());
+    BOOST_TEST(tree.size() == 6);
+    BOOST_TEST(it->first == 2);
+    BOOST_TEST(tree.begin()->first == 2);
+
+    tree.emplace(1, "a");
+    it = tree.erase(tree.find(30));
+    BOOST_TEST(tree.size() == 6);
+    BOOST_TEST(it->first == 40);
+
+    tree.emplace(30, "merge");
+    it = tree.erase(tree.find(50));
+    BOOST_TEST(tree.size() == 6);
+    BOOST_TEST(it->first == 60);
+
+    tree.emplace(50, "merge");
+    it = tree.erase(tree.find(70));
+    BOOST_TEST(tree.size() == 6);
+    BOOST_TEST((it == tree.end()));
+  }
+  {
+    tree.emplace(70, "distr");
+    tree.emplace(75, "distr");
+    it = tree.erase(tree.find(50));
+    BOOST_TEST(tree.size() == 7);
+    BOOST_TEST(it->first == 60);
+
+    tree.emplace(50, "distr");
+    it = tree.erase(tree.find(75));
+    BOOST_TEST(tree.size() == 7);
+    BOOST_TEST((it == tree.end()));
+
+    tree.emplace(75, "distr");
+    tree.emplace(80, "distr");
+    it = tree.erase(tree.begin());
+    BOOST_TEST(tree.size() == 8);
+    BOOST_TEST(it->first == 2);
+
+    tree.emplace(1, "distr");
+    it = tree.erase(tree.find(70));
+    BOOST_TEST(tree.size() == 8);
+    BOOST_TEST(it->first == 75);
+
+    tree.emplace(85, "distr");
+    it = tree.erase(tree.find(30));
+    BOOST_TEST(tree.size() == 8);
+    BOOST_TEST(it->first == 40);
+  }
 }
