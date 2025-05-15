@@ -59,7 +59,6 @@ alymova::Postfix::Postfix(const std::string& s):
     }
     else
     {
-      stoll(now);
       postfix_.push(now);
     }
   }

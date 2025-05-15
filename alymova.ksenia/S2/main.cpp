@@ -51,10 +51,6 @@ int main(int argc, char** argv)
       res.pop();
     }
     std::cout << '\n';
-    if (argc == 2)
-    {
-      file.close();
-    }
   }
   catch (const std::exception& e)
   {
