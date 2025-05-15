@@ -980,7 +980,7 @@ namespace alymova
       delete parent;
       root_ = node_merge;
       root_->parent = nullptr;
-      //return;
+      return root_;
     }
     return parent;
     /*Iterator new_pos(parent, NodePoint::First);
