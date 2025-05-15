@@ -204,17 +204,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
     return {iterator(current, false), true};
   }
   value_type to_insert = value;
-  value_type values_to_split[3] = {current->data1, current->data2, to_insert};
-  if (compare_(values_to_split[2].first, values_to_split[0].first)) {
-    std::swap(values_to_split[2], values_to_split[0]);
-  }
-  if (compare_(values_to_split[1].first, values_to_split[0].first)) {
-    std::swap(values_to_split[1], values_to_split[0]);
-  }
-  if (compare_(values_to_split[2].first, values_to_split[1].first)) {
-    std::swap(values_to_split[2], values_to_split[1]);
-  }
-  split_nodes(current, values_to_split);
+  split_nodes(current, to_insert);
   ++size_;
   return find_impl(value.first);
 }
@@ -286,65 +276,89 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::const_iterator,
 }
 
 template< class Key, class T, class Compare >
-void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type (&values)[3])
+void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to_insert, Node* left_child,
+  Node* right_child)
 {
-  Node* parent = node->parent;
-  value_type left_val = values[0];
-  value_type mid_val = values[1];
-  value_type right_val = values[2];
-  Node* left_node = new Node{left_val, left_val, parent, nullptr, nullptr, nullptr, true};
+  value_type values_to_split[3] = {node->data1, node->data2, to_insert};
+  if (compare_(values_to_split[2].first, values_to_split[0].first)) {
+    std::swap(values_to_split[2], values_to_split[0]);
+  }
+  if (compare_(values_to_split[1].first, values_to_split[0].first)) {
+    std::swap(values_to_split[1], values_to_split[0]);
+  }
+  if (compare_(values_to_split[2].first, values_to_split[1].first)) {
+    std::swap(values_to_split[2], values_to_split[1]);
+  }
+  Node* left_node = new Node{values_to_split[0], values_to_split[0], nullptr, nullptr, nullptr, nullptr, true};
   Node* right_node = nullptr;
   try {
-    right_node = new Node{right_val, right_val, parent, nullptr, nullptr, nullptr, true};
+    right_node = new Node{values_to_split[2], values_to_split[2], nullptr, nullptr, nullptr, nullptr, true};
   } catch (const std::bad_alloc&) {
     delete left_node;
     throw;
   }
-  if (parent == dummy_root_) {
-    Node* new_root = nullptr;
-    try {
-      new_root = new Node{mid_val, mid_val, dummy_root_, left_node, nullptr, right_node, true};
-    } catch (const std::bad_alloc&) {
-      delete left_node;
-      delete right_node;
-      throw;
+  if (node->left) {
+    Node* kids[4] = {node->left, node->middle, node->right, nullptr};
+    if (compare_(to_insert.first, node->data1.first)) {
+      kids[3] = kids[2];
+      kids[2] = kids[1];
+      kids[0] = left_child;
+      kids[1] = right_child;
+    } else if (compare_(node->data2.first, to_insert.first)) {
+      kids[3] = right_child;
+      kids[2] = left_child;
+    } else {
+      kids[3] = kids[2];
+      kids[2] = right_child;
+      kids[1] = left_child;
     }
-    left_node->parent = new_root;
-    right_node->parent = new_root;
-    dummy_root_->left = new_root;
-    return;
+    left_node->left = kids[0];
+    if (kids[0]) {
+      kids[0]->parent = left_node;
+    }
+    left_node->right = kids[1];
+    if (kids[1]) {
+      kids[1]->parent = left_node;
+    }
+    right_node->left = kids[2];
+    if (kids[2]) {
+      kids[2]->parent = right_node;
+    }
+    right_node->right = kids[3];
+    if (kids[3]) {
+      kids[3]->parent = right_node;
+    }
   }
-  if (parent->is_two) {
-    if (compare_(mid_val.first, parent->data1.first)) {
+  Node* parent = node->parent;
+  if (parent == dummy_root_) {
+    node->data1 = values_to_split[1];
+    node->data2 = values_to_split[1];
+    node->left = left_node;
+    left_node->parent = node;
+    node->right = right_node;
+    right_node->parent = node;
+    node->middle = nullptr;
+    node->is_two = true;
+    return;
+  } else if (parent->is_two) {
+    if (compare_(values_to_split[1].first, parent->data1.first)) {
       parent->data2 = parent->data1;
-      parent->data1 = mid_val;
-      parent->right = parent->middle;
+      parent->data1 = values_to_split[1];
       parent->left = left_node;
       parent->middle = right_node;
     } else {
-      parent->data2 = mid_val;
+      parent->data2 = values_to_split[1];
       parent->middle = left_node;
       parent->right = right_node;
     }
     parent->is_two = false;
     left_node->parent = parent;
     right_node->parent = parent;
+    delete node;
     return;
-  }
-  if (compare_(mid_val.first, parent->data1.first)) {
-    values[2] = parent->data2;
-    values[1] = parent->data1;
-    values[0] = mid_val;
-  } else if (compare_(mid_val.first, parent->data2.first)) {
-    values[0] = parent->data1;
-    values[1] = mid_val;
-    values[2] = parent->data2;
   } else {
-    values[0] = parent->data1;
-    values[1] = parent->data2;
-    values[2] = mid_val;
+    return split_nodes(parent, values_to_split[1], left_node, right_node);
   }
-  split_nodes(parent, values);
 }
 
 template< class Key, class T, class Compare >

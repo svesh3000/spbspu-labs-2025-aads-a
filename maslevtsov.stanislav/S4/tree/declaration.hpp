@@ -59,7 +59,7 @@ namespace maslevtsov {
     size_type size_;
     Compare compare_;
 
-    void split_nodes(Node* node, value_type (&values)[3]);
+    void split_nodes(Node* node, value_type& to_insert, Node* left_child = nullptr, Node* right_child = nullptr);
     std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };
 }

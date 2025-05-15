@@ -46,32 +46,47 @@ namespace maslevtsov {
   template< class T, bool is_const >
   typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator++()
   {
-    if (!(node_->is_two) && is_first_) {
-      TreeNode< T >* min_node = get_min_node(node_->middle);
-      if (!min_node) {
-        is_first_ = false;
+    if (!node_) {
+      return *this;
+    }
+    if (!node_->is_two && is_first_) {
+      if (node_->middle) {
+        node_ = get_min_node(node_->middle);
+        is_first_ = true;
       } else {
-        node_ = min_node;
+        is_first_ = false;
       }
       return *this;
     }
-    TreeNode< T >* min_node = get_min_node(node_->right);
-    if (!min_node) {
-      if (node_->parent) {
-        while (node_->parent && node_->parent->right == node_) {
-          node_ = node_->parent;
+    if ((node_->is_two || !is_first_) && node_->right) {
+      node_ = get_min_node(node_->right);
+      is_first_ = true;
+      return *this;
+    }
+    TreeNode< T >* child = node_;
+    TreeNode< T >* parent = node_->parent;
+    while (parent) {
+      if (parent->is_two) {
+        if (parent->left == child) {
+          node_ = parent;
+          is_first_ = true;
+          return *this;
         }
-        if (node_->parent && node_->parent->middle == node_) {
-          node_ = node_->parent;
+      } else {
+        if (parent->left == child) {
+          node_ = parent;
+          is_first_ = true;
+          return *this;
+        } else if (parent->middle == child) {
+          node_ = parent;
           is_first_ = false;
           return *this;
-        } else if (node_->parent) {
-          node_ = node_->parent;
         }
       }
-    } else {
-      node_ = min_node;
+      child = parent;
+      parent = parent->parent;
     }
+    node_ = child;
     is_first_ = true;
     return *this;
   }
@@ -87,33 +102,48 @@ namespace maslevtsov {
   template< class T, bool is_const >
   typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator--()
   {
-    if (!(node_->is_two) && !is_first_) {
-      TreeNode< T >* max_node = get_max_node(node_->middle);
-      if (!max_node) {
-        is_first_ = true;
+    if (!node_) {
+      return *this;
+    }
+    if (!node_->is_two && !is_first_) {
+      if (node_->middle) {
+        node_ = get_max_node(node_->middle);
+        is_first_ = false;
       } else {
-        node_ = max_node;
+        is_first_ = true;
       }
       return *this;
     }
-    TreeNode< T >* max_node = get_max_node(node_->left);
-    if (!max_node) {
-      if (node_->parent) {
-        while (node_->parent && node_->parent->left == node_) {
-          node_ = node_->parent;
-        }
-        if (node_->parent && node_->parent->middle == node_) {
-          node_ = node_->parent;
+    if ((node_->is_two || is_first_) && node_->left) {
+      node_ = get_max_node(node_->left);
+      is_first_ = false;
+      return *this;
+    }
+    TreeNode< T >* child = node_;
+    TreeNode< T >* parent = node_->parent;
+    while (parent) {
+      if (parent->is_two) {
+        if (parent->right == child) {
+          node_ = parent;
           is_first_ = true;
           return *this;
-        } else if (node_->parent) {
-          node_ = node_->parent;
+        }
+      } else {
+        if (parent->right == child) {
+          node_ = parent;
+          is_first_ = false;
+          return *this;
+        } else if (parent->middle == child) {
+          node_ = parent;
+          is_first_ = true;
+          return *this;
         }
       }
-    } else {
-      node_ = max_node;
+      child = parent;
+      parent = parent->parent;
     }
-    is_first_ = false;
+    node_ = child;
+    is_first_ = true;
     return *this;
   }
 
