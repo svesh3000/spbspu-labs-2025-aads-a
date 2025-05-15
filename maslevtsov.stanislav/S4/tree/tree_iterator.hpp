@@ -65,7 +65,7 @@ namespace maslevtsov {
     }
     TreeNode< T >* child = node_;
     TreeNode< T >* parent = node_->parent;
-    while (parent) {
+    while (parent && parent->parent) {
       if (parent->is_two) {
         if (parent->left == child) {
           node_ = parent;
@@ -86,7 +86,7 @@ namespace maslevtsov {
       child = parent;
       parent = parent->parent;
     }
-    node_ = child;
+    node_ = nullptr;
     is_first_ = true;
     return *this;
   }
@@ -121,7 +121,7 @@ namespace maslevtsov {
     }
     TreeNode< T >* child = node_;
     TreeNode< T >* parent = node_->parent;
-    while (parent) {
+    while (parent && parent->parent) {
       if (parent->is_two) {
         if (parent->right == child) {
           node_ = parent;
@@ -142,7 +142,7 @@ namespace maslevtsov {
       child = parent;
       parent = parent->parent;
     }
-    node_ = child;
+    node_ = nullptr;
     is_first_ = true;
     return *this;
   }

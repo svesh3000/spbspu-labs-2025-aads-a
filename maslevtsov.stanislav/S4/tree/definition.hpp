@@ -107,19 +107,19 @@ typename maslevtsov::Tree< Key, T, Compare >::const_iterator
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::cend() const noexcept
 {
-  return {dummy_root_, true};
+  return {nullptr, true};
 }
 
 template< class Key, class T, class Compare >
@@ -169,7 +169,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
     ++size_;
     return {iterator(new_node, true), true};
   }
-  auto result = find_impl(value.first);
+  std::pair< iterator, bool > result = find_impl(value.first);
   if (result.second) {
     return result;
   }
@@ -203,7 +203,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
     ++size_;
     return {iterator(current, false), true};
   }
-  value_type to_insert = value;
+  value_type to_insert(value);
   split_nodes(current, to_insert);
   ++size_;
   return find_impl(value.first);
@@ -366,7 +366,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::find_impl(const Key& key) const noexcept
 {
   if (empty()) {
-    return {iterator(dummy_root_, true), true};
+    return {iterator(dummy_root_, true), false};
   }
   Node* current = dummy_root_->left;
   Node* greater = nullptr;
