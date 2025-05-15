@@ -1,11 +1,9 @@
 #include <iostream>
-#include <map>
 #include <string>
 #include <limits>
-#include "tree_manips.hpp"
 #include <fstream>
+#include "tree_manips.hpp"
 #include <tree/tree.hpp>
-#include <tree/node.hpp>
 
 namespace
 {
