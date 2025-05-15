@@ -65,7 +65,7 @@ namespace alymova
     Iterator erase(Iterator pos);
     Iterator erase(Iterator first, Iterator last);
 
-    void swap(Tree& other);
+    void swap(Tree& other) noexcept;
     void clear() noexcept;
 
     size_t count(const Key& key) const;
@@ -85,18 +85,18 @@ namespace alymova
     Comparator cmp_;
 
     void clear(Node* node) noexcept;
-    void move_fake() noexcept;
+    void move_fake() const noexcept;
     void split_insert(Node* node);
     Node* find_to_insert(const Key& key) const;
-    Node* find_to_insert(ConstIterator hint) const;
-    bool check_hint(ConstIterator hint, const Key& key);
-    Iterator find_to_erase(Iterator pos);
-    bool have_triple_neighbor(Iterator pos);
+    Node* find_to_insert(ConstIterator hint) const noexcept;
+    bool check_hint(ConstIterator hint, const Key& key) const;
+    Iterator find_to_erase(Iterator pos) const noexcept;
+    bool have_triple_neighbor(Iterator pos) const noexcept;
     void distribute_erase(Iterator pos);
     void merge_erase(Iterator pos);
 
-    bool is_balanced();
-    size_t find_height(Node* node);
+    bool is_balanced() const noexcept;
+    size_t find_height(Node* node) const noexcept;
   };
 
   template< class T, class Value, class Comparator >
@@ -358,8 +358,20 @@ namespace alymova
       root_ = new Node();
       to_insert = root_;
     }
-    to_insert->insert(value);
-    split_insert(to_insert);
+    try
+    {
+      to_insert->insert(value);
+      split_insert(to_insert);
+    }
+    catch(...)
+    {
+      if (size_ == 0)
+      {
+        delete root_;
+        root_ = fake_;
+      }
+      throw;
+    }
     move_fake();
     size_++;
     return find(value.first);
@@ -380,11 +392,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::erase(Iterator pos)
   {
-    assert(!empty() && "Removing from empty map");
-    if (pos == end())
-    {
-      return end();
-    }
+    assert(pos != end() && "Removing from empty map");
     if (size_ == 1)
     {
       delete pos.node_;
@@ -428,7 +436,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other)
+  void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other) noexcept
   {
     std::swap(size_, other.size_);
     std::swap(fake_, other.fake_);
@@ -622,7 +630,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::move_fake() noexcept
+  void TwoThreeTree< Key, Value, Comparator >::move_fake() const noexcept
   {
     Node* tmp = root_;
     while (tmp->right && tmp->right != fake_)
@@ -658,7 +666,7 @@ namespace alymova
 
   template< class Key, class Value, class Comparator >
   detail::TTTNode< Key, Value, Comparator >*
-    TwoThreeTree< Key, Value, Comparator >::find_to_insert(ConstIterator hint) const
+    TwoThreeTree< Key, Value, Comparator >::find_to_insert(ConstIterator hint) const noexcept
   {
     Iterator tmp = hint;
     if ((hint == cend() && !empty()) || !tmp.node_->isLeaf())
@@ -669,7 +677,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TwoThreeTree< Key, Value, Comparator >::check_hint(ConstIterator hint, const Key& key)
+  bool TwoThreeTree< Key, Value, Comparator >::check_hint(ConstIterator hint, const Key& key) const
   {
     if (hint != cend())
     {
@@ -686,7 +694,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find_to_erase(Iterator pos)
+  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::find_to_erase(Iterator pos) const noexcept
   {
     Node* node = pos.node_;
     Node* node_instead = node;
@@ -721,7 +729,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TwoThreeTree< Key, Value, Comparator >::have_triple_neighbor(Iterator pos)
+  bool TwoThreeTree< Key, Value, Comparator >::have_triple_neighbor(Iterator pos) const noexcept
   {
     Node* node = pos.node_;
     if (!node)
@@ -753,7 +761,7 @@ namespace alymova
     Node* right = parent->right;
     if (parent->type == NodeType::Double)
     {
-      node->insert(parent->data[0]);
+      node->insert(std::move(parent->data[0]));
       parent->remove(NodePoint::First);
       if (left == node)
       {
@@ -761,7 +769,7 @@ namespace alymova
         {
           std::swap(node->left, node->right);
         }
-        parent->insert(right->data[0]);
+        parent->insert(std::move(right->data[0]));
         right->remove(NodePoint::First);
         node->right = right->left;
         if (node->right)
@@ -777,7 +785,7 @@ namespace alymova
         {
           std::swap(node->left, node->right);
         }
-        parent->insert(left->data[1]);
+        parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
         node->left = left->right;
         if (node->left)
@@ -791,7 +799,7 @@ namespace alymova
     }
     if (left == node)
     {
-      node->insert(parent->data[0]);
+      node->insert(std::move(parent->data[0]));
       parent->remove(NodePoint::First);
       if (!node->left)
       {
@@ -799,7 +807,7 @@ namespace alymova
       }
       if (mid->type == NodeType::Triple)
       {
-        parent->insert(mid->data[0]);
+        parent->insert(std::move(mid->data[0]));
         mid->remove(NodePoint::First);
         node->right = mid->left;
         if (node->right)
@@ -810,7 +818,7 @@ namespace alymova
         mid->mid = nullptr;
         return;
       }
-      node->insert(mid->data[0]);
+      node->insert(std::move(mid->data[0]));
       node->mid = mid->left;
       if (node->mid)
       {
@@ -828,7 +836,7 @@ namespace alymova
     }
     if (mid == node)
     {
-      node->insert(parent->data[0]);
+      node->insert(std::move(parent->data[0]));
       parent->remove(NodePoint::First);
       if (!node->right)
       {
@@ -836,7 +844,7 @@ namespace alymova
       }
       if (left->type == NodeType::Triple)
       {
-        parent->insert(left->data[1]);
+        parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
         node->left = left->right;
         if (node->left)
@@ -847,7 +855,7 @@ namespace alymova
         left->mid = nullptr;
         return;
       }
-      node->insert(left->data[0]);
+      node->insert(std::move(left->data[0]));
       node->mid = left->right;
       if (node->mid)
       {
@@ -866,7 +874,7 @@ namespace alymova
     }
     if (right == node)
     {
-      node->insert(parent->data[1]);
+      node->insert(std::move(parent->data[1]));
       parent->remove(NodePoint::Second);
       if (!node->right)
       {
@@ -874,7 +882,7 @@ namespace alymova
       }
       if (mid->type == NodeType::Triple)
       {
-        parent->insert(mid->data[1]);
+        parent->insert(std::move(mid->data[1]));
         mid->remove(NodePoint::Second);
         node->left = mid->right;
         if (node->left)
@@ -885,7 +893,7 @@ namespace alymova
         mid->mid = nullptr;
         return;
       }
-      node->insert(mid->data[0]);
+      node->insert(std::move(mid->data[0]));
       node->mid = mid->right;
       if (node->mid)
       {
@@ -944,7 +952,7 @@ namespace alymova
       }
       parent->right = nullptr;
     }
-    node_merge->insert(parent->data[0]);
+    node_merge->insert(std::move(parent->data[0]));
     parent->remove(NodePoint::First);
     node->clear();
     delete node;
@@ -967,13 +975,13 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TwoThreeTree< Key, Value, Comparator >::is_balanced()
+  bool TwoThreeTree< Key, Value, Comparator >::is_balanced() const noexcept
   {
     return find_height(root_) != -1;
   }
 
   template< class Key, class Value, class Comparator >
-  size_t TwoThreeTree< Key, Value, Comparator >::find_height(Node* node)
+  size_t TwoThreeTree< Key, Value, Comparator >::find_height(Node* node) const noexcept
   {
     if (node == nullptr || node == fake_)
     {

@@ -24,12 +24,13 @@ namespace alymova
       Node* overflow;
 
       TTTNode();
-      TTTNode(const std::pair< Key, Value >& pair, Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
+      TTTNode(const std::pair< Key, Value >& pair,
+        Node* parent, Node* left, Node* mid, Node* right, Node* overflow);
 
       void insert(const std::pair< Key, Value >& value);
-      void remove(NodePoint point);
-      bool isLeaf();
-      void clear();
+      void remove(NodePoint point) noexcept;
+      bool isLeaf() const noexcept;
+      void clear()noexcept;
     };
 
     template< class Key, class Value, class Comparator >
@@ -63,31 +64,30 @@ namespace alymova
       if (type == NodeType::Empty)
       {
         type = NodeType::Double;
+        return;
       }
-      else if (type == NodeType::Double)
+      if (type == NodeType::Double)
       {
         if (cmp(data[1].first, data[0].first))
         {
           std::swap(data[0], data[1]);
         }
         type = NodeType::Triple;
+        return;
       }
-      else if (type == NodeType::Triple)
+      if (cmp(data[2].first, data[1].first))
       {
-        if (cmp(data[2].first, data[1].first))
-        {
-          std::swap(data[2], data[1]);
-        }
-        if (cmp(data[1].first, data[0].first))
-        {
-          std::swap(data[1], data[0]);
-        }
-        type = NodeType::Overflow;
+        std::swap(data[2], data[1]);
       }
+      if (cmp(data[1].first, data[0].first))
+      {
+        std::swap(data[1], data[0]);
+      }
+      type = NodeType::Overflow;
     }
 
     template< class Key, class Value, class Comparator >
-    void TTTNode< Key, Value, Comparator >::remove(NodePoint point)
+    void TTTNode< Key, Value, Comparator >::remove(NodePoint point) noexcept
     {
       assert(type != NodeType::Empty && "Removing from empty node");
       if (type == NodeType::Double)
@@ -104,7 +104,7 @@ namespace alymova
     }
 
     template< class Key, class Value, class Comparator >
-    bool TTTNode< Key, Value, Comparator >::isLeaf()
+    bool TTTNode< Key, Value, Comparator >::isLeaf() const noexcept
     {
       if (right)
       {
@@ -117,7 +117,7 @@ namespace alymova
     }
 
     template< class Key, class Value, class Comparator >
-    void TTTNode< Key, Value, Comparator >::clear()
+    void TTTNode< Key, Value, Comparator >::clear() noexcept
     {
       parent = nullptr;
       left = nullptr;

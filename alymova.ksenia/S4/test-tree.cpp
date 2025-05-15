@@ -260,3 +260,13 @@ BOOST_AUTO_TEST_CASE(test_emplace_insert)
   tree.insert(tree.begin(), {0, "oo"});
   BOOST_TEST(tree.begin()->first == 0);
 }
+BOOST_AUTO_TEST_CASE(test_erase)
+{
+  using Tree = alymova::TwoThreeTree< int, std::string, std::less< int > >;
+  using Iterator = alymova::TTTIterator< int, std::string, std::less< int > >;
+
+  Tree tree1;
+  tree1.emplace(1, "a");
+  Iterator it = tree1.erase(tree1.begin());
+  BOOST_TEST((it == tree1.end()));
+}
