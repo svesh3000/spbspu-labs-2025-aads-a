@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_basic)
   BOOST_TEST(array1.size() == 9);
   BOOST_TEST(array1.back() == "10");
 
-  array_t array5(array_t());
+  array_t array5(array_t{});
   BOOST_TEST(array5.empty());
 
   array5 = array1;
