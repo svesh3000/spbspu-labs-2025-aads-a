@@ -1,7 +1,6 @@
 #ifndef MAP_OPERATIONS_HPP
 #define MAP_OPERATIONS_HPP
 
-#include <map>
 #include <string>
 #include <functional>
 #include "tree/declaration.hpp"
