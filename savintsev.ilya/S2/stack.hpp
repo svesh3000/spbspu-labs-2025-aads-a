@@ -45,7 +45,7 @@ namespace savintsev
   }
 
   template< typename T >
-  void Stack< T >::pop()
+  void Stack< T >::pop() noexcept
   {
     stack_.pop_back();
   }

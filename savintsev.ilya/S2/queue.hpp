@@ -47,7 +47,7 @@ namespace savintsev
   }
 
   template< typename T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
     queue_.pop_front();
   }
