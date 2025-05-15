@@ -91,9 +91,10 @@ namespace alymova
     Node* find_to_insert(ConstIterator hint) const noexcept;
     bool check_hint(ConstIterator hint, const Key& key) const;
     Iterator find_to_erase(Iterator pos) const noexcept;
-    bool have_triple_neighbor(Iterator pos) const noexcept;
-    void distribute_erase(Iterator pos);
-    void merge_erase(Iterator pos);
+    bool have_triple_neighbor(const Node* node) const noexcept;
+    void fix(Node* node);
+    void distribute_erase(Node* node);
+    Node* merge_erase(Node* node);
 
     bool is_balanced() const noexcept;
     size_t find_height(Node* node) const noexcept;
@@ -406,14 +407,15 @@ namespace alymova
     pos_instead.node_->remove(pos_instead.point_);
     if (pos_instead.node_->type == NodeType::Empty)
     {
-      if (have_triple_neighbor(pos_instead))
+      fix(pos_instead.node_);
+      /*if (have_triple_neighbor(pos_instead))
       {
         distribute_erase(pos_instead);
       }
       else
       {
         merge_erase(pos_instead);
-      }
+      }*/
     }
     move_fake();
     size_--;
@@ -729,9 +731,8 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TwoThreeTree< Key, Value, Comparator >::have_triple_neighbor(Iterator pos) const noexcept
+  bool TwoThreeTree< Key, Value, Comparator >::have_triple_neighbor(const Node* node) const noexcept
   {
-    Node* node = pos.node_;
     if (!node)
     {
       return false;
@@ -752,9 +753,25 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::distribute_erase(Iterator pos)
+  void TwoThreeTree< Key, Value, Comparator >::fix(Node* node)
   {
-    Node* node = pos.node_;
+    if (!node->parent)
+    {
+      return;
+    }
+    if (have_triple_neighbor(node))
+    {
+      distribute_erase(node);
+      return;
+    }
+    Node* new_node = merge_erase(node);
+    fix(node);
+  }
+
+  template< class Key, class Value, class Comparator >
+  void TwoThreeTree< Key, Value, Comparator >::distribute_erase(Node* node)
+  {
+    //Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
     Node* mid = parent->mid;
@@ -912,9 +929,9 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  void TwoThreeTree< Key, Value, Comparator >::merge_erase(Iterator pos)
+  detail::TTTNode< Key, Value, Comparator >* TwoThreeTree< Key, Value, Comparator >::merge_erase(Node* node)
   {
-    Node* node = pos.node_;
+    //Node* node = pos.node_;
     Node* parent = node->parent;
     Node* left = parent->left;
     Node* right = parent->right;
@@ -963,15 +980,16 @@ namespace alymova
       delete parent;
       root_ = node_merge;
       root_->parent = nullptr;
-      return;
+      //return;
     }
-    Iterator new_pos(parent, NodePoint::First);
+    return parent;
+    /*Iterator new_pos(parent, NodePoint::First);
     if (have_triple_neighbor(new_pos))
     {
       distribute_erase(new_pos);
       return;
     }
-    merge_erase(new_pos);
+    merge_erase(new_pos);*/
   }
 
   template< class Key, class Value, class Comparator >
