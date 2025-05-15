@@ -361,10 +361,10 @@ BOOST_AUTO_TEST_CASE(test_erase)
     BOOST_TEST(it->first == 5);
 
 
-    for (auto it = tree.begin(); it != tree.end(); it++)
+    /*for (auto it = tree.begin(); it != tree.end(); it++)
     {
       std::cout << it->first << '\n';
     }
-    std::cout << "-----------\n";
+    std::cout << "-----------\n";*/
   }
 }
