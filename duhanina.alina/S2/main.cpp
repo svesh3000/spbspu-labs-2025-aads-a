@@ -23,63 +23,6 @@ namespace
     return true;
   }
 
-  duhanina::Queue< std::string > infixToPostfix(const std::string& infix)
-  {
-    duhanina::Stack< char > operators;
-    duhanina::Queue< std::string > output;
-    std::stringstream ss(infix);
-    std::string token;
-    while (ss >> token)
-    {
-      if (std::isdigit(token[0]))
-      {
-        output.push(token);
-      }
-      else if (token[0] == '(')
-      {
-        operators.push(token[0]);
-      }
-      else if (token[0] == ')')
-      {
-        while (!operators.empty() && operators.top() != '(')
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        if (!operators.empty() && operators.top() == '(')
-        {
-          operators.pop();
-        }
-        else
-        {
-          throw std::runtime_error("Mismatched parentheses");
-        }
-      }
-      else if (isOperator(token[0]))
-      {
-        while (!operators.empty() && higherEqualPrecedence(operators.top(), token[0]))
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        operators.push(token[0]);
-      }
-      else
-      {
-        throw std::runtime_error("Invalid token");
-      }
-    }
-    while (!operators.empty())
-    {
-      if (operators.top() == '(' || operators.top() == ')')
-      {
-        throw std::runtime_error("Mismatched parentheses");
-      }
-      output.push(std::string(1, operators.top()));
-      operators.pop();
-    }
-    return output;
-  }
 duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
 {
   duhanina::Stack<char> operators;
