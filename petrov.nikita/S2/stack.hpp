@@ -56,7 +56,7 @@ namespace petrov
   template< typename T >
   void Stack< T >::pop()
   {
-    dynamic_array_.pop();
+    dynamic_array_.pop_back();
   }
 
   template< typename T >

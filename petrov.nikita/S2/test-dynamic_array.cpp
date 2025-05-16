@@ -185,21 +185,21 @@ BOOST_AUTO_TEST_CASE(push_back_six_elements)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(array_pop_method)
+BOOST_AUTO_TEST_SUITE(array_pop_back_method)
 
-BOOST_AUTO_TEST_CASE(pop_one_element)
+BOOST_AUTO_TEST_CASE(pop_back_one_element)
 {
   std::ostringstream out;
   petrov::DynamicArray< int > array;
   array.push_back(1);
   array.push_back(2);
   array.push_back(3);
-  array.pop();
+  array.pop_back();
   out << array.back();
   BOOST_TEST(out.str() == "2");
 }
 
-BOOST_AUTO_TEST_CASE(pop_three_element)
+BOOST_AUTO_TEST_CASE(pop_back_three_element)
 {
   std::ostringstream out;
   petrov::DynamicArray< int > array;
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(pop_three_element)
   }
   for (size_t i = 1; i <= 3; i++)
   {
-    array.pop();
+    array.pop_back();
   }
   out << array[0];
   for (size_t i = 1; i < array.size(); i++)
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(pop_three_element)
   BOOST_TEST(out.str() == "1 2");
 }
 
-BOOST_AUTO_TEST_CASE(pop_five_elements)
+BOOST_AUTO_TEST_CASE(pop_back_five_elements)
 {
   std::ostringstream out;
   petrov::DynamicArray< int > array;
@@ -229,13 +229,13 @@ BOOST_AUTO_TEST_CASE(pop_five_elements)
   }
   for (size_t i = 1; i <= 5; i++)
   {
-    array.pop();
+    array.pop_back();
   }
   out << array[0];
   BOOST_TEST(out.str() == "1");
 }
 
-BOOST_AUTO_TEST_CASE(pop_all_elements)
+BOOST_AUTO_TEST_CASE(pop_back_all_elements)
 {
   std::ostringstream out;
   petrov::DynamicArray< int > array;
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(pop_all_elements)
   }
   for (size_t i = 1; i <= 6; i++)
   {
-    array.pop();
+    array.pop_back();
   }
   out << array.empty();
   BOOST_TEST(out.str() == "1");

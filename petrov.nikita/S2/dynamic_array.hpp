@@ -15,7 +15,8 @@ namespace petrov
     DynamicArray():
       massive_(nullptr),
       capacity_(0),
-      size_(0)
+      size_(0),
+      front_index_(0)
     {}
     DynamicArray(const this_t & rhs);
     DynamicArray(this_t && rhs);
@@ -25,7 +26,8 @@ namespace petrov
     T & operator[](const size_t & pos);
     template< typename U >
     void push_back(U && val);
-    void pop();
+    void pop_back();
+    void pop_front();
     T & front();
     const T & front() const;
     T & back();
@@ -37,13 +39,15 @@ namespace petrov
     T * massive_;
     size_t capacity_;
     size_t size_;
+    size_t front_index_;
   };
 
   template< typename T >
   DynamicArray< T >::DynamicArray(const this_t & rhs):
     massive_(nullptr),
     capacity_(rhs.capacity_),
-    size_(rhs.size_)
+    size_(rhs.size_),
+    front_index_(rhs.front_index_)
   {
     massive_ = new T[rhs.capacity_];
     for (size_t i = 0; i < rhs.size_; i++)
@@ -56,7 +60,8 @@ namespace petrov
   DynamicArray< T >::DynamicArray(this_t && rhs):
     massive_(rhs.massive_),
     capacity_(rhs.capacity_),
-    size_(rhs.size_)
+    size_(rhs.size_),
+    front_index_(rhs.front_index_)
   {}
 
   template< typename T >
@@ -80,6 +85,7 @@ namespace petrov
     massive_ = rhs.massive_;
     capacity_ = rhs.capacity_;
     size_ = rhs.size_;
+    front_index_ = rhs.front_index_;
     return *this;
   }
 
@@ -121,7 +127,7 @@ namespace petrov
   }
 
   template< typename T >
-  void DynamicArray< T >::pop()
+  void DynamicArray< T >::pop_back()
   {
     if (empty())
     {
@@ -131,43 +137,38 @@ namespace petrov
   }
 
   template< typename T >
-  T & DynamicArray< T >::front()
+  void DynamicArray< T >::pop_front()
   {
     if (empty())
     {
-      throw std::logic_error("ERROR: Array is empty");
+      return;
     }
-    return massive_[0];
+    front_index_++;
+    size_--;
+  }
+
+  template< typename T >
+  T & DynamicArray< T >::front()
+  {
+    return massive_[front_index_];
   }
 
   template< typename T >
   const T & DynamicArray< T >::front() const
   {
-    if (empty())
-    {
-      throw std::logic_error("ERROR: Array is empty");
-    }
-    return massive_[0];
+    return massive_[front_index_];
   }
 
   template< typename T >
   T & DynamicArray< T >::back()
   {
-    if (empty())
-    {
-      throw std::logic_error("ERROR: Array is empty");
-    }
-    return massive_[size_ - 1];
+    return massive_[size_ + front_index_ - 1];
   }
 
   template< typename T >
   const T & DynamicArray< T >::back() const
   {
-    if (empty())
-    {
-      throw std::logic_error("ERROR: Array is empty");
-    }
-    return massive_[size_ - 1];
+    return massive_[size_ + front_index_ - 1];
   }
 
   template< typename T >
@@ -190,6 +191,5 @@ namespace petrov
     std::swap(size_, rhs.size_);
   }
 }
-
 
 #endif
