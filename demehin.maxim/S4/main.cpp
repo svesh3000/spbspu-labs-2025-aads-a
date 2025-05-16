@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   {
     inputTrees(file, mapOfTrees);
   }
-  catch (std::exception&)
+  catch (const std::exception&)
   {
     std::cout << "input error\n";
     return 1;
