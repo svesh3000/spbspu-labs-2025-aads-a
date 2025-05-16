@@ -13,15 +13,15 @@ namespace petrov
   {
   public:
     using this_t = Stack< T >;
-    Stack():
-      dynamic_array_()
+    Stack()
     {}
     template< typename U >
     Stack(this_t && rhs);
     ~Stack() = default;
     template< typename U >
     this_t & operator=(this_t && rhs);
-    void push(const T & element);
+    template< typename U >
+    void push(U && element);
     void pop();
     T & top();
     const T & top() const;
@@ -43,10 +43,12 @@ namespace petrov
   typename Stack< T >::this_t & Stack< T >::operator=(this_t && rhs)
   {
     dynamic_array_ = rhs.dynamic_array_;
+    return *this;
   }
 
   template< typename T >
-  void Stack< T >::push(const T & element)
+  template< typename U >
+  void Stack< T >::push(U && element)
   {
     dynamic_array_.push_back(element);
   }
