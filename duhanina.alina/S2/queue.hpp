@@ -48,10 +48,11 @@ namespace duhanina
   template < typename T >
   void Queue< T >::pop()
   {
-    if (++head_ == array_.capacity_)
-    {
-      head_ = 0;
-    }
+//    if (++head_ == array_.capacity_)
+  //  {
+    //  head_ = 0;
+    //}
+    array_.pop_front();
   }
 
   template < typename T >
