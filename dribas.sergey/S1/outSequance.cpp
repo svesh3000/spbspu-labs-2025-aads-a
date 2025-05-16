@@ -3,7 +3,9 @@
 #include <iostream>
 #include <limits>
 
-void dribas::outSequanceName(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance)
+using Seq = dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >;
+
+void dribas::outSequanceName(std::ostream& out, const Seq& sequance)
 {
   out << sequance.begin()->first;
   for (auto i = ++sequance.begin(); i != sequance.end(); i++) {
@@ -11,7 +13,7 @@ void dribas::outSequanceName(std::ostream& out, const List< std::pair< std::stri
   }
 }
 
-void dribas::outSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance, bool& isOverflow) {
+void dribas::outSequanceNameSum(std::ostream& out, const Seq& sequance, bool& isOverflow) {
   size_t maxSize = 0;
   for (auto i = sequance.begin(); i != sequance.end(); ++i) {
     maxSize = std::max(maxSize, i->second.size());
