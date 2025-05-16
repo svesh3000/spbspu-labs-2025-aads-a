@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(insert_shuffled_hints)
   std::mt19937 gen(rd());
   std::shuffle(keys.begin(), keys.end(), gen);
   for (const auto& key: keys) {
-    std::uniform_int_distribution<> distr(0, map.size()); //
+    std::uniform_int_distribution<> distr(0, map.size());
     auto pos = std::next(map.begin(), distr(gen));
     BOOST_TEST(map.insert(pos, std::make_pair(key, "")).second);
   }

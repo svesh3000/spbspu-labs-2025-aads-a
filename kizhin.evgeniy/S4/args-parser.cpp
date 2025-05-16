@@ -25,6 +25,6 @@ std::ostream& kizhin::printUsage(std::ostream& out, const char* executablePath)
   if (!sentry) {
     return out;
   }
-  return out << "Usage: " << executablePath << " [filename]";
+  return out << "Usage: " << executablePath << " <filename>";
 }
 
