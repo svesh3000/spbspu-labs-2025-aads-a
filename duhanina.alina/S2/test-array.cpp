@@ -95,8 +95,8 @@ BOOST_AUTO_TEST_CASE(MoveAssignment)
 BOOST_AUTO_TEST_CASE(ResizeTest)
 {
   array_t arr;
-  const size_t initСapacity = 50;
-  for (size_t i = 0; i < initСapacity; ++i)
+  const size_t initCapacity = 50;
+  for (size_t i = 0; i < initCapacity; ++i)
   {
     arr.push_back(1);
   }
