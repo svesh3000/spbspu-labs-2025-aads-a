@@ -2,9 +2,7 @@
 #define TREE_HPP
 #include <initializer_list>
 #include <stdexcept>
-#include <utility>
 #include "iterator.hpp"
-#include "treeNode.hpp"
 
 namespace kiselev
 {
@@ -84,7 +82,6 @@ namespace kiselev
     void fixInsert(Node* node) noexcept;
     void fixDelete(Node* node) noexcept;
     Node* root_;
-    //Node* end_;
     Cmp cmp_;
     size_t size_;
   };
@@ -92,7 +89,6 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
-    //end_(new Node{ Color::BLACK, nullptr, nullptr, nullptr, value() }),
     size_(0)
   {}
 
@@ -467,47 +463,43 @@ namespace kiselev
 
   template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
-  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::emplace(Args&&... args)
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
     value val(std::forward< Args >(args)...);
-    Node* newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
+    const Key& key = val.first;
     if (!root_)
     {
-      root_ = newNode;
-      //end_->left = root_;
+      root_ = new Node{ std::move(val), Color::BLACK, nullptr, nullptr, nullptr };
       size_ = 1;
       return { Iterator(root_), true };
     }
-    else
+    Node* temp = root_;
+    Node* parent = nullptr;
+    while (temp)
     {
-      Node* temp = root_;
-      Node* parent = nullptr;
-      while (temp)
+      parent = temp;
+      if (cmp_(key, temp->data.first))
       {
-        parent = temp;
-        if (cmp_(val.first, temp->data.first))
-        {
-          temp = temp->left;
-        }
-        else if (cmp_(temp->data.first, val.first))
-        {
-          temp = temp->right;
-        }
-        else
-        {
-          delete newNode;
-          return { Iterator(temp), false };
-        }
+        temp = temp->left;
       }
-      newNode->parent = parent;
-      if (cmp_(parent->data.first, newNode->data.first))
+      else if (cmp_(temp->data.first, key))
       {
-        parent->right = newNode;
+        temp = temp->right;
       }
       else
       {
-        parent->left = newNode;
+        return { Iterator(temp), false };
       }
+    }
+
+    Node* newNode = new Node{ std::move(val), Color::RED, nullptr, nullptr, parent };
+    if (cmp_(parent->data.first, newNode->data.first))
+    {
+      parent->right = newNode;
+    }
+    else
+    {
+      parent->left = newNode;
     }
     fixInsert(newNode);
     size_++;
@@ -523,23 +515,24 @@ namespace kiselev
       return emplace(std::forward< Args >(args)...).first;
     }
     value val(std::forward< Args >(args)...);
+    const Key& key = val.first;
     Node* pos = hint.node_;
-    if (cmp_(val.first, pos->data.first))
+    if (cmp_(key, pos->data.first))
     {
       if (!pos->left)
       {
-        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
         pos->left = newNode;
         fixInsert(newNode);
         ++size_;
         return Iterator(newNode);
       }
     }
-    else if (cmp_(pos->data.first, val.first))
+    else if (cmp_(pos->data.first, key))
     {
       if (!pos->right)
       {
-        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
         pos->right = newNode;
         fixInsert(newNode);
         ++size_;
@@ -554,7 +547,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
+  std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
   {
     return emplace(val);
   }
@@ -607,47 +600,47 @@ namespace kiselev
   {
     if (pos == cend())
     {
-      return end();
+        return end();
     }
     Node* toDelete = pos.node_;
     Node* replace = nullptr;
     Node* child = nullptr;
     if (!toDelete->left || !toDelete->right)
     {
-      replace = toDelete;
+        replace = toDelete;
     }
     else
     {
-      replace = toDelete->right;
-      while (replace->left)
-      {
-        replace = replace->left;
-      }
+        replace = toDelete->right;
+        while (replace->left)
+        {
+            replace = replace->left;
+        }
     }
     child = replace->left ? replace->left : replace->right;
     if (child)
     {
-      child->parent = replace->parent;
+        child->parent = replace->parent;
     }
     if (!replace->parent)
     {
-      root_ = child;
+        root_ = child;
     }
     else if (replace == replace->parent->left)
     {
-      replace->parent->left = child;
+        replace->parent->left = child;
     }
     else
     {
-      replace->parent->right = child;
+        replace->parent->right = child;
     }
     if (replace != toDelete)
     {
-      toDelete->data = std::move(replace->data);
+        toDelete->data = std::move(replace->data);
     }
     if (replace->color == Color::BLACK)
     {
-      fixDelete(child ? child : replace->parent);
+        fixDelete(child ? child : replace->parent);
     }
     Iterator next(pos.node_);
     ++next;
@@ -774,7 +767,11 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   Value& RBTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    Iterator it = insert(std::make_pair(key, Value())).first;
+    Iterator it = find(key);
+    if (it == end())
+    {
+      it = insert(std::make_pair(key, Value())).first;
+    }
     return it->second;
   }
 
