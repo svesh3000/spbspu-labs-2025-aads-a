@@ -23,6 +23,8 @@ namespace kushekbaev
     FwdList(FwdList&& other);
     ~FwdList();
 
+    FwdList& operator=(const FwdList< T >& other);
+    FwdList& operator=(FwdList< T >&& other);
     FwdList& operator=(std::initializer_list< T > init);
     bool operator==(const FwdList& other) const noexcept;
     bool operator!=(const FwdList& other) const noexcept;
@@ -134,6 +136,25 @@ namespace kushekbaev
   {
     clear();
     std::free(fake_);
+  }
+
+  template< typename T >
+  FwdList< T >& FwdList< T >::operator=(const FwdList< T >& other)
+  {
+    FwdList tmp(other);
+    swap(tmp);
+    return *this;
+  }
+
+  template< typename T >
+  FwdList< T >& FwdList< T >::operator=(FwdList< T >&& other)
+  {
+    clear();
+    fake_ = other.fake_;
+    size_ = other.size_;
+    delete other.fake_;
+    other.size_ = 0;
+    return *this;
   }
 
   template< typename T >
