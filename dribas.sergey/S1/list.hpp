@@ -199,7 +199,7 @@ namespace dribas
   void dribas::List< T >::remove(const T& value) noexcept
   {
     remove_if([&value](const T& element) {
-        return element == value;
+      return element == value;
     });
   }
 
@@ -238,12 +238,12 @@ namespace dribas
 
   template< class T >
   template< class Predicate >
-  void dribas::List< T >::remove_if(Predicate predicator) noexcept
+  void dribas::List< T >::remove_if(Predicate predicat) noexcept
   {
     Node< T >* current = head_;
     Node< T >* prev = nullptr;
     while (current) {
-      if (predicator(current->data_)) {
+      if (predicat(current->data_)) {
         Node< T >* toDelete = current;
         if (prev) {
           prev->next_ = current->next_;
@@ -283,24 +283,25 @@ namespace dribas
   template< class T >
   void dribas::List< T >::pop_back() noexcept
   {
-    if (!empty()) {
-      if (head_ == tail_) {
-        delete head_;
-        head_ = nullptr;
-        tail_ = nullptr;
-      } else {
-        tail_ = tail_->prev_;
-        delete tail_->next_;
-        tail_->next_ = nullptr;
-      }
-      size_--;
+    if (empty()) {
+      return;
     }
+    if (head_ == tail_) {
+      delete head_;
+      head_ = nullptr;
+      tail_ = nullptr;
+    } else {
+      tail_ = tail_->prev_;
+      delete tail_->next_;
+      tail_->next_ = nullptr;
+    }
+    size_--;
   }
 
   template< class T >
   void dribas::List< T >::clear() noexcept
   {
-    while (size_ != 0) {
+    while (!empty()) {
       pop_back();
     }
   }
@@ -366,7 +367,7 @@ namespace dribas
     Node< T >* current = rhs.head_;
     try {
       while (current) {
-        Node< T >* temp = new Node<T>{ current->data_ };
+        Node< T >* temp = new Node< T >{ current->data_ };
         if (head_ == nullptr) {
           head_ = temp;
           tail_ = temp;
@@ -435,12 +436,7 @@ namespace dribas
   {
     if (this != std::addressof(other)) {
       clear();
-      head_ = other.head_;
-      tail_ = other.tail_;
-      size_ = other.size_;
-      other.head_ = nullptr;
-      other.tail_ = nullptr;
-      other.size_ = 0;
+      swap(other);
     }
     return *this;
   }
@@ -451,9 +447,6 @@ namespace dribas
     tail_(rhs.tail_),
     size_(rhs.size_)
   {
-    size_ = rhs.size_;
-    head_ = rhs.head_;
-    tail_ = rhs.tail_;
     rhs.size_ = 0;
     rhs.tail_ = nullptr;
     rhs.head_ = nullptr;

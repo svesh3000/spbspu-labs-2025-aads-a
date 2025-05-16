@@ -2,6 +2,13 @@
 #include "list.hpp"
 
 using namespace dribas;
+namespace
+{
+  bool isEven(int i)
+  {
+  return i == 1;
+  }
+}
 
 BOOST_AUTO_TEST_SUITE(Constructor)
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest) {
@@ -72,20 +79,16 @@ BOOST_AUTO_TEST_SUITE(noAssignmentOperator)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(MethodList)
-bool predicate(int i)
-{
-  return i == 1;
-}
 
 BOOST_AUTO_TEST_CASE(removeIf) {
   List< int > list;
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);
-  list.remove_if(predicate);
+  list.remove_if(isEven);
   BOOST_CHECK(list.front() == 2);
   list.clear();
-  list.remove_if(predicate);
+  list.remove_if(isEven);
   BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_CASE(remove ) {
@@ -183,13 +186,13 @@ BOOST_AUTO_TEST_CASE(PopFrontEmptyList) {
 }
 BOOST_AUTO_TEST_CASE(PopFrontSingleElement)
 {
-  dribas::List<int> list;
+  dribas::List< int > list;
   list.push_front(1);
   list.pop_front();
   BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_CASE(PopFrontMultipleElements) {
-  dribas::List<int> list;
+  dribas::List< int > list;
   list.push_front(3);
   list.push_front(2);
   list.push_front(1);
@@ -199,7 +202,7 @@ BOOST_AUTO_TEST_CASE(PopFrontMultipleElements) {
   BOOST_CHECK(list.back() == 3);
 }
 BOOST_AUTO_TEST_CASE(PopFrontAllElements) {
-  dribas::List<int> list;
+  dribas::List< int > list;
   list.push_front(2);
   list.push_front(1);
   list.pop_front();
@@ -218,7 +221,7 @@ BOOST_AUTO_TEST_CASE(PopBackEmptyList) {
   BOOST_CHECK(list.size() == 0);
 }
 BOOST_AUTO_TEST_CASE(PopBackSingleElement) {
-  dribas::List<int> list;
+  dribas::List< int > list;
   list.push_back(32);
   list.pop_back();
   BOOST_CHECK(list.empty());
@@ -268,12 +271,12 @@ BOOST_AUTO_TEST_CASE(assignRangeFromVector)
 }
 BOOST_AUTO_TEST_CASE(assignRangeFromArray)
 {
-  dribas::List<double> list;
-  double arr[] = {1.1, 2.2, 3.3};
+  dribas::List< int > list;
+  double arr[] = {1, 2, 3};
   list.assign_range(arr);
   BOOST_CHECK(list.size() == 3);
-  BOOST_CHECK_CLOSE(list.front(), 1.1, 0.001);
-  BOOST_CHECK_CLOSE(list.back(), 3.3, 0.001);
+  BOOST_CHECK(list.front() == 1);
+  BOOST_CHECK(list.back() == 3);
 }
 BOOST_AUTO_TEST_CASE(assignRangeFromEmpty)
 {
