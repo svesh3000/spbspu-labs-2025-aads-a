@@ -94,23 +94,19 @@ duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
     {
       pos++;
     }
-    
     if (pos >= len)
     {
       break;
     }
 
     std::string token;
-    
     if (std::isdigit(infix[pos]))
     {
       size_t start = pos;
-      
       while (pos < len && std::isdigit(infix[pos]))
       {
         pos++;
       }
-      
       token = infix.substr(start, pos - start);
       output.push(token);
     }
@@ -130,12 +126,10 @@ duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
           output.push(std::string(1, operators.top()));
           operators.pop();
         }
-        
         if (operators.empty())
         {
           throw std::runtime_error("Mismatched parentheses");
         }
-        
         operators.pop();
       }
       else if (isOperator(c))
@@ -146,7 +140,6 @@ duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
           output.push(std::string(1, operators.top()));
           operators.pop();
         }
-        
         operators.push(c);
       }
       else
@@ -162,7 +155,6 @@ duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
     {
       throw std::runtime_error("Mismatched parentheses");
     }
-    
     output.push(std::string(1, operators.top()));
     operators.pop();
   }
