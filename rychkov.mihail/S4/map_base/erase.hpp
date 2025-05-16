@@ -175,7 +175,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const K1& key)
 {

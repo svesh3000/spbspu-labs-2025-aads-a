@@ -31,9 +31,9 @@ namespace rychkov
   constexpr bool is_transparent_v = is_transparent< Cmp >::value;
   namespace details
   {
-    template< class R, class K1, class C, class Exclude >
-    using transparent_compare_key = std::enable_if_t< std::is_same< remove_cvref_t< K1 >, Exclude >::value
-          && is_transparent_v< C >, R >;
+    template< class R, class K1, class C, class... Exclude >
+    using transparent_compare_key_t = std::enable_if_t< conjunction_v< !std::is_same< remove_cvref_t< K1 >,
+              Exclude >::value... > && is_transparent_v< C >, R >;
   }
 
   template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
@@ -117,29 +117,47 @@ namespace rychkov
 
   private:
     template< class R, class K1 >
-    using transparent_compare_key = details::transparent_compare_key< R, K1, C, const_iterator >;
+    using transparent_compare_key_t = details::transparent_compare_key_t< R, K1, C, iterator, const_iterator >;
 
   public:
     template< class K1 >
-    transparent_compare_key< iterator, K1 > lower_bound(const K1& key);
+    transparent_compare_key_t< iterator, K1 > lower_bound(const K1& key);
     template< class K1 >
-    transparent_compare_key< const_iterator, K1 > lower_bound(const K1& key) const;
+    transparent_compare_key_t< const_iterator, K1 > lower_bound(const K1& key) const;
     template< class K1 >
-    transparent_compare_key< iterator, K1 > upper_bound(const K1& key);
+    transparent_compare_key_t< iterator, K1 > upper_bound(const K1& key);
     template< class K1 >
-    transparent_compare_key< const_iterator, K1 > upper_bound(const K1& key) const;
+    transparent_compare_key_t< const_iterator, K1 > upper_bound(const K1& key) const;
     template< class K1 >
-    transparent_compare_key< iterator, K1 > find(const K1& key);
+    transparent_compare_key_t< iterator, K1 > find(const K1& key);
     template< class K1 >
-    transparent_compare_key< const_iterator, K1 > find(const K1& key) const;
+    transparent_compare_key_t< const_iterator, K1 > find(const K1& key) const;
     template< class K1 >
-    transparent_compare_key< bool, K1 > contains(const K1& key) const;
+    transparent_compare_key_t< bool, K1 > contains(const K1& key) const;
     template< class K1 >
-    transparent_compare_key< std::pair< iterator, iterator >, K1 > equal_range(const K1& key);
+    transparent_compare_key_t< std::pair< iterator, iterator >, K1 > equal_range(const K1& key);
     template< class K1 >
-    transparent_compare_key< std::pair< const_iterator, const_iterator >, K1 > equal_range(const K1& key) const;
+    transparent_compare_key_t< std::pair< const_iterator, const_iterator >, K1 > equal_range(const K1& key) const;
     template< class K1 >
-    transparent_compare_key< size_type, K1 > count(const K1& key) const;
+    transparent_compare_key_t< size_type, K1 > count(const K1& key) const;
+
+    template< bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& > at(const key_type& key);
+    template< bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, const mapped_type& > at(const key_type& key) const;
+    template< class K1, bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, const mapped_type& >, K1 >
+        at(const K1& key) const;
+    template< class K1, bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& >, K1 >
+        at(const K1& key);
+    template< bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& > operator[](const key_type& key);
+    template< bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& > operator[](key_type&& key);
+    template< class K1, bool IsSet2 = IsSet, bool IsMulti2 = IsMulti >
+    transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& >, K1 >
+        operator[](K1&& key);
 
     void clear();
     void swap(MapBase& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
@@ -148,7 +166,7 @@ namespace rychkov
     iterator erase(const_iterator from, const_iterator to);
     size_type erase(const key_type& key);
     template< class K1 >
-    transparent_compare_key< size_type, K1 > erase(const K1& key);
+    transparent_compare_key_t< size_type, K1 > erase(const K1& key);
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args&&... args);
@@ -181,14 +199,14 @@ namespace rychkov
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > > try_emplace(key_type&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class K1, class... Args >
-    transparent_compare_key< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
+    transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
         try_emplace(K1&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, iterator > try_emplace(const_iterator hint, const key_type& key, Args&&... args);
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, iterator > try_emplace(const_iterator hint, key_type&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class K1, class... Args >
-    transparent_compare_key< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
+    transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
         try_emplace(const_iterator hint, K1&& key, Args&&... args);
 
   private:

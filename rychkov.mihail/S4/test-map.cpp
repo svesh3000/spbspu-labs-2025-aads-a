@@ -3,6 +3,7 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <iterator>
 #include <boost/test/unit_test.hpp>
 #include <mem_checker.hpp>
 #include "map.hpp"
@@ -10,6 +11,14 @@
 
 BOOST_AUTO_TEST_SUITE(S4_map_test)
 
+BOOST_AUTO_TEST_CASE(multimap_test)
+{
+  rychkov::MultiMap< int, char > map = {{0, '1'}, {0, '2'}, {0, '3'}, {1, '3'}, {1, '4'}, {1, '4'}, {2, '5'}};
+  BOOST_TEST(map.size() == 7);
+  BOOST_TEST((map.lower_bound(0) == map.begin()));
+  BOOST_TEST(std::distance(map.upper_bound(0), --map.end()) == 3);
+  BOOST_TEST((map.upper_bound(1) == --map.end()));
+}
 BOOST_AUTO_TEST_CASE(empty_test)
 {
   rychkov::Map< int, char > map;
@@ -68,22 +77,14 @@ BOOST_AUTO_TEST_CASE(random_test)
   std::sort(data, data + input_size);
   size = input_size;
   BOOST_TEST(std::equal(set.begin(), set.end(), data));
-  for (; size > 0; size--)
+  while (size > 0)
   {
     std::uniform_int_distribution< size_t > range(0, size - 1);
     size_t id = range(engine);
-    decltype(set)::iterator next = set.erase(set.find(data[id]));
-    std::remove(data, data + size, data[id]);
-    if (id == size - 1)
-    {
-      BOOST_TEST((next == set.end()));
-    }
-    else
-    {
-      BOOST_TEST(*next == data[id]);
-    }
+    set.erase(data[id]);
+    size = std::remove(data, data + size, data[id]) - data;
     BOOST_TEST(std::equal(set.begin(), set.end(), data));
-    BOOST_TEST(set.size() == size - 1);
+    BOOST_TEST(set.size() == size);
   }
 }
 

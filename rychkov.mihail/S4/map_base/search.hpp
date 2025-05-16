@@ -60,14 +60,6 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterat
   const_iterator left = {fake_children_[0], 0}, right = end();
   while (true)
   {
-    if (left.pointed_ >= left.node_->size())
-    {
-      if (left.node_->isleaf())
-      {
-        return {left, right};
-      }
-      left = {left.node_->children[left.pointed_], 0};
-    }
     if (compare_with_key(key, *left))
     {
       right = left;
@@ -76,13 +68,33 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterat
         return {left, left};
       }
       left = {left.node_->children[left.pointed_], 0};
-      continue;
     }
     else if (!compare_with_key(*left, key))
     {
+      if (IsMulti)
+      {
+        right = left;
+        if (left.node_->isleaf())
+        {
+          return {left, left};
+        }
+        left = {left.node_->children[left.pointed_], 0};
+        continue;
+      }
       return {left, left};
     }
-    left.pointed_++;
+    else
+    {
+      left.pointed_++;
+      if (left.pointed_ >= left.node_->size())
+      {
+        if (left.node_->isleaf())
+        {
+          return {left, right};
+        }
+        left = {left.node_->children[left.pointed_], 0};
+      }
+    }
   }
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
@@ -189,7 +201,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type
 
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::lower_bound(const K1& key)
 {
@@ -198,7 +210,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::lower_bound(const K1& key) const
 {
@@ -206,7 +218,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::upper_bound(const K1& key)
 {
@@ -215,7 +227,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::upper_bound(const K1& key) const
 {
@@ -223,7 +235,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::find(const K1& key)
 {
@@ -232,7 +244,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterator, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::find(const K1& key) const
 {
@@ -241,14 +253,14 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key< bool, K1 >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t< bool, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::contains(const K1& key) const
 {
   return find(key) != end();
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator,
         typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator >, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::equal_range(const K1& key)
@@ -257,7 +269,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterator,
         typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterator >, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::equal_range(const K1& key) const
@@ -266,7 +278,7 @@ typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class K1 >
-typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key_t
     < typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::size_type, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::count(const K1& key) const
 {
