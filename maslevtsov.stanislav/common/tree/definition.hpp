@@ -3,6 +3,7 @@
 
 #include "declaration.hpp"
 #include <utility>
+#include <queue.hpp>
 
 template< class Key, class T, class Compare >
 maslevtsov::Tree< Key, T, Compare >::Tree():
@@ -183,12 +184,38 @@ F maslevtsov::Tree< Key, T, Compare >::traverse_rnl(F f) const
 template< class Key, class T, class Compare >
 template< typename F >
 F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f)
-{}
+{
+  if (empty()) {
+    throw std::logic_error("nothing to traverse");
+  }
+  Queue< Node* > queue;
+  queue.push(dummy_root_->left);
+  while (!queue.empty()) {
+    Node* current = queue.front();
+    queue.pop();
+    f(current->data1);
+    if (!current->is_two) {
+      f(current->data2);
+    }
+    if (current->left) {
+      queue.push(current->left);
+    }
+    if (current->middle) {
+      queue.push(current->middle);
+    }
+    if (current->right) {
+      queue.push(current->right);
+    }
+  }
+  return f;
+}
 
 template< class Key, class T, class Compare >
 template< typename F >
 F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f) const
-{}
+{
+  return const_cast< Tree< Key, T, Compare >* >(this)->traverse_breadth(f);
+}
 
 template< class Key, class T, class Compare >
 bool maslevtsov::Tree< Key, T, Compare >::empty() const noexcept
