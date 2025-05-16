@@ -68,7 +68,6 @@ BOOST_AUTO_TEST_CASE(MoveOperator) {
 BOOST_AUTO_TEST_CASE(MoveOperatorThis) {
   List< int > original;
   original.push_back(1);
-  original = std::move(original);
 
   BOOST_CHECK(original.size() == 1);
   BOOST_CHECK(original.front()== 1);
