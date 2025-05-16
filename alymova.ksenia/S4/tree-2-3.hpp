@@ -843,13 +843,10 @@ namespace alymova
       }
       node->insert(std::move(mid->data[0]));
       node->mid = mid->left;
-      if (node->mid)
-      {
-        node->mid->parent = node;
-      }
       node->right = mid->right;
       if (node->right && node->right != fake_)
       {
+        node->mid->parent = node;
         node->right->parent = node;
       }
       mid->clear();
@@ -880,13 +877,10 @@ namespace alymova
       }
       node->insert(std::move(left->data[0]));
       node->mid = left->right;
+      node->left = left->left;
       if (node->mid)
       {
         node->mid->parent = node;
-      }
-      node->left = left->left;
-      if (node->left)
-      {
         node->left->parent = node;
       }
       left->clear();
@@ -899,9 +893,9 @@ namespace alymova
     {
       node->insert(std::move(parent->data[1]));
       parent->remove(NodePoint::Second);
-      if (!node->right)
+      if (!node->right || node->right == fake_)
       {
-        std::swap(node->right, node->left);
+        node->right = std::exchange(node->left, nullptr);
       }
       if (mid->type == NodeType::Triple)
       {
@@ -918,13 +912,10 @@ namespace alymova
       }
       node->insert(std::move(mid->data[0]));
       node->mid = mid->right;
+      node->left = mid->left;
       if (node->mid)
       {
         node->mid->parent = node;
-      }
-      node->left = mid->left;
-      if (node->left)
-      {
         node->left->parent = node;
       }
       mid->clear();

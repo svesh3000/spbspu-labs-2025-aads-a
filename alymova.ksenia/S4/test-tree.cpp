@@ -360,11 +360,74 @@ BOOST_AUTO_TEST_CASE(test_erase)
     BOOST_TEST(tree.size() == 12);
     BOOST_TEST(it->first == 5);
 
+    tree.emplace(56, "distr");
+    tree.emplace(57, "distr");
+    it = tree.erase(tree.find(55));
+    BOOST_TEST(tree.size() == 13);
+    BOOST_TEST(it->first == 56);
 
-    /*for (auto it = tree.begin(); it != tree.end(); it++)
-    {
-      std::cout << it->first << '\n';
-    }
-    std::cout << "-----------\n";*/
+    tree.emplace(0, "distr");
+    tree.emplace(2, "distr");
+    tree.erase(tree.find(52));
+    it = tree.erase(tree.find(57));
+    BOOST_TEST(tree.size() == 13);
+    BOOST_TEST(it->first == 60);
+
+    tree.emplace(57, "distr");
+    tree.emplace(32, "distr");
+    it = tree.erase(tree.find(50));
+    BOOST_TEST(tree.size() == 14);
+    BOOST_TEST(it->first == 56);
+
+    tree.erase(tree.find(40));
+    tree.erase(tree.find(32));
+    it = tree.erase(tree.find(35));
+    BOOST_TEST(tree.size() == 11);
+    BOOST_TEST(it->first == 56);
+
+    tree.emplace(90, "distr");
+    tree.emplace(100, "distr");
+    it = tree.erase(--tree.end());
+    BOOST_TEST(tree.size() == 12);
+    BOOST_TEST((it == tree.end()));
+
+    tree.emplace(58, "distr");
+    tree.emplace(35, "distr");
+    tree.emplace(40, "distr");
+    tree.erase(--tree.end());
+    it = tree.erase(tree.find(80));
+    BOOST_TEST(tree.size() == 13);
+    BOOST_TEST(it->first == 85);
+
+    tree.emplace(90, "distr");
+    tree.emplace(80, "distr");
+    it = tree.erase(--tree.end());
+    BOOST_TEST(tree.size() == 14);
+    BOOST_TEST((it == tree.end()));
+
+    tree.erase(tree.find(85));
+    tree.erase(tree.find(80));
+    it = tree.erase(tree.find(75));
+    BOOST_TEST(tree.size() == 11);
+    BOOST_TEST((it == tree.end()));
   }
+  size_t erase_size = tree.erase(1000);
+  BOOST_TEST(erase_size == 0);
+  BOOST_TEST(tree.size() == 11);
+
+  erase_size = tree.erase(0);
+  BOOST_TEST(erase_size == 1);
+  BOOST_TEST(tree.size() == 10);
+
+  it = tree.erase(tree.begin(), tree.begin());
+  BOOST_TEST(tree.size() == 10);
+  BOOST_TEST(it->first == 2);
+
+  it = tree.erase(tree.begin(), tree.find(40));
+  BOOST_TEST(tree.size() == 5);
+  BOOST_TEST(it->first == 40);
+
+  it = tree.erase(tree.begin(), tree.end());
+  BOOST_TEST(tree.size() == 0);
+  BOOST_TEST((it == tree.end()));
 }
