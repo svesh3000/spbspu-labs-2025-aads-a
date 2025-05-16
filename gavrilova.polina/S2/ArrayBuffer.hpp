@@ -7,7 +7,7 @@
 
 namespace gavrilova
 {
-  template <typename T>
+  template < class T >
   class ArrayBuffer
   {
   public:
@@ -49,16 +49,16 @@ namespace gavrilova
     void resize(size_t new_capacity);
   };
 
-  template <typename T>
-  ArrayBuffer<T>::ArrayBuffer()
+  template < class T >
+  ArrayBuffer< T >::ArrayBuffer()
   {
     size_ = 0;
     capacity_ = DEFAULT_CAPACITY;
     data_ = new T[capacity_];
   }
 
-  template <typename T>
-  ArrayBuffer<T>::ArrayBuffer(const ArrayBuffer& other)
+  template < class T >
+  ArrayBuffer< T >::ArrayBuffer(const ArrayBuffer& other)
   {
     size_ = other.size_;
     capacity_ = other.capacity_;
@@ -73,8 +73,8 @@ namespace gavrilova
     }
   }
 
-  template <typename T>
-  ArrayBuffer<T>::ArrayBuffer(ArrayBuffer&& other) noexcept
+  template < class T >
+  ArrayBuffer< T >::ArrayBuffer(ArrayBuffer&& other) noexcept
   {
     size_ = other.size_;
     capacity_ = other.capacity_;
@@ -84,47 +84,47 @@ namespace gavrilova
     other.data_ = nullptr;
   }
 
-  template <typename T>
-  ArrayBuffer<T>::~ArrayBuffer()
+  template < class T >
+  ArrayBuffer< T >::~ArrayBuffer()
   {
     delete[] data_;
   }
 
-  template <typename T>
-  ArrayBuffer<T>& ArrayBuffer<T>::operator=(const ArrayBuffer& other)
+  template < class T >
+  ArrayBuffer< T >& ArrayBuffer< T >::operator=(const ArrayBuffer& other)
   {
     if (this != std::addressof(other)) {
-      ArrayBuffer<T> cpy(other);
+      ArrayBuffer< T > cpy(other);
       swap(cpy);
     }
     return *this;
   }
 
-  template <typename T>
-  ArrayBuffer<T>& ArrayBuffer<T>::operator=(ArrayBuffer&& other) noexcept
+  template < class T >
+  ArrayBuffer< T >& ArrayBuffer< T >::operator=(ArrayBuffer&& other) noexcept
   {
     if (this != std::addressof(other)) {
-      ArrayBuffer<T> cpy(std::move(other));
+      ArrayBuffer< T > cpy(std::move(other));
       swap(cpy);
     }
     return *this;
   }
 
-  template <typename T>
-  T& ArrayBuffer<T>::operator[](size_t index)
+  template < class T >
+  T& ArrayBuffer< T >::operator[](size_t index)
   {
     if (index >= size_) throw std::out_of_range("Index out of range");
     return data_[index];
   }
 
-  template <typename T>
-  const T& ArrayBuffer<T>::operator[](size_t index) const
+  template < class T >
+  const T& ArrayBuffer< T >::operator[](size_t index) const
   {
     return data_[index];
   }
 
-  template <typename T>
-  T& ArrayBuffer<T>::front()
+  template < class T >
+  T& ArrayBuffer< T >::front()
   {
     if (empty()) {
       throw std::out_of_range("Buffer is empty");
@@ -132,8 +132,8 @@ namespace gavrilova
     return data_[0];
   }
 
-  template <typename T>
-  const T& ArrayBuffer<T>::front() const
+  template < class T >
+  const T& ArrayBuffer< T >::front() const
   {
     if (empty()) {
       throw std::out_of_range("Buffer is empty");
@@ -141,8 +141,8 @@ namespace gavrilova
     return data_[0];
   }
 
-  template <typename T>
-  T& ArrayBuffer<T>::back()
+  template < class T >
+  T& ArrayBuffer< T >::back()
   {
     if (empty()) {
       throw std::out_of_range("Buffer is empty");
@@ -150,8 +150,8 @@ namespace gavrilova
     return data_[size_ - 1];
   }
 
-  template <typename T>
-  const T& ArrayBuffer<T>::back() const
+  template < class T >
+  const T& ArrayBuffer< T >::back() const
   {
     if (empty()) {
       throw std::out_of_range("Buffer is empty");
@@ -159,8 +159,8 @@ namespace gavrilova
     return data_[size_ - 1];
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::push_back(const T& value)
+  template < class T >
+  void ArrayBuffer< T >::push_back(const T& value)
   {
     if (capacity_ == 0) {
       resize(DEFAULT_CAPACITY);
@@ -171,8 +171,8 @@ namespace gavrilova
     data_[size_++] = value;
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::push_back(T&& value)
+  template < class T >
+  void ArrayBuffer< T >::push_back(T&& value)
   {
     if (capacity_ == 0) {
       resize(DEFAULT_CAPACITY);
@@ -183,8 +183,8 @@ namespace gavrilova
     data_[size_++] = std::move(value);
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::pop_back()
+  template < class T >
+  void ArrayBuffer< T >::pop_back()
   {
     if (empty()) {
       throw std::out_of_range("Buffer is empty");
@@ -192,40 +192,40 @@ namespace gavrilova
     --size_;
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::clear()
+  template < class T >
+  void ArrayBuffer< T >::clear()
   {
     size_ = 0;
   }
 
-  template <typename T>
-  bool ArrayBuffer<T>::empty() const
+  template < class T >
+  bool ArrayBuffer< T >::empty() const
   {
     return size_ == 0;
   }
 
-  template <typename T>
-  size_t ArrayBuffer<T>::size() const
+  template < class T >
+  size_t ArrayBuffer< T >::size() const
   {
     return size_;
   }
 
-  template <typename T>
-  size_t ArrayBuffer<T>::capacity() const
+  template < class T >
+  size_t ArrayBuffer< T >::capacity() const
   {
     return capacity_;
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::swap(ArrayBuffer& other) noexcept
+  template < class T >
+  void ArrayBuffer< T >::swap(ArrayBuffer& other) noexcept
   {
     std::swap(size_, other.size_);
     std::swap(capacity_, other.capacity_);
     std::swap(data_, other.data_);
   }
 
-  template <typename T>
-  void ArrayBuffer<T>::resize(size_t new_capacity)
+  template < class T >
+  void ArrayBuffer< T >::resize(size_t new_capacity)
   {
     T* new_data = new T[new_capacity];
     for (size_t i = 0; i < size_; ++i) {
