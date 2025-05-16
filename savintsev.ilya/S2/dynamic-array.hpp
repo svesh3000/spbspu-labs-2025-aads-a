@@ -81,23 +81,16 @@ namespace savintsev
   template< typename T >
   Array< T > & Array< T >::operator=(const Array & rhs)
   {
-    T * data = createExpandCopy(rhs.data_ + rhs.start_, rhs.size_, rhs.capacity_);
-    delete[] data_;
-    data_ = data;
-    size_ = rhs.size_;
-    start_ = 0;
-    capacity_ = rhs.capacity_;
+    Array< T > copy{rhs};
+    swap(*this, copy);
     return *this;
   }
 
   template< typename T >
   Array< T > & Array< T >::operator=(Array && rhs) noexcept
   {
-    delete[] data_;
-    data_ = rhs.data_;
-    size_ = rhs.size_;
-    start_ = rhs.start_;
-    capacity_ = rhs.capacity_;
+    Array< T > copy{std::move(rhs)};
+    swap(*this, copy);
     return *this;
   }
 
