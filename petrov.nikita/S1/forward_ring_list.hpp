@@ -29,9 +29,6 @@ namespace petrov
       node_(nullptr)
     {}
     ConstForwardListIterator(const this_t & rhs) = default;
-    explicit ConstForwardListIterator(const node_t * node):
-      node_(node)
-    {}
     ~ConstForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
     this_t & operator++();
@@ -42,6 +39,9 @@ namespace petrov
     bool operator!=(const this_t & rhs) const;
   private:
     const ListNode< T > * node_;
+    explicit ConstForwardListIterator(const node_t * node):
+      node_(node)
+    {}
   };
 
   template< typename T >
@@ -55,9 +55,6 @@ namespace petrov
       node_(nullptr)
     {}
     ForwardListIterator(const this_t & rhs) = default;
-    explicit ForwardListIterator(node_t * node):
-      node_(node)
-    {}
     ~ForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
     this_t & operator++();
@@ -68,6 +65,9 @@ namespace petrov
     bool operator!=(const this_t & rhs) const;
   private:
     ListNode< T > * node_;
+    explicit ForwardListIterator(node_t * node):
+      node_(node)
+    {}
   };
 
   template< typename T >
@@ -94,8 +94,10 @@ namespace petrov
     const_it_t cend() const;
     it_t begin();
     it_t end();
-    T & front() const;
-    T & back() const;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     template< typename U >
@@ -336,13 +338,25 @@ namespace petrov
   }
 
   template< typename T >
-  T & ForwardRingList< T >::front() const
+  T & ForwardRingList< T >::front()
+  {
+    return const_cast< T >(static_cast< const T >(this)->front());
+  }
+
+  template< typename T >
+  const T & ForwardRingList< T >::front() const
   {
     return head_->data;
   }
 
   template< typename T >
-  T & ForwardRingList< T >::back() const
+  T & ForwardRingList< T >::back()
+  {
+    return const_cast< T >(static_cast< const T >(this)->back());
+  }
+
+  template< typename T >
+  const T & ForwardRingList< T >::back() const
   {
     return tail_->data;
   }
