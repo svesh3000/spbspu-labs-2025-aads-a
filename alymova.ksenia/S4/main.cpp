@@ -2,12 +2,9 @@
 #include <fstream>
 #include <string>
 #include <exception>
-#include <map>
 #include <functional>
 #include "utils.hpp"
 #include "tree-2-3.hpp"
-#include "tree-node.hpp"
-#include "tree-iterators.hpp"
 
 int main(int argc, char** argv)
 {

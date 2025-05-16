@@ -1,8 +1,6 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 #include <iostream>
-#include <functional>
-#include <map>
 #include "tree-2-3.hpp"
 
 namespace alymova

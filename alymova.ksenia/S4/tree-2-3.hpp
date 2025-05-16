@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cassert>
 #include <functional>
-#include <iostream>
 #include <exception>
 #include "tree-iterators.hpp"
 #include "tree-iterator-impl.hpp"
