@@ -57,7 +57,7 @@ namespace rychkov
         }
         catch(...)
         {}
-        context.out << "<INVALID_COMMAND>\n";
+        context.out << "<INVALID COMMAND>\n";
         if (available())
         {
           context.in.clear();

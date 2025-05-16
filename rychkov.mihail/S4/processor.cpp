@@ -52,12 +52,12 @@ bool rychkov::S4ParseProcessor::print(ParserContext& context)
   {
     return false;
   }
-  context.out << data_p->first;
   if (data_p->second.empty())
   {
-    context.out << " <EMPTY>\n";
+    context.out << "<EMPTY>\n";
     return true;
   }
+  context.out << data_p->first;
   for (const inner_map::value_type& i: data_p->second)
   {
     context.out << ' ' << i.first << ' ' << i.second;
@@ -68,55 +68,57 @@ bool rychkov::S4ParseProcessor::print(ParserContext& context)
 bool rychkov::S4ParseProcessor::make_complement(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
-      || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
   inner_map& link = map[name];
   const inner_map& lhslink = map.at(lhs);
   const inner_map& rhslink = map.at(rhs);
+  inner_map temp;
   for (const inner_map::value_type& i: lhslink)
   {
     if (!rhslink.contains(i.first))
     {
-      link.insert(i);
+      temp.insert(i);
     }
   }
+  link = std::move(temp);
   return true;
 }
 bool rychkov::S4ParseProcessor::make_intersect(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
-      || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
   inner_map& link = map[name];
   const inner_map& lhslink = map.at(lhs);
   const inner_map& rhslink = map.at(rhs);
+  inner_map temp;
   for (const inner_map::value_type& i: lhslink)
   {
     if (rhslink.contains(i.first))
     {
-      link.insert(i);
+      temp.insert(i);
     }
   }
+  link = std::move(temp);
   return true;
 }
 bool rychkov::S4ParseProcessor::make_union(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
-      || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
   inner_map& link = map[name];
   const inner_map& lhslink = map.at(lhs);
   const inner_map& rhslink = map.at(rhs);
-  link.insert(lhslink.begin(), lhslink.end());
-  link.insert(rhslink.begin(), rhslink.end());
+  inner_map temp = lhslink;
+  temp.insert(rhslink.begin(), rhslink.end());
+  link = std::move(temp);
   return true;
 }
