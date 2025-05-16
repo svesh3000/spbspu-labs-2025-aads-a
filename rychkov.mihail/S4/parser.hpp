@@ -27,10 +27,11 @@ namespace rychkov
     parser_processor processor;
     ParserContext context;
 
-    Parser(ParserContext parse_context, parser_processor proc, map_type call_map):
-      processor(std::move(proc)),
+    template< class P = parser_processor, class M = map_type >
+    Parser(ParserContext parse_context, P proc, M&& call_map):
+      processor(std::forward< P >(proc)),
       context(parse_context),
-      call_map_(std::move(call_map))
+      call_map_(std::forward< M >(call_map))
     {}
 
     bool available() const noexcept

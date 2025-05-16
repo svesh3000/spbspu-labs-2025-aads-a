@@ -23,11 +23,12 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bo
 
   if (size_ == 0)
   {
-    fake_children_[0] = new node_type;
-    fake_children_[0]->parent = fake_root();
-    cached_begin_ = fake_children_[0];
-    cached_rbegin_ = fake_children_[0];
-    cached_begin_->emplace_back(std::forward< Args >(args)...);
+    node_type* root = new node_type;
+    fake_children_[0] = root;
+    root->emplace_back(std::forward< Args >(args)...);
+    root->parent = fake_root();
+    cached_begin_ = root;
+    cached_rbegin_ = root;
     size_++;
     return {begin(), true};
   }
@@ -89,7 +90,7 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bo
     to_insert.children[1]->parent = root;
     caret->children[0] = root;
     root->parent = caret;
-    root->emplace_back(to_insert[0]);
+    root->emplace_back(std::move(to_insert[0]));
     root->children[0] = to_insert.children[0];
     root->children[1] = to_insert.children[1];
     to_insert.pop_back();

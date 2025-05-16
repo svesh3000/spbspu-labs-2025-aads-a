@@ -6,10 +6,10 @@
 namespace rychkov
 {
   template< class K, class T, class C = std::less<>, size_t N = 2 >
-  class Map: public MapBase< K, T, C, N, false, true >
+  class Map: public MapBase< K, T, C, N, false, false >
   {
   private:
-    using Base = MapBase< K, T, C, N, false, true >;
+    using Base = MapBase< K, T, C, N, false, false >;
   public:
     using key_type = typename Base::key_type;
     using mapped_type = typename Base::mapped_type;
@@ -109,34 +109,19 @@ typename rychkov::Map< K, T, C, N >::transparent_compare_key
 template< class K, class T, class C, size_t N >
 typename rychkov::Map< K, T, C, N >::mapped_type& rychkov::Map< K, T, C, N >::operator[](const key_type& key)
 {
-  iterator temp = this->find(key);
-  if (temp == this->end())
-  {
-    return this->try_emplace(key).first->second;
-  }
-  return temp->second;
+  return this->try_emplace(key).first->second;
 }
 template< class K, class T, class C, size_t N >
 typename rychkov::Map< K, T, C, N >::mapped_type& rychkov::Map< K, T, C, N >::operator[](key_type&& key)
 {
-  iterator temp = this->find(key);
-  if (temp == this->end())
-  {
-    return this->try_emplace(std::move(key)).first->second;
-  }
-  return temp->second;
+  return this->try_emplace(std::move(key)).first->second;
 }
 template< class K, class T, class C, size_t N >
 template< class K1 >
 typename rychkov::Map< K, T, C, N >::transparent_compare_key< typename rychkov::Map< K, T, C, N >::mapped_type&, K1 >
     rychkov::Map< K, T, C, N >::operator[](K1&& key)
 {
-  iterator temp = this->find(key);
-  if (temp == this->end())
-  {
-    return this->try_emplace(std::forward< K1 >(key)).first->second;
-  }
-  return temp->second;
+  return this->try_emplace(std::forward< K1 >(key)).first->second;
 }
 
 #endif

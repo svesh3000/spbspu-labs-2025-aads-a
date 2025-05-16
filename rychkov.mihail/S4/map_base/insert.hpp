@@ -12,11 +12,11 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::const_iterat
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::find_hint_pair(const K1& key) const
 {
   const_iterator hint = lower_bound_impl(key).first;
-  if (!IsMulti && (hint.pointed_ < hint.node_->size()) && !compare_with_key(key, *hint))
+  if (IsMulti || (hint.pointed_ >= hint.node_->size()) || compare_with_key(key, *hint))
   {
-    return {hint, false};
+    return {hint, true};
   }
-  return {hint, true};
+  return {hint, false};
 }
 
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
@@ -186,9 +186,9 @@ std::enable_if_t< !IsSet && !IsSet2,
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< bool IsSet2, class K1, class... Args >
-std::enable_if_t< !IsSet && !IsSet2
-      && rychkov::is_transparent_v< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::key_compare >,
-      std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bool > >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+    < std::enable_if_t< !IsSet && !IsSet2,
+        std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bool > >, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::try_emplace(K1&& key, Args&&... args)
 {
   return emplace_hint_impl(find_hint_pair(key), std::piecewise_construct,
@@ -210,9 +210,9 @@ std::enable_if_t< !IsSet && !IsSet2, typename rychkov::MapBase< K, T, C, N, IsSe
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< bool IsSet2, class K1, class... Args >
-std::enable_if_t< !IsSet && !IsSet2
-      && rychkov::is_transparent_v< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::key_compare >,
-      typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator >
+typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::transparent_compare_key
+    < std::enable_if_t< !IsSet && !IsSet2,
+        std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bool > >, K1 >
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::try_emplace(const_iterator hint, K1&& key, Args&&... args)
 {
   return emplace_hint_impl(correct_hint(hint, key), std::forward< K1 >(key), std::forward< Args >(args)...).first;

@@ -8,30 +8,6 @@
 #include "map.hpp"
 #include "set.hpp"
 
-template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::debug_print() const
-{
-  debug_print(fake_children_[0], 0);
-}
-template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::debug_print(node_type* node, size_t offset) const
-{
-  if (node == nullptr)
-  {
-    return;
-  }
-  for (node_size_type i = 0; i < node->size(); i++)
-  {
-    debug_print(node->children[i], offset + 1);
-    for (size_t j = 0; j < offset; j++)
-    {
-      std::cout << '\t';
-    }
-    std::cout << node->operator[](i) << '\n';
-  }
-  debug_print(node->children[node->size()], offset + 1);
-}
-
 BOOST_AUTO_TEST_SUITE(S4_map_test)
 
 BOOST_AUTO_TEST_CASE(empty_test)

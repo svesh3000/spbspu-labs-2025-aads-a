@@ -75,14 +75,16 @@ namespace rychkov
     using value_compare = std::conditional_t< IsSet, key_compare, map_value_compare >;
 
     MapBase() noexcept(std::is_nothrow_default_constructible< value_compare >::value);
+    MapBase(value_compare compare) noexcept(std::is_nothrow_move_constructible< value_compare >::value);
     MapBase(const MapBase& rhs);
     MapBase(MapBase&& rhs) noexcept(std::is_nothrow_move_constructible< value_compare >::value);
-    MapBase(std::initializer_list< value_type > init);
+    MapBase(std::initializer_list< value_type > init, value_compare compare = {});
     template< class InputIt >
-    MapBase(InputIt from, InputIt to);
+    MapBase(InputIt from, InputIt to, value_compare compare = {});
     ~MapBase();
     MapBase& operator=(const MapBase& rhs);
     MapBase& operator=(MapBase&& rhs) noexcept(noexcept(swap(std::declval< MapBase& >())));
+    MapBase& operator=(std::initializer_list< value_type > init);
 
     bool empty() const noexcept;
     size_type size() const noexcept;
@@ -119,26 +121,25 @@ namespace rychkov
 
   public:
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, iterator > lower_bound(const K1& key);
+    transparent_compare_key< iterator, K1 > lower_bound(const K1& key);
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, const_iterator > lower_bound(const K1& key) const;
+    transparent_compare_key< const_iterator, K1 > lower_bound(const K1& key) const;
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, iterator > upper_bound(const K1& key);
+    transparent_compare_key< iterator, K1 > upper_bound(const K1& key);
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, const_iterator > upper_bound(const K1& key) const;
+    transparent_compare_key< const_iterator, K1 > upper_bound(const K1& key) const;
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, iterator > find(const K1& key);
+    transparent_compare_key< iterator, K1 > find(const K1& key);
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, const_iterator > find(const K1& key) const;
+    transparent_compare_key< const_iterator, K1 > find(const K1& key) const;
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, bool > contains(const K1& key) const;
+    transparent_compare_key< bool, K1 > contains(const K1& key) const;
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, std::pair< iterator, iterator > > equal_range(const K1& key);
+    transparent_compare_key< std::pair< iterator, iterator >, K1 > equal_range(const K1& key);
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, std::pair< const_iterator, const_iterator > >
-        equal_range(const K1& key) const;
+    transparent_compare_key< std::pair< const_iterator, const_iterator >, K1 > equal_range(const K1& key) const;
     template< class K1 >
-    std::enable_if_t< is_transparent_v< key_compare >, size_type > count(const K1& key) const;
+    transparent_compare_key< size_type, K1 > count(const K1& key) const;
 
     void clear();
     void swap(MapBase& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
@@ -180,23 +181,22 @@ namespace rychkov
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > > try_emplace(key_type&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class K1, class... Args >
-    std::enable_if_t< !IsSet && !IsSet2 && is_transparent_v< key_compare >, std::pair< iterator, bool > >
+    transparent_compare_key< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
         try_emplace(K1&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, iterator > try_emplace(const_iterator hint, const key_type& key, Args&&... args);
     template< bool IsSet2 = IsSet, class... Args >
     std::enable_if_t< !IsSet && !IsSet2, iterator > try_emplace(const_iterator hint, key_type&& key, Args&&... args);
     template< bool IsSet2 = IsSet, class K1, class... Args >
-    std::enable_if_t< !IsSet && !IsSet2 && is_transparent_v< key_compare >, iterator >
+    transparent_compare_key< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
         try_emplace(const_iterator hint, K1&& key, Args&&... args);
-void debug_print() const;
+
   private:
     static constexpr size_t node_capacity = N;
     static constexpr size_t node_middle = (node_capacity + 1) / 2;
     using node_type = MapBaseNode< real_value_type, node_capacity >;
     using node_size_type = typename node_type::size_type;
 
-void debug_print(node_type* node, size_t level = 0) const;
     value_compare comp_;
     node_type* cached_begin_ = nullptr;
     node_type* cached_rbegin_ = nullptr;
@@ -211,7 +211,7 @@ void debug_print(node_type* node, size_t level = 0) const;
     static void correct_emplace_result(node_type& left, node_type& right,
         node_size_type ins_point, const_iterator& hint);
     static void correct_erase_result(const_iterator to, const_iterator from, iterator& result, bool will_be_replaced);
-    void destroy_subtree(node_type* node);
+    static void destroy_subtree(node_type* node);
 
     template< class K1 >
     std::pair< const_iterator, const_iterator > lower_bound_impl(const K1& key) const;

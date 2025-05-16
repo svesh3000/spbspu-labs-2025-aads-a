@@ -15,6 +15,17 @@ rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase()
   fake_size_(0)
 {}
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(value_compare key)
+    noexcept(std::is_nothrow_move_constructible< value_compare >::value):
+  comp_(std::move(key)),
+  cached_begin_(fake_root()),
+  cached_rbegin_(fake_root()),
+  size_(0),
+  fake_parent_(nullptr),
+  fake_children_{nullptr},
+  fake_size_(0)
+{}
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(MapBase&& rhs)
     noexcept(std::is_nothrow_move_constructible< value_compare >::value):
   comp_(std::move(rhs.comp_)),
@@ -29,29 +40,54 @@ rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(MapBase&& rhs)
   {
     cached_rbegin_ = cached_begin_ = fake_root();
   }
+  else
+  {
+    fake_children_[0]->parent = fake_root();
+  }
+}
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(const MapBase& rhs):
+  MapBase(rhs.begin(), rhs.end(), rhs.comp_)
+{}
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase
+    (std::initializer_list< value_type > init, value_compare compare):
+  MapBase(init.begin(), init.end(), std::move(compare))
+{}
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+template< class InputIt >
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(InputIt from, InputIt to, value_compare compare):
+  MapBase(std::move(compare))
+{
+  for (; from != to; ++from)
+  {
+    insert(*from);
+  }
+}
+template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >&
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::operator=(const MapBase& rhs)
+{
+  MapBase temp = rhs;
+  swap(temp);
+  return *this;
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 rychkov::MapBase< K, T, C, N, IsSet, IsMulti >&
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::operator=(MapBase&& rhs)
     noexcept(noexcept(swap(std::declval< MapBase& >())))
 {
-  MapBase temp = std::move(*this);
-  swap(rhs);
+  MapBase temp = std::move(rhs);
+  swap(temp);
   return *this;
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(std::initializer_list< value_type > init):
-  MapBase(init.begin(), init.end())
-{}
-template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-template< class InputIt >
-rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::MapBase(InputIt from, InputIt to):
-  MapBase()
+rychkov::MapBase< K, T, C, N, IsSet, IsMulti >&
+    rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::operator=(std::initializer_list< value_type > init)
 {
-  for (; from != to; ++from)
-  {
-    insert(*from);
-  }
+  MapBase temp = init;
+  swap(temp);
+  return *this;
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::~MapBase()
@@ -69,13 +105,19 @@ void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::swap(MapBase& rhs)
   std::swap(fake_children_[0], rhs.fake_children_[0]);
   if (size_ == 0)
   {
-    cached_begin_ = fake_root();
-    cached_rbegin_ = cached_begin_;
+    cached_rbegin_ = cached_begin_ = fake_root();
+  }
+  else
+  {
+    fake_children_[0]->parent = fake_root();
   }
   if (rhs.size_ == 0)
   {
-    rhs.cached_begin_ = fake_root();
-    rhs.cached_rbegin_ = rhs.cached_begin_;
+    rhs.cached_rbegin_ = rhs.cached_begin_ = fake_root();
+  }
+  else
+  {
+    rhs.fake_children_[0]->parent = rhs.fake_root();
   }
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >

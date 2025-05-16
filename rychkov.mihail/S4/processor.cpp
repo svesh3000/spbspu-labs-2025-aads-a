@@ -19,23 +19,24 @@ bool rychkov::S4ParseProcessor::init(ParserContext& context, int argc, char** ar
   std::string name;
   while (file >> name)
   {
-    //inner_map& link = map[name];
-    if (context.eol())
+    if (map.contains(name))
     {
-      break;
-    }
-    int key = 0;
-    std::string str;
-    if (!context.in >> key)
-    {
-      return true;
-    }
-    if (!(context.in >> str))
-    {
-      context.err << "failed to read string for key\n";
+      context.err << "map name repeated\n";
       return false;
     }
-    //link.try_emplace(key, std::move(str));
+    inner_map& link = map[name];
+    int key = 0;
+    while (file >> key)
+    {
+      std::string str;
+      if (!(file >> str))
+      {
+        context.err << "failed to read string for key\n";
+        return false;
+      }
+      link.try_emplace(key, std::move(str));
+    }
+    file.clear(file.rdstate() & ~std::ios::failbit);
   }
   return true;
 }
@@ -64,20 +65,58 @@ bool rychkov::S4ParseProcessor::print(ParserContext& context)
   context.out << '\n';
   return true;
 }
-bool rychkov::S4ParseProcessor::make_complement(ParserContext&)
+bool rychkov::S4ParseProcessor::make_complement(ParserContext& context)
 {
+  std::string name, lhs, rhs;
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
+      || !map.contains(lhs) || !map.contains(rhs))
+  {
+    return false;
+  }
+  inner_map& link = map[name];
+  const inner_map& lhslink = map.at(lhs);
+  const inner_map& rhslink = map.at(rhs);
+  for (const inner_map::value_type& i: lhslink)
+  {
+    if (!rhslink.contains(i.first))
+    {
+      link.insert(i);
+    }
+  }
   return true;
 }
-bool rychkov::S4ParseProcessor::make_intersect(ParserContext&)
+bool rychkov::S4ParseProcessor::make_intersect(ParserContext& context)
 {
+  std::string name, lhs, rhs;
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
+      || !map.contains(lhs) || !map.contains(rhs))
+  {
+    return false;
+  }
+  inner_map& link = map[name];
+  const inner_map& lhslink = map.at(lhs);
+  const inner_map& rhslink = map.at(rhs);
+  for (const inner_map::value_type& i: lhslink)
+  {
+    if (rhslink.contains(i.first))
+    {
+      link.insert(i);
+    }
+  }
   return true;
 }
 bool rychkov::S4ParseProcessor::make_union(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol())
+  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || map.contains(name)
+      || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
+  inner_map& link = map[name];
+  const inner_map& lhslink = map.at(lhs);
+  const inner_map& rhslink = map.at(rhs);
+  link.insert(lhslink.begin(), lhslink.end());
+  link.insert(rhslink.begin(), rhslink.end());
   return true;
 }
