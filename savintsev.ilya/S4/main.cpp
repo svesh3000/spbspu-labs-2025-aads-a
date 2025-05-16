@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <string>
 #include "dataset.h"
 
@@ -10,8 +11,10 @@ int main(int argc, char ** argv)
     return 1;
   }
 
+  using namespace savintsev;
+
   DatasetCollection datasets;
-  datasets = savintsev::load_dataset_from(argv[1]);
+  datasets = load_dataset_from(argv[1]);
 
   if (datasets.empty())
   {
@@ -19,27 +22,22 @@ int main(int argc, char ** argv)
     return 1;
   }
 
-  DatasetCommands datasets_commands = savintsev::register_commands();
+  DatasetCommands datasets_commands;
+  datasets_commands.insert({"print", print_dataset});
+  datasets_commands.insert({"complement", complement_datasets});
+  datasets_commands.insert({"intersect", intersect_datasets});
+  datasets_commands.insert({"union", union_datasets});
 
-  std::string command;
-  while (std::cin)
+  for (std::string command; std::cin >> command;)
   {
-    std::cin >> command;
-    if (!std::cin)
-    {
-      break;
-    }
     try
     {
       datasets_commands.at(command)(datasets);
     }
-    catch (const std::exception & e)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-      while (std::cin.peek() != '\n')
-      {
-        std::cin >> command;
-      }
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }

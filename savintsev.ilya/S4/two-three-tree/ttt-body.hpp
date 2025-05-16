@@ -107,10 +107,10 @@ namespace savintsev
   template< typename K, typename V, typename C >
   TwoThreeTree< K, V, C > & TwoThreeTree< K, V, C >::operator=(const TwoThreeTree & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-        TwoThreeTree temp(other);
-        swap(temp);
+      TwoThreeTree temp(other);
+      swap(temp);
     }
     return *this;
   }
@@ -127,7 +127,7 @@ namespace savintsev
   template< typename K, typename V, typename C >
   TwoThreeTree< K, V, C > & TwoThreeTree< K, V, C >::operator=(TwoThreeTree && other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       root_ = clear_nodes(root_);
       root_ = other.root_;
@@ -140,7 +140,7 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::begin() noexcept
   {
-    if (!root_ || root_->len_ == 0)
+    if (!root_ || root_->len == 0)
     {
       return end();
     }
@@ -158,7 +158,7 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::begin() const noexcept
   {
-    if (!root_ || root_->len_ == 0)
+    if (!root_ || root_->len == 0)
     {
       return end();
     }
@@ -176,7 +176,7 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::cbegin() const noexcept
   {
-    if (!root_ || root_->len_ == 0)
+    if (!root_ || root_->len == 0)
     {
       return end();
     }
@@ -299,31 +299,31 @@ namespace savintsev
     node_type * node = root_;
     while (node)
     {
-      assert(node->len_ <= 3);
-      for (size_t i = 0; i < node->len_; ++i)
+      assert(node->len <= 3);
+      for (size_t i = 0; i < node->len; ++i)
       {
-        if (node->data_[i].first == k)
+        if (node->data[i].first == k)
         {
           return {iterator(root_, node, i), true};
         }
       }
 
-      if (!node->kids_[0])
+      if (!node->kids[0])
       {
         return std::make_pair(iterator(root_, node, 0), false);
       }
 
-      if (C{}(k, node->data_[0].first))
+      if (C{}(k, node->data[0].first))
       {
-        node = node->kids_[0];
+        node = node->kids[0];
       }
-      else if (node->len_ == 1 || C{}(k, node->data_[1].first))
+      else if (node->len == 1 || C{}(k, node->data[1].first))
       {
-        node = node->kids_[1];
+        node = node->kids[1];
       }
       else
       {
-        node = node->kids_[2];
+        node = node->kids[2];
       }
     }
     return {iterator(root_), false};
@@ -332,9 +332,9 @@ namespace savintsev
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::insert_data_in_node(node_type * node, const value_type & val)
   {
-    node->data_[node->len_] = val;
-    assert(node->len_ < 3);
-    node->len_++;
+    node->data[node->len] = val;
+    assert(node->len < 3);
+    node->len++;
     sort_node(node);
   }
 
@@ -347,17 +347,20 @@ namespace savintsev
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::remove_data_from_node(node_type * node, const key_type & k)
   {
-    if (node->len_ == 0) return;
-    if (node->len_ >= 1 && node->data_[0].first == k)
+    if (node->len == 0)
     {
-      node->data_[0] = node->data_[1];
-      node->data_[1] = node->data_[2];
-      node->len_--;
+      return;
     }
-    else if (node->len_ == 2 && node->data_[1].first == k)
+    if (node->len >= 1 && node->data[0].first == k)
     {
-      node->data_[1] = node->data_[2];
-      node->len_--;
+      node->data[0] = node->data[1];
+      node->data[1] = node->data[2];
+      node->len--;
+    }
+    else if (node->len == 2 && node->data[1].first == k)
+    {
+      node->data[1] = node->data[2];
+      node->len--;
     }
   }
 
@@ -370,7 +373,7 @@ namespace savintsev
     }
     for (size_t i = 0; i < 4; ++i)
     {
-      node->kids_[i] = clear_nodes(node->kids_[i]);
+      node->kids[i] = clear_nodes(node->kids[i]);
     }
     delete node;
     return nullptr;
@@ -383,19 +386,28 @@ namespace savintsev
     {
       return nullptr;
     }
-    node_type * root = new node_type{};
-    for (size_t i = 0; i < other->len_; ++i)
+    node_type * root = nullptr;
+    try
     {
-      root->data_[i] = other->data_[i];
-    }
-    root->len_ = other->len_;
-    for (size_t i = 0; i < 3; ++i)
-    {
-      if (other->kids_[i])
+      root = new node_type{};
+      for (size_t i = 0; i < other->len; ++i)
       {
-        root->kids_[i] = clone_nodes(other->kids_[i]);
-        root->kids_[i]->parent_ = root;
+        root->data[i] = other->data[i];
       }
+      root->len = other->len;
+      for (size_t i = 0; i < 3; ++i)
+      {
+        if (other->kids[i])
+        {
+          root->kids[i] = clone_nodes(other->kids[i]);
+          root->kids[i]->father = root;
+        }
+      }
+    }
+    catch(...)
+    {
+      root = clear_nodes(root);
+      throw;
     }
     return root;
   }
@@ -409,12 +421,12 @@ namespace savintsev
       return nullptr;
     }
 
-    while (temp->kids_[0])
+    while (temp->kids[0])
     {
-      temp = temp->kids_[0];
+      temp = temp->kids[0];
     }
 
-    return (temp->len_ == 0 ? nullptr : temp);
+    return (temp->len == 0 ? nullptr : temp);
   }
 
   template< typename K, typename V, typename C >
@@ -425,14 +437,14 @@ namespace savintsev
       return nullptr;
     }
 
-    if (!leaf->parent_ && leaf->len_ == 0)
+    if (!leaf->father && leaf->len == 0)
     {
       for (size_t i = 0; i < 4; ++i)
       {
-        if (leaf->kids_[i])
+        if (leaf->kids[i])
         {
-          leaf->kids_[i]->parent_ = nullptr;
-          node_type* new_root = leaf->kids_[i];
+          leaf->kids[i]->father = nullptr;
+          node_type* new_root = leaf->kids[i];
           delete leaf;
           return new_root;
         }
@@ -440,22 +452,22 @@ namespace savintsev
       delete leaf;
       return nullptr;
     }
-    if (leaf->len_ != 0)
+    if (leaf->len != 0)
     {
-      if (leaf->parent_)
+      if (leaf->father)
       {
-        return fix_nodes_properties(leaf->parent_);
+        return fix_nodes_properties(leaf->father);
       }
       return leaf;
     }
     else
     {
-      node_type * parent = leaf->parent_;
-      if (parent->kids_[0]->len_ == 2 || parent->kids_[1]->len_ == 2 || parent->len_ == 2)
+      node_type * parent = leaf->father;
+      if (parent->kids[0]->len == 2 || parent->kids[1]->len == 2 || parent->len == 2)
       {
         leaf = redistribute_nodes(leaf);
       }
-      else if (parent->len_ == 2 && parent->kids_[2]->len_ == 2)
+      else if (parent->len == 2 && parent->kids[2]->len == 2)
       {
         leaf = redistribute_nodes(leaf);
       }
@@ -470,238 +482,238 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::redistribute_nodes(node_type * leaf)
   {
-    node_type * parent = leaf->parent_;
-    node_type * first = parent->kids_[0];
-    node_type * second = parent->kids_[1];
-    node_type * third = parent->kids_[2];
-    if ((parent->len_ == 2) && (first->len_ < 2) && (second->len_ < 2) && (third->len_ < 2))
+    node_type * parent = leaf->father;
+    node_type * first = parent->kids[0];
+    node_type * second = parent->kids[1];
+    node_type * third = parent->kids[2];
+    if ((parent->len == 2) && (first->len < 2) && (second->len < 2) && (third->len < 2))
     {
       if (first == leaf)
       {
-        parent->kids_[0] = parent->kids_[1];
-        parent->kids_[1] = parent->kids_[2];
-        parent->kids_[2] = nullptr;
-        insert_data_in_node(parent->kids_[0], parent->data_[0]);
-        parent->kids_[0]->kids_[2] = parent->kids_[0]->kids_[1];
-        parent->kids_[0]->kids_[1] = parent->kids_[0]->kids_[0];
+        parent->kids[0] = parent->kids[1];
+        parent->kids[1] = parent->kids[2];
+        parent->kids[2] = nullptr;
+        insert_data_in_node(parent->kids[0], parent->data[0]);
+        parent->kids[0]->kids[2] = parent->kids[0]->kids[1];
+        parent->kids[0]->kids[1] = parent->kids[0]->kids[0];
 
-        if (leaf->kids_[0])
+        if (leaf->kids[0])
         {
-          parent->kids_[0]->kids_[0] = leaf->kids_[0];
+          parent->kids[0]->kids[0] = leaf->kids[0];
         }
-        else if (leaf->kids_[1])
+        else if (leaf->kids[1])
         {
-          parent->kids_[0]->kids_[0] = leaf->kids_[1];
+          parent->kids[0]->kids[0] = leaf->kids[1];
         }
-        if (parent->kids_[0]->kids_[0])
+        if (parent->kids[0]->kids[0])
         {
-          parent->kids_[0]->kids_[0]->parent_ = parent->kids_[0];
+          parent->kids[0]->kids[0]->father = parent->kids[0];
         }
-        remove_data_from_node(parent, parent->data_[0]);
+        remove_data_from_node(parent, parent->data[0]);
         delete first;
       }
       else if (second == leaf)
       {
-        insert_data_in_node(first, parent->data_[0]);
-        remove_data_from_node(parent, parent->data_[0]);
-        if (leaf->kids_[0])
+        insert_data_in_node(first, parent->data[0]);
+        remove_data_from_node(parent, parent->data[0]);
+        if (leaf->kids[0])
         {
-          first->kids_[2] = leaf->kids_[0];
+          first->kids[2] = leaf->kids[0];
         }
-        else if (leaf->kids_[1])
+        else if (leaf->kids[1])
         {
-          first->kids_[2] = leaf->kids_[1];
+          first->kids[2] = leaf->kids[1];
         }
-        if (first->kids_[2])
+        if (first->kids[2])
         {
-          first->kids_[2]->parent_ = first;
+          first->kids[2]->father = first;
         }
-        parent->kids_[1] = parent->kids_[2];
-        parent->kids_[2] = nullptr;
+        parent->kids[1] = parent->kids[2];
+        parent->kids[2] = nullptr;
 
         delete second;
       }
       else if (third == leaf)
       {
-        insert_data_in_node(second, parent->data_[1]);
-        parent->kids_[2] = nullptr;
-        remove_data_from_node(parent, parent->data_[1]);
-        if (leaf->kids_[0])
+        insert_data_in_node(second, parent->data[1]);
+        parent->kids[2] = nullptr;
+        remove_data_from_node(parent, parent->data[1]);
+        if (leaf->kids[0])
         {
-          second->kids_[2] = leaf->kids_[0];
+          second->kids[2] = leaf->kids[0];
         }
-        else if (leaf->kids_[1])
+        else if (leaf->kids[1])
         {
-          second->kids_[2] = leaf->kids_[1];
+          second->kids[2] = leaf->kids[1];
         }
-        if (second->kids_[2])
+        if (second->kids[2])
         {
-          second->kids_[2]->parent_ = second;
+          second->kids[2]->father = second;
         }
         delete third;
       }
     }
-    else if ((parent->len_ == 2) && ((first->len_ == 2) || (second->len_ == 2) || (third->len_ == 2)))
+    else if ((parent->len == 2) && ((first->len == 2) || (second->len == 2) || (third->len == 2)))
     {
       if (third == leaf)
       {
-        if (leaf->kids_[0])
+        if (leaf->kids[0])
         {
-          leaf->kids_[1] = leaf->kids_[0];
-          leaf->kids_[0] = nullptr;
+          leaf->kids[1] = leaf->kids[0];
+          leaf->kids[0] = nullptr;
         }
 
-        insert_data_in_node(leaf, parent->data_[1]);
-        if (second->len_ == 2)
+        insert_data_in_node(leaf, parent->data[1]);
+        if (second->len == 2)
         {
-          parent->data_[1] = second->data_[1];
-          remove_data_from_node(second, second->data_[1]);
-          leaf->kids_[0] = second->kids_[2];
-          second->kids_[2] = nullptr;
-          if (leaf->kids_[0])
+          parent->data[1] = second->data[1];
+          remove_data_from_node(second, second->data[1]);
+          leaf->kids[0] = second->kids[2];
+          second->kids[2] = nullptr;
+          if (leaf->kids[0])
           {
-            leaf->kids_[0]->parent_ = leaf;
+            leaf->kids[0]->father = leaf;
           }
         }
-        else if (first->len_ == 2)
+        else if (first->len == 2)
         {
-          parent->data_[1] = second->data_[0];
-          leaf->kids_[0] = second->kids_[1];
-          second->kids_[1] = second->kids_[0];
-          if (leaf->kids_[0])
+          parent->data[1] = second->data[0];
+          leaf->kids[0] = second->kids[1];
+          second->kids[1] = second->kids[0];
+          if (leaf->kids[0])
           {
-            leaf->kids_[0]->parent_ = leaf;
+            leaf->kids[0]->father = leaf;
           }
-          second->data_[0] = parent->data_[0];
-          parent->data_[0] = first->data_[1];
-          remove_data_from_node(first, first->data_[1]);
-          second->kids_[0] = first->kids_[2];
-          if (second->kids_[0])
+          second->data[0] = parent->data[0];
+          parent->data[0] = first->data[1];
+          remove_data_from_node(first, first->data[1]);
+          second->kids[0] = first->kids[2];
+          if (second->kids[0])
           {
-            second->kids_[0]->parent_ = second;
+            second->kids[0]->father = second;
           }
-          first->kids_[2] = nullptr;
+          first->kids[2] = nullptr;
         }
       }
       else if (second == leaf)
       {
-        if (third->len_ == 2)
+        if (third->len == 2)
         {
-          if (leaf->kids_[0] == nullptr)
+          if (leaf->kids[0] == nullptr)
           {
-            leaf->kids_[0] = leaf->kids_[1];
-            leaf->kids_[1] = nullptr;
+            leaf->kids[0] = leaf->kids[1];
+            leaf->kids[1] = nullptr;
           }
-          insert_data_in_node(second, parent->data_[1]);
-          parent->data_[1] = third->data_[0];
-          remove_data_from_node(third, third->data_[0]);
-          second->kids_[1] = third->kids_[0];
-          if (second->kids_[1])
+          insert_data_in_node(second, parent->data[1]);
+          parent->data[1] = third->data[0];
+          remove_data_from_node(third, third->data[0]);
+          second->kids[1] = third->kids[0];
+          if (second->kids[1])
           {
-            second->kids_[1]->parent_ = second;
+            second->kids[1]->father = second;
           }
-          third->kids_[0] = third->kids_[1];
-          third->kids_[1] = third->kids_[2];
-          third->kids_[2] = nullptr;
+          third->kids[0] = third->kids[1];
+          third->kids[1] = third->kids[2];
+          third->kids[2] = nullptr;
         }
-        else if (first->len_ == 2)
+        else if (first->len == 2)
         {
-          if (leaf->kids_[1] == nullptr)
+          if (leaf->kids[1] == nullptr)
           {
-            leaf->kids_[1] = leaf->kids_[0];
-            leaf->kids_[0] = nullptr;
+            leaf->kids[1] = leaf->kids[0];
+            leaf->kids[0] = nullptr;
           }
-          insert_data_in_node(second, parent->data_[0]);
-          parent->data_[0] = first->data_[1];
-          remove_data_from_node(first, first->data_[1]);
-          second->kids_[0] = first->kids_[2];
-          if (second->kids_[0])
+          insert_data_in_node(second, parent->data[0]);
+          parent->data[0] = first->data[1];
+          remove_data_from_node(first, first->data[1]);
+          second->kids[0] = first->kids[2];
+          if (second->kids[0])
           {
-            second->kids_[0]->parent_ = second;
+            second->kids[0]->father = second;
           }
-          first->kids_[2] = nullptr;
+          first->kids[2] = nullptr;
         }
       }
       else if (first == leaf)
       {
-        if (leaf->kids_[0] == nullptr)
+        if (leaf->kids[0] == nullptr)
         {
-          leaf->kids_[0] = leaf->kids_[1];
-          leaf->kids_[1] = nullptr;
+          leaf->kids[0] = leaf->kids[1];
+          leaf->kids[1] = nullptr;
         }
-        insert_data_in_node(first, parent->data_[0]);
-        if (second->len_ == 2)
+        insert_data_in_node(first, parent->data[0]);
+        if (second->len == 2)
         {
-          parent->data_[0] = second->data_[0];
-          remove_data_from_node(second, second->data_[0]);
-          first->kids_[1] = second->kids_[0];
-          if (first->kids_[1])
+          parent->data[0] = second->data[0];
+          remove_data_from_node(second, second->data[0]);
+          first->kids[1] = second->kids[0];
+          if (first->kids[1])
           {
-            first->kids_[1]->parent_ = first;
+            first->kids[1]->father = first;
           }
-          second->kids_[0] = second->kids_[1];
-          second->kids_[1] = second->kids_[2];
-          second->kids_[2] = nullptr;
+          second->kids[0] = second->kids[1];
+          second->kids[1] = second->kids[2];
+          second->kids[2] = nullptr;
         }
-        else if (third->len_ == 2)
+        else if (third->len == 2)
         {
-          parent->data_[0] = second->data_[0];
-          second->data_[0] = parent->data_[1];
-          parent->data_[1] = third->data_[0];
-          remove_data_from_node(third, third->data_[0]);
-          first->kids_[1] = second->kids_[0];
-          if (first->kids_[1])
+          parent->data[0] = second->data[0];
+          second->data[0] = parent->data[1];
+          parent->data[1] = third->data[0];
+          remove_data_from_node(third, third->data[0]);
+          first->kids[1] = second->kids[0];
+          if (first->kids[1])
           {
-            first->kids_[1]->parent_ = first;
+            first->kids[1]->father = first;
           }
-          second->kids_[0] = second->kids_[1];
-          second->kids_[1] = third->kids_[0];
-          if (second->kids_[1])
+          second->kids[0] = second->kids[1];
+          second->kids[1] = third->kids[0];
+          if (second->kids[1])
           {
-            second->kids_[1]->parent_ = second;
+            second->kids[1]->father = second;
           }
-          third->kids_[0] = third->kids_[1];
-          third->kids_[1] = third->kids_[2];
-          third->kids_[2] = nullptr;
+          third->kids[0] = third->kids[1];
+          third->kids[1] = third->kids[2];
+          third->kids[2] = nullptr;
         }
       }
     }
-    else if (parent->len_ == 1)
+    else if (parent->len == 1)
     {
-      insert_data_in_node(leaf, parent->data_[0]);
+      insert_data_in_node(leaf, parent->data[0]);
 
-      if (first == leaf && second->len_ == 2)
+      if (first == leaf && second->len == 2)
       {
-        parent->data_[0] = second->data_[0];
-        remove_data_from_node(second, second->data_[0]);
+        parent->data[0] = second->data[0];
+        remove_data_from_node(second, second->data[0]);
 
-        if (leaf->kids_[0] == nullptr)
+        if (leaf->kids[0] == nullptr)
         {
-          leaf->kids_[0] = leaf->kids_[1];
+          leaf->kids[0] = leaf->kids[1];
         }
-        leaf->kids_[1] = second->kids_[0];
-        second->kids_[0] = second->kids_[1];
-        second->kids_[1] = second->kids_[2];
-        second->kids_[2] = nullptr;
-        if (leaf->kids_[1])
+        leaf->kids[1] = second->kids[0];
+        second->kids[0] = second->kids[1];
+        second->kids[1] = second->kids[2];
+        second->kids[2] = nullptr;
+        if (leaf->kids[1])
         {
-          leaf->kids_[1]->parent_ = leaf;
+          leaf->kids[1]->father = leaf;
         }
       }
-      else if (second == leaf && first->len_ == 2)
+      else if (second == leaf && first->len == 2)
       {
-        parent->data_[0] = first->data_[1];
-        remove_data_from_node(first, first->data_[1]);
+        parent->data[0] = first->data[1];
+        remove_data_from_node(first, first->data[1]);
 
-        if (leaf->kids_[1] == nullptr)
+        if (leaf->kids[1] == nullptr)
         {
-          leaf->kids_[1] = leaf->kids_[0];
+          leaf->kids[1] = leaf->kids[0];
         }
-        leaf->kids_[0] = first->kids_[2];
-        first->kids_[2] = nullptr;
-        if (leaf->kids_[0])
+        leaf->kids[0] = first->kids[2];
+        first->kids[2] = nullptr;
+        if (leaf->kids[0])
         {
-          leaf->kids_[0]->parent_ = leaf;
+          leaf->kids[0]->father = leaf;
         }
       }
     }
@@ -711,64 +723,64 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::merge_nodes(node_type * leaf)
   {
-    node_type * parent = leaf->parent_;
+    node_type * parent = leaf->father;
 
-    if (parent->kids_[0] == leaf)
+    if (parent->kids[0] == leaf)
     {
-      insert_data_in_node(parent->kids_[1], parent->data_[0]);
-      parent->kids_[1]->kids_[2] = parent->kids_[1]->kids_[1];
-      parent->kids_[1]->kids_[1] = parent->kids_[1]->kids_[0];
+      insert_data_in_node(parent->kids[1], parent->data[0]);
+      parent->kids[1]->kids[2] = parent->kids[1]->kids[1];
+      parent->kids[1]->kids[1] = parent->kids[1]->kids[0];
 
-      if (leaf->kids_[0])
+      if (leaf->kids[0])
       {
-        parent->kids_[1]->kids_[0] = leaf->kids_[0];
+        parent->kids[1]->kids[0] = leaf->kids[0];
       }
-      else if (leaf->kids_[1])
+      else if (leaf->kids[1])
       {
-        parent->kids_[1]->kids_[0] = leaf->kids_[1];
+        parent->kids[1]->kids[0] = leaf->kids[1];
       }
-      if (parent->kids_[1]->kids_[0])
+      if (parent->kids[1]->kids[0])
       {
-        parent->kids_[1]->kids_[0]->parent_ = parent->kids_[1];
+        parent->kids[1]->kids[0]->father = parent->kids[1];
       }
-      remove_data_from_node(parent, parent->data_[0]);
-      delete parent->kids_[0];
-      parent->kids_[0] = nullptr;
+      remove_data_from_node(parent, parent->data[0]);
+      delete parent->kids[0];
+      parent->kids[0] = nullptr;
     }
-    else if (parent->kids_[1] == leaf)
+    else if (parent->kids[1] == leaf)
     {
-      insert_data_in_node(parent->kids_[0], parent->data_[0]);
+      insert_data_in_node(parent->kids[0], parent->data[0]);
 
-      if (leaf->kids_[0])
+      if (leaf->kids[0])
       {
-        parent->kids_[0]->kids_[2] = leaf->kids_[0];
+        parent->kids[0]->kids[2] = leaf->kids[0];
       }
-      else if (leaf->kids_[1])
+      else if (leaf->kids[1])
       {
-        parent->kids_[0]->kids_[2] = leaf->kids_[1];
+        parent->kids[0]->kids[2] = leaf->kids[1];
       }
 
-      if (parent->kids_[0]->kids_[2])
+      if (parent->kids[0]->kids[2])
       {
-        parent->kids_[0]->kids_[2]->parent_ = parent->kids_[0];
+        parent->kids[0]->kids[2]->father = parent->kids[0];
       }
-      remove_data_from_node(parent, parent->data_[0]);
-      delete parent->kids_[1];
-      parent->kids_[1] = nullptr;
+      remove_data_from_node(parent, parent->data[0]);
+      delete parent->kids[1];
+      parent->kids[1] = nullptr;
     }
 
-    if (!parent->parent_)
+    if (!parent->father)
     {
       node_type * temp = nullptr;
-      if (parent->kids_[0])
+      if (parent->kids[0])
       {
-        temp = parent->kids_[0];
+        temp = parent->kids[0];
       }
       else
       {
-        temp = parent->kids_[1];
+        temp = parent->kids[1];
       }
-      temp->parent_ = nullptr;
+      temp->father = nullptr;
       delete parent;
       return temp;
     }
@@ -784,16 +796,16 @@ namespace savintsev
     }
     node_type * target = position.node_;
     node_type * closest = nullptr;
-    if (position.pos_ + 1 < 3 && target->kids_[position.pos_ + 1])
+    if (position.pos_ + 1 < 3 && target->kids[position.pos_ + 1])
     {
-      closest = search_min(target->kids_[position.pos_ + 1]);
+      closest = search_min(target->kids[position.pos_ + 1]);
     }
 
     const key_type k = position->first;
     const key_type k_next = (++position)->first;
     if (closest)
     {
-      std::swap(target->data_[position.pos_], closest->data_[0]);
+      std::swap(target->data[position.pos_], closest->data[0]);
       target = closest;
     }
     remove_data_from_node(target, k);
@@ -811,10 +823,10 @@ namespace savintsev
       return 0ull;
     }
     node_type * target = result.first.node_;
-    node_type * closest = search_min(target->kids_[result.first.pos_ + 1]);
+    node_type * closest = search_min(target->kids[result.first.pos_ + 1]);
     if (closest)
     {
-      std::swap(target->data_[result.first.pos_], closest->data_[0]);
+      std::swap(target->data[result.first.pos_], closest->data[0]);
       target = closest;
     }
     remove_data_from_node(target, k);
@@ -870,7 +882,7 @@ namespace savintsev
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::node_type * TwoThreeTree< K, V, C >::split_node(node_type * node)
   {
-    if (node->len_ < 3)
+    if (node->len < 3)
     {
       return node;
     }
@@ -885,47 +897,47 @@ namespace savintsev
       delete left;
       throw;
     }
-    left->parent_ = node->parent_;
-    right->parent_ = node->parent_;
+    left->father = node->father;
+    right->father = node->father;
     for (size_t i = 0; i < 2; ++i)
     {
-      left->kids_[i] = node->kids_[i];
-      if (left->kids_[i])
+      left->kids[i] = node->kids[i];
+      if (left->kids[i])
       {
-        left->kids_[i]->parent_ = left;
+        left->kids[i]->father = left;
       }
-      right->kids_[i] = node->kids_[i + 2];
-      if (right->kids_[i])
+      right->kids[i] = node->kids[i + 2];
+      if (right->kids[i])
       {
-        right->kids_[i]->parent_ = right;
+        right->kids[i]->father = right;
       }
     }
-    insert_data_in_node(left, node->data_[0]);
-    insert_data_in_node(right, node->data_[2]);
+    insert_data_in_node(left, node->data[0]);
+    insert_data_in_node(right, node->data[2]);
 
-    if (node->parent_)
+    if (node->father)
     {
-      node_type * parent = node->parent_;
+      node_type * parent = node->father;
 
-      insert_data_in_node(parent, node->data_[1]);
+      insert_data_in_node(parent, node->data[1]);
 
-      if (parent->kids_[0] == node)
+      if (parent->kids[0] == node)
       {
-        parent->kids_[3] = parent->kids_[2];
-        parent->kids_[2] = parent->kids_[1];
-        parent->kids_[1] = right;
-        parent->kids_[0] = left;
+        parent->kids[3] = parent->kids[2];
+        parent->kids[2] = parent->kids[1];
+        parent->kids[1] = right;
+        parent->kids[0] = left;
       }
-      else if (parent->kids_[1] == node)
+      else if (parent->kids[1] == node)
       {
-        parent->kids_[3] = parent->kids_[2];
-        parent->kids_[2] = right;
-        parent->kids_[1] = left;
+        parent->kids[3] = parent->kids[2];
+        parent->kids[2] = right;
+        parent->kids[1] = left;
       }
       else
       {
-        parent->kids_[3] = right;
-        parent->kids_[2] = left;
+        parent->kids[3] = right;
+        parent->kids[2] = left;
       }
 
       delete node;
@@ -933,14 +945,14 @@ namespace savintsev
     }
     else
     {
-      left->parent_ = node;
-      right->parent_ = node;
-      node->data_[0] = node->data_[1];
-      node->kids_[0] = left;
-      node->kids_[1] = right;
-      node->kids_[2] = nullptr;
-      node->kids_[3] = nullptr;
-      node->len_ = 1;
+      left->father = node;
+      right->father = node;
+      node->data[0] = node->data[1];
+      node->kids[0] = left;
+      node->kids[1] = right;
+      node->kids[2] = nullptr;
+      node->kids[3] = nullptr;
+      node->len = 1;
       return node;
     }
   }
@@ -948,26 +960,26 @@ namespace savintsev
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::sort_node(node_type * node)
   {
-    if (node->len_ == 2)
+    if (node->len == 2)
     {
-      if (!Compare{}(node->data_[0].first, node->data_[1].first))
+      if (!Compare{}(node->data[0].first, node->data[1].first))
       {
-        std::swap(node->data_[0], node->data_[1]);
+        std::swap(node->data[0], node->data[1]);
       }
     }
-    if (node->len_ == 3)
+    if (node->len == 3)
     {
-      if (!Compare{}(node->data_[0].first, node->data_[1].first))
+      if (!Compare{}(node->data[0].first, node->data[1].first))
       {
-        std::swap(node->data_[0], node->data_[1]);
+        std::swap(node->data[0], node->data[1]);
       }
-      if (!Compare{}(node->data_[1].first, node->data_[2].first))
+      if (!Compare{}(node->data[1].first, node->data[2].first))
       {
-        std::swap(node->data_[1], node->data_[2]);
+        std::swap(node->data[1], node->data[2]);
       }
-      if (!Compare{}(node->data_[0].first, node->data_[1].first))
+      if (!Compare{}(node->data[0].first, node->data[1].first))
       {
-        std::swap(node->data_[0], node->data_[1]);
+        std::swap(node->data[0], node->data[1]);
       }
     }
   }
@@ -980,32 +992,39 @@ namespace savintsev
     {
       return {result.first, false};
     }
-    node_type * current = result.first.node_;
-
-    if (!current)
+    try
     {
-      node_type * root = new node_type{};
-      root_ = root;
-      insert_data_in_node(root_, val);
+      node_type * current = result.first.node_;
+
+      if (!current)
+      {
+        root_ = new node_type{};
+        insert_data_in_node(root_, val);
+        size_++;
+        return {iterator(root_, root_), true};
+      }
+
+      insert_data_in_node(current, val);
+
+      while (current && current->len == 3)
+      {
+        current = split_node(current);
+      }
+      while (current->father)
+      {
+        current = current->father;
+      }
+
+      root_ = current;
       size_++;
-      return {iterator(root_, root_), true};
+
+      return {lazy_find(val.first).first, true};
     }
-
-    insert_data_in_node(current, val);
-
-    while (current && current->len_ == 3)
+    catch (...)
     {
-      current = split_node(current);
-    }
-    while (current->parent_)
-    {
-      current = current->parent_;
-    }
 
-    root_ = current;
-    size_++;
-
-    return {lazy_find(val.first).first, true};
+      throw;
+    }
   }
 }
 

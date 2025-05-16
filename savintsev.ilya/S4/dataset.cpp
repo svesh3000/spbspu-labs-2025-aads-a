@@ -109,14 +109,4 @@ namespace savintsev
     }
     datasets[newset] = std::move(values);
   }
-
-  DatasetCommands register_commands()
-  {
-    DatasetCommands commands;
-    commands.insert({"print", print_dataset});
-    commands.insert({"complement", complement_datasets});
-    commands.insert({"intersect", intersect_datasets});
-    commands.insert({"union", union_datasets});
-    return commands;
-  }
 }
