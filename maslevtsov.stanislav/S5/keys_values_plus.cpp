@@ -19,17 +19,19 @@ void maslevtsov::KeysValuesPlus::operator()(const std::pair< int, std::string >&
   constexpr int max_int = std::numeric_limits< int >::max();
   constexpr int min_int = std::numeric_limits< int >::min();
   if (same_sign(keys_sum, value.first) && (keys_sum > 0)) {
-    if (max_int - keys_sum > value.first) {
+    if (max_int - keys_sum >= value.first) {
       keys_sum += value.first;
+    } else {
+      throw std::overflow_error("addition overflow");
     }
   } else if (same_sign(keys_sum, value.first) && (keys_sum < 0)) {
-    if (min_int - keys_sum < value.first) {
+    if (min_int - keys_sum <= value.first) {
       keys_sum += value.first;
+    } else {
+      throw std::overflow_error("addition overflow");
     }
   } else if (!same_sign(keys_sum, value.first)) {
     keys_sum += value.first;
-  } else {
-    throw std::overflow_error("addition overflow");
   }
   values += ' ' + value.second;
 }
