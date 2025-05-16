@@ -547,7 +547,7 @@ namespace kiselev
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair < typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
+  std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::insert(const value& val)
   {
     return emplace(val);
   }
@@ -600,47 +600,47 @@ namespace kiselev
   {
     if (pos == cend())
     {
-        return end();
+      return end();
     }
     Node* toDelete = pos.node_;
     Node* replace = nullptr;
     Node* child = nullptr;
     if (!toDelete->left || !toDelete->right)
     {
-        replace = toDelete;
+      replace = toDelete;
     }
     else
     {
-        replace = toDelete->right;
-        while (replace->left)
-        {
-            replace = replace->left;
-        }
+      replace = toDelete->right;
+      while (replace->left)
+      {
+        replace = replace->left;
+      }
     }
     child = replace->left ? replace->left : replace->right;
     if (child)
     {
-        child->parent = replace->parent;
+      child->parent = replace->parent;
     }
     if (!replace->parent)
     {
-        root_ = child;
+      root_ = child;
     }
     else if (replace == replace->parent->left)
     {
-        replace->parent->left = child;
+      replace->parent->left = child;
     }
     else
     {
-        replace->parent->right = child;
+      replace->parent->right = child;
     }
     if (replace != toDelete)
     {
-        toDelete->data = std::move(replace->data);
+      toDelete->data = std::move(replace->data);
     }
     if (replace->color == Color::BLACK)
     {
-        fixDelete(child ? child : replace->parent);
+      fixDelete(child ? child : replace->parent);
     }
     Iterator next(pos.node_);
     ++next;
@@ -767,11 +767,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   Value& RBTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    Iterator it = find(key);
-    if (it == end())
-    {
-      it = insert(std::make_pair(key, Value())).first;
-    }
+    Iterator it = insert(std::make_pair(key, Value())).first;
     return it->second;
   }
 
