@@ -12,13 +12,18 @@ namespace demehin
     TreeNode* right;
     int height;
 
-    explicit TreeNode(const std::pair< Key, T >&) noexcept;
-    TreeNode(const std::pair< Key, T >&, const TreeNode*) noexcept;
+    template< typename... Args >
+    explicit TreeNode(Args&&... args) noexcept;
+
+    template< typename... Args >
+    TreeNode(const TreeNode* parent, Args&&... args) noexcept;
+
   };
 
   template< typename Key, typename T >
-  TreeNode< Key, T >::TreeNode(const std::pair< Key, T >& value) noexcept:
-    data(value),
+  template< typename... Args >
+  TreeNode< Key, T >::TreeNode(Args&&... args) noexcept:
+    data(std::forward< Args >(args)...),
     parent(nullptr),
     left(nullptr),
     right(nullptr),
@@ -26,11 +31,13 @@ namespace demehin
   {}
 
   template< typename Key, typename T >
-  TreeNode< Key, T >::TreeNode(const std::pair< Key, T >& value, const TreeNode* prnt) noexcept:
-    TreeNode(value)
+  template< typename... Args >
+  TreeNode< Key, T >::TreeNode(const TreeNode* prnt, Args&&... args) noexcept:
+    TreeNode(std::forward< Args >(args)...)
   {
     parent = prnt;
   }
+
 }
 
 #endif

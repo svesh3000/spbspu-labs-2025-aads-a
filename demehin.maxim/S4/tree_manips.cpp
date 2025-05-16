@@ -12,7 +12,7 @@ void demehin::print(std::ostream& out, std::istream& in, const MapOfTrees& mapOf
   }
 
   out << datasetName;
-  for (auto& key : map)
+  for (auto&& key: map)
   {
     out << " " << key.first << " " << key.second;
   }
@@ -35,7 +35,7 @@ void demehin::makeComplement(std::istream& in, MapOfTrees& mapOfTrees)
     map2 = mapOfTrees.at(name1);
   }
 
-  for (auto& key : map1)
+  for (auto&& key: map1)
   {
     if (map2.find(key.first) == map2.end())
     {
@@ -64,7 +64,7 @@ void demehin::makeIntersect(std::istream& in, MapOfTrees& mapOfTrees)
   TreeMap newMap, lhsMap, rhsMap;
   lhsMap = mapOfTrees.at(lhsName);
   rhsMap = mapOfTrees.at(rhsName);
-  for (auto& key : lhsMap)
+  for (auto&& key: lhsMap)
   {
     if (rhsMap.find(key.first) != rhsMap.end())
     {
@@ -92,11 +92,11 @@ void demehin::makeUnion(std::istream& in, MapOfTrees& mapOfTrees)
   TreeMap newMap, lhsMap, rhsMap;
   lhsMap = mapOfTrees.at(lhsName);
   rhsMap = mapOfTrees.at(rhsName);
-  for (auto& key : lhsMap)
+  for (auto&& key: lhsMap)
   {
     newMap.insert(key);
   }
-  for (auto& key : rhsMap)
+  for (auto&& key: rhsMap)
   {
     if (newMap.find(key.first) == newMap.end())
     {
