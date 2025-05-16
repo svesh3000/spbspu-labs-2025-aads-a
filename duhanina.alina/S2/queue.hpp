@@ -30,7 +30,6 @@ namespace duhanina
 
   private:
     DynamicArray< T > array_;
-    size_t head_;
   };
 
   template < typename T >
@@ -48,10 +47,6 @@ namespace duhanina
   template < typename T >
   void Queue< T >::pop()
   {
-//    if (++head_ == array_.capacity_)
-  //  {
-    //  head_ = 0;
-    //}
     array_.pop_front();
   }
 

@@ -6,13 +6,9 @@
 
 namespace duhanina
 {
-  template< typename U >
-  class Queue;
-
   template < typename T >
   class DynamicArray
   {
-    friend class Queue< T >;
   public:
     DynamicArray() noexcept;
     ~DynamicArray();
@@ -39,6 +35,7 @@ namespace duhanina
     T* data_;
     size_t capacity_;
     size_t length_;
+    size_t head_;
     void resize();
   };
 
@@ -46,7 +43,8 @@ namespace duhanina
   DynamicArray< T >::DynamicArray() noexcept:
     data_(nullptr),
     capacity_(50),
-    length_(0)
+    length_(0),
+    head_(0)
   {
     data_ = new T[capacity_];
   }
@@ -61,13 +59,14 @@ namespace duhanina
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
     data_(new T[other.capacity_]),
     capacity_(other.capacity_),
-    length_(other.length_)
+    length_(other.length_),
+    head_(0)
   {
     try
     {
       for (size_t i = 0; i < other.length_; ++i)
       {
-        data_[i] = other.data_[i];
+        data_[i] = other.data_[i + other.head_];
       }
     }
     catch (...)
@@ -81,11 +80,13 @@ namespace duhanina
   DynamicArray< T >::DynamicArray(DynamicArray&& other) noexcept:
     data_(other.data_),
     capacity_(other.capacity_),
-    length_(other.length_)
+    length_(other.length_),
+    head_(0)
   {
     other.data_ = nullptr;
     other.capacity_ = 0;
     other.length_ = 0;
+    other.head_ = 0;
   }
 
   template < typename T >
@@ -98,7 +99,7 @@ namespace duhanina
       {
         for (size_t i = 0; i < other.length_; ++i)
         {
-          new_data[i] = other.data_[i];
+          new_data[i] = other.data_[i + other.head_];
         }
       }
       catch (...)
@@ -123,9 +124,11 @@ namespace duhanina
       data_ = other.data_;
       capacity_ = other.capacity_;
       length_ = other.length_;
+      head_ = 0;
       other.data_ = nullptr;
       other.capacity_ = 0;
       other.length_ = 0;
+      other.head_ = 0;
     }
     return *this;
   }
@@ -140,7 +143,7 @@ namespace duhanina
       new_data = new T[new_capacity];
       for (size_t i = 0; i < length_; ++i)
       {
-        new_data[i] = data_[i];
+        new_data[i + head_] = data_[i + head_];
       }
     }
     catch (...)
@@ -160,7 +163,8 @@ namespace duhanina
     {
       resize();
     }
-    data_[length_++] = value;
+    data_[length_ + head_] = value;
+    ++length_;
   }
 
   template < typename T >
@@ -180,11 +184,8 @@ namespace duhanina
     {
       throw std::out_of_range("Array is empty");
     }
-    for (size_t i = 0; i < length_ - 1; ++i)
-    {
-      data_[i] = data_[i + 1];
-    }
-    length_--;
+    head_ = (head_ + 1) % capacity_;
+    --length_;
   }
 
   template < typename T >
@@ -202,25 +203,25 @@ namespace duhanina
   template < typename T >
   const T& DynamicArray< T >::front() const noexcept
   {
-    return data_[0];
+    return data_[head_];
   }
 
   template < typename T >
   T& DynamicArray< T >::front() noexcept
   {
-    return data_[0];
+    return data_[head_];
   }
 
   template < typename T >
   const T& DynamicArray< T >::back() const noexcept
   {
-    return data_[length_ - 1];
+    return data_[length_ + head_ - 1];
   }
 
   template < typename T >
   T& DynamicArray< T >::back() noexcept
   {
-    return data_[length_ - 1];
+    return data_[length_ + head_ - 1];
   }
 }
 
