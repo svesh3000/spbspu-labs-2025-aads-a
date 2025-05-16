@@ -89,38 +89,38 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
 {
-  return {iterator::get_min_node(dummy_root_->left), true};
+  return {iterator::get_min_node(dummy_root_), true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::begin() const
 {
-  return {const_iterator::get_min_node(dummy_root_->left), true};
+  return {const_iterator::get_min_node(dummy_root_), true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::cbegin() const noexcept
 {
-  return {const_iterator::get_min_node(dummy_root_->left), true};
+  return {const_iterator::get_min_node(dummy_root_), true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
 {
-  return {nullptr, true};
+  return {dummy_root_, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
 {
-  return {nullptr, true};
+  return {dummy_root_, true};
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::cend() const noexcept
 {
-  return {nullptr, true};
+  return {dummy_root_, true};
 }
 
 template< class Key, class T, class Compare >
