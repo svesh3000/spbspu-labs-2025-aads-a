@@ -132,7 +132,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
-    fake_(new Node{}),
+    fake_(new Node()),
     root_(fake_)
   {
     fake_->type = NodeType::Fake;
@@ -323,7 +323,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  template <class... Args >
+  template < class... Args >
   std::pair< TTTIterator< Key, Value, Comparator >, bool >
     TwoThreeTree< Key, Value, Comparator >::emplace(Args&&... args)
   {
@@ -339,7 +339,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  template <class... Args >
+  template < class... Args >
   TTTIterator< Key, Value, Comparator >
     TwoThreeTree< Key, Value, Comparator >::emplace_hint(ConstIterator hint, Args&&... args)
   {

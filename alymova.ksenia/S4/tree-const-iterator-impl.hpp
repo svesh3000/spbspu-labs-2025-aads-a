@@ -27,7 +27,6 @@ namespace alymova
   {
     assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
     assert(node_->type != NodeType::Empty && "Incorrect node index");
-    assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     if (node_->type == NodeType::Double)
     {
@@ -95,6 +94,8 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator>& TTTConstIterator< Key, Value, Comparator >::operator--() noexcept
   {
+    assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
+
     if (node_->type == NodeType::Double)
     {
       if (node_->left)
@@ -179,7 +180,6 @@ namespace alymova
   const std::pair< Key, Value >& TTTConstIterator< Key, Value, Comparator >::operator*() const noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
-    assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     return node_->data[point_ - 1];
   }
@@ -188,7 +188,6 @@ namespace alymova
   const std::pair< Key, Value >* TTTConstIterator< Key, Value, Comparator >::operator->() const noexcept
   {
     assert(node_ != nullptr && "You are trying to access beyond tree's bounds");
-    assert(point_ != NodePoint::Empty && "Incorrect node index");
 
     return std::addressof(node_->data[point_ - 1]);
   }
