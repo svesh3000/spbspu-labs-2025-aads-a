@@ -1,7 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <iterator>
-#include <assert.h>
+#include <cassert>
 #include "treeNode.hpp"
 
 namespace kiselev
