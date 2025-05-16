@@ -16,7 +16,7 @@ int main()
     dribas::outSequanceName(std::cout, sequance);
     std::cout << '\n';
   }
-  dribas::outSequanceNameSum(std::cout, sequance);
+  dribas::outSequanceNameSum(std::cout, sequance, isOverflow);
   std::cout << '\n';
   if (isOverflow) {
     std::cerr << "OverFlow!\n";

@@ -11,7 +11,7 @@ void dribas::outSequanceName(std::ostream& out, const List< std::pair< std::stri
   }
 }
 
-void dribas::outSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance) {
+void dribas::outSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance, bool& isOverflow) {
   size_t maxSize = 0;
   for (auto i = sequance.begin(); i != sequance.end(); ++i) {
     maxSize = std::max(maxSize, i->second.size());
@@ -23,7 +23,6 @@ void dribas::outSequanceNameSum(std::ostream& out, const List< std::pair< std::s
   }
 
   dribas::List< unsigned long long > sums;
-  bool isOverflow = false;
   for (size_t i = 0; i < maxSize; ++i) {
     auto first_elem = sequance.begin();
     while (first_elem != sequance.end() && i >= first_elem->second.size()) {

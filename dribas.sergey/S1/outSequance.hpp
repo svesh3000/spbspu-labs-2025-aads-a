@@ -8,7 +8,7 @@
 namespace dribas
 {
   void outSequanceName(std::ostream&, const List< std::pair< std::string, List< unsigned long long > > >&);
-  void outSequanceNameSum(std::ostream&, const List< std::pair< std::string, List< unsigned long long > > >&);
+  void outSequanceNameSum(std::ostream&, const List< std::pair< std::string, List< unsigned long long > > >&, bool&);
 }
 
 #endif
