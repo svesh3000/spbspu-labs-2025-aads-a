@@ -31,7 +31,7 @@ namespace maslov
 
   template< typename T >
   Queue< T >::Queue():
-    capacity_(20),
+    capacity_(0),
     size_(0),
     head_(0),
     data_(new T[capacity_])
@@ -126,7 +126,11 @@ namespace maslov
       T * newData = nullptr;
       try
       {
-        size_t newCapacity = capacity_ * 2;
+        size_t newCapacity = 1;
+        if (capacity_ != 0)
+        {
+          newCapacity = capacity_ * 2;
+        }
         newData = new T[newCapacity];
         for (size_t i = 0; i < size_; ++i)
         {
