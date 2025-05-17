@@ -7,6 +7,9 @@
 namespace shramko
 {
   template< typename T >
+  class ForwardList;
+
+  template< typename T >
   class Iterator
   {
   public:
@@ -44,6 +47,8 @@ namespace shramko
     }
 
     bool operator!=(const Iterator& other) const { return !(*this == other); }
+    const T* operator->() const { return &node_->dataValue; }
+    friend class ForwardList<T>;
 
   private:
     friend class ForwardList<T>;

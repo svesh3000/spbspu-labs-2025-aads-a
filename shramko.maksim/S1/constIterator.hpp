@@ -7,6 +7,9 @@
 namespace shramko
 {
   template< typename T >
+  class ForwardList;
+
+  template< typename T >
   class ConstIterator
   {
   public:
@@ -42,10 +45,11 @@ namespace shramko
     }
 
     bool operator!=(const ConstIterator& other) const { return !(*this == other); }
+    friend class ForwardList< T >;
 
   private:
-    friend class ForwardList<T>;
-    ListNode<T>* node_;
+    friend class ForwardList< T >;
+    ListNode< T >* node_;
     bool isFirstPass_;
   };
 }
