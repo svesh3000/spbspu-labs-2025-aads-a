@@ -16,10 +16,10 @@ BOOST_AUTO_TEST_CASE(check_begin)
 BOOST_AUTO_TEST_CASE(check_end)
 {
   shramko::ForwardList<int> myList;
-  myList.addToFront(3);
-  myList.addToFront(7);
+  myList.addToFront(1);
+  myList.addToFront(2);
   auto it = myList.end();
-  BOOST_TEST(*it == 3);
+  BOOST_TEST(*it == 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
