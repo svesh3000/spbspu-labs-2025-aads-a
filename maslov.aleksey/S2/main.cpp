@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   Queue< Queue< std::string > > queue;
   Stack< long long int > results;
   try
-  {  
+  {
     if (argc > 1)
     {
       std::ifstream fileInput(argv[1]);
