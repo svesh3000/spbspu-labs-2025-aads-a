@@ -591,8 +591,9 @@ namespace kiselev
         delete newNode;
         return Iterator(pos);
       }
+      value val = newNode->data;
       delete newNode;
-      return emplace(std::forward< Args >(args)...).first;
+      return emplace(val).first;
     }
     catch (...)
     {
