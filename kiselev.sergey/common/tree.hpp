@@ -498,44 +498,52 @@ namespace kiselev
     //value val(std::forward< Args >(args)...);
     //const Key& key = val.first;
     Node* newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, {std::forward< Args >(args)...} };
-    if (!root_)
+    try
     {
-      //root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
-      root_ = newNode;
-      fakeRoot_->left = root_;
-      root_->parent = fakeRoot_;
-      size_ = 1;
-      return { Iterator(root_), true };
-    }
-    Node* temp = root_;
-    Node* parent = nullptr;
-    while (temp)
-    {
-      parent = temp;
-      if (cmp_(newNode->data.first, temp->data.first))
+      if (!root_)
       {
-        temp = temp->left;
+        //root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
+        root_ = newNode;
+        fakeRoot_->left = root_;
+        root_->parent = fakeRoot_;
+        size_ = 1;
+        return { Iterator(root_), true };
       }
-      else if (cmp_(temp->data.first, newNode->data.first))
+      Node* temp = root_;
+      Node* parent = nullptr;
+      while (temp)
       {
-        temp = temp->right;
+        parent = temp;
+        if (cmp_(newNode->data.first, temp->data.first))
+        {
+          temp = temp->left;
+        }
+        else if (cmp_(temp->data.first, newNode->data.first))
+        {
+          temp = temp->right;
+        }
+        else
+        {
+          return { Iterator(temp), false };
+        }
+      }
+
+      //Node* newNode = new Node{ Color::RED, nullptr, nullptr, parent, std::move(val) };
+      newNode->parent = parent;
+      newNode->color = Color::RED;
+      if (cmp_(parent->data.first, newNode->data.first))
+      {
+        parent->right = newNode;
       }
       else
       {
-        return { Iterator(temp), false };
+        parent->left = newNode;
       }
     }
-
-    //Node* newNode = new Node{ Color::RED, nullptr, nullptr, parent, std::move(val) };
-    newNode->parent = parent;
-    newNode->color = Color::RED;
-    if (cmp_(parent->data.first, newNode->data.first))
+    catch (...)
     {
-      parent->right = newNode;
-    }
-    else
-    {
-      parent->left = newNode;
+      delete newNode;
+      throw;
     }
     fixInsert(newNode);
     size_++;
@@ -550,37 +558,45 @@ namespace kiselev
     {
       return emplace(std::forward< Args >(args)...).first;
     }
-    value val(std::forward< Args >(args)...);
-    const Key& key = val.first;
+    //value val(std::forward< Args >(args)...);
+    //const Key& key = val.first;
     Node* pos = hint.node_;
     Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, {std::forward< Args >(args)...} };
-    if (cmp_(key, pos->data.first))
+    try
     {
-      if (!pos->left)
+      if (cmp_(newNode->data.first, pos->data.first))
       {
-        //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
-        pos->left = newNode;
-        fixInsert(newNode);
-        ++size_;
-        return Iterator(newNode);
+        if (!pos->left)
+        {
+          //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+          pos->left = newNode;
+          fixInsert(newNode);
+          ++size_;
+          return Iterator(newNode);
+        }
       }
-    }
-    else if (cmp_(pos->data.first, key))
-    {
-      if (!pos->right)
+      else if (cmp_(pos->data.first, newNode->data.first))
       {
-        //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
-        pos->right = newNode;
-        fixInsert(newNode);
-        ++size_;
-        return Iterator(newNode);
+        if (!pos->right)
+        {
+          //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+          pos->right = newNode;
+          fixInsert(newNode);
+          ++size_;
+          return Iterator(newNode);
+        }
       }
+      else
+      {
+        return Iterator(pos);
+      }
+      return emplace(std::forward< Args >(args)...).first;
     }
-    else
+    catch (...)
     {
-      return Iterator(pos);
+      delete newNode;
+      throw;
     }
-    return emplace(std::forward< Args >(args)...).first;
   }
 
   template< typename Key, typename Value, typename Cmp >
