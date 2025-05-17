@@ -193,6 +193,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   }
   if (current->is_two) {
     if (compare_(value.first, current->data1.first)) {
+      current->data2 = current->data1;
       current->data1 = value;
       current->is_two = false;
       ++size_;
