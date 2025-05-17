@@ -588,6 +588,7 @@ namespace kiselev
       }
       else
       {
+        delete newNode;
         return Iterator(pos);
       }
       delete newNode;
