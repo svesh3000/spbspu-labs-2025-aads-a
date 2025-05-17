@@ -47,14 +47,6 @@ namespace shramko
     }
 
     bool operator!=(const Iterator& other) const { return !(*this == other); }
-    friend std::ostream& operator<<(std::ostream& os, const Iterator<T>& iter)
-    {
-        if (iter.node_)
-            os << "Iterator(node=" << iter.node_ << ")";
-        else
-            os << "Iterator(null)";
-        return os;
-    }
 
   private:
     friend class ForwardList<T>;
