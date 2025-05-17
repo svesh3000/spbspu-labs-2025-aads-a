@@ -16,7 +16,7 @@ namespace shramko
     using SelfType = Iterator< T >;
 
     Iterator() : node_(nullptr), isFirstPass_(true) {}
-    Iterator(ListNode<T>* node) : node_(node), isFirstPass_(true) {}
+    Iterator(ListNode<T>* node): node_(node), isFirstPass_(true) {}
 
     SelfType& operator++()
     {
@@ -37,7 +37,7 @@ namespace shramko
     const T& operator*() const { return node_->dataValue; }
     const T* operator->() const { return &node_->dataValue; }
 
-    bool operator==(const SelfType& other) const 
+    bool operator==(const SelfType& other) const
     {
       return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
