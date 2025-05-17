@@ -18,7 +18,7 @@ namespace shramko
     Iterator() : node_(nullptr), isFirstPass_(true) {}
     Iterator(ListNode<T>* node) : node_(node), isFirstPass_(true) {}
 
-    SelfType& operator++() 
+    SelfType& operator++()
     {
       node_ = node_->nextPtr;
       isFirstPass_ = false;
