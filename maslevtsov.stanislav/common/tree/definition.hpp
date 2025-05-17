@@ -161,7 +161,6 @@ F maslevtsov::Tree< Key, T, Compare >::traverse_rnl(F f)
     f(*it);
   }
   f(*it);
-  --it;
   return f;
 }
 
@@ -177,13 +176,19 @@ F maslevtsov::Tree< Key, T, Compare >::traverse_rnl(F f) const
     f(*it);
   }
   f(*it);
-  --it;
   return f;
 }
 
 template< class Key, class T, class Compare >
 template< typename F >
 F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f)
+{
+  return const_cast< const Tree< Key, T, Compare >* >(this)->traverse_breadth(f);
+}
+
+template< class Key, class T, class Compare >
+template< typename F >
+F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f) const
 {
   if (empty()) {
     throw std::logic_error("nothing to traverse");
@@ -208,13 +213,6 @@ F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f)
     }
   }
   return f;
-}
-
-template< class Key, class T, class Compare >
-template< typename F >
-F maslevtsov::Tree< Key, T, Compare >::traverse_breadth(F f) const
-{
-  return const_cast< Tree< Key, T, Compare >* >(this)->traverse_breadth(f);
 }
 
 template< class Key, class T, class Compare >

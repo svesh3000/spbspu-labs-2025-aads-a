@@ -7,7 +7,7 @@ namespace {
   {
     constexpr int max_int = std::numeric_limits< int >::max();
     constexpr int min_int = std::numeric_limits< int >::min();
-    if ((b > 0 && a > max_int - b) || (b < 0 && a < min_int - b)) {
+    if ((a > 0 && b > max_int - a) || (a < 0 && b < 0 && b < min_int - a)) {
       throw std::overflow_error("overflow error");
     }
     return a + b;
