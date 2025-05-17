@@ -590,7 +590,8 @@ namespace kiselev
       {
         return Iterator(pos);
       }
-      return emplace(newNode->data).first;
+      delete newNode;
+      return emplace(std::forward< Args >(args)...).first;
     }
     catch (...)
     {
