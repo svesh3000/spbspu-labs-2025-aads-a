@@ -495,11 +495,13 @@ namespace kiselev
   template< typename... Args >
   std::pair< typename RBTree< Key, Value, Cmp >::Iterator, bool > RBTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
-    value val(std::forward< Args >(args)...);
-    const Key& key = val.first;
+    //value val(std::forward< Args >(args)...);
+    //const Key& key = val.first;
+    Node* newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, {std::forward< Args >(args)...} };
     if (!root_)
     {
-      root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
+      //root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
+      root_ = newNode;
       fakeRoot_->left = root_;
       root_->parent = fakeRoot_;
       size_ = 1;
@@ -510,11 +512,11 @@ namespace kiselev
     while (temp)
     {
       parent = temp;
-      if (cmp_(key, temp->data.first))
+      if (cmp_(newNode->data.first, temp->data.first))
       {
         temp = temp->left;
       }
-      else if (cmp_(temp->data.first, key))
+      else if (cmp_(temp->data.first, newNode->data.first))
       {
         temp = temp->right;
       }
@@ -524,7 +526,9 @@ namespace kiselev
       }
     }
 
-    Node* newNode = new Node{ Color::RED, nullptr, nullptr, parent, std::move(val) };
+    //Node* newNode = new Node{ Color::RED, nullptr, nullptr, parent, std::move(val) };
+    newNode->parent = parent;
+    newNode->color = Color::RED;
     if (cmp_(parent->data.first, newNode->data.first))
     {
       parent->right = newNode;
@@ -549,11 +553,12 @@ namespace kiselev
     value val(std::forward< Args >(args)...);
     const Key& key = val.first;
     Node* pos = hint.node_;
+    Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, {std::forward< Args >(args)...} };
     if (cmp_(key, pos->data.first))
     {
       if (!pos->left)
       {
-        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+        //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
         pos->left = newNode;
         fixInsert(newNode);
         ++size_;
@@ -564,7 +569,7 @@ namespace kiselev
     {
       if (!pos->right)
       {
-        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
+        //Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
         pos->right = newNode;
         fixInsert(newNode);
         ++size_;
