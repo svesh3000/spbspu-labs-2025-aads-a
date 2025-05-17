@@ -524,6 +524,7 @@ namespace kiselev
         }
         else
         {
+          delete newNode;
           return { Iterator(temp), false };
         }
       }
