@@ -662,7 +662,7 @@ namespace kiselev
     {
       child->parent = replace->parent;
     }
-    if (!replace->parent)
+    if (replace->parent == fakeRoot_)
     {
       root_ = child;
       root_->parent = fakeRoot_;
@@ -739,7 +739,7 @@ namespace kiselev
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::lowerBound(const Key& key) noexcept
   {
     Node* temp = root_;
-    Node* res = nullptr;
+    Node* res = fakeRoot_;
     while (temp)
     {
       if (!cmp_(temp->data.first, key))
@@ -765,7 +765,7 @@ namespace kiselev
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::upperBound(const Key& key) noexcept
   {
     Node* temp = root_;
-    Node* res = nullptr;
+    Node* res = fakeRoot_;
     while (temp)
     {
       if (cmp_(key, temp->data.first))
