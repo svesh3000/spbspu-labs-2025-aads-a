@@ -11,7 +11,7 @@
 
 namespace shramko
 {
-  template< typename T > 
+  template< typename T >
   class ForwardList
   {
   public:
