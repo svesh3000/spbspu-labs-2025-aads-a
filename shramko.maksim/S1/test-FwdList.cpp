@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(check_end)
   myList.addToFront(3);
   myList.addToFront(7);
   auto it = myList.end();
-  BOOST_TEST(*it == 3);
+  BOOST_TEST(it == shramko::ForwardList<int>::iterator(nullptr));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
