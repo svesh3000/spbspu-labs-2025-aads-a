@@ -108,7 +108,7 @@ namespace maslevtsov {
     if (!node_->is_two && !is_first_) {
       if (node_->middle) {
         node_ = get_max_node(node_->middle);
-        is_first_ = false;
+        is_first_ = node_->is_two ? true : false;
       } else {
         is_first_ = true;
       }
@@ -116,7 +116,7 @@ namespace maslevtsov {
     }
     if ((node_->is_two || is_first_) && node_->left) {
       node_ = get_max_node(node_->left);
-      is_first_ = false;
+      is_first_ = node_->is_two ? true : false;
       return *this;
     }
     TreeNode< T >* child = node_;
@@ -125,17 +125,17 @@ namespace maslevtsov {
       if (parent->is_two) {
         if (parent->right == child) {
           node_ = parent;
-          is_first_ = true;
+          is_first_ = node_->is_two ? true : false;
           return *this;
         }
       } else {
         if (parent->right == child) {
           node_ = parent;
-          is_first_ = false;
+          is_first_ = node_->is_two ? true : false;
           return *this;
         } else if (parent->middle == child) {
           node_ = parent;
-          is_first_ = true;
+          is_first_ = node_->is_two ? true : false;
           return *this;
         }
       }
@@ -143,7 +143,7 @@ namespace maslevtsov {
       parent = parent->parent;
     }
     node_ = child;
-    is_first_ = true;
+    is_first_ = node_->is_two ? true : false;
     return *this;
   }
 
@@ -170,7 +170,7 @@ namespace maslevtsov {
   template< class T, bool is_const >
   bool TreeIterator< T, is_const >::operator==(const TreeIterator& rhs) const
   {
-    return node_ == rhs.node_ && (!node_ || is_first_ == rhs.is_first_);
+    return node_ == rhs.node_ && is_first_ == rhs.is_first_;
   }
 
   template< class T, bool is_const >
