@@ -12,11 +12,12 @@ namespace kiselev
   template< class Key, class Value >
   struct TreeNode
   {
-    std::pair< Key, Value > data;
+    //std::pair< Key, Value > data;
     Color color;
     TreeNode* left;
     TreeNode* right;
     TreeNode* parent;
+    std::pair< Key, Value > data;
   };
 }
 #endif

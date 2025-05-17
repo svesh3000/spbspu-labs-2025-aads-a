@@ -2,6 +2,7 @@
 #define TREE_HPP
 #include <initializer_list>
 #include <stdexcept>
+#include <utility>
 #include "iterator.hpp"
 
 namespace kiselev
@@ -469,7 +470,7 @@ namespace kiselev
     const Key& key = val.first;
     if (!root_)
     {
-      root_ = new Node{ std::move(val), Color::BLACK, nullptr, nullptr, nullptr };
+      root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
       size_ = 1;
       return { Iterator(root_), true };
     }
@@ -492,7 +493,7 @@ namespace kiselev
       }
     }
 
-    Node* newNode = new Node{ std::move(val), Color::RED, nullptr, nullptr, parent };
+    Node* newNode = new Node{ Color::RED, nullptr, nullptr, parent, std::move(val) };
     if (cmp_(parent->data.first, newNode->data.first))
     {
       parent->right = newNode;
@@ -521,7 +522,7 @@ namespace kiselev
     {
       if (!pos->left)
       {
-        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
+        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
         pos->left = newNode;
         fixInsert(newNode);
         ++size_;
@@ -532,7 +533,7 @@ namespace kiselev
     {
       if (!pos->right)
       {
-        Node* newNode = new Node{ val, Color::RED, nullptr, nullptr, pos };
+        Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, std::move(val) };
         pos->right = newNode;
         fixInsert(newNode);
         ++size_;
