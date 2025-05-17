@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <utility>
 #include "iterator.hpp"
+#include "treeNode.hpp"
 
 namespace kiselev
 {
@@ -83,6 +84,7 @@ namespace kiselev
     void fixInsert(Node* node) noexcept;
     void fixDelete(Node* node) noexcept;
     Node* root_;
+    Node* fakeRoot_;
     Cmp cmp_;
     size_t size_;
   };
@@ -90,6 +92,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
+    fakeRoot_(new Node{ Color::BLACK, nullptr, nullptr, nullptr, value() }),
     size_(0)
   {}
 
@@ -97,15 +100,25 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::RBTree(const RBTree< Key, Value, Cmp >& tree):
     RBTree()
   {
-    for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
+    try
     {
-      insert(*it);
+      for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
+      {
+        insert(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      delete fakeRoot_;
+      throw;
     }
   }
 
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree) noexcept:
     root_(std::exchange(tree.root_, nullptr)),
+    fakeRoot_(std::exchange(tree.fakeRoot_, nullptr)),
     size_(std::exchange(tree.size_, 0))
   {}
 
@@ -114,9 +127,18 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::RBTree(InputIt first, InputIt last):
     RBTree()
   {
-    for (; first != last; first++)
+    try
     {
-      insert(*first);
+      for (; first != last; first++)
+      {
+        insert(*first);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      delete fakeRoot_;
+      throw;
     }
   }
   template< typename Key, typename Value, typename Cmp >
@@ -152,12 +174,18 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::~RBTree()
   {
     clear();
+    delete fakeRoot_;
   }
 
   template< typename Key, typename Value, typename Cmp >
   void RBTree< Key, Value, Cmp >::clear() noexcept
   {
-    erase(begin(), end());
+    if (root_)
+    {
+      erase(begin(), end());
+      root_ = nullptr;
+      fakeRoot_->left = fakeRoot_;
+    }
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -170,7 +198,7 @@ namespace kiselev
       child->left->parent = node;
     }
     child->parent = node->parent;
-    if (!node->parent)
+    if (node->parent == fakeRoot_)
     {
       root_ = child;
     }
@@ -196,7 +224,7 @@ namespace kiselev
       child->right->parent = node;
     }
     child->parent = node->parent;
-    if (!node->parent)
+    if (node->parent == fakeRoot_)
     {
       root_ = child;
     }
@@ -373,6 +401,7 @@ namespace kiselev
   void RBTree< Key, Value, Cmp >::swap(RBTree< Key, Value, Cmp >& tree) noexcept
   {
     std::swap(root_, tree.root_);
+    std::swap(fakeRoot_, tree.fakeRoot_);
     std::swap(size_, tree.size_);
   }
 
@@ -409,13 +438,13 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::end() noexcept
   {
-    return Iterator(nullptr);
+    return Iterator(fakeRoot_);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cend() const noexcept
   {
-    return ConstIterator(nullptr);
+    return ConstIterator(fakeRoot_);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -471,6 +500,8 @@ namespace kiselev
     if (!root_)
     {
       root_ = new Node{ Color::BLACK, nullptr, nullptr, nullptr, std::move(val) };
+      fakeRoot_->left = root_;
+      root_->parent = fakeRoot_;
       size_ = 1;
       return { Iterator(root_), true };
     }
@@ -606,6 +637,14 @@ namespace kiselev
     Node* toDelete = pos.node_;
     Node* replace = nullptr;
     Node* child = nullptr;
+    if (size_ == 1)
+    {
+      delete root_;
+      root_ = nullptr;
+      fakeRoot_->left = fakeRoot_;
+      size_ = 0;
+      return end();
+    }
     if (!toDelete->left || !toDelete->right)
     {
       replace = toDelete;
@@ -626,6 +665,8 @@ namespace kiselev
     if (!replace->parent)
     {
       root_ = child;
+      root_->parent = fakeRoot_;
+      fakeRoot_->left = root_;
     }
     else if (replace == replace->parent->left)
     {
