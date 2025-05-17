@@ -15,9 +15,6 @@ namespace demehin
     template< typename... Args >
     explicit TreeNode(Args&&... args) noexcept;
 
-    template< typename... Args >
-    TreeNode(const TreeNode* parent, Args&&... args) noexcept;
-
   };
 
   template< typename Key, typename T >
@@ -29,15 +26,6 @@ namespace demehin
     right(nullptr),
     height(1)
   {}
-
-  template< typename Key, typename T >
-  template< typename... Args >
-  TreeNode< Key, T >::TreeNode(const TreeNode* prnt, Args&&... args) noexcept:
-    TreeNode(std::forward< Args >(args)...)
-  {
-    parent = prnt;
-  }
-
 }
 
 #endif
