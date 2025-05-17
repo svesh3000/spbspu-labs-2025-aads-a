@@ -127,7 +127,10 @@ typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::begin() 
 template< typename T >
 typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::end() const noexcept
 {
-  return iterator(nullptr);
+  if (currentSize_ == 0) return iterator(nullptr);
+  iterator it(tailNode_->nextPtr);
+  it.isFirstPass_ = false;
+  return it;
 }
 
 template< typename T >
