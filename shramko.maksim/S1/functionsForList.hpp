@@ -1,19 +1,21 @@
 #ifndef FUNCTIONSFORLIST_HPP
 #define FUNCTIONSFORLIST_HPP
 
-#include <ostream>
-#include <string>
 #include <list>
+#include <string>
+#include <ostream>
+#include <limits>
+#include "FwdList.hpp"
 
 namespace shramko
 {
-  using list_t = std::list< unsigned long long >;
-  using pairs_list_t = std::list< std::pair< std::string, list_t > >;
-
-  size_t maxPairSize(const pairs_list_t& list) noexcept;
-  unsigned long long getListElementSum(const list_t& list);
-  void printInfo(std::ostream& out, const pairs_list_t& pairs_list);
-  bool isSumOverflow(size_t a, size_t b) noexcept;
+  using NumberList = ForwardList<unsigned long long>;
+  using PairList = ForwardList< std::pair< std::string, NumberList >>;
+  
+  void printNames(const PairList& lists, std::ostream& out);
+  bool checkSumOverflow(size_t a, size_t b);
+  void printSumResult(const ForwardList<int>& sums, bool overflow, std::ostream& out);
+  void processLists(const PairList& lists, size_t maxLen, bool& overflow, std::ostream& out);
 }
 
 #endif

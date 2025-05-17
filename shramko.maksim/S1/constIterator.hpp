@@ -1,69 +1,50 @@
-#ifndef CONST_ITERATOR_HPP
-#define CONST_ITERATOR_HPP
+#ifndef CONSTITERATOR_HPP
+#define CONSTITERATOR_HPP
 
 #include <iterator>
-#include <type_traits>
-#include <cassert>
-#include "node.hpp"
+#include "FwdListNode.hpp"
 
 namespace shramko
 {
   template< typename T >
-  class FwdList;
+  class ForwardList;
 
-  template< typename T, bool is_const >
-  class FwdListIterator : public std::iterator<std::forward_iterator_tag, T>
+  template< typename T >
+  class ConstIterator : public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    using this_t = FwdListIterator< T, is_const >;
-    using node_type = typename std::conditional< is_const, const FwdListNode< T >, FwdListNode< T > >::type;
-    using value_type = typename std::conditional< is_const, const T, T >::type;
-
-    FwdListIterator() noexcept = default;
-    FwdListIterator(node_type* node) noexcept : node_(node) {}
-    FwdListIterator(const this_t&) noexcept = default;
-
-    this_t& operator=(const this_t&) noexcept = default;
-
-    value_type& operator*() const noexcept
+    using SelfType = ConstIterator< T >;
+    
+    ConstIterator() : node_(nullptr), isFirstPass_(true) {}
+    ConstIterator(ListNode<T>* node) : node_(node), isFirstPass_(true) {}
+    
+    SelfType& operator++() 
     {
-      assert(node_ != nullptr);
-      return node_->data_;
-    }
-
-    value_type* operator->() const noexcept
-    {
-      assert(node_ != nullptr);
-      return std::addressof(node_->data_);
-    }
-
-    this_t& operator++() noexcept
-    {
-      assert(node_ != nullptr);
-      node_ = node_->next_;
+      node_ = node_->nextPtr;
+      isFirstPass_ = false;
       return *this;
     }
-
-    this_t operator++(int) noexcept
+    
+    SelfType operator++(int)
     {
-      this_t tmp = *this;
+      SelfType temp = *this;
       ++(*this);
-      return tmp;
+      return temp;
     }
-
-    bool operator==(const this_t& rhs) const noexcept
-    {
-      return node_ == rhs.node_;
+    
+    const T& operator*() const { return node_->dataValue; }
+    const T* operator->() const { return &node_->dataValue; }
+    
+    bool operator==(const SelfType& other) const 
+    { 
+      return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
-
-    bool operator!=(const this_t& rhs) const noexcept
-    {
-      return !(*this == rhs);
-    }
+    
+    bool operator!=(const SelfType& other) const { return !(*this == other); }
 
   private:
-    friend class FwdList< T >;
-    node_type* node_ = nullptr;
+    ListNode<T>* node_;
+    bool isFirstPass_;
   };
 }
 
