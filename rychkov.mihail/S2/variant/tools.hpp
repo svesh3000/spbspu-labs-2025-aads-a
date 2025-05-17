@@ -2,6 +2,7 @@
 #define TOOLS_HPP
 
 #include <cstddef>
+#include <functional.hpp>
 #include <type_traits.hpp>
 #include <type_tools.hpp>
 
