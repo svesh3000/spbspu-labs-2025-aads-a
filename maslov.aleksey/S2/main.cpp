@@ -63,7 +63,8 @@ int main(int argc, char ** argv)
       std::ifstream fileInput(argv[1]);
       if (!fileInput.is_open())
       {
-        throw std::runtime_error("ERROR: cannot open the file");
+        std::cerr << "ERROR: cannot open the file\n";
+        return 1;
       }
       inputExpression(fileInput, queue);
     }
