@@ -63,7 +63,7 @@ namespace rychkov
       expression.push(operators.top());
       operators.pop();
     }
-    Operator result;
+    Operator result = static_cast< Operator >('\0');
     if (!operators.empty() && equalPriority(operators.top(), referenceOperator))
     {
       result = operators.top();
