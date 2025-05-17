@@ -38,7 +38,7 @@ namespace shramko
     const T* operator->() const { return &node_->dataValue; }
 
     bool operator==(const SelfType& other) const 
-    { 
+    {
       return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
 
