@@ -138,6 +138,7 @@ namespace mozhegova
   BiTree< Key, T, Cmp >::~BiTree()
   {
     clear();
+    delete fakeLeaf_;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -237,21 +238,20 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   void BiTree< Key, T, Cmp >::clear() noexcept
   {
-    if (!root_)
-    {
-      clearTree(root_);
-    }
+    clearTree(root_);
+    size_ = 0;
   }
 
   template< typename Key, typename T, typename Cmp >
   void BiTree< Key, T, Cmp >::clearTree(node * root)
   {
-    if (!root)
+    if (!root || root == fakeLeaf_)
     {
-      clearTree(root->left);
-      clearTree(root->right);
-      delete root;
+      return;
     }
+    clearTree(root->left);
+    clearTree(root->right);
+    delete root;
   }
 
   template< typename Key, typename T, typename Cmp >
