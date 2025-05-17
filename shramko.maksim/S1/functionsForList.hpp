@@ -11,7 +11,7 @@ namespace shramko
 {
   using NumberList = ForwardList<unsigned long long>;
   using PairList = ForwardList< std::pair< std::string, NumberList >>;
-  
+
   void printNames(const PairList& lists, std::ostream& out);
   bool checkSumOverflow(size_t a, size_t b);
   void printSumResult(const ForwardList<int>& sums, bool overflow, std::ostream& out);
