@@ -520,7 +520,7 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMax(node * root) const
   {
-    while (root->right != fakeLeaf_)
+    while (root && root->right != fakeLeaf_)
     {
       root = root->right;
     }
@@ -530,7 +530,7 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMin(node * root) const
   {
-    while (root->left != fakeLeaf_)
+    while (root && root->left != fakeLeaf_)
     {
       root = root->left;
     }
