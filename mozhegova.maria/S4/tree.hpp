@@ -1,13 +1,14 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include <exception>
+#include <functional>
+#include <stdexcept>
 #include "constIterator.hpp"
 #include "iterator.hpp"
 
 namespace mozhegova
 {
-  template< typename Key, typename T, typename Cmp >
+  template< typename Key, typename T, typename Cmp = std::less< Key > >
   class BiTree
   {
   public:
@@ -24,12 +25,14 @@ namespace mozhegova
 
     ~BiTree();
 
+    BiTree< Key, T, Cmp > & operator=(const BiTree< Key, T, Cmp > &);
+    BiTree< Key, T, Cmp > & operator=(BiTree< Key, T, Cmp > &&) noexcept;
     T & operator[](const Key &);
 
     cIter cbegin() const noexcept;
     cIter cend() const noexcept;
-    iter begin() noexcept;
-    iter end() noexcept;
+    iter begin() const noexcept;
+    iter end() const noexcept;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -71,8 +74,8 @@ namespace mozhegova
     node * rotateRight(node *);
     node * rotateLeft(node *);
     node * balance(node *);
-    node * findMax(node *);
-    node * findMin(node *);
+    node * findMax(node *) const;
+    node * findMin(node *) const;
     int getBalanceFactor(node *);
     void updateHeight(node *);
   };
@@ -87,9 +90,9 @@ namespace mozhegova
 
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp >::BiTree(const BiTree< Key, T, Cmp > & other):
-    BiTree(),
-    cmp_(other.cmp_)
+    BiTree()
   {
+    cmp_ = other.cmp_;
     for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
       insert(*it);
@@ -136,35 +139,57 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp > & BiTree< Key, T, Cmp >::operator=(const BiTree< Key, T, Cmp > & other)
+  {
+    if (this != std::addressof(other))
+    {
+      BiTree< Key, T, Cmp > temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  BiTree< Key, T, Cmp > & BiTree< Key, T, Cmp >::operator=(BiTree< Key, T, Cmp > && other) noexcept
+  {
+    if (this != std::addressof(other))
+    {
+      BiTree< Key, T, Cmp > temp(std::move(other));
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
   T & BiTree< Key, T, Cmp >::operator[](const Key & key)
   {
-    auto it = find(key);
+    iter it = find(key);
     if (it == end())
     {
       insert(std::make_pair(key, T()));
       it = find(key);
     }
-    return it->second;
+    return const_cast< T & >(it->second);
   }
 
   template< typename Key, typename T, typename Cmp >
   T & BiTree< Key, T, Cmp >::at(const Key & key)
   {
-    auto it = find(key);
+    iter it = find(key);
     if (it == end())
     {
-      throw std::out_of_memory("<INVALID COMMAND>");
+      throw std::out_of_range("<INVALID COMMAND>");
     }
-    return it->second;
+    return const_cast< T & >(it->second);
   }
 
   template< typename Key, typename T, typename Cmp >
   const T & BiTree< Key, T, Cmp >::at(const Key & key) const
   {
-    auto it = find(key);
-    if (it == end())
+    cIter it = find(key);
+    if (it == cend())
     {
-      throw std::out_of_memory("<INVALID COMMAND>");
+      throw std::out_of_range("<INVALID COMMAND>");
     }
     return it->second;
   }
@@ -195,14 +220,14 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::iter BiTree< Key, T, Cmp >::begin() noexcept
+  typename BiTree< Key, T, Cmp >::iter BiTree< Key, T, Cmp >::begin() const noexcept
   {
     node * temp = root_;
     return iter(findMin(temp));
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::iter BiTree< Key, T, Cmp >::end() noexcept
+  typename BiTree< Key, T, Cmp >::iter BiTree< Key, T, Cmp >::end() const noexcept
   {
     return iter(fakeLeaf_);
   }
@@ -304,14 +329,14 @@ namespace mozhegova
   {
     if (!root || root == fakeLeaf_)
     {
-      return new node{val, nullptr, fakeLeaf_, fakeLeaf_, 1};
+      return new node(val, fakeLeaf_);
     }
     else if (cmp_(root->data.first, val.first))
     {
       root->right = insertTree(root->right, val);
       root->right->parent = root;
     }
-    else if (cmp_(key, root->data.first))
+    else if (cmp_(val.first, root->data.first))
     {
       root->left = insertTree(root->left, val);
       root->left->parent = root;
@@ -474,7 +499,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< typename BiTree< Key, T, Cmp >::iter, typename BiTree< Key, T, Cmp >::iter, > BiTree< Key, T, Cmp >::equal_range(const Key & key) noexcept
+  std::pair< typename BiTree< Key, T, Cmp >::iter, typename BiTree< Key, T, Cmp >::iter > BiTree< Key, T, Cmp >::equal_range(const Key & key) noexcept
   {
     return {lower_bound(key), upper_bound(key)};
   }
@@ -491,7 +516,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMax(node * root)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMax(node * root) const
   {
     while (root->right != fakeLeaf_)
     {
@@ -501,7 +526,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMin(node * root)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMin(node * root) const
   {
     while (root->left != fakeLeaf_)
     {
@@ -569,7 +594,7 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   int BiTree< Key, T, Cmp >::getBalanceFactor(node * root)
   {
-    return root->left.h - root->right.h;
+    return root->left->h - root->right->h;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -582,7 +607,7 @@ namespace mozhegova
       {
         root->left = rotateLeft(root->left);
       }
-      return rotateRight(root);
+      root = rotateRight(root);
     }
     if (k < -1)
     {
@@ -590,8 +615,9 @@ namespace mozhegova
       {
         root->right = rotateRight(root->right);
       }
-      return rotateLeft(root);
+      root = rotateLeft(root);
     }
+    return root;
   }
 
   template< typename Key, typename T, typename Cmp >

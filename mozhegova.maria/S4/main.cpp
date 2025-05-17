@@ -2,17 +2,17 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include <map>
+#include "tree.hpp"
 #include "commands.hpp"
 
 namespace
 {
-  void inputDicts(std::istream & in, std::map< std::string, std::map< int, std::string > > & dicts)
+  void inputDicts(std::istream & in, mozhegova::BiTree< std::string, mozhegova::BiTree< int, std::string > > & dicts)
   {
     while (!in.eof())
     {
       in.clear();
-      std::map< int, std::string > temp;
+      mozhegova::BiTree< int, std::string > temp;
       std::string name;
       in >> name;
       int key = 0;
@@ -40,7 +40,7 @@ int main(int argc, char * argv[])
     std::cerr << "file isn't open\n";
     return 1;
   }
-  std::map< std::string, std::map< int, std::string > > dicts;
+  BiTree< std::string, BiTree< int, std::string > > dicts;
   inputDicts(file, dicts);
   std::string command;
   while ((!std::cin.eof()) && (std::cin >> command))

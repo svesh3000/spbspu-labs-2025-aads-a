@@ -12,6 +12,7 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   class TreeConstIterator
   {
+    friend class BiTree< Key, T, Cmp >;
   public:
     using this_t = TreeConstIterator< Key, T, Cmp >;
 
@@ -26,7 +27,7 @@ namespace mozhegova
     this_t operator--(int) noexcept;
 
     const std::pair< Key, T > & operator*() const noexcept;
-    const std::pair< Key, T > & operator->() const noexcept;
+    const std::pair< Key, T > * operator->() const noexcept;
 
     bool operator==(const this_t &) const noexcept;
     bool operator!=(const this_t &) const noexcept;
@@ -118,7 +119,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  const std::pair< Key, T > & TreeConstIterator< Key, T, Cmp >::operator->() const noexcept
+  const std::pair< Key, T > * TreeConstIterator< Key, T, Cmp >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);

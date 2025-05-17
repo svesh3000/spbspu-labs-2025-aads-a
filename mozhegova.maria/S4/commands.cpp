@@ -3,7 +3,7 @@
 
 void mozhegova::print(std::ostream & out, std::string name, const dictionaries & dicts)
 {
-  std::map< int, std::string > dict = dicts.at(name);
+  BiTree< int, std::string > dict = dicts.at(name);
   if (dict.empty())
   {
     out << "<EMPTY>\n";
@@ -19,9 +19,9 @@ void mozhegova::print(std::ostream & out, std::string name, const dictionaries &
 
 void mozhegova::complement(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
 {
-  std::map< int, std::string > dict1 = dicts.at(dictName1);
-  std::map< int, std::string > dict2 = dicts.at(dictName2);
-  std::map< int, std::string > newDict;
+  BiTree< int, std::string > dict1 = dicts.at(dictName1);
+  BiTree< int, std::string > dict2 = dicts.at(dictName2);
+  BiTree< int, std::string > newDict;
   for (auto cit = dict1.cbegin(); cit != dict1.cend(); ++cit)
   {
     if (!dict2.count(cit->first))
@@ -34,9 +34,9 @@ void mozhegova::complement(std::string newDictName, std::string dictName1, std::
 
 void mozhegova::intersect(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
 {
-  std::map< int, std::string > dict1 = dicts.at(dictName1);
-  std::map< int, std::string > dict2 = dicts.at(dictName2);
-  std::map< int, std::string > newDict;
+  BiTree< int, std::string > dict1 = dicts.at(dictName1);
+  BiTree< int, std::string > dict2 = dicts.at(dictName2);
+  BiTree< int, std::string > newDict;
   for (auto cit = dict1.cbegin(); cit != dict1.cend(); ++cit)
   {
     if (dict2.count(cit->first))
@@ -49,9 +49,9 @@ void mozhegova::intersect(std::string newDictName, std::string dictName1, std::s
 
 void mozhegova::unionCmd(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
 {
-  std::map< int, std::string > dict1 = dicts.at(dictName1);
-  std::map< int, std::string > dict2 = dicts.at(dictName2);
-  std::map< int, std::string > newDict = dict1;
+  BiTree< int, std::string > dict1 = dicts.at(dictName1);
+  BiTree< int, std::string > dict2 = dicts.at(dictName2);
+  BiTree< int, std::string > newDict = dict1;
   for (auto cit = dict2.cbegin(); cit != dict2.cend(); ++cit)
   {
     if (!dict1.count(cit->first))
