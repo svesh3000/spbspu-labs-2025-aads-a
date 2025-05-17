@@ -17,8 +17,8 @@ namespace shramko
   public:
     friend class ConstIterator<T>;
     friend class Iterator<T>;
-    using ConstIterator = ConstIterator<T>;
-    using Iterator = Iterator<T>;
+    using const_iterator = ConstIterator<T>;
+    using iterator = Iterator<T>;
 
     ForwardList();
     ~ForwardList();
@@ -27,10 +27,10 @@ namespace shramko
     ForwardList<T>& operator=(ForwardList<T> other);
     ForwardList<T>& operator=(ForwardList<T>&& other);
 
-    Iterator begin() const noexcept;
-    Iterator end() const noexcept;
-    ConstIterator cbegin() const noexcept;
-    ConstIterator cend() const noexcept;
+    iterator begin() const noexcept;
+    iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
     T& getFront() const;
     T& getBack() const;
@@ -119,31 +119,31 @@ shramko::ForwardList< T >::~ForwardList()
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::Iterator shramko::ForwardList< T >::begin() const noexcept
+typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::begin() const noexcept
 {
-  return Iterator(headNode_);
+  return iterator(headNode_);
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::Iterator shramko::ForwardList< T >::end() const noexcept
+typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::end() const noexcept
 {
-  if (currentSize_ == 0) return Iterator(nullptr);
-  Iterator it(tailNode_->nextPtr);
+  if (currentSize_ == 0) return iterator(nullptr);
+  iterator it(tailNode_->nextPtr);
   it.isFirstPass_ = false;
   return it;
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::ConstIterator shramko::ForwardList< T >::cbegin() const noexcept
+typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::cbegin() const noexcept
 {
-  return ConstIterator(headNode_);
+  return const_iterator(headNode_);
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::ConstIterator shramko::ForwardList< T >::cend() const noexcept
+typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::cend() const noexcept
 {
-  if (currentSize_ == 0) return ConstIterator(nullptr);
-  ConstIterator it(tailNode_->nextPtr);
+  if (currentSize_ == 0) return const_iterator(nullptr);
+  const_iterator it(tailNode_->nextPtr);
   it.isFirstPass_ = false;
   return it;
 }
