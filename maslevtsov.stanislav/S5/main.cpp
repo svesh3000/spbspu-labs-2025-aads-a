@@ -23,6 +23,10 @@ int main(int argc, char** argv)
   while (fin && fin >> key >> value) {
     data[key] = value;
   }
+  if (!fin.eof()) {
+    std::cerr << "<INVALID INPUT>\n";
+    return 1;
+  }
   std::string result = "";
   KeysValuesPlus plus;
   try {
