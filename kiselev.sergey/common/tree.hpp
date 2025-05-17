@@ -497,7 +497,7 @@ namespace kiselev
   {
     //value val(std::forward< Args >(args)...);
     //const Key& key = val.first;
-    Node* newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, {std::forward< Args >(args)...} };
+    Node* newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, { std::forward< Args >(args)... } };
     try
     {
       if (!root_)
@@ -590,7 +590,7 @@ namespace kiselev
       {
         return Iterator(pos);
       }
-      return emplace(std::forward< Args >(args)...).first;
+      return emplace(newNode->data).first;
     }
     catch (...)
     {
