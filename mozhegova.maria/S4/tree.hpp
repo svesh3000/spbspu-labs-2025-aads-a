@@ -12,8 +12,10 @@ namespace mozhegova
   class BiTree
   {
   public:
-    using iter = TreeConstIterator< Key, T, Cmp >;
-    using cIter = TreeIterator< Key, T, Cmp >;
+    using cIter = TreeConstIterator< Key, T, Cmp >;
+    using iter = TreeIterator< Key, T, Cmp >;
+    using iterPair = std::pair< iter, iter >;
+    using cIterPair = std::pair< cIter, cIter >;
 
     BiTree();
     BiTree(const BiTree< Key, T, Cmp > &);
@@ -53,8 +55,8 @@ namespace mozhegova
     size_t erase(const Key &) noexcept;
     void erase(iter first, iter last);
 
-    std::pair< cIter, cIter > equal_range(const Key &) const noexcept;
-    std::pair< iter, iter > equal_range(const Key &) noexcept;
+    cIterPair equal_range(const Key &) const noexcept;
+    iterPair equal_range(const Key &) noexcept;
     iter lower_bound(const Key &) noexcept;
     cIter lower_bound(const Key &) const noexcept;
     iter upper_bound(const Key &) noexcept;
@@ -493,13 +495,13 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< typename BiTree< Key, T, Cmp >::cIter, typename BiTree< Key, T, Cmp >::cIter > BiTree< Key, T, Cmp >::equal_range(const Key & key) const noexcept
+  typename BiTree< Key, T, Cmp >::cIterPair BiTree< Key, T, Cmp >::equal_range(const Key & key) const noexcept
   {
     return {lower_bound(key), upper_bound(key)};
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< typename BiTree< Key, T, Cmp >::iter, typename BiTree< Key, T, Cmp >::iter > BiTree< Key, T, Cmp >::equal_range(const Key & key) noexcept
+  typename BiTree< Key, T, Cmp >::iterPair BiTree< Key, T, Cmp >::equal_range(const Key & key) noexcept
   {
     return {lower_bound(key), upper_bound(key)};
   }
