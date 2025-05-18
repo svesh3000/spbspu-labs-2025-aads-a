@@ -100,13 +100,16 @@ namespace alymova
   };
 
   template< class T, class Value, class Comparator >
-  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
 
   template< class T, class Value, class Comparator >
-  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
 
   template< class T, class Value, class Comparator >
-  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
   {
     if (lhs.size() != rhs.size())
     {
@@ -131,11 +134,9 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
-    fake_(new Node()),
+    fake_(new Node{{T(), T(), T()}, NodeType::Fake, nullptr, nullptr, nullptr, nullptr, nullptr}),
     root_(fake_)
-  {
-    fake_->type = NodeType::Fake;
-  }
+  {}
 
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree(const Tree& other):
@@ -357,7 +358,7 @@ namespace alymova
     }
     if (size_ == 0)
     {
-      root_ = new Node();
+      root_ = new Node{{}, NodeType::Empty, nullptr, nullptr, nullptr, nullptr, nullptr};
       to_insert = root_;
     }
     try
@@ -564,11 +565,11 @@ namespace alymova
       parent = node->parent;
       if (!parent)
       {
-        parent = new Node();
+        parent = new Node{{}, NodeType::Empty, nullptr, nullptr, nullptr, nullptr, nullptr};
         root_ = parent;
       }
-      left = new Node(node->data[0], parent, node->left, nullptr, node->mid, nullptr);
-      right = new Node(node->data[2], parent, node->right, nullptr, node->overflow, nullptr);
+      left = new Node{{node->data[0]}, NodeType::Double, parent, node->left, nullptr, node->mid, nullptr};
+      right = new Node{{node->data[2]}, NodeType::Double, parent, node->right, nullptr, node->overflow, nullptr};
       if (left->left)
       {
         left->left->parent = left;
