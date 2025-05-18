@@ -2,29 +2,59 @@
 #include <limits>
 
 namespace {
-  unsigned long long addition (unsigned long long first, unsigned long long second) {
-    unsigned long long MAX_OF_ULL = std::numeric_limits<unsigned long long>::max();
+  unsigned long long addition(unsigned long long first, unsigned long long second)
+  {
+    unsigned long long MAX_OF_ULL = std::numeric_limits< unsigned long long >::max();
     if (first > MAX_OF_ULL - second) {
       throw std::overflow_error("Overflow.\n");
     }
     return first + second;
   }
-}
-std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
-{
-  auto ptr = list.begin();
-  auto end = list.end();
-  if (ptr == end) {
+
+  template < typename T, typename Selector >
+  std::ostream& outputListElements(std::ostream& out, const T& list, Selector select)
+  {
+    auto ptr = list.begin();
+    auto end = list.end();
+    if (ptr == end) {
+      return out;
+    }
+    out << select(*ptr);
+    ++ptr;
+    while (ptr != end) {
+      out << " " << select(*ptr);
+      ++ptr;
+    }
     return out;
   }
-  out << ptr->first;
-  ++ptr;
-  while (ptr != end) {
-    out << " " << ptr->first;
-    ++ptr;
-  }
-  return out;
 }
+
+std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
+{
+  return outputListElements(out, list, [](const auto& pair) { return pair.first; });
+}
+
+std::ostream& gavrilova::outFwdListULL(std::ostream& out, const FwdList< ULL >& list)
+{
+  return outputListElements(out, list, [](const auto& value) { return value; });
+}
+
+// std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
+// {
+//   auto ptr = list.begin();
+//   auto end = list.end();
+//   if (ptr == end) {
+//     return out;
+//   }
+//   out << ptr->first;
+//   ++ptr;
+//   while (ptr != end) {
+//     out << " " << ptr->first;
+//     ++ptr;
+//   }
+//   return out;
+// }
+
 gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n)
 {
   auto beginList = list.begin();
@@ -58,24 +88,27 @@ gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out
       curSum = addition(curSum, *ptr_arr[j]);
       ++ptr_arr[j];
     }
+    if (i < maxLen - 1) {
+      out << "\n";
+    }
     sums.push_front(curSum);
-    out << "\n";
   }
   sums.reverse();
   return sums;
 }
-std::ostream& gavrilova::outFwdListULL(std::ostream& out, const FwdList< ULL >& list) {
-  auto ptr = list.begin();
-  auto end = list.end();
-  if (ptr == end) {
-    return out;
-  }
-  out << *ptr;
-  ++ptr;
-  while (ptr != end) {
-    out << " " << *ptr;
-    ++ptr;
-  }
-  out << "\n";
-  return out;
-}
+
+// std::ostream& gavrilova::outFwdListULL(std::ostream& out, const FwdList< ULL >& list)
+// {
+//   auto ptr = list.begin();
+//   auto end = list.end();
+//   if (ptr == end) {
+//     return out;
+//   }
+//   out << *ptr;
+//   ++ptr;
+//   while (ptr != end) {
+//     out << " " << *ptr;
+//     ++ptr;
+//   }
+//   return out;
+// }

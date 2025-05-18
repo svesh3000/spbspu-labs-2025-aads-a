@@ -6,17 +6,15 @@
 #include <stdexcept>
 #include "NodeFwdList.hpp"
 
-
 namespace gavrilova {
 
-  template< class T >
+  template < class T >
   struct IteratorFwd;
-  template< class T >
+  template < class T >
   struct ConstIteratorFwd;
 
-  template< class T >
-  class FwdList
-  {
+  template < class T >
+  class FwdList {
   public:
     using Iterator = gavrilova::IteratorFwd< T >;
     using CIterator = gavrilova::ConstIteratorFwd< T >;
@@ -53,7 +51,7 @@ namespace gavrilova {
     void clear() noexcept;
 
     void remove(const T& value) noexcept;
-    template< class UnaryPredicate >
+    template < class UnaryPredicate >
     void remove_if(UnaryPredicate p) noexcept;
 
     void splice(CIterator pos, FwdList< T >&) noexcept;
@@ -67,14 +65,14 @@ namespace gavrilova {
     void swap(FwdList< T >& other) noexcept;
 
     void assign(size_t count, const T& value);
-    template< class InputIt >
+    template < class InputIt >
     void assign(InputIt first, InputIt last);
     void assign(std::initializer_list< T > init);
 
     Iterator insert(CIterator pos, const T& value);
     Iterator insert(CIterator pos, T&& value);
     Iterator insert(CIterator pos, size_t count, const T& value);
-    template< class InputIt >
+    template < class InputIt >
     Iterator insert(CIterator pos, InputIt first, InputIt last);
     Iterator insert(CIterator pos, std::initializer_list< T > init);
 
@@ -86,23 +84,23 @@ namespace gavrilova {
     size_t nodeCount_;
   };
 
-  template< class T >
-  FwdList< T >::FwdList() :
+  template < class T >
+  FwdList< T >::FwdList():
     fake_(reinterpret_cast< NodeFwdList< T >* >(new char[sizeof(NodeFwdList< T >)])),
     nodeCount_(0)
   {
     fake_->next = fake_;
   }
 
-  template< class T >
-  FwdList< T >::FwdList(const FwdList& other) :
+  template < class T >
+  FwdList< T >::FwdList(const FwdList& other):
     FwdList()
   {
     assign(other.begin(), other.end());
   }
 
-  template< class T >
-  FwdList< T >::FwdList(FwdList&& other) noexcept :
+  template < class T >
+  FwdList< T >::FwdList(FwdList&& other) noexcept:
     fake_(other.fake_),
     nodeCount_(other.nodeCount_)
   {
@@ -110,14 +108,14 @@ namespace gavrilova {
     other.nodeCount_ = 0;
   }
 
-  template< class T >
-  FwdList< T >::FwdList(std::initializer_list< T > init) :
+  template < class T >
+  FwdList< T >::FwdList(std::initializer_list< T > init):
     FwdList()
   {
     assign(init);
   }
 
-  template< class T >
+  template < class T >
   FwdList< T >& FwdList< T >::operator=(const FwdList& other)
   {
     if (this != std::addressof(other)) {
@@ -127,7 +125,7 @@ namespace gavrilova {
     return *this;
   }
 
-  template< class T >
+  template < class T >
   FwdList< T >& FwdList< T >::operator=(FwdList&& other) noexcept
   {
     if (this == &other) {
@@ -144,7 +142,7 @@ namespace gavrilova {
     return *this;
   }
 
-  template< class T >
+  template < class T >
   FwdList< T >& FwdList< T >::operator=(std::initializer_list< T > init)
   {
     clear();
@@ -152,38 +150,38 @@ namespace gavrilova {
     return *this;
   }
 
-  template< class T >
+  template < class T >
   FwdList< T >::~FwdList()
   {
     clear();
     delete[] reinterpret_cast< char* >(fake_);
   }
 
-  template< class T >
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::begin() const noexcept
   {
     return Iterator(fake_->next);
   }
 
-  template< class T >
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::end() const noexcept
   {
     return Iterator(fake_);
   }
 
-  template< class T >
+  template < class T >
   typename FwdList< T >::CIterator FwdList< T >::cbegin() const noexcept
   {
     return CIterator(fake_->next);
   }
 
-  template< class T >
+  template < class T >
   typename FwdList< T >::CIterator FwdList< T >::cend() const noexcept
   {
     return CIterator(fake_);
   }
 
-  template< class T >
+  template < class T >
   T& FwdList< T >::front()
   {
     if (empty()) {
@@ -192,19 +190,19 @@ namespace gavrilova {
     return fake_->next->data;
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::empty() const noexcept
   {
     return nodeCount_ == 0;
   }
 
-  template< class T >
+  template < class T >
   size_t FwdList< T >::size() const noexcept
   {
     return nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::push_front(const T& value)
   {
     NodeFwdList< T >* newNode = new NodeFwdList< T >{value, fake_->next};
@@ -212,7 +210,7 @@ namespace gavrilova {
     ++nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::push_front(T&& value)
   {
     NodeFwdList< T >* newNode = new NodeFwdList< T >{std::move(value), fake_->next};
@@ -220,7 +218,7 @@ namespace gavrilova {
     ++nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::pop_front() noexcept
   {
     NodeFwdList< T >* temp = fake_->next;
@@ -229,7 +227,7 @@ namespace gavrilova {
     --nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::clear() noexcept
   {
     while (!empty()) {
@@ -237,13 +235,16 @@ namespace gavrilova {
     }
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::remove(const T& value) noexcept
   {
     struct IsEqual {
       const T& value;
-      IsEqual(const T& v) : value(v) {}
-      bool operator()(const T& data) const {
+      IsEqual(const T& v):
+        value(v)
+      {}
+      bool operator()(const T& data) const
+      {
         return data == value;
       }
     };
@@ -251,8 +252,8 @@ namespace gavrilova {
     remove_if(IsEqual(value));
   }
 
-  template< class T >
-  template< class UnaryPredicate >
+  template < class T >
+  template < class UnaryPredicate >
   void FwdList< T >::remove_if(UnaryPredicate p) noexcept
   {
     NodeFwdList< T >* current = fake_;
@@ -268,10 +269,10 @@ namespace gavrilova {
     }
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other) noexcept
   {
-    if(other.empty()) {
+    if (other.empty()) {
       return;
     }
     NodeFwdList< T >* first_other = other.fake_->next;
@@ -291,14 +292,14 @@ namespace gavrilova {
     other.nodeCount_ = 0;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other) noexcept
   {
     FwdList< T > list_for_splice(std::move(other));
     splice(pos, list_for_splice);
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator it) noexcept
   {
     if (!(*it) || *it == other.fake_) {
@@ -324,17 +325,17 @@ namespace gavrilova {
     ++nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other, CIterator it) noexcept
   {
     FwdList< T > list_for_splice(std::move(other));
     splice(pos, list_for_splice, it);
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator first, CIterator last) noexcept
   {
-    if(other.empty()) {
+    if (other.empty()) {
       return;
     }
     NodeFwdList< T >* before_first_other = first.node_;
@@ -357,14 +358,14 @@ namespace gavrilova {
     nodeCount_ += other.nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other, CIterator first, CIterator last) noexcept
   {
     FwdList< T > list_for_splice(std::move(other));
     splice(pos, list_for_splice, first, last);
   }
 
-  template< class T >
+  template < class T >
   void FwdList< T >::reverse()
   {
     if (empty()) {
@@ -382,7 +383,7 @@ namespace gavrilova {
     fake_->next = next;
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::operator==(const FwdList< T >& other) const noexcept
   {
     if (nodeCount_ != other.nodeCount_) {
@@ -400,14 +401,14 @@ namespace gavrilova {
     return true;
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::operator!=(const FwdList< T >& other) const noexcept
   {
     return !(*this == other);
   }
 
-  template< class T >
-  bool FwdList< T >::operator<(const FwdList< T >&other) const noexcept
+  template < class T >
+  bool FwdList< T >::operator<(const FwdList< T >& other) const noexcept
   {
     Iterator it1 = begin();
     Iterator it2 = other.begin();
@@ -424,32 +425,32 @@ namespace gavrilova {
     return nodeCount_ < other.nodeCount_;
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::operator>(const FwdList< T >& other) const noexcept
   {
     return other < *this;
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::operator>=(const FwdList< T >& other) const noexcept
   {
     return !(other < *this);
   }
 
-  template< class T >
+  template < class T >
   bool FwdList< T >::operator<=(const FwdList< T >& other) const noexcept
   {
     return !(other > *this);
   }
 
-  template< class T>
-  void FwdList< T >::swap(FwdList< T >& other ) noexcept
+  template < class T >
+  void FwdList< T >::swap(FwdList< T >& other) noexcept
   {
     std::swap(fake_, other.fake_);
     std::swap(nodeCount_, other.nodeCount_);
   }
 
-  template< class T>
+  template < class T >
   void FwdList< T >::assign(size_t count, const T& value)
   {
     FwdList< T > temporary;
@@ -459,8 +460,8 @@ namespace gavrilova {
     swap(temporary);
   }
 
-  template< class T >
-  template< class InputIt >
+  template < class T >
+  template < class InputIt >
   void FwdList< T >::assign(InputIt first, InputIt last)
   {
     FwdList< T > temporary;
@@ -472,13 +473,13 @@ namespace gavrilova {
     swap(temporary);
   }
 
-  template< class T>
+  template < class T >
   void FwdList< T >::assign(std::initializer_list< T > init)
   {
     assign(init.begin(), init.end());
   }
 
-  template< class T>
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, const T& value)
   {
     NodeFwdList< T >* node = pos.node_;
@@ -492,13 +493,13 @@ namespace gavrilova {
     return Iterator(node->next);
   }
 
-  template< class T >
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, T&& value)
   {
     return insert(pos, std::move(value));
   }
 
-  template< class T>
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, size_t count, const T& value)
   {
     if (count == 0) {
@@ -513,8 +514,8 @@ namespace gavrilova {
     return result;
   }
 
-  template< class T >
-  template< class InputIt >
+  template < class T >
+  template < class InputIt >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, InputIt first, InputIt last)
   {
     if (first == last) {
@@ -526,18 +527,17 @@ namespace gavrilova {
     return result;
   }
 
-  template< class T>
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, std::initializer_list< T > init)
   {
-    if (init.size() == 0)
-    {
+    if (init.size() == 0) {
       return Iterator(pos.node_);
     }
 
     return insert(pos, init.begin(), init.end());
   }
 
-  template <class T>
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::erase(CIterator pos)
   {
     if (empty()) {
@@ -554,12 +554,11 @@ namespace gavrilova {
     return Iterator{prevNode->next};
   }
 
-  template <class T>
+  template < class T >
   typename FwdList< T >::Iterator FwdList< T >::erase(CIterator first, CIterator last)
   {
     Iterator erased;
-    for (auto it = first; it != last; it++)
-    {
+    for (auto it = first; it != last; it++) {
       erased = erase(it);
     }
     return erased;

@@ -1,10 +1,11 @@
-#include <string>
 #include <iostream>
+#include <string>
+#include "FwdList.hpp"
 #include "inputList.hpp"
 #include "outputList.hpp"
-#include "FwdList.hpp"
 
-int main() {
+int main()
+{
   using namespace gavrilova;
   using ULL = unsigned long long;
 
@@ -16,7 +17,7 @@ int main() {
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
-    std::pair< std::string, FwdList< ULL > > new_pair {name, numbers};
+    std::pair< std::string, FwdList< ULL > > new_pair{name, numbers};
     listOfPairs.insert(cur_it, new_pair);
     ++cur_it;
     ++numOfPairs;
@@ -30,7 +31,8 @@ int main() {
   FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
-  } catch(const std::overflow_error& e) {
+    std::cout << "\n";
+  } catch (const std::overflow_error& e) {
     std::cout << "\n";
     std::cerr << e.what();
     return 1;
@@ -39,5 +41,6 @@ int main() {
     std::cout << "0" << "\n";
   } else {
     outFwdListULL(std::cout, sums);
+    std::cout << "\n";
   }
 }
