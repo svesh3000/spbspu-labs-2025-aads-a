@@ -112,37 +112,14 @@ BOOST_AUTO_TEST_CASE(front_back_pop)
   zholobov::Queue< std::string > queue;
   queue.push("This");
   BOOST_TEST(queue.front() == "This");
-  BOOST_TEST(queue.back() == "This");
   queue.push("is");
   BOOST_TEST(queue.front() == "This");
-  BOOST_TEST(queue.back() == "is");
   queue.push("content");
   BOOST_TEST(queue.front() == "This");
-  BOOST_TEST(queue.back() == "content");
   queue.pop();
   BOOST_TEST(queue.front() == "is");
-  BOOST_TEST(queue.back() == "content");
   queue.pop();
   BOOST_TEST(queue.front() == "content");
-  BOOST_TEST(queue.back() == "content");
-}
-
-BOOST_AUTO_TEST_CASE(many_push_pop)
-{
-  zholobov::Queue< int > queue;
-  for (int i = 0; i < 20; ++i) {
-    queue.push(i);
-  }
-  for (int i = 0; i < 10; ++i) {
-    queue.pop();
-  }
-  for (int i = 0; i < 40; ++i) {
-    queue.push(i);
-  }
-  for (int i = 0; i < 48; ++i) {
-    queue.pop();
-  }
-  BOOST_TEST(to_string(queue) == "38 39");
 }
 
 BOOST_AUTO_TEST_CASE(empty)

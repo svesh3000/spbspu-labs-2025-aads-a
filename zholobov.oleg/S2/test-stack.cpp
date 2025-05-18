@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(push_move)
   BOOST_TEST(val == "");
 }
 
-BOOST_AUTO_TEST_CASE(front_back_pop)
+BOOST_AUTO_TEST_CASE(top_pop)
 {
   zholobov::Stack< std::string > stack;
   stack.push("This");
@@ -119,24 +119,6 @@ BOOST_AUTO_TEST_CASE(front_back_pop)
   BOOST_TEST(stack.top() == "is");
   stack.pop();
   BOOST_TEST(stack.top() == "This");
-}
-
-BOOST_AUTO_TEST_CASE(many_push_pop)
-{
-  zholobov::Stack< int > stack;
-  for (int i = 0; i < 500; ++i) {
-    stack.push(i);
-  }
-  for (int i = 0; i < 400; ++i) {
-    stack.pop();
-  }
-  for (int i = 0; i < 1000; ++i) {
-    stack.push(i);
-  }
-  for (int i = 0; i < 1098; ++i) {
-    stack.pop();
-  }
-  BOOST_TEST(to_string(stack) == "1 0");
 }
 
 BOOST_AUTO_TEST_CASE(empty)

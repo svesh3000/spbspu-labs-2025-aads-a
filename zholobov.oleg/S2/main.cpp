@@ -6,13 +6,7 @@
 #include "queue.hpp"
 #include "stack.hpp"
 
-namespace zholobov {
-
-  bool isOperator(const std::string& token)
-  {
-    return (token == "+") || (token == "-") || (token == "*") || (token == "/") || (token == "%");
-  }
-
+namespace {
   int operatorPriority(const std::string& op)
   {
     if (op == "+" || op == "-") {
@@ -24,17 +18,66 @@ namespace zholobov {
     return 0;
   }
 
-  bool isNumber(const std::string& str)
+  constexpr long max_value = std::numeric_limits< long >::max();
+  constexpr long min_value = std::numeric_limits< long >::min();
+
+  long isAdditionOverflow(long lhs, long rhs)
   {
-    if (str.empty()) {
-      return false;
-    }
-    for (size_t i = 0; i < str.size(); ++i) {
-      if (!std::isdigit(str[i])) {
-        return false;
+    return (((rhs > 0) && (lhs > (max_value - rhs))) || ((rhs < 0) && (lhs < (min_value - rhs))));
+  }
+
+  long isSubtractionOverflow(long lhs, long rhs)
+  {
+    return (((rhs > 0) && (lhs < (min_value + rhs))) || ((rhs < 0) && (lhs > (max_value + rhs))));
+  }
+
+  long isMultiplicationOverflow(long lhs, long rhs)
+  {
+    bool error = false;
+    if (lhs > 0) {
+      if (rhs > 0) {
+        error = (lhs > (max_value / rhs));
+      } else {
+        error = (rhs < (min_value / lhs));
+      }
+    } else {
+      if (rhs > 0) {
+        error = (lhs < (min_value / rhs));
+      } else {
+        error = ((lhs != 0) && (rhs < (max_value / lhs)));
       }
     }
-    return true;
+    return error;
+  }
+
+  long isDivisionOverflow(long lhs, long rhs)
+  {
+    return ((lhs == min_value) && (rhs == -1));
+  }
+
+  long isModuloOverflow(long lhs, long rhs)
+  {
+    return ((lhs == min_value) && (rhs == -1));
+  }
+}
+
+namespace zholobov {
+
+  bool isOperator(const std::string& token)
+  {
+    return (token == "+") || (token == "-") || (token == "*") || (token == "/") || (token == "%");
+  }
+
+  bool strToLong(const std::string& str, long& result)
+  {
+    char* end;
+    result = std::strtol(str.c_str(), &end, 10);
+    return *end == '\0';
+  }
+
+  bool isLessPriority(const std::string& op1, const std::string& op2)
+  {
+    return operatorPriority(op1) < operatorPriority(op2);
   }
 
   Queue< std::string > infixToPostfix(Queue< std::string > tokens)
@@ -46,7 +89,8 @@ namespace zholobov {
       std::string token = tokens.front();
       tokens.pop();
 
-      if (isNumber(token)) {
+      long value = 0;
+      if (strToLong(token, value)) {
         result.push(std::move(token));
       } else if (token == "(") {
         op_stack.push(std::move(token));
@@ -60,9 +104,7 @@ namespace zholobov {
         }
         op_stack.pop();
       } else if (isOperator(token)) {
-        while ((!op_stack.empty()) &&
-               (op_stack.top() != "(") &&
-               (operatorPriority(op_stack.top()) >= operatorPriority(token))) {
+        while ((!op_stack.empty()) && (op_stack.top() != "(") && (!isLessPriority(op_stack.top(), token))) {
           result.push(op_stack.top());
           op_stack.pop();
         }
@@ -91,8 +133,9 @@ namespace zholobov {
       std::string token = postfix_expr.front();
       postfix_expr.pop();
 
-      if (isNumber(token)) {
-        eval_stack.push(std::stol(token));
+      long value = 0;
+      if (strToLong(token, value)) {
+        eval_stack.push(value);
       } else {
         if (eval_stack.empty()) {
           throw std::runtime_error("Not enough operands");
@@ -105,37 +148,18 @@ namespace zholobov {
         long lhs = eval_stack.top();
         eval_stack.pop();
 
-        constexpr long max_value = std::numeric_limits< long >::max();
-        constexpr long min_value = std::numeric_limits< long >::min();
-
         if (token == "+") {
-          if (((rhs > 0) && (lhs > (max_value - rhs))) ||
-              ((rhs < 0) && (lhs < (min_value - rhs)))) {
+          if (isAdditionOverflow(lhs, rhs)) {
             throw std::runtime_error("Addition overflow");
           }
           eval_stack.push(lhs + rhs);
         } else if (token == "-") {
-          if (((rhs > 0) && (lhs < (min_value + rhs))) ||
-              ((rhs < 0) && (lhs > (max_value + rhs)))) {
+          if (isSubtractionOverflow(lhs, rhs)) {
             throw std::runtime_error("Subtraction overflow");
           }
           eval_stack.push(lhs - rhs);
         } else if (token == "*") {
-          bool error = false;
-          if (lhs > 0) {
-            if (rhs > 0) {
-              error = (lhs > (max_value / rhs));
-            } else {
-              error = (rhs < (min_value / lhs));
-            }
-          } else {
-            if (rhs > 0) {
-              error = (lhs < (min_value / rhs));
-            } else {
-              error = ((lhs != 0) && (rhs < (max_value / lhs)));
-            }
-          }
-          if (error) {
+          if (isMultiplicationOverflow(lhs, rhs)) {
             throw std::runtime_error("Multiplication overflow");
           }
           eval_stack.push(lhs * rhs);
@@ -143,7 +167,7 @@ namespace zholobov {
           if (rhs == 0) {
             throw std::runtime_error("Division by zero");
           }
-          if ((lhs == min_value) && (rhs == -1)) {
+          if (isDivisionOverflow(lhs, rhs)) {
             throw std::runtime_error("Division overflow");
           }
           eval_stack.push(lhs / rhs);
@@ -151,8 +175,8 @@ namespace zholobov {
           if (rhs == 0) {
             throw std::runtime_error("Modulo by zero");
           }
-          if ((lhs == min_value) && (rhs == -1)) {
-            throw std::runtime_error("Reminder overflow");
+          if (isModuloOverflow(lhs, rhs)) {
+            throw std::runtime_error("Modulo overflow");
           }
           long res = lhs % rhs;
           if (res < 0) {
@@ -191,10 +215,11 @@ namespace zholobov {
   Queue< std::string > stringToTokens(const std::string& str)
   {
     Queue< std::string > tokens;
-    std::istringstream iss(str);
-    std::string token;
-    while (iss >> token) {
-      tokens.push(std::move(token));
+    size_t start = 0;
+    size_t end = 0;
+    while ((start = str.find_first_not_of(' ', end)) != std::string::npos) {
+      end = str.find_first_of(' ', start);
+      tokens.push(str.substr(start, end - start));
     }
     return tokens;
   }
