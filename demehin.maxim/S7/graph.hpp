@@ -5,6 +5,7 @@
 #include <list/list.hpp>
 #include <tree/tree.hpp>
 #include "hash_table.hpp"
+#include <list>
 
 namespace demehin
 {
@@ -20,7 +21,7 @@ namespace demehin
   {
   public:
     using PairOfStr = std::pair< std::string, std::string >;
-    using Edges = HashTable< PairOfStr, List< unsigned int >, PairHash >;
+    using Edges = HashTable< PairOfStr, std::list< unsigned int >, PairHash >;
 
     void addEdge(const std::string&, const std::string&, unsigned int);
     bool deleteEdge(const std::string&, const std::string&, unsigned int);
