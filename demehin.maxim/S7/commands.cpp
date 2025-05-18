@@ -88,21 +88,11 @@ void demehin::printInbounds(std::ostream& out, std::istream& in, const MapOfGrap
 
 void demehin::bind(std::istream& in, MapOfGraphs& graphs)
 {
-  /*std::string gr_name, from, to;
-  unsigned int weight;
-  in >> gr_name >> from >> to >> weight;
-
-  graphs.at(gr_name).addEdge(from, to, weight);*/
   std::string gr_name, from, to;
   unsigned int weight;
   in >> gr_name >> from >> to >> weight;
 
-  auto& graph = graphs.at(gr_name);
-
-  graph.addEdge(from, from, 0);
-  graph.addEdge(to, to, 0);
-
-  graph.addEdge(from, to, weight);
+  graphs.at(gr_name).addEdge(from, to, weight);
 }
 
 void demehin::cut(std::istream& in, MapOfGraphs& graphs)
