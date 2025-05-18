@@ -3,6 +3,7 @@
 #include <functional>
 #include <dynamic_array.hpp>
 #include "hash_table_iterator.hpp"
+#include <vector>
 
 namespace demehin
 {
@@ -77,7 +78,7 @@ namespace demehin
       SlotState state = SlotState::EMPTY;
     };
 
-    DynamicArray< Slot > slots_;
+    std::vector< Slot > slots_;
     size_t item_cnt_;
     Hash hasher_;
     Equal equal_;
@@ -85,7 +86,7 @@ namespace demehin
 
     size_t findKey(const Key&) const;
     size_t findSlot(const Key&) const;
-    size_t findSlotIn(const Key&, const DynamicArray< Slot >&) const noexcept;
+    size_t findSlotIn(const Key&, const std::vector< Slot >&) const noexcept;
 
   };
 
@@ -172,7 +173,7 @@ namespace demehin
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
-  size_t HashTable< Key, T, Hash, Equal >::findSlotIn(const Key& key, const DynamicArray< Slot >& target) const noexcept
+  size_t HashTable< Key, T, Hash, Equal >::findSlotIn(const Key& key, const std::vector< Slot >& target) const noexcept
   {
     size_t hash_val = hasher_(key) % target.size();
     size_t ind = hash_val;
@@ -198,7 +199,7 @@ namespace demehin
       return;
     }
 
-    DynamicArray< Slot > new_slots(new_size);
+    std::vector< Slot > new_slots(new_size);
     for (auto& slot : slots_)
     {
       if (slot.state == SlotState::OCCUPIED)
