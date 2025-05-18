@@ -196,11 +196,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   Value& TwoThreeTree< Key, Value, Comparator >::operator[](const Key& key)
   {
-    if (find(key) == end())
+    auto it = lower_bound(key);
+    if (it == end() || it->first != key)
     {
-      insert({key, Value()});
+      return insert(it, {key, Value()})->second;
     }
-    return (find(key)->second);
+    return (it->second);
   }
 
   template< class Key, class Value, class Comparator >
@@ -212,11 +213,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   const Value& TwoThreeTree< Key, Value, Comparator >::at(const Key& key) const
   {
-    if (find(key) == end())
+    auto it = find(key);
+    if (it == end())
     {
       throw std::out_of_range("Container does not have an element with the such key");
     }
-    return (find(key)->second);
+    return (it->second);
   }
 
   template< class Key, class Value, class Comparator >
