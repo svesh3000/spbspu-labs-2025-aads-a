@@ -131,7 +131,6 @@ void demehin::create(std::istream& in, MapOfGraphs& graphs)
     newGraph.addVertex(vrt);
   }
   graphs[gr_name] = newGraph;
-  //graphs[gr_name];
 
 }
 
