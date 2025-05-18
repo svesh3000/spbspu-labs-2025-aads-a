@@ -28,6 +28,11 @@ int main()
     std::cout << "\n";
   }
 
+  if (maxLen == 0) {
+    std::cout << "0" << "\n";
+    return 0;
+  }
+
   FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
@@ -36,10 +41,8 @@ int main()
     std::cerr << e.what() << "\n";
     return 1;
   }
-  if (maxLen == 0) {
-    std::cout << "0" << "\n";
-  } else {
-    outFwdListULL(std::cout, sums);
-    std::cout << "\n";
-  }
+
+  outFwdListULL(std::cout, sums);
+  std::cout << "\n";
+
 }
