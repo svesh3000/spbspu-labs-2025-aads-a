@@ -126,7 +126,8 @@ namespace alymova
   }
 
   template< class T, class Value, class Comparator >
-  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
   {
     return (!(lhs == rhs));
   }
