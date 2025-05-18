@@ -109,6 +109,7 @@ void demehin::cut(std::istream& in, MapOfGraphs& graphs)
 
 void demehin::create(std::istream& in, MapOfGraphs& graphs)
 {
+
   std::string gr_name;
   in >> gr_name;
 
@@ -117,7 +118,21 @@ void demehin::create(std::istream& in, MapOfGraphs& graphs)
     throw std::logic_error("incorrect parameters");
   }
 
-  graphs[gr_name];
+  Graph newGraph;
+  size_t vrt_cnt = 0;
+  in >> vrt_cnt;
+  for (size_t i = 0; i < vrt_cnt; i++)
+  {
+    std::string vrt;
+    if (!(in >> vrt))
+    {
+      throw std::logic_error("incorrect parameter");
+    }
+    newGraph.addVertex(vrt);
+  }
+  graphs[gr_name] = newGraph;
+  //graphs[gr_name];
+
 }
 
 void demehin::merge(std::istream& in, MapOfGraphs& graphs)

@@ -23,6 +23,7 @@ namespace demehin
     using PairOfStr = std::pair< std::string, std::string >;
     using Edges = HashTable< PairOfStr, std::list< unsigned int >, PairHash >;
 
+    void addVertex(const std::string&) noexcept;
     void addEdge(const std::string&, const std::string&, unsigned int);
     bool deleteEdge(const std::string&, const std::string&, unsigned int);
     const Edges& getEdges() const;

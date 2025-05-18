@@ -1,5 +1,13 @@
 #include "graph.hpp"
 
+void demehin::Graph::addVertex(const std::string& vrt) noexcept
+{
+  if (!hasVrt(vrt))
+  {
+    addEdge(vrt, vrt, 0);
+  }
+}
+
 void demehin::Graph::addEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
   auto key = std::make_pair(from, to);
