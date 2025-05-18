@@ -15,6 +15,7 @@ namespace demehin
   class TreeIterator
   {
     friend class Tree< Key, T, Cmp >;
+    friend class TreeConstIterator< Key, T, Cmp >;
   public:
     using this_t = TreeIterator< Key, T, Cmp >;
     using Node = demehin::TreeNode< Key, T >;
