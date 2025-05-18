@@ -76,6 +76,8 @@ namespace kiselev
     std::pair< Iterator, Iterator > equalRange(const Key&) noexcept;
     std::pair< ConstIterator, ConstIterator > equalRange(const Key&) const noexcept;
 
+    TreeNode< Key, Value >* getMax() const noexcept;
+
   private:
     using Node = TreeNode< Key, Value>;
 
@@ -84,7 +86,6 @@ namespace kiselev
     void fixInsert(Node* node) noexcept;
     void fixDelete(Node* node) noexcept;
     Node* root_;
-    Node* fakeRoot_;
     Cmp cmp_;
     size_t size_;
   };
@@ -92,7 +93,6 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
-    fakeRoot_(new Node{ Color::BLACK, nullptr, nullptr, nullptr, value() }),
     size_(0)
   {}
 
@@ -100,25 +100,15 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::RBTree(const RBTree< Key, Value, Cmp >& tree):
     RBTree()
   {
-    try
+    for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
     {
-      for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
-      {
-        insert(*it);
-      }
-    }
-    catch (...)
-    {
-      clear();
-      delete fakeRoot_;
-      throw;
+      insert(*it);
     }
   }
 
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree) noexcept:
     root_(std::exchange(tree.root_, nullptr)),
-    fakeRoot_(std::exchange(tree.fakeRoot_, nullptr)),
     size_(std::exchange(tree.size_, 0))
   {}
 
@@ -127,18 +117,9 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::RBTree(InputIt first, InputIt last):
     RBTree()
   {
-    try
+    for (; first != last; first++)
     {
-      for (; first != last; first++)
-      {
-        insert(*first);
-      }
-    }
-    catch (...)
-    {
-      clear();
-      delete fakeRoot_;
-      throw;
+      insert(*first);
     }
   }
   template< typename Key, typename Value, typename Cmp >
@@ -174,18 +155,12 @@ namespace kiselev
   RBTree< Key, Value, Cmp >::~RBTree()
   {
     clear();
-    delete fakeRoot_;
   }
 
   template< typename Key, typename Value, typename Cmp >
   void RBTree< Key, Value, Cmp >::clear() noexcept
   {
-    if (root_)
-    {
-      erase(begin(), end());
-      root_ = nullptr;
-      fakeRoot_->left = fakeRoot_;
-    }
+    erase(begin(), end());
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -198,7 +173,7 @@ namespace kiselev
       child->left->parent = node;
     }
     child->parent = node->parent;
-    if (node->parent == fakeRoot_)
+    if (!node->parent)
     {
       root_ = child;
     }
@@ -224,7 +199,7 @@ namespace kiselev
       child->right->parent = node;
     }
     child->parent = node->parent;
-    if (node->parent == fakeRoot_)
+    if (!node->parent)
     {
       root_ = child;
     }
@@ -401,7 +376,6 @@ namespace kiselev
   void RBTree< Key, Value, Cmp >::swap(RBTree< Key, Value, Cmp >& tree) noexcept
   {
     std::swap(root_, tree.root_);
-    std::swap(fakeRoot_, tree.fakeRoot_);
     std::swap(size_, tree.size_);
   }
 
@@ -417,7 +391,7 @@ namespace kiselev
     {
       temp = temp->left;
     }
-    return Iterator(temp);
+    return Iterator(temp, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -432,19 +406,19 @@ namespace kiselev
     {
       temp = temp->left;
     }
-    return ConstIterator(temp);
+    return ConstIterator(temp, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::end() noexcept
   {
-    return Iterator(fakeRoot_);
+    return Iterator(nullptr, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cend() const noexcept
   {
-    return ConstIterator(fakeRoot_);
+    return ConstIterator(nullptr, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -463,7 +437,7 @@ namespace kiselev
       }
       else
       {
-        return Iterator(temp);
+        return Iterator(temp, this);
       }
     }
     return end();
@@ -485,7 +459,7 @@ namespace kiselev
       }
       else
       {
-        return ConstIterator(temp);
+        return ConstIterator(temp, this);
       }
     }
     return cend();
@@ -501,10 +475,8 @@ namespace kiselev
       if (!root_)
       {
         root_ = newNode;
-        fakeRoot_->left = root_;
-        root_->parent = fakeRoot_;
         size_ = 1;
-        return { Iterator(root_), true };
+        return { Iterator(root_, this), true };
       }
       Node* temp = root_;
       Node* parent = nullptr;
@@ -522,7 +494,7 @@ namespace kiselev
         else
         {
           delete newNode;
-          return { Iterator(temp), false };
+          return { Iterator(temp, this), false };
         }
       }
 
@@ -544,7 +516,7 @@ namespace kiselev
     }
     fixInsert(newNode);
     size_++;
-    return { Iterator(newNode), true };
+    return { Iterator(newNode, this), true };
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -567,7 +539,7 @@ namespace kiselev
           pos->left = newNode;
           fixInsert(newNode);
           ++size_;
-          return Iterator(newNode);
+          return Iterator(newNode, this);
         }
       }
       else if (cmp_(pos->data.first, val.first))
@@ -577,13 +549,13 @@ namespace kiselev
           pos->right = newNode;
           fixInsert(newNode);
           ++size_;
-          return Iterator(newNode);
+          return Iterator(newNode, this);
         }
       }
       else
       {
         delete newNode;
-        return Iterator(pos);
+        return Iterator(pos, this);
       }
       value val = newNode->data;
       delete newNode;
@@ -623,7 +595,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::insert(Iterator pos, const value& val)
   {
-    ConstIterator it(pos.node_);
+    ConstIterator it(pos.node_, this);
     return emplaceHint(it, val);
   }
 
@@ -658,8 +630,6 @@ namespace kiselev
     if (size_ == 1)
     {
       delete root_;
-      root_ = nullptr;
-      fakeRoot_->left = fakeRoot_;
       size_ = 0;
       return end();
     }
@@ -680,11 +650,9 @@ namespace kiselev
     {
       child->parent = replace->parent;
     }
-    if (replace->parent == fakeRoot_)
+    if (!replace->parent)
     {
       root_ = child;
-      root_->parent = fakeRoot_;
-      fakeRoot_->left = root_;
     }
     else if (replace == replace->parent->left)
     {
@@ -702,7 +670,7 @@ namespace kiselev
     {
       fixDelete(child ? child : replace->parent);
     }
-    Iterator next(pos.node_);
+    Iterator next(pos.node_, this);
     ++next;
     delete replace;
     --size_;
@@ -735,7 +703,7 @@ namespace kiselev
     {
       first = erase(first);
     }
-    return Iterator(last.node_);
+    return Iterator(last.node_, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -757,7 +725,7 @@ namespace kiselev
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::lowerBound(const Key& key) noexcept
   {
     Node* temp = root_;
-    Node* res = fakeRoot_;
+    Node* res = nullptr;
     while (temp)
     {
       if (!cmp_(temp->data.first, key))
@@ -770,7 +738,7 @@ namespace kiselev
         temp = temp->right;
       }
     }
-    return Iterator(res);
+    return Iterator(res, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -783,7 +751,7 @@ namespace kiselev
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::upperBound(const Key& key) noexcept
   {
     Node* temp = root_;
-    Node* res = fakeRoot_;
+    Node* res = nullptr;
     while (temp)
     {
       if (cmp_(key, temp->data.first))
@@ -796,7 +764,7 @@ namespace kiselev
         temp = temp->right;
       }
     }
-    return Iterator(res);
+    return Iterator(res, this);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -846,6 +814,21 @@ namespace kiselev
   Value& RBTree< Key, Value, Cmp >::at(const Key& key)
   {
     return const_cast< Value& >(static_cast< const RBTree< Key, Value, Cmp >& >(*this).at(key));
+  }
+
+  template< typename Key, typename Value, typename Cmp >
+  TreeNode< Key, Value >* RBTree< Key, Value, Cmp >::getMax() const noexcept
+  {
+    if (!root_)
+    {
+      return nullptr;
+    }
+    Node* temp = root_;
+    while (temp->right)
+    {
+      temp = temp->right;
+    }
+    return temp;
   }
 }
 #endif

@@ -39,25 +39,29 @@ namespace kiselev
       bool operator!=(const iterator&) const noexcept;
     private:
       TreeNode< Key, Value >* node_;
-      explicit Iterator(TreeNode< Key, Value >*);
+      const RBTree< Key, Value, Cmp >* tree_;
+      Iterator(TreeNode< Key, Value >*, const RBTree< Key, Value, Cmp >*);
       friend class Iterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst >::Iterator():
-      node_(nullptr)
+      node_(nullptr),
+      tree_(nullptr)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
     Iterator< Key, Value, Cmp, IsConst >::Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept:
-      node_(other.node_)
+      node_(other.node_),
+      tree_(other.tree_)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node):
-      node_(node)
+    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node, const RBTree< Key, Value, Cmp >* tree):
+      node_(node),
+      tree_(tree)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
@@ -66,6 +70,7 @@ namespace kiselev
       const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
     {
       node_ = other.node_;
+      tree_ = other.tree_;
       return *this;
     }
 
@@ -102,21 +107,28 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator--() noexcept
     {
-      assert(node_ != nullptr);
-      if (node_->left)
+      assert(tree_ != nullptr);
+      if (node_ == nullptr)
       {
-        node_ = node_->left;
-        while (node_->right)
-        {
-          node_ = node_->right;
-        }
-        return iterator(node_);
+        node_ = tree_->getMax();
       }
-      while (node_->parent && node_ == node_->parent->left)
+      else
       {
+        if (node_->left)
+        {
+          node_ = node_->left;
+          while (node_->right)
+          {
+            node_ = node_->right;
+          }
+          return iterator(node_);
+        }
+        while (node_->parent && node_ == node_->parent->left)
+        {
+          node_ = node_->parent;
+        }
         node_ = node_->parent;
       }
-      node_ = node_->parent;
       return *this;
     }
 
