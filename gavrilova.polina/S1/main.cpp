@@ -33,8 +33,7 @@ int main()
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
     std::cout << "\n";
   } catch (const std::overflow_error& e) {
-    std::cout << "\n";
-    std::cerr << e.what();
+    std::cerr << e.what() << "\n";
     return 1;
   }
   if (maxLen == 0) {

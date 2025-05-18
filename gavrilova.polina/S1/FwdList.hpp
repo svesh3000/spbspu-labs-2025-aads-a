@@ -43,6 +43,7 @@ namespace gavrilova {
     CIterator cend() const noexcept;
 
     T& front();
+    const T& front() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T& value);
@@ -191,6 +192,15 @@ namespace gavrilova {
   }
 
   template < class T >
+  const T& FwdList< T >::front() const
+  {
+    if (empty()) {
+      throw std::out_of_range("List is empty");
+    }
+    return fake_->next->data;
+  }
+
+  template < class T >
   bool FwdList< T >::empty() const noexcept
   {
     return nodeCount_ == 0;
@@ -272,64 +282,26 @@ namespace gavrilova {
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other) noexcept
   {
-    if (other.empty()) {
-      return;
-    }
-    NodeFwdList< T >* first_other = other.fake_->next;
-    NodeFwdList< T >* last_other = first_other;
-
-    while (last_other->next != other.fake_) {
-      last_other = last_other->next;
-    }
-    other.fake_->next = other.fake_;
-
-    NodeFwdList< T >* node = pos.node_;
-    NodeFwdList< T >* node_next = node->next;
-    node->next = first_other;
-    last_other->next = node_next;
-
-    nodeCount_ += other.nodeCount_;
-    other.nodeCount_ = 0;
+    splice(pos, other, other.cbegin(), other.cend());
   }
 
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other) noexcept
   {
-    FwdList< T > list_for_splice(std::move(other));
-    splice(pos, list_for_splice);
+    splice(pos, other);
   }
 
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator it) noexcept
   {
-    if (!(*it) || *it == other.fake_) {
-      return;
-    }
-    Iterator it_next = it;
-    if (pos == it || pos == ++it_next) {
-      return;
-    }
-    NodeFwdList< T >* node_for_move = it_next.node_;
-    if (!node_for_move) {
-      return;
-    }
-    NodeFwdList< T >* node_prev_moved = it.node_;
-    NodeFwdList< T >* node_after_moved = it_next.node_;
-    node_prev_moved->next = node_after_moved;
-    --other.nodeCount_;
-
-    NodeFwdList< T >* node = pos.node_;
-    NodeFwdList< T >* node_next = node->next;
-    node->next = node_for_move;
-    node_for_move->next = node_next;
-    ++nodeCount_;
+    auto it_end = it;
+    splice(pos, other, it, ++it_end);
   }
 
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other, CIterator it) noexcept
   {
-    FwdList< T > list_for_splice(std::move(other));
-    splice(pos, list_for_splice, it);
+    splice(pos, other, it);
   }
 
   template < class T >
@@ -361,8 +333,7 @@ namespace gavrilova {
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >&& other, CIterator first, CIterator last) noexcept
   {
-    FwdList< T > list_for_splice(std::move(other));
-    splice(pos, list_for_splice, first, last);
+    splice(pos, other, first, last);
   }
 
   template < class T >
@@ -496,7 +467,7 @@ namespace gavrilova {
   template < class T >
   typename FwdList< T >::Iterator FwdList< T >::insert(CIterator pos, T&& value)
   {
-    return insert(pos, std::move(value));
+    return insert(pos, value);
   }
 
   template < class T >
