@@ -7,7 +7,7 @@
 namespace
 {
   template< typename T >
-  bool isMultipOverflow(const T&  a, const T& b)
+  bool isMultipOverflow(const T& a, const T& b)
   {
     static_assert(std::is_integral< T >::value);
     T max = std::numeric_limits< T >::max();
