@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   {
     BOOST_TEST(tree3.size() == 4);
   }
-  
+
 }
 BOOST_AUTO_TEST_CASE(test_iterators)
 {
