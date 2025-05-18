@@ -135,9 +135,16 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
-    fake_(new Node{{T(), T(), T()}, NodeType::Fake, nullptr, nullptr, nullptr, nullptr, nullptr}),
+    fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     root_(fake_)
-  {}
+  {
+    fake_->type = NodeType::Fake;
+    fake_->parent = nullptr;
+    fake_->left = nullptr;
+    fake_->mid = nullptr;
+    fake_->right = nullptr;
+    fake_->overflow = nullptr;
+  }
 
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree(const Tree& other):
@@ -174,7 +181,7 @@ namespace alymova
     {
       clear(root_);
     }
-    delete fake_;
+    delete[] reinterpret_cast< char* >(fake_);
   }
 
   template< class Key, class Value, class Comparator >
