@@ -321,17 +321,18 @@ namespace demehin
       return emplace(std::forward< Args >(args)...).first;
     }
 
-    DataPair newPair(std::forward< Args >(args)...);
-    const Key& newKey = newPair.first;
+    Node tempNode(std::forward< Args >(args)...);
+    const Key& newKey = tempNode.data.first;
 
     if (hint != cend())
     {
       const Key& hintKey = hint->first;
       auto nextHint = hint;
       ++nextHint;
+
       if (cmp_(hintKey, newKey) && (nextHint == cend() || cmp_(newKey, nextHint->first)))
       {
-        Node* newNode = new Node(std::forward< Args >(args)...);
+        Node* newNode = new Node(std::move(tempNode.data));
         Node* hintNode = hint.getNode();
         newNode->parent = hintNode;
         hintNode->right = newNode;
@@ -340,7 +341,7 @@ namespace demehin
         return Iter(newNode);
       }
     }
-    return emplace(std::forward< Args >(args)...).first;
+    return emplace(std::move(tempNode.data)).first;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -639,13 +640,8 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   T& Tree< Key, T, Cmp >::operator[](const Key& key)
   {
-    auto searched = find(key);
-    if (searched == end())
-    {
-      insert(std::make_pair(key, T()));
-      searched = find(key);
-    }
-    return searched->second;
+    auto toreturn = insert(std::make_pair(key, T()));
+    return toreturn.first->second;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -742,21 +738,7 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::lower_bound(const Key& key) const noexcept
   {
-    Node* current = root_;
-    Node* res = fakeRoot_;
-    while (current != fakeRoot_ && current != nullptr)
-    {
-      if (!cmp_(current->data.first, key))
-      {
-        res = current;
-        current = current->left;
-      }
-      else
-      {
-        current = current->right;
-      }
-    }
-    return cIter(res);
+    return cIter(lower_bound(key));
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -782,21 +764,7 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::upper_bound(const Key& key) const noexcept
   {
-    Node* current = root_;
-    Node* res = fakeRoot_;
-    while (current != fakeRoot_ && current != nullptr)
-    {
-      if (cmp_(key, current->data.first))
-      {
-        res = current;
-        current = current->left;
-      }
-      else
-      {
-        current = current->right;
-      }
-    }
-    return cIter(res);
+    return cIter(upper_bound(key));
   }
 
   template< typename Key, typename T, typename Cmp >

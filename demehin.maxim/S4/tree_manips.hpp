@@ -1,7 +1,6 @@
 #ifndef TREE_MANIPS
 #define TREE_MANIPS
 #include <string>
-#include <map>
 #include <iostream>
 #include <tree/tree.hpp>
 

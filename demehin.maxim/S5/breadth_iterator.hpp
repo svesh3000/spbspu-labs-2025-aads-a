@@ -63,15 +63,15 @@ namespace demehin
     else
     {
       node_ = queue_.front();
-      if (node_->left)
+      queue_.pop();
+      if (node_->left != nullptr)
       {
         queue_.push(node_->left);
       }
-      if (node_->right)
+      if (node_->right != nullptr)
       {
         queue_.push(node_->right);
       }
-      queue_.pop();
       if (queue_.empty())
       {
         node_ = nullptr;

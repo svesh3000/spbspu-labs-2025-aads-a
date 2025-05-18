@@ -21,6 +21,8 @@ namespace demehin
     using DataPair = std::pair< Key, T >;
 
     TreeConstIterator() noexcept;
+    TreeConstIterator(const TreeIterator< Key, T, Cmp >&) noexcept;
+
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
     this_t& operator--() noexcept;
@@ -42,6 +44,11 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   TreeConstIterator< Key, T, Cmp >::TreeConstIterator() noexcept:
     node_(nullptr)
+  {}
+
+  template< typename Key, typename T, typename Cmp >
+  TreeConstIterator< Key, T, Cmp >::TreeConstIterator(const TreeIterator< Key, T, Cmp >& other) noexcept:
+    node_(other.getNode())
   {}
 
   template< typename Key, typename T, typename Cmp >

@@ -1,11 +1,9 @@
 #include <iostream>
-#include <map>
 #include <string>
 #include <limits>
-#include "tree_manips.hpp"
 #include <fstream>
 #include <tree/tree.hpp>
-#include <tree/node.hpp>
+#include "tree_manips.hpp"
 
 namespace
 {
@@ -45,14 +43,14 @@ int main(int argc, char* argv[])
   {
     inputTrees(file, mapOfTrees);
   }
-  catch (std::exception&)
+  catch (const std::exception&)
   {
     std::cout << "input error\n";
     return 1;
   }
 
   demehin::Tree< std::string, std::function< void() > > commands;
-  commands["print"] = std::bind(demehin::print, std::ref(std::cout), std::ref(std::cin), std::ref(mapOfTrees));
+  commands["print"] = std::bind(demehin::print, std::ref(std::cout), std::ref(std::cin), std::cref(mapOfTrees));
   commands["complement"] = std::bind(demehin::makeComplement, std::ref(std::cin), std::ref(mapOfTrees));
   commands["intersect"] = std::bind(demehin::makeIntersect, std::ref(std::cin), std::ref(mapOfTrees));
   commands["union"] = std::bind(demehin::makeUnion, std::ref(std::cin), std::ref(mapOfTrees));
