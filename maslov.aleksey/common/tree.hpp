@@ -1,6 +1,8 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
+#include "queue.hpp"
+#include "stack.hpp"
 #include "iterator.hpp"
 
 namespace maslov
@@ -58,6 +60,19 @@ namespace maslov
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    template< typename F >
+    F traverseLnr(F f);
+    template< typename F >
+    F traverseLnr(F f) const;
+    template< typename F >
+    F traverseRnl(F f);
+    template< typename F >
+    F traverseRnl(F f) const;
+    template< typename F >
+    F traverseBreadth(F f);
+    template< typename F >
+    F traverseBreadth(F f) const;
    private:
     BiTreeNode< Key, T > * fakeRoot_;
     BiTreeNode< Key, T > * fakeLeaf_;
@@ -715,6 +730,37 @@ namespace maslov
     }
     return firstIt;
   }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseLnr(F f)
+  {}
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseLnr(F f) const
+  {}
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseRnl(F f)
+  {}
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseRnl(F f) const
+  {}
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseBreadth(F f)
+  {}
+
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F BiTree< Key, T, Cmp >::traverseBreadth(F f) const
+  {}
 }
 
 #endif
