@@ -153,7 +153,7 @@ void demehin::extract(std::istream& in, MapOfGraphs& graphs)
     throw std::logic_error("incorrect parameters");
   }
 
-  List< std::string > vrts;
+  std::list< std::string > vrts;
   auto gr = graphs.at(gr_name);
   for (size_t i = 0; i < vrt_cnt; i++)
   {
