@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(element_access_test)
 
 BOOST_AUTO_TEST_CASE(operations_test)
 {
-  demehin::Tree<size_t, std::string> tree;
+  demehin::Tree< size_t, std::string > tree;
   tree.insert(std::make_pair(1, "1"));
   tree.insert(std::make_pair(5, "5"));
   tree.insert(std::make_pair(3, "3"));

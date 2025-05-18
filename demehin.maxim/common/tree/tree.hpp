@@ -692,21 +692,7 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::lower_bound(const Key& key) const noexcept
   {
-    Node* current = root_;
-    Node* res = fakeRoot_;
-    while (current != fakeRoot_ && current != nullptr)
-    {
-      if (!cmp_(current->data.first, key))
-      {
-        res = current;
-        current = current->left;
-      }
-      else
-      {
-        current = current->right;
-      }
-    }
-    return cIter(res);
+    return cIter(lower_bound(key));
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -732,21 +718,7 @@ namespace demehin
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp >::cIter Tree< Key, T, Cmp >::upper_bound(const Key& key) const noexcept
   {
-    Node* current = root_;
-    Node* res = fakeRoot_;
-    while (current != fakeRoot_ && current != nullptr)
-    {
-      if (cmp_(key, current->data.first))
-      {
-        res = current;
-        current = current->left;
-      }
-      else
-      {
-        current = current->right;
-      }
-    }
-    return cIter(res);
+    return cIter(upper_bound(key));
   }
 
   template< typename Key, typename T, typename Cmp >
