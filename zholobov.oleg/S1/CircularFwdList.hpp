@@ -14,9 +14,9 @@ namespace zholobov {
   namespace details {
     template < typename T >
     using IsInputIterator = std::enable_if_t<
-      std::is_base_of<
-        std::input_iterator_tag,
-        typename std::iterator_traits< T >::iterator_category >::value >;
+        std::is_base_of<
+            std::input_iterator_tag,
+            typename std::iterator_traits< T >::iterator_category >::value >;
   }
 
   template < typename T >
@@ -24,7 +24,7 @@ namespace zholobov {
   public:
     using value_type = T;
     using reference = value_type&;
-    using const_reference = const reference;
+    using const_reference = const value_type&;
     using iterator = CircularFwdListIterator< value_type >;
     using const_iterator = CircularFwdListConstIterator< value_type >;
 
@@ -90,12 +90,12 @@ namespace zholobov {
     template < class Predicate >
     void remove_if(Predicate pred);
 
-    void splice_after(const_iterator pos, CircularFwdList< T >& other);
-    void splice_after(const_iterator pos, CircularFwdList< T >&& other);
-    void splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator it);
-    void splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator it);
-    void splice_after(const_iterator pos, CircularFwdList< T >& other, const_iterator first, const_iterator last);
-    void splice_after(const_iterator pos, CircularFwdList< T >&& other, const_iterator first, const_iterator last);
+    template < typename List >
+    void splice_after(const_iterator pos, List&& other);
+    template < typename List >
+    void splice_after(const_iterator pos, List&& other, const_iterator it);
+    template < typename List >
+    void splice_after(const_iterator pos, List&& other, const_iterator first, const_iterator last);
 
     void swap(CircularFwdList& other) noexcept;
     void clear() noexcept;
@@ -110,7 +110,10 @@ namespace zholobov {
 
 template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList():
-  before_head_(reinterpret_cast< FwdListNodeBase* >(std::addressof(head_))), head_(nullptr), tail_(nullptr), size_(0)
+  before_head_(reinterpret_cast< FwdListNodeBase* >(std::addressof(head_))),
+  head_(nullptr),
+  tail_(nullptr),
+  size_(0)
 {}
 
 template < typename T >
@@ -122,13 +125,8 @@ template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(size_t n, const value_type& val):
   CircularFwdList()
 {
-  try {
-    for (size_t i = 0; i < n; ++i) {
-      push_front(val);
-    }
-  } catch (const std::bad_alloc&) {
-    clear();
-    throw;
+  for (size_t i = 0; i < n; ++i) {
+    push_front(val);
   }
 }
 
@@ -143,13 +141,8 @@ template < typename T >
 zholobov::CircularFwdList< T >::CircularFwdList(const CircularFwdList& other):
   CircularFwdList()
 {
-  try {
-    for (const auto& elem : other) {
-      push_back(elem);
-    }
-  } catch (const std::bad_alloc&) {
-    clear();
-    throw;
+  for (const auto& elem: other) {
+    push_back(elem);
   }
 }
 
@@ -223,7 +216,7 @@ template < typename T >
 void zholobov::CircularFwdList< T >::assign(std::initializer_list< T > init)
 {
   CircularFwdList< T > temp;
-  for (const auto& elem : init) {
+  for (const auto& elem: init) {
     temp.push_back(elem);
   }
   swap(temp);
@@ -369,27 +362,6 @@ void zholobov::CircularFwdList< T >::pop_front()
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::pop_back()
-{
-  FwdListNodeBase* temp = tail_;
-  if (size_ == 0) {
-    return;
-  } else if (size_ == 1) {
-    head_ = nullptr;
-    tail_ = nullptr;
-  } else {
-    FwdListNodeBase* cur = head_;
-    while (cur->next != tail_) {
-      ++cur;
-    }
-    tail_ = cur;
-    tail_->next = head_;
-  }
-  delete temp;
-  --size_;
-}
-
-template < typename T >
 typename zholobov::CircularFwdList< T >::iterator
 zholobov::CircularFwdList< T >::insert_after(const_iterator position, const T& x)
 {
@@ -466,7 +438,9 @@ zholobov::CircularFwdList< T >::erase_after(const_iterator position, const_itera
 template < typename T >
 void zholobov::CircularFwdList< T >::remove(const value_type& val)
 {
-  remove_if([&val](const T& value) { return value == val; });
+  remove_if([&val](const T& value) {
+    return value == val;
+  });
 }
 
 template < typename T >
@@ -495,14 +469,10 @@ void zholobov::CircularFwdList< T >::remove_if(Predicate pred)
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >& other)
+template < typename List >
+void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, List&& other)
 {
-  splice_after(pos, std::move(other));
-}
-
-template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFwdList< T >&& other)
-{
+  static_assert(std::is_same< std::decay_t< List >, CircularFwdList< T > >::value, "Invalid list type");
   if (!other.empty()) {
     FwdListNodeBase* p = before_head_;
     const_iterator it = cbefore_begin();
@@ -526,16 +496,10 @@ void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, CircularFw
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos,
-                                                  CircularFwdList< T >& other, const_iterator it)
+template < typename List >
+void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, List&& other, const_iterator it)
 {
-  splice_after(pos, std::move(other), it);
-}
-
-template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(const_iterator pos,
-                                                  CircularFwdList< T >&& other, const_iterator it)
-{
+  static_assert(std::is_same< std::decay_t< List >, CircularFwdList< T > >::value, "Invalid list type");
   FwdListNodeBase* p = before_head_;
   const_iterator this_it = cbefore_begin();
   while ((this_it != cend()) && (this_it != pos)) {
@@ -559,19 +523,13 @@ void zholobov::CircularFwdList< T >::splice_after(const_iterator pos,
 }
 
 template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(
-  const_iterator pos, CircularFwdList< T >& other, const_iterator first, const_iterator last)
+template < typename List >
+void zholobov::CircularFwdList< T >::splice_after(const_iterator pos, List&& other, const_iterator first, const_iterator last)
 {
-  splice_after(pos, std::move(other), first, last);
-}
-
-template < typename T >
-void zholobov::CircularFwdList< T >::splice_after(
-  const_iterator pos, CircularFwdList< T >&& other, const_iterator first, const_iterator last)
-{
-  FwdListNodeBase** pos_p = const_cast< FwdListNodeBase** >(pos.node_);
-  FwdListNodeBase** first_p = const_cast< FwdListNodeBase** >(first.node_);
-  FwdListNodeBase** last_p = const_cast< FwdListNodeBase** >(last.node_);
+  static_assert(std::is_same< std::decay_t< List >, CircularFwdList< T > >::value, "Invalid list type");
+  FwdListNodeBase** pos_p = pos.node_;
+  FwdListNodeBase** first_p = first.node_;
+  FwdListNodeBase** last_p = last.node_;
 
   size_t count = std::distance(first, last) - 1;
   if (count > 0) {

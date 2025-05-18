@@ -1,3 +1,4 @@
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -11,25 +12,29 @@ namespace {
   class SequencePrinter {
   public:
     explicit SequencePrinter(std::ostream& out, std::string delimiter = " ") noexcept:
-      out_(out), delimiter_(std::move(delimiter)), first_(true) {}
+      out_(out),
+      delimiter_(std::move(delimiter)),
+      print_func([this](const T& value) {
+        out_ << value;
+        print_func = [this](const T& value) {
+          out_ << delimiter_ << value;
+        };
+      })
+    {}
 
     SequencePrinter(const SequencePrinter&) = delete;
     SequencePrinter& operator=(const SequencePrinter&) = delete;
 
     SequencePrinter& operator<<(const T& value)
     {
-      if (!first_) {
-        out_ << delimiter_;
-      }
-      first_ = false;
-      out_ << value;
+      print_func(value);
       return *this;
     }
 
   private:
     std::ostream& out_;
     std::string delimiter_;
-    bool first_;
+    std::function< void(const T& value) > print_func;
   };
 
   using ElemType = unsigned long;
@@ -40,19 +45,15 @@ namespace {
   ListOfNamedElemList read_list_of_elems_list(std::istream& input)
   {
     ListOfNamedElemList list;
-    while (input.good()) {
-      std::string line;
-      std::getline(input, line);
-      std::stringstream ss(line);
-      std::string name;
+
+    std::string name;
+    while (input >> name) {
       ElemList int_list;
-      if (!(ss >> name)) {
-        continue;
-      }
       ElemType elem = 0;
-      while (ss >> elem) {
+      while (input >> elem) {
         int_list.push_back(elem);
       }
+      input.clear();
       NamedElemList list_elem(std::move(name), std::move(int_list));
       list.push_back(std::move(list_elem));
     }
@@ -66,7 +67,7 @@ namespace {
     zholobov::CircularFwdList< std::pair< ElemList::const_iterator, ElemList::const_iterator > > iter_list;
     if (!list.empty()) {
       SequencePrinter< std::string > printer(out);
-      for (const auto& elem : list) {
+      for (const auto& elem: list) {
         printer << elem.first;
         iter_list.push_back(std::make_pair(elem.second.cbegin(), elem.second.cend()));
       }
@@ -77,7 +78,7 @@ namespace {
       is_done_printing = true;
       ElemType sum = 0;
       SequencePrinter< ElemType > printer(out);
-      for (auto& elem : iter_list) {
+      for (auto& elem: iter_list) {
         if (elem.first != elem.second) {
           ElemType val = *(elem.first);
           printer << val;
@@ -105,7 +106,7 @@ namespace {
       out << "0\n";
     } else {
       SequencePrinter< ElemType > printer(out);
-      for (const auto& elem : sum_list) {
+      for (const auto& elem: sum_list) {
         printer << elem;
       }
       out << "\n";
