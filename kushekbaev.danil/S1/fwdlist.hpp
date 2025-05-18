@@ -154,7 +154,7 @@ namespace kushekbaev
     clear();
     fake_ = other.fake_;
     size_ = other.size_;
-    delete other.fake_;
+    other.fake_ = nullptr;
     other.size_ = 0;
     return *this;
   }
