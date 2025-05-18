@@ -72,6 +72,9 @@ namespace zholobov {
   {
     char* end;
     result = std::strtol(str.c_str(), &end, 10);
+    if (errno == ERANGE) {
+      throw std::range_error("Range error");
+    }
     return *end == '\0';
   }
 
