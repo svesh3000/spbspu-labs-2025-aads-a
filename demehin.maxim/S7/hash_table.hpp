@@ -433,7 +433,8 @@ namespace demehin
   template< typename Key, typename T, typename Hash, typename Equal >
   void HashTable< Key, T, Hash, Equal >::swap(HashTable& other) noexcept
   {
-    std::swap(slots_, other.slots);
+
+    std::swap(slots_, other.slots_);
     std::swap(item_cnt_, other.item_cnt_);
     std::swap(hasher_, other.hasher_);
     std::swap(equal_, other.equal_);
