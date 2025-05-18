@@ -13,6 +13,20 @@ namespace
   }
 }
 
+BOOST_AUTO_TEST_CASE(extra_test)
+{
+  demehin::Tree< int, std::string > tree;
+
+  tree[1] = "1";
+  tree.insert(std::make_pair(2, "2"));
+  BOOST_TEST(tree[1] == "1");
+  BOOST_TEST(tree[2] == "2");
+
+  tree[2] = "4";
+  BOOST_TEST(tree[2] == "4");
+}
+
+
 BOOST_AUTO_TEST_CASE(tree_print_test)
 {
   demehin::Tree< size_t, std::string > t;
