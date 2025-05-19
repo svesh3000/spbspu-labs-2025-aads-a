@@ -69,14 +69,9 @@ shramko::ForwardList< T >::ForwardList(const ForwardList< T >& other):
   tailNode_(nullptr),
   currentSize_(0)
 {
-  ForwardList< T > temp;
   for (auto it = other.begin(); it != other.end(); ++it)
   {
-    temp.addToFront(*it);
-  }
-  for (auto it = temp.begin(); it != temp.end(); ++it)
-  {
-    addToFront(*it);
+    addToBack(*it);
   }
 }
 
