@@ -1,5 +1,5 @@
-#ifndef ITERATOR_HPP
-#define ITERATOR_HPP
+#ifndef CONSTITERATOR_HPP
+#define CONSTITERATOR_HPP
 
 #include <iterator>
 #include "FwdListNode.hpp"
@@ -10,65 +10,55 @@ namespace shramko
   class ForwardList;
 
   template< typename T >
-  class Iterator
+  class ConstIterator
   {
   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
-    using pointer = T*;
-    using reference = T&;
+    using pointer = const T*;
+    using reference = const T&;
 
-    Iterator():
+    ConstIterator():
       node_(nullptr),
       isFirstPass_(true)
     {}
-
-    explicit Iterator(ListNode< T >* node):
+    
+    explicit ConstIterator(ListNode< T >* node):
       node_(node),
       isFirstPass_(true)
     {}
 
-    Iterator& operator++()
+    ConstIterator& operator++()
     {
       node_ = node_->nextPtr;
       isFirstPass_ = false;
       return *this;
     }
 
-    Iterator operator++(int)
+    ConstIterator operator++(int)
     {
-      Iterator temp = *this;
+      ConstIterator temp = *this;
       ++(*this);
       return temp;
     }
 
-    reference operator*()
+    reference operator*() const
     {
       return node_->dataValue;
     }
-
-    pointer operator->()
+    
+    pointer operator->() const
     {
       return &node_->dataValue;
     }
 
-    const T& operator*() const
-    {
-      return node_->dataValue;
-    }
-
-    const T* operator->() const
-    {
-      return &node_->dataValue;
-    }
-
-    bool operator==(const Iterator& other) const
+    bool operator==(const ConstIterator& other) const
     {
       return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
 
-    bool operator!=(const Iterator& other) const
+    bool operator!=(const ConstIterator& other) const
     {
       return !(*this == other);
     }
