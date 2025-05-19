@@ -15,7 +15,7 @@ void shramko::printNames(const PairList& lists, std::ostream& out)
   out << "\n";
 }
 
-bool shramko::checkSumOverflow(size_t a, size_t b)
+bool shramko::checkSumOverflow(int a, int b)
 {
   return (b > std::numeric_limits< int >::max() - a);
 }
@@ -60,17 +60,25 @@ void shramko::processLists(const PairList& lists, size_t maxLen, bool& overflow,
           ++it;
         }
 
+        if (*it > static_cast<unsigned long long>(std::numeric_limits<int>::max()))
+        {
+          overflow = true;
+        }
+        else
+        {
+          int currentValue = static_cast<int>(*it);
+          if (checkSumOverflow(currentSum, currentValue))
+          {
+            overflow = true;
+          }
+          currentSum += currentValue;
+        }
+
         if (!firstElement)
         {
           out << " ";
         }
         out << *it;
-
-        if (checkSumOverflow(currentSum, *it))
-        {
-          overflow = true;
-        }
-        currentSum += *it;
         firstElement = false;
       }
     }
