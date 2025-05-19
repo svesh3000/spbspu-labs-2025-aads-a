@@ -26,6 +26,7 @@ void shramko::printSumResult(const ForwardList< int >& sums, bool overflow, std:
   {
     return;
   }
+
   if (sums.isEmpty())
   {
     out << "0\n";
