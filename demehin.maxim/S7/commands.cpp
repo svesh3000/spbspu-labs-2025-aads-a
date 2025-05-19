@@ -41,6 +41,12 @@ namespace
 
 void demehin::printGraphsNames(std::ostream& out, const MapOfGraphs& graphs)
 {
+  if (graphs.empty())
+  {
+    out << "\n";
+    return;
+  }
+
   for (auto it = graphs.begin(); it != graphs.end(); it++)
   {
     out << (*it).first << "\n";
@@ -52,6 +58,12 @@ void demehin::printVertexesNames(std::ostream& out, std::istream& in, const MapO
   std::string gr_name;
   in >> gr_name;
   Graph gr = graphs.at(gr_name);
+
+  if (gr.getVrts().empty())
+  {
+    out << "\n";
+    return;
+  }
 
   demehin::Tree< std::string, std::string > vrts = gr.getVrts();
   for (auto it = vrts.begin(); it != vrts.end(); it++)
