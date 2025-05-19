@@ -73,7 +73,7 @@ namespace aleksandrov
     assert(node_);
     return node_->data;
   }
-  
+
   template< typename T >
   T* Iterator< T >::operator->() noexcept
   {
@@ -87,7 +87,7 @@ namespace aleksandrov
     assert(node_);
     return std::addressof(node_->data);
   }
-  
+
   template< typename T >
   bool Iterator< T >::operator==(const Iterator< T >& rhs) const noexcept
   {
