@@ -11,6 +11,7 @@ void demehin::Graph::addVertex(const std::string& vrt) noexcept
 void demehin::Graph::addEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
   auto key = std::make_pair(from, to);
+  //edges[key].push_back(weight);
   edges[key].push_back(weight);
 }
 
