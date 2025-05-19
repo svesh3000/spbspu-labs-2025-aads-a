@@ -1,13 +1,18 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
+#include <iterator>
 #include <memory>
 #include "node.hpp"
 
 namespace finaev
 {
   template< class T >
+  class List;
+
+  template< class T >
   struct listIterator: public std::iterator< std::forward_iterator_tag, T >
   {
+    friend class List< T >;
   public:
     using this_t = listIterator< T >;
     listIterator();
@@ -18,8 +23,8 @@ namespace finaev
     this_t operator++(int);
     this_t& operator--();
     this_t operator--(int);
-    bool operator==(const this_t& i) const;
-    bool operator!=(const this_t& i) const;
+    bool operator==(const this_t&) const;
+    bool operator!=(const this_t&) const;
   private:
     Node< T >* node_;
     explicit listIterator(Node< T >* node);
@@ -44,7 +49,7 @@ namespace finaev
   template< class T >
   T* listIterator< T >::operator->()
   {
-    return std::addressof(this->node_);
+    return std::addressof(node_->data);
   }
 
   template< class T >

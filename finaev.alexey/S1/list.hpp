@@ -144,10 +144,6 @@ namespace finaev
   template< class T >
   listIterator< T > List< T >::end() noexcept
   {
-    if (!tail_)
-    {
-      return listIterator< T >();
-    }
     return listIterator< T >(tail_->next);
   }
 
@@ -160,10 +156,6 @@ namespace finaev
   template< class T >
   constListIterator< T > List< T >::constEnd() const noexcept
   {
-    if (!tail_)
-    {
-      return constListIterator< T >();
-    }
     return constListIterator< T >(tail_->next);
   }
 

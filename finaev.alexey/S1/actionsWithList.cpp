@@ -57,7 +57,7 @@ finaev::List< finaev::List< size_t > > finaev::createRightList(List< std::pair< 
 
 void finaev::printList(finaev::List< size_t > list, std::ostream& out)
 {
-  if (list.begin() == nullptr)
+  if (list.isEmpty())
   {
     return;
   }
