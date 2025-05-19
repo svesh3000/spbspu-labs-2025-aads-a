@@ -99,12 +99,6 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
     }
   }
 
-  //if (weights.empty())
-  //{
-    //edges.erase(edgeIt);
-    //return true;
-  //}
-
   return isDeleted;
 }
 
