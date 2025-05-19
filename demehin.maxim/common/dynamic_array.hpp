@@ -81,7 +81,7 @@ namespace demehin
 
   template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
-    data_(details::copyData(other.data_, other.size_)),
+    data_(details::copyData(other.data_ + other.begin_, other.size_)),
     size_(other.size_),
     capacity_(other.capacity_),
     begin_(other.begin_)
@@ -161,7 +161,7 @@ namespace demehin
   template< typename T >
   void DynamicArray< T >::push(const T& value)
   {
-    if (size_ == capacity_)
+    if (size_ + begin_ >= capacity_)
     {
       resize();
     }
