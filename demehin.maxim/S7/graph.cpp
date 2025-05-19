@@ -11,7 +11,7 @@ void demehin::Graph::addVertex(const std::string& vrt) noexcept
 void demehin::Graph::addEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
   auto key = std::make_pair(from, to);
-  edges[key].push_back(weight);
+  edges[key].push(weight);
 }
 
 demehin::Tree< std::string, std::string > demehin::Graph::getVrts() const
@@ -75,7 +75,7 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
 
 bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
-  auto key = std::make_pair(from, to);
+  /*auto key = std::make_pair(from, to);
   auto edgeIt = edges.find(key);
 
   if (edgeIt == edges.end())
@@ -96,6 +96,37 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
     {
       it++;
     }
+  }
+
+  return isDeleted;*/
+
+  auto key = std::make_pair(from, to);
+  auto edgeIt = edges.find(key);
+
+  if (edgeIt == edges.end())
+  {
+    return false;
+  }
+
+  auto& weights = edgeIt->second;
+  DynamicArray< unsigned int > newWeights;
+  bool isDeleted = false;
+
+  for (auto it = weights.cbegin(); it != weights.cend(); ++it)
+  {
+    if (*it == weight)
+    {
+      isDeleted = true;
+    }
+    else
+    {
+      newWeights.push(*it);
+    }
+  }
+
+  if (isDeleted)
+  {
+    weights = std::move(newWeights);
   }
 
   return isDeleted;
