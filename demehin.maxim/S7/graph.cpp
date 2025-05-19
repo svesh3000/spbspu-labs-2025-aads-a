@@ -12,7 +12,7 @@ void demehin::Graph::addEdge(const std::string& from, const std::string& to, uns
 {
   auto key = std::make_pair(from, to);
   //edges[key].push_back(weight);
-  edges[key].push_back(weight);
+  edges[key].push(weight);
 }
 
 demehin::Tree< std::string, std::string > demehin::Graph::getVrts() const
