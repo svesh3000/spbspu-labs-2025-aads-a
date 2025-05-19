@@ -2,8 +2,10 @@
 
 void shramko::printNames(const PairList& lists, std::ostream& out)
 {
-  if (lists.isEmpty()) return;
-
+  if (lists.isEmpty())
+  {
+    return;
+  }
   auto it = lists.begin();
   out << it->first;
   for (++it; it != lists.end(); ++it)
@@ -15,13 +17,15 @@ void shramko::printNames(const PairList& lists, std::ostream& out)
 
 bool shramko::checkSumOverflow(size_t a, size_t b)
 {
-  return (b > std::numeric_limits<int>::max() - a);
+  return (b > std::numeric_limits< int >::max() - a);
 }
 
-void shramko::printSumResult(const ForwardList<int>& sums, bool overflow, std::ostream& out)
+void shramko::printSumResult(const ForwardList< int >& sums, bool overflow, std::ostream& out)
 {
-  if (overflow) return;
-
+  if (overflow)
+  {
+    return;
+  }
   if (sums.isEmpty())
   {
     out << "0\n";
@@ -39,21 +43,27 @@ void shramko::printSumResult(const ForwardList<int>& sums, bool overflow, std::o
 
 void shramko::processLists(const PairList& lists, size_t maxLen, bool& overflow, std::ostream& out)
 {
-  ForwardList<int> sumList;
+  ForwardList< int > sumList;
 
   for (size_t i = 0; i < maxLen; ++i)
   {
     int currentSum = 0;
     bool firstElement = true;
 
-    for (const auto& pair : lists)
+    for (const auto& pair: lists)
     {
       if (i < pair.second.getSize())
       {
         auto it = pair.second.begin();
-        for (size_t j = 0; j < i; ++j) ++it;
+        for (size_t j = 0; j < i; ++j)
+        {
+          ++it;
+        }
 
-        if (!firstElement) out << " ";
+        if (!firstElement)
+        {
+          out << " ";
+        }
         out << *it;
 
         if (checkSumOverflow(currentSum, *it))

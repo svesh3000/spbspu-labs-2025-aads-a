@@ -19,8 +19,15 @@ namespace shramko
     using pointer = T*;
     using reference = T&;
 
-    Iterator() : node_(nullptr), isFirstPass_(true) {}
-    explicit Iterator(ListNode<T>* node) : node_(node), isFirstPass_(true) {}
+    Iterator():
+      node_(nullptr),
+      isFirstPass_(true)
+    {}
+
+    explicit Iterator(ListNode< T >* node):
+      node_(node),
+      isFirstPass_(true)
+    {}
 
     Iterator& operator++()
     {
@@ -36,21 +43,39 @@ namespace shramko
       return temp;
     }
 
-    reference operator*() { return node_->dataValue; }
-    pointer operator->() { return &node_->dataValue; }
-    const T& operator*() const { return node_->dataValue; }
-    const T* operator->() const { return &node_->dataValue; }
+    reference operator*()
+    {
+      return node_->dataValue;
+    }
+
+    pointer operator->()
+    {
+      return &node_->dataValue;
+    }
+
+    const T& operator*() const
+    {
+      return node_->dataValue;
+    }
+
+    const T* operator->() const
+    {
+      return &node_->dataValue;
+    }
 
     bool operator==(const Iterator& other) const
     {
       return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
 
-    bool operator!=(const Iterator& other) const { return !(*this == other); }
+    bool operator!=(const Iterator& other) const
+    { 
+      return !(*this == other);
+    }
 
   private:
-    friend class ForwardList<T>;
-    ListNode<T>* node_;
+    friend class ForwardList< T >;
+    ListNode< T >* node_;
     bool isFirstPass_;
   };
 }

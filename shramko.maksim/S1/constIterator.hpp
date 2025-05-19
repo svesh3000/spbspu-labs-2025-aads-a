@@ -1,5 +1,5 @@
-#ifndef CONSTITERATOR_HPP
-#define CONSTITERATOR_HPP
+#ifndef ITERATOR_HPP
+#define ITERATOR_HPP
 
 #include <iterator>
 #include "FwdListNode.hpp"
@@ -10,45 +10,72 @@ namespace shramko
   class ForwardList;
 
   template< typename T >
-  class ConstIterator
+  class Iterator
   {
   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
-    using pointer = const T*;
-    using reference = const T&;
+    using pointer = T*;
+    using reference = T&;
 
-    ConstIterator() : node_(nullptr), isFirstPass_(true) {}
-    explicit ConstIterator(ListNode<T>* node) : node_(node), isFirstPass_(true) {}
+    Iterator():
+      node_(nullptr),
+      isFirstPass_(true)
+    {}
+    
+    explicit Iterator(ListNode< T >* node):
+      node_(node),
+      isFirstPass_(true)
+    {}
 
-    ConstIterator& operator++()
+    Iterator& operator++()
     {
       node_ = node_->nextPtr;
       isFirstPass_ = false;
       return *this;
     }
 
-    ConstIterator operator++(int)
+    Iterator operator++(int)
     {
-      ConstIterator temp = *this;
+      Iterator temp = *this;
       ++(*this);
       return temp;
     }
 
-    reference operator*() const { return node_->dataValue; }
-    pointer operator->() const { return &node_->dataValue; }
+    reference operator*()
+    { 
+      return node_->dataValue;
+    }
+    
+    pointer operator->()
+    { 
+      return &node_->dataValue;
+    }
+    
+    const T& operator*() const
+    { 
+      return node_->dataValue;
+    }
+    
+    const T* operator->() const
+    { 
+      return &node_->dataValue;
+    }
 
-    bool operator==(const ConstIterator& other) const
+    bool operator==(const Iterator& other) const
     {
       return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
     }
 
-    bool operator!=(const ConstIterator& other) const { return !(*this == other); }
+    bool operator!=(const Iterator& other) const
+    { 
+      return !(*this == other);
+    }
 
   private:
-    friend class ForwardList<T>;
-    ListNode<T>* node_;
+    friend class ForwardList< T >;
+    ListNode< T >* node_;
     bool isFirstPass_;
   };
 }

@@ -7,8 +7,11 @@ namespace shramko
   struct ListNode
   {
     T dataValue;
-    ListNode<T>* nextPtr;
-    ListNode(T val) : dataValue(val), nextPtr(nullptr) {}
+    ListNode< T >* nextPtr;
+    ListNode(T val):
+      dataValue(val),
+      nextPtr(nullptr)
+    {}
   };
 }
 

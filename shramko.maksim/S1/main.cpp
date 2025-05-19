@@ -21,14 +21,17 @@ int main()
 
     data.addToBack(std::make_pair(name, numbers));
 
-    if (std::cin.eof()) break;
+    if (std::cin.eof())
+    {
+      break;
+    }
     std::cin.clear();
   }
 
   printNames(data, std::cout);
 
   size_t maxLength = 0;
-  for (const auto& pair : data)
+  for (const auto& pair: data)
   {
     if (pair.second.getSize() > maxLength)
     {
