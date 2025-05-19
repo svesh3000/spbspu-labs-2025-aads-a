@@ -23,7 +23,7 @@ namespace shramko
       node_(nullptr),
       isFirstPass_(true)
     {}
-    
+
     explicit ConstIterator(ListNode< T >* node):
       node_(node),
       isFirstPass_(true)
@@ -47,7 +47,7 @@ namespace shramko
     {
       return node_->dataValue;
     }
-    
+
     pointer operator->() const
     {
       return &node_->dataValue;
