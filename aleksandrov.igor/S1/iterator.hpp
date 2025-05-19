@@ -19,8 +19,10 @@ namespace aleksandrov
     Iterator< T >& operator++();
     Iterator< T > operator++(int);
 
-    T& operator*() const noexcept;
-    T* operator->() const noexcept;
+    T& operator*() noexcept;
+    const T& operator*() const noexcept;
+    T* operator->() noexcept;
+    const T* operator->() const noexcept;
 
     bool operator!=(const Iterator< T >&) const noexcept;
     bool operator==(const Iterator< T >&) const noexcept;
@@ -59,19 +61,33 @@ namespace aleksandrov
   }
 
   template< typename T >
-  T& Iterator< T >::operator*() const noexcept
+  T& Iterator< T >::operator*() noexcept
   {
     assert(node_);
     return node_->data;
   }
 
   template< typename T >
-  T* Iterator< T >::operator->() const noexcept
+  const T& Iterator< T >::operator*() const noexcept
+  {
+    assert(node_);
+    return node_->data;
+  }
+  
+  template< typename T >
+  T* Iterator< T >::operator->() noexcept
   {
     assert(node_);
     return std::addressof(node_->data);
   }
 
+  template< typename T >
+  const T* Iterator< T >::operator->() const noexcept
+  {
+    assert(node_);
+    return std::addressof(node_->data);
+  }
+  
   template< typename T >
   bool Iterator< T >::operator==(const Iterator< T >& rhs) const noexcept
   {

@@ -1,8 +1,8 @@
 #include "list-utils.hpp"
 #include "list.hpp"
-#include <limits>
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 
 namespace aleksandrov
 {
@@ -30,42 +30,28 @@ namespace aleksandrov
     }
   }
 
-  void outputList(const List< unsigned long long >& list, std::ostream& output)
+  void outputList(const List< unsigned long long >& list, std::ostream& out)
   {
-    output << *list.cbegin();
+    out << *list.cbegin();
     for (auto it = ++list.cbegin(); it != list.cend(); ++it)
     {
-      output << " " << *it;
+      out << ' ' << *it;
     }
   }
 
-  void getPairsList(std::istream& input, PairsList& list)
+  void getPairsList(std::istream& in, PairsList& list)
   {
-    try
+    std::string listName;
+    while (in >> listName)
     {
-      std::string listName;
-      while (input >> listName)
+      List< unsigned long long > numList;
+      unsigned long long num = 0;
+      while (in >> num)
       {
-        List< unsigned long long > numList;
-        try
-        {
-          unsigned long long num = 0;
-          while (input >> num)
-          {
-            numList.pushBack(num);
-          }
-          input.clear();
-          list.pushBack(std::make_pair(listName, numList));
-        }
-        catch (const std::bad_alloc&)
-        {
-          throw;
-        }
+        numList.emplaceBack(num);
       }
-    }
-    catch (const std::bad_alloc&)
-    {
-      throw;
+      in.clear();
+      list.emplaceBack(std::make_pair(listName, numList));
     }
   }
 
@@ -75,7 +61,6 @@ namespace aleksandrov
     {
       return 0;
     }
-
     size_t maxSize = 0;
     for (auto it = list.begin(); it != list.end(); ++it)
     {
@@ -86,39 +71,25 @@ namespace aleksandrov
 
   void getTransposedList(const PairsList& list, List< List< unsigned long long > >& toTranspose)
   {
-    try
+    size_t shift = 0;
+    size_t maxSubListSize = calcMaxSubListSize(list);
+    while (shift != maxSubListSize)
     {
-      size_t shift = 0;
-      size_t maxSubListSize = calcMaxSubListSize(list);
-      while (shift != maxSubListSize)
+      List< unsigned long long > numList;
+      for (auto it = list.begin(); it != list.end(); ++it)
       {
-        List< unsigned long long > numList;
-        try
+        auto shiftedIt = it->second.begin();
+        for (size_t i = 0; i < shift && shiftedIt != it->second.end(); ++i)
         {
-          for (auto it = list.begin(); it != list.end(); ++it)
-          {
-            auto shiftedIt = it->second.begin();
-            for (size_t i = 0; i < shift && shiftedIt != it->second.end(); ++i)
-            {
-              ++shiftedIt;
-            }
-            if (shiftedIt != it->second.end())
-            {
-              numList.pushBack(*shiftedIt);
-            }
-          }
+          ++shiftedIt;
         }
-        catch (const std::bad_alloc&)
+        if (shiftedIt != it->second.end())
         {
-          throw;
+          numList.emplaceBack(*shiftedIt);
         }
-        ++shift;
-        toTranspose.pushBack(numList);
       }
-    }
-    catch (const std::bad_alloc&)
-    {
-      throw;
+      ++shift;
+      toTranspose.emplaceBack(numList);
     }
   }
 }
