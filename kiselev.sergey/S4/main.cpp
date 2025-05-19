@@ -3,18 +3,17 @@
 #include <functional>
 #include <limits>
 #include "commands.hpp"
-using namespace kiselev;
 
 namespace
 {
-  void input(std::istream& in, dataset& dictionary)
+  void input(std::istream& in, kiselev::dataset& dictionary)
   {
     std::string name;
     std::string value;
     size_t key;
     while (in >> name)
     {
-      data tree;
+      kiselev::data tree;
       if (in.get() == '\n')
       {
         dictionary.insert(std::make_pair(name, tree));
@@ -34,6 +33,7 @@ namespace
 }
 int main(int argc, char** argv)
 {
+  using namespace kiselev;
   if (argc != 2)
   {
     std::cerr << "Invalid parameters\n";
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   }
   RBTree< std::string, std::function< void() > > commands;
   using namespace std::placeholders;
-  commands.insert(std::make_pair("print", std::bind(print, std::ref(std::cout), std::ref(std::cin), std::ref(dictionary))));
+  commands.insert(std::make_pair("print", std::bind(print, std::ref(std::cout), std::ref(std::cin), std::cref(dictionary))));
   commands.insert(std::make_pair("complement", std::bind(complement, std::ref(std::cin), std::ref(dictionary))));
   commands.insert(std::make_pair("intersect", std::bind(intersect, std::ref(std::cin), std::ref(dictionary))));
   commands.insert(std::make_pair("union", std::bind(unite, std::ref(std::cin), std::ref(dictionary))));
