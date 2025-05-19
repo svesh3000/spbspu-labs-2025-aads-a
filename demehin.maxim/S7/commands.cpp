@@ -6,6 +6,12 @@ namespace
 
   void printBounds(std::ostream& out, const Tree< std::string, Tree< unsigned int, size_t > > bounds)
   {
+    if (bounds.size() == 0)
+    {
+      out << "\n";
+      return;
+    }
+
     for (auto it = bounds.begin(); it != bounds.end(); it++)
     {
       out << (*it).first;
