@@ -2,6 +2,7 @@
 #define TREE_HPP
 #include <initializer_list>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include "iterator.hpp"
 #include "treeNode.hpp"
@@ -86,6 +87,7 @@ namespace kiselev
     void fixInsert(Node* node) noexcept;
     void fixDelete(Node* node) noexcept;
     Node* root_;
+    Node* maxNode_;
     Cmp cmp_;
     size_t size_;
   };
@@ -93,6 +95,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
+    maxNode_(nullptr),
     size_(0)
   {}
 
@@ -109,6 +112,7 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree) noexcept:
     root_(std::exchange(tree.root_, nullptr)),
+    maxNode_(std::exchange(tree.maxNode_, nullptr)),
     size_(std::exchange(tree.size_, 0))
   {}
 
@@ -376,6 +380,7 @@ namespace kiselev
   void RBTree< Key, Value, Cmp >::swap(RBTree< Key, Value, Cmp >& tree) noexcept
   {
     std::swap(root_, tree.root_);
+    std::swap(maxNode_, tree.maxNode_);
     std::swap(size_, tree.size_);
   }
 
@@ -391,7 +396,7 @@ namespace kiselev
     {
       temp = temp->left;
     }
-    return Iterator(temp, temp->parent);
+    return Iterator(temp, false);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -406,38 +411,19 @@ namespace kiselev
     {
       temp = temp->left;
     }
-    return ConstIterator(temp, temp->parent);
-    //ConstIterator(begin());
+    return ConstIterator(temp, false);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::end() noexcept
   {
-    if (empty())
-    {
-      return Iterator(nullptr, nullptr);
-    }
-    Node* temp = root_;
-    while (temp->right)
-    {
-      temp = temp->right;
-    }
-    return Iterator(nullptr, temp);
+    return Iterator(maxNode_, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cend() const noexcept
   {
-    if (empty())
-    {
-      return ConstIterator(nullptr, nullptr);
-    }
-    Node* temp = root_;
-    while (temp->right)
-    {
-      temp = temp->right;
-    }
-    return ConstIterator(nullptr, temp);
+    return ConstIterator(maxNode_, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -456,7 +442,7 @@ namespace kiselev
       }
       else
       {
-        return Iterator(temp, temp->parent);
+        return Iterator(temp, false);
       }
     }
     return end();
@@ -478,11 +464,10 @@ namespace kiselev
       }
       else
       {
-        return ConstIterator(temp, temp->parent);
+        return ConstIterator(temp, false);
       }
     }
     return cend();
-    //return ConstIterator(find(key));
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -495,8 +480,9 @@ namespace kiselev
       if (!root_)
       {
         root_ = newNode;
+        maxNode_ = root_;
         size_ = 1;
-        return { Iterator(root_, root_->parent), true };
+        return { Iterator(root_, false), true };
       }
       Node* temp = root_;
       Node* parent = nullptr;
@@ -514,7 +500,7 @@ namespace kiselev
         else
         {
           delete newNode;
-          return { Iterator(temp, temp->parent), false };
+          return { Iterator(temp, false), false };
         }
       }
 
@@ -528,6 +514,10 @@ namespace kiselev
       {
         parent->left = newNode;
       }
+      if (cmp_(maxNode_->data.first, newNode->data.first))
+      {
+        maxNode_ = newNode;
+      }
     }
     catch (...)
     {
@@ -536,7 +526,7 @@ namespace kiselev
     }
     fixInsert(newNode);
     size_++;
-    return { Iterator(newNode, newNode->parent), true };
+    return { Iterator(newNode, false), true };
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -548,7 +538,12 @@ namespace kiselev
       return emplace(std::forward< Args >(args)...).first;
     }
     Node* pos = hint.node_;
-    Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, {std::forward< Args >(args)...} };
+    Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, { std::forward< Args >(args)... } };
+    Node* temp = maxNode_;
+    if (cmp_(maxNode_->data.first, newNode->data.first))
+    {
+      maxNode_ = newNode;
+    }
     value val = newNode->data;
     try
     {
@@ -559,7 +554,7 @@ namespace kiselev
           pos->left = newNode;
           fixInsert(newNode);
           ++size_;
-          return Iterator(newNode, newNode->parent);
+          return Iterator(newNode, false);
         }
       }
       else if (cmp_(pos->data.first, val.first))
@@ -569,20 +564,22 @@ namespace kiselev
           pos->right = newNode;
           fixInsert(newNode);
           ++size_;
-          return Iterator(newNode, newNode->parent);
+          return Iterator(newNode, false);
         }
       }
       else
       {
+        maxNode_ = temp;
         delete newNode;
-        return Iterator(pos, newNode->parent);
+        return Iterator(pos, false);
       }
-      value val = newNode->data;
+      maxNode_ = temp;
       delete newNode;
       return emplace(val).first;
     }
     catch (...)
     {
+      maxNode_ = temp;
       delete newNode;
       throw;
     }
@@ -653,6 +650,10 @@ namespace kiselev
       size_ = 0;
       return end();
     }
+    if (toDelete == maxNode_)
+    {
+        maxNode_ = toDelete->parent;
+    }
     if (!toDelete->left || !toDelete->right)
     {
       replace = toDelete;
@@ -690,7 +691,7 @@ namespace kiselev
     {
       fixDelete(child ? child : replace->parent);
     }
-    Iterator next(pos.node_, pos.node_->parent);
+    Iterator next(pos.node_, pos.isEnd_);
     ++next;
     delete replace;
     --size_;
@@ -723,7 +724,7 @@ namespace kiselev
     {
       first = erase(first);
     }
-    return last == cend() ? end() : Iterator(last.node_, last.node_->parent);
+    return Iterator(last.node_, last.isEnd_);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -758,7 +759,7 @@ namespace kiselev
         temp = temp->right;
       }
     }
-    return res ? Iterator(res, res->parent) : end();
+    return res ? Iterator(res, false) : end();
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -784,7 +785,7 @@ namespace kiselev
         temp = temp->right;
       }
     }
-    return res ? Iterator(res, res->parent) : end();
+    return res ? Iterator(res, false) : end();
   }
 
   template< typename Key, typename Value, typename Cmp >

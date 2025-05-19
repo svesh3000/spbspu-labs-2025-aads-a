@@ -39,8 +39,8 @@ namespace kiselev
       bool operator!=(const iterator&) const noexcept;
     private:
       TreeNode< Key, Value >* node_;
-      TreeNode< Key, Value >* parent_;
-      Iterator(TreeNode< Key, Value >*, TreeNode< Key, Value >*);
+      bool isEnd_;
+      Iterator(TreeNode< Key, Value >*, bool);
       friend class Iterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
     };
@@ -48,20 +48,20 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst >::Iterator():
       node_(nullptr),
-      parent_(nullptr)
+      isEnd_(false)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
     Iterator< Key, Value, Cmp, IsConst >::Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept:
       node_(other.node_),
-      parent_(other.parent_)
+      isEnd_(other.isEnd_)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node, TreeNode< Key, Value >* parent):
+    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node, bool isEnd):
       node_(node),
-      parent_(parent)
+      isEnd_(isEnd)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
@@ -70,7 +70,7 @@ namespace kiselev
       const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
     {
       node_ = other.node_;
-      parent_ = other.parent_;
+      isEnd_ = other.isEnd_;
       return *this;
     }
 
@@ -78,6 +78,7 @@ namespace kiselev
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator++() noexcept
     {
       assert(node_ != nullptr);
+      TreeNode< Key, Value >* temp = node_;
       if (node_->right)
       {
         node_ = node_->right;
@@ -94,9 +95,10 @@ namespace kiselev
         }
         node_ = node_->parent;
       }
-      if (node_)
+      if (!node_)
       {
-        parent_ = node_->parent;
+        node_ = temp;
+        isEnd_ = true;
       }
       return *this;
     }
@@ -113,10 +115,10 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator--() noexcept
     {
-      if (!node_ && !parent_)
+      assert(node_ != nullptr);
+      if (isEnd_)
       {
-        node_ = parent_;
-        parent_ = node_->parent;
+        isEnd_ = false;
       }
       else
       {
@@ -163,7 +165,7 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     bool Iterator< Key, Value, Cmp, IsConst >::operator==(const iterator& other) const noexcept
     {
-      return node_ == other.node_;
+      return node_ == other.node_ && isEnd_ == other.isEnd_;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
