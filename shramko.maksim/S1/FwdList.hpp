@@ -32,8 +32,10 @@ namespace shramko
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
 
-    T& getFront() const;
-    T& getBack() const;
+    const T& getFront() const;
+    const T& getBack() const;
+    T& getFront();
+    T& getBack();
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
 
@@ -150,7 +152,7 @@ typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::ce
 }
 
 template< typename T >
-T& shramko::ForwardList< T >::getFront() const
+const T& shramko::ForwardList< T >::getFront() const
 {
   if (isEmpty())
   {
@@ -160,13 +162,25 @@ T& shramko::ForwardList< T >::getFront() const
 }
 
 template< typename T >
-T& shramko::ForwardList< T >::getBack() const
+const T& shramko::ForwardList< T >::getBack() const
 {
   if (isEmpty())
   {
     throw std::logic_error("List is empty!");
   }
   return tailNode_->dataValue;
+}
+
+template< typename T >
+T& shramko::ForwardList< T >::getFront()
+{
+  return const_cast< T& >(static_cast< const ForwardList* >(this)->getFront());
+}
+
+template< typename T >
+T& shramko::ForwardList< T >::getBack()
+{
+  return const_cast< T& >(static_cast< const ForwardList* >(this)->getBack());
 }
 
 template< typename T >
