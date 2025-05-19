@@ -44,22 +44,22 @@ namespace shramko
     }
 
     reference operator*()
-    { 
+    {
       return node_->dataValue;
     }
     
     pointer operator->()
-    { 
+    {
       return &node_->dataValue;
     }
     
     const T& operator*() const
-    { 
+    {
       return node_->dataValue;
     }
     
     const T* operator->() const
-    { 
+    {
       return &node_->dataValue;
     }
 
@@ -69,7 +69,7 @@ namespace shramko
     }
 
     bool operator!=(const Iterator& other) const
-    { 
+    {
       return !(*this == other);
     }
 

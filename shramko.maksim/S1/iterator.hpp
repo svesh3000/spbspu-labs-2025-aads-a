@@ -69,7 +69,7 @@ namespace shramko
     }
 
     bool operator!=(const Iterator& other) const
-    { 
+    {
       return !(*this == other);
     }
 
