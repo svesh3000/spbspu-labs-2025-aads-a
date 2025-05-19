@@ -1,5 +1,6 @@
 #ifndef TREE_HPP
 #define TREE_HPP
+#include <cassert>
 #include <initializer_list>
 #include <stdexcept>
 #include <type_traits>
@@ -87,7 +88,6 @@ namespace kiselev
     void fixInsert(Node* node) noexcept;
     void fixDelete(Node* node) noexcept;
     Node* root_;
-    Node* maxNode_;
     Cmp cmp_;
     size_t size_;
   };
@@ -95,7 +95,6 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree():
     root_(nullptr),
-    maxNode_(nullptr),
     size_(0)
   {}
 
@@ -112,7 +111,6 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   RBTree< Key, Value, Cmp >::RBTree(RBTree< Key, Value, Cmp >&& tree) noexcept:
     root_(std::exchange(tree.root_, nullptr)),
-    maxNode_(std::exchange(tree.maxNode_, nullptr)),
     size_(std::exchange(tree.size_, 0))
   {}
 
@@ -380,7 +378,6 @@ namespace kiselev
   void RBTree< Key, Value, Cmp >::swap(RBTree< Key, Value, Cmp >& tree) noexcept
   {
     std::swap(root_, tree.root_);
-    std::swap(maxNode_, tree.maxNode_);
     std::swap(size_, tree.size_);
   }
 
@@ -417,13 +414,31 @@ namespace kiselev
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::Iterator RBTree< Key, Value, Cmp >::end() noexcept
   {
-    return Iterator(maxNode_, true);
+    if (empty())
+    {
+      return Iterator(root_, true);
+    }
+    Node* temp = root_;
+    while (temp->right)
+    {
+      temp = temp->right;
+    }
+    return Iterator(temp, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename RBTree< Key, Value, Cmp >::ConstIterator RBTree< Key, Value, Cmp >::cend() const noexcept
   {
-    return ConstIterator(maxNode_, true);
+    if (empty())
+    {
+      return ConstIterator(root_, true);
+    }
+    Node* temp = root_;
+    while (temp->right)
+    {
+      temp = temp->right;
+    }
+    return ConstIterator(temp, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -480,7 +495,6 @@ namespace kiselev
       if (!root_)
       {
         root_ = newNode;
-        maxNode_ = root_;
         size_ = 1;
         return { Iterator(root_, false), true };
       }
@@ -514,10 +528,6 @@ namespace kiselev
       {
         parent->left = newNode;
       }
-      if (cmp_(maxNode_->data.first, newNode->data.first))
-      {
-        maxNode_ = newNode;
-      }
     }
     catch (...)
     {
@@ -539,11 +549,6 @@ namespace kiselev
     }
     Node* pos = hint.node_;
     Node* newNode = new Node{ Color::RED, nullptr, nullptr, pos, { std::forward< Args >(args)... } };
-    Node* temp = maxNode_;
-    if (cmp_(maxNode_->data.first, newNode->data.first))
-    {
-      maxNode_ = newNode;
-    }
     value val = newNode->data;
     try
     {
@@ -569,17 +574,14 @@ namespace kiselev
       }
       else
       {
-        maxNode_ = temp;
         delete newNode;
         return Iterator(pos, false);
       }
-      maxNode_ = temp;
       delete newNode;
       return emplace(val).first;
     }
     catch (...)
     {
-      maxNode_ = temp;
       delete newNode;
       throw;
     }
@@ -649,10 +651,6 @@ namespace kiselev
       delete root_;
       size_ = 0;
       return end();
-    }
-    if (toDelete == maxNode_)
-    {
-        maxNode_ = toDelete->parent;
     }
     if (!toDelete->left || !toDelete->right)
     {
