@@ -100,13 +100,16 @@ namespace alymova
   };
 
   template< class T, class Value, class Comparator >
-  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
 
   template< class T, class Value, class Comparator >
-  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept;
 
   template< class T, class Value, class Comparator >
-  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  bool operator==(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
   {
     if (lhs.size() != rhs.size())
     {
@@ -123,7 +126,8 @@ namespace alymova
   }
 
   template< class T, class Value, class Comparator >
-  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs, const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
+  bool operator!=(const TwoThreeTree< T, Value, Comparator >& lhs,
+    const TwoThreeTree< T, Value, Comparator >& rhs) noexcept
   {
     return (!(lhs == rhs));
   }
@@ -131,10 +135,15 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
-    fake_(new Node()),
+    fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     root_(fake_)
   {
     fake_->type = NodeType::Fake;
+    fake_->parent = nullptr;
+    fake_->left = nullptr;
+    fake_->mid = nullptr;
+    fake_->right = nullptr;
+    fake_->overflow = nullptr;
   }
 
   template< class Key, class Value, class Comparator >
@@ -172,7 +181,7 @@ namespace alymova
     {
       clear(root_);
     }
-    delete fake_;
+    delete[] reinterpret_cast< char* >(fake_);
   }
 
   template< class Key, class Value, class Comparator >
@@ -196,11 +205,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   Value& TwoThreeTree< Key, Value, Comparator >::operator[](const Key& key)
   {
-    if (find(key) == end())
+    auto it = lower_bound(key);
+    if (it == end() || it->first != key)
     {
-      insert({key, Value()});
+      return insert(it, {key, Value()})->second;
     }
-    return (find(key)->second);
+    return (it->second);
   }
 
   template< class Key, class Value, class Comparator >
@@ -212,11 +222,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   const Value& TwoThreeTree< Key, Value, Comparator >::at(const Key& key) const
   {
-    if (find(key) == end())
+    auto it = find(key);
+    if (it == end())
     {
       throw std::out_of_range("Container does not have an element with the such key");
     }
-    return (find(key)->second);
+    return (it->second);
   }
 
   template< class Key, class Value, class Comparator >
@@ -355,7 +366,7 @@ namespace alymova
     }
     if (size_ == 0)
     {
-      root_ = new Node();
+      root_ = new Node{{}, NodeType::Empty, nullptr, nullptr, nullptr, nullptr, nullptr};
       to_insert = root_;
     }
     try
@@ -562,11 +573,11 @@ namespace alymova
       parent = node->parent;
       if (!parent)
       {
-        parent = new Node();
+        parent = new Node{{}, NodeType::Empty, nullptr, nullptr, nullptr, nullptr, nullptr};
         root_ = parent;
       }
-      left = new Node(node->data[0], parent, node->left, nullptr, node->mid, nullptr);
-      right = new Node(node->data[2], parent, node->right, nullptr, node->overflow, nullptr);
+      left = new Node{{node->data[0]}, NodeType::Double, parent, node->left, nullptr, node->mid, nullptr};
+      right = new Node{{node->data[2]}, NodeType::Double, parent, node->right, nullptr, node->overflow, nullptr};
       if (left->left)
       {
         left->left->parent = left;

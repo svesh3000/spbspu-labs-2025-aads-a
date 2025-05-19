@@ -33,6 +33,24 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
 
   tree3 = Tree(tree5.begin(), tree5.end());
   BOOST_TEST(tree5 == tree5);
+
+  BOOST_TEST(tree3[1] == "cat");
+  BOOST_TEST(tree3[10] == "");
+  BOOST_TEST(tree3.size() == 3);
+  tree3[10] = "mouse";
+  BOOST_TEST(tree3[5] == "");
+  BOOST_TEST(tree3.size() == 4);
+
+  BOOST_TEST(tree3.at(10) == "mouse");
+  try
+  {
+    tree3.at(100);
+  }
+  catch(const std::exception& e)
+  {
+    BOOST_TEST(tree3.size() == 4);
+  }
+
 }
 BOOST_AUTO_TEST_CASE(test_iterators)
 {
