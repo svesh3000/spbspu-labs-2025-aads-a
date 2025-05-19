@@ -26,7 +26,7 @@ namespace
 
 finaev::List< finaev::List< size_t > > finaev::createRightList(List< std::pair< std::string, List< size_t > > > List)
 {
-  finaev::List<finaev::List<size_t>> listOfLists;
+  finaev::List< finaev::List< size_t > > listOfLists;
   size_t max_size = 0;
   for (auto i = List.begin(); i != List.end(); ++i)
   {
@@ -37,7 +37,7 @@ finaev::List< finaev::List< size_t > > finaev::createRightList(List< std::pair< 
   }
   for (size_t i = 0; i < max_size; ++i)
   {
-    finaev::List<size_t> list;
+    finaev::List< size_t > list;
     listOfLists.pushBack(list);
   }
   for (auto i = List.begin(); i != List.end(); ++i)

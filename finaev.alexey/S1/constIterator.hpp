@@ -6,13 +6,12 @@
 
 namespace finaev
 {
-  template < class T >
+  template< class T >
   struct constListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     using this_t = constListIterator< T >;
     constListIterator();
-    explicit constListIterator(const Node< T >* node);
     ~constListIterator() = default;
     const T& operator*() const;
     const T* operator->() const;
@@ -24,6 +23,7 @@ namespace finaev
     bool operator!=(const this_t& i) const;
   private:
     const Node< T >* node_;
+    explicit constListIterator(const Node< T >* node);
   };
 
   template< class T >

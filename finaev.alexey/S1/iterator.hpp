@@ -11,7 +11,6 @@ namespace finaev
   public:
     using this_t = listIterator< T >;
     listIterator();
-    listIterator(Node< T >* node);
     ~listIterator() = default;
     T& operator*();
     T* operator->();
@@ -23,15 +22,16 @@ namespace finaev
     bool operator!=(const this_t& i) const;
   private:
     Node< T >* node_;
+    explicit listIterator(Node< T >* node);
   };
 
   template< class T >
-  listIterator < T >::listIterator():
+  listIterator< T >::listIterator():
     node_(nullptr)
   {}
 
   template< class T >
-  listIterator < T >::listIterator(Node< T >* node):
+  listIterator< T >::listIterator(Node< T >* node):
     node_(node)
   {}
 

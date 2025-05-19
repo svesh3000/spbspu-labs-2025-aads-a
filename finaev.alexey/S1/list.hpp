@@ -62,7 +62,7 @@ namespace finaev
     std::swap(size_, other.size_);
   }
 
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
     if (this == std::addressof(other))
