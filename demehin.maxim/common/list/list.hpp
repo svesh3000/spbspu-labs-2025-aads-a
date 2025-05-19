@@ -101,7 +101,8 @@ namespace demehin
 
   template< typename T >
   List< T >::List():
-    fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
+    fake_(new Node(T(), nullptr, nullptr)),
+    //fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     tail_(fake_),
     size_(0)
   {
@@ -135,7 +136,8 @@ namespace demehin
   List< T >::~List()
   {
     clear();
-    delete[] reinterpret_cast< char* >(fake_);
+    delete fake_;
+    //delete[] reinterpret_cast< char* >(fake_);
   }
 
   template< typename T >
