@@ -11,7 +11,7 @@ void demehin::Graph::addVertex(const std::string& vrt) noexcept
 void demehin::Graph::addEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
   auto key = std::make_pair(from, to);
-  edges[key].push(weight);
+  edges[key].push_back(weight);
 }
 
 demehin::Tree< std::string, std::string > demehin::Graph::getVrts() const
@@ -75,7 +75,7 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
 
 bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, unsigned int weight)
 {
-  /*auto key = std::make_pair(from, to);
+  auto key = std::make_pair(from, to);
   auto edgeIt = edges.find(key);
 
   if (edgeIt == edges.end())
@@ -98,9 +98,9 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
     }
   }
 
-  return isDeleted;*/
+  return isDeleted;
 
-  auto key = std::make_pair(from, to);
+  /*auto key = std::make_pair(from, to);
   auto edgeIt = edges.find(key);
 
   if (edgeIt == edges.end())
@@ -129,7 +129,7 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
     weights = std::move(newWeights);
   }
 
-  return isDeleted;
+  return isDeleted;*/
 }
 
 

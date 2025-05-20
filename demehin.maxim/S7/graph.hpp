@@ -21,7 +21,7 @@ namespace demehin
   {
   public:
     using PairOfStr = std::pair< std::string, std::string >;
-    using Edges = HashTable< PairOfStr, DynamicArray< unsigned int >, PairHash >;
+    using Edges = HashTable< PairOfStr, List< unsigned int >, PairHash >;
 
     void addVertex(const std::string&) noexcept;
     void addEdge(const std::string&, const std::string&, unsigned int);

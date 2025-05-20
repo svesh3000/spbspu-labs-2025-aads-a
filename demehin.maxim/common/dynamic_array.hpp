@@ -155,6 +155,10 @@ namespace demehin
   template< typename T >
   DynamicArray< T >::~DynamicArray()
   {
+    //for (size_t i = 0; i < size_; i++)
+    //{
+      //data_[i + begin_].~T();
+    //}
     delete[] data_;
   }
 
