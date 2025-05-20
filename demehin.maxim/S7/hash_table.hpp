@@ -249,7 +249,7 @@ namespace demehin
   template< typename Key, typename T, typename Hash, typename Equal >
   std::pair< typename HashTable< Key, T, Hash, Equal >::Iter, bool > HashTable< Key, T, Hash, Equal >::insert(const std::pair< Key, T >& val)
   {
-    /*const Key& key = val.first;
+    const Key& key = val.first;
 
     if (load_factor() >= max_load_factor_)
     {
@@ -268,8 +268,8 @@ namespace demehin
     slot.state = SlotState::OCCUPIED;
     item_cnt_++;
 
-    return { Iter(this, ind), true };*/
-    return emplace(val);
+    return { Iter(this, ind), true };
+    //return emplace(val);
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
