@@ -4,6 +4,8 @@
 #include <cassert>
 #include <functional>
 #include <exception>
+#include <stack.hpp>
+#include <queue.hpp>
 #include "tree-iterators.hpp"
 #include "tree-iterator-impl.hpp"
 #include "tree-const-iterator-impl.hpp"
@@ -36,6 +38,15 @@ namespace alymova
     Value& operator[](const Key& key);
     Value& at(const Key& key);
     const Value& at(const Key& key) const;
+
+    template< class F >
+    F traverse_lnr(F f) const;
+
+    template< class F >
+    F traverse_rnl(F f) const;
+
+    template< class F >
+    F traverse_breadth(F f) const;
 
     Iterator begin();
     ConstIterator begin() const noexcept;
@@ -273,6 +284,79 @@ namespace alymova
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cend() const noexcept
   {
     return ConstIterator(fake_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f) const
+  {
+    if (empty())
+    {
+      return f;
+    }
+    for (auto it = begin(); it != end(); it++)
+    {
+      f(*it);
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_rnl(F f) const
+  {
+    if (empty())
+    {
+      return f;
+    }
+    auto it = --end();
+    for (; it != begin(); it--)
+    {
+      f(*it);
+    }
+    f(*it);
+    return f;
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_breadth(F f) const
+  {
+    if (empty())
+    {
+      return f;
+    }
+    Stack< Node* > visited;
+    Queue< Node* > nexts;
+    nexts.push(root_);
+    Node* temp;
+    while (!nexts.empty())
+    {
+      temp = nexts.front();
+      visited.push(temp);
+      nexts.pop();
+      if (temp->right && temp->right != fake_)
+      {
+        nexts.push(temp->right);
+      }
+      if (temp->mid)
+      {
+        nexts.push(temp->mid);
+      }
+      if (temp->left)
+      {
+        nexts.push(temp->left);
+      }
+    }
+    while (!visited.empty())
+    {
+      for (size_t i = 0; i < visited.top()->type; i++)
+      {
+        f(visited.top()->data[i]);
+      }
+      visited.pop();
+    }
+    return f;
   }
 
   template< class Key, class Value, class Comparator >
