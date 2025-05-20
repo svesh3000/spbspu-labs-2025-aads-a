@@ -18,10 +18,5 @@ namespace zakirov
   void get_list_ull(std::istream & in, list_ull & forward_list);
   void output_result(std::ostream & out, list_pair & forward_list);
 }
-/*
-using list_ull_it = zakirov::FwdIterator< unsigned long long >;
-using it_to_it = zakirov::FwdIterator<list_ull_it>;
-using list_pair_it = zakirov::FwdIterator< pair_strlist >;
-using list_iter_it = zakirov::FwdIterator< zakirov::FwdIterator< list_ull > >;
-*/
+
 #endif

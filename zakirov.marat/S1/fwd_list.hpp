@@ -274,9 +274,7 @@ namespace zakirov
   template< typename T >
   void FwdList< T >::swap(FwdList & other)
   {
-    FwdListNode< T > * temporary_node = other.fake_node_;
-    other.fake_node_ = fake_node_;
-    fake_node_ = temporary_node;
+    std::swap(fake_node_, other.fake_node_);
   }
 
   template< typename T >
@@ -309,44 +307,34 @@ namespace zakirov
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst)
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst);
+    splice_after(pos, fwdlst);
   }
 
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i)
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst, i);
+    splice_after(pos, fwdlst, i);
   }
 
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last)
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst, first, last);
+    splice_after(pos, fwdlst, first, last);
   }
 
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
   {
-    clear();
-    for (size_t i = 0; i < n; ++i)
-    {
-      push_front(val);
-    }
+    FwdList< T > inserter(n, val);
+    swap(inserter);
   }
 
   template< typename T >
   template< typename InputIterator >
   void FwdList< T >::assign(InputIterator first, InputIterator last)
   {
-    clear();
-    FwdIterator< T > inserter = begin();
-    for (; first != last; ++first, ++inserter)
-    {
-      insert_after(inserter, *first);
-    }
+    FwdList< T > inserter(first, last);
+    swap(inserter);
   }
 
   template< typename T >
