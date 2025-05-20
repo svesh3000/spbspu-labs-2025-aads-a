@@ -149,15 +149,15 @@ namespace demehin
   template< typename T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
-    /*if (this != std::addressof(other))
+    if (this != std::addressof(other))
     {
       tail_ = std::exchange(other.tail_, nullptr);
       fake_ = std::exchange(other.fake_, nullptr);
       size_ = std::exchange(other.size_, 0);
     }
-    return *this;*/
+    return *this;
 
-    if (this != std::addressof(other))
+    /*if (this != std::addressof(other))
     {
       clear();
       delete[] reinterpret_cast<char*>(std::exchange(fake_, other.fake_));
@@ -166,7 +166,7 @@ namespace demehin
       other.fake_->next = other.fake_;
       other.fake_->prev = other.fake_;
     }
-    return *this;
+    return *this;*/
   }
 
 

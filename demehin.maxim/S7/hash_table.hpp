@@ -249,7 +249,27 @@ namespace demehin
   template< typename Key, typename T, typename Hash, typename Equal >
   std::pair< typename HashTable< Key, T, Hash, Equal >::Iter, bool > HashTable< Key, T, Hash, Equal >::insert(const std::pair< Key, T >& val)
   {
-    return emplace(val);
+    const Key& key = val.first;
+
+    if (load_factor() >= max_load_factor_)
+    {
+      rehash(slots_.size() * 2);
+    }
+
+    size_t ind = findSlot(key);
+    Slot& slot = slots_[ind];
+
+    if (slot.state == SlotState::OCCUPIED)
+    {
+      return { Iter(this, ind), false };
+    }
+
+    slot.pair = val;
+    slot.state = SlotState::OCCUPIED;
+    item_cnt_++;
+
+    return { Iter(this, ind), true };
+    //return emplace(val);
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
