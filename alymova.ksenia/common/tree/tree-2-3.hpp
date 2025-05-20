@@ -326,7 +326,7 @@ namespace alymova
     {
       return f;
     }
-    Stack< Node* > visited;
+    Queue< Node* > visited;
     Queue< Node* > nexts;
     nexts.push(root_);
     Node* temp;
@@ -335,24 +335,24 @@ namespace alymova
       temp = nexts.front();
       visited.push(temp);
       nexts.pop();
-      if (temp->right && temp->right != fake_)
+      if (temp->left)
       {
-        nexts.push(temp->right);
+        nexts.push(temp->left);
       }
       if (temp->mid)
       {
         nexts.push(temp->mid);
       }
-      if (temp->left)
+      if (temp->right && temp->right != fake_)
       {
-        nexts.push(temp->left);
+        nexts.push(temp->right);
       }
     }
     while (!visited.empty())
     {
-      for (size_t i = 0; i < visited.top()->type; i++)
+      for (size_t i = 0; i < visited.front()->type; i++)
       {
-        f(visited.top()->data[i]);
+        f(visited.front()->data[i]);
       }
       visited.pop();
     }
