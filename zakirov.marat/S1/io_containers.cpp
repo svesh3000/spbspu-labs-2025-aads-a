@@ -49,16 +49,16 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
   for (auto i = forward_list.begin(); i != forward_list.end(); ++i, ++iter_list)
   {
-    list_iterators.insert_after(iter_list, (*i).second.begin());
+    list_iterators.insert_after(iter_list, i->second.begin());
     ++list_size;
   }
 
   auto output_iter = forward_list.begin();
-  out << (* output_iter).first;
+  out << output_iter->first;
   ++output_iter;
   for (; output_iter != forward_list.end(); ++output_iter)
   {
-    out << ' ' << (* output_iter).first;
+    out << ' ' << output_iter->first;
   }
 
   out << '\n';
@@ -72,7 +72,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     number_sum = 0;
     iter_list = list_iterators.begin();
     pair_iter = forward_list.begin();
-    while ((* iter_list) == (* pair_iter).second.end() && iter_list != list_iterators.end())
+    while (*iter_list == pair_iter->second.end() && iter_list != list_iterators.end())
     {
       ++iter_list;
       ++pair_iter;
@@ -88,10 +88,10 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
       break;
     }
 
-    if ((* iter_list) != (* pair_iter).second.end())
+    if (*iter_list != pair_iter->second.end())
     {
-      out << ** iter_list;
-      number_sum += (** iter_list);
+      out << **iter_list;
+      number_sum += (**iter_list);
       ++(* iter_list);
     }
     else
@@ -104,16 +104,16 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
     for (; iter_list != list_iterators.end(); ++iter_list)
     {
-      if ((* iter_list) != (* pair_iter).second.end())
+      if (*iter_list != pair_iter->second.end())
       {
-        if (number_sum > std::numeric_limits< unsigned long long >::max() - ** iter_list)
+        if (number_sum > std::numeric_limits< unsigned long long >::max() - **iter_list)
         {
           flag_overflow = true;
         }
 
-        out << ' ' << ** iter_list;
-        number_sum += (** iter_list);
-        ++(* iter_list);
+        out << ' ' << **iter_list;
+        number_sum += **iter_list;
+        ++(*iter_list);
       }
       else
       {
@@ -143,11 +143,11 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   else
   {
     iter_added = list_added.begin();
-    out << * iter_added;
+    out << *iter_added;
     ++iter_added;
     for (; iter_added != list_added.end(); ++iter_added)
     {
-      out << ' ' << * iter_added;
+      out << ' ' << *iter_added;
     }
 
     out << '\n';

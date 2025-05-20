@@ -6,6 +6,9 @@
 namespace zakirov
 {
   template< typename T >
+  class FwdList;
+
+  template< typename T >
   class FwdIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
@@ -20,8 +23,9 @@ namespace zakirov
     bool operator!=(const FwdIterator< T > & other) const noexcept;
     bool operator==(const FwdIterator< T > & other) const noexcept;
   private:
+    friend class FwdList< T >;
     explicit FwdIterator(FwdListNode< T > * node) noexcept;
-    zakirov::FwdListNode< T > * node_;
+    FwdListNode< T > * node_;
   };
 
   template< typename T >
@@ -43,7 +47,7 @@ namespace zakirov
   template< typename T >
   T * FwdIterator< T >::operator->() noexcept
   {
-    return std::addressof(node_->data_) noexcept;
+    return std::addressof(node_->data_);
   }
 
   template< typename T >
@@ -88,8 +92,9 @@ namespace zakirov
     bool operator!=(const CFwdIterator< T > & other) const noexcept;
     bool operator==(const CFwdIterator< T > & other) const noexcept;
   private:
+    friend class FwdList< T >;
     explicit CFwdIterator(FwdListNode< T > * node) noexcept;
-    const zakirov::FwdListNode< T > * node_;
+    const FwdListNode< T > * node_;
   };
 
   template< typename T >
