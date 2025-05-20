@@ -49,9 +49,9 @@ namespace zakirov
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T > init_list);
     void clear() noexcept;
-    void remove(T data) noexcept;
     template< typename P>
     void remove_if(P predicate) noexcept;
+    void remove(const T & data) noexcept;
   private:
     FwdListNode< T > * fake_node_;
   };
@@ -365,30 +365,10 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::remove(T data) noexcept
-  {
-    FwdIterator< T > prev = end();
-    FwdIterator< T > real = begin();
-    for (FwdIterator< T > i = begin(); i != end(); ++i)
-    {
-      if (i.node_->data_ == data)
-      {
-        erase_after(prev);
-        ++real;
-      }
-      else
-      {
-        ++prev;
-        ++real;
-      }
-    }
-  }
-
-  template< typename T >
   template< typename P >
   void FwdList< T >::remove_if(P predicate) noexcept
   {
-    FwdIterator< T > prev = end();
+    FwdIterator< T > prev = before_begin();
     FwdIterator< T > real = begin();
     for (FwdIterator< T > i = begin(); i != end(); ++i)
     {
@@ -403,6 +383,15 @@ namespace zakirov
         ++real;
       }
     }
+  }
+
+  template< typename T >
+  void FwdList< T >::remove(const T & data) noexcept
+  {
+    remove_if([&](const T & value)
+    {
+      return data == value;
+    });
   }
 }
 
