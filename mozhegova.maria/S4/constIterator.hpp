@@ -10,7 +10,8 @@ namespace mozhegova
   class BiTree;
 
   template< typename Key, typename T, typename Cmp >
-  class TreeConstIterator
+  class TreeConstIterator:
+    public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, T > >
   {
     friend class BiTree< Key, T, Cmp >;
   public:
@@ -51,17 +52,17 @@ namespace mozhegova
   TreeConstIterator< Key, T, Cmp > & TreeConstIterator< Key, T, Cmp >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    if (node_->right)
+    if (node_->right->h != 0)
     {
       node_ = node_->right;
-      while (node_->left)
+      while (node_->left->h != 0)
       {
         node_ = node_->left;
       }
     }
     else
     {
-      if (node_->parent && node_ == node_->parent->right)
+      while (node_->parent && node_ == node_->parent->right)
       {
         node_ = node_->parent;
       }
@@ -83,17 +84,17 @@ namespace mozhegova
   TreeConstIterator< Key, T, Cmp > & TreeConstIterator< Key, T, Cmp >::operator--() noexcept
   {
     assert(node_ != nullptr);
-    if (node_->left)
+    if (node_->left->h != 0)
     {
       node_ = node_->left;
-      while (node_->right)
+      while (node_->right->h != 0)
       {
         node_ = node_->right;
       }
     }
     else
     {
-      if (node_->parent && node_ == node_->parent->left)
+      while (node_->parent && node_ == node_->parent->left)
       {
         node_ = node_->parent;
       }
