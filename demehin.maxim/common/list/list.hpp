@@ -25,6 +25,7 @@ namespace demehin
     ~List();
 
     List< T >& operator=(const List< T >&);
+    List< T >& operator=(List< T >&&) noexcept;
     bool operator==(const List< T >&) const noexcept;
     bool operator!=(const List< T >&) const noexcept;
     bool operator<(const List< T >&) const noexcept;
@@ -144,6 +145,30 @@ namespace demehin
     assign(other.begin(), other.end());
     return *this;
   }
+
+  template< typename T >
+  List< T >& List< T >::operator=(List< T >&& other) noexcept
+  {
+    /*if (this != std::addressof(other))
+    {
+      tail_ = std::exchange(other.tail_, nullptr);
+      fake_ = std::exchange(other.fake_, nullptr);
+      size_ = std::exchange(other.size_, 0);
+    }
+    return *this;*/
+
+    if (this != std::addressof(other))
+    {
+      clear();
+      delete[] reinterpret_cast<char*>(std::exchange(fake_, other.fake_));
+      tail_ = std::exchange(other.tail_, other.fake_);
+      size_ = std::exchange(other.size_, 0);
+      other.fake_->next = other.fake_;
+      other.fake_->prev = other.fake_;
+    }
+    return *this;
+  }
+
 
   template< typename T >
   bool List< T >::operator==(const List< T >& rhs) const noexcept
