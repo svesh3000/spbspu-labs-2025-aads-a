@@ -2,6 +2,7 @@
 #define ITERATOR_HPP
 
 #include <cassert>
+#include <iterator>
 #include "node.hpp"
 
 namespace mozhegova
