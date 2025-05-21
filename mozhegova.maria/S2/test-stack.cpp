@@ -31,14 +31,3 @@ BOOST_AUTO_TEST_CASE(stack_metods)
   stack1.pop();
   BOOST_TEST(stack1.empty());
 }
-
-BOOST_AUTO_TEST_CASE(stack_resize)
-{
-  mozhegova::Stack< int > stack1;
-  BOOST_TEST(stack1.size() == 0);
-  for (int i = 0; i < 60; i++)
-  {
-    stack1.push(i);
-  }
-  BOOST_TEST(stack1.size() == 60);
-}

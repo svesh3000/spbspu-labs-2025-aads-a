@@ -1,8 +1,7 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include <cstddef>
-#include <stdexcept>
+#include "resize.hpp"
 
 namespace mozhegova
 {
@@ -29,14 +28,12 @@ namespace mozhegova
     size_t size_;
     size_t capacity_;
     T * data_;
-
-    void resize();
   };
 
   template< typename T >
   Stack< T >::Stack():
     size_(0),
-    capacity_(50),
+    capacity_(1),
     data_(new T[capacity_])
   {}
 
@@ -46,9 +43,17 @@ namespace mozhegova
     capacity_(other.capacity_),
     data_(new T[capacity_])
   {
-    for (size_t i = 0; i < size_; i++)
+    try
     {
-      data_[i] = other.data_[i];
+      for (size_t i = 0; i < size_; i++)
+      {
+        data_[i] = other.data_[i];
+      }
+    }
+    catch(const std::exception &)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
@@ -101,7 +106,7 @@ namespace mozhegova
   {
     if (size_ == capacity_)
     {
-      resize();
+      data_ = resize(data_, capacity_);
     }
     data_[size_++] = value;
   }
@@ -146,19 +151,6 @@ namespace mozhegova
   size_t Stack< T >::size() const noexcept
   {
     return size_;
-  }
-
-  template< typename T >
-  void Stack< T >::resize()
-  {
-    capacity_ *= 2;
-    T * temp = new T[capacity_];
-    for (size_t i = 0; i < size_; i++)
-    {
-      temp[i] = data_[i];
-    }
-    delete[] data_;
-    data_ = temp;
   }
 }
 

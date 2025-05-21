@@ -263,7 +263,7 @@ int main(int argc, char * argv[])
     postExprs = convertInfToPost(infExprs);
     results = calculateExprs(postExprs);
   }
-  catch(const std::exception & e)
+  catch (const std::exception & e)
   {
     std::cerr << e.what() << '\n';
     return 1;
