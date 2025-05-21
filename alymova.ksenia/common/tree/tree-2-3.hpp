@@ -40,11 +40,17 @@ namespace alymova
     const Value& at(const Key& key) const;
 
     template< class F >
+    F traverse_lnr(F f);
+    template< class F >
     F traverse_lnr(F f) const;
 
     template< class F >
+    F traverse_rnl(F f);
+    template< class F >
     F traverse_rnl(F f) const;
 
+    template< class F >
+    F traverse_breadth(F f);
     template< class F >
     F traverse_breadth(F f) const;
 
@@ -288,6 +294,13 @@ namespace alymova
 
   template< class Key, class Value, class Comparator >
   template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f)
+  {
+    return static_cast< const TwoThreeTree& >(*this).traverse_lnr(f);
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f) const
   {
     if (empty())
@@ -299,6 +312,13 @@ namespace alymova
       f(*it);
     }
     return f;
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_rnl(F f)
+  {
+    return static_cast< const TwoThreeTree& >(*this).traverse_rnl(f);
   }
 
   template< class Key, class Value, class Comparator >
@@ -320,21 +340,30 @@ namespace alymova
 
   template< class Key, class Value, class Comparator >
   template< class F >
+  F TwoThreeTree< Key, Value, Comparator >::traverse_breadth(F f)
+  {
+    return static_cast< const TwoThreeTree& >(*this).traverse_breadth(f);
+  }
+
+  template< class Key, class Value, class Comparator >
+  template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_breadth(F f) const
   {
     if (empty())
     {
       return f;
     }
-    Queue< Node* > visited;
     Queue< Node* > nexts;
     nexts.push(root_);
     Node* temp;
     while (!nexts.empty())
     {
       temp = nexts.front();
-      visited.push(temp);
       nexts.pop();
+      for (size_t i = 0; i < temp->type; i++)
+      {
+        f(temp->data[i]);
+      }
       if (temp->left)
       {
         nexts.push(temp->left);
@@ -347,14 +376,6 @@ namespace alymova
       {
         nexts.push(temp->right);
       }
-    }
-    while (!visited.empty())
-    {
-      for (size_t i = 0; i < visited.front()->type; i++)
-      {
-        f(visited.front()->data[i]);
-      }
-      visited.pop();
     }
     return f;
   }
