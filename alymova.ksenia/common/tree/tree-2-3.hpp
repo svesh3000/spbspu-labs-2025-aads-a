@@ -9,6 +9,7 @@
 #include "tree-iterators.hpp"
 #include "tree-iterator-impl.hpp"
 #include "tree-const-iterator-impl.hpp"
+#include "tree-heavy-iterators.hpp"
 
 namespace alymova
 {
@@ -296,7 +297,18 @@ namespace alymova
   template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f)
   {
-    return static_cast< const TwoThreeTree& >(*this).traverse_lnr(f);
+    if (empty())
+    {
+      return f;
+    }
+    TTTLnrIterator< Key, Value, Comparator > it{root_, NodePoint::First};
+    TTTLnrIterator< Key, Value, Comparator > it_end{fake_, NodePoint::Fake};
+    for (; it != it_end; ++it)
+    {
+      f(*it);
+    }
+    return f;
+    //return static_cast< const TwoThreeTree& >(*this).traverse_lnr(f);
   }
 
   template< class Key, class Value, class Comparator >
@@ -307,10 +319,16 @@ namespace alymova
     {
       return f;
     }
-    for (auto it = begin(); it != end(); it++)
+    TTTLnrIterator< Key, Value, Comparator > it{root_, NodePoint::First};
+    TTTLnrIterator< Key, Value, Comparator > it_end{fake_, NodePoint::Fake};
+    for (; it != it_end; it++)
+    {
+      std::cout << it->first << '\n';
+    }
+    /*for (auto it = begin(); it != end(); it++)
     {
       f(*it);
-    }
+    }*/
     return f;
   }
 

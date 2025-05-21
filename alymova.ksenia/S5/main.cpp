@@ -35,7 +35,7 @@ int main(int args, char** argv)
     std::cerr << "<INCORRECT MAP>\n";
     return 1;
   }
-
+  
   if (dataset.empty())
   {
     std::cout << "<EMPTY>\n";
