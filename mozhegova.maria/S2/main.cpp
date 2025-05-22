@@ -90,18 +90,15 @@ namespace
               postExpr.push(stack.top());
               stack.pop();
             }
-            if (stack.top() == "(")
+            if (stack.empty())
             {
-              stack.pop();
+              throw std::logic_error("invalid brackets");
             }
-            else
-            {
-              throw std::logic_error("invalid expression");
-            }
+            stack.pop();
           }
           else if (isOperation(token))
           {
-            while (!stack.empty() && isHighPriority(token, stack.top()))
+            while (!stack.empty() && stack.top() != "(" && isHighPriority(token, stack.top()))
             {
               postExpr.push(stack.top());
               stack.pop();
@@ -118,7 +115,7 @@ namespace
       {
         if (stack.top() == "(")
         {
-          throw std::logic_error("invalid expression");
+          throw std::logic_error("invalid brackets");
         }
         postExpr.push(stack.top());
         stack.pop();
