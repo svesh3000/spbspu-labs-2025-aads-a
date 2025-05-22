@@ -39,7 +39,7 @@ int main()
     std::cout << "\n";
   } catch (const std::overflow_error& e) {
     std::cerr << e.what() << "\n";
-    return 1;а
+    return 1;
   }
 
   outFwdListULL(std::cout, sums);
