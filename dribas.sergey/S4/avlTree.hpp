@@ -19,7 +19,7 @@
 //     Node< Key, T >* parent;
 //     int height;
 //     bool isFake;
-//     Node(const std::pair< Key, T >&); 
+//     Node(const std::pair< Key, T >&);
 //     Node();
 //     ~Node();
 //   };
@@ -140,7 +140,7 @@
 //   }
 
 //   template< class Key, class T, class Compare >
-//   AVLTree< Key, T, Compare >::AVLTree(Tree&& other): 
+//   AVLTree< Key, T, Compare >::AVLTree(Tree&& other):
 //     root_(other.root_),
 //     fakeleaf_(other.fakeleaf_),
 //     comp(std::move(other.comp))
