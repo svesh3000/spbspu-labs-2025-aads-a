@@ -119,12 +119,109 @@ namespace kiselev
     Iterator erase(ConstIterator pos);
 
     template< typename... Args >
-    std::pair< Iterator, bool > emplace(Args&&... args);
-    template< typename... Args >
-    std::pair< Iterator, bool > emplaceHint(ConstIterator hint, Args... args);
+    std::pair< Iterator, bool > emplace(Args&&... args)
+    {
+      value newVal(std::forward< Args >(args)...);
+      if (loadFactor() >= maxLoadFactor_)
+      {
+        rehash(slots_.size() * 2);
+      }
+      size_t posIn = slots_.size();
+      size_t h1 = hash1(newVal.first);
+      size_t h2 = hash2(newVal.first);
+      for (size_t i = 0; i < slots_.size(); ++i)
+      {
+        size_t pos = (h1 + i * h2) % slots_.size();
+        if (slots_[pos].status == Status::OCCUPIED)
+        {
+          if (equal(slots_[pos].pair.first, newVal.first))
+          {
+            return {Iterator(this, pos), false};
+          }
+        }
+        else
+        {
+          if (posIn == slots_.size())
+          {
+            posIn = pos;
+          }
+          if (slots_[pos].status == Status::EMPTY)
+          {
+            posIn = pos;
+            break;
+          }
+        }
+      }
+      if (posIn == slots_.size())
+      {
+        rehash(slots_.size() * 2);
+        return (emplace(std::forward< Args >(args)...));
+      }
+      new (&slots_[posIn].pair) value(std::move(newVal));
+      slots_[posIn].status == Status::OCCUPIED;
+      count_++;
+    }
 
-    std::pair< Iterator, bool > insert(const value&);
-    std::pair< Iterator, bool > insert(value&&);
+    template< typename... Args >
+    std::pair< Iterator, bool > emplaceHint(ConstIterator hint, Args... args)
+    {
+      if (hint == cend())
+      {
+        return emplace(std::forward< Args >(args)...);
+      }
+      if (loadFactor() >= maxLoadFactor_)
+      {
+        rehash(slots_.size() * 2);
+        return emplace(std::forward<Args>(args)...);
+      }
+      value newVal(std::forward< Args >(args)...);
+      if (slots_[hint.index_].status == Status::OCCUPIED && equal(slots_[hint.index_].pair.first, newVal.first))
+      {
+        return { hint, false };
+      }
+      size_t h1 = hash1(newVal.first);
+      size_t h2 = hash2(newVal.first);
+      size_t pos = (h1 + (hint.index_ - h1 % slots_.size()) * h2) % slots_.size();
+      if (pos < slots_.size() && slots_[pos].status != Status::OCCUPIED)
+      {
+        new (&slots_[pos].pair) value(std::move(newVal));
+        slots_[pos].status = Status::OCCUPIED;
+        count_++;
+        return {Iterator(this, pos), true};
+      }
+      return emplace(std::forward< Args >(args)...);
+    }
+
+    std::pair< Iterator, bool > insert(const value& val)
+    {
+      return emplace(val);
+    }
+
+    std::pair< Iterator, bool > insert(value&& val)
+    {
+      return emplace(std::move(val));
+    }
+
+    std::pair< Iterator, bool > insert(ConstIterator hint, const value& val)
+    {
+      return emplaceHint(hint, val);
+    }
+
+    std::pair< Iterator, bool > insert(ConstIterator hint, value&& val)
+    {
+      return emplaceHint(hint, std::move(val));
+    }
+
+    template< class InputIt >
+    std::pair< Iterator, bool > insert(InputIt first, InputIt last)
+    {
+      HashTable< Key, Value, Hash1, Hash2, Equal > temp(*this);
+      for (; first != last; ++first)
+      {
+        temp.insert(*first);
+      }
+      swap(temp);
+    }
 
     Iterator find(const Key& key);
     Iterator find(const Key& key) const;
