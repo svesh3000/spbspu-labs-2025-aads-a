@@ -42,10 +42,7 @@ namespace kiselev
     HashTable(InputIt first, InputIt last):
       HashTable()
     {
-      for (; first != last; first++)
-      {
-        insert(*first);
-      }
+      insert(first, last);
     }
 
     HashTable(std::initializer_list< value > il):
@@ -115,8 +112,44 @@ namespace kiselev
       return count_ == 0;
     }
 
-    Iterator erase(Iterator pos);
-    Iterator erase(ConstIterator pos);
+    Iterator erase(Iterator pos)
+    {
+      ConstIterator it(pos);
+      return erase(it);
+    }
+    Iterator erase(ConstIterator pos)
+    {
+      if (pos == end())
+      {
+        return pos;
+      }
+      if (pos.index_ >= slots_.size() || slots_[pos.index_].status != Status::OCCUPIED)
+      {
+        return end();
+      }
+      slots_[pos.index_].status = Status::DELETED;
+      --count_;
+      ++pos;
+      return pos;
+    }
+    Iterator erase(ConstIterator first, ConstIterator last)
+    {
+      while (first != last)
+      {
+        first = erase(first);
+      }
+      return Iterator(last.table_, last.index_);
+    }
+    size_t erase(const Key& key)
+    {
+      Iterator it = find(key);
+      if (it != end())
+      {
+        erase(it);
+        return 1;
+      }
+      return 0;
+    }
 
     template< typename... Args >
     std::pair< Iterator, bool > emplace(Args&&... args)
@@ -157,9 +190,10 @@ namespace kiselev
         rehash(slots_.size() * 2);
         return (emplace(std::forward< Args >(args)...));
       }
-      new (&slots_[posIn].pair) value(std::move(newVal));
+      slots_[posIn].pair = std::move(newVal);
       slots_[posIn].status == Status::OCCUPIED;
       count_++;
+      return { Iterator(this, posIn), true };
     }
 
     template< typename... Args >
@@ -184,7 +218,7 @@ namespace kiselev
       size_t pos = (h1 + (hint.index_ - h1 % slots_.size()) * h2) % slots_.size();
       if (pos < slots_.size() && slots_[pos].status != Status::OCCUPIED)
       {
-        new (&slots_[pos].pair) value(std::move(newVal));
+        slots_[pos].pair = std::move(newVal);
         slots_[pos].status = Status::OCCUPIED;
         count_++;
         return {Iterator(this, pos), true};
@@ -225,7 +259,10 @@ namespace kiselev
 
     Iterator find(const Key& key);
     Iterator find(const Key& key) const;
-    void clear() noexcept;
+    void clear() noexcept
+    {
+      erase(cbegin(), cend());
+    }
     void swap(HashTable< Key, Value, Hash1, Hash2, Equal >& table) noexcept
     {
       std::swap(slots_, table.slots_);
