@@ -181,8 +181,6 @@ namespace
 
   long long calculateWithCheck(std::string op, long long a, long long b)
   {
-    const long long max = std::numeric_limits< long long >::max();
-    const long long min = std::numeric_limits< long long >::min();
     if (op == "+")
     {
       return addWithCheck(a, b);
