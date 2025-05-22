@@ -41,10 +41,8 @@ int main(int argc, char** argv)
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)();
-    } catch (const std::invalid_argument& e) {
-      std::cerr << e.what() << '\n';
     } catch (const std::exception&) {
-      std::cerr << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
