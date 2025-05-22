@@ -1,6 +1,7 @@
 #ifndef ITERATORHASH_HPP
 #define ITERATORHASH_HPP
 #include <cstddef>
+#include <memory>
 #include <utility>
 namespace kiselev
 {
@@ -17,26 +18,85 @@ namespace kiselev
     using iterator = IteratorHash< Key, Value, Hash1, Hash2, Equal, IsConst >;
     using table = HashTable< Key, Value, Hash1, Hash2, Equal >;
 
-    IteratorHash();
+    IteratorHash():
+      table_(nullptr),
+      index_(0)
+    {}
+
     template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-    IteratorHash(const IteratorHash< Key, Value, Hash1, Hash2, Equal, OtherIsConst >&) noexcept;
+    IteratorHash(const IteratorHash< Key, Value, Hash1, Hash2, Equal, OtherIsConst >& other) noexcept:
+      table_(other.table_),
+      index_(other.index_)
+    {}
+
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-    iterator& operator=(const IteratorHash< Key, Value, Hash1, Hash2, Equal, OtherIsConst >&) noexcept;
+    iterator& operator=(const IteratorHash< Key, Value, Hash1, Hash2, Equal, OtherIsConst >& other) noexcept
+    {
+      table_ = other.table_;
+      index_ = other.index;
+      return *this;
+    }
 
-    iterator& operator++() noexcept;
-    iterator operator++(int) noexcept;
+    iterator& operator++() noexcept
+    {
+      ++index_;
+      while (index_ < table_->slots_.size() && table_->slots_[index_].status != table::Status::OCCUPIED)
+      {
+        ++index_;
+      }
+      return *this;
+    }
 
-    iterator& operator--() noexcept;
-    iterator operator--(int) noexcept;
+    iterator operator++(int) noexcept
+    {
+      iterator result(*this);
+      ++(*this);
+      return result;
+    }
 
-    reference operator*() const noexcept;
-    pointer operator->() const noexcept;
+    iterator& operator--() noexcept
+    {
+      --index_;
+      while (index_ > 0 && table_->slots_[index_].status != table::Status::OCCUPIED)
+      {
+        --index_;
+      }
+      return *this;
+    }
 
-    bool operator==(const iterator&) const noexcept;
-    bool operator!=(const iterator&) const noexcept;
+    iterator operator--(int) noexcept
+    {
+      iterator result(*this);
+      --(*this);
+      return result;
+    }
+
+    reference operator*() const noexcept
+    {
+      return table_->slots_[index_].pair;
+    }
+    pointer operator->() const noexcept
+    {
+      return std::addressof(table_->slots_[index_].pair);
+    }
+
+    bool operator==(const iterator& other) const noexcept
+    {
+      return table_ == other.table_ && index_ == other.index_;
+    }
+
+    bool operator!=(const iterator& other) const noexcept
+    {
+      return !(*this == other);
+    }
   private:
     table* table_;
     size_t index_;
+    IteratorHash(table* tab, size_t index) noexcept:
+      table_(tab),
+      index_(index)
+    {}
+
     friend class IteratorHash< Key, Value, Hash1, Hash2, Equal, !IsConst >;
     friend class HashTable< Key, Value, Hash1, Hash2, Equal >;
   };

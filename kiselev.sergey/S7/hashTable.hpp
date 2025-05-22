@@ -11,13 +11,6 @@
 
 namespace kiselev
 {
-  enum class Status
-  {
-    EMPTY,
-    DELETED,
-    OCCUPIED
-  };
-
   template< class Key, class Value, class Hash1 = std::hash< Key >, class Hash2 = boost::hash< Value >, class Equal = std::equal_to< Key > >
   class HashTable
   {
@@ -41,7 +34,7 @@ namespace kiselev
     }
 
     HashTable(HashTable< Key, Value, Hash1, Hash2, Equal >&& table):
-      slots_(std::exchange(table.slots_, table.slots_.clear())),
+      slots_(std::move(table.slots_)),
       count_(std::exchange(table.count_, 0))
     {}
 
@@ -58,11 +51,6 @@ namespace kiselev
     HashTable(std::initializer_list< value > il):
       HashTable(il.begin(), il.end())
     {}
-
-    ~HashTable()
-    {
-      clear();
-    }
 
     HashTable& operator=(const HashTable< Key, Value, Hash1, Hash2, Equal >& table)
     {
@@ -85,16 +73,47 @@ namespace kiselev
       return *this;
     }
 
-    Value& operator[](const Key&) const;
-    Value& operator[](Key&&) const;
+    Value& operator[](const Key& key);
+    Value& operator[](Key&&);
 
-    Iterator begin() noexcept;
-    Iterator end() noexcept;
-    ConstIterator cbegin() const noexcept;
-    ConstIterator cend() const noexcept;
+    Iterator begin() noexcept
+    {
+      size_t index = 0;
+      while (index < slots_.size() && slots_[index].status != Status::OCCUPIED)
+      {
+        ++index;
+      }
+      return Iterator(this, index);
+    }
 
-    size_t size() const noexcept;
-    bool empty() const noexcept;
+    Iterator end() noexcept
+    {
+      return Iterator(this, slots_.size());
+    }
+
+    ConstIterator cbegin() const noexcept
+    {
+      size_t index = 0;
+      while (index < slots_.size() && slots_[index].status != Status::OCCUPIED)
+      {
+        ++index;
+      }
+      return ConstIterator(this, index);
+    }
+
+    ConstIterator cend() const noexcept
+    {
+      return ConstIterator(this, slots_.size());
+    }
+
+    size_t size() const noexcept
+    {
+      return count_;
+    }
+    bool empty() const noexcept
+    {
+      return count_ == 0;
+    }
 
     Iterator erase(Iterator pos);
     Iterator erase(ConstIterator pos);
@@ -110,12 +129,26 @@ namespace kiselev
     Iterator find(const Key& key);
     Iterator find(const Key& key) const;
     void clear() noexcept;
-    void swap(HashTable< Key, Value, Hash1, Hash2, Equal >&) noexcept;
+    void swap(HashTable< Key, Value, Hash1, Hash2, Equal >& table) noexcept
+    {
+      std::swap(slots_, table.slots_);
+      std::swap(count_, table.count_);
+    }
 
-    float loadFactor() const;
+    float loadFactor() const
+    {
+      return count_ / slots_.size();
+    }
     void rehash(size_t count);
 
   private:
+    enum class Status
+    {
+      EMPTY,
+      DELETED,
+      OCCUPIED
+    };
+
     struct Slot
     {
       std::pair< Key, Value > pair;
@@ -124,14 +157,10 @@ namespace kiselev
 
     std::vector< Slot > slots_;
     size_t count_;
-    float MaxloadFactor_ = 0.6;
+    float maxLoadFactor_ = 0.6;
     Hash1 hash1;
     Hash2 hash2;
     Equal equal;
-
-
-
-
   };
 }
 #endif
