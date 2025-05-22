@@ -4,6 +4,7 @@
 #include <functional>
 #include <initializer_list>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 #include <utility>
 #include <boost/container_hash/hash.hpp>
@@ -24,9 +25,14 @@ namespace kiselev
       count_(0)
     {}
 
+    explicit HashTable(size_t size):
+      slots_(size),
+      count_(0)
+    {}
     HashTable(const HashTable< Key, Value, Hash1, Hash2, Equal >& table):
       HashTable()
     {
+      maxLoadFactor_ = table.maxLoadFactor_;
       for (ConstIterator it = table.cbegin(); it != table.cend(); ++it)
       {
         insert(*it);
@@ -35,7 +41,8 @@ namespace kiselev
 
     HashTable(HashTable< Key, Value, Hash1, Hash2, Equal >&& table):
       slots_(std::move(table.slots_)),
-      count_(std::exchange(table.count_, 0))
+      count_(std::exchange(table.count_, 0)),
+      maxLoadFactor_(std::exchange(table.maxLoadFactor_, 0))
     {}
 
     template< typename InputIt >
@@ -70,8 +77,31 @@ namespace kiselev
       return *this;
     }
 
-    Value& operator[](const Key& key);
-    Value& operator[](Key&&);
+    Value& operator[](const Key& key)
+    {
+      Iterator res = insert({ key, Value() }).first;
+      return res->second;
+    }
+    Value& operator[](Key&& key)
+    {
+      Iterator res = insert({ std::move(key), Value() }).first;
+      return res->second;
+    }
+
+    Value& at(const Key& key)
+    {
+      return const_cast< Value& >(static_cast< const HashTable< Key, Value, Hash1, Hash2, Equal > >(*this).at(key));
+    }
+
+    const Value& at(const Key& key) const
+    {
+      ConstIterator it = find(key);
+      if (it == cend())
+      {
+        throw std::out_of_range("There is no such key");
+      }
+      return it->second;
+    }
 
     Iterator begin() noexcept
     {
@@ -257,8 +287,30 @@ namespace kiselev
       swap(temp);
     }
 
-    Iterator find(const Key& key);
-    Iterator find(const Key& key) const;
+    Iterator find(const Key& key)
+    {
+      size_t h1 = hash1(key);
+      size_t h2 = hash2(key);
+      for (size_t i = 0; i < slots_.size(); ++i)
+      {
+        size_t pos = (h1 + i * h2) % slots_.size();
+        if (slots_[pos].status == Status::EMPTY)
+        {
+          return end();
+        }
+        if (slots_[pos].status == Status::OCCUPIED && equal(slots_[pos].pair.first, key))
+        {
+          return Iterator(this, pos);
+        }
+      }
+      return end();
+    }
+
+    ConstIterator find(const Key& key) const
+    {
+      return ConstIterator(find(key));
+    }
+
     void clear() noexcept
     {
       erase(cbegin(), cend());
@@ -267,6 +319,7 @@ namespace kiselev
     {
       std::swap(slots_, table.slots_);
       std::swap(count_, table.count_);
+      std::swap(maxLoadFactor_, table.maxLoadFactor_);
     }
 
     float loadFactor() const
@@ -288,7 +341,21 @@ namespace kiselev
       }
     }
 
-    void rehash(size_t count);
+    void rehash(size_t count)
+    {
+      size_t minSize = static_cast<size_t>(std::ceil(count_ / maxLoadFactor_));
+      if (count < minSize)
+      {
+        count = minSize;
+      }
+      if (count <= slots_.size())
+      {
+        return;
+      }
+      HashTable< Key, Value, Hash1, Hash2, Equal > newTable(count);
+      newTable.insert(this->cbegin(), this->cend());
+      swap(newTable);
+    }
 
   private:
     enum class Status
