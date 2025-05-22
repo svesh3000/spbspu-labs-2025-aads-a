@@ -1,8 +1,9 @@
 #include "sequencefunctions.h"
 #include <limits>
+
 namespace
 {
-  bool allItersEnds(asafov::data_list_t::const_iterator* begins, asafov::data_list_t::const_iterator* ends, size_t size)
+  bool allItersEnds(const asafov::data_list_t::ConstIterator* begins, const asafov::data_list_t::ConstIterator* ends, size_t size)
   {
     for (size_t i = 0; i < size; i++)
     {
@@ -28,9 +29,10 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     return;
   }
 
-  data_list_t::const_iterator* begins = new data_list_t::const_iterator[sequences.size() * 2];
-  data_list_t::const_iterator* ends = &begins[sequences.size()];
-  sequence_list_t::const_iterator seqiter = sequences.cbegin();
+  data_list_t::ConstIterator* begins = new data_list_t::ConstIterator[sequences.size() * 2];
+  data_list_t::ConstIterator* ends = begins + sequences.size();
+
+  sequence_list_t::ConstIterator seqiter = sequences.cbegin();
   size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
@@ -58,12 +60,13 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     size_t pos = 0;
     for (; pos < size;)
     {
-      if(begins[pos] != ends[pos])
+      if (begins[pos] != ends[pos])
       {
-        if(sum > std::numeric_limits<data_t>::max() - *begins[pos])
+        if (sum > std::numeric_limits< data_t >::max() - *begins[pos])
         {
           isAllItersEnds = false;
-        } else
+        }
+        else
         {
           sum += *begins[pos];
         }
@@ -80,7 +83,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     {
       if (begins[pos] != ends[pos])
       {
-        if (sum > std::numeric_limits<data_t>::max() - *begins[pos])
+        if (sum > std::numeric_limits< data_t >::max() - *begins[pos])
         {
           isAllItersEnds = false;
         }
