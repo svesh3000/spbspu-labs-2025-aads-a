@@ -3,7 +3,6 @@
 #include <functional>
 #include <dynamic_array.hpp>
 #include "hash_table_iterator.hpp"
-#include <vector>
 
 namespace demehin
 {

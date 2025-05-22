@@ -1,9 +1,9 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <tree/tree.hpp>
 #include "graph.hpp"
 #include "commands.hpp"
-#include <tree/tree.hpp>
 
 namespace
 {

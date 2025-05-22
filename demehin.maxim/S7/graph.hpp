@@ -1,11 +1,9 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 #include <string>
-#include <unordered_map>
 #include <list/list.hpp>
 #include <tree/tree.hpp>
 #include "hash_table.hpp"
-#include <list>
 
 namespace demehin
 {
