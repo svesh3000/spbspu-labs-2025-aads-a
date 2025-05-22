@@ -139,6 +139,21 @@ namespace kiselev
     {
       return count_ / slots_.size();
     }
+
+    float maxLoadFactor() const
+    {
+      return maxLoadFactor_;
+    }
+
+    void maxLoadFactor(float ml)
+    {
+      maxLoadFactor_ = ml;
+      if (loadFactor() > maxLoadFactor_)
+      {
+        rehash(slots_.size() * 2);
+      }
+    }
+
     void rehash(size_t count);
 
   private:
@@ -154,6 +169,50 @@ namespace kiselev
       std::pair< Key, Value > pair;
       Status status = Status::EMPTY;
     };
+
+    size_t findPos(const Key& key) const
+    {
+      size_t h1 = hash1(key);
+      size_t h2 = hash2(key);
+      for (size_t i = 0; i < slots_.size(); ++i)
+      {
+        size_t pos = (h1 + i * h2) % slots_.size();
+        if (slots_[pos].status == Status::EMPTY)
+        {
+          return pos;
+        }
+        if (slots_[pos].status == Status::OCCUPIED && equal(slots_[pos].pair.first, key))
+        {
+          return pos;
+        }
+      }
+      return slots_.size();
+    }
+
+    size_t findExisting(const Key& key)
+    {
+      size_t pos = findPos(key);
+      if (pos < slots_.size() && slots_[pos].status == Status::OCCUPIED)
+      {
+        return pos;
+      }
+      return slots_.size();
+    }
+
+    size_t findForInsert(const Key& key)
+    {
+      size_t h1 = hash1(key);
+      size_t h2 = hash2(key);
+      for (size_t i = 0; i < slots_.size(); ++i)
+      {
+        size_t pos = (h1 + i * h2) % slots_.size();
+        if (slots_[pos].status != Status::OCCUPIED)
+        {
+          return pos;
+        }
+      }
+      return slots_.size();
+    }
 
     std::vector< Slot > slots_;
     size_t count_;
