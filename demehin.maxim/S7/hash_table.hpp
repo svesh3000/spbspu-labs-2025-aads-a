@@ -269,7 +269,6 @@ namespace demehin
     item_cnt_++;
 
     return { Iter(this, ind), true };
-    //return emplace(val);
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >
@@ -454,7 +453,6 @@ namespace demehin
   template< typename Key, typename T, typename Hash, typename Equal >
   void HashTable< Key, T, Hash, Equal >::swap(HashTable& other) noexcept
   {
-
     std::swap(slots_, other.slots_);
     std::swap(item_cnt_, other.item_cnt_);
     std::swap(hasher_, other.hasher_);

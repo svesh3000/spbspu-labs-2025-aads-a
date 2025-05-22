@@ -156,19 +156,7 @@ namespace demehin
       size_ = std::exchange(other.size_, 0);
     }
     return *this;
-
-    /*if (this != std::addressof(other))
-    {
-      clear();
-      delete[] reinterpret_cast<char*>(std::exchange(fake_, other.fake_));
-      tail_ = std::exchange(other.tail_, other.fake_);
-      size_ = std::exchange(other.size_, 0);
-      other.fake_->next = other.fake_;
-      other.fake_->prev = other.fake_;
-    }
-    return *this;*/
   }
-
 
   template< typename T >
   bool List< T >::operator==(const List< T >& rhs) const noexcept

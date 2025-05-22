@@ -206,7 +206,7 @@ void demehin::extract(std::istream& in, MapOfGraphs& graphs)
     std::string to = it->first.second;
     bool from_found = false;
     bool to_found = false;
-    for (auto v : vrts)
+    for (auto v: vrts)
     {
       if (v == from)
       {
@@ -220,7 +220,7 @@ void demehin::extract(std::istream& in, MapOfGraphs& graphs)
 
     if (from_found && to_found)
     {
-      for (unsigned w : it->second)
+      for (unsigned w: it->second)
       {
         new_gr.addEdge(from, to, w);
       }

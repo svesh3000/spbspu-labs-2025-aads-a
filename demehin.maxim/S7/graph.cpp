@@ -99,37 +99,6 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
   }
 
   return isDeleted;
-
-  /*auto key = std::make_pair(from, to);
-  auto edgeIt = edges.find(key);
-
-  if (edgeIt == edges.end())
-  {
-    return false;
-  }
-
-  auto& weights = edgeIt->second;
-  DynamicArray< unsigned int > newWeights;
-  bool isDeleted = false;
-
-  for (auto it = weights.cbegin(); it != weights.cend(); ++it)
-  {
-    if (*it == weight)
-    {
-      isDeleted = true;
-    }
-    else
-    {
-      newWeights.push(*it);
-    }
-  }
-
-  if (isDeleted)
-  {
-    weights = std::move(newWeights);
-  }
-
-  return isDeleted;*/
 }
 
 

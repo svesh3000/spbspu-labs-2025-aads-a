@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "data_utils.hpp"
 #include "dynamic_array_iterator.hpp"
+#include "dynamic_array_citerator.hpp"
 
 namespace demehin
 {
@@ -33,7 +34,7 @@ namespace demehin
     void pop_back();
     void pop_front();
 
-    cIter erase(cIter);
+    Iter erase(cIter);
 
     const T& front() const;
     T& front();
@@ -96,11 +97,11 @@ namespace demehin
   {}
 
   template< typename T >
-  typename DynamicArray< T >::cIter DynamicArray< T >::erase(cIter pos)
+  typename DynamicArray< T >::Iter DynamicArray< T >::erase(cIter pos)
   {
     if (pos == cend())
     {
-        return cend();
+        return end();
     }
 
     size_t ind = pos - cbegin();
@@ -115,7 +116,7 @@ namespace demehin
     }
 
     size_--;
-    return cIter(data_ + begin_ + ind);
+    return Iter(data_ + begin_ + ind);
   }
 
   template< typename T >
@@ -155,10 +156,6 @@ namespace demehin
   template< typename T >
   DynamicArray< T >::~DynamicArray()
   {
-    //for (size_t i = 0; i < size_; i++)
-    //{
-      //data_[i + begin_].~T();
-   //}
     delete[] data_;
   }
 
@@ -192,24 +189,6 @@ namespace demehin
     begin_++;
     size_--;
   }
-
-  /*template< typename T >
-  typename DynamicArray< T >::Iter DynamicArray< T >::erase(cIter pos)
-  {
-    if (pos == cend())
-    {
-      return end();
-    }
-
-    size_t ind = pos - cbegin();
-    for (size_t i = ind; i < size_ - 1; i++)
-    {
-      data_[begin_ + i] = std::move(data_[begin_ + i + 1]);
-    }
-
-    size_--;
-    return Iter(data_ + begin_ + ind);
-  }*/
 
   template< typename T >
   const T& DynamicArray< T >::front() const
