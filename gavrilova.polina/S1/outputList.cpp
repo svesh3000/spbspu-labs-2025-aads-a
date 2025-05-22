@@ -6,7 +6,7 @@ namespace {
   {
     unsigned long long MAX_OF_ULL = std::numeric_limits< unsigned long long >::max();
     if (first > MAX_OF_ULL - second) {
-      throw std::overflow_error("Overflow.\n");
+      throw std::overflow_error("Overflow.");
     }
     return first + second;
   }
@@ -68,8 +68,12 @@ gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out
         all_empty = false;
         out << (first_element ? "" : " ") << **current_ptr;
         first_element = false;
-
-        curSum = addition(curSum, **current_ptr);
+        try {
+          curSum = addition(curSum, **current_ptr);
+        } catch (...) {
+          out << "\n";
+          throw;
+        }
 
         ++(*current_ptr);
       }

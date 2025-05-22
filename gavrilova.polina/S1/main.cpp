@@ -44,5 +44,4 @@ int main()
 
   outFwdListULL(std::cout, sums);
   std::cout << "\n";
-
 }
