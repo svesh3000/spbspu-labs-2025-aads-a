@@ -9,18 +9,18 @@ namespace zakirov
     T data_;
     FwdListNode< T > * next_;
 
-    FwdListNode(T & data);
-    FwdListNode(T & data, FwdListNode< T > * next);
+    FwdListNode(const T & data);
+    FwdListNode(const T & data, FwdListNode< T > * next);
   };
 
   template< typename T >
-  FwdListNode< T >::FwdListNode(T & data):
+  FwdListNode< T >::FwdListNode(const T & data):
     data_(data),
     next_(nullptr)
   {}
 
   template< typename T >
-  FwdListNode< T >::FwdListNode(T & data, FwdListNode< T > * next):
+  FwdListNode< T >::FwdListNode(const T & data, FwdListNode< T > * next):
     data_(data),
     next_(next)
   {}

@@ -1,5 +1,5 @@
-#ifndef MY_LIST_HPP
-#define MY_LIST_HPP
+#ifndef FWD_LIST_HPP
+#define FWD_LIST_HPP
 #include <cstddef>
 #include <utility>
 #include "fwd_list_node.hpp"
@@ -31,13 +31,13 @@ namespace zakirov
     FwdIterator< T > end() noexcept;
     CFwdIterator< T > cend() const noexcept;
     void push_front(const T & data);
-    void push_front(const T && data);
+    void push_front(T && data);
     void pop_front() noexcept;
     void insert_after(FwdIterator< T > element, const T & data);
     void erase_after(FwdIterator< T > element) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void swap(FwdList & other);
+    void swap(FwdList & other) noexcept;
     void splice_after(FwdIterator< T > pos, const FwdList & fwdlst);
     void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > i);
     void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
@@ -49,16 +49,18 @@ namespace zakirov
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T > init_list);
     void clear() noexcept;
-    template< typename P>
+    template< typename P >
     void remove_if(P predicate) noexcept;
     void remove(const T & data) noexcept;
   private:
     FwdListNode< T > * fake_node_;
+    size_t size_;
   };
 
   template< typename T >
   FwdList< T >::FwdList():
-    fake_node_(reinterpret_cast< FwdListNode< T >* >(new char[sizeof(FwdListNode< T >)]))
+    fake_node_(reinterpret_cast< FwdListNode< T >* >(new char[sizeof(FwdListNode< T >)])),
+    size_ = 0
   {
     fake_node_->next_ = fake_node_;
   }
@@ -87,25 +89,13 @@ namespace zakirov
 
   template< typename T >
   FwdList< T >::FwdList(std::initializer_list< T > init_list):
-    FwdList()
-  {
-    FwdIterator< T > inserter = begin();
-    for (auto i = init_list.begin(); i != init_list.end(); ++i, ++inserter)
-    {
-      insert_after(inserter, *i);
-    }
-  }
+    FwdList(init_list.begin(), init_list.end())
+  {}
 
   template< typename T >
   FwdList< T >::FwdList(const FwdList & other):
-    FwdList()
-  {
-    FwdIterator< T > inserter = before_begin();
-    for (CFwdIterator< T > i = other.cbegin(); i != other.cend(); ++i, ++inserter)
-    {
-      insert_after(inserter, *i);
-    }
-  }
+    FwdList(other.cbegin(), other.cend())
+  {}
 
   template< typename T >
   FwdList< T >::FwdList(FwdList && other) noexcept:
@@ -127,9 +117,9 @@ namespace zakirov
   FwdList< T > & FwdList< T >::operator=(const FwdList< T > & fwdlst)
   {
     clear();
-    FwdIterator<T> inserter = begin();
-    CFwdIterator<T> left = fwdlst.cbegin();
-    CFwdIterator<T> right = fwdlst.cend();
+    FwdIterator< T > inserter = begin();
+    CFwdIterator< T > left = fwdlst.cbegin();
+    CFwdIterator< T > right = fwdlst.cend();
     for (; left != right; ++left, ++inserter)
     {
       insert_after(inserter, *left);
@@ -140,9 +130,9 @@ namespace zakirov
   template< typename T >
   FwdList< T > & FwdList< T >::operator=(FwdList< T > && fwdlst) noexcept
   {
-    if (this != &fwdlst)
+    if (this != std::addressof(fwdlst))
     {
-      FwdListNode<T> * temporary_node = fake_node_;
+      FwdListNode< T > * temporary_node = fake_node_;
       fake_node_ = fwdlst.fake_node_;
       fwdlst.fake_node_ = temporary_node;
     }
@@ -219,14 +209,16 @@ namespace zakirov
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
     new_element->next_ = fake_node_->next_;
     fake_node_->next_ = new_element;
+    ++size_;
   }
 
   template< typename T >
-  void FwdList< T >::push_front(const T && data)
+  void FwdList< T >::push_front(T && data)
   {
     FwdListNode< T > * new_element = new FwdListNode< T >(std::move(data));
     new_element->next_ = fake_node_->next_;
     fake_node_->next_ = new_element;
+    ++size_;
   }
 
   template< typename T >
@@ -235,6 +227,7 @@ namespace zakirov
     FwdListNode< T > * temp_element = element.node_->next_->next_;
     delete element.node_->next_;
     element.node_->next_ = temp_element;
+    --size_;
   }
 
   template< typename T >
@@ -243,6 +236,7 @@ namespace zakirov
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
     new_element->next_ = element.node_->next_;
     element.node_->next_ = new_element;
+    ++size_;
   }
 
   template< typename T >
@@ -250,31 +244,23 @@ namespace zakirov
   {
     if (fake_node_->next_ == fake_node_)
     {
-      return 1;
+      return true;
     }
 
-    return 0;
+    return false;
   }
 
   template< typename T >
   size_t FwdList< T >::size() const noexcept
   {
-    size_t counter = 0;
-    FwdListNode< T > * nailed_ptr = fake_node_;
-    FwdListNode< T > * fillable_ptr = fake_node_->next_;
-    while (nailed_ptr != fillable_ptr)
-    {
-      ++counter;
-      fillable_ptr = fillable_ptr->next_;
-    }
-
-    return counter;
+    return size_;
   }
 
   template< typename T >
-  void FwdList< T >::swap(FwdList & other)
+  void FwdList< T >::swap(FwdList & other) noexcept
   {
     std::swap(fake_node_, other.fake_node_);
+    std::swap(size_, other.size_);
   }
 
   template< typename T >
@@ -291,6 +277,8 @@ namespace zakirov
     pos.node_->next_ = i.node_->next_;
     pos.node_->next_->next_ = next_base;
     i.node_->next_ = next_new;
+    --fwdlst.size_;
+    ++size_;
   }
 
   template< typename T >
@@ -350,6 +338,8 @@ namespace zakirov
     {
       pop_front();
     }
+
+    size_ = 0;
   }
 
   template< typename T >
@@ -364,6 +354,7 @@ namespace zakirov
       {
         erase_after(prev);
         ++real;
+        --size_;
       }
       else
       {
