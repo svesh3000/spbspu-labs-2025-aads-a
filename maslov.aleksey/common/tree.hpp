@@ -746,7 +746,7 @@ namespace maslov
         current = current->right;
         leftDone = (current == fakeLeaf_);
       }
-    } 
+    }
     return f;
   }
 
@@ -775,7 +775,7 @@ namespace maslov
       {
         current = stack.top();
         stack.pop();
-        f(current->data); 
+        f(current->data);
         current = current->left;
         rightDone = (current == fakeLeaf_);
       }
