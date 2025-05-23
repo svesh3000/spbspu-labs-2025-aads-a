@@ -4,6 +4,8 @@
 #include <stack.hpp>
 #include "tree-node.hpp"
 
+#include <iostream>
+
 namespace alymova
 {
   template< class Key, class Value, class Comparator >
@@ -23,7 +25,7 @@ namespace alymova
     bool operator!=(const ConstLnrIterator& other) const noexcept;
     const std::pair< Key, Value >& operator*() const noexcept;
     const std::pair< Key, Value >* operator->() const noexcept;
-  private:
+  protected:
     Node const* root_;
     std::pair< Node*, NodePoint > node_;
     std::pair< Node*, NodePoint > tmp_;
@@ -32,6 +34,20 @@ namespace alymova
     TTTConstLnrIterator(Node* root, NodePoint point);
 
     friend class TwoThreeTree< Key, Value, Comparator >;
+  };
+
+  template< class Key, class Value, class Comparator >
+  struct TTTLnrIterator final:
+    public TTTConstLnrIterator< Key, Value, Comparator >
+  {
+    using Base = TTTConstLnrIterator< Key, Value, Comparator >;
+    using Node = typename detail::TTTNode< Key, Value, Comparator >;
+    using NodePoint = typename detail::NodePoint;
+
+    TTTLnrIterator(Node* root, NodePoint);
+
+    std::pair< Key, Value >& operator*() noexcept;
+    std::pair< Key, Value >* operator->() noexcept;
   };
 
   template< class Key, class Value, class Comparator >
@@ -135,6 +151,29 @@ namespace alymova
     assert(node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
 
     return std::addressof(node_.first->data[node_.second - 1]);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTLnrIterator< Key, Value, Comparator >::TTTLnrIterator(Node* node, NodePoint point):
+    Base(node, point)
+  {}
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >& TTTLnrIterator< Key, Value, Comparator >::operator*() noexcept
+  {
+    assert(Base::node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(Base::node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
+
+    return Base::node_.first->data[Base::node_.second - 1];
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >* TTTLnrIterator< Key, Value, Comparator >::operator->() noexcept
+  {
+    assert(Base::node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(Base::node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
+
+    return std::addressof(Base::node_.first->data[Base::node_.second - 1]);
   }
 }
 

@@ -22,8 +22,11 @@ namespace alymova
     using Tree = TwoThreeTree< Key, Value, Comparator >;
     using Iterator = TTTIterator< Key, Value, Comparator >;
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
+    using LnrIterator = TTTLnrIterator< Key, Value, Comparator >;
     using ConstLnrIterator = TTTConstLnrIterator< Key, Value, Comparator >;
+    using RnlIterator = TTTRnlIterator< Key, Value, Comparator >;
     using ConstRnlIterator = TTTConstRnlIterator< Key, Value, Comparator >;
+    using BreadthIterator = TTTBreadthIterator< Key, Value, Comparator >;
     using ConstBreadthIterator = TTTConstBreadthIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value, Comparator >;
     using NodeType = typename Node::NodeType;
@@ -60,18 +63,30 @@ namespace alymova
     template< class F >
     F traverse_breadth(F f) const;
 
-    Iterator begin();
+    Iterator begin() noexcept;
     ConstIterator begin() const noexcept;
     ConstIterator cbegin() const noexcept;
+
+    LnrIterator lnr_begin() noexcept;
     ConstLnrIterator lnr_cbegin() const noexcept;
+
+    RnlIterator rnl_begin() noexcept;
     ConstRnlIterator rnl_cbegin() const noexcept;
+
+    BreadthIterator breadth_begin() noexcept;
     ConstBreadthIterator breadth_cbegin() const noexcept;
 
-    Iterator end();
+    Iterator end() noexcept;
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
+
+    LnrIterator lnr_end() noexcept;
     ConstLnrIterator lnr_cend() const noexcept;
+
+    RnlIterator rnl_end() noexcept;
     ConstRnlIterator rnl_cend() const noexcept;
+
+    BreadthIterator breadth_end() noexcept;
     ConstBreadthIterator breadth_cend() const noexcept;
 
     bool empty() const noexcept;
@@ -263,7 +278,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::begin()
+  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::begin() noexcept
   {
     return Iterator(cbegin());
   }
@@ -290,9 +305,21 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  TTTLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_begin() noexcept
+  {
+    return LnrIterator(root_, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cbegin() const noexcept
   {
     return ConstLnrIterator(root_, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_begin() noexcept
+  {
+    return RnlIterator(root_, NodePoint::First);
   }
 
   template< class Key, class Value, class Comparator >
@@ -302,13 +329,19 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  TTTBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_begin() noexcept
+  {
+    return BreadthIterator(root_, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cbegin() const noexcept
   {
     return ConstBreadthIterator(root_, NodePoint::First);
   }
 
   template< class Key, class Value, class Comparator >
-  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::end()
+  TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::end() noexcept
   {
     return Iterator(cend());
   }
@@ -326,15 +359,33 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  TTTLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_end() noexcept
+  {
+    return LnrIterator(fake_right_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const noexcept
   {
     return ConstLnrIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
+  TTTRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_end() noexcept
+  {
+    return RnlIterator(fake_left_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const noexcept
   {
     return ConstRnlIterator(fake_left_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_end() noexcept
+  {
+    return BreadthIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
@@ -952,7 +1003,6 @@ namespace alymova
         parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
         node->left = left->right;
-        //if (node->left && node->left != fake_left_)
         if (node->left)
         {
           node->left->parent = node;
@@ -986,7 +1036,7 @@ namespace alymova
       node->insert(std::move(mid->data[0]));
       node->mid = mid->left;
       node->right = mid->right;
-      if (node->right && node->right != fake_right_)
+      if (node->mid)
       {
         node->mid->parent = node;
         node->right->parent = node;
@@ -1000,7 +1050,7 @@ namespace alymova
     {
       node->insert(std::move(parent->data[0]));
       parent->remove(NodePoint::First);
-      if (!node->right)
+      if (!node->right || node->right == fake_right_)
       {
         std::swap(node->left, node->right);
       }

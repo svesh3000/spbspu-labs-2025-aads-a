@@ -4,6 +4,8 @@
 #include <queue.hpp>
 #include "tree-node.hpp"
 
+#include <iostream>
+
 namespace alymova
 {
   template< class Key, class Value, class Comparator >
@@ -23,30 +25,41 @@ namespace alymova
     bool operator!=(const ConstBreadthIterator& other) const noexcept;
     const std::pair< Key, Value >& operator*() const noexcept;
     const std::pair< Key, Value >* operator->() const noexcept;
-  private:
-    Node const* root_;
+  protected:
     std::pair< Node*, NodePoint > node_;
     Queue< std::pair< Node*, NodePoint > > nexts_;
 
-    TTTConstBreadthIterator(Node* root, NodePoint point);
+    TTTConstBreadthIterator(Node* node, NodePoint point);
 
     friend class TwoThreeTree< Key, Value, Comparator >;
   };
 
+  template< class Key, class Value, class Comparator >
+  struct TTTBreadthIterator final:
+    public TTTConstBreadthIterator< Key, Value, Comparator >
+  {
+    using Base = TTTConstBreadthIterator< Key, Value, Comparator >;
+    using Node = typename detail::TTTNode< Key, Value, Comparator >;
+    using NodePoint = typename detail::NodePoint;
+
+    TTTBreadthIterator(Node* root, NodePoint);
+
+    std::pair< Key, Value >& operator*() noexcept;
+    std::pair< Key, Value >* operator->() noexcept;
+  };
+
   template < class Key, class Value, class Comparator >
   TTTConstBreadthIterator< Key, Value, Comparator >::TTTConstBreadthIterator():
-    root_(nullptr),
     node_({nullptr, NodeType::Empty}),
     nexts_()
   {}
 
   template< class Key, class Value, class Comparator >
-  TTTConstBreadthIterator< Key, Value, Comparator >::TTTConstBreadthIterator(Node* root, NodePoint point):
-    root_(root),
-    node_({root, point}),
+  TTTConstBreadthIterator< Key, Value, Comparator >::TTTConstBreadthIterator(Node* node, NodePoint point):
+    node_({node, point}),
     nexts_()
   {
-    if (point != NodePoint::Fake && root)
+    if (point != NodePoint::Fake && node)
     {
       nexts_.push(node_);
       if (node_.first->type == NodeType::Triple)
@@ -151,6 +164,29 @@ namespace alymova
     assert(node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
 
     return std::addressof(node_.first->data[node_.second - 1]);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTBreadthIterator< Key, Value, Comparator >::TTTBreadthIterator(Node* node, NodePoint point):
+    Base(node, point)
+  {}
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >& TTTBreadthIterator< Key, Value, Comparator >::operator*() noexcept
+  {
+    assert(Base::node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(Base::node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
+
+    return Base::node_.first->data[Base::node_.second - 1];
+  }
+
+  template< class Key, class Value, class Comparator >
+  std::pair< Key, Value >* TTTBreadthIterator< Key, Value, Comparator >::operator->() noexcept
+  {
+    assert(Base::node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(Base::node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
+
+    return std::addressof(Base::node_.first->data[Base::node_.second - 1]);
   }
 }
 #endif
