@@ -798,7 +798,7 @@ namespace maslov
     queue.push(fakeRoot_->left);
     while (!queue.empty())
     {
-      BiTreeNode< Key, T > * current = queeue.front();
+      BiTreeNode< Key, T > * current = queue.front();
       queue.pop();
       f(current->data);
       if (current->left != fakeLeaf_)
