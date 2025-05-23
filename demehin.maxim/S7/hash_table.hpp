@@ -155,7 +155,7 @@ namespace demehin
         return ind;
       }
 
-      if (slots_[ind].state == SlotState::DELETED && first_deleted != slots_.size())
+      if (slots_[ind].state == SlotState::DELETED && first_deleted == slots_.size())
       {
         first_deleted = ind;
       }
