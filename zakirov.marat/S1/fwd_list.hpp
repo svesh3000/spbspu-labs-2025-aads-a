@@ -38,9 +38,9 @@ namespace zakirov
     bool empty() const noexcept;
     size_t size() const noexcept;
     void swap(FwdList & other) noexcept;
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst);
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > i);
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
     void splice_after(FwdIterator< T > pos, FwdList && fwdlst);
     void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i);
     void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last);
@@ -60,7 +60,7 @@ namespace zakirov
   template< typename T >
   FwdList< T >::FwdList():
     fake_node_(reinterpret_cast< FwdListNode< T >* >(new char[sizeof(FwdListNode< T >)])),
-    size_ = 0
+    size_(0)
   {
     fake_node_->next_ = fake_node_;
   }
@@ -264,13 +264,13 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst)
   {
     splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end());
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > i)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i)
   {
     FwdList< T > * next_base = pos.node_->next_;
     FwdList< T > * next_new = i.node_->next_->next_;
@@ -282,7 +282,7 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
   {
     FwdIterator< T > after_first = first;
     ++after_first;
