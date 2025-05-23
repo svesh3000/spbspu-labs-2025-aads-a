@@ -66,27 +66,15 @@ namespace alymova
     Iterator begin() noexcept;
     ConstIterator begin() const noexcept;
     ConstIterator cbegin() const noexcept;
-
-    LnrIterator lnr_begin() noexcept;
     ConstLnrIterator lnr_cbegin() const noexcept;
-
-    RnlIterator rnl_begin() noexcept;
     ConstRnlIterator rnl_cbegin() const noexcept;
-
-    BreadthIterator breadth_begin() noexcept;
     ConstBreadthIterator breadth_cbegin() const noexcept;
 
     Iterator end() noexcept;
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
-
-    LnrIterator lnr_end() noexcept;
     ConstLnrIterator lnr_cend() const noexcept;
-
-    RnlIterator rnl_end() noexcept;
     ConstRnlIterator rnl_cend() const noexcept;
-
-    BreadthIterator breadth_end() noexcept;
     ConstBreadthIterator breadth_cend() const noexcept;
 
     bool empty() const noexcept;
@@ -305,39 +293,36 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_begin() noexcept
-  {
-    return LnrIterator(root_, NodePoint::First);
-  }
-
-  template< class Key, class Value, class Comparator >
   TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cbegin() const noexcept
   {
-    return ConstLnrIterator(root_, NodePoint::First);
-  }
-
-  template< class Key, class Value, class Comparator >
-  TTTRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_begin() noexcept
-  {
-    return RnlIterator(root_, NodePoint::First);
+    NodePoint point = NodePoint::First;
+    if (empty())
+    {
+      point = NodePoint::Fake;
+    }
+    return ConstLnrIterator(root_, point);
   }
 
   template< class Key, class Value, class Comparator >
   TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cbegin() const noexcept
   {
-    return ConstRnlIterator(root_, NodePoint::First);
-  }
-
-  template< class Key, class Value, class Comparator >
-  TTTBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_begin() noexcept
-  {
-    return BreadthIterator(root_, NodePoint::First);
+    NodePoint point = NodePoint::First;
+    if (empty())
+    {
+      point = NodePoint::Fake;
+    }
+    return ConstRnlIterator(root_, point);
   }
 
   template< class Key, class Value, class Comparator >
   TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cbegin() const noexcept
   {
-    return ConstBreadthIterator(root_, NodePoint::First);
+    NodePoint point = NodePoint::First;
+    if (empty())
+    {
+      point = NodePoint::Fake;
+    }
+    return ConstBreadthIterator(root_, point);
   }
 
   template< class Key, class Value, class Comparator >
@@ -359,33 +344,15 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_end() noexcept
-  {
-    return LnrIterator(fake_right_, NodePoint::Fake);
-  }
-
-  template< class Key, class Value, class Comparator >
   TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const noexcept
   {
     return ConstLnrIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
-  TTTRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_end() noexcept
-  {
-    return RnlIterator(fake_left_, NodePoint::Fake);
-  }
-
-  template< class Key, class Value, class Comparator >
   TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const noexcept
   {
     return ConstRnlIterator(fake_left_, NodePoint::Fake);
-  }
-
-  template< class Key, class Value, class Comparator >
-  TTTBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_end() noexcept
-  {
-    return BreadthIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
