@@ -11,6 +11,7 @@
 #include "tree-const-iterator-impl.hpp"
 #include "tree-lnr-iterator.hpp"
 #include "tree-rnl-iterator.hpp"
+#include "tree-breadth-iterator.hpp"
 
 namespace alymova
 {
@@ -23,7 +24,7 @@ namespace alymova
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
     using ConstLnrIterator = TTTConstLnrIterator< Key, Value, Comparator >;
     using ConstRnlIterator = TTTConstRnlIterator< Key, Value, Comparator >;
-    //using ConstBreadthIterator = TTTConstBreadthIterator< Key, Value, Comparator >;
+    using ConstBreadthIterator = TTTConstBreadthIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value, Comparator >;
     using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;
@@ -64,12 +65,14 @@ namespace alymova
     ConstIterator cbegin() const noexcept;
     ConstLnrIterator lnr_cbegin() const noexcept;
     ConstRnlIterator rnl_cbegin() const noexcept;
+    ConstBreadthIterator breadth_cbegin() const noexcept;
 
     Iterator end();
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
     ConstLnrIterator lnr_cend() const noexcept;
     ConstRnlIterator rnl_cend() const noexcept;
+    ConstBreadthIterator breadth_cend() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -299,6 +302,12 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cbegin() const noexcept
+  {
+    return ConstBreadthIterator(root_, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
   TTTIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::end()
   {
     return Iterator(cend());
@@ -326,6 +335,12 @@ namespace alymova
   TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const noexcept
   {
     return ConstRnlIterator(fake_left_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cend() const noexcept
+  {
+    return ConstBreadthIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
@@ -375,33 +390,9 @@ namespace alymova
   template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_breadth(F f) const
   {
-    if (empty())
+    for (auto it = breadth_cbegin(); it != breadth_cend(); ++it)
     {
-      return f;
-    }
-    Queue< Node* > nexts;
-    nexts.push(root_);
-    Node* temp;
-    while (!nexts.empty())
-    {
-      temp = nexts.front();
-      nexts.pop();
-      for (size_t i = 0; i < temp->type; i++)
-      {
-        f(temp->data[i]);
-      }
-      if (temp->left && temp->left != fake_left_)
-      {
-        nexts.push(temp->left);
-      }
-      if (temp->mid)
-      {
-        nexts.push(temp->mid);
-      }
-      if (temp->right && temp->right != fake_right_)
-      {
-        nexts.push(temp->right);
-      }
+      f(*it);
     }
     return f;
   }

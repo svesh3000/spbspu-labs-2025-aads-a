@@ -21,8 +21,8 @@ namespace alymova
     ConstLnrIterator operator++(int);
     bool operator==(const ConstLnrIterator& other) const noexcept;
     bool operator!=(const ConstLnrIterator& other) const noexcept;
-    std::pair< Key, Value >& operator*() noexcept;
-    std::pair< Key, Value >* operator->() noexcept;
+    const std::pair< Key, Value >& operator*() const noexcept;
+    const std::pair< Key, Value >* operator->() const noexcept;
   private:
     Node const* root_;
     std::pair< Node*, NodePoint > node_;
@@ -120,17 +120,19 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  std::pair< Key, Value >& TTTConstLnrIterator< Key, Value, Comparator >::operator*() noexcept
+  const std::pair< Key, Value >& TTTConstLnrIterator< Key, Value, Comparator >::operator*() const noexcept
   {
     assert(node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
 
     return node_.first->data[node_.second - 1];
   }
 
   template< class Key, class Value, class Comparator >
-  std::pair< Key, Value >* TTTConstLnrIterator< Key, Value, Comparator >::operator->() noexcept
+  const std::pair< Key, Value >* TTTConstLnrIterator< Key, Value, Comparator >::operator->() const noexcept
   {
     assert(node_.first != nullptr && "You are trying to access beyond tree's bounds");
+    assert(node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
 
     return std::addressof(node_.first->data[node_.second - 1]);
   }
