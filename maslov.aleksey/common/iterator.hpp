@@ -23,6 +23,8 @@ namespace maslov
     thisT & operator=(const thisT &) = default;
     thisT & operator++();
     thisT operator++(int);
+    thisT & operator--();
+    thisT operator--(int);
     std::pair< Key, T > & operator*();
     std::pair< Key, T > * operator->();
     bool operator!=(const thisT &) const;
@@ -89,16 +91,67 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
+  typename TreeIterator< Key, T, Cmp >::thisT & TreeIterator< Key, T, Cmp >::operator--()
+  {
+    assert(fakeLeaf_->parent->left != fakeLeaf_);
+    if (node_ == fakeLeaf_)
+    {
+      node_ = fakeLeaf_->parent->left;
+      while (node_->right != fakeLeaf_)
+      {
+        node_ = node_->right;
+      }
+    }
+    else
+    {
+      if (node_->left == fakeLeaf_)
+      {
+        BiTreeNode< Key, T > * parent = node_->parent;
+        while ((parent != fakeLeaf_->parent) && (node_ == parent->left))
+        {
+          node_ = parent;
+          parent = parent->parent;
+        }
+        if (parent == fakeLeaf_->parent)
+        {
+          node_ = fakeLeaf_;
+        }
+        else
+        {
+          node_ = parent;
+        }
+      }
+      else
+      {
+        node_ = node_->left;
+        while (node_->right != fakeLeaf_)
+        {
+          node_ = node_->right;
+        }
+      }
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename TreeIterator< Key, T, Cmp >::thisT TreeIterator< Key, T, Cmp >::operator--(int)
+  {
+    thisT tmp(*this);
+    --(*this);
+    return tmp;
+  }
+
+  template< typename Key, typename T, typename Cmp >
   std::pair< Key, T > & TreeIterator< Key, T, Cmp >::operator*()
   {
-    assert(node_ != nullptr);
+    assert(node_ != nullptr && node_ != fakeLeaf_);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
   std::pair< Key, T > * TreeIterator< Key, T, Cmp >::operator->()
   {
-    assert(node_ != nullptr);
+    assert(node_ != nullptr && node_ != fakeLeaf_);
     return std::addressof(node_->data);
   }
 
@@ -127,6 +180,8 @@ namespace maslov
     thisT & operator=(const thisT &) = default;
     thisT & operator++();
     thisT operator++(int);
+    thisT & operator--();
+    thisT operator--(int);
     const std::pair< Key, T > & operator*() const;
     const std::pair< Key, T > * operator->() const;
     bool operator==(const thisT & rhs) const;
@@ -193,16 +248,67 @@ namespace maslov
   }
 
   template< typename Key, typename T, typename Cmp >
+  typename TreeConstIterator< Key, T, Cmp >::thisT & TreeConstIterator< Key, T, Cmp >::operator--()
+  {
+    assert(fakeLeaf_->parent->left != fakeLeaf_);
+    if (node_ == fakeLeaf_)
+    {
+      node_ = fakeLeaf_->parent->left;
+      while (node_->right != fakeLeaf_)
+      {
+        node_ = node_->right;
+      }
+    }
+    else
+    {
+      if (node_->left == fakeLeaf_)
+      {
+        BiTreeNode< Key, T > * parent = node_->parent;
+        while ((parent != fakeLeaf_->parent) && (node_ == parent->left))
+        {
+          node_ = parent;
+          parent = parent->parent;
+        }
+        if (parent == fakeLeaf_->parent)
+        {
+          node_ = fakeLeaf_;
+        }
+        else
+        {
+          node_ = parent;
+        }
+      }
+      else
+      {
+        node_ = node_->left;
+        while (node_->right != fakeLeaf_)
+        {
+          node_ = node_->right;
+        }
+      }
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename TreeConstIterator< Key, T, Cmp >::thisT TreeConstIterator< Key, T, Cmp >::operator--(int)
+  {
+    thisT tmp(*this);
+    --(*this);
+    return tmp;
+  }
+
+  template< typename Key, typename T, typename Cmp >
   const std::pair< Key, T > & TreeConstIterator< Key, T, Cmp >::operator*() const
   {
-    assert(node_ != nullptr);
+    assert(node_ != nullptr && node_ != fakeLeaf_);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
   const std::pair< Key, T > * TreeConstIterator< Key, T, Cmp >::operator->() const
   {
-    assert(node_ != nullptr);
+    assert(node_ != nullptr && node_ != fakeLeaf_);
     return std::addressof(node_->data);
   }
 
