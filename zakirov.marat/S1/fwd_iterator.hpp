@@ -12,7 +12,7 @@ namespace zakirov
   class FwdIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    FwdIterator() noexcept;
+    explicit FwdIterator() noexcept;
     ~FwdIterator() = default;
     FwdIterator(const FwdIterator< T > &) noexcept = default;
     FwdIterator< T > & operator=(const FwdIterator< T > &) noexcept = default;
@@ -34,7 +34,7 @@ namespace zakirov
   {}
 
   template< typename T >
-  FwdIterator< T >::FwdIterator(zakirov::FwdListNode< T > * node) noexcept:
+  FwdIterator< T >::FwdIterator(FwdListNode< T > * node) noexcept:
     node_(node)
   {}
 
@@ -81,7 +81,7 @@ namespace zakirov
   class CFwdIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    CFwdIterator() noexcept;
+    explicit CFwdIterator() noexcept;
     ~CFwdIterator() = default;
     CFwdIterator(const CFwdIterator< T > &) noexcept = default;
     CFwdIterator< T > & operator=(const CFwdIterator< T > &) noexcept = default;
