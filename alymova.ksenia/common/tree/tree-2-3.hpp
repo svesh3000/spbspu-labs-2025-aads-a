@@ -9,7 +9,8 @@
 #include "tree-iterators.hpp"
 #include "tree-iterator-impl.hpp"
 #include "tree-const-iterator-impl.hpp"
-#include "tree-heavy-iterators.hpp"
+#include "tree-lnr-iterator.hpp"
+#include "tree-rnl-iterator.hpp"
 
 namespace alymova
 {
@@ -20,6 +21,9 @@ namespace alymova
     using Tree = TwoThreeTree< Key, Value, Comparator >;
     using Iterator = TTTIterator< Key, Value, Comparator >;
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
+    using ConstLnrIterator = TTTConstLnrIterator< Key, Value, Comparator >;
+    using ConstRnlIterator = TTTConstRnlIterator< Key, Value, Comparator >;
+    //using ConstBreadthIterator = TTTConstBreadthIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value, Comparator >;
     using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;
@@ -58,9 +62,14 @@ namespace alymova
     Iterator begin();
     ConstIterator begin() const noexcept;
     ConstIterator cbegin() const noexcept;
+    ConstLnrIterator lnr_cbegin() const noexcept;
+    ConstRnlIterator rnl_cbegin() const noexcept;
+  
     Iterator end();
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
+    ConstLnrIterator lnr_cend() const noexcept;
+    ConstRnlIterator rnl_cend() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -98,6 +107,7 @@ namespace alymova
   private:
     size_t size_;
     Node* fake_;
+    Node* fake_left_;
     Node* root_;
     Comparator cmp_;
 
@@ -154,14 +164,13 @@ namespace alymova
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
+    fake_left_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     root_(fake_)
   {
     fake_->type = NodeType::Fake;
-    fake_->parent = nullptr;
-    fake_->left = nullptr;
-    fake_->mid = nullptr;
-    fake_->right = nullptr;
-    fake_->overflow = nullptr;
+    fake_->clear();
+    fake_left_->type = NodeType::Fake;
+    fake_left_->clear();
   }
 
   template< class Key, class Value, class Comparator >
@@ -173,6 +182,7 @@ namespace alymova
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree(Tree&& other) noexcept:
     size_(std::exchange(other.size_, 0)),
     fake_(std::exchange(other.fake_, nullptr)),
+    fake_left_(std::exchange(other.fake_left_, nullptr)),
     root_(std::exchange(other.root_, nullptr))
   {}
 
@@ -200,6 +210,7 @@ namespace alymova
       clear(root_);
     }
     delete[] reinterpret_cast< char* >(fake_);
+    delete[] reinterpret_cast< char* >(fake_left_);
   }
 
   template< class Key, class Value, class Comparator >
@@ -268,11 +279,23 @@ namespace alymova
       return cend();
     }
     Node* tmp = root_;
-    while (tmp->left)
+    while (tmp->left && tmp->left != fake_left_)
     {
       tmp = tmp->left;
     }
     return ConstIterator(tmp, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cbegin() const noexcept
+  {
+    return ConstLnrIterator(root_, NodePoint::First);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cbegin() const noexcept
+  {
+    return ConstRnlIterator(root_, NodePoint::First);
   }
 
   template< class Key, class Value, class Comparator >
@@ -294,41 +317,32 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
+  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const noexcept
+  {
+    return ConstLnrIterator(fake_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
+  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const noexcept
+  {
+    return ConstRnlIterator(fake_left_, NodePoint::Fake);
+  }
+
+  template< class Key, class Value, class Comparator >
   template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f)
   {
-    if (empty())
-    {
-      return f;
-    }
-    TTTLnrIterator< Key, Value, Comparator > it{root_, NodePoint::First};
-    TTTLnrIterator< Key, Value, Comparator > it_end{fake_, NodePoint::Fake};
-    for (; it != it_end; ++it)
-    {
-      f(*it);
-    }
-    return f;
-    //return static_cast< const TwoThreeTree& >(*this).traverse_lnr(f);
+    return static_cast< const TwoThreeTree& >(*this).traverse_lnr(f);
   }
 
   template< class Key, class Value, class Comparator >
   template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_lnr(F f) const
   {
-    if (empty())
-    {
-      return f;
-    }
-    TTTLnrIterator< Key, Value, Comparator > it{root_, NodePoint::First};
-    TTTLnrIterator< Key, Value, Comparator > it_end{fake_, NodePoint::Fake};
-    for (; it != it_end; it++)
-    {
-      std::cout << it->first << '\n';
-    }
-    /*for (auto it = begin(); it != end(); it++)
+    for (auto it = lnr_cbegin(); it != lnr_cend(); ++it)
     {
       f(*it);
-    }*/
+    }
     return f;
   }
 
@@ -343,16 +357,10 @@ namespace alymova
   template< class F >
   F TwoThreeTree< Key, Value, Comparator >::traverse_rnl(F f) const
   {
-    if (empty())
-    {
-      return f;
-    }
-    auto it = --end();
-    for (; it != begin(); it--)
+    for (auto it = rnl_cbegin(); it != rnl_cend(); ++it)
     {
       f(*it);
     }
-    f(*it);
     return f;
   }
 
@@ -382,7 +390,7 @@ namespace alymova
       {
         f(temp->data[i]);
       }
-      if (temp->left)
+      if (temp->left && temp->left != fake_left_)
       {
         nexts.push(temp->left);
       }
@@ -571,6 +579,7 @@ namespace alymova
   {
     std::swap(size_, other.size_);
     std::swap(fake_, other.fake_);
+    std::swap(fake_left_, other.fake_left_);
     std::swap(root_, other.root_);
     std::swap(cmp_, other.cmp_);
   }
@@ -673,7 +682,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::clear(Node* root) noexcept
   {
-    if (!root || root == fake_)
+    if (!root || root == fake_ || root == fake_left_)
     {
       return;
     }
@@ -701,7 +710,7 @@ namespace alymova
       }
       left = new Node{{node->data[0]}, NodeType::Double, parent, node->left, nullptr, node->mid, nullptr};
       right = new Node{{node->data[2]}, NodeType::Double, parent, node->right, nullptr, node->overflow, nullptr};
-      if (left->left)
+      if (left->left && left->left != fake_left_)
       {
         left->left->parent = left;
         left->right->parent = left;
@@ -766,6 +775,7 @@ namespace alymova
     if (empty())
     {
       fake_->parent = nullptr;
+      fake_left_->parent = nullptr;
       return;
     }
     Node* tmp = root_;
@@ -775,6 +785,13 @@ namespace alymova
     }
     tmp->right = fake_;
     fake_->parent = tmp;
+    tmp = root_;
+    while (tmp->left && tmp->left != fake_left_)
+    {
+      tmp = tmp->left;
+    }
+    tmp->left = fake_left_;
+    fake_left_->parent = tmp;
   }
 
   template< class Key, class Value, class Comparator >
@@ -836,7 +853,7 @@ namespace alymova
     Node* node_instead = node;
     if (pos.point_ == NodePoint::First)
     {
-      if (node_instead->left)
+      if (node_instead->left && node_instead->left != fake_left_)
       {
         node_instead = node_instead->left;
         while (node_instead->right && node_instead->right != fake_)
@@ -850,7 +867,7 @@ namespace alymova
       if (node_instead->right && node_instead->right != fake_)
       {
         node_instead = node_instead->right;
-        while (node_instead->left)
+        while (node_instead->left && node_instead->left != fake_left_)
         {
           node_instead = node_instead->left;
         }
@@ -921,7 +938,7 @@ namespace alymova
       parent->remove(NodePoint::First);
       if (left == node)
       {
-        if (!node->left)
+        if (!node->left || node->left == fake_left_)
         {
           std::swap(node->left, node->right);
         }
@@ -944,7 +961,7 @@ namespace alymova
         parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
         node->left = left->right;
-        if (node->left)
+        if (node->left && node->left != fake_left_)
         {
           node->left->parent = node;
         }
@@ -957,7 +974,7 @@ namespace alymova
     {
       node->insert(std::move(parent->data[0]));
       parent->remove(NodePoint::First);
-      if (!node->left)
+      if (!node->left || node->left == fake_left_)
       {
         std::swap(node->left, node->right);
       }

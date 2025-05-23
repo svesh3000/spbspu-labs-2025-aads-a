@@ -1,5 +1,5 @@
-#ifndef TREE_HEAVY_ITERATORS_HPP
-#define TREE_HEAVY_ITERATORS_HPP
+#ifndef TREE_LNR_ITERATORS_HPP
+#define TREE_LNR_ITERATORS_HPP
 #include <iterator>
 #include <stack.hpp>
 #include "tree-node.hpp"
@@ -7,22 +7,20 @@
 namespace alymova
 {
   template< class Key, class Value, class Comparator >
-  struct TTTLnrIterator:
+  struct TTTConstLnrIterator:
     public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
   {
   public:
-    //using LnrIterator = TTTLnrIterator< Key, Value, Comparator >;
+    using ConstLnrIterator = TTTConstLnrIterator< Key, Value, Comparator >;
     using Node = typename detail::TTTNode< Key, Value, Comparator >;
     using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;
 
-    TTTLnrIterator();
-    TTTLnrIterator& operator++();
-    TTTLnrIterator operator++(int);
-    TTTLnrIterator& operator--() noexcept;
-    TTTLnrIterator operator--(int) noexcept;
-    bool operator==(const TTTLnrIterator& other) const noexcept;
-    bool operator!=(const TTTLnrIterator& other) const noexcept;
+    TTTConstLnrIterator();
+    ConstLnrIterator& operator++();
+    ConstLnrIterator operator++(int);
+    bool operator==(const ConstLnrIterator& other) const noexcept;
+    bool operator!=(const ConstLnrIterator& other) const noexcept;
     std::pair< Key, Value >& operator*() noexcept;
     std::pair< Key, Value >* operator->() noexcept;
   private:
@@ -31,14 +29,13 @@ namespace alymova
     std::pair< Node*, NodePoint > tmp_;
     Stack< std::pair< Node*, NodePoint > > nexts_;
 
-    TTTLnrIterator(Node* root, NodePoint point);
-    void fallLeft();
+    TTTConstLnrIterator(Node* root, NodePoint point);
 
     friend class TwoThreeTree< Key, Value, Comparator >;
   };
 
   template< class Key, class Value, class Comparator >
-  TTTLnrIterator< Key, Value, Comparator >::TTTLnrIterator():
+  TTTConstLnrIterator< Key, Value, Comparator >::TTTConstLnrIterator():
     root_(nullptr),
     node_({nullptr, NodePoint::Empty}),
     tmp_({nullptr, NodePoint::Empty}),
@@ -46,22 +43,34 @@ namespace alymova
   {}
 
   template< class Key, class Value, class Comparator >
-  TTTLnrIterator< Key, Value, Comparator >::TTTLnrIterator(Node* root, NodePoint point):
+  TTTConstLnrIterator< Key, Value, Comparator >::TTTConstLnrIterator(Node* root, NodePoint point):
     root_(root),
     node_({root, point}),
     tmp_({root, point}),
     nexts_()
   {
-    if (point != NodePoint::Fake)
+    if (point != NodePoint::Fake && root)
     {
+      while (tmp_.first)
+      {
+        if (tmp_.first->type == NodeType::Fake)
+        {
+          tmp_.first = nullptr;
+          break;
+        }
+        nexts_.push(tmp_);
+        tmp_.first = tmp_.first->left;
+      }
       ++(*this);
     }
   }
 
   template< class Key, class Value, class Comparator >
-  TTTLnrIterator< Key, Value, Comparator >& TTTLnrIterator< Key, Value, Comparator >::operator++()
+  TTTConstLnrIterator< Key, Value, Comparator >& TTTConstLnrIterator< Key, Value, Comparator >::operator++()
   {
+    assert(node_.first != nullptr && "You are trying to access beyond tree's bounds");
     assert(node_.second != NodePoint::Fake && "You are trying to access beyond tree's bounds");
+
     while (tmp_.first)
     {
       nexts_.push(tmp_);
@@ -87,7 +96,15 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TTTLnrIterator< Key, Value, Comparator >::operator==(const TTTLnrIterator& other) const noexcept
+  TTTConstLnrIterator< Key, Value, Comparator > TTTConstLnrIterator< Key, Value, Comparator >::operator++(int)
+  {
+    ConstLnrIterator old = *this;
+    ++(*this);
+    return old;
+  }
+
+  template< class Key, class Value, class Comparator >
+  bool TTTConstLnrIterator< Key, Value, Comparator >::operator==(const ConstLnrIterator& other) const noexcept
   {
     if (node_.second == NodePoint::Fake && other.node_.second == NodePoint::Fake)
     {
@@ -97,13 +114,13 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  bool TTTLnrIterator< Key, Value, Comparator >::operator!=(const TTTLnrIterator& other) const noexcept
+  bool TTTConstLnrIterator< Key, Value, Comparator >::operator!=(const ConstLnrIterator& other) const noexcept
   {
     return !(*this == other);
   }
 
   template< class Key, class Value, class Comparator >
-  std::pair< Key, Value >& TTTLnrIterator< Key, Value, Comparator >::operator*() noexcept
+  std::pair< Key, Value >& TTTConstLnrIterator< Key, Value, Comparator >::operator*() noexcept
   {
     assert(node_.first != nullptr && "You are trying to access beyond tree's bounds");
 
@@ -111,7 +128,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  std::pair< Key, Value >* TTTLnrIterator< Key, Value, Comparator >::operator->() noexcept
+  std::pair< Key, Value >* TTTConstLnrIterator< Key, Value, Comparator >::operator->() noexcept
   {
     assert(node_.first != nullptr && "You are trying to access beyond tree's bounds");
 
