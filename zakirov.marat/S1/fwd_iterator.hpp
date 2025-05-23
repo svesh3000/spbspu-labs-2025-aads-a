@@ -18,6 +18,8 @@ namespace zakirov
     FwdIterator< T > & operator=(const FwdIterator< T > &) noexcept = default;
     T & operator*() noexcept;
     T * operator->() noexcept;
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
     FwdIterator< T > & operator++() noexcept;
     FwdIterator< T > & operator++(int) noexcept;
     bool operator!=(const FwdIterator< T > & other) const noexcept;
@@ -46,6 +48,18 @@ namespace zakirov
 
   template< typename T >
   T * FwdIterator< T >::operator->() noexcept
+  {
+    return std::addressof(node_->data_);
+  }
+
+  template< typename T >
+  const T & FwdIterator< T >::operator*() const noexcept
+  {
+    return node_->data_;
+  }
+
+  template< typename T >
+  const T * FwdIterator< T >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }
