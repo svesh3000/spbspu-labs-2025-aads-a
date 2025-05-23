@@ -92,7 +92,8 @@ BOOST_AUTO_TEST_CASE(assignment_operator_lvalue)
 BOOST_AUTO_TEST_CASE(assignment_operator_rvalue)
 {
   zakirov::FwdList< int > rvalue_data_lst({0, 1, 2, 3, 4});
-  zakirov::FwdList< int > rvalue_test_lst = std::move(rvalue_data_lst);
+  zakirov::FwdList< int > rvalue_test_lst;
+  rvalue_test_lst = std::move(rvalue_data_lst);
   BOOST_TEST(rvalue_test_lst.empty() == false);
   BOOST_TEST(rvalue_test_lst.size() == 5);
   zakirov::FwdIterator< int > test_iter = rvalue_test_lst.begin();

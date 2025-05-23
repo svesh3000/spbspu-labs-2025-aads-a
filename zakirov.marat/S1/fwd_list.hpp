@@ -132,9 +132,7 @@ namespace zakirov
   {
     if (this != std::addressof(fwdlst))
     {
-      FwdListNode< T > * temporary_node = fake_node_;
-      fake_node_ = fwdlst.fake_node_;
-      fwdlst.fake_node_ = temporary_node;
+      swap(fwdlst);
     }
 
     return *this;
