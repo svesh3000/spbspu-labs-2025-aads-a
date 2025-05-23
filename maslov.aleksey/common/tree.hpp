@@ -727,33 +727,98 @@ namespace maslov
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseLnr(F f)
-  {}
+  {
+    Stack< BiTreeNode< Key, T > * > stack;
+    BiTreeNode< Key, T > * current = fakeRoot_->left;
+    bool leftDone = false;
+    while (current != fakeLeaf_ || !stack.empty())
+    {
+      if (!leftDone && current != fakeLeaf_)
+      {
+        stack.push(current);
+        current = current->left;
+      }
+      else
+      {
+        current = stack.top();
+        stack.pop();
+        f(current->data);
+        current = current->right;
+        leftDone = (current == fakeLeaf_);
+      }
+    } 
+    return f;
+  }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseLnr(F f) const
-  {}
+  {
+    return const_cast< BiTree< Key, T, Cmp > * >(this)->traverseLnr(f);
+  }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseRnl(F f)
-  {}
+  {
+    Stack< BiTreeNode< Key, T > * > stack;
+    BiTreeNode< Key, T > * current = fakeRoot_->left;
+    bool rightDone = false;
+    while (current != fakeLeaf_ || !stack.empty())
+    {
+      if (!rightDone && current != fakeLeaf_)
+      {
+        stack.push(current);
+        current = current->right;
+      }
+      else
+      {
+        current = stack.top();
+        stack.pop();
+        f(current->data); 
+        current = current->left;
+        rightDone = (current == fakeLeaf_);
+      }
+    }
+    return f;
+  }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseRnl(F f) const
-  {}
+  {
+    return const_cast< BiTree< Key, T, Cmp > * >(this)->traverseRnl(f);
+  }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseBreadth(F f)
-  {}
-
+  {
+    Queue< BiTreeNode< Key, T > * > queue;
+    queue.push(fakeRoot_->left);
+    while (!queue.empty())
+    {
+      BiTreeNode< Key, T > * current = queeue.front();
+      queue.pop();
+      f(current->data);
+      if (current->left != fakeLeaf_)
+      {
+        queue.push(current->left);
+      }
+      if (current->right != fakeLeaf_)
+      {
+        queue.push(current->right);
+      }
+    }
+    return f;
+  }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseBreadth(F f) const
-  {}
+  {
+    return const_cast< BiTree< Key, T, Cmp > * >(this)->traverseBreadth(f);
+  }
 }
 
 #endif

@@ -31,25 +31,25 @@ int main(int argc, char * argv[])
   try
   {
     std::string cmd(argv[1]);
-    maslov::KeySum keySum;
+    maslov::KeyValueAccumulator result;
     if (cmd == "ascending")
     {
-      biTree.traverseLnr(keySum);
+      biTree.traverseLnr(result);
     }
     else if (cmd == "descending")
     {
-      biTree.traverseRnl(keySum);
+      biTree.traverseRnl(result);
     }
     else if (cmd == "breadth")
     {
-      biTree.traverseBreadth(keySum);
+      biTree.traverseBreadth(result);
     }
     else
     {
       std::cerr << "<INVALID COMMAND>\n";
       return 1;
     }
-    std::cout << keySum.key << ' ' << keySum.value << '\n';
+    std::cout << result.keySum << ' ' << result.values << '\n';
   }
   catch (const std::exception & e)
   {

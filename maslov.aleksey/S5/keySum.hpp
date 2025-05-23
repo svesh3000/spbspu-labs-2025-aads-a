@@ -5,11 +5,11 @@
 
 namespace maslov
 {
-  struct KeySum
+  struct KeyValueAccumulator
   {
-    int key;
-    std::string value;
-    void operator()(const std::pair< int, std::string > & pairKeyValue);
+    int keySum;
+    std::string values;
+    void operator()(const std::pair< int, std::string > & keyValue);
   };
 }
 
