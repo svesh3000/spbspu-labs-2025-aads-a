@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <tree.hpp>
-#include "keySum.hpp"
+#include "accumulator.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -10,7 +10,7 @@ int main(int argc, char * argv[])
     std::cerr << "ERROR: wrong arguments\n";
     return 1;
   }
-  std::ifstream fileInput(argv[1]);
+  std::ifstream fileInput(argv[2]);
   if (!fileInput.is_open())
   {
     std::cerr << "ERROR: cannot open the file\n";
@@ -34,15 +34,15 @@ int main(int argc, char * argv[])
     maslov::KeyValueAccumulator result;
     if (cmd == "ascending")
     {
-      biTree.traverseLnr(result);
+      result = biTree.traverseLnr(result);
     }
     else if (cmd == "descending")
     {
-      biTree.traverseRnl(result);
+      result = biTree.traverseRnl(result);
     }
     else if (cmd == "breadth")
     {
-      biTree.traverseBreadth(result);
+      result = biTree.traverseBreadth(result);
     }
     else
     {
