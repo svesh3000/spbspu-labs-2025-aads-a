@@ -1,10 +1,11 @@
-#include <string>
 #include <iostream>
+#include <string>
+#include "FwdList.hpp"
 #include "inputList.hpp"
 #include "outputList.hpp"
-#include "FwdList.hpp"
 
-int main() {
+int main()
+{
   using namespace gavrilova;
   using ULL = unsigned long long;
 
@@ -16,7 +17,7 @@ int main() {
   while (std::cin >> name && !std::cin.eof()) {
     FwdList< ULL > numbers = inputNumbers(std::cin);
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
-    std::pair< std::string, FwdList< ULL > > new_pair {name, numbers};
+    std::pair< std::string, FwdList< ULL > > new_pair{name, numbers};
     listOfPairs.insert(cur_it, new_pair);
     ++cur_it;
     ++numOfPairs;
@@ -27,17 +28,20 @@ int main() {
     std::cout << "\n";
   }
 
+  if (maxLen == 0) {
+    std::cout << "0" << "\n";
+    return 0;
+  }
+
   FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
-  } catch(const std::overflow_error& e) {
     std::cout << "\n";
-    std::cerr << e.what();
+  } catch (const std::overflow_error& e) {
+    std::cerr << e.what() << "\n";
     return 1;
   }
-  if (maxLen == 0) {
-    std::cout << "0" << "\n";
-  } else {
-    outFwdListULL(std::cout, sums);
-  }
+
+  outFwdListULL(std::cout, sums);
+  std::cout << "\n";
 }

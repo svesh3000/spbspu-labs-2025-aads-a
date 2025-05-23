@@ -2,12 +2,11 @@
 #define OUTPUT_LIST_HPP
 
 #include <istream>
+#include "ConstIteratorFwd.hpp"
 #include "FwdList.hpp"
 #include "IteratorFwd.hpp"
-#include "ConstIteratorFwd.hpp"
 
-namespace gavrilova
-{
+namespace gavrilova {
   using ULL = unsigned long long;
   using FLPairs = FwdList< std::pair< std::string, FwdList< ULL > > >;
   std::ostream& outNames(std::ostream& out, FLPairs list);
