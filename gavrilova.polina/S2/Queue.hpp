@@ -2,8 +2,8 @@
 #define QUEUE_HPP
 
 #include <cstddef>
-#include <utility>
 #include <stdexcept>
+#include <utility>
 #include "ArrayBuffer.hpp"
 
 namespace gavrilova {
@@ -28,7 +28,6 @@ namespace gavrilova {
     ArrayBuffer< T > buffer_;
     size_t head_ = 0;
   };
-
 
   template < class T >
   void Queue< T >::push(const T& value)
@@ -84,7 +83,7 @@ namespace gavrilova {
     std::swap(head_, other.head_);
   }
 
-  template <class T>
+  template < class T >
   void Queue< T >::clear()
   {
     buffer_.clear();

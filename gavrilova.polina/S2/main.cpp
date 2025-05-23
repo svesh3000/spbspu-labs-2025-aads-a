@@ -1,11 +1,10 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
-#include "parse_expr.hpp"
 #include "Queue.hpp"
 #include "Stack.hpp"
-
+#include "parse_expr.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -28,7 +27,7 @@ int main(int argc, char* argv[])
     }
     try {
       Queue< std::string > infix_q = split(line, ' ');
-      Queue< std:: string > postfix_q = infix_to_postfix(infix_q);
+      Queue< std::string > postfix_q = infix_to_postfix(infix_q);
       results.push(calculate(postfix_q));
     } catch (const std::exception& e) {
       std::cerr << e.what() << "\n";

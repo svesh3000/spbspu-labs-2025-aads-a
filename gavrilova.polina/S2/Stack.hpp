@@ -2,8 +2,8 @@
 #define STACK_HPP
 
 #include <cstddef>
-#include <utility>
 #include <stdexcept>
+#include <utility>
 #include "ArrayBuffer.hpp"
 
 namespace gavrilova {
@@ -20,7 +20,7 @@ namespace gavrilova {
     void pop();
     bool empty() const;
     size_t size() const;
-    void swap(Stack& other ) noexcept;
+    void swap(Stack& other) noexcept;
 
   private:
     ArrayBuffer< T > buffer_;

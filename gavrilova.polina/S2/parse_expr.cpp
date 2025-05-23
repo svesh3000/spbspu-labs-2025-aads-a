@@ -1,7 +1,7 @@
 #include "parse_expr.hpp"
 #include <cctype>
-#include <stdexcept>
 #include <climits>
+#include <stdexcept>
 #include "Stack.hpp"
 
 namespace {
@@ -13,28 +13,35 @@ namespace {
   bool has_higher_precedence(const std::string& op1, const std::string& op2)
   {
     auto get_precedence = [](const std::string& op) {
-      if (op == "+" || op == "-") return 1;
-      if (op == "*" || op == "/" || op == "%") return 2;
+      if (op == "+" || op == "-") {
+        return 1;
+      }
+      if (op == "*" || op == "/" || op == "%") {
+        return 2;
+      }
       return 0;
     };
     return get_precedence(op1) >= get_precedence(op2);
   }
 
-  long long plus(long long a, long long b) {
+  long long plus(long long a, long long b)
+  {
     if (a > LLONG_MAX - b) {
       throw std::overflow_error("Overflow in addition");
     }
     return a + b;
   }
 
-  long long subtract(long long a, long long b) {
+  long long subtract(long long a, long long b)
+  {
     if ((b > 0 && a < LLONG_MIN + b) || (b < 0 && a > LLONG_MAX + b)) {
       throw std::overflow_error("Overflow in subtraction");
     }
     return a - b;
   }
 
-  long long multiply(long long a, long long b) {
+  long long multiply(long long a, long long b)
+  {
     if (a > 0 && b > 0 && a > LLONG_MAX / b) {
       throw std::overflow_error("Overflow in multiplication");
     }
@@ -50,7 +57,8 @@ namespace {
     return a * b;
   }
 
-  long long divide(long long a, long long b) {
+  long long divide(long long a, long long b)
+  {
     if (b == 0) {
       throw std::invalid_argument("Division by zero");
     }
@@ -60,7 +68,8 @@ namespace {
     return a / b;
   }
 
-  long long mod(long long a, long long b) {
+  long long mod(long long a, long long b)
+  {
     if (b == 0) {
       throw std::invalid_argument("Modulo by zero");
     }
@@ -111,8 +120,8 @@ gavrilova::Queue< std::string > gavrilova::split(const std::string& line, const 
 
 gavrilova::Queue< std::string > gavrilova::infix_to_postfix(Queue< std::string >& infix_q)
 {
-  Stack<std::string> stack;
-  Queue<std::string> postfix_q;
+  Stack< std::string > stack;
+  Queue< std::string > postfix_q;
 
   while (!infix_q.empty()) {
     std::string token = infix_q.front();

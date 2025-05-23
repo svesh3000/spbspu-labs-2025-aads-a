@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
-#include "Stack.hpp"
 #include <string>
+#include "Stack.hpp"
 
 BOOST_AUTO_TEST_CASE(TestElementAccessStack)
 {

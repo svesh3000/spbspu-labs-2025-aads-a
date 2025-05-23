@@ -2,14 +2,12 @@
 #define ARRAY_BUFFER_HPP
 
 #include <cstddef>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
-namespace gavrilova
-{
+namespace gavrilova {
   template < class T >
-  class ArrayBuffer
-  {
+  class ArrayBuffer {
   public:
     ArrayBuffer();
     ArrayBuffer(const ArrayBuffer& other);
@@ -50,12 +48,11 @@ namespace gavrilova
   };
 
   template < class T >
-  ArrayBuffer< T >::ArrayBuffer()
-  {
-    size_ = 0;
-    capacity_ = DEFAULT_CAPACITY;
-    data_ = new T[capacity_];
-  }
+  ArrayBuffer< T >::ArrayBuffer():
+    size_(0),
+    capacity_(0),
+    data_(nullptr)
+  {}
 
   template < class T >
   ArrayBuffer< T >::ArrayBuffer(const ArrayBuffer& other)
@@ -164,8 +161,7 @@ namespace gavrilova
   {
     if (capacity_ == 0) {
       resize(DEFAULT_CAPACITY);
-    }
-    else if (size_ == capacity_) {
+    } else if (size_ == capacity_) {
       resize(capacity_ * KOEF_FOR_GROWTH);
     }
     data_[size_++] = value;
@@ -176,8 +172,7 @@ namespace gavrilova
   {
     if (capacity_ == 0) {
       resize(DEFAULT_CAPACITY);
-    }
-    else if (size_ == capacity_) {
+    } else if (size_ == capacity_) {
       resize(capacity_ * KOEF_FOR_GROWTH);
     }
     data_[size_++] = std::move(value);
