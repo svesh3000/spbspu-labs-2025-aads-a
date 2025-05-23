@@ -64,7 +64,7 @@ namespace alymova
     ConstIterator cbegin() const noexcept;
     ConstLnrIterator lnr_cbegin() const noexcept;
     ConstRnlIterator rnl_cbegin() const noexcept;
-  
+
     Iterator end();
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
@@ -106,7 +106,7 @@ namespace alymova
 
   private:
     size_t size_;
-    Node* fake_;
+    Node* fake_right_;
     Node* fake_left_;
     Node* root_;
     Comparator cmp_;
@@ -163,12 +163,12 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree():
     size_(0),
-    fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
+    fake_right_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     fake_left_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
-    root_(fake_)
+    root_(fake_right_)
   {
-    fake_->type = NodeType::Fake;
-    fake_->clear();
+    fake_right_->type = NodeType::Fake;
+    fake_right_->clear();
     fake_left_->type = NodeType::Fake;
     fake_left_->clear();
   }
@@ -181,7 +181,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TwoThreeTree< Key, Value, Comparator >::TwoThreeTree(Tree&& other) noexcept:
     size_(std::exchange(other.size_, 0)),
-    fake_(std::exchange(other.fake_, nullptr)),
+    fake_right_(std::exchange(other.fake_right_, nullptr)),
     fake_left_(std::exchange(other.fake_left_, nullptr)),
     root_(std::exchange(other.root_, nullptr))
   {}
@@ -209,7 +209,7 @@ namespace alymova
     {
       clear(root_);
     }
-    delete[] reinterpret_cast< char* >(fake_);
+    delete[] reinterpret_cast< char* >(fake_right_);
     delete[] reinterpret_cast< char* >(fake_left_);
   }
 
@@ -313,13 +313,13 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   TTTConstIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::cend() const noexcept
   {
-    return ConstIterator(fake_, NodePoint::Fake);
+    return ConstIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
   TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const noexcept
   {
-    return ConstLnrIterator(fake_, NodePoint::Fake);
+    return ConstLnrIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
@@ -398,7 +398,7 @@ namespace alymova
       {
         nexts.push(temp->mid);
       }
-      if (temp->right && temp->right != fake_)
+      if (temp->right && temp->right != fake_right_)
       {
         nexts.push(temp->right);
       }
@@ -510,7 +510,7 @@ namespace alymova
       if (size_ == 0)
       {
         delete root_;
-        root_ = fake_;
+        root_ = fake_right_;
       }
       throw;
     }
@@ -578,7 +578,7 @@ namespace alymova
   void TwoThreeTree< Key, Value, Comparator >::swap(Tree& other) noexcept
   {
     std::swap(size_, other.size_);
-    std::swap(fake_, other.fake_);
+    std::swap(fake_right_, other.fake_right_);
     std::swap(fake_left_, other.fake_left_);
     std::swap(root_, other.root_);
     std::swap(cmp_, other.cmp_);
@@ -682,7 +682,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   void TwoThreeTree< Key, Value, Comparator >::clear(Node* root) noexcept
   {
-    if (!root || root == fake_ || root == fake_left_)
+    if (!root || root == fake_right_ || root == fake_left_)
     {
       return;
     }
@@ -717,7 +717,7 @@ namespace alymova
         right->left->parent = right;
         right->right->parent = right;
       }
-      if (right->left == fake_)
+      if (right->left == fake_right_)
       {
         right->left = nullptr;
       }
@@ -774,17 +774,17 @@ namespace alymova
   {
     if (empty())
     {
-      fake_->parent = nullptr;
+      fake_right_->parent = nullptr;
       fake_left_->parent = nullptr;
       return;
     }
     Node* tmp = root_;
-    while (tmp->right && tmp->right != fake_)
+    while (tmp->right && tmp->right != fake_right_)
     {
       tmp = tmp->right;
     }
-    tmp->right = fake_;
-    fake_->parent = tmp;
+    tmp->right = fake_right_;
+    fake_right_->parent = tmp;
     tmp = root_;
     while (tmp->left && tmp->left != fake_left_)
     {
@@ -856,7 +856,7 @@ namespace alymova
       if (node_instead->left && node_instead->left != fake_left_)
       {
         node_instead = node_instead->left;
-        while (node_instead->right && node_instead->right != fake_)
+        while (node_instead->right && node_instead->right != fake_right_)
         {
           node_instead = node_instead->right;
         }
@@ -864,7 +864,7 @@ namespace alymova
     }
     else if (pos.point_ == NodePoint::Second)
     {
-      if (node_instead->right && node_instead->right != fake_)
+      if (node_instead->right && node_instead->right != fake_right_)
       {
         node_instead = node_instead->right;
         while (node_instead->left && node_instead->left != fake_left_)
@@ -909,7 +909,7 @@ namespace alymova
     if (size_ == 1)
     {
       delete root_;
-      root_ = fake_;
+      root_ = fake_right_;
       return;
     }
     if (!node->parent)
@@ -954,14 +954,15 @@ namespace alymova
       }
       else
       {
-        if (!node->right || node->right == fake_)
+        if (!node->right || node->right == fake_right_)
         {
           node->right = std::exchange(node->left, nullptr);
         }
         parent->insert(std::move(left->data[1]));
         left->remove(NodePoint::Second);
         node->left = left->right;
-        if (node->left && node->left != fake_left_)
+        //if (node->left && node->left != fake_left_)
+        if (node->left)
         {
           node->left->parent = node;
         }
@@ -994,7 +995,7 @@ namespace alymova
       node->insert(std::move(mid->data[0]));
       node->mid = mid->left;
       node->right = mid->right;
-      if (node->right && node->right != fake_)
+      if (node->right && node->right != fake_right_)
       {
         node->mid->parent = node;
         node->right->parent = node;
@@ -1043,7 +1044,7 @@ namespace alymova
     {
       node->insert(std::move(parent->data[1]));
       parent->remove(NodePoint::Second);
-      if (!node->right || node->right == fake_)
+      if (!node->right || node->right == fake_right_)
       {
         node->right = std::exchange(node->left, nullptr);
       }
@@ -1140,7 +1141,7 @@ namespace alymova
   template< class Key, class Value, class Comparator >
   size_t TwoThreeTree< Key, Value, Comparator >::find_height(Node* node) const noexcept
   {
-    if (node == nullptr || node == fake_)
+    if (node == nullptr || node == fake_right_)
     {
       return 0;
     }
