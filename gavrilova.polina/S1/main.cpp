@@ -8,7 +8,7 @@ int main()
 {
   using namespace gavrilova;
   using ULL = unsigned long long;
-  
+
   FwdList< std::pair< std::string, FwdList< ULL > > > listOfPairs{};
   size_t numOfPairs = 0;
   std::string name;
@@ -22,17 +22,17 @@ int main()
     ++cur_it;
     ++numOfPairs;
   }
-  
+
   if (numOfPairs) {
     outNames(std::cout, listOfPairs);
     std::cout << "\n";
   }
-  
+
   if (maxLen == 0) {
     std::cout << "0" << "\n";
     return 0;
   }
-  
+
   FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
@@ -41,7 +41,7 @@ int main()
     std::cerr << e.what() << "\n";
     return 1;
   }
-  
+
   outFwdListULL(std::cout, sums);
   std::cout << "\n";
 }
