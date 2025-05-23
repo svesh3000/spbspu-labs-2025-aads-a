@@ -95,7 +95,7 @@ namespace maslov
   {
     assert(fakeLeaf_->parent->left != fakeLeaf_);
     if (node_ == fakeLeaf_)
-    {   
+    {
       node_ = fakeLeaf_->parent->left;
       while (node_->right != fakeLeaf_)
       {
@@ -252,7 +252,7 @@ namespace maslov
   {
     assert(fakeLeaf_->parent->left != fakeLeaf_);
     if (node_ == fakeLeaf_)
-    {   
+    {
       node_ = fakeLeaf_->parent->left;
       while (node_->right != fakeLeaf_)
       {
