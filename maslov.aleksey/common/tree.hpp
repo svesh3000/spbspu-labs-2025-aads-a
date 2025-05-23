@@ -25,7 +25,6 @@ namespace maslov
     T & at(const Key & key);
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
-    const T & operator[](const Key & key) const;
 
     void push(const Key & key, const T & value);
     T get(const Key & key) const;
@@ -451,12 +450,6 @@ namespace maslov
   {
     auto pair = insert({key, T{}});
     return pair.first->second;
-  }
-
-  template< typename Key, typename T, typename Cmp >
-  const T & BiTree< Key, T, Cmp >::operator[](const Key & key) const
-  {
-    return at(key);
   }
 
   template< typename Key, typename T, typename Cmp >
