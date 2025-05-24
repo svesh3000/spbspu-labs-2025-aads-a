@@ -31,6 +31,8 @@ namespace zholobov {
     void swap(Array& other) noexcept;
 
   private:
+    void realloc();
+
     T* data_;
     size_t capacity_;
     size_t head_;
@@ -108,25 +110,19 @@ zholobov::Array< T >::~Array()
 template < typename T >
 void zholobov::Array< T >::push_back(const T& value)
 {
-  push_back(std::move(T(value)));
+  if (size_ == capacity_) {
+    realloc();
+  }
+  size_t tail = (head_ + size_) % capacity_;
+  data_[tail] = value;
+  ++size_;
 }
 
 template < typename T >
 void zholobov::Array< T >::push_back(T&& value)
 {
   if (size_ == capacity_) {
-    size_t new_capacity = (capacity_ != 0) ? capacity_ * 2 : initial_capacity;
-    T* new_data = new T[new_capacity];
-
-    for (size_t i = 0; i < size_; ++i) {
-      size_t pos = (head_ + i) % capacity_;
-      new_data[i] = data_[pos];
-    }
-
-    delete[] data_;
-    data_ = new_data;
-    head_ = 0;
-    capacity_ = new_capacity;
+    realloc();
   }
   size_t tail = (head_ + size_) % capacity_;
   data_[tail] = std::move(value);
@@ -137,7 +133,7 @@ template < typename T >
 const T& zholobov::Array< T >::front() const
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   return data_[head_];
 }
@@ -146,7 +142,7 @@ template < typename T >
 T& zholobov::Array< T >::front()
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   return data_[head_];
 }
@@ -155,7 +151,7 @@ template < typename T >
 const T& zholobov::Array< T >::back() const
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   return data_[(head_ + size_ - 1) % capacity_];
 }
@@ -164,7 +160,7 @@ template < typename T >
 T& zholobov::Array< T >::back()
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   return data_[(head_ + size_ - 1) % capacity_];
 }
@@ -173,7 +169,7 @@ template < typename T >
 void zholobov::Array< T >::pop_front()
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   head_ = (head_ + 1) % capacity_;
   --size_;
@@ -183,7 +179,7 @@ template < typename T >
 void zholobov::Array< T >::pop_back()
 {
   if (empty()) {
-    throw std::out_of_range("Stack is empty");
+    throw std::out_of_range("Array is empty");
   }
   --size_;
 }
@@ -212,6 +208,27 @@ void zholobov::Array< T >::swap(Array& other) noexcept
   std::swap(capacity_, other.capacity_);
   std::swap(head_, other.head_);
   std::swap(size_, other.size_);
+}
+
+template < typename T >
+void zholobov::Array< T >::realloc()
+{
+  size_t new_capacity = (capacity_ != 0) ? capacity_ * 2 : initial_capacity;
+  T* new_data = nullptr;
+  try {
+    new_data = new T[new_capacity];
+    for (size_t i = 0; i < size_; ++i) {
+      size_t pos = (head_ + i) % capacity_;
+      new_data[i] = std::move(data_[pos]);
+    }
+    delete[] data_;
+    data_ = new_data;
+    head_ = 0;
+    capacity_ = new_capacity;
+  } catch (...) {
+    delete[] new_data;
+    throw;
+  }
 }
 
 #endif
