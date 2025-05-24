@@ -5,7 +5,7 @@
 
 BOOST_AUTO_TEST_CASE(TestEmptyTree)
 {
-  
+
   gavrilova::TwoThreeTree< int, std::string > tree;
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
