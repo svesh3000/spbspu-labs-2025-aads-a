@@ -53,21 +53,21 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   TwoThreeTree< Key, Value, Cmp >::TwoThreeTree():
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
-    size_(0),
-    cmp_()
+    size_(0)
   {
     fake_->children[0] = nullptr;
     fake_->children[1] = nullptr;
     fake_->children[2] = nullptr;
+    fake_->parent = fake_;
+    fake_->is_3_node = false;
+    fake_->key_count = 0;
   }
 
   template < class Key, class Value, class Cmp >
   TwoThreeTree< Key, Value, Cmp >::TwoThreeTree(const TwoThreeTree& other):
     TwoThreeTree()
   {
-    cmp_ = other.cmp_;
-    fake_->children[0] = copy(other.fake_->children[0], fake_);
-    size_ = other.size_;
+    
   }
 
   template < class Key, class Value, class Cmp >
@@ -128,7 +128,7 @@ namespace gavrilova {
       new_node->children[1] = fake_;
       new_node->children[2] = fake_;
       fake_->children[0] = new_node;
-      size_ = 1;
+      ++size_;
       return;
     }
 
@@ -152,6 +152,7 @@ namespace gavrilova {
       split_and_up(node);
       // node_up(leaf->parent, middle_to_up, leaf, leaf->parent->children[2]);
     }
+    ++size_;
     return;
   }
 
@@ -215,7 +216,7 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   bool TwoThreeTree< Key, Value, Cmp >::empty() const noexcept
   {
-    return size_ == 0;
+    return size() == 0;
   }
 
   template < class Key, class Value, class Cmp >
@@ -235,7 +236,13 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   void TwoThreeTree< Key, Value, Cmp >::clear() noexcept
   {
+    if (empty()) {
+      return;
+    }
     clear_recursive(fake_->children[0]);
+    fake_->children[0] = fake_;
+    fake_->children[1] = fake_;
+    fake_->children[2] = fake_;
     size_ = 0;
   }
 
@@ -365,7 +372,6 @@ namespace gavrilova {
     if (parent == fake_) {
       std::cout << "fake\n";
       fake_->children[0] = to_up;
-      size_ += 2;
       return;
     }
     if (!parent->is_3_node) {
@@ -391,7 +397,6 @@ namespace gavrilova {
         parent->children[2] = to_up->children[1];
         delete to_up;
       }
-      ++size_;
       return;
     } else {
       std::cout << "to_up " << to_up->data[0].first << "\n";
@@ -467,7 +472,6 @@ namespace gavrilova {
         to_up->children[0] = parent;
         to_up->children[1] = new_node;
       }
-      ++size_;
       split_and_up(to_up);
     }
   }
