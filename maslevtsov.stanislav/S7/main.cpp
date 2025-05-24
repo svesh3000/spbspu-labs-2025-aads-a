@@ -1,39 +1,7 @@
 #include <fstream>
 #include <iostream>
-#include <unordered_map>
-#include <boost/hash2/siphash.hpp>
 #include <tree/definition.hpp>
-#include <fwd_list/definition.hpp>
-
-namespace maslevtsov {
-  struct PairDoubleHash
-  {
-    size_t operator()(const std::pair< std::string, std::string >& pair) const
-    {
-      size_t h1 = std::hash< std::string >{}(pair.first);
-      size_t h2 = std::hash< std::string >{}(pair.second);
-      boost::hash2::siphash_64 siph;
-      siph.update(pair.first.data(), pair.first.size());
-      size_t result;
-      result ^= h1;
-      result ^= h2;
-      result ^= siph.result();
-      return result;
-    }
-  };
-
-  class Graph
-  {
-  public:
-    void add_edge(const std::string& vertice1, const std::string& vertice2, unsigned weight);
-
-  private:
-    using vertices_pair_t = std::pair< std::string, std::string >;
-    using edges_set_t = std::unordered_map< vertices_pair_t, FwdList< unsigned >, PairDoubleHash >;
-
-    edges_set_t edges_set;
-  };
-}
+#include "graph.hpp"
 
 int main(int argc, char** argv)
 {
@@ -47,9 +15,10 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  using graphs_tree_t = maslevtsov::Tree< std::string, maslevtsov::Graph >;
+  using namespace maslevtsov;
+  using graphs_map_t = std::unordered_map< std::string, maslevtsov::Graph, StringDoubleHash >;
 
-  graphs_tree_t graphs;
+  graphs_map_t graphs;
   std::string graph_name;
   while ((fin >> graph_name) && !fin.eof()) {
     size_t edges_count = 0;
