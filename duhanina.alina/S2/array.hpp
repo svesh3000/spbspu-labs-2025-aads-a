@@ -1,6 +1,7 @@
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
 
+#include <utility>
 #include <stdexcept>
 #include <cstddef>
 
@@ -93,7 +94,7 @@ namespace duhanina
     if (this != std::addressof(other))
     {
       DynamicArray< T > temp(other);
-      swap(temp);
+      std::swap(temp);
     }
     return *this;
   }
@@ -104,7 +105,7 @@ namespace duhanina
     if (this != std::addressof(other))
     {
       DynamicArray< T > temp(std::move(other));
-      swap(temp);
+      std::swap(temp);
     }
     return *this;
   }
