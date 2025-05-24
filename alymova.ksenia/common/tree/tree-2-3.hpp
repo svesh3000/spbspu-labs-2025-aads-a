@@ -63,16 +63,16 @@ namespace alymova
     Iterator begin() noexcept;
     ConstIterator begin() const noexcept;
     ConstIterator cbegin() const noexcept;
-    ConstLnrIterator lnr_cbegin() const noexcept;
-    ConstRnlIterator rnl_cbegin() const noexcept;
-    ConstBreadthIterator breadth_cbegin() const noexcept;
+    ConstLnrIterator lnr_cbegin() const;
+    ConstRnlIterator rnl_cbegin() const;
+    ConstBreadthIterator breadth_cbegin() const;
 
     Iterator end() noexcept;
     ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
-    ConstLnrIterator lnr_cend() const noexcept;
-    ConstRnlIterator rnl_cend() const noexcept;
-    ConstBreadthIterator breadth_cend() const noexcept;
+    ConstLnrIterator lnr_cend() const;
+    ConstRnlIterator rnl_cend() const;
+    ConstBreadthIterator breadth_cend() const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -290,7 +290,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cbegin() const noexcept
+  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cbegin() const
   {
     NodePoint point = NodePoint::First;
     if (empty())
@@ -301,7 +301,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cbegin() const noexcept
+  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cbegin() const
   {
     NodePoint point = NodePoint::First;
     if (empty())
@@ -312,7 +312,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cbegin() const noexcept
+  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cbegin() const
   {
     NodePoint point = NodePoint::First;
     if (empty())
@@ -341,19 +341,19 @@ namespace alymova
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const noexcept
+  TTTConstLnrIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::lnr_cend() const
   {
     return ConstLnrIterator(fake_right_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const noexcept
+  TTTConstRnlIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::rnl_cend() const
   {
     return ConstRnlIterator(fake_left_, NodePoint::Fake);
   }
 
   template< class Key, class Value, class Comparator >
-  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cend() const noexcept
+  TTTConstBreadthIterator< Key, Value, Comparator > TwoThreeTree< Key, Value, Comparator >::breadth_cend() const
   {
     return ConstBreadthIterator(fake_right_, NodePoint::Fake);
   }

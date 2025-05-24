@@ -40,10 +40,10 @@ int main(int args, char** argv)
     std::cout << "<EMPTY>\n";
     return 0;
   }
-  std::string round = argv[1];
-  TreeSum result;
   try
   {
+    std::string round = argv[1];
+    TreeSum result;
     if (round == "ascending")
     {
       result = dataset.traverse_lnr(result);
