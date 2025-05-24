@@ -4,8 +4,6 @@
 #include <cassert>
 #include <functional>
 #include <exception>
-#include <stack.hpp>
-#include <queue.hpp>
 #include "tree-iterators.hpp"
 #include "tree-iterator-impl.hpp"
 #include "tree-const-iterator-impl.hpp"

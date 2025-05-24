@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <functional>
 #include <tree/tree-2-3.hpp>
 #include "tree-sum-functor.hpp"
 
