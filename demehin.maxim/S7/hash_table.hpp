@@ -199,7 +199,7 @@ namespace demehin
     }
 
     DynamicArray< Slot > new_slots(new_size);
-    for (auto& slot : slots_)
+    for (auto&& slot: slots_)
     {
       if (slot.state == SlotState::OCCUPIED)
       {

@@ -46,7 +46,7 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
     if (it->first.first == vrt)
     {
       std::string target = it->first.second;
-      for (auto weight : it->second)
+      for (auto&& weight: it->second)
       {
         res[target][weight]++;
       }
@@ -64,7 +64,7 @@ demehin::Tree< std::string, demehin::Tree< unsigned int, size_t > > demehin::Gra
     if (it->first.second == vrt)
     {
       std::string target = it->first.first;
-      for (auto weight : it->second)
+      for (auto&& weight: it->second)
       {
         res[target][weight]++;
       }
@@ -100,7 +100,6 @@ bool demehin::Graph::deleteEdge(const std::string& from, const std::string& to, 
 
   return isDeleted;
 }
-
 
 const demehin::Graph::Edges& demehin::Graph::getEdges() const
 {

@@ -31,7 +31,7 @@ namespace
   {
     for (auto it = edges.cbegin(); it != edges.cend(); it++)
     {
-      for (unsigned int weight : it->second)
+      for (auto&& weight: it->second)
       {
         gr.addEdge(it->first.first, it->first.second, weight);
       }
@@ -206,7 +206,7 @@ void demehin::extract(std::istream& in, MapOfGraphs& graphs)
     std::string to = it->first.second;
     bool from_found = false;
     bool to_found = false;
-    for (auto v: vrts)
+    for (auto&& v: vrts)
     {
       if (v == from)
       {
@@ -220,7 +220,7 @@ void demehin::extract(std::istream& in, MapOfGraphs& graphs)
 
     if (from_found && to_found)
     {
-      for (unsigned w: it->second)
+      for (auto&& w: it->second)
       {
         new_gr.addEdge(from, to, w);
       }

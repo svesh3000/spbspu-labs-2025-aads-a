@@ -54,7 +54,7 @@ namespace demehin
 
     Ptr operator->() const noexcept
     {
-      return &table_->slots_[index_].pair;
+      return std::addressof(table_->slots_[index_].pair);
     }
 
     bool operator==(const this_t& rhs) const noexcept
@@ -68,6 +68,9 @@ namespace demehin
     }
 
   private:
+    Table* table_;
+    size_t index_;
+
     HashTIterator(Table* table, size_t index) noexcept:
       table_(table),
       index_(index)
@@ -82,9 +85,6 @@ namespace demehin
         ++index_;
       }
     }
-
-    Table* table_;
-    size_t index_;
   };
 }
 
