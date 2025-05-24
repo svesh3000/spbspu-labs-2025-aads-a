@@ -23,11 +23,6 @@ int main(int argc, char * argv[])
   {
     biTree.push(key, value);
   }
-  if (biTree.empty())
-  {
-    std::cout << "<EMPTY>\n";
-    return 0;
-  }
   try
   {
     std::string cmd(argv[1]);

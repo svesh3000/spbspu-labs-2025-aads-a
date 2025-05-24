@@ -1,5 +1,5 @@
-#ifndef KEY_SUM_HPP
-#define KEY_SUM_HPP
+#ifndef ACCUMULATOR_HPP
+#define ACCUMULATOR_HPP
 
 #include <string>
 

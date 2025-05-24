@@ -728,6 +728,10 @@ namespace maslov
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseLnr(F f)
   {
+    if (empty())
+    {
+      throw std::runtime_error("<EMPTY>");
+    }
     Stack< BiTreeNode< Key, T > * > stack;
     BiTreeNode< Key, T > * current = fakeRoot_->left;
     bool leftDone = false;
@@ -761,6 +765,10 @@ namespace maslov
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseRnl(F f)
   {
+    if (empty())
+    {
+      throw std::runtime_error("<EMPTY>");
+    }
     Stack< BiTreeNode< Key, T > * > stack;
     BiTreeNode< Key, T > * current = fakeRoot_->left;
     bool rightDone = false;
@@ -794,6 +802,10 @@ namespace maslov
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseBreadth(F f)
   {
+    if (empty())
+    {
+      throw std::runtime_error("<EMPTY>");
+    }
     Queue< BiTreeNode< Key, T > * > queue;
     queue.push(fakeRoot_->left);
     while (!queue.empty())
