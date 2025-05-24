@@ -65,8 +65,9 @@ namespace savintsev
     size_t size_ = 0;
 
     std::pair< iterator, bool > lazy_find(const key_type & k) const;
+    std::pair< iterator, bool > insert_node(node_type * target, const value_type & val);
+
     node_type * split_node(node_type * node);
-    void sort_node(node_type * node);
     void insert_data_in_node(node_type * node, const value_type & val);
     void remove_data_from_node(node_type * node, const value_type & val);
     void remove_data_from_node(node_type * node, const key_type & k);
@@ -232,35 +233,36 @@ namespace savintsev
   typename TwoThreeTree< K, V, C >::iterator TwoThreeTree< K, V, C >::find(const key_type & k)
   {
     auto result = lazy_find(k);
-    if (result.second)
-    {
-      return result.first;
-    }
-    return end();
+    return result.second ? result.first : end();
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::const_iterator TwoThreeTree< K, V, C >::find(const key_type & k) const
   {
     auto result = lazy_find(k);
-    if (result.second)
-    {
-      return result.first;
-    }
-    return end();
+    return result.second ? result.first : end();
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](const key_type & k)
   {
-    return insert({k, mapped_type{}}).first->second;
+    auto res = lazy_find(k);
+    if (res.second)
+    {
+      return res.first->second;
+    }
+    return insert_node(res.first.node_, {k, mapped_type{}}).first->second;
   }
 
   template< typename K, typename V, typename C >
   typename TwoThreeTree< K, V, C >::mapped_type & TwoThreeTree< K, V, C >::operator[](key_type && k)
   {
-    std::pair< K, V > inserted = {k, mapped_type{}};
-    return insert(inserted).first->second;
+    auto res = lazy_find(k);
+    if (res.second)
+    {
+      return res.first->second;
+    }
+    return insert_node(res.first.node_, {std::move(k), mapped_type{}}).first->second;
   }
 
   template< typename K, typename V, typename C >
@@ -286,7 +288,8 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  std::pair<
+  std::pair
+  <
     typename TwoThreeTree< K, V, C >::iterator,
     bool
   >
@@ -329,13 +332,127 @@ namespace savintsev
     return {iterator(root_), false};
   }
 
+  template< typename K, typename V, typename C >
+  std::pair
+  <
+    typename TwoThreeTree< K, V, C >::iterator,
+    bool
+  >
+  TwoThreeTree< K, V, C >::insert_node(node_type * target, const value_type & val)
+  {
+    node_type * old_root = root_;
+    size_t old_size = size_;
+
+    try
+    {
+      if (!target)
+      {
+        node_type * new_node = new node_type{};
+        try
+        {
+          insert_data_in_node(new_node, val);
+        }
+        catch (...)
+        {
+          delete new_node;
+          throw;
+        }
+        root_ = new_node;
+        size_++;
+        return {iterator(root_, new_node, 0), true};
+      }
+
+      node_type * current = target;
+      bool data_inserted = false;
+
+      try
+      {
+        insert_data_in_node(current, val);
+        data_inserted = true;
+
+        while (current && current->len == 3)
+        {
+          node_type * new_current = split_node(current);
+          if (new_current == current)
+          {
+            break;
+          }
+          current = new_current;
+        }
+
+        while (current && current->father)
+        {
+          current = current->father;
+        }
+        root_ = current;
+        size_++;
+
+        return {lazy_find(val.first).first, true};
+      }
+      catch (...)
+      {
+        if (data_inserted)
+        {
+          remove_data_from_node(target, val.first);
+          while (current && current != target)
+          {
+            current = merge_nodes(current);
+          }
+        }
+        throw;
+      }
+    }
+    catch (...)
+    {
+      root_ = old_root;
+      size_ = old_size;
+      throw;
+    }
+  }
+
   template< typename Key, typename Value, typename Compare >
   void TwoThreeTree< Key, Value, Compare >::insert_data_in_node(node_type * node, const value_type & val)
   {
-    node->data[node->len] = val;
     assert(node->len < 3);
-    node->len++;
-    sort_node(node);
+
+    std::array< value_type, 3 > tmp_data;
+    size_t tmp_len = node->len;
+
+    for (size_t i = 0; i < tmp_len; ++i)
+    {
+      tmp_data[i] = node->data[i];
+    }
+
+    tmp_data[tmp_len++] = val;
+
+    if (tmp_len == 2)
+    {
+      if (!Compare{}(tmp_data[0].first, tmp_data[1].first))
+      {
+        std::swap(tmp_data[0], tmp_data[1]);
+      }
+    }
+    else if (tmp_len == 3)
+    {
+      if (!Compare{}(tmp_data[0].first, tmp_data[1].first))
+      {
+        std::swap(tmp_data[0], tmp_data[1]);
+      }
+      if (!Compare{}(tmp_data[1].first, tmp_data[2].first))
+      {
+        std::swap(tmp_data[1], tmp_data[2]);
+      }
+      if (!Compare{}(tmp_data[0].first, tmp_data[1].first))
+      {
+        std::swap(tmp_data[0], tmp_data[1]);
+      }
+    }
+
+    for (size_t i = 0; i < tmp_len; ++i)
+    {
+      node->data[i] = std::move(tmp_data[i]);
+    }
+    node->len = tmp_len;
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -957,74 +1074,20 @@ namespace savintsev
     }
   }
 
-  template< typename Key, typename Value, typename Compare >
-  void TwoThreeTree< Key, Value, Compare >::sort_node(node_type * node)
-  {
-    if (node->len == 2)
-    {
-      if (!Compare{}(node->data[0].first, node->data[1].first))
-      {
-        std::swap(node->data[0], node->data[1]);
-      }
-    }
-    if (node->len == 3)
-    {
-      if (!Compare{}(node->data[0].first, node->data[1].first))
-      {
-        std::swap(node->data[0], node->data[1]);
-      }
-      if (!Compare{}(node->data[1].first, node->data[2].first))
-      {
-        std::swap(node->data[1], node->data[2]);
-      }
-      if (!Compare{}(node->data[0].first, node->data[1].first))
-      {
-        std::swap(node->data[0], node->data[1]);
-      }
-    }
-  }
-
   template< typename K, typename V, typename C >
-  std::pair< typename TwoThreeTree< K, V, C >::iterator, bool > TwoThreeTree< K, V, C >::insert(const value_type & val)
+  std::pair
+  <
+    typename TwoThreeTree< K, V, C >::iterator,
+    bool
+  >
+  TwoThreeTree< K, V, C >::insert(const value_type & val)
   {
     auto result = lazy_find(val.first);
     if (result.second)
     {
       return {result.first, false};
     }
-    try
-    {
-      node_type * current = result.first.node_;
-
-      if (!current)
-      {
-        root_ = new node_type{};
-        insert_data_in_node(root_, val);
-        size_++;
-        return {iterator(root_, root_), true};
-      }
-
-      insert_data_in_node(current, val);
-
-      while (current && current->len == 3)
-      {
-        current = split_node(current);
-      }
-      while (current->father)
-      {
-        current = current->father;
-      }
-
-      root_ = current;
-      size_++;
-
-      return {lazy_find(val.first).first, true};
-    }
-    catch (...)
-    {
-
-      throw;
-    }
+    return insert_node(result.first.node_, val);
   }
 }
 
