@@ -11,35 +11,60 @@
 
 namespace rychkov
 {
-  int getPriority(char operatorChar)
+  enum Operator: char
   {
-    switch (operatorChar)
+    plus = '+',
+    minus = '-',
+    multiplies = '*',
+    divides = '/',
+    modulus = '%',
+    openinigParenthesis = '(',
+    closingParenthesis = ')',
+  };
+  namespace details
+  {
+    int getPriority(Operator oper)
     {
-    case '(':
-    case ')':
-      return 1;
-    case '%':
-      return 2;
-    case '+':
-    case '-':
-      return 3;
-    case '*':
-    case '/':
-      return 4;
-    default:
-      return -1;
+      switch (oper)
+      {
+      case openinigParenthesis:
+      case closingParenthesis:
+        return 1;
+      case modulus:
+        return 2;
+      case plus:
+      case minus:
+        return 3;
+      case multiplies:
+      case divides:
+        return 4;
+      default:
+        return -1;
+      }
     }
   }
-  char popLowPrioritized(rychkov::Queue< rychkov::Variant< long long, char > >& expression,
-      rychkov::Stack< char >& operators, int referencePriority = 0)
+  bool lessPriority(Operator lhs, Operator rhs)
   {
-    while (!operators.empty() && (rychkov::getPriority(operators.top()) > referencePriority))
+    return details::getPriority(lhs) < details::getPriority(rhs);
+  }
+  bool equalPriority(Operator lhs, Operator rhs)
+  {
+    return details::getPriority(lhs) == details::getPriority(rhs);
+  }
+  bool isOperator(char c)
+  {
+    return details::getPriority(static_cast< Operator >(c)) != -1;
+  }
+  Operator popLowPrioritized(Queue< Variant< long long, Operator > >& expression,
+        Stack< Operator >& operators, Operator referenceOperator = static_cast< Operator >('\0'))
+  {
+    while (!operators.empty() && lessPriority(referenceOperator, operators.top()))
     {
       expression.push(operators.top());
       operators.pop();
     }
-    char result = '\0';
-    if (!operators.empty() && (rychkov::getPriority(operators.top()) == referencePriority))
+    Operator result = static_cast< Operator >('\0');
+    if (!operators.empty() && equalPriority(operators.top(), referenceOperator))
     {
       result = operators.top();
       if (operators.top() != '(')
@@ -54,6 +79,11 @@ namespace rychkov
 
 int main(int argc, char** argv)
 {
+  using rychkov::Stack;
+  using rychkov::Queue;
+  using rychkov::Variant;
+  using rychkov::Operator;
+
   std::istream* inPtr = &std::cin;
   std::ifstream inFile;
   if (argc == 2)
@@ -69,11 +99,11 @@ int main(int argc, char** argv)
   std::istream& in = *inPtr;
 
   in >> std::noskipws;
-  rychkov::Stack< long long > results;
+  Stack< long long > results;
   while (!in.eof())
   {
-    rychkov::Queue< rychkov::Variant< long long, char > > expression;
-    rychkov::Stack< char > operators;
+    Queue< Variant< long long, Operator > > expression;
+    Stack< Operator > operators;
     bool isNumber = false;
     long long number = 0;
     char c = 0;
@@ -107,18 +137,18 @@ int main(int argc, char** argv)
         }
         if (!std::isspace(c))
         {
-          int priority = rychkov::getPriority(c);
-          if (priority == -1)
+          if (!rychkov::isOperator(c))
           {
             std::cerr << "found unknown symbol - '" << c << "'\n";
             return 1;
           }
+          Operator oper = static_cast< Operator >(c);
           if (c == '(')
           {
-            operators.push(c);
+            operators.push(oper);
             continue;
           }
-          char equalPrioritized = rychkov::popLowPrioritized(expression, operators, priority);
+          Operator equalPrioritized = rychkov::popLowPrioritized(expression, operators, oper);
           if ((equalPrioritized != '(') && (c == ')'))
           {
             std::cerr << "wrong parentheses order\n";
@@ -126,19 +156,19 @@ int main(int argc, char** argv)
           }
           if (c != ')')
           {
-            operators.push(c);
+            operators.push(oper);
           }
         }
       }
     }
-    rychkov::popLowPrioritized(expression, operators, 0);
+    rychkov::popLowPrioritized(expression, operators);
     operators.clear();
     if (expression.empty())
     {
       continue;
     }
 
-    rychkov::Stack< long long > operands;
+    Stack< long long > operands;
     if (!rychkov::holds_alternative< long long >(expression.front()))
     {
       std::cerr << "expression does not start with number\n";
@@ -148,7 +178,7 @@ int main(int argc, char** argv)
     expression.pop();
     for (; !expression.empty(); expression.pop())
     {
-      if (rychkov::holds_alternative< char >(expression.front()))
+      if (rychkov::holds_alternative< Operator >(expression.front()))
       {
         if (operands.size() < 2)
         {
@@ -160,7 +190,7 @@ int main(int argc, char** argv)
         try
         {
           operands.top() = rychkov::executeOperation(operands.top(),
-                rychkov::get< char >(expression.front()), rightOperand);
+                rychkov::get< Operator >(expression.front()), rightOperand);
         }
         catch (const std::invalid_argument& e)
         {
