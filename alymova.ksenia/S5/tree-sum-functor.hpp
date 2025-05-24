@@ -8,9 +8,10 @@ namespace alymova
 {
   struct TreeSum
   {
-    int keys = 0;
+    int keys;
     Queue< std::string > values;
 
+    TreeSum();
     void operator()(const std::pair< int, std::string >& key_value);
   };
   std::ostream& operator<<(std::ostream& out, const TreeSum& object);

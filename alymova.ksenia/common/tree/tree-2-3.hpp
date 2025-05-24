@@ -18,14 +18,13 @@ namespace alymova
   {
   public:
     using Tree = TwoThreeTree< Key, Value, Comparator >;
+
     using Iterator = TTTIterator< Key, Value, Comparator >;
     using ConstIterator = TTTConstIterator< Key, Value, Comparator >;
-    using LnrIterator = TTTLnrIterator< Key, Value, Comparator >;
     using ConstLnrIterator = TTTConstLnrIterator< Key, Value, Comparator >;
-    using RnlIterator = TTTRnlIterator< Key, Value, Comparator >;
     using ConstRnlIterator = TTTConstRnlIterator< Key, Value, Comparator >;
-    using BreadthIterator = TTTBreadthIterator< Key, Value, Comparator >;
     using ConstBreadthIterator = TTTConstBreadthIterator< Key, Value, Comparator >;
+
     using Node = typename detail::TTTNode< Key, Value, Comparator >;
     using NodeType = typename Node::NodeType;
     using NodePoint = typename detail::NodePoint;

@@ -2,6 +2,11 @@
 #include <exception>
 #include <limits>
 
+alymova::TreeSum::TreeSum():
+  keys(0),
+  values()
+{}
+
 void alymova::TreeSum::operator()(const std::pair< int, std::string >& key_value)
 {
   if (isOverflowAddition(keys, key_value.first))
