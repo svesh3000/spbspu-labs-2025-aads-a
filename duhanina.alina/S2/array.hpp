@@ -16,6 +16,9 @@ namespace duhanina
 
     DynamicArray(const DynamicArray& other);
     DynamicArray(DynamicArray&& other) noexcept;
+
+    void swap(DynamicArray& other) noexcept;
+
     DynamicArray& operator=(const DynamicArray&);
     DynamicArray& operator=(DynamicArray&& other) noexcept;
 
@@ -88,25 +91,28 @@ namespace duhanina
     other.head_ = 0;
   }
 
+  template< typename T >
+  void DynamicArray< T >::swap(DynamicArray< T >& other) noexcept
+  {
+    std::swap(data_, other.data_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(length_, other.length_);
+    std::swap(head_, other.head_);
+  }
+
   template < typename T >
   DynamicArray< T >& DynamicArray< T >::operator=(const DynamicArray& other)
   {
-    if (this != std::addressof(other))
-    {
-      DynamicArray< T > temp(other);
-      std::swap(temp);
-    }
+    DynamicArray< T > temp(other);
+    swap(temp);
     return *this;
   }
 
   template < typename T >
   DynamicArray< T >& DynamicArray< T >::operator=(DynamicArray&& other) noexcept
   {
-    if (this != std::addressof(other))
-    {
-      DynamicArray< T > temp(std::move(other));
-      std::swap(temp);
-    }
+    DynamicArray< T > temp(std::move(other));
+    swap(temp);
     return *this;
   }
 
