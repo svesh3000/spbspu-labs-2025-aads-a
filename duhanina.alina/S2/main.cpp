@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <stdexcept>
 #include <cctype>
 #include <climits>
@@ -9,101 +8,92 @@
 
 namespace
 {
-  bool isOperator(char c)
+  bool isOperator(const std::string& c)
   {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+    return c == "+" || c == "-" || c == "*" || c == "/" || c == "%";
   }
 
-  bool higherEqualPrecedence(char op1, char op2)
+  bool higherEqualPrecedence(const std::string& op1, const std::string& op2)
   {
-    if ((op1 == '+' || op1 == '-') && (op2 == '*' || op2 == '/' || op2 == '%'))
+    if ((op1 == "+" || op1 == "-") && (op2 == "*" || op2 == "/" || op2 == "%"))
     {
       return false;
     }
     return true;
   }
 
-duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
-{
-  duhanina::Stack<char> operators;
-  duhanina::Queue<std::string> output;
-  size_t pos = 0;
-  const size_t len = infix.length();
-
-  while (pos < len)
+  void processToken(const std::string& token, duhanina::Stack< std::string >& operators, duhanina::Queue< std::string >& output)
   {
-    // Пропускаем пробелы
-    while (pos < len && infix[pos] == ' ')
+    if (token.empty())
     {
-      pos++;
+      return;
     }
-    if (pos >= len)
+    if (std::isdigit(token[0]))
     {
-      break;
-    }
-
-    std::string token;
-    if (std::isdigit(infix[pos]))
-    {
-      size_t start = pos;
-      while (pos < len && std::isdigit(infix[pos]))
-      {
-        pos++;
-      }
-      token = infix.substr(start, pos - start);
       output.push(token);
+    }
+    else if (token == "(")
+    {
+      operators.push(token);
+    }
+    else if (token == ")")
+    {
+      while (!operators.empty() && operators.top() != "(")
+      {
+        output.push(std::string(operators.top()));
+        operators.pop();
+      }
+      if (operators.empty())
+      {
+        throw std::runtime_error("Mismatched parentheses");
+      }
+      operators.pop();
+    }
+    else if (isOperator(token))
+    {
+      while (!operators.empty() && operators.top() != "(" && higherEqualPrecedence(operators.top(), token))
+      {
+        output.push(std::string(operators.top()));
+        operators.pop();
+      }
+      operators.push(token);
     }
     else
     {
-      char c = infix[pos++];
-      token = std::string(1, c);
-
-      if (c == '(')
-      {
-        operators.push(c);
-      }
-      else if (c == ')')
-      {
-        while (!operators.empty() && operators.top() != '(')
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        if (operators.empty())
-        {
-          throw std::runtime_error("Mismatched parentheses");
-        }
-        operators.pop();
-      }
-      else if (isOperator(c))
-      {
-        while (!operators.empty() && operators.top() != '(' &&
-               higherEqualPrecedence(operators.top(), c))
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        operators.push(c);
-      }
-      else
-      {
-        throw std::runtime_error("Invalid token: " + token);
-      }
+      throw std::runtime_error("Invalid token");
     }
   }
 
-  while (!operators.empty())
+  duhanina::Queue< std::string > infixToPostfix(const std::string& infix)
   {
-    if (operators.top() == '(')
+    duhanina::Stack< std::string > operators;
+    duhanina::Queue< std::string > output;
+    size_t start = 0;
+    size_t end = infix.find(' ');
+    while (end != std::string::npos)
     {
-      throw std::runtime_error("Mismatched parentheses");
+      if (end != start)
+      {
+        processToken(infix.substr(start, end - start), operators, output);
+      }
+      start = end + 1;
+      end = infix.find(' ', start);
     }
-    output.push(std::string(1, operators.top()));
-    operators.pop();
+    if (start < infix.length())
+    {
+      processToken(infix.substr(start), operators, output);
+    }
+    while (!operators.empty())
+    {
+      if (operators.top() == "(")
+      {
+        throw std::runtime_error("Mismatched parentheses");
+      }
+      output.push(std::string(operators.top()));
+      operators.pop();
+    }
+    return output;
   }
-
-  return output;
-}
 
   long long checkedAdd(long long a, long long b)
   {
@@ -184,7 +174,7 @@ duhanina::Queue<std::string> infixToPostfix(const std::string& infix)
       {
         operands.push(std::stoll(token));
       }
-      else if (isOperator(token[0]))
+      else if (isOperator(token))
       {
         long long operand2 = operands.top();
         operands.pop();

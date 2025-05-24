@@ -9,22 +9,11 @@ namespace duhanina
   class Stack
   {
   public:
-    Stack() = default;
-    ~Stack() = default;
-
-    Stack(const Stack& other) = default;
-    Stack(Stack&& other) noexcept = default;
-    Stack& operator=(const Stack& other) = default;
-    Stack& operator=(Stack&&) noexcept = default;
-
     bool empty() const noexcept;
-
     void push(const T& value);
     void pop();
-
     const T& top() const noexcept;
     T& top() noexcept;
-
     size_t size() const noexcept;
 
   private:

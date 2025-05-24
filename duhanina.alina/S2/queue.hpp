@@ -9,23 +9,11 @@ namespace duhanina
   class Queue
   {
   public:
-    Queue() = default;
-    ~Queue() = default;
-
-    Queue(const Queue& other) = default;
-    Queue(Queue&& other) noexcept = default;
-    Queue& operator=(const Queue& other) = default;
-    Queue& operator=(Queue&&) noexcept = default;
-
     bool empty() const noexcept;
-
     void push(const T& value);
-
     void pop();
-
     const T& front() const noexcept;
     T& front() noexcept;
-
     size_t size() const noexcept;
 
   private:

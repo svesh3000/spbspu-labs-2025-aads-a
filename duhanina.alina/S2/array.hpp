@@ -32,22 +32,20 @@ namespace duhanina
     T& back() noexcept;
 
    private:
-    T* data_;
     size_t capacity_;
     size_t length_;
     size_t head_;
+    T* data_;
     void resize();
   };
 
   template < typename T >
   DynamicArray< T >::DynamicArray() noexcept:
-    data_(nullptr),
     capacity_(50),
     length_(0),
-    head_(0)
-  {
-    data_ = new T[capacity_];
-  }
+    head_(0),
+    data_(new T[capacity_])
+  {}
 
   template < typename T >
   DynamicArray< T >::~DynamicArray()
@@ -57,10 +55,10 @@ namespace duhanina
 
   template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
-    data_(new T[other.capacity_]),
     capacity_(other.capacity_),
     length_(other.length_),
-    head_(0)
+    head_(0),
+    data_(new T[other.capacity_])
   {
     try
     {
@@ -78,10 +76,10 @@ namespace duhanina
 
   template < typename T >
   DynamicArray< T >::DynamicArray(DynamicArray&& other) noexcept:
-    data_(other.data_),
     capacity_(other.capacity_),
     length_(other.length_),
-    head_(0)
+    head_(0),
+    data_(other.data_)
   {
     other.data_ = nullptr;
     other.capacity_ = 0;
@@ -94,23 +92,8 @@ namespace duhanina
   {
     if (this != std::addressof(other))
     {
-      T* new_data = new T[other.capacity_];
-      try
-      {
-        for (size_t i = 0; i < other.length_; ++i)
-        {
-          new_data[i] = other.data_[i + other.head_];
-        }
-      }
-      catch (...)
-      {
-        delete[] new_data;
-        throw;
-      }
-      delete[] data_;
-      data_ = new_data;
-      capacity_ = other.capacity_;
-      length_ = other.length_;
+      DynamicArray< T > temp(other);
+      swap(temp);
     }
     return *this;
   }
@@ -120,15 +103,8 @@ namespace duhanina
   {
     if (this != std::addressof(other))
     {
-      delete[] data_;
-      data_ = other.data_;
-      capacity_ = other.capacity_;
-      length_ = other.length_;
-      head_ = 0;
-      other.data_ = nullptr;
-      other.capacity_ = 0;
-      other.length_ = 0;
-      other.head_ = 0;
+      DynamicArray< T > temp(std::move(other));
+      swap(temp);
     }
     return *this;
   }
