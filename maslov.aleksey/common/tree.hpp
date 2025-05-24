@@ -730,7 +730,7 @@ namespace maslov
   {
     if (empty())
     {
-      throw std::runtime_error("<EMPTY>");
+      throw std::logic_error("<EMPTY>");
     }
     Stack< BiTreeNode< Key, T > * > stack;
     BiTreeNode< Key, T > * current = fakeRoot_->left;
@@ -767,7 +767,7 @@ namespace maslov
   {
     if (empty())
     {
-      throw std::runtime_error("<EMPTY>");
+      throw std::logic_error("<EMPTY>");
     }
     Stack< BiTreeNode< Key, T > * > stack;
     BiTreeNode< Key, T > * current = fakeRoot_->left;
@@ -804,7 +804,7 @@ namespace maslov
   {
     if (empty())
     {
-      throw std::runtime_error("<EMPTY>");
+      throw std::logic_error("<EMPTY>");
     }
     Queue< BiTreeNode< Key, T > * > queue;
     queue.push(fakeRoot_->left);

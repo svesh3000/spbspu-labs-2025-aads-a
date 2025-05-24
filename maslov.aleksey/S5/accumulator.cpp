@@ -10,11 +10,11 @@ namespace
     const int min = std::numeric_limits< int >::min();
     if ((op2 > 0) && (op1 > max - op2))
     {
-      throw std::overflow_error("ERROR: overflow");
+      throw std::runtime_error("ERROR: overflow");
     }
     if ((op2 < 0) && (op1 < min - op2))
     {
-      throw std::overflow_error("ERROR: underflow");
+      throw std::runtime_error("ERROR: underflow");
     }
   }
 }

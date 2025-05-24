@@ -23,6 +23,11 @@ int main(int argc, char * argv[])
   {
     biTree.push(key, value);
   }
+  if (!fileInput.eof())
+  {
+    std::cerr << "ERROR: wrong input\n";
+    return 1;
+  }
   try
   {
     std::string cmd(argv[1]);
@@ -45,6 +50,11 @@ int main(int argc, char * argv[])
       return 1;
     }
     std::cout << result.keySum << ' ' << result.values << '\n';
+  }
+  catch (const std::logic_error & e)
+  {
+    std::cout << e.what() << '\n';
+    return 0;
   }
   catch (const std::exception & e)
   {
