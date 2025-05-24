@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 #include <string>
-#include <fwd_list/definition.hpp>
+#include <vector/definition.hpp>
 #include "double_hash.hpp"
 
 namespace maslevtsov {
@@ -14,7 +14,7 @@ namespace maslevtsov {
 
   private:
     using vertices_pair_t = std::pair< std::string, std::string >;
-    using edges_set_t = std::unordered_map< vertices_pair_t, FwdList< unsigned >, maslevtsov::PairDoubleHash >;
+    using edges_set_t = std::unordered_map< vertices_pair_t, Vector< unsigned >, maslevtsov::PairDoubleHash >;
 
     edges_set_t edges_set;
   };
