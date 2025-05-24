@@ -98,7 +98,7 @@ namespace dribas
     const NodeType* getRoot() const noexcept;
     void clearSubtree(NodeType*) noexcept;
   };
-  
+
   template <class Key, class T, class Compare>
   void AVLTree<Key, T, Compare>::clear() noexcept {
     clearSubtree(root_);
@@ -178,7 +178,7 @@ namespace dribas
   }
 
   template< class Key, class T, class Compare >
-  const Node< Key, T >* AVLTree< Key, T, Compare >::getRoot() const noexcept 
+  const Node< Key, T >* AVLTree< Key, T, Compare >::getRoot() const noexcept
   {
     return root_;
   }
