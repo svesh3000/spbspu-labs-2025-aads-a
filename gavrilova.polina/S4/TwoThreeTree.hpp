@@ -67,7 +67,6 @@ namespace gavrilova {
   TwoThreeTree< Key, Value, Cmp >::TwoThreeTree(const TwoThreeTree& other):
     TwoThreeTree()
   {
-    
   }
 
   template < class Key, class Value, class Cmp >
