@@ -1,25 +1,22 @@
-#include <iostream>
-#include <functional>
 #include <cstring>
 #include <fstream>
+#include <functional>
+#include <iostream>
+#include <limits>
 #include <map>
 #include <stdexcept>
-#include <limits>
 #include "commands.hpp"
 
-namespace
-{
+namespace {
   using TreeKey = std::map< size_t, std::string >;
   using DataTree = std::map< std::string, TreeKey >;
   void input_trees(std::ifstream& in, DataTree& map_trees)
   {
     std::string name_map;
-    while (in >> name_map)
-    {
+    while (in >> name_map) {
       TreeKey tree_value;
       size_t key = 0;
-      while (in >> key)
-      {
+      while (in >> key) {
         std::string value;
         in >> value;
         tree_value.insert(std::pair< size_t, std::string >{key, value});
@@ -34,69 +31,51 @@ int main(int argc, char* argv[])
 {
   using TreeKey = std::map< size_t, std::string >;
   using DataTree = std::map< std::string, TreeKey >;
-  if (argc != 2)
-  {
+  if (argc != 2) {
     std::cerr << "Incorrect file\n";
     return 1;
   }
   std::ifstream file(argv[1]);
   DataTree set_trees;
-  try
-  {
+  try {
     input_trees(file, set_trees);
-  }
-  catch(const std::exception& e)
-  {
+  } catch (const std::exception& e) {
     std::cerr << "1" << e.what() << '\n';
     return 1;
   }
-  while (!std::cin.eof())
-  {
+  while (!std::cin.eof()) {
     std::string name_operat;
     std::cin >> name_operat;
-    if (std::cin.eof())
-    {
+    if (std::cin.eof()) {
       break;
     }
-    try
-    {
-      if (name_operat == "print")
-      {
+    try {
+      if (name_operat == "print") {
         std::string name_tree;
         std::cin >> name_tree;
         gavrilova::print_dataset(std::cout, name_tree, set_trees);
-      }
-      else if (name_operat == "complement")
-      {
+      } else if (name_operat == "complement") {
         std::string name_new_tree;
         std::string name_tree1;
         std::string name_tree2;
         std::cin >> name_new_tree >> name_tree1 >> name_tree2;
         gavrilova::complement(name_new_tree, name_tree1, name_tree2, set_trees);
-      }
-      else if (name_operat == "intersect")
-      {
+      } else if (name_operat == "intersect") {
         std::string name_new_tree;
         std::string name_tree1;
         std::string name_tree2;
         std::cin >> name_new_tree >> name_tree1 >> name_tree2;
         gavrilova::intersect(name_new_tree, name_tree1, name_tree2, set_trees);
-      }
-      else if (name_operat == "union")
-      {
+      } else if (name_operat == "union") {
         std::string name_new_tree;
         std::string name_tree1;
         std::string name_tree2;
         std::cin >> name_new_tree >> name_tree1 >> name_tree2;
         gavrilova::union_data(name_new_tree, name_tree1, name_tree2, set_trees);
-      }
-      else
-      {
+      } else {
         throw std::logic_error("Error in commands");
       }
-    }
-    catch(const std::exception& e)
-    {
+    } catch (const std::exception& e) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
