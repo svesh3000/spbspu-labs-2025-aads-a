@@ -1,10 +1,11 @@
-#include <string>
 #include <iostream>
+#include <string>
+#include "FwdList.hpp"
 #include "inputList.hpp"
 #include "outputList.hpp"
-#include "FwdList.hpp"
 
-int main() {
+int main()
+{
   using namespace gavrilova;
   using ULL = unsigned long long;
 
@@ -19,9 +20,14 @@ int main() {
     FwdList< ULL > numbers = inputNumbers(std::cin);
     // std::cout << "finish input numbers\n";
     maxLen = (maxLen < numbers.size()) ? numbers.size() : maxLen;
+<<<<<<< HEAD
     std::pair< std::string, FwdList< ULL > > new_pair {name, numbers};
     listOfPairs.insert(cur_it, new_pair);
     // std::cout << "insert LOP\n";
+=======
+    std::pair< std::string, FwdList< ULL > > new_pair{name, numbers};
+    listOfPairs.insert(cur_it, new_pair);
+>>>>>>> gavrilova.polina/S2
     ++cur_it;
     ++numOfPairs;
   }
@@ -33,18 +39,29 @@ int main() {
   }
   // std::cout << "11\n";
 
-  FwdList< ULL > sums {};
+  if (maxLen == 0) {
+    std::cout << "0" << "\n";
+    return 0;
+  }
+
+  FwdList< ULL > sums{};
   try {
     sums = outNumbers(std::cout, listOfPairs, maxLen, numOfPairs);
-  } catch(const std::overflow_error& e) {
     std::cout << "\n";
-    std::cerr << e.what();
+  } catch (const std::overflow_error& e) {
+    std::cerr << e.what() << "\n";
     return 1;
   }
+<<<<<<< HEAD
   if (maxLen == 0) {
     std::cout << "0" << "\n";
   } else {
     outFwdListULL(std::cout, sums);
   }
  std::cout << "1\n";
+=======
+
+  outFwdListULL(std::cout, sums);
+  std::cout << "\n";
+>>>>>>> gavrilova.polina/S2
 }

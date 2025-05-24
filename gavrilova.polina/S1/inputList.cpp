@@ -1,6 +1,6 @@
 #include "inputList.hpp"
 
-gavrilova::FwdList< unsigned long long > gavrilova::inputNumbers (std::istream& in)
+gavrilova::FwdList< unsigned long long > gavrilova::inputNumbers(std::istream& in)
 {
   FwdList< unsigned long long > numbers;
   unsigned long long num = 0;
