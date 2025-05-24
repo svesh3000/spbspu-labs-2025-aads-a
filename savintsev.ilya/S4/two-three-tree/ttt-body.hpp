@@ -415,7 +415,7 @@ namespace savintsev
   {
     assert(node->len < 3);
 
-    std::array< value_type, 3 > tmp_data;
+    value_type tmp_data[3];
     size_t tmp_len = node->len;
 
     for (size_t i = 0; i < tmp_len; ++i)
