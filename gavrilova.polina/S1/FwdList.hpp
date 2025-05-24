@@ -287,7 +287,7 @@ namespace gavrilova {
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other) noexcept
   {
-    if(other.empty()) {
+    if (other.empty()) {
       return;
     }
     NodeFwdList< T >* first_other = other.fake_->next;
