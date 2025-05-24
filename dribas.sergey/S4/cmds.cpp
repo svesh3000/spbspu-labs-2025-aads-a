@@ -10,7 +10,7 @@ void dribas::print(std::ostream& out , std::istream& input, const dataset& setda
     return;
   }
   out << name;
-  for (auto it = tree.cbegin(); it != tree.cend(); ++it) {
+  for (auto it = tree.begin(); it != tree.end(); ++it) {
     out << " " << it->first << " " << it->second;
   }
   out << "\n";
@@ -53,7 +53,7 @@ void dribas::unite(std::istream& input, dataset& setOfData)
   auto firstTree = setOfData.at(firstName);
   auto secondTree = setOfData.at(secondName);
   data newTree = firstTree;
-  for (auto it = secondTree.cbegin(); it != secondTree.cend(); ++it)
+  for (auto it = secondTree.begin(); it != secondTree.end(); ++it)
   {
     newTree.insert(*it);
   }

@@ -31,7 +31,7 @@ int main(int argc, char** argv)
   }
   file.close();
 
-  std::map< std::string, std::function< void() > > cmds;
+  dribas::AVLTree< std::string, std::function< void() > > cmds;
   cmds.insert(std::make_pair("print", std::bind(print, std::ref(std::cout), std::ref(std::cin), std::cref(datas))));
   cmds.insert(std::make_pair("complement", std::bind(complement, std::ref(std::cin), std::ref(datas))));
   cmds.insert(std::make_pair("intersect", std::bind(intersect, std::ref(std::cin), std::ref(datas))));
