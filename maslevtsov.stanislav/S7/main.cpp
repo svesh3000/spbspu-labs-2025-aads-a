@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <functional>
+#include <limits>
 #include <tree/definition.hpp>
 #include "graph.hpp"
 
@@ -31,5 +33,18 @@ int main(int argc, char** argv)
       graph.add_edge(vertice1, vertice2, weight);
     }
     graphs[graph_name] = graph;
+  }
+
+  std::unordered_map< std::string, std::function< void() >, StringDoubleHash > commands;
+
+  std::string command;
+  while ((std::cin >> command) && !std::cin.eof()) {
+    try {
+      commands.at(command)();
+    } catch (...) {
+      std::cerr << "<INVALID COOMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 }
