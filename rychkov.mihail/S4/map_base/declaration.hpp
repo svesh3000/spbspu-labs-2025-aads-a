@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <type_traits>
+#include <memory>
 #include "node.hpp"
 #include "iterator.hpp"
 

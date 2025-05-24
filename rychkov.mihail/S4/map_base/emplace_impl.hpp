@@ -13,7 +13,7 @@ std::pair< typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator, bo
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::emplace_hint_impl(std::pair< const_iterator, bool > hint_pair,
       Args&&... args)
 {
-  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "move construct need to be nothrow");
 
   const_iterator hint = hint_pair.first;
   if (!hint_pair.second)

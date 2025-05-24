@@ -10,7 +10,7 @@ template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 typename rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::iterator
     rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::erase(const_iterator pos)
 {
-  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "use of unready functional");
+  static_assert(std::is_nothrow_move_constructible< real_value_type >::value, "move construct need to be nothrow");
 
   size_--;
   iterator result{pos.node_, pos.pointed_};

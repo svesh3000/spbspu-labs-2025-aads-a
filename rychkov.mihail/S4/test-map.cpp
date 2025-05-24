@@ -30,8 +30,8 @@ BOOST_AUTO_TEST_CASE(empty_test)
 }
 BOOST_AUTO_TEST_CASE(map_test)
 {
-  rychkov::Map< int, char > map = {{0, '1'}, {3, '2'}, {-1, '3'}, {2, '4'}};
-  BOOST_TEST(map.size() == 4);
+  rychkov::Map< int, char > map = {{0, '1'}, {3, '2'}, {-1, '3'}, {2, '4'}, {3, '5'}, {9, '6'}};
+  BOOST_TEST(map.size() == 5);
   BOOST_TEST((map.find(234) == map.end()));
   BOOST_TEST((map.find(-1) == map.begin()));
   BOOST_TEST(!map.contains(-44));
@@ -61,17 +61,30 @@ BOOST_AUTO_TEST_CASE(erase_test)
 }
 BOOST_AUTO_TEST_CASE(random_test)
 {
+  struct Wrapper
+  {
+    std::mt19937::result_type value;
+    bool operator==(Wrapper rhs) const noexcept
+    {
+      return value == rhs.value;
+    }
+    bool operator<(Wrapper rhs) const noexcept
+    {
+      return value < rhs.value;
+    }
+  };
+  rychkov::MemTrack< Wrapper > observer{};
   std::mt19937 engine;
   engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
   constexpr size_t input_size = 8192;
-  int data[input_size];
-  rychkov::MultiSet< int, std::less<>, 10 > set;
+  Wrapper data[input_size];
+  rychkov::MultiSet< rychkov::MemChecker< Wrapper >, std::less<>, 10 > set;
   size_t size = 0;
-  for (int& i: data)
+  for (Wrapper& i: data)
   {
     std::uniform_int_distribution< size_t > range(0, size - 1);
     decltype(set)::iterator wrong_hint = (size == 0 ? set.begin() : set.lower_bound(data[range(engine)]));
-    i = engine();
+    i = {engine()};
     set.insert(wrong_hint, i);
   }
   std::sort(data, data + input_size);

@@ -1,6 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#include <functional>
 #include "map_base.hpp"
 
 namespace rychkov

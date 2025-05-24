@@ -58,11 +58,8 @@ namespace rychkov
         catch(...)
         {}
         context.out << "<INVALID COMMAND>\n";
-        if (available())
-        {
-          context.in.clear();
-          context.in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        }
+        context.in.clear(context.in.rdstate() & ~std::ios::failbit);
+        context.in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
       return available();
     }
