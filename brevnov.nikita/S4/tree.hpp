@@ -424,20 +424,20 @@
       fixHeight(node->right);
       node->nodeHeight = 1 + std::max(height(node->left), height(node->right));
       int balance = balanceFactor(node);
-      if (balance > 1 && cmp_(node->data->first, node->left->data->first))
+      if (balance > 1 && cmp_(node->data.first, node->left->data.first))
       {
         node = rightRotate(node);
       }
-      if (balance < -1 && !cmp_(node->data->first, node->right->data->first))
+      if (balance < -1 && !cmp_(node->data.first, node->right->data.first))
       {
         node = leftRotate(node);
       }
-      if (balance > 1 && !cmp_(node->data->first, node->left->data->first))
+      if (balance > 1 && !cmp_(node->data.first, node->left->data.first))
       {
         node->left = leftRotate(node->left);
         node = rightRotate(node);
       }
-      if (balance < -1 && cmp_(node->data->first, node->right->data->first))
+      if (balance < -1 && cmp_(node->data.first, node->right->data.first))
       {
         node->right = rightRotate(node->right);
         node = leftRotate(node);
