@@ -6,6 +6,7 @@
 #include <memory>
 #include "node.hpp"
 #include "iterator.hpp"
+#include "heavy_iterator.hpp"
 
 namespace rychkov
 {
@@ -60,6 +61,16 @@ namespace rychkov
     using const_iterator = MapBaseIterator< value_type, N, real_value_type, true, false >;
     using reverse_iterator = MapBaseIterator< value_type, N, real_value_type, false, true >;
     using const_reverse_iterator = MapBaseIterator< value_type, N, real_value_type, true, true >;
+
+    using heavy_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, false, false, false >;
+    using const_heavy_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, true, false, false >;
+    using reverse_heavy_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, false, true, false >;
+    using const_reverse_heavy_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, true, true, false >;
+
+    using breadth_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, false, false, true >;
+    using const_breadth_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, true, false, true >;
+    using reverse_breadth_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, false, true, true >;
+    using const_reverse_breadth_iterator = MapBaseHeavyIterator< value_type, N, real_value_type, true, true, true >;
 
     struct map_value_compare
     {

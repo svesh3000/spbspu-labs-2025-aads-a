@@ -87,6 +87,8 @@ namespace rychkov
   private:
     template< class K, class M, class C, size_t N1, bool IsSet, bool IsMulti >
     friend class MapBase;
+    template< class V, size_t N1, class RealV, bool isConst1, bool isReversed1, bool isBreadth >
+    friend class MapBaseHeavyIterator;
     friend class MapBaseIterator< Value, N, RealValue, true, isReversed >;
 
     using node_size_type = typename node_type::size_type;
@@ -130,6 +132,10 @@ void rychkov::MapBaseIterator< Value, N, RealValue, isConst, isReversed >::shift
       {
         break;
       }
+    }
+    if (!node_->isfake())
+    {
+      pointed_--;
     }
   }
 }
