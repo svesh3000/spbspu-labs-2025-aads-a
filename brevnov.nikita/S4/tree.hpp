@@ -8,6 +8,7 @@
 #include "iterator.hpp"
 #include "treeNode.hpp"
 
+
 namespace brevnov
 {
   template< typename Key, typename Value, typename Cmp = std::less< Key > >
@@ -15,8 +16,8 @@ namespace brevnov
   {
   public:
     using value = std::pair< Key, Value >;
-    using Iterator = brevnov::Iterator< Key, Value, Cmp, false >;
-    using ConstIterator = brevnov::Iterator< Key, Value, Cmp, true >;
+    using Iterator = Iterator< Key, Value, Cmp, false >;
+    using ConstIterator = Iterator< Key, Value, Cmp, true >;
     using IteratorPair = std::pair< Iterator, Iterator >;
     using ConstIteratorPair = std::pair< ConstIterator, ConstIterator >;
     using Node = TreeNode< Key, Value>;
