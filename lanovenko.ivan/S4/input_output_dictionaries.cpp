@@ -1,28 +1,31 @@
 #include "input_output_dictionaries.hpp"
 
-void lanovenko::getDictionaries(std::istream &in, map_t &dictionaries)
+void lanovenko::getDictionaries(std::istream& in, map_t& dictionaries)
 {
   std::string name, value;
   int key = 0;
   while (!in.eof())
   {
-    std::map< int, std::string > dictionary{};
+    Tree< int, std::string, std::less< int > > dictionary{};
     in >> name;
     while (in && in.peek() != '\n')
     {
       in >> key >> value;
       dictionary.insert({ key, value });
     }
-    dictionaries.insert({ name, dictionary });
+    if (!dictionary.empty())
+    {
+      dictionaries.insert({ name, dictionary });
+    }
   }
   std::cin.clear();
 }
 
-void lanovenko::printDictionary(map_t &dictionaries)
+void lanovenko::printDictionary(map_t& dictionaries)
 {
   std::string name = "";
   std::cin >> name;
-  const std::map< int, std::string > dictionary = dictionaries.at(name);
+  const Tree< int, std::string, std::less < int > > dictionary = dictionaries.at(name);
   if (dictionary.empty())
   {
     std::cout << "<EMPTY>" << "\n";

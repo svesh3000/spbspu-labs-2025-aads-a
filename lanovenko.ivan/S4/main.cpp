@@ -1,18 +1,25 @@
 #include <limits>
 #include <algorithm>
+#include <string>
+#include <iostream>
+#include "tree_node.hpp"
+#include "tree.hpp"
+#include "tree_iterator.hpp"
 #include "input_output_dictionaries.hpp"
 #include "command_processing.hpp"
 
 int main(int argc, char** argv)
 {
   using namespace lanovenko;
+
   if (argc != 2)
   {
     std::cerr << "< INVALID PARAMETRS COUNT >\n";
     return 1;
   }
   std::ifstream input(argv[1]);
-  std::map< std::string, std::map< int, std::string > > dictionaries{};
+
+  map_t dictionaries{};
   getDictionaries(input, dictionaries);
   std::string command = "";
   while (!(std::cin >> command).eof())

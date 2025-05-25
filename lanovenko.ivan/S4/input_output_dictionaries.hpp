@@ -5,11 +5,12 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "tree.hpp"
 
 namespace lanovenko
 {
-  using map_t = std::map< std::string, std::map< int, std::string > >;
-  void getDictionaries(std::istream& in, map_t& dictionaries);
+  using map_t = Tree < std::string, Tree< int, std::string, std::less< int > >, std::less< std::string > >;
+  void getDictionaries(std::istream& in, map_t&);
   void printDictionary(map_t& dictionaries);
 }
 
