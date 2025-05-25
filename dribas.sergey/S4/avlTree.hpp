@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstddef>
 #include <stdexcept>
+#include <algorithm>
 
 #include "iterator.hpp"
 #include "constIterator.hpp"
@@ -29,7 +30,6 @@ namespace dribas
 
   template< class Key, class T >
   Node< Key, T >::Node():
-    value(),
     left(nullptr),
     right(nullptr),
     parent(nullptr),
@@ -95,7 +95,6 @@ namespace dribas
     NodeType* rotateRight(NodeType*);
     NodeType* rotateLeft(NodeType*);
     NodeType* findNode(const Key&) const;
-    const NodeType* getRoot() const noexcept;
     void clearSubtree(NodeType*) noexcept;
   };
 
@@ -157,6 +156,7 @@ namespace dribas
     }
     return node->value.second;
   }
+
   template< class Key, class T, class Compare >
   const T& AVLTree< Key, T, Compare >::at(const Key& key) const
   {
@@ -178,14 +178,9 @@ namespace dribas
   }
 
   template< class Key, class T, class Compare >
-  const Node< Key, T >* AVLTree< Key, T, Compare >::getRoot() const noexcept
+  ConstIterator< Key, T, Compare> AVLTree<Key, T, Compare >::begin() const noexcept
   {
-    return root_;
-  }
-  template< class Key, class T, class Compare >
-  ConstIterator<Key, T, Compare> AVLTree<Key, T, Compare>::begin() const noexcept
-  {
-    const Node<Key, T>* node = getRoot();
+    const Node< Key, T >* node = root_;
     while (node && !node->left->isFake) {
       node = node->left;
     }
@@ -195,13 +190,13 @@ namespace dribas
   template< class Key, class T, class Compare >
   Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::end() noexcept
   {
-    return iterator(nullptr, this);
+    return iterator(fakeleaf_, this);
   }
 
   template< class Key, class T, class Compare >
   ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::end() const noexcept
   {
-    return const_iterator(nullptr, this);
+    return const_iterator(fakeleaf_, this);
   }
 
   template< class Key, class T, class Compare >
@@ -221,12 +216,10 @@ namespace dribas
   {
     size_t size = 0;
     for (auto i = begin(); i != end(); ++i) {
-        size++;
+      size++;
     }
     return size;
   }
-
-
 
   template < class Key, class T, class Compare >
   std::pair< Iterator< Key, T, Compare >, bool > AVLTree< Key, T, Compare >::insert(const std::pair< Key, T >& value)
@@ -263,30 +256,38 @@ namespace dribas
       parent->right = newNode;
     }
 
-    NodeType* node = parent;
-    while (node != nullptr) {
-      updateHeight(node);
-      node = balance(node);
+    NodeType* node = newNode;
+    while (node->parent && !node->parent->isFake) {
       node = node->parent;
+      node = balance(node);
+      
+      if (node->parent) {
+        if (node->parent->left == node->parent->left) {
+          node->parent->left = node;
+        } else {
+          node->parent->right = node;
+        }
+      }
     }
+
+    if (node == root_) {
+      root_ = balance(root_);
+    }
+
     return std::make_pair(Iterator< Key, T, Compare >(newNode, this), true);
   }
 
   template < class Key, class T, class Compare >
   void AVLTree< Key, T, Compare >::updateHeight(NodeType* node)
   {
-    if (node->isFake) {
-      return;
-    }
+    if (node->isFake) return;
     node->height = 1 + std::max(node->left->height, node->right->height);
   }
 
   template < class Key, class T, class Compare >
   int AVLTree <Key, T, Compare >::getBalanceFactor(NodeType* node) const
   {
-    if (node->isFake) {
-      return 0;
-    }
+    if (node->isFake) return 0;
     return node->left->height - node->right->height;
   }
 
@@ -294,19 +295,17 @@ namespace dribas
   Node< Key, T >* AVLTree< Key, T, Compare >::rotateRight(NodeType* y)
   {
     NodeType* x = y->left;
-    NodeType* T2 = x->right;
+    NodeType* w = x->right;
 
     x->right = y;
-    y->left = T2;
+    y->left = w;
 
-    if (!T2->isFake) {
-      T2->parent = y;
-    }
     x->parent = y->parent;
     y->parent = x;
+    if (w && !w->isFake) w->parent = y;
 
-    updateHeight(y);
-    updateHeight(x);
+    y->height = 1 + std::max(y->left->height, y->right->height);
+    x->height = 1 + std::max(x->left->height, x->right->height);
 
     return x;
   }
@@ -315,73 +314,80 @@ namespace dribas
   Node< Key, T >* AVLTree< Key, T, Compare >::rotateLeft(NodeType* x)
   {
     NodeType* y = x->right;
-    NodeType* T2 = y->left;
+    NodeType* w = y->left;
 
     y->left = x;
-    x->right = T2;
+    x->right = w;
 
-    if (!T2->isFake) {
-      T2->parent = x;
-    }
     y->parent = x->parent;
     x->parent = y;
-    updateHeight(x);
-    updateHeight(y);
+    if (w && !w->isFake) w->parent = x;
+
+    x->height = 1 + std::max(x->left->height, x->right->height);
+    y->height = 1 + std::max(y->left->height, y->right->height);
+
     return y;
   }
 
   template < class Key, class T, class Compare >
   Node< Key, T >* AVLTree< Key, T, Compare >::balance(NodeType* node)
   {
-    if (node->isFake) {
-      return node;
-    }
+    if (node->isFake) return node;
+
     updateHeight(node);
     int balanceFactor = getBalanceFactor(node);
-    if (balanceFactor > 1 && getBalanceFactor(node->left) >= 0) {
-      return rotateRight(node);
-    }
-    if (balanceFactor < -1 && getBalanceFactor(node->right) <= 0) {
-      return rotateLeft(node);
-    }
-    if (balanceFactor > 1 && getBalanceFactor(node->left) < 0) {
-      node->left = rotateLeft(node->left);
-      return rotateRight(node);
-    }
-    if (balanceFactor < -1 && getBalanceFactor(node->right) > 0) {
-      node->right = rotateRight(node->right);
-      return rotateLeft(node);
-    }
 
+    if (balanceFactor > 1) {
+      if (getBalanceFactor(node->left) < 0) {
+        node->left = rotateLeft(node->left);
+      }
+      return rotateRight(node);
+    }
+    if (balanceFactor < -1) {
+      if (getBalanceFactor(node->right) > 0) {
+        node->right = rotateRight(node->right);
+      }
+      return rotateLeft(node);
+    }
     return node;
   }
 
-    template< class Key, class T, class Compare >
-    void AVLTree< Key, T, Compare >::swap(Tree& other)
-    {
-      std::swap(other.comp, comp);
-      std::swap(other.fakeleaf_, fakeleaf_);
-      std::swap(other.root_, root_);
-    }
+  template< class Key, class T, class Compare >
+  void AVLTree< Key, T, Compare >::swap(Tree& other)
+  {
+    std::swap(other.comp, comp);
+    std::swap(other.fakeleaf_, fakeleaf_);
+    std::swap(other.root_, root_);
+  }
 
-    template< class Key, class T, class Compare >
-    AVLTree< Key, T, Compare >::AVLTree()
-    {
-      fakeleaf_ = new Node< Key, T >();
-      fakeleaf_->left = fakeleaf_->right = fakeleaf_;
-      root_ = fakeleaf_;
-    }
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >::AVLTree()
+  {
+    fakeleaf_ = new Node< Key, T >();
+    fakeleaf_->left = fakeleaf_;
+    fakeleaf_->right = fakeleaf_;
+    fakeleaf_->parent = nullptr;
+    root_ = fakeleaf_;
+  }
 
-    template <class Key, class T, class Compare>
-    Node< Key, T > * AVLTree< Key, T, Compare >::copyTree(const NodeType* otherNode) {
-      if (otherNode->isFake) {
-        return fakeleaf_;
-      }
-      NodeType* newNode = new NodeType(otherNode->value, fakeleaf_);
-      newNode->left = copyTree(otherNode->left);
-      newNode->right = copyTree(otherNode->right);
-      newNode->height = otherNode->height;
-      return newNode;
+  template <class Key, class T, class Compare>
+  Node< Key, T >* AVLTree< Key, T, Compare >::copyTree(const NodeType* otherNode)
+  {
+    if (otherNode->isFake) {
+      return fakeleaf_;
+    }
+    NodeType* newNode = new NodeType(otherNode->value, fakeleaf_);
+    newNode->left = copyTree(otherNode->left);
+    newNode->right = copyTree(otherNode->right);
+    newNode->height = otherNode->height;
+
+    if (!newNode->left->isFake) {
+      newNode->left->parent = newNode;
+    }
+    if (!newNode->right->isFake) {
+      newNode->right->parent = newNode;
+    }
+    return newNode;
   }
 
   template <class Key, class T, class Compare>
@@ -393,7 +399,6 @@ namespace dribas
       delete node;
     }
   }
-
 
   template< class Key, class T, class Compare >
   AVLTree< Key, T, Compare >::~AVLTree()
@@ -440,8 +445,5 @@ namespace dribas
     }
     return *this;
   }
-
-
 }
-
 #endif

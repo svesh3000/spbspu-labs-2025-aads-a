@@ -73,7 +73,7 @@ namespace dribas
         node_ = node_->left;
       }
     } else {
-      const Node<Key, T>* prev = node_;
+      const Node< Key, T >* prev = node_;
       node_ = node_->parent;
       while (node_ && prev == node_->right) {
         prev = node_;
@@ -86,33 +86,19 @@ namespace dribas
   template <class Key, class T, class Compare>
   ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator--() noexcept
   {
-    if (!node_) {
-      const Node<Key, T>* node = tree_->getRoot();
-      while (node && !node->right->isFake) {
-        node = node->right;
-      }
-      node_ = node;
-      return *this;
-    }
-
-    if (node_->isFake) {
-      return *this;
-    }
-
     if (!node_->left->isFake) {
       node_ = node_->left;
       while (!node_->right->isFake) {
         node_ = node_->right;
       }
     } else {
-      const Node<Key, T>* prev = node_;
+      const Node< Key, T >* before;
       node_ = node_->parent;
-      while (node_ && prev == node_->left) {
-        prev = node_;
+      while (node_ && before == node_->left) {
+        before = node_;
         node_ = node_->parent;
       }
     }
-    return *this;
   }
 
   template < class Key, class T, class Compare >
