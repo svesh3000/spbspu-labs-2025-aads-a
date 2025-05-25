@@ -333,7 +333,7 @@
     template< typename... Args >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
     {
-      Node * newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, { std::forward< Args >(args)... } };
+      Node * newNode = new Node{ nullptr, nullptr, nullptr,1 ,  { std::forward< Args >(args)... } };
       try
       {
         if (!root_)
