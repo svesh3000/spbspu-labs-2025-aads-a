@@ -72,7 +72,7 @@ alymova::CommandsSet alymova::complectCommands(std::istream& in, std::ostream& o
 {
   return
   {
-    {"GRAPHS", alymova::GraphsCommand{out}},
-    {"VERTEXES", alymova::VertexesCommand{in, out}}
+    {"graphs", alymova::GraphsCommand{out}},
+    {"vertexes", alymova::VertexesCommand{in, out}}
   };
 }
