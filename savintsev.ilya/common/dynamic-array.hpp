@@ -14,6 +14,8 @@ namespace savintsev
     Array(Array && rhs) noexcept;
     ~Array();
 
+    T & operator[](size_t n);
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -86,6 +88,12 @@ namespace savintsev
   Array< T >::~Array()
   {
     delete[] data_;
+  }
+
+  template< typename T >
+  T & Array< T >::operator[](size_t n)
+  {
+    return data_[n + start_];
   }
 
   template< typename T >

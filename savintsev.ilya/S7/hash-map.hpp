@@ -1,10 +1,18 @@
 #ifndef HASH_MAP_HPP
 #define HASH_MAP_HPP
 #include <dynamic-array.hpp>
+#include "xxhash-wrapper.hpp"
 
 namespace savintsev
 {
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  template
+  <
+    typename Key,
+    typename T,
+    typename HS1 = std::hash< Key >,
+    typename HS2 = savintsev::XXHash< Key >,
+    typename EQ = std::equal_to<>
+  >
   class HashMap
   {
   private:
@@ -19,7 +27,7 @@ namespace savintsev
     T & insert_data(const Key & k);
     void delete_data(const Key & k);
     bool lookup_data(const Key & k);
-    std::pair< T &, bool> get_data(const Key & k);
+    std::pair< T &, bool > get_data(const Key & k);
   public:
 
     HashMap(size_t size);
@@ -119,7 +127,7 @@ namespace savintsev
     return get_data(k).second;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  std::pair< T &, bool> HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k)
+  std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k)
   {
     Key current_key = k;
 
@@ -142,7 +150,7 @@ namespace savintsev
         return {t2_[h2].first.second, true};
       }
     }
-    return {T{}, false};
+    return {t1_[0].first.second, false};
   }
 }
 
