@@ -169,7 +169,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  Node* rightRotate(Node* y)
+  AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* y)
   {
     Node* x = y->left;
     Node* T2 = x->right;
@@ -181,7 +181,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  Node* leftRotate(Node* x)
+  AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* x)
   {
     Node* y = x->right;
     Node* T2 = y->left;
