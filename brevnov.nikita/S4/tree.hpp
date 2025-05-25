@@ -189,6 +189,20 @@
       Node* T2 = x->right;
       x->right = y;
       y->left = T2;
+      if (y->parent)
+      {
+        if (y->parent->left == y)
+        {
+          y->parent->left = x;
+        }
+        else
+        {
+          y->parent->right = x;
+        }
+      }
+      x->parent = y->parent;
+      y->parent = x;
+      T2->parent = y;
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
       return x;
@@ -201,6 +215,20 @@
       Node* T2 = y->left;
       y->left = x;
       x->right = T2;
+      if (x->parent)
+      {
+        if (x->parent->left == x)
+        {
+          x->parent->left = y;
+        }
+        else
+        {
+          x->parent->right = y;
+        }
+      }
+      y->parent = x->parent;
+      x->parent = y;
+      T2->parent = x;
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
       return y;
@@ -396,29 +424,23 @@
       fixHeight(node->right);
       node->nodeHeight = 1 + std::max(height(node->left), height(node->right));
       int balance = balanceFactor(node);
-      if (balance > 1)
+      if (balance > 1 && cmp_(node->data->first, node->left->data->first))
       {
-        if (balanceFactor(node->left) >= 0)
-        {
-          node = rightRotate(node);
-        }
-        else
-        {
-          node->left = leftRotate(node->left);
-          node = rightRotate(node);
-        }
+        node = rightRotate(node);
       }
-      else if (balance < -1)
+      if (balance < -1 && !cmp_(node->data->first, node->right->data->first))
       {
-        if (balanceFactor(node->right) <= 0)
-        {
-          node = leftRotate(node);
-        }
-        else
-        {
-          node->right = rightRotate(node->right);
-          node = leftRotate(node);
-        }
+        node = leftRotate(node);
+      }
+      if (balance > 1 && !cmp_(node->data->first, node->left->data->first))
+      {
+        node->left = leftRotate(node->left);
+        node = rightRotate(node);
+      }
+      if (balance < -1 && cmp_(node->data->first, node->right->data->first))
+      {
+        node->right = rightRotate(node->right);
+        node = leftRotate(node);
       }
     }
 
