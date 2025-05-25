@@ -276,6 +276,7 @@ namespace zholobov {
       auto newNode = new node_type(std::forward< Args >(args)...);
       fakeRoot_->left = newNode;
       newNode->parent = fakeRoot_;
+      ++size_;
       return {newNode, true};
     }
 
@@ -299,6 +300,7 @@ namespace zholobov {
     }
 
     rebalanceToRoot(newNode);
+    ++size_;
     return {newNode, true};
   }
 
@@ -309,38 +311,53 @@ namespace zholobov {
   {
     auto&& args_tuple = std::forward_as_tuple(std::forward< Args >(args)...);
     auto& key = std::get< 0 >(args_tuple);
-    if (position != cend()) {
-      node_type* hint = position.node_;
-      if ((hint != nullptr) && (hint->parent != nullptr) && cmp_(key, hint->data.first)) {
-        const_iterator prevPosition(position);
-        --prevPosition;
-        node_type* prevNode = prevPosition.node_;
-        if (!prevNode || cmp_(prevNode->data.first, key)) {
-          auto newNode = new node_type(std::forward< Args >(args)...);
-          newNode->parent = hint;
-          hint->left = newNode;
-          rebalance_to_root(newNode);
-          return iterator(newNode);
+
+    node_type* cur = position.node_;
+    if (cur != nullptr && cur != fakeRoot_) {
+      node_type* next = (++position).node_;
+      if (cmp_(cur->data.first, key) && (position == cend() || cmp_(key, next))) {
+        auto newNode = new node_type(std::forward< Args >(args)...);
+        if (cur->right == nullptr) {
+          cur->right = newNode;
+        } else {
+          cur = cur->right;
+          while (cur->left != nullptr) {
+            cur = cur->left;
+          }
+          cur->left = newNode;
         }
+        newNode->parent = cur;
+        rebalanceToRoot(newNode);
+        ++size_;
+        return iterator(newNode);
       }
     }
+
     return emplace(std::forward< Args >(args)...).first;
   }
 
   template < typename Key, typename T, typename Compare >
   std::pair< typename Tree< Key, T, Compare >::iterator, bool >
   Tree< Key, T, Compare >::insert(const value_type& value)
-  {}
+  {
+    return emplace(value);
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator
   Tree< Key, T, Compare >::insert(const_iterator pos, const value_type& value)
-  {}
+  {
+    return emplace_hint(pos, value);
+  }
 
   template < typename Key, typename T, typename Compare >
   template < class InputIt >
   void Tree< Key, T, Compare >::insert(InputIt first, InputIt last)
-  {}
+  {
+    for (; first != last; first++) {
+      insert(*first);
+    }
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(iterator position)
