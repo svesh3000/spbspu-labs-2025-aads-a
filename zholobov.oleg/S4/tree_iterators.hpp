@@ -28,8 +28,6 @@ namespace zholobov {
 
   private:
     TreeIterator(Node* node);
-    static bool isFakeNode(Node* node) { return node->parent == nullptr; }
-
     Node* node_;
   };
 
@@ -83,12 +81,12 @@ zholobov::TreeIterator< Node >& zholobov::TreeIterator< Node >::operator++() noe
       node_ = node_->left;
     }
   } else {
-    Node* p = node_->parent;
-    while ((p != nullptr) && (node_ == p->right)) {
-      node_ = p;
-      p = p->parent;
+    while ((node_->parent != nullptr) && (node_ == node_->parent->right)) {
+      node_ = node_->parent;
     }
-    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+    if (node_->parent != nullptr) {
+      node_ = node_->parent;
+    }
   }
   return *this;
 }
@@ -106,18 +104,23 @@ template < typename Node >
 zholobov::TreeIterator< Node >& zholobov::TreeIterator< Node >::operator--() noexcept
 {
   assert(node_ != nullptr);
-  if (node_->left != nullptr) {
+  if (node_->parent == nullptr) {
+    node_ = node_->left;
+    if (node_ != nullptr) {
+      while (node_->right != nullptr) {
+        node_ = node_->right;
+      }
+    }
+  } else if (node_->left) {
     node_ = node_->left;
     while (node_->right != nullptr) {
       node_ = node_->right;
     }
   } else {
-    Node* p = node_->parent;
-    while ((p != nullptr) && (node_ == p->left)) {
-      node_ = p;
-      p = p->parent;
+    while ((node_->parent != nullptr) && (node_ == node_->parent->left)) {
+      node_ = node_->parent;
     }
-    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+    node_ = node_->parent;
   }
   return *this;
 }
@@ -182,12 +185,12 @@ zholobov::TreeConstIterator< Node >& zholobov::TreeConstIterator< Node >::operat
       node_ = node_->left;
     }
   } else {
-    Node* p = node_->parent;
-    while ((p != nullptr) && (node_ == p->right)) {
-      node_ = p;
-      p = p->parent;
+    while ((node_->parent != nullptr) && (node_ == node_->parent->right)) {
+      node_ = node_->parent;
     }
-    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+    if (node_->parent != nullptr) {
+      node_ = node_->parent;
+    }
   }
   return *this;
 }
@@ -205,18 +208,23 @@ template < typename Node >
 zholobov::TreeConstIterator< Node >& zholobov::TreeConstIterator< Node >::operator--() noexcept
 {
   assert(node_ != nullptr);
-  if (node_->left != nullptr) {
+  if (node_->parent == nullptr) {
+    node_ = node_->left;
+    if (node_ != nullptr) {
+      while (node_->right != nullptr) {
+        node_ = node_->right;
+      }
+    }
+  } else if (node_->left) {
     node_ = node_->left;
     while (node_->right != nullptr) {
       node_ = node_->right;
     }
   } else {
-    Node* p = node_->parent;
-    while ((p != nullptr) && (node_ == p->left)) {
-      node_ = p;
-      p = p->parent;
+    while ((node_->parent != nullptr) && (node_ == node_->parent->left)) {
+      node_ = node_->parent;
     }
-    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+    node_ = node_->parent;
   }
   return *this;
 }

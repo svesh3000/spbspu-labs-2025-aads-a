@@ -187,27 +187,53 @@ namespace zholobov {
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::begin() noexcept
-  {}
+  {
+    if (empty()) {
+      return end();
+    }
+    node_type* cur = fakeRoot_;
+    while (cur->left != nullptr) {
+      cur = cur->left;
+    }
+    return iterator(cur);
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::begin() const noexcept
-  {}
+  {
+    return cbegin();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::end() noexcept
-  {}
+  {
+    return iterator(fakeRoot_);
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::end() const noexcept
-  {}
+  {
+    return cend();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::cbegin() const noexcept
-  {}
+  {
+    if (empty()) {
+      return end();
+    }
+    node_type* cur = fakeRoot_;
+    while (cur->left != nullptr) {
+      cur = cur->left;
+    }
+    return const_iterator(cur);
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::cend() const noexcept
-  {}
+  {
+    return const_iterator(fakeRoot_);
+  }
 
   template < typename Key, typename T, typename Compare >
   bool Tree< Key, T, Compare >::empty() const noexcept
