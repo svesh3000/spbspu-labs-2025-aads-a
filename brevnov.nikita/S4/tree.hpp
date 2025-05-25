@@ -87,7 +87,7 @@ namespace brevnov
   private:
     using Node = TreeNode< Key, Value>;
     Node* leftRotate(Node* x) noexcept;
-    Node* rightRotate(Node* y);
+    Node* rightRotate(Node* y) noexcept;
     void fixHeight(Node* node) noexcept;
     Node * root_;
     Cmp cmp_;
@@ -169,7 +169,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* y)
+  typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* y) noexcept
   {
     Node* x = y->left;
     Node* T2 = x->right;
@@ -181,7 +181,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* x)
+  typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* x) noexcept
   {
     Node* y = x->right;
     Node* T2 = y->left;
