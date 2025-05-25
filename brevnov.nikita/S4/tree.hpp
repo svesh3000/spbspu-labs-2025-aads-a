@@ -335,7 +335,7 @@
     template< typename... Args >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
     {
-      Node* newNode = new Node{};
+      TreeNode* newNode = new Node{};
       newNode->data = std::pair<Key, Value>(std::forward<Args>(args)...);
       newNode->nodeHeight = 1;
       newNode->left = nullptr;
