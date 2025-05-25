@@ -1,7 +1,9 @@
 #ifndef HASH_MAP_HPP
 #define HASH_MAP_HPP
 #include <dynamic-array.hpp>
-#include "xxhash-wrapper.hpp"
+#include <boost/hash2/fnv1a.hpp>
+#include <boost/hash2/xxhash.hpp>
+#include "boost-hash-wrapper.hpp"
 
 namespace savintsev
 {
@@ -9,8 +11,8 @@ namespace savintsev
   <
     typename Key,
     typename T,
-    typename HS1 = std::hash< Key >,
-    typename HS2 = savintsev::XXHash< Key >,
+    typename HS1 = BoostHash< Key, boost::hash2::fnv1a_64 >,
+    typename HS2 = BoostHash< Key, boost::hash2::xxhash_64 >,
     typename EQ = std::equal_to<>
   >
   class HashMap
