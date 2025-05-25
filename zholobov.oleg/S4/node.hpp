@@ -7,6 +7,10 @@ namespace zholobov {
 
   template < typename Key, typename T >
   struct Node {
+    using key_type = Key;
+    using mapped_type = T;
+    using value_type = std::pair< Key, T >;
+
     template < typename... Args >
     Node(Args&&... args) noexcept:
       data(std::forward< Args >(args)...),
@@ -16,7 +20,7 @@ namespace zholobov {
       height(1)
     {}
 
-    std::pair< Key, T > data;
+    value_type data;
     Node* parent;
     Node* left;
     Node* right;

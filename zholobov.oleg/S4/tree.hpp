@@ -2,15 +2,11 @@
 #define TREE_HPP
 
 #include <functional>
-#include <map>
+
+#include "node.hpp"
+#include "tree_iterators.hpp"
 
 namespace zholobov {
-
-  template < typename T >
-  class TreeIterator;
-
-  template < typename T >
-  class TreeConstIterator;
 
   template < typename Key, typename T, typename Compare = std::less< Key > >
   class Tree {
@@ -20,8 +16,9 @@ namespace zholobov {
     using value_type = std::pair< const Key, T >;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = TreeIterator< value_type >;
-    using const_iterator = TreeConstIterator< value_type >;
+    using node_type = Node< Key, T >;
+    using iterator = TreeIterator< node_type >;
+    using const_iterator = TreeConstIterator< node_type >;
     using size_type = size_t;
 
     Tree();
