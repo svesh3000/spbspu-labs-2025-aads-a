@@ -390,7 +390,7 @@
       }
       fixHeight(node->left);
       fixHeight(node->right);
-      node->height = 1 + std::max(height(node->left), height(node->right));
+      node->nodeHeight = 1 + std::max(height(node->left), height(node->right));
       int balance = balanceFactor(node);
       if (balance > 1)
       {
