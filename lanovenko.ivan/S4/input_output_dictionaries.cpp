@@ -4,10 +4,9 @@ void lanovenko::getDictionaries(std::istream& in, map_t& dictionaries)
 {
   std::string name, value;
   int key = 0;
-  while (!in.eof())
+  while (!(in >> name).eof())
   {
     Tree< int, std::string, std::less< int > > dictionary{};
-    in >> name;
     while (in && in.peek() != '\n')
     {
       in >> key >> value;
