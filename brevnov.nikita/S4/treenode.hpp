@@ -17,7 +17,7 @@ namespace brevnov
       data(k)
     {}
 
-    int height(const TreeNode<T>* node)
+    int height(const TreeNode* node)
     {
       if (node == nullptr)
       {
@@ -26,7 +26,7 @@ namespace brevnov
       return node->height;
     }
 
-    int balanceFactor(const TreeNode<T>* node)
+    int balanceFactor(const TreeNode* node)
     {
       if (node == nullptr)
       {
