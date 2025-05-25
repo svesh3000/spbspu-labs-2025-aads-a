@@ -82,8 +82,313 @@ namespace zholobov {
 
     std::pair< iterator, iterator > equal_range(const key_type& key);
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
+
+  private:
+    int height(node_type* node);
+    void updateHeight(node_type* node);
+    int getBalance(node_type* node);
+    node_type* rotateRight(node_type* node);
+    node_type* rotateLeft(node_type* node);
+    node_type* rebalance(node_type* node);
+
+    node_type* fakeRoot_;
+    Compare cmp_;
+    size_type size_;
   };
 
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::Tree():
+    Tree(Compare())
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::Tree(const Compare& comp):
+    fakeRoot_(::operator new(sizeof(node_type))),
+    cmp_(comp),
+    size_(0)
+  {
+    fakeRoot_->parent = nullptr;
+    fakeRoot_.left = nullptr;
+    fakeRoot_.right = nullptr;
+    fakeRoot_->height = -1;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::Tree(const Tree< Key, T, Compare >& other):
+    Tree(other.cmp_)
+  {
+    for (const auto& elem: other) {
+      insert(elem);
+    }
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::Tree(Tree< Key, T, Compare >&& other):
+    Tree()
+  {
+    swap(other);
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename InputIt >
+  Tree< Key, T, Compare >::Tree(InputIt first, InputIt last, const Compare& comp):
+    Tree(comp)
+  {
+    for (const auto it = first; it != last; ++it) {
+      insert(*it);
+    }
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::Tree(std::initializer_list< value_type > init, const Compare& comp):
+    Tree(comp)
+  {
+    auto last = std::cend(init);
+    for (auto it = std::cbegin(init); it != last; ++it) {
+      insert(*it);
+    }
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >::~Tree()
+  {
+    clear();
+    ::operator delete(fakeRoot_);
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >& Tree< Key, T, Compare >::operator=(const Tree& other)
+  {
+    if (this != std::addressof(other)) {
+      Tree< Key, T, Compare > temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >& Tree< Key, T, Compare >::operator=(Tree&& other) noexcept
+  {
+    if (this != std::addressof(other)) {
+      swap(other);
+    }
+    return *this;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  Tree< Key, T, Compare >& Tree< Key, T, Compare >::operator=(std::initializer_list< value_type > ilist)
+  {
+    Tree< Key, T, Compare > temp(cmp_);
+    for (const auto& elem: ilist) {
+      temp.insert(elem);
+    }
+    swap(temp);
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::begin() noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::begin() const noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::end() noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::end() const noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::cbegin() const noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::cend() const noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  bool Tree< Key, T, Compare >::empty() const noexcept
+  {
+    return true;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::size() const noexcept
+  {
+    return 0;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::operator[](const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::at(const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  const typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::at(const key_type& key) const
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  template < class... Args >
+  std::pair< typename Tree< Key, T, Compare >::iterator, bool > Tree< Key, T, Compare >::emplace(Args&&... args)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  template < class... Args >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::emplace_hint(const_iterator position, Args&&... args)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  std::pair< typename Tree< Key, T, Compare >::iterator, bool > Tree< Key, T, Compare >::insert(const value_type& value)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::insert(const_iterator pos, const value_type& value)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  template < class InputIt >
+  void Tree< Key, T, Compare >::insert(InputIt first, InputIt last)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(iterator position)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(const_iterator position)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::erase(const key_type& key)
+  {
+    return 0;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(const_iterator first, const_iterator last)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::swap(Tree& other) noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::clear() noexcept
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::find(const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::find(const key_type& key) const
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::count(const key_type& key) const
+  {
+    return 0;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::lower_bound(const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::lower_bound(const key_type& key) const
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::upper_bound(const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::upper_bound(const key_type& key) const
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  std::pair< typename Tree< Key, T, Compare >::iterator, typename Tree< Key, T, Compare >::iterator >
+  Tree< Key, T, Compare >::equal_range(const key_type& key)
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  std::pair< typename Tree< Key, T, Compare >::const_iterator, typename Tree< Key, T, Compare >::const_iterator >
+  Tree< Key, T, Compare >::equal_range(const key_type& key) const
+  {}
+
+  template < typename Key, typename T, typename Compare >
+  int Tree< Key, T, Compare >::height(node_type* node)
+  {
+    return node ? node->height : 0;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::updateHeight(node_type* node)
+  {
+    if (node) {
+      node->height = 1 + std::max(height(node->left), height(node->right));
+    }
+  }
+
+  template < typename Key, typename T, typename Compare >
+  int Tree< Key, T, Compare >::getBalance(node_type* node)
+  {
+    return node ? height(node->left) - height(node->right) : 0;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::rotateRight(node_type* node)
+  {
+    node_type* l = node->left;
+    node->left = l->right;
+    if (l->right) {
+      l->right->parent = node;
+    }
+    l->right = node;
+    l->parent = node->parent;
+    node->parent = l;
+    updateHeight(node);
+    updateHeight(l);
+    return l;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::rotateLeft(node_type* node)
+  {
+    node_type* r = node->right;
+    node->right = r->left;
+    if (r->left) r->left->parent = node;
+    r->left = node;
+    r->parent = node->parent;
+    node->parent = r;
+    updateHeight(node);
+    updateHeight(r);
+    return r;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::rebalance(node_type* node)
+  {
+    updateHeight(node);
+    int balance = getBalance(node);
+    if (balance > 1) {
+      if (getBalance(node->left) < 0)
+        node->left = rotateLeft(node->left);
+      return rotateRight(node);
+    }
+    if (balance < -1) {
+      if (getBalance(node->right) > 0)
+        node->right = rotateRight(node->right);
+      return rotateLeft(node);
+    }
+    return node;
+  }
 }
 
 #endif
