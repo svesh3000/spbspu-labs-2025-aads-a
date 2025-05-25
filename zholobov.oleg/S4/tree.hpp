@@ -90,6 +90,7 @@ namespace zholobov {
     node_type* rotateRight(node_type* node);
     node_type* rotateLeft(node_type* node);
     node_type* rebalance(node_type* node);
+    void rebalanceToRoot(node_type* fromNode);
 
     node_type* fakeRoot_;
     Compare cmp_;
@@ -238,18 +239,20 @@ namespace zholobov {
   template < typename Key, typename T, typename Compare >
   bool Tree< Key, T, Compare >::empty() const noexcept
   {
-    return true;
+    return size_ == 0;
   }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::size() const noexcept
   {
-    return 0;
+    return size_;
   }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::operator[](const key_type& key)
-  {}
+  {
+    return insert(std::make_pair(key, T())).first->second;
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::at(const key_type& key)
@@ -262,19 +265,76 @@ namespace zholobov {
   template < typename Key, typename T, typename Compare >
   template < class... Args >
   std::pair< typename Tree< Key, T, Compare >::iterator, bool > Tree< Key, T, Compare >::emplace(Args&&... args)
-  {}
+  {
+    auto&& args_tuple = std::forward_as_tuple(std::forward< Args >(args)...);
+    auto& key = std::get< 0 >(args_tuple);
+
+    node_type* parent = fakeRoot_;
+    node_type* cur = fakeRoot_->left;
+
+    if (!cur) {
+      auto newNode = new node_type(std::forward< Args >(args)...);
+      fakeRoot_->left = newNode;
+      newNode->parent = fakeRoot_;
+      return {newNode, true};
+    }
+
+    while (cur) {
+      parent = cur;
+      if (cmp_(key, cur->data.first)) {
+        cur = cur->left;
+      } else if (cmp_(cur->data.first, key)) {
+        cur = cur->right;
+      } else {
+        return {iterator(cur), false};
+      }
+    }
+
+    auto newNode = new node_type(std::forward< Args >(args)...);
+    newNode->parent = parent;
+    if (Cmp(key, parent->key)) {
+      parent->left = newNode;
+    } else {
+      parent->right = newNode;
+    }
+
+    rebalanceToRoot(newNode);
+    return {newNode, true};
+  }
 
   template < typename Key, typename T, typename Compare >
   template < class... Args >
-  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::emplace_hint(const_iterator position, Args&&... args)
+  typename Tree< Key, T, Compare >::iterator
+  Tree< Key, T, Compare >::emplace_hint(const_iterator position, Args&&... args)
+  {
+    auto&& args_tuple = std::forward_as_tuple(std::forward< Args >(args)...);
+    auto& key = std::get< 0 >(args_tuple);
+    if (position != cend()) {
+      node_type* hint = position.node_;
+      if ((hint != nullptr) && (hint->parent != nullptr) && cmp_(key, hint->data.first)) {
+        const_iterator prevPosition(position);
+        --prevPosition;
+        node_type* prevNode = prevPosition.node_;
+        if (!prevNode || cmp_(prevNode->data.first, key)) {
+          auto newNode = new node_type(std::forward< Args >(args)...);
+          newNode->parent = hint;
+          hint->left = newNode;
+          rebalance_to_root(newNode);
+          return iterator(newNode);
+        }
+      }
+    }
+    return emplace(std::forward< Args >(args)...).first;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  std::pair< typename Tree< Key, T, Compare >::iterator, bool >
+  Tree< Key, T, Compare >::insert(const value_type& value)
   {}
 
   template < typename Key, typename T, typename Compare >
-  std::pair< typename Tree< Key, T, Compare >::iterator, bool > Tree< Key, T, Compare >::insert(const value_type& value)
-  {}
-
-  template < typename Key, typename T, typename Compare >
-  typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::insert(const_iterator pos, const value_type& value)
+  typename Tree< Key, T, Compare >::iterator
+  Tree< Key, T, Compare >::insert(const_iterator pos, const value_type& value)
   {}
 
   template < typename Key, typename T, typename Compare >
@@ -414,6 +474,25 @@ namespace zholobov {
       return rotateLeft(node);
     }
     return node;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::rebalanceToRoot(node_type* fromNode)
+  {
+    node_type* cur = fromNode;
+    while (cur != fakeRoot_) {
+      node_type* p = cur->parent;
+      if ((p == nullptr) || (p == fakeRoot_)) break;
+
+      if (p->left == cur)
+        p->left = rebalance(cur);
+      else
+        p->right = rebalance(cur);
+
+      updateHeight(p);
+      cur = p;
+    }
+    fakeRoot_->left = rebalance(fakeRoot_->left);
   }
 }
 
