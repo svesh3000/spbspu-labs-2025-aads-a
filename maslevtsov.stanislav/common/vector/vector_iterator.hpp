@@ -36,7 +36,7 @@ namespace maslevtsov {
   private:
     T* ptr_;
 
-    explicit VectorIterator(const T* ptr) noexcept;
+    explicit VectorIterator(T* ptr) noexcept;
   };
 
   template< class T, detail::IteratorType it_type >
@@ -96,7 +96,7 @@ namespace maslevtsov {
   }
 
   template< class T, detail::IteratorType it_type >
-  VectorIterator< T, it_type >::VectorIterator(const T* ptr) noexcept:
+  VectorIterator< T, it_type >::VectorIterator(T* ptr) noexcept:
     ptr_(ptr)
   {}
 }
