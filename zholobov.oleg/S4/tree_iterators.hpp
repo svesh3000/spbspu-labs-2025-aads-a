@@ -17,9 +17,10 @@ namespace zholobov {
     using reference = value_type&;
 
     TreeIterator();
-    explicit TreeIterator(const TreeIterator& other);
     TreeIterator& operator++() noexcept;
     TreeIterator operator++(int) noexcept;
+    TreeIterator& operator--() noexcept;
+    TreeIterator operator--(int) noexcept;
     reference operator*() const noexcept;
     pointer operator->() const noexcept;
     bool operator==(const TreeIterator& other) const noexcept;
@@ -27,6 +28,8 @@ namespace zholobov {
 
   private:
     TreeIterator(Node* node);
+    static bool isFakeNode(Node* node) { return node->parent == nullptr; }
+
     Node* node_;
   };
 
@@ -40,11 +43,14 @@ namespace zholobov {
     using value_type = typename Node::value_type;
     using pointer = const value_type*;
     using reference = const value_type&;
+    using this_t = TreeConstIterator< Node >;
 
     TreeConstIterator();
-    explicit TreeConstIterator(const TreeConstIterator& other);
+    TreeConstIterator(const TreeIterator< Node >& other);
     TreeConstIterator& operator++() noexcept;
     TreeConstIterator operator++(int) noexcept;
+    TreeConstIterator& operator--() noexcept;
+    TreeConstIterator operator--(int) noexcept;
     reference operator*() const noexcept;
     pointer operator->() const noexcept;
     bool operator==(const TreeConstIterator& other) const noexcept;
@@ -55,6 +61,199 @@ namespace zholobov {
     Node* node_;
   };
 
+}
+
+template < typename Node >
+zholobov::TreeIterator< Node >::TreeIterator():
+  node_(nullptr)
+{}
+
+template < typename Node >
+zholobov::TreeIterator< Node >::TreeIterator(Node* node):
+  node_(node)
+{}
+
+template < typename Node >
+zholobov::TreeIterator< Node >& zholobov::TreeIterator< Node >::operator++() noexcept
+{
+  assert(node_ != nullptr);
+  if (node_->right != nullptr) {
+    node_ = node_->right;
+    while (node_->left != nullptr) {
+      node_ = node_->left;
+    }
+  } else {
+    Node* p = node_->parent;
+    while ((p != nullptr) && (node_ == p->right)) {
+      node_ = p;
+      p = p->parent;
+    }
+    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+  }
+  return *this;
+}
+
+template < typename Node >
+zholobov::TreeIterator< Node > zholobov::TreeIterator< Node >::operator++(int) noexcept
+{
+  assert(node_ != nullptr);
+  zholobov::TreeIterator< Node > temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template < typename Node >
+zholobov::TreeIterator< Node >& zholobov::TreeIterator< Node >::operator--() noexcept
+{
+  assert(node_ != nullptr);
+  if (node_->left != nullptr) {
+    node_ = node_->left;
+    while (node_->right != nullptr) {
+      node_ = node_->right;
+    }
+  } else {
+    Node* p = node_->parent;
+    while ((p != nullptr) && (node_ == p->left)) {
+      node_ = p;
+      p = p->parent;
+    }
+    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+  }
+  return *this;
+}
+
+template < typename Node >
+zholobov::TreeIterator< Node > zholobov::TreeIterator< Node >::operator--(int) noexcept
+{
+  assert(node_ != nullptr);
+  zholobov::TreeIterator< Node > temp(*this);
+  --(*this);
+  return temp;
+}
+
+template < typename Node >
+typename zholobov::TreeIterator< Node >::reference zholobov::TreeIterator< Node >::operator*() const noexcept
+{
+  assert(node_ != nullptr);
+  return node_->data;
+}
+
+template < typename Node >
+typename zholobov::TreeIterator< Node >::pointer zholobov::TreeIterator< Node >::operator->() const noexcept
+{
+  assert(node_ != nullptr);
+  return std::addressof(node_->data);
+}
+
+template < typename Node >
+bool zholobov::TreeIterator< Node >::operator==(const TreeIterator& other) const noexcept
+{
+  return node_ == other.node_;
+}
+
+template < typename Node >
+bool zholobov::TreeIterator< Node >::operator!=(const TreeIterator& other) const noexcept
+{
+  return !(*this == other);
+}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node >::TreeConstIterator():
+  node_(nullptr)
+{}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node >::TreeConstIterator(const zholobov::TreeIterator< Node >& other):
+  node_(other.node_)
+{}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node >::TreeConstIterator(Node* node):
+  node_(node)
+{}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node >& zholobov::TreeConstIterator< Node >::operator++() noexcept
+{
+  assert(node_ != nullptr);
+  if (node_->right != nullptr) {
+    node_ = node_->right;
+    while (node_->left != nullptr) {
+      node_ = node_->left;
+    }
+  } else {
+    Node* p = node_->parent;
+    while ((p != nullptr) && (node_ == p->right)) {
+      node_ = p;
+      p = p->parent;
+    }
+    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+  }
+  return *this;
+}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node > zholobov::TreeConstIterator< Node >::operator++(int) noexcept
+{
+  assert(node_ != nullptr);
+  zholobov::TreeConstIterator< Node > temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node >& zholobov::TreeConstIterator< Node >::operator--() noexcept
+{
+  assert(node_ != nullptr);
+  if (node_->left != nullptr) {
+    node_ = node_->left;
+    while (node_->right != nullptr) {
+      node_ = node_->right;
+    }
+  } else {
+    Node* p = node_->parent;
+    while ((p != nullptr) && (node_ == p->left)) {
+      node_ = p;
+      p = p->parent;
+    }
+    node_ = ((p != nullptr) && (p->parent != nullptr)) ? p : nullptr;
+  }
+  return *this;
+}
+
+template < typename Node >
+zholobov::TreeConstIterator< Node > zholobov::TreeConstIterator< Node >::operator--(int) noexcept
+{
+  assert(node_ != nullptr);
+  zholobov::TreeConstIterator< Node > temp(*this);
+  --(*this);
+  return temp;
+}
+
+template < typename Node >
+typename zholobov::TreeConstIterator< Node >::reference zholobov::TreeConstIterator< Node >::operator*() const noexcept
+{
+  assert(node_ != nullptr);
+  return node_->data;
+}
+
+template < typename Node >
+typename zholobov::TreeConstIterator< Node >::pointer zholobov::TreeConstIterator< Node >::operator->() const noexcept
+{
+  assert(node_ != nullptr);
+  return std::addressof(node_->data);
+}
+
+template < typename Node >
+bool zholobov::TreeConstIterator< Node >::operator==(const TreeConstIterator& other) const noexcept
+{
+  return node_ == other.node_;
+}
+
+template < typename Node >
+bool zholobov::TreeConstIterator< Node >::operator!=(const TreeConstIterator& other) const noexcept
+{
+  return !(*this == other);
 }
 
 #endif
