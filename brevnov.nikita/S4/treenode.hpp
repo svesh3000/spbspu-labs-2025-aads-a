@@ -17,31 +17,14 @@ namespace brevnov
       data(k)
     {}
 
-    explicit TreeNode(const std::pair< Key, Value > && k):
+    explicit TreeNode(std::pair< Key, Value > && k):
       left(nullptr),
       right(nullptr),
       parent(nullptr),
       nodeHeight(1),
       data(std::move(k))
     {}
-
-    int getHeight(const TreeNode* node)
-    {
-      if (node == nullptr)
-      {
-        return 0;
-      }
-      return node->height;
-    }
-
-    int balanceFactor(const TreeNode* node)
-    {
-      if (node == nullptr)
-      {
-        return 0;
-      }
-      return getHeight(node->left) - getHeight(node->right);
-    }
+    
     TreeNode* left;
     TreeNode* right;
     TreeNode* parent;

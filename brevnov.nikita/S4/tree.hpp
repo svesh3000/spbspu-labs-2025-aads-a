@@ -84,7 +84,7 @@ namespace brevnov
     TreeNode< Key, Value >* getMax() const noexcept;
 
   private:
-      int height(const TreeNode* node)
+    int height(typename AVLTree<Key, Value, Cmp>::Node* node) const noexcept
     {
       if (node == nullptr)
       {
@@ -93,7 +93,7 @@ namespace brevnov
       return node->nodeHeight;
     }
 
-    int balanceFactor(const TreeNode* node)
+    int balanceFactor(typename AVLTree<Key, Value, Cmp>::Node* node) const noexcept
     {
       if (node == nullptr)
       {
@@ -335,7 +335,12 @@ template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
-    auto* newNode = new Node{std::pair<Key, Value>(std::forward<Args>(args)...)};
+    auto* newNode = new Node{};
+    newNode->data = std::pair<Key, Value>(std::forward<Args>(args)...);
+    newNode->nodeHeight = 1;
+    newNode->left = nullptr;
+    newNode->right = nullptr;
+    newNode->parent = nullptr;
     try
     {
       if (!root_)
