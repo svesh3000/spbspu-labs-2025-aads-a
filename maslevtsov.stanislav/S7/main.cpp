@@ -49,7 +49,7 @@ int main(int argc, char** argv)
       commands.at(command)();
       std::cout << '\n';
     } catch (...) {
-      std::cerr << "<INVALID COOMAND>\n";
+      std::cout << "<INVALID COOMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
