@@ -17,7 +17,7 @@ namespace brevnov
       data(k)
     {}
 
-    int height(const TreeNode* node)
+    int getHeight(const TreeNode* node)
     {
       if (node == nullptr)
       {
@@ -32,7 +32,7 @@ namespace brevnov
       {
         return 0;
       }
-      return height(node->left) - height(node->right);
+      return getHeight(node->left) - getHeight(node->right);
     }
     TreeNode* left;
     TreeNode* right;

@@ -8,6 +8,7 @@
 #include "iterator.hpp"
 #include "treeNode.hpp"
 
+height
 
 namespace brevnov
 {
@@ -175,8 +176,8 @@ template< typename Key, typename Value, typename Cmp >
     Node* T2 = x->right;
     x->right = y;
     y->left = T2;
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
     return x;
   }
 
@@ -187,8 +188,8 @@ template< typename Key, typename Value, typename Cmp >
     Node* T2 = y->left;
     y->left = x;
     x->right = T2;
-    x->height = max(height(x->left), height(x->right)) + 1;
-    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
     return y;
   }
 
@@ -376,7 +377,7 @@ template< typename Key, typename Value, typename Cmp >
     }
     fixHeight(node->left);
     fixHeight(node->right);
-    node->height = 1 + max(height(node->left), height(node->right));
+    node->height = 1 + max(getHeight(node->left), getHeight(node->right));
     int balance = balanceFactor(node);
     if (balance > 1 && cmp_(node->data.first, node->left->data.first))
     {
