@@ -24,25 +24,11 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  /*std::string name;
-  while (file >> name)
-  {
-    Graph gr;
-    file >> gr;
-    if (file)
-    {
-      graphs.insert(std::make_pair(name, gr));
-    }
-  }
-  if (!file.eof() && file.fail())
-  {
-    std::cerr << "<INCORRECT GRAPHS DESCRIPTION>\n";
-    return 1;
-  }*/
-
   try
   {
     GraphsSet graphs = readGraphsFile(file);
+    file.clear();
+
     CommandsSet commands = complectCommands(std::cin, std::cout);
     std::string command;
     while (std::cin >> command)
@@ -62,9 +48,5 @@ int main(int argc, char** argv)
     std::cerr << e.what() << '\n';
     return 1;
   }
-  /*for (auto it = graphs.begin(); it != graphs.end(); ++it)
-  {
-    std::cout << it->first << '\n' << it->second << '\n';
-  }*/
 }
 
