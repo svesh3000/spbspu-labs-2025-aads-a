@@ -47,11 +47,15 @@ namespace zholobov {
 
     bool empty() const noexcept;
     size_type size() const noexcept;
-    size_type max_size() const noexcept;
 
-    mapped_type& operator[](const key_type& x);
-    mapped_type& at(const key_type& x);
-    const mapped_type& at(const key_type& x) const;
+    mapped_type& operator[](const key_type& key);
+    mapped_type& at(const key_type& key);
+    const mapped_type& at(const key_type& key) const;
+
+    template < class... Args >
+    std::pair< iterator, bool > emplace(Args&&... args);
+    template < class... Args >
+    iterator emplace_hint(const_iterator position, Args&&... args);
 
     std::pair< iterator, bool > insert(const value_type& value);
     iterator insert(const_iterator pos, const value_type& value);
@@ -66,8 +70,18 @@ namespace zholobov {
     void swap(Tree&) noexcept;
     void clear() noexcept;
 
-    iterator find(const key_type& x);
-    const_iterator find(const key_type& x) const;
+    iterator find(const key_type& key);
+    const_iterator find(const key_type& key) const;
+
+    size_type count(const key_type& x) const;
+
+    iterator lower_bound(const key_type& key);
+    const_iterator lower_bound(const key_type& key) const;
+    iterator upper_bound(const key_type& key);
+    const_iterator upper_bound(const key_type& key) const;
+
+    std::pair< iterator, iterator > equal_range(const key_type& key);
+    std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
   };
 
 }
