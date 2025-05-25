@@ -20,7 +20,6 @@ namespace brevnov
     using ConstIter = Iterator< Key, Value, Cmp, true >;
     using IterPair = std::pair< Iter, Iter >;
     using ConstIterPair = std::pair< ConstIter, ConstIter >;
-    using Node = TreeNode< Key, Value>;
 
     AVLTree();
     AVLTree(const AVLTree< Key, Value, Cmp >&);
@@ -86,6 +85,7 @@ namespace brevnov
     TreeNode< Key, Value >* getMax() const noexcept;
 
   private:
+    using Node = TreeNode< Key, Value>;
     Node* leftRotate(Node* x) noexcept;
     Node* rightRotate(Node* y);
     void fixHeight(Node* node) noexcept;
