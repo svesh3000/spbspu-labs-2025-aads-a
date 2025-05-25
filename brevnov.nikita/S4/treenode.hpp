@@ -24,7 +24,6 @@ namespace brevnov
       nodeHeight(1),
       data(std::move(k))
     {}
-    
     TreeNode* left;
     TreeNode* right;
     TreeNode* parent;
