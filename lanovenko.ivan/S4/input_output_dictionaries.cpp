@@ -13,10 +13,7 @@ void lanovenko::getDictionaries(std::istream& in, map_t& dictionaries)
       in >> key >> value;
       dictionary.insert({ key, value });
     }
-    if (!dictionary.empty())
-    {
-      dictionaries.insert({ name, dictionary });
-    }
+    dictionaries.insert({ name, dictionary });
   }
   std::cin.clear();
 }
