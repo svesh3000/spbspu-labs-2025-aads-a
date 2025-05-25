@@ -8,8 +8,6 @@
 #include "iterator.hpp"
 #include "treeNode.hpp"
 
-height
-
 namespace brevnov
 {
   template< typename Key, typename Value, typename Cmp = std::less< Key > >
