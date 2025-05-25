@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include "iterator.hpp"
+#include "iter.hpp"
 #include "treeNode.hpp"
 
 
@@ -16,10 +16,10 @@ namespace brevnov
   {
   public:
     using value = std::pair< Key, Value >;
-    using Iterator = Iterator< Key, Value, Cmp, false >;
-    using ConstIterator = Iterator< Key, Value, Cmp, true >;
-    using IteratorPair = std::pair< Iterator, Iterator >;
-    using ConstIteratorPair = std::pair< ConstIterator, ConstIterator >;
+    using Iter = Iterator< Key, Value, Cmp, false >;
+    using ConstIter = Iterator< Key, Value, Cmp, true >;
+    using IterPair = std::pair< Iter, Iter >;
+    using ConstIterPair = std::pair< ConstIter, ConstIter >;
     using Node = TreeNode< Key, Value>;
 
     AVLTree();
@@ -42,46 +42,46 @@ namespace brevnov
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    Iterator begin() noexcept;
-    ConstIterator cbegin() const noexcept;
-    Iterator end() noexcept;
-    ConstIterator cend() const noexcept;
+    Iter begin() noexcept;
+    ConstIter cbegin() const noexcept;
+    Iter end() noexcept;
+    ConstIter cend() const noexcept;
 
-    std::pair< Iterator, bool > insert(const value&);
-    std::pair< Iterator, bool > insert(value&);
-    std::pair< Iterator, bool > insert(value&&);
-    Iterator insert(ConstIterator, const value&);
-    Iterator insert(Iterator, const value&);
+    std::pair< Iter, bool > insert(const value&);
+    std::pair< Iter, bool > insert(value&);
+    std::pair< Iter, bool > insert(value&&);
+    Iter insert(ConstIter, const value&);
+    Iter insert(Iter, const value&);
     template< typename InputIt >
     void insert(InputIt first, InputIt last);
     void insert(std::initializer_list< value >);
 
-    Iterator erase(Iterator) noexcept;
-    Iterator erase(ConstIterator) noexcept;
+    Iter erase(Iter) noexcept;
+    Iter erase(ConstIter) noexcept;
     size_t erase(const Key&) noexcept;
-    Iterator erase(Iterator first, Iterator last) noexcept;
-    Iterator erase(ConstIterator first, ConstIterator last) noexcept;
+    Iter erase(Iter first, Iter last) noexcept;
+    Iter erase(ConstIter first, ConstIter last) noexcept;
 
     template< typename... Args >
-    std::pair< Iterator, bool > emplace(Args&&...);
+    std::pair< Iter, bool > emplace(Args&&...);
     template< typename... Args >
-    Iterator emplaceHint(ConstIterator, Args&&...);
+    Iter emplaceHint(ConstIter, Args&&...);
 
     void swap(AVLTree< Key, Value, Cmp >&) noexcept;
     void clear() noexcept;
 
-    Iterator find(const Key&) noexcept;
-    ConstIterator find(const Key&) const noexcept;
+    Iter find(const Key&) noexcept;
+    ConstIter find(const Key&) const noexcept;
 
     size_t count(const Key&) const noexcept;
 
-    Iterator lowerBound(const Key&) noexcept;
-    ConstIterator lowerBound(const Key&) const noexcept;
-    Iterator upperBound(const Key&) noexcept;
-    ConstIterator upperBound(const Key&) const noexcept;
+    Iter lowerBound(const Key&) noexcept;
+    ConstIter lowerBound(const Key&) const noexcept;
+    Iter upperBound(const Key&) noexcept;
+    ConstIter upperBound(const Key&) const noexcept;
 
-    std::pair< Iterator, Iterator > equalRange(const Key&) noexcept;
-    std::pair< ConstIterator, ConstIterator > equalRange(const Key&) const noexcept;
+    std::pair< Iter, Iter > equalRange(const Key&) noexcept;
+    std::pair< ConstIter, ConstIter > equalRange(const Key&) const noexcept;
 
     TreeNode< Key, Value >* getMax() const noexcept;
 
@@ -104,7 +104,7 @@ namespace brevnov
   AVLTree< Key, Value, Cmp >::AVLTree(const AVLTree< Key, Value, Cmp >& tree):
     AVLTree()
   {
-    for (ConstIterator it = tree.cbegin(); it != tree.cend(); ++it)
+    for (ConstIter it = tree.cbegin(); it != tree.cend(); ++it)
     {
       insert(*it);
     }
@@ -212,7 +212,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::begin() noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::begin() noexcept
   {
     if (empty())
     {
@@ -223,11 +223,11 @@ template< typename Key, typename Value, typename Cmp >
     {
       temp = temp->left;
     }
-    return Iterator(temp, false);
+    return Iter(temp, false);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIterator AVLTree< Key, Value, Cmp >::cbegin() const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIter AVLTree< Key, Value, Cmp >::cbegin() const noexcept
   {
     if (empty())
     {
@@ -238,41 +238,41 @@ template< typename Key, typename Value, typename Cmp >
     {
       temp = temp->left;
     }
-    return ConstIterator(temp, false);
+    return ConstIter(temp, false);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::end() noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::end() noexcept
   {
     if (empty())
     {
-      return Iterator(root_, true);
+      return Iter(root_, true);
     }
     Node* temp = root_;
     while (temp->right)
     {
       temp = temp->right;
     }
-    return Iterator(temp, true);
+    return Iter(temp, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIterator AVLTree< Key, Value, Cmp >::cend() const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIter AVLTree< Key, Value, Cmp >::cend() const noexcept
   {
     if (empty())
     {
-      return ConstIterator(root_, true);
+      return ConstIter(root_, true);
     }
     Node* temp = root_;
     while (temp->right)
     {
       temp = temp->right;
     }
-    return ConstIterator(temp, true);
+    return ConstIter(temp, true);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::find(const Key& key) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::find(const Key& key) noexcept
   {
     Node* temp = root_;
     while (temp)
@@ -287,14 +287,14 @@ template< typename Key, typename Value, typename Cmp >
       }
       else
       {
-        return Iterator(temp, false);
+        return Iter(temp, false);
       }
     }
     return end();
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIterator AVLTree< Key, Value, Cmp >::find(const Key& key) const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIter AVLTree< Key, Value, Cmp >::find(const Key& key) const noexcept
   {
     Node* temp = root_;
     while (temp)
@@ -309,7 +309,7 @@ template< typename Key, typename Value, typename Cmp >
       }
       else
       {
-        return ConstIterator(temp, false);
+        return ConstIter(temp, false);
       }
     }
     return cend();
@@ -317,7 +317,7 @@ template< typename Key, typename Value, typename Cmp >
 
   template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
-  std::pair< typename AVLTree< Key, Value, Cmp >::Iterator, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
+  std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
     Node* newNode = new Node{nullptr, nullptr, nullptr, 1, { std::forward< Args >(args)... } };
     try
@@ -326,7 +326,7 @@ template< typename Key, typename Value, typename Cmp >
       {
         root_ = newNode;
         size_ = 1;
-        return { Iterator(root_, false), true };
+        return { Iter(root_, false), true };
       }
       Node* temp = root_;
       Node* parent = nullptr;
@@ -344,7 +344,7 @@ template< typename Key, typename Value, typename Cmp >
         else
         {
           delete newNode;
-          return { Iterator(temp, false), false };
+          return { Iter(temp, false), false };
         }
       }
       newNode->parent = parent;
@@ -364,7 +364,7 @@ template< typename Key, typename Value, typename Cmp >
     }
     fixHeight(root_);
     size_++;
-    return { Iterator(newNode, false), true };
+    return { Iter(newNode, false), true };
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -398,7 +398,7 @@ template< typename Key, typename Value, typename Cmp >
 
   template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::emplaceHint(ConstIterator hint, Args &&... args)
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::emplaceHint(ConstIter hint, Args &&... args)
   {
     if (hint == cend() || empty())
     {
@@ -416,7 +416,7 @@ template< typename Key, typename Value, typename Cmp >
           pos->left = newNode;
           fixHeight(root_);
           ++size_;
-          return Iterator(newNode, false);
+          return Iter(newNode, false);
         }
       }
       else if (cmp_(pos->data.first, val.first))
@@ -426,13 +426,13 @@ template< typename Key, typename Value, typename Cmp >
           pos->right = newNode;
           fixHeight(root_);
           ++size_;
-          return Iterator(newNode, false);
+          return Iter(newNode, false);
         }
       }
       else
       {
         delete newNode;
-        return Iterator(pos, false);
+        return Iter(pos, false);
       }
       delete newNode;
       return emplace(val).first;
@@ -445,33 +445,33 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair< typename AVLTree< Key, Value, Cmp >::Iterator, bool > AVLTree< Key, Value, Cmp >::insert(const value& val)
+  std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(const value& val)
   {
     return emplace(val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair< typename AVLTree< Key, Value, Cmp >::Iterator, bool > AVLTree< Key, Value, Cmp >::insert(value& val)
+  std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value& val)
   {
     return emplace(val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  std::pair< typename AVLTree< Key, Value, Cmp >::Iterator, bool > AVLTree< Key, Value, Cmp >::insert(value&& val)
+  std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value&& val)
   {
     return emplace(std::move(val));
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::insert(ConstIterator pos, const value& val)
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::insert(ConstIter pos, const value& val)
   {
     return emplaceHint(pos, val);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::insert(Iterator pos, const value& val)
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::insert(Iter pos, const value& val)
   {
-    ConstIterator it(pos);
+    ConstIter it(pos);
     return emplaceHint(it, val);
   }
 
@@ -494,7 +494,7 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::erase(ConstIterator pos) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(ConstIter pos) noexcept
   {
     if (pos == cend())
     {
@@ -543,7 +543,7 @@ template< typename Key, typename Value, typename Cmp >
       del->data = std::move(replace->data);
     }
     fixHeight(root_);
-    Iterator next(pos.node_, pos.isEnd_);
+    Iter next(pos.node_, pos.isEnd_);
     ++next;
     delete replace;
     --size_;
@@ -551,16 +551,16 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::erase(Iterator pos) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(Iter pos) noexcept
   {
-    ConstIterator it(pos);
+    ConstIter it(pos);
     return erase(it);
   }
 
   template< typename Key, typename Value, typename Cmp >
   size_t AVLTree< Key, Value, Cmp >::erase(const Key& key) noexcept
   {
-    Iterator it = find(key);
+    Iter it = find(key);
     if (it == end())
     {
       return 0;
@@ -570,32 +570,32 @@ template< typename Key, typename Value, typename Cmp >
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::erase(ConstIterator first, ConstIterator last) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(ConstIter first, ConstIter last) noexcept
   {
     while (first != last)
     {
       first = erase(first);
     }
-    return Iterator(last.node_, last.isEnd_);
+    return Iter(last.node_, last.isEnd_);
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::erase(Iterator first, Iterator last) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(Iter first, Iter last) noexcept
   {
-    ConstIterator constFirst(first);
-    ConstIterator constLast(last);
+    ConstIter constFirst(first);
+    ConstIter constLast(last);
     return erase(constFirst, constLast);
   }
 
   template< typename Key, typename Value, typename Cmp >
   size_t AVLTree< Key, Value, Cmp >::count(const Key& key) const noexcept
   {
-    ConstIterator it = find(key);
+    ConstIter it = find(key);
     return it == cend() ? 0 : 1;
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::lowerBound(const Key& key) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::lowerBound(const Key& key) noexcept
   {
     Node* temp = root_;
     Node* result = nullptr;
@@ -611,17 +611,17 @@ template< typename Key, typename Value, typename Cmp >
         temp = temp->right;
       }
     }
-    return result ? Iterator(result, false) : end();
+    return result ? Iter(result, false) : end();
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIterator AVLTree< Key, Value, Cmp >::lowerBound(const Key& key) const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIter AVLTree< Key, Value, Cmp >::lowerBound(const Key& key) const noexcept
   {
-    return ConstIterator(lowerBound(key));
+    return ConstIter(lowerBound(key));
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::Iterator AVLTree< Key, Value, Cmp >::upperBound(const Key& key) noexcept
+  typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::upperBound(const Key& key) noexcept
   {
     Node* temp = root_;
     Node* result = nullptr;
@@ -637,45 +637,45 @@ template< typename Key, typename Value, typename Cmp >
         temp = temp->right;
       }
     }
-    return result ? Iterator(result, false) : end();
+    return result ? Iter(result, false) : end();
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIterator AVLTree< Key, Value, Cmp >::upperBound(const Key& key) const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIter AVLTree< Key, Value, Cmp >::upperBound(const Key& key) const noexcept
   {
-    return ConstIterator(upperBound(key));
+    return ConstIter(upperBound(key));
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::IteratorPair AVLTree< Key, Value, Cmp >::equalRange(const Key& key) noexcept
+  typename AVLTree< Key, Value, Cmp >::IterPair AVLTree< Key, Value, Cmp >::equalRange(const Key& key) noexcept
   {
-    return { Iterator(lowerBound(key)), Iterator(upperBound(key)) };
+    return { Iter(lowerBound(key)), Iter(upperBound(key)) };
   }
 
   template< typename Key, typename Value, typename Cmp >
-  typename AVLTree< Key, Value, Cmp >::ConstIteratorPair AVLTree< Key, Value, Cmp >::equalRange(const Key& key) const noexcept
+  typename AVLTree< Key, Value, Cmp >::ConstIterPair AVLTree< Key, Value, Cmp >::equalRange(const Key& key) const noexcept
   {
-    return { ConstIterator(lowerBound(key)), ConstIterator(upperBound(key)) };
+    return { ConstIter(lowerBound(key)), ConstIter(upperBound(key)) };
   }
 
   template< typename Key, typename Value, typename Cmp >
   const Value& AVLTree< Key, Value, Cmp >::operator[](const Key& key) const
   {
-    ConstIterator it = find(key);
+    ConstIter it = find(key);
     return it->second;
   }
 
   template< typename Key, typename Value, typename Cmp >
   Value& AVLTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    Iterator it = insert(std::make_pair(key, Value())).first;
+    Iter it = insert(std::make_pair(key, Value())).first;
     return it->second;
   }
 
   template< typename Key, typename Value, typename Cmp >
   const Value& AVLTree< Key, Value, Cmp >::at(const Key& key) const
   {
-    ConstIterator it = find(key);
+    ConstIter it = find(key);
     if (it == cend())
     {
       throw std::out_of_range("There is no such key");
