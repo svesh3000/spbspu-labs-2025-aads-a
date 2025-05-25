@@ -84,6 +84,23 @@ namespace brevnov
     TreeNode< Key, Value >* getMax() const noexcept;
 
   private:
+      int height(const TreeNode* node)
+    {
+      if (node == nullptr)
+      {
+        return 0;
+      }
+      return node->nodeHeight;
+    }
+
+    int balanceFactor(const TreeNode* node)
+    {
+      if (node == nullptr)
+      {
+        return 0;
+      }
+      return height(node->left) - height(node->right);
+    }
     using Node = TreeNode< Key, Value>;
     Node* leftRotate(Node* x) noexcept;
     Node* rightRotate(Node* y) noexcept;
@@ -174,8 +191,8 @@ template< typename Key, typename Value, typename Cmp >
     Node* T2 = x->right;
     x->right = y;
     y->left = T2;
-    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
-    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
     return x;
   }
 
@@ -186,8 +203,8 @@ template< typename Key, typename Value, typename Cmp >
     Node* T2 = y->left;
     y->left = x;
     x->right = T2;
-    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
-    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
     return y;
   }
 
@@ -318,7 +335,7 @@ template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
-    Node* newNode = new Node{std::pair<Key, Value>(std::forward<Args>(args)...)};
+    auto* newNode = new Node{std::pair<Key, Value>(std::forward<Args>(args)...)};
     try
     {
       if (!root_)
@@ -375,23 +392,29 @@ template< typename Key, typename Value, typename Cmp >
     }
     fixHeight(node->left);
     fixHeight(node->right);
-    node->height = 1 + max(getHeight(node->left), getHeight(node->right));
+    node->height = 1 + max(height(node->left), height(node->right));
     int balance = balanceFactor(node);
-    if (balance > 1 && cmp_(node->data.first, node->left->data.first))
+    if (balance > 1) {
+      if (balanceFactor(node->left) >= 0) {
+        node = rightRotate(node);
+      } 
+      else 
+      {
+        node->left = leftRotate(node->left);
+        node = rightRotate(node);
+      }
+    }
+    else if (balance < -1)
     {
-      node = rightRotate(node);
-    }
-    if (balance < -1 && !cmp_(node->data.first, node->right->data.first))
-    {
-      node = leftRotate(node);
-    }
-    if (balance > 1 && !cmp_(node->data.first, node->left->data.first)) {
-      node->left = leftRotate(node->left);
-      node = rightRotate(node);
-    }
-    if (balance < -1 && cmp_(node->data.first, node->right->data.first)) {
-      node->right = rightRotate(node->right);
-      node = leftRotate(node);
+      if (balanceFactor(node->right) <= 0)
+      {
+        node = leftRotate(node);
+      } 
+      else 
+      {
+        node->right = rightRotate(node->right);
+        node = leftRotate(node);
+      }
     }
   }
 
@@ -458,7 +481,7 @@ template< typename Key, typename Value, typename Cmp >
   template< typename Key, typename Value, typename Cmp >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value&& val)
   {
-    return emplace(std::move(val.first, val.second));
+    return emplace(std::move(val.first), std::move(val.second));
   }
 
   template< typename Key, typename Value, typename Cmp >

@@ -9,12 +9,20 @@ namespace brevnov
   {
     TreeNode() = default;
 
-    explicit TreeNode(const std::pair< Key, Value > k):
+    explicit TreeNode(const std::pair< Key, Value > & k):
       left(nullptr),
       right(nullptr),
       parent(nullptr),
-      height(1),
+      nodeHeight(1),
       data(k)
+    {}
+
+    explicit TreeNode(const std::pair< Key, Value > && k):
+      left(nullptr),
+      right(nullptr),
+      parent(nullptr),
+      nodeHeight(1),
+      data(std::move(k))
     {}
 
     int getHeight(const TreeNode* node)
@@ -37,7 +45,7 @@ namespace brevnov
     TreeNode* left;
     TreeNode* right;
     TreeNode* parent;
-    int height;
+    int nodeHeight;
     std::pair< Key, Value > data;
   };
 }
