@@ -39,11 +39,13 @@ int main(int argc, char** argv)
 
   std::unordered_map< std::string, IOFuncBinder< graphs_map_t >, StringDoubleHash > commands;
   commands["graphs"] = IOFuncBinder< graphs_map_t >(print_graphs, graphs, std::cout);
+  commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {
     try {
       commands.at(command)();
+      std::cout << '\n';
     } catch (...) {
       std::cerr << "<INVALID COOMAND>\n";
       std::cin.clear();

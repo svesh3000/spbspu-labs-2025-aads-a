@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector/definition.hpp>
+#include <tree/definition.hpp>
 #include "double_hash.hpp"
 
 namespace maslevtsov {
@@ -11,12 +12,13 @@ namespace maslevtsov {
   {
   public:
     void add_edge(const std::string& vertice1, const std::string& vertice2, unsigned weight);
+    Tree< std::string, int > get_vertices() const;
 
   private:
     using vertices_pair_t = std::pair< std::string, std::string >;
     using edges_set_t = std::unordered_map< vertices_pair_t, Vector< unsigned >, maslevtsov::PairDoubleHash >;
 
-    edges_set_t edges_set;
+    edges_set_t edges_set_;
   };
 }
 

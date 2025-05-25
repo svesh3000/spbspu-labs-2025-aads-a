@@ -1,31 +1,26 @@
 #include "commands.hpp"
 #include <vector/definition.hpp>
 
-namespace {
-  void sort(maslevtsov::Vector< std::string >& array)
-  {
-    for (size_t i = 0; i < array.size() - 1; ++i) {
-      for (size_t j = 0; j < array.size() - i - 1; ++j) {
-        if (array[j] > array[j + 1]) {
-          std::swap(array[j], array[j + 1]);
-        }
-      }
-    }
+void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
+{
+  Tree< std::string, int > names;
+  for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
+    names[i->first];
+  }
+  out << names.begin()->first;
+  for (auto i = ++names.begin(); i != names.end(); ++i) {
+    out << '\n' << i->first;
   }
 }
 
-void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
+void maslevtsov::print_vertices(const graphs_map_t& graphs, std::istream& in, std::ostream& out)
 {
-  if (graphs.empty()) {
-    out << '\n';
-    return;
-  }
-  Vector< std::string > names;
-  for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
-    names.push_back(i->first);
-  }
-  sort(names);
-  for (std::string i: names) {
-    out << i << '\n';
+  std::string graph_name;
+  in >> graph_name;
+  Graph graph = graphs.at(graph_name);
+  Tree< std::string, int > names = graph.get_vertices();
+  out << names.begin()->first;
+  for (auto i = ++names.begin(); i != names.end(); ++i) {
+    out << '\n' << i->first;
   }
 }
