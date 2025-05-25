@@ -378,19 +378,19 @@ template< typename Key, typename Value, typename Cmp >
     fixHeight(node->right);
     node->height = 1 + max(height(node->left), height(node->right));
     int balance = balanceFactor(node);
-    if (balance > 1 && Key < node->left->key)
+    if (balance > 1 && cmp_(node->data.first, node->left->data.first))
     {
       node = rightRotate(node);
     }
-    if (balance < -1 && Key > node->right->key)
+    if (balance < -1 && !cmp_(node->data.first, node->right->data.first))
     {
       node = leftRotate(node);
     }
-    if (balance > 1 && Key > node->left->key) {
+    if (balance > 1 && !cmp_(node->data.first, node->left->data.first)) {
       node->left = leftRotate(node->left);
       node = rightRotate(node);
     }
-    if (balance < -1 && Key < node->right->key) {
+    if (balance < -1 && cmp_(node->data.first, node->right->data.first)) {
       node->right = rightRotate(node->right);
       node = leftRotate(node);
     }
