@@ -327,6 +327,10 @@ namespace lanovenko
   TreeNode<Key, Value>* Tree<Key, Value, Comparator>::minValueNode(TreeNode<Key, Value>* node) const
   {
     TreeNode< Key, Value >* current = node;
+    if(!current)
+    {
+      return nullptr;
+    }
     while (current->left_)
     {
       current = current->left_;
