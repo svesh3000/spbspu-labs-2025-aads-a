@@ -185,26 +185,31 @@
     template< typename Key, typename Value, typename Cmp >
     typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* y) noexcept
     {
+      if (!y || !y->left)
+      {
+        return y;
+      }
       Node* x = y->left;
       Node* T2 = x->right;
       x->right = y;
       y->left = T2;
-      if (y->parent)
-      {
-        if (y->parent->left == y)
-        {
-          y->parent->left = x;
-        }
-        else
-        {
-          y->parent->right = x;
-        }
-      }
       x->parent = y->parent;
       y->parent = x;
       if (T2)
       {
         T2->parent = y;
+      }
+      if (!x->parent)
+      {
+        root_ = x;
+      }
+      else if (x->parent->left == y)
+      {
+        x->parent->left = x;
+      }
+      else
+      {
+        x->parent->right = x;
       }
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
@@ -214,26 +219,31 @@
     template< typename Key, typename Value, typename Cmp >
     typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* x) noexcept
     {
+      if (!x || !x->right)
+      {
+        return x;
+      }
       Node* y = x->right;
       Node* T2 = y->left;
       y->left = x;
       x->right = T2;
-      if (x->parent)
-      {
-        if (x->parent->left == x)
-        {
-          x->parent->left = y;
-        }
-        else
-        {
-          x->parent->right = y;
-        }
-      }
       y->parent = x->parent;
       x->parent = y;
       if (T2)
       {
         T2->parent = x;
+      }
+      if (!y->parent)
+      {
+        root_ = y;
+      }
+      else if (y->parent->left == x)
+      {
+        y->parent->left = y;
+      }
+      else
+      {
+        y->parent->right = y;
       }
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
