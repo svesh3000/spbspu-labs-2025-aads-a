@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(copyTree.size() == 3);
   AVLTree< size_t, std::string > moveTree(std::move(copyTree));
   BOOST_TEST(moveTree.size() == 3);
-  AVLTree< size_t, std::string >::Iterator it = testTree.begin();
+  AVLTree< size_t, std::string >::Iter it = testTree.begin();
   ++it;
   AVLTree< size_t, std::string > rangeTree(it, testTree.end());
   BOOST_TEST(rangeTree.size() == 2);
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(size_and_empty_and_clear)
 BOOST_AUTO_TEST_CASE(insert_element)
 {
   AVLTree< size_t, std::string > tree;
-  AVLTree< size_t, std::string >::Iterator it = tree.insert({ 1, "1" }).first;
+  AVLTree< size_t, std::string >::Iter it = tree.insert({ 1, "1" }).first;
   BOOST_TEST((*it).first == 1);
   bool isInserted = tree.insert({ 1, "1" }).second;
   BOOST_TEST(!isInserted);
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(insert_element)
 BOOST_AUTO_TEST_CASE(insert_hint)
 {
   AVLTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
-  AVLTree< size_t, std::string >::Iterator it = tree.begin();
-  AVLTree< size_t, std::string >::ConstIterator cit = tree.cend();
+  AVLTree< size_t, std::string >::Iter it = tree.begin();
+  AVLTree< size_t, std::string >::ConstIter cit = tree.cend();
   tree.insert(it, std::make_pair(4, "4"));
   BOOST_TEST(tree.size() == 4);
   tree.insert(cit, std::make_pair(5, "5"));
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(insert_range_and_init)
 BOOST_AUTO_TEST_CASE(erase_position)
 {
   AVLTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" }, { 4, "4" } });
-  AVLTree< size_t, std::string >::Iterator it = tree.erase(tree.begin());
+  AVLTree< size_t, std::string >::Iter it = tree.erase(tree.begin());
   BOOST_CHECK(it == tree.begin());
   it = tree.erase(tree.cbegin());
   BOOST_CHECK(it == tree.begin());
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(emplace_element_and_hint)
   AVLTree< size_t, std::string > tree;
   tree.emplace(1, "1");
   BOOST_TEST(tree.size() == 1);
-  AVLTree< size_t, std::string >::Iterator it = tree.emplace(2, "2").first;
+  AVLTree< size_t, std::string >::Iter it = tree.emplace(2, "2").first;
   BOOST_TEST((*it).first == 2);
   it = tree.emplaceHint(tree.cbegin(), 5, "5");
   BOOST_TEST((*it).first == 5);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(emplace_element_and_hint)
 BOOST_AUTO_TEST_CASE(swap)
 {
   AVLTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
-  AVLTree< size_t, std::string >::Iterator it = tree.begin();
+  AVLTree< size_t, std::string >::Iter it = tree.begin();
   AVLTree< size_t, std::string > tree2;
   tree2.swap(tree);
   BOOST_CHECK(tree2.begin() == it);
@@ -133,11 +133,11 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_CASE(find)
 {
   AVLTree< size_t, std::string > tree({ { 1, "1" }, { 2, "2" }, { 3, "3" } });
-  AVLTree< size_t, std::string >::Iterator it = tree.find(1);
+  AVLTree< size_t, std::string >::Iter it = tree.find(1);
   BOOST_CHECK(it != tree.end());
   it = tree.find(4);
   BOOST_CHECK(it == tree.end());
-  AVLTree< size_t, std::string >::ConstIterator cit = tree.find(3);
+  AVLTree< size_t, std::string >::ConstIter cit = tree.find(3);
   BOOST_CHECK(cit != tree.cend());
 }
 
@@ -148,13 +148,13 @@ BOOST_AUTO_TEST_CASE(count_lowerBound_upperBound_equalRange)
   BOOST_TEST(i == 1);
   i = tree.count(7);
   BOOST_TEST(i == 0);
-  AVLTree< size_t, std::string >::Iterator it = tree.lowerBound(2);
+  AVLTree< size_t, std::string >::Iter it = tree.lowerBound(2);
   BOOST_TEST((*it).first == 2);
   it = tree.lowerBound(7);
   BOOST_CHECK(it == tree.end());
   it = tree.upperBound(4);
   BOOST_CHECK((*it).first == 5);
-  AVLTree< size_t, std::string >::Iterator first = tree.lowerBound(3);
+  AVLTree< size_t, std::string >::Iter first = tree.lowerBound(3);
   it = tree.upperBound(3);
   BOOST_CHECK(first == tree.equalRange(3).first);
   BOOST_CHECK(it == tree.equalRange(3).second);

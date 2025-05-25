@@ -333,9 +333,10 @@
     template< typename... Args >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
     {
-      Node * newNode = new Node{ nullptr, nullptr, nullptr,1 ,  { std::forward< Args >(args)... } };
+      Node * newNode = nullptr;
       try
       {
+        newNode = new Node{ nullptr, nullptr, nullptr,1 ,  { std::forward< Args >(args)... } };
         if (!root_)
         {
           root_ = newNode;
@@ -376,7 +377,10 @@
       }
       catch (...)
       {
-        delete newNode;
+        if (newNode)
+        {
+          delete newNode;
+        }
         throw;
       }
     }
@@ -422,15 +426,16 @@
     template< typename... Args >
     typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::emplaceHint(ConstIter hint, Args &&... args)
     {
+      Node * newNode = nullptr;
       if (hint == cend() || empty())
       {
         return emplace(std::forward< Args >(args)...).first;
       }
-      Node* pos = hint.node_;
-      Node* newNode = new Node{nullptr, nullptr, pos, 1,{ std::forward< Args >(args)... } };
-      value val = newNode->data;
       try
       {
+        Node* pos = hint.node_;
+        newNode = new Node{nullptr, nullptr, pos, 1,{ std::forward< Args >(args)... } };
+        value val = newNode->data;
         if (cmp_(val.first, pos->data.first))
         {
           if (!pos->left)
@@ -461,7 +466,10 @@
       }
       catch (...)
       {
-        delete newNode;
+        if (newNode)
+        {
+          delete newNode;
+        }
         throw;
       }
     }
