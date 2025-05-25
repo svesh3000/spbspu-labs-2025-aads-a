@@ -148,10 +148,6 @@ namespace
 
   void processCommand(DictionaryStorage& storage, const std::string& cmd, const std::string& args)
   {
-    if (cmd == "print")
-    {
-      printDict(storage, args);
-    }
     duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
     initializeCommands(commands);
     try
