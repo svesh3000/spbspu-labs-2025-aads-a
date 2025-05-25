@@ -8,6 +8,9 @@
 
 namespace lanovenko
 {
+  template<typename Key, typename Value, typename Comparator>
+  class TreeIterator;
+
   template< typename Key, typename Value, typename Comparator >
   class Tree
   {
