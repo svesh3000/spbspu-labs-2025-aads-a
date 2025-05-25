@@ -9,7 +9,7 @@ namespace brevnov
   {
     TreeNode() = default;
     TreeNode(std::pair< Key, Value > k):
-      key(k),
+      data(k),
       left(nullptr),
       right(nullptr),
       height(1)
