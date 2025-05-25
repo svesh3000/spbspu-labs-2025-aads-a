@@ -1,5 +1,5 @@
-#ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#ifndef COMMANDLIST_HPP
+#define COMMANDLIST_HPP
 #include <iostream>
 #include <string>
 #include "tree.hpp"
