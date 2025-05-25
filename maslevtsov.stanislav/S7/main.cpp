@@ -40,6 +40,8 @@ int main(int argc, char** argv)
   std::unordered_map< std::string, IOFuncBinder< graphs_map_t >, StringDoubleHash > commands;
   commands["graphs"] = IOFuncBinder< graphs_map_t >(print_graphs, graphs, std::cout);
   commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
+  commands["outbound"] = IOFuncBinder< graphs_map_t >(print_outbound, graphs, std::cin, std::cout);
+  commands["inbound"] = IOFuncBinder< graphs_map_t >(print_inbound, graphs, std::cin, std::cout);
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {
