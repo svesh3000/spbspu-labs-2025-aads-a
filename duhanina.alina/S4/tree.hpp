@@ -12,7 +12,6 @@ namespace duhanina
   class Tree
   {
   public:
-    using Node_t = Node< Key, Value >;
     using Iterator_t = Iterator< Key, Value, Compare >;
     using ConstIterator_t = ConstIterator< Key, Value, Compare >;
 
@@ -24,11 +23,11 @@ namespace duhanina
     explicit Tree(std::initializer_list< std::pair< Key, Value > >);
 
     Tree(const Tree& other);
-    Tree(Tree&& other) noexcept;
+    Tree(Tree&& other);
     ~Tree();
 
     Tree& operator=(const Tree& other);
-    Tree& operator=(Tree&& other) noexcept;
+    Tree& operator=(Tree&& other);
 
     Iterator_t begin() const noexcept;
     ConstIterator_t cbegin() const noexcept;
@@ -36,8 +35,8 @@ namespace duhanina
     ConstIterator_t cend() const noexcept;
 
     void push(const Key& k, const Value& v);
-    Value get(const Key& k) const;
-    Value drop(const Key& k);
+    Value& get(const Key& k) const;
+    Value& drop(const Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -63,14 +62,16 @@ namespace duhanina
     Iterator_t find(const Key& key) noexcept;
     ConstIterator_t find(const Key& key) const noexcept;
 
-    std::pair< Node_t*, Node_t* > equal_range(const Key& key) noexcept;
-    std::pair< const Node_t*, const Node_t* > equal_range(const Key& key) const noexcept;
+    std::pair< Iterator_t, Iterator_t > equal_range(const Key& key) noexcept;
+    std::pair< ConstIterator_t, ConstIterator_t > equal_range(const Key& key) const noexcept;
     Iterator_t lower_bound(const Key& key) noexcept;
     ConstIterator_t lower_bound(const Key& key) const noexcept;
     Iterator_t upper_bound(const Key& key) noexcept;
     ConstIterator_t upper_bound(const Key& key) const noexcept;
 
   private:
+    using Node_t = Node< Key, Value >;
+
     Node_t* fakeRoot_;
     size_t size_;
     Compare comp_;
@@ -115,19 +116,43 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(const Tree& other):
-    fakeRoot_(new Node_t(Key(), Value(), nullptr)),
-    size_(other.size_)
+    fakeRoot_(nullptr),
+    size_(0)
   {
-    setRoot(copyTree(other.getRoot(), fakeRoot_));
+    Node_t* newRoot = nullptr;
+    Node_t* tempFakeRoot = nullptr;
+    try
+    {
+      tempFakeRoot = new Node_t(Key(), Value(), nullptr);
+      newRoot = copyTree(other.getRoot(), tempFakeRoot);
+      fakeRoot_ = tempFakeRoot;
+      setRoot(newRoot);
+      size_ = other.size_;
+    }
+    catch (...)
+    {
+      clear(newRoot);
+      delete tempFakeRoot;
+      throw;
+    }
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
+  Tree< Key, Value, Compare >::Tree(Tree&& other):
     fakeRoot_(other.fakeRoot_),
     size_(other.size_)
   {
-    other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-    other.size_ = 0;
+    try
+    {
+      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
+      other.size_ = 0;
+    }
+    catch (...)
+    {
+      fakeRoot_ = nullptr;
+      size_ = 0;
+      throw;
+    }
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -142,24 +167,56 @@ namespace duhanina
   {
     if (this != std::addressof(other))
     {
-      clear();
-      setRoot(copyTree(other.getRoot(), fakeRoot_));
-      size_ = other.size_;
+      Node_t* oldFakeRoot = fakeRoot_;
+      Node_t* oldRoot = fakeRoot_->left;
+      size_t oldSize = size_;
+      Node_t* newFakeRoot = nullptr;
+      Node_t* newRoot = nullptr;
+      try
+      {
+        newFakeRoot = new Node_t(Key(), Value(), nullptr);
+        newRoot = copyTree(other.getRoot(), newFakeRoot);
+        fakeRoot_ = newFakeRoot;
+        setRoot(newRoot);
+        size_ = other.size_;
+        clear(oldRoot);
+        delete oldFakeRoot;
+      }
+      catch (...)
+      {
+        clear(newRoot);
+        delete newFakeRoot;
+        fakeRoot_ = oldFakeRoot;
+        size_ = oldSize;
+        throw;
+      }
     }
     return *this;
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other) noexcept
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other)
   {
     if (this != std::addressof(other))
     {
-      clear();
-      delete fakeRoot_;
-      fakeRoot_ = other.fakeRoot_;
-      size_ = other.size_;
-      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-      other.size_ = 0;
+      Node_t* oldFakeRoot = fakeRoot_;
+      Node_t* oldRoot = fakeRoot_->left;
+      size_t oldSize = size_;
+      try
+      {
+        clear();
+        delete fakeRoot_;
+        fakeRoot_ = other.fakeRoot_;
+        size_ = other.size_;
+        other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
+        other.size_ = 0;
+      }
+      catch (...)
+      {
+        fakeRoot_ = oldFakeRoot;
+        size_ = oldSize;
+        throw;
+      }
     }
     return *this;
   }
@@ -205,12 +262,24 @@ namespace duhanina
       existing->data.second = v;
       return;
     }
-    setRoot(insert(getRoot(), k, v, fakeRoot_));
-    size_++;
+    Node_t* oldRoot = getRoot();
+    size_t oldSize = size_;
+    try
+    {
+      Node_t* newRoot = insert(getRoot(), k, v, fakeRoot_);
+      setRoot(newRoot);
+      size_ = oldSize + 1;
+    }
+    catch (...)
+    {
+      setRoot(oldRoot);
+      size_ = oldSize;
+      throw;
+    }
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value Tree< Key, Value, Compare >::get(const Key& k) const
+  Value& Tree< Key, Value, Compare >::get(const Key& k) const
   {
     Node_t* node = find(getRoot(), k);
     if (!node)
@@ -221,17 +290,12 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value Tree< Key, Value, Compare >::drop(const Key& k)
+  Value& Tree< Key, Value, Compare >::drop(const Key& k)
   {
-    if (!count(k))
-    {
-      throw std::out_of_range("Key not found");
-    }
-    Value value = find(getRoot(), k)->data.second;
-    Key keyCopy = k;
-    setRoot(remove(getRoot(), keyCopy));
+    auto* result = new Value(std::move(get(k)));
+    setRoot(remove(getRoot(), k));
     size_--;
-    return value;
+    return result;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -413,14 +477,14 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< typename Tree< Key, Value, Compare >::Node_t*, typename Tree< Key, Value, Compare >::Node_t* >
+  std::pair< typename Tree< Key, Value, Compare >::Iterator_t, typename Tree< Key, Value, Compare >::Iterator_t >
     Tree< Key, Value, Compare >::equal_range(const Key& key) noexcept
   {
     return { lower_bound(key), upper_bound(key) };
   }
 
   template < typename Key, typename Value, typename Compare >
-  std::pair< const typename Tree< Key, Value, Compare >::Node_t*, const typename Tree< Key, Value, Compare >::Node_t* >
+  std::pair< typename Tree< Key, Value, Compare >::ConstIterator_t, typename Tree< Key, Value, Compare >::ConstIterator_t >
     Tree< Key, Value, Compare >::equal_range(const Key& key) const noexcept
   {
     return { lower_bound(key), upper_bound(key) };
@@ -806,11 +870,34 @@ namespace duhanina
     {
       return nullptr;
     }
-    Node_t* newNode = new Node_t(node->data.first, node->data.second, parent);
-    newNode->left = copyTree(node->left, newNode);
-    newNode->right = copyTree(node->right, newNode);
-    newNode->height = node->height;
-    return newNode;
+    Node_t* left_copy = nullptr;
+    Node_t* right_copy = nullptr;
+    Node_t* newNode = nullptr;
+    try
+    {
+      left_copy = copyTree(node->left, nullptr);
+      right_copy = copyTree(node->right, nullptr);
+      newNode = new Node_t(node->data.first, node->data.second, parent);
+      newNode->left = left_copy;
+      newNode->right = right_copy;
+      if (left_copy)
+      {
+        left_copy->parent = newNode;
+      }
+      if (right_copy)
+      {
+        right_copy->parent = newNode;
+      }
+      newNode->height = node->height;
+      return newNode;
+    }
+    catch (...)
+    {
+      clear(left_copy);
+      clear(right_copy);
+      delete newNode;
+      throw;
+    }
   }
 
   template < typename Key, typename Value, typename Compare >

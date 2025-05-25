@@ -7,6 +7,7 @@
 
 using Dictionary = duhanina::Tree< size_t, std::string, std::less< size_t > >;
 using DictionaryStorage = duhanina::Tree< std::string, Dictionary, std::less< std::string > >;
+using DicFunc = std::function< void(DictionaryStorage&, const std::string&) >;
 
 namespace
 {
@@ -80,71 +81,84 @@ namespace
     }
   }
 
+  void complementOperation(DictionaryStorage& storage, const std::string& args)
+  {
+    size_t pos = 0;
+    std::string newName = readNextToken(args, pos);
+    std::string name1 = readNextToken(args, pos);
+    std::string name2 = readNextToken(args, pos);
+    Dictionary& dict1 = storage[name1];
+    Dictionary& dict2 = storage[name2];
+    Dictionary result;
+    for (auto it = dict1.begin(); it != dict1.end(); ++it)
+    {
+      if (dict2.count(it->first) == 0)
+      {
+        result[it->first] = it->second;
+      }
+    }
+    storage[newName] = result;
+  }
+
+  void intersectOperation(DictionaryStorage& storage, const std::string& args)
+  {
+    size_t pos = 0;
+    std::string newName = readNextToken(args, pos);
+    std::string name1 = readNextToken(args, pos);
+    std::string name2 = readNextToken(args, pos);
+    Dictionary& dict1 = storage[name1];
+    Dictionary& dict2 = storage[name2];
+    Dictionary result;
+    for (auto it = dict1.begin(); it != dict1.end(); ++it)
+    {
+      if (dict2.count(it->first) > 0)
+      {
+        result[it->first] = it->second;
+      }
+    }
+    storage[newName] = result;
+  }
+
+  void unionOperation(DictionaryStorage& storage, const std::string& args)
+  {
+    size_t pos = 0;
+    std::string newName = readNextToken(args, pos);
+    std::string name1 = readNextToken(args, pos);
+    std::string name2 = readNextToken(args, pos);
+    Dictionary& dict1 = storage[name1];
+    Dictionary& dict2 = storage[name2];
+    Dictionary result = dict1;
+    for (auto it = dict2.begin(); it != dict2.end(); ++it)
+    {
+      if (result.count(it->first) == 0)
+      {
+        result[it->first] = it->second;
+      }
+    }
+    storage[newName] = result;
+  }
+
+  void initializeCommands(duhanina::Tree< std::string, DicFunc, std::less< std::string > >& commands)
+  {
+    commands["print"] = std::bind(printDict, std::placeholders::_1, std::placeholders::_2);
+    commands["complement"] = std::bind(complementOperation, std::placeholders::_1, std::placeholders::_2);
+    commands["intersect"] = std::bind(intersectOperation, std::placeholders::_1, std::placeholders::_2);
+    commands["union"] = std::bind(unionOperation, std::placeholders::_1, std::placeholders::_2);
+  }
+
   void processCommand(DictionaryStorage& storage, const std::string& cmd, const std::string& args)
   {
     if (cmd == "print")
     {
       printDict(storage, args);
     }
-    else if (cmd == "complement" || cmd == "intersect" || cmd == "union")
+    duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
+    initializeCommands(commands);
+    try
     {
-      size_t pos = 0;
-      std::string newName = readNextToken(args, pos);
-      std::string name1 = readNextToken(args, pos);
-      std::string name2 = readNextToken(args, pos);
-      try
-      {
-        if (cmd == "complement")
-        {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result;
-          for (auto it = dict1.begin(); it != dict1.end(); ++it)
-          {
-            if (!dict2.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
-        }
-        else if (cmd == "intersect")
-        {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result;
-
-          for (auto it = dict1.begin(); it != dict1.end(); ++it)
-          {
-            if (dict2.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
-        }
-        else if (cmd == "union")
-        {
-          Dictionary dict1 = storage.get(name1);
-          Dictionary dict2 = storage.get(name2);
-          Dictionary result = dict1;
-
-          for (auto it = dict2.begin(); it != dict2.end(); ++it)
-          {
-            if (!result.count(it->first))
-            {
-              result.push(it->first, it->second);
-            }
-          }
-          storage.push(newName, result);
-        }
-      }
-      catch (...)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      commands.at(cmd)(storage, args);
     }
-    else
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
     }

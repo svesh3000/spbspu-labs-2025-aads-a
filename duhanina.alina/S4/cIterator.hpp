@@ -16,7 +16,6 @@ namespace duhanina
   {
   public:
     ConstIterator();
-    explicit ConstIterator(const Node< Key, Value >* node);
 
     const std::pair< Key, Value >& operator*() const;
     const std::pair< Key, Value >* operator->() const;
@@ -32,6 +31,7 @@ namespace duhanina
   private:
     const Node< Key, Value >* current_;
     friend class Tree< Key, Value, Compare >;
+    explicit ConstIterator(const Node< Key, Value >* node);
   };
 
   template < typename Key, typename Value, typename Compare >
