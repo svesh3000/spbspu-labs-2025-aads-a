@@ -82,10 +82,8 @@
       std::pair< Iter, Iter > equalRange(const Key&) noexcept;
       std::pair< ConstIter, ConstIter > equalRange(const Key&) const noexcept;
 
-      TreeNode< Key, Value >* getMax() const noexcept;
-
     private:
-      int height(typename AVLTree<Key, Value, Cmp>::Node* node) const noexcept
+      int height(Node* node) const noexcept
       {
         if (node == nullptr)
         {
@@ -94,7 +92,7 @@
         return node->nodeHeight;
       }
 
-      int balanceFactor(typename AVLTree<Key, Value, Cmp>::Node* node) const noexcept
+      int balanceFactor(Node* node) const noexcept
       {
         if (node == nullptr)
         {
@@ -102,8 +100,8 @@
         }
         return height(node->left) - height(node->right);
       }
-      Node* leftRotate(Node* x) noexcept;
-      Node* rightRotate(Node* y) noexcept;
+      Node * leftRotate(Node* x) noexcept;
+      Node * rightRotate(Node* y) noexcept;
       void fixHeight(Node* node) noexcept;
       Node * root_;
       Cmp cmp_;
@@ -335,12 +333,7 @@
     template< typename... Args >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
     {
-      TreeNode* newNode = new Node{};
-      newNode->data = std::pair<Key, Value>(std::forward<Args>(args)...);
-      newNode->nodeHeight = 1;
-      newNode->left = nullptr;
-      newNode->right = nullptr;
-      newNode->parent = nullptr;
+      Node * newNode = new Node{ Color::BLACK, nullptr, nullptr, nullptr, { std::forward< Args >(args)... } };
       try
       {
         if (!root_)
@@ -397,7 +390,7 @@
       }
       fixHeight(node->left);
       fixHeight(node->right);
-      node->height = 1 + max(height(node->left), height(node->right));
+      node->height = 1 + std::max(height(node->left), height(node->right));
       int balance = balanceFactor(node);
       if (balance > 1)
       {
@@ -476,19 +469,19 @@
     template< typename Key, typename Value, typename Cmp >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(const value& val)
     {
-      return emplace(val.first, val.second);
+      return emplace(val);
     }
 
     template< typename Key, typename Value, typename Cmp >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value& val)
     {
-      return emplace(val.first, val.second);
+      return emplace(val);
     }
 
     template< typename Key, typename Value, typename Cmp >
     std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value&& val)
     {
-      return emplace(std::move(val.first), std::move(val.second));
+      return emplace(std::move(val));
     }
 
     template< typename Key, typename Value, typename Cmp >
