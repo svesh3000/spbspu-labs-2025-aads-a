@@ -260,7 +260,7 @@ namespace dribas
     while (node->parent && !node->parent->isFake) {
       node = node->parent;
       node = balance(node);
-      
+
       if (node->parent) {
         if (node->parent->left == node->parent->left) {
           node->parent->left = node;
