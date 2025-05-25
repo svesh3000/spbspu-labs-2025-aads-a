@@ -202,7 +202,10 @@
       }
       x->parent = y->parent;
       y->parent = x;
-      T2->parent = y;
+      if (T2)
+      {
+        T2->parent = y;
+      }
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
       return x;
@@ -228,7 +231,10 @@
       }
       y->parent = x->parent;
       x->parent = y;
-      T2->parent = x;
+      if (T2)
+      {
+        T2->parent = x;
+      }
       x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
       y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
       return y;
