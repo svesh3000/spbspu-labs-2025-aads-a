@@ -9,10 +9,13 @@ namespace savintsev
   class Array
   {
   public:
+    ~Array();
     Array(size_t n);
     Array(const Array & rhs);
     Array(Array && rhs) noexcept;
-    ~Array();
+
+    Array & operator=(const Array & rhs);
+    Array & operator=(Array && rhs) noexcept;
 
     T & operator[](size_t n);
 
@@ -83,6 +86,28 @@ namespace savintsev
     start_(rhs.start_),
     capacity_(rhs.capacity_)
   {}
+
+  template< typename T >
+  Array< T > & Array< T >::operator=(const Array & rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      Array temp(rhs);
+      swap(*this, temp);
+    }
+    return *this;
+  }
+
+  template< typename T >
+  Array< T > & Array< T >::operator=(Array && rhs) noexcept
+  {
+    if (this != std::addressof(rhs))
+    {
+      Array temp(std::move(rhs));
+      swap(*this, temp);
+    }
+    return *this;
+  }
 
   template< typename T >
   Array< T >::~Array()
