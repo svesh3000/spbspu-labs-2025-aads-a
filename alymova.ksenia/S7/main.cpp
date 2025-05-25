@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     {
       try
       {
-        commands.at(command)(graphs); 
+        commands.at(command)(graphs);
       }
       catch (const std::exception& e)
       {
