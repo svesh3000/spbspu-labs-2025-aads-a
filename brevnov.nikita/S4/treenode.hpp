@@ -8,14 +8,16 @@ namespace brevnov
   struct TreeNode
   {
     TreeNode() = default;
-    TreeNode(std::pair< Key, Value > k):
-      data(k),
+
+    explicit TreeNode(const std::pair< Key, Value > k):
       left(nullptr),
       right(nullptr),
-      height(1)
+      parent(nullptr),
+      height(1),
+      data(k)
     {}
 
-    int height(TreeNode<T>* node)
+    int height(const TreeNode<T>* node)
     {
       if (node == nullptr)
       {
@@ -24,7 +26,7 @@ namespace brevnov
       return node->height;
     }
 
-      int balanceFactor(TreeNode<T>* node)
+    int balanceFactor(const TreeNode<T>* node)
     {
       if (node == nullptr)
       {
