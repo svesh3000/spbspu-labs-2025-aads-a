@@ -101,7 +101,7 @@ namespace savintsev
     if (!t1_[h1].second)
     {
       Key old_key = t1_[h1].first.first;
-      if (!(EQ{}(current_key, old_key) || EQ{}(old_key, current_key)))
+      if (EQ{}(current_key, old_key))
       {
         t1_[h1].second = true;
         --size_;
@@ -113,7 +113,7 @@ namespace savintsev
     if (!t2_[h2].second)
     {
       Key old_key = t2_[h2].first.first;
-      if (!(EQ{}(current_key, old_key) || EQ{}(old_key, current_key)))
+      if (EQ{}(current_key, old_key))
       {
         t2_[h2].second = true;
         --size_;
@@ -129,13 +129,15 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k)
   {
+    //std::cout << "get_data: getting data " << k << '\n';
     Key current_key = k;
 
     size_t h1 = HS1{}(current_key) % capacity_;
     if (!t1_[h1].second)
     {
       Key old_key = t1_[h1].first.first;
-      if (!(EQ{}(current_key, old_key) || EQ{}(old_key, current_key)))
+      //std::cout << "get_data: let's check equal " << current_key << " and " << old_key << '\n';
+      if (EQ{}(current_key, old_key))
       {
         return {t1_[h1].first.second, true};
       }
@@ -145,11 +147,12 @@ namespace savintsev
     if (!t2_[h2].second)
     {
       Key old_key = t2_[h2].first.first;
-      if (!(EQ{}(current_key, old_key) || EQ{}(old_key, current_key)))
+      if (EQ{}(current_key, old_key))
       {
         return {t2_[h2].first.second, true};
       }
     }
+    //std::cout << "get_data: no equal " << current_key << '\n';
     return {t1_[0].first.second, false};
   }
 }
