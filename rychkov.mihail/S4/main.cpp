@@ -1,6 +1,6 @@
 #include <iostream>
-#include "map.hpp"
-#include "parser.hpp"
+#include <map.hpp>
+#include <parser.hpp>
 #include "processor.hpp"
 
 int main(int argc, char** argv)
