@@ -318,7 +318,7 @@ template< typename Key, typename Value, typename Cmp >
   template< typename... Args >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::emplace(Args &&... args)
   {
-    Node* newNode = new Node{nullptr, nullptr, nullptr, 1, { std::forward< Args >(args)... } };
+    Node* newNode = new Node{std::pair<Key, Value>(std::forward<Args>(args)...)};
     try
     {
       if (!root_)
@@ -355,15 +355,15 @@ template< typename Key, typename Value, typename Cmp >
       {
         parent->left = newNode;
       }
+      fixHeight(root_);
+      size_++;
+      return { Iter(newNode, false), true };
     }
     catch (...)
     {
       delete newNode;
       throw;
     }
-    fixHeight(root_);
-    size_++;
-    return { Iter(newNode, false), true };
   }
 
   template< typename Key, typename Value, typename Cmp >
@@ -446,19 +446,19 @@ template< typename Key, typename Value, typename Cmp >
   template< typename Key, typename Value, typename Cmp >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(const value& val)
   {
-    return emplace(val);
+    return emplace(val.first, val.second);
   }
 
   template< typename Key, typename Value, typename Cmp >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value& val)
   {
-    return emplace(val);
+    return emplace(val.first, val.second);
   }
 
   template< typename Key, typename Value, typename Cmp >
   std::pair< typename AVLTree< Key, Value, Cmp >::Iter, bool > AVLTree< Key, Value, Cmp >::insert(value&& val)
   {
-    return emplace(std::move(val));
+    return emplace(std::move(val.first, val.second));
   }
 
   template< typename Key, typename Value, typename Cmp >
