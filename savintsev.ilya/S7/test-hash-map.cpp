@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(hm_test_operator_sq)
   BOOST_TEST(book[2] == "orange");
   BOOST_TEST(book[3] == "banana");
 
-  HashMap< std::string, std::string > cringe(10);
+  HashMap< std::string, std::string > cringe;
 
   cringe["lox1"] = "apple";
   cringe["lox2"] = "orange";

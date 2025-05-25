@@ -18,6 +18,7 @@ namespace savintsev
   class HashMap
   {
   private:
+
     Array< std::pair< std::pair< Key, T >, bool > > t1_;
     Array< std::pair< std::pair< Key, T >, bool > > t2_;
 
@@ -25,18 +26,49 @@ namespace savintsev
     size_t size_ = 0;
 
     static constexpr size_t MAX_ITERATIONS = 100;
+    
+    double max_load_factor_ = 0.75;
 
     T & insert_data(const Key & k);
     void delete_data(const Key & k);
     bool lookup_data(const Key & k);
     std::pair< T &, bool > get_data(const Key & k);
+
   public:
 
+    HashMap();
     HashMap(size_t size);
 
+    size_t size() const;
+    bool empty() const noexcept;
+
+    T & at(const Key & k);
+    const T & at(const Key & k) const;
+
     T & operator[](const Key & k);
+    T & operator[](Key && k );
+
+    //iterator erase ( const_iterator position );
+    size_t erase(const Key & k);
+    //iterator erase ( const_iterator first, const_iterator last );
+
+    //std::pair< iterator, bool > insert(const T & val );
+
+    //iterator find ( const key_type& k );
+    //const_iterator find ( const key_type& k ) const;
+
+    float load_factor() const noexcept;
+    float max_load_factor() const noexcept;
+    void max_load_factor(float z);
+
+    void rehash(size_t n);
+
   };
 
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  HashMap< Key, T, HS1, HS2, EQ >::HashMap():
+    HashMap(10)
+  {}
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   HashMap< Key, T, HS1, HS2, EQ >::HashMap(size_t size):
     t1_(size),
@@ -50,6 +82,36 @@ namespace savintsev
     }
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  size_t HashMap< Key, T, HS1, HS2, EQ >::size() const
+  {
+    return size_;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  bool HashMap< Key, T, HS1, HS2, EQ >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  T & HashMap< Key, T, HS1, HS2, EQ >::at(const Key & k)
+  {
+    auto data = get_data(k);
+    if (data.second)
+    {
+      return data.first;
+    }
+    throw std::runtime_error("hashmap: at failed: no such item");
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  const T & HashMap< Key, T, HS1, HS2, EQ >::at(const Key & k) const
+  {
+    auto data = get_data(k);
+    if (data.second)
+    {
+      return data.first;
+    }
+    throw std::runtime_error("hashmap: at failed: no such item");
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::operator[](const Key & k)
   {
     auto data = get_data(k);
@@ -58,6 +120,45 @@ namespace savintsev
       return data.first;
     }
     return insert_data(k);
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  T & HashMap< Key, T, HS1, HS2, EQ >::operator[](Key && k)
+  {
+    auto data = get_data(k);
+    if (data.second)
+    {
+      return data.first;
+    }
+    return insert_data(k);
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  float HashMap< Key, T, HS1, HS2, EQ >::load_factor() const noexcept
+  {
+    double factor = size_ / (capacity_ * 2);
+    return factor;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  float HashMap< Key, T, HS1, HS2, EQ >::max_load_factor() const noexcept
+  {
+    return max_load_factor_;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  void HashMap< Key, T, HS1, HS2, EQ >::max_load_factor(float z)
+  {
+    if (z > 0 && z <= 1)
+    {
+      max_load_factor_ = z;
+    }
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  void HashMap< Key, T, HS1, HS2, EQ >::rehash(size_t n)
+  {
+    //auto t1_ 
+
+    for (size_t i = 0; i < capacity_; ++i)
+    {
+      //new_t1
+    }
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::insert_data(const Key & k)
@@ -71,6 +172,7 @@ namespace savintsev
       if (t1_[h1].second)
       {
         t1_[h1] = {{current_key, current_t}, false};
+        size_++;
         return t1_[h1].first.second;
       }
 
@@ -83,6 +185,7 @@ namespace savintsev
       if (t2_[h2].second)
       {
         t2_[h2] = {{current_key, current_t}, false};
+        size_++;
         return t2_[h2].first.second;;
       }
 
@@ -131,14 +234,12 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k)
   {
-    //std::cout << "get_data: getting data " << k << '\n';
     Key current_key = k;
 
     size_t h1 = HS1{}(current_key) % capacity_;
     if (!t1_[h1].second)
     {
       Key old_key = t1_[h1].first.first;
-      //std::cout << "get_data: let's check equal " << current_key << " and " << old_key << '\n';
       if (EQ{}(current_key, old_key))
       {
         return {t1_[h1].first.second, true};
@@ -154,7 +255,6 @@ namespace savintsev
         return {t2_[h2].first.second, true};
       }
     }
-    //std::cout << "get_data: no equal " << current_key << '\n';
     return {t1_[0].first.second, false};
   }
 }
