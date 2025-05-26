@@ -1,6 +1,8 @@
 #ifndef MAP_BASE_TRAVERSES_HPP
 #define MAP_BASE_TRAVERSES_HPP
 
+#include "declaration.hpp"
+
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
 template< class Unary >
 Unary rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::traverse_lnr(Unary f) const

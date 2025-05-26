@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   }
   catch (const std::invalid_argument&)
   {
-    std::cerr << "add owerflow\n";
+    std::cerr << "sum overflow\n";
     return 1;
   }
   if (map.empty())

@@ -7,19 +7,23 @@
 #include <stack.hpp>
 #include <queue.hpp>
 #include "node.hpp"
-#include "iterator.hpp"
 
 namespace rychkov
 {
+  template< class V, size_t N, class RealV, bool isConst, bool isReversed >
+  class MapBaseIterator;
+
   template< class Value, size_t N, class RealValue, bool isConst, bool isReversed, bool isBreadth >
   class MapBaseHeavyIterator
   {
   private:
-    using real_value_type = RealValue;
-  public:
     static constexpr size_t node_capacity = N;
+    using real_value_type = RealValue;
     using node_type = MapBaseNode< real_value_type, node_capacity >;
 
+    template< class V, size_t N1, class RealV, bool isConst1, bool isReversed1 >
+    friend class MapBaseIterator;
+  public:
     using difference_type = ptrdiff_t;
     using value_type = Value;
     using pointer = value_type*;

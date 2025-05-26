@@ -47,9 +47,11 @@ BOOST_AUTO_TEST_CASE(iterator_test)
   BOOST_TEST(std::equal(crbreadth{set.rbegin()}, crbreadth{}, rbreadth_data + 2));
   BOOST_TEST(std::equal(rbreadth_data + 2, rbreadth_data + set.size(), rbreadth{set.rbegin()}));
   BOOST_TEST(std::equal(rbreadth_data + 2, rbreadth_data + set.size(), crbreadth{set.crbegin()}));
-}
-BOOST_AUTO_TEST_CASE(traverse_test)
-{
+
+  BOOST_TEST((decltype(set)::iterator{heavy{set.begin()}} == set.begin()));
+  BOOST_TEST((decltype(set)::reverse_iterator{rheavy{set.rbegin()}} == set.rbegin()));
+  BOOST_TEST((decltype(set)::iterator{breadth{set.begin()}} == set.begin()));
+  BOOST_TEST((decltype(set)::reverse_iterator{rbreadth{set.rbegin()}} == set.rbegin()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
