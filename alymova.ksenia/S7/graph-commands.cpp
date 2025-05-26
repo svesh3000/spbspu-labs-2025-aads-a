@@ -169,7 +169,7 @@ void alymova::CreateCommand::operator()(GraphsSet& graphs)
   if (in)
   {
     graphs.insert(std::make_pair(graph_name, graph_new));
-    retur;
+    return;
   }
   throw std::logic_error("<INVALID COMMAND>");
 }
