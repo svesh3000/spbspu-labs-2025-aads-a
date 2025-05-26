@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <limits>
 
 namespace
 {
@@ -255,7 +256,7 @@ int main(int argc, const char * const * argv)
       }
       else
       {
-        std::cin.ignore(1024, '\n');
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         std::cout << "<INVALID COMMAND>" << "\n";
       }
     }
