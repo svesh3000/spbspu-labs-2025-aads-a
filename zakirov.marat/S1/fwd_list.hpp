@@ -148,13 +148,13 @@ namespace zakirov
   template< typename T >
   T & FwdList< T >::front() noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->data_;
   }
 
   template< typename T >
   const T & FwdList< T >::front() const noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->data_;
   }
 
   template< typename T >
@@ -199,6 +199,7 @@ namespace zakirov
     FwdListNode< T > * new_begin = (fake_node_->next_)->next_;
     delete fake_node_->next_;
     fake_node_->next_ = new_begin;
+    --size_;
   }
 
   template< typename T >
@@ -220,21 +221,21 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::erase_after(FwdIterator< T > element) noexcept
-  {
-    FwdListNode< T > * temp_element = element.node_->next_->next_;
-    delete element.node_->next_;
-    element.node_->next_ = temp_element;
-    --size_;
-  }
-
-  template< typename T >
   void FwdList< T >::insert_after(FwdIterator< T > element, const T & data)
   {
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
     new_element->next_ = element.node_->next_;
     element.node_->next_ = new_element;
     ++size_;
+  }
+
+  template< typename T >
+  void FwdList< T >::erase_after(FwdIterator< T > element) noexcept
+  {
+    FwdListNode< T > * temp_element = element.node_->next_->next_;
+    delete element.node_->next_;
+    element.node_->next_ = temp_element;
+    --size_;
   }
 
   template< typename T >
@@ -264,14 +265,19 @@ namespace zakirov
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst)
   {
-    splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end());
+    splice_after(pos, fwdlst, fwdlst.before_begin(), fwdlst.end());
   }
 
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i)
   {
-    FwdList< T > * next_base = pos.node_->next_;
-    FwdList< T > * next_new = i.node_->next_->next_;
+    FwdListNode< T > * next_base = pos.node_->next_;
+    FwdListNode< T > * next_new = i.node_->next_->next_;
+    if (i.node_->next_ == fwdlst.fake_node_)
+    {
+      return;
+    }
+
     pos.node_->next_ = i.node_->next_;
     pos.node_->next_->next_ = next_base;
     i.node_->next_ = next_new;
@@ -282,11 +288,14 @@ namespace zakirov
   template< typename T >
   void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
   {
-    FwdIterator< T > after_first = first;
-    ++after_first;
-    for (; after_first != last; ++after_first, ++first)
+    FwdIterator< T > after_iter = first;
+    ++after_iter;
+    while (after_iter != last)
     {
       splice_after(pos, fwdlst, first);
+      after_iter = first;
+      ++after_iter;
+      ++pos;
     }
   }
 
@@ -346,13 +355,12 @@ namespace zakirov
   {
     FwdIterator< T > prev = before_begin();
     FwdIterator< T > real = begin();
-    for (FwdIterator< T > i = begin(); i != end(); ++i)
+    while (real != end())
     {
       if (predicate(*real))
       {
-        erase_after(prev);
         ++real;
-        --size_;
+        erase_after(prev);
       }
       else
       {
