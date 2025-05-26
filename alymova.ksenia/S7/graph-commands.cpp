@@ -84,13 +84,13 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  TwoThreeTree< std::string, size_t, std::less< std::string > > sorted;
+  TwoThreeTree< std::string, std::unordered_multimap< size_t, size_t >, std::less< std::string > > sorted;
   for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
   {
     if (it->first.second == vertex)
     {
-      std::cout << "1\n";
-      sorted.insert(std::make_pair(it->first.first, it->second));
+      sorted[it->first.first].insert(std::make_pair(it->second, it->second));
+      //sorted.insert(std::make_pair(it->first.first, it->second));
     }
   }
   if (sorted.empty() && it_name->second.vertexes.find(vertex) == it_name->second.vertexes.end())
@@ -100,12 +100,20 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   auto it = sorted.begin();
   if (it != sorted.end())
   {
-    out << it->first << ' ' << it->second;
+    out << it->first;
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); ++it_weight)
+    {
+      out << ' ' << it_weight->first;
+    }
     ++it;
   }
   for (; it != sorted.end(); ++it)
   {
-    out << '\n' << it->first << ' ' << it->second;
+    out << '\n' << it->first;
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); ++it_weight)
+    {
+      out << ' ' << it_weight->second;
+    }
   }
 }
 
@@ -160,7 +168,7 @@ void alymova::CreateCommand::operator()(GraphsSet& graphs)
   std::string vertex;
   for (size_t i = 0; i < vertexes_cnt; ++i)
   {
-    if (!(in >> vertex));
+    if (!(in >> vertex))
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
@@ -185,6 +193,20 @@ void alymova::MergeCommand::operator()(GraphsSet& graphs)
     graph_new.edges.insert(*it);
   }
   graphs.insert(std::make_pair(name_new, graph_new));
+}
+
+void alymova::ExtractCommand::operator()(GraphSet& graphs)
+{
+  std::string name_new, name;
+  in >> name_new >> name;
+  auto it_name = graphs.find(name);
+  if (it_name == graphs.end() || graphs.find(name_new) == graphs.end() || !in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  size_t vertexes_cnt;
+  in >> vertexes_cnt;
+  Graph graph_new;
 }
 
 alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
