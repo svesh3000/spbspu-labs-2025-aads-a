@@ -36,6 +36,10 @@ int main(int argc, char** argv)
       try
       {
         commands.at(command)(graphs);
+        if (command == "graphs" || command == "vertexes" || command == "inbound" || command == "outbound")
+        {
+          std::cout << '\n';
+        }
       }
       catch (const std::exception& e)
       {
