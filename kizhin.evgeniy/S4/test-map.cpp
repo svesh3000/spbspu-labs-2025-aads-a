@@ -209,6 +209,7 @@ BOOST_AUTO_TEST_CASE(insert_shuffled_keys)
   std::shuffle(keys.begin(), keys.end(), gen);
   for (const auto& key: keys) {
     BOOST_TEST(map.insert(std::make_pair(key, "")).second);
+    testMapInvariants(map);
   }
   std::sort(keys.begin(), keys.end(), map.keyComp());
   const auto cmp = [](const auto& lhs, const auto& rhs) -> bool
@@ -230,6 +231,7 @@ BOOST_AUTO_TEST_CASE(insert_shuffled_hints)
     std::uniform_int_distribution<> distr(0, map.size());
     auto pos = std::next(map.begin(), distr(gen));
     BOOST_TEST(map.insert(pos, std::make_pair(key, "")).second);
+    testMapInvariants(map);
   }
   std::sort(keys.begin(), keys.end(), map.keyComp());
   const auto cmp = [](const auto& lhs, const auto& rhs) -> bool
@@ -273,6 +275,86 @@ BOOST_AUTO_TEST_CASE(insert_initializer_list)
   map.insert(init);
   testMapInvariants(map);
   BOOST_TEST(map == initied);
+}
+
+BOOST_AUTO_TEST_CASE(erase_all_form_empty)
+{
+  MapT map;
+  map.erase(map.begin(), map.end());
+  testMapInvariants(map);
+  BOOST_TEST(map.empty());
+}
+
+BOOST_AUTO_TEST_CASE(erase_all)
+{
+  MapT map;
+  std::vector< MapT::key_type > keys(500);
+  std::iota(keys.begin(), keys.end(), -1);
+  for (const auto& key: keys) {
+    map.insert(std::make_pair(key, ""));
+  }
+  map.erase(map.begin(), map.end());
+  testMapInvariants(map);
+  BOOST_TEST(map.empty());
+}
+
+BOOST_AUTO_TEST_CASE(erase_key)
+{
+  const MapT expected{
+    { 1, "abc" },
+    { 3, "ghi" },
+  };
+  MapT map{
+    { 1, "abc" },
+    { 2, "def" },
+    { 3, "ghi" },
+  };
+  map.erase(2);
+  testMapInvariants(map);
+  BOOST_TEST(map == expected);
+}
+
+BOOST_AUTO_TEST_CASE(erase_shuffeled_keys)
+{
+  MapT map;
+  std::vector< MapT::key_type > keys(1'500);
+  std::iota(keys.begin(), keys.end(), 0);
+  for (const auto& key: keys) {
+    map.insert(std::make_pair(key, ""));
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::shuffle(keys.begin(), keys.end(), gen);
+  size_t size = keys.size();
+  for (const auto& key: keys) {
+    BOOST_TEST(map.erase(key) == 1);
+    testMapInvariants(map);
+    --size;
+    BOOST_TEST(map.size() == size);
+  }
+  testMapInvariants(map);
+  BOOST_TEST(map.empty());
+}
+
+BOOST_AUTO_TEST_CASE(erase_shuffled_pos)
+{
+  MapT map;
+  std::vector< MapT::key_type > keys(1'500);
+  std::iota(keys.begin(), keys.end(), 0);
+  for (const auto& key: keys) {
+    map.insert(std::make_pair(key, ""));
+  }
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  for (size_t i = keys.size(); i != 0; --i) {
+    std::uniform_int_distribution<> distr(0, map.size() - 1);
+    auto pos = std::next(map.begin(), distr(gen));
+    BOOST_TEST(map.size() == i);
+    map.erase(pos);
+    testMapInvariants(map);
+  }
+  BOOST_TEST(map.empty());
+  testMapInvariants(map);
 }
 
 BOOST_AUTO_TEST_CASE(clear_empty)
