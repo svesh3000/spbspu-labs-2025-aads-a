@@ -89,6 +89,7 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   {
     if (it->first.second == vertex)
     {
+      std::cout << "1\n";
       sorted.insert(std::make_pair(it->first.first, it->second));
     }
   }
@@ -133,11 +134,6 @@ void alymova::CutCommand::operator()(GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  /*auto bound = it_name->second.edges.equal_range(std::make_pair(vertex1, vertex2));
-  if (bound.first == bound.second)
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }*/
   std::pair< std::string, std::string > vertex_pair(vertex1, vertex2);
   for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
   {
@@ -153,25 +149,42 @@ void alymova::CutCommand::operator()(GraphsSet& graphs)
 void alymova::CreateCommand::operator()(GraphsSet& graphs)
 {
   std::string graph_name;
-  size_t vertexes_cnt;
-  in >> graph_name >> vertexes_cnt;
+  in >> graph_name;
   if (graphs.find(graph_name) != graphs.end() || !in)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
+  size_t vertexes_cnt;
+  in >> vertexes_cnt;
   Graph graph_new;
   std::string vertex;
   for (size_t i = 0; i < vertexes_cnt; ++i)
   {
-    in >> vertex;
+    if (!(in >> vertex));
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
     graph_new.vertexes.insert(std::make_pair(vertex, vertex));
   }
-  if (in)
+  graphs.insert(std::make_pair(graph_name, graph_new));
+}
+
+void alymova::MergeCommand::operator()(GraphsSet& graphs)
+{
+  std::string name_new, name1, name2;
+  in >> name_new >> name1 >> name2;
+  auto it_name1 = graphs.find(name1);
+  auto it_name2 = graphs.find(name2);
+  if (graphs.find(name_new) != graphs.end() || it_name1 == graphs.end() || it_name2 == graphs.end() || !in)
   {
-    graphs.insert(std::make_pair(graph_name, graph_new));
-    return;
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  throw std::logic_error("<INVALID COMMAND>");
+  Graph graph_new = it_name1->second;
+  for (auto it = it_name2->second.edges.begin(); it != it_name2->second.edges.end(); ++it)
+  {
+    graph_new.edges.insert(*it);
+  }
+  graphs.insert(std::make_pair(name_new, graph_new));
 }
 
 alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
@@ -204,6 +217,8 @@ alymova::CommandsSet alymova::complectCommands(std::istream& in, std::ostream& o
     {"inbound", InboundCommand{in, out}},
     {"bind", BindCommand{in}},
     {"cut", CutCommand{in}},
-    {"create", CreateCommand{in}}
+    {"create", CreateCommand{in}},
+    {"merge", MergeCommand{in}}
+    //{"extract", ExtractCommand{in}}
   };
 }

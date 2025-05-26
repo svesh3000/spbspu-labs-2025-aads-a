@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
     CommandsSet commands = complectCommands(std::cin, std::cout);
     std::string command;
-    while (std::cin >> command)
+    while (!(std::cin >> command).eof())
     {
       try
       {
@@ -44,6 +44,7 @@ int main(int argc, char** argv)
       }
       catch (const std::exception& e)
       {
+        std::cin.clear();
         std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         std::cout << "<INVALID COMMAND>\n";
       }
