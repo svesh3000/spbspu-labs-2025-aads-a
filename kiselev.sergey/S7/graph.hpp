@@ -29,17 +29,21 @@ namespace kiselev
       edges[{ v1, v2 }].push_back(weight);
     }
 
-    void removeEdge(const std::string& v1, const std::string& v2, unsigned int weight)
+    bool removeEdge(const std::string& v1, const std::string& v2, unsigned int weight)
     {
       auto it = edges.find({ v1, v2 });
-      if (it != edges.end())
+      if (it == edges.end())
       {
-        it->second.remove(weight);
-        if (it->second.empty())
-        {
-          edges.erase(it);
-        }
+        return false;
       }
+      size_t size1 = it->second.size();
+      it->second.remove(weight);
+      size_t size2 = it->second.size();
+      if (it->second.empty())
+      {
+        edges.erase(it);
+      }
+      return size2 < size1;
     }
 
     std::map< std::string, std::string > getVertexes() const
