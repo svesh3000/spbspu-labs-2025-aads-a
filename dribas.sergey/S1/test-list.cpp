@@ -11,12 +11,14 @@ namespace
 }
 
 BOOST_AUTO_TEST_SUITE(Constructor)
-BOOST_AUTO_TEST_CASE(DefaultConstructorTest) {
+BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
+{
   List< int > list;
 
   BOOST_CHECK(list.empty());
 }
-BOOST_AUTO_TEST_CASE(CopyConstructorTest) {
+BOOST_AUTO_TEST_CASE(CopyConstructorTest)
+{
   List< int > original;
   original.push_back(1);
   List< int > copy(original);
@@ -25,7 +27,8 @@ BOOST_AUTO_TEST_CASE(CopyConstructorTest) {
   BOOST_CHECK(copy.begin() != original.begin());
   BOOST_CHECK_EQUAL(copy.front(), original.front());
 }
-BOOST_AUTO_TEST_CASE(MoveConstructorTest) {
+BOOST_AUTO_TEST_CASE(MoveConstructorTest)
+{
   List< int > original;
   original.push_back(1);
   List< int > moved(std::move(original));
@@ -37,7 +40,8 @@ BOOST_AUTO_TEST_CASE(MoveConstructorTest) {
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(assignmentOperator)
-BOOST_AUTO_TEST_CASE(CopyOperator) {
+BOOST_AUTO_TEST_CASE(CopyOperator)
+{
   List< int > original;
   List< int > copy;
   original.push_back(1);
@@ -47,7 +51,8 @@ BOOST_AUTO_TEST_CASE(CopyOperator) {
   BOOST_CHECK(copy.begin() != original.begin());
   BOOST_CHECK(copy.front() == original.front());
 }
-BOOST_AUTO_TEST_CASE(CopyOperatorThis) {
+BOOST_AUTO_TEST_CASE(CopyOperatorThis)
+{
   List< int > original;
   original.push_back(1);
   original = original;
@@ -55,7 +60,8 @@ BOOST_AUTO_TEST_CASE(CopyOperatorThis) {
   BOOST_CHECK(original.size() == 1);
   BOOST_CHECK(original.front() == 1);
 }
-BOOST_AUTO_TEST_CASE(MoveOperator) {
+BOOST_AUTO_TEST_CASE(MoveOperator)
+{
 
   List< int > original;
   original.push_back(1);
@@ -65,7 +71,8 @@ BOOST_AUTO_TEST_CASE(MoveOperator) {
   BOOST_CHECK(moved.front() == 1);
   BOOST_CHECK(original.size() == 0);
 }
-BOOST_AUTO_TEST_CASE(MoveOperatorThis) {
+BOOST_AUTO_TEST_CASE(MoveOperatorThis)
+{
   List< int > original;
   original.push_back(1);
 
@@ -79,7 +86,8 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(MethodList)
 
-BOOST_AUTO_TEST_CASE(removeIf) {
+BOOST_AUTO_TEST_CASE(removeIf)
+{
   List< int > list;
   list.push_back(1);
   list.push_back(2);
@@ -90,7 +98,8 @@ BOOST_AUTO_TEST_CASE(removeIf) {
   list.remove_if(isEven);
   BOOST_CHECK(list.empty());
 }
-BOOST_AUTO_TEST_CASE(remove ) {
+BOOST_AUTO_TEST_CASE(remove )
+{
   List< int > list;
   list.push_back(1);
   list.push_back(2);
@@ -101,19 +110,22 @@ BOOST_AUTO_TEST_CASE(remove ) {
   list.remove(1);
   BOOST_CHECK(list.empty());
 }
-BOOST_AUTO_TEST_CASE(empty) {
+BOOST_AUTO_TEST_CASE(empty)
+{
   List< int > list;
   BOOST_CHECK(list.empty());
   list.push_back(1);
   BOOST_CHECK(!list.empty());
 }
-BOOST_AUTO_TEST_CASE(size) {
+BOOST_AUTO_TEST_CASE(size)
+{
   List< int > list;
   BOOST_CHECK(list.size() == 0);
   list.push_back(1);
   BOOST_CHECK(list.size() == 1);
 }
-BOOST_AUTO_TEST_CASE(PushFrontToNonEmptyList) {
+BOOST_AUTO_TEST_CASE(PushFrontToNonEmptyList)
+{
   dribas::List< int > list;
   list.push_front(2);
   list.push_front(1);
@@ -122,7 +134,8 @@ BOOST_AUTO_TEST_CASE(PushFrontToNonEmptyList) {
   BOOST_CHECK(list.front() == 1);
   BOOST_CHECK(list.back() == 2);
 }
-BOOST_AUTO_TEST_CASE(PushFrontToEmptyList) {
+BOOST_AUTO_TEST_CASE(PushFrontToEmptyList)
+{
   dribas::List< int > list;
   list.push_front(78);
 
@@ -131,7 +144,8 @@ BOOST_AUTO_TEST_CASE(PushFrontToEmptyList) {
   BOOST_CHECK(list.front() == list.back());
   BOOST_CHECK(list.front() == 78);
 }
-BOOST_AUTO_TEST_CASE(PushFrontRvalue) {
+BOOST_AUTO_TEST_CASE(PushFrontRvalue)
+{
   dribas::List< std::string > list;
   list.push_front("second");
   list.push_front("first");
@@ -140,7 +154,8 @@ BOOST_AUTO_TEST_CASE(PushFrontRvalue) {
   BOOST_CHECK(list.front() == "first");
   BOOST_CHECK(list.back() == "second");
 }
-BOOST_AUTO_TEST_CASE(PushFrontRvalues) {
+BOOST_AUTO_TEST_CASE(PushFrontRvalues)
+{
   dribas::List< std::string > list;
   list.push_front("3");
   list.push_front("2");
@@ -150,7 +165,8 @@ BOOST_AUTO_TEST_CASE(PushFrontRvalues) {
   BOOST_CHECK(list.front() == "1");
   BOOST_CHECK(*(++list.begin()) == "2");
 }
-BOOST_AUTO_TEST_CASE(PushFrontMove) {
+BOOST_AUTO_TEST_CASE(PushFrontMove)
+{
   dribas::List< std::string > list;
   std::string value = "value";
   list.push_front(std::move(value));
@@ -158,7 +174,8 @@ BOOST_AUTO_TEST_CASE(PushFrontMove) {
   BOOST_CHECK(list.front() == "value");
   BOOST_CHECK(list.size() == 1);
 }
-BOOST_AUTO_TEST_CASE(FrontBackSingleElement) {
+BOOST_AUTO_TEST_CASE(FrontBackSingleElement)
+{
   List< int > list;
   list.push_front(42);
   BOOST_CHECK(list.front() == 42);
@@ -167,7 +184,8 @@ BOOST_AUTO_TEST_CASE(FrontBackSingleElement) {
   BOOST_CHECK(constList.front() == 42);
   BOOST_CHECK(constList.back() == 42);
 }
-BOOST_AUTO_TEST_CASE(FrontBackModifyElements) {
+BOOST_AUTO_TEST_CASE(FrontBackModifyElements)
+{
   dribas::List< int > list;
   list.push_front(2);
   list.push_front(1);
@@ -178,7 +196,8 @@ BOOST_AUTO_TEST_CASE(FrontBackModifyElements) {
   BOOST_CHECK(list.front() == 10);
   BOOST_CHECK(list.back() == 20);
 }
-BOOST_AUTO_TEST_CASE(PopFrontEmptyList) {
+BOOST_AUTO_TEST_CASE(PopFrontEmptyList)
+{
   dribas::List< int > list;
   list.pop_front();
   BOOST_CHECK(list.empty());
@@ -190,7 +209,8 @@ BOOST_AUTO_TEST_CASE(PopFrontSingleElement)
   list.pop_front();
   BOOST_CHECK(list.empty());
 }
-BOOST_AUTO_TEST_CASE(PopFrontMultipleElements) {
+BOOST_AUTO_TEST_CASE(PopFrontMultipleElements)
+{
   dribas::List< int > list;
   list.push_front(3);
   list.push_front(2);
@@ -200,7 +220,8 @@ BOOST_AUTO_TEST_CASE(PopFrontMultipleElements) {
   BOOST_CHECK(list.front() == 2);
   BOOST_CHECK(list.back() == 3);
 }
-BOOST_AUTO_TEST_CASE(PopFrontAllElements) {
+BOOST_AUTO_TEST_CASE(PopFrontAllElements)
+{
   dribas::List< int > list;
   list.push_front(2);
   list.push_front(1);
@@ -213,20 +234,23 @@ BOOST_AUTO_TEST_CASE(PopFrontAllElements) {
   BOOST_CHECK(list.empty());
   BOOST_CHECK(list.size() == 0);
 }
-BOOST_AUTO_TEST_CASE(PopBackEmptyList) {
+BOOST_AUTO_TEST_CASE(PopBackEmptyList)
+{
   dribas::List< int > list;
   list.pop_back();
   BOOST_CHECK(list.empty());
   BOOST_CHECK(list.size() == 0);
 }
-BOOST_AUTO_TEST_CASE(PopBackSingleElement) {
+BOOST_AUTO_TEST_CASE(PopBackSingleElement)
+{
   dribas::List< int > list;
   list.push_back(32);
   list.pop_back();
   BOOST_CHECK(list.empty());
   BOOST_CHECK(list.size() == 0);
 }
-BOOST_AUTO_TEST_CASE(ClearAlreadyEmptyList) {
+BOOST_AUTO_TEST_CASE(ClearAlreadyEmptyList)
+{
   dribas::List< int > list;
   list.clear();
   BOOST_CHECK(list.empty());
@@ -236,7 +260,8 @@ BOOST_AUTO_TEST_CASE(ClearAlreadyEmptyList) {
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(Itarator)
-BOOST_AUTO_TEST_CASE(iteratorBeginEnd) {
+BOOST_AUTO_TEST_CASE(iteratorBeginEnd)
+{
   List< int > list;
   list.push_back(1);
   list.push_back(2);
@@ -248,7 +273,8 @@ BOOST_AUTO_TEST_CASE(iteratorBeginEnd) {
   ++it;
   BOOST_CHECK(*it == 3);
 }
-BOOST_AUTO_TEST_CASE(iteratorEmptyList) {
+BOOST_AUTO_TEST_CASE(iteratorEmptyList)
+{
   List< int > emptyList;
   BOOST_CHECK(emptyList.begin() == emptyList.end());
   const List< int > constEmptyList;
