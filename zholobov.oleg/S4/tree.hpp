@@ -17,7 +17,7 @@ namespace zholobov {
     using value_type = std::pair< const Key, T >;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using node_type = Node< Key, T >;
+    using node_type = Node< const Key, T >;
     using iterator = TreeIterator< node_type >;
     using const_iterator = TreeConstIterator< node_type >;
     using size_type = size_t;
@@ -110,13 +110,13 @@ namespace zholobov {
 
   template < typename Key, typename T, typename Compare >
   Tree< Key, T, Compare >::Tree(const Compare& comp):
-    fakeRoot_(::operator new(sizeof(node_type))),
+    fakeRoot_(static_cast< node_type* >(::operator new(sizeof(node_type)))),
     cmp_(comp),
     size_(0)
   {
     fakeRoot_->parent = nullptr;
-    fakeRoot_.left = nullptr;
-    fakeRoot_.right = nullptr;
+    fakeRoot_->left = nullptr;
+    fakeRoot_->right = nullptr;
     fakeRoot_->height = -1;
   }
 
@@ -141,7 +141,7 @@ namespace zholobov {
   Tree< Key, T, Compare >::Tree(InputIt first, InputIt last, const Compare& comp):
     Tree(comp)
   {
-    for (const auto it = first; it != last; ++it) {
+    for (auto it = first; it != last; ++it) {
       insert(*it);
     }
   }
@@ -177,6 +177,7 @@ namespace zholobov {
   Tree< Key, T, Compare >& Tree< Key, T, Compare >::operator=(Tree&& other) noexcept
   {
     if (this != std::addressof(other)) {
+      clear();
       swap(other);
     }
     return *this;
@@ -284,34 +285,35 @@ namespace zholobov {
   template < class... Args >
   std::pair< typename Tree< Key, T, Compare >::iterator, bool > Tree< Key, T, Compare >::emplace(Args&&... args)
   {
-    auto&& args_tuple = std::forward_as_tuple(std::forward< Args >(args)...);
-    auto& key = std::get< 0 >(args_tuple);
-
+    value_type value(std::forward< Args >(args)...);
     node_type* parent = fakeRoot_;
     node_type* cur = fakeRoot_->left;
-
     if (!cur) {
-      auto newNode = new node_type(std::forward< Args >(args)...);
+      auto newNode = new node_type(std::move(value));
       fakeRoot_->left = newNode;
       newNode->parent = fakeRoot_;
       ++size_;
       return {newNode, true};
     }
 
+    auto& key = value.first;
+    bool isLeft = false;
     while (cur) {
       parent = cur;
       if (cmp_(key, cur->data.first)) {
         cur = cur->left;
+        isLeft = true;
       } else if (cmp_(cur->data.first, key)) {
         cur = cur->right;
+        isLeft = false;
       } else {
         return {iterator(cur), false};
       }
     }
 
-    auto newNode = new node_type(std::forward< Args >(args)...);
+    auto newNode = new node_type(std::move(value));
     newNode->parent = parent;
-    if (Cmp(key, parent->key)) {
+    if (isLeft) {
       parent->left = newNode;
     } else {
       parent->right = newNode;
@@ -327,31 +329,30 @@ namespace zholobov {
   typename Tree< Key, T, Compare >::iterator
   Tree< Key, T, Compare >::emplace_hint(const_iterator position, Args&&... args)
   {
-    auto&& args_tuple = std::forward_as_tuple(std::forward< Args >(args)...);
-    auto& key = std::get< 0 >(args_tuple);
+    value_type value(std::forward< Args >(args)...);
+    auto& key = value.first;
 
-    node_type* cur = position.node_;
-    if (cur != nullptr && cur != fakeRoot_) {
+    node_type* hint = position.node_;
+    if (hint != nullptr && hint != fakeRoot_) {
       node_type* next = (++position).node_;
-      if (cmp_(cur->data.first, key) && (position == cend() || cmp_(key, next))) {
-        auto newNode = new node_type(std::forward< Args >(args)...);
-        if (cur->right == nullptr) {
-          cur->right = newNode;
+      if (cmp_(hint->data.first, key) && (position == cend() || cmp_(key, next->data.first))) {
+        auto newNode = new node_type(std::move(value));
+        if (hint->right == nullptr) {
+          hint->right = newNode;
         } else {
-          cur = cur->right;
-          while (cur->left != nullptr) {
-            cur = cur->left;
+          hint = hint->right;
+          while (hint->left != nullptr) {
+            hint = hint->left;
           }
-          cur->left = newNode;
+          hint->left = newNode;
         }
-        newNode->parent = cur;
+        newNode->parent = hint;
         rebalanceToRoot(newNode);
         ++size_;
         return iterator(newNode);
       }
     }
-
-    return emplace(std::forward< Args >(args)...).first;
+    return emplace(std::move(value)).first;
   }
 
   template < typename Key, typename T, typename Compare >
@@ -373,7 +374,7 @@ namespace zholobov {
   void Tree< Key, T, Compare >::insert(InputIt first, InputIt last)
   {
     for (; first != last; first++) {
-      insert(*first);
+      emplace(*first);
     }
   }
 
@@ -453,6 +454,7 @@ namespace zholobov {
   void Tree< Key, T, Compare >::clear() noexcept
   {
     clearTree(fakeRoot_->left);
+    size_ = 0;
     fakeRoot_->left = nullptr;
   }
 
@@ -544,7 +546,7 @@ namespace zholobov {
   {
     node_type* l = node->left;
     node->left = l->right;
-    if (l->right) {
+    if (l->right != nullptr) {
       l->right->parent = node;
     }
     l->right = node;
@@ -560,7 +562,9 @@ namespace zholobov {
   {
     node_type* r = node->right;
     node->right = r->left;
-    if (r->left) r->left->parent = node;
+    if (r->left != nullptr) {
+      r->left->parent = node;
+    }
     r->left = node;
     r->parent = node->parent;
     node->parent = r;
@@ -634,9 +638,9 @@ namespace zholobov {
   {
     node_type* cur = fakeRoot_->left;
     while (cur) {
-      if (cmp_(key, cur->key)) {
+      if (cmp_(key, cur->data.first)) {
         cur = cur->left;
-      } else if (Cmp(cur->key, key)) {
+      } else if (cmp_(cur->data.first, key)) {
         cur = cur->right;
       } else {
         return cur;
@@ -650,7 +654,7 @@ namespace zholobov {
   {
     node_type* cur = fakeRoot_->left;
     node_type* result = nullptr;
-    while (cur) {
+    while (cur != nullptr) {
       if (cmp_(cur->data.first, key)) {
         cur = cur->right;
       } else {
@@ -666,8 +670,8 @@ namespace zholobov {
   {
     node_type* cur = fakeRoot_->left;
     node_type* result = nullptr;
-    while (cur) {
-      if (Cmp(key, cur->key)) {
+    while (cur != nullptr) {
+      if (cmp_(key, cur->data.first)) {
         result = cur;
         cur = cur->left;
       } else {

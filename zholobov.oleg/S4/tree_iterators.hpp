@@ -6,9 +6,14 @@
 namespace zholobov {
 
   template < typename Node >
+  class TreeConstIterator;
+
+  template < typename Node >
   class TreeIterator {
-    template < typename, typename >
+    template < typename, typename, typename >
     friend class Tree;
+
+    friend class TreeConstIterator< Node >;
 
   public:
     using iterator_category = std::bidirectional_iterator_tag;
@@ -33,7 +38,7 @@ namespace zholobov {
 
   template < typename Node >
   class TreeConstIterator {
-    template < typename, typename >
+    template < typename, typename, typename >
     friend class Tree;
 
   public:
@@ -215,7 +220,7 @@ zholobov::TreeConstIterator< Node >& zholobov::TreeConstIterator< Node >::operat
         node_ = node_->right;
       }
     }
-  } else if (node_->left) {
+  } else if (node_->left != nullptr) {
     node_ = node_->left;
     while (node_->right != nullptr) {
       node_ = node_->right;
