@@ -65,12 +65,13 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
       sorted.insert(std::make_pair(it->first.second, it->second));
     }
   }
-  auto it = sorted.begin();
-  if (it != sorted.end())
+  if (sorted.empty())
   {
-    out << it->first << ' ' << it->second;
-    ++it;
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  auto it = sorted.begin();
+  out << it->first << ' ' << it->second;
+  ++it;
   for (; it != sorted.end(); ++it)
   {
     out << '\n' << it->first << ' ' << it->second;
@@ -94,12 +95,13 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
       sorted.insert(std::make_pair(it->first.first, it->second));
     }
   }
-  auto it = sorted.begin();
-  if (it != sorted.end())
+  if (sorted.empty())
   {
-    out << it->first << ' ' << it->second;
-    ++it;
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  auto it = sorted.begin();
+  out << it->first << ' ' << it->second;
+  ++it;
   for (; it != sorted.end(); ++it)
   {
     out << '\n' << it->first << ' ' << it->second;
