@@ -19,6 +19,18 @@ namespace alymova
     std::ostream& out;
     void operator()(const GraphsSet& graphs);
   };
+  struct OutboundCommand
+  {
+    std::istream& in;
+    std::ostream& out;
+    void operator()(const GraphsSet& graphs);
+  };
+  struct InboundCommand
+  {
+    std::istream& in;
+    std::ostream& out;
+    void operator()(const GraphsSet& graphs);
+  };
 
   GraphsSet readGraphsFile(std::istream& in);
   CommandsSet complectCommands(std::istream& in, std::ostream& out);
