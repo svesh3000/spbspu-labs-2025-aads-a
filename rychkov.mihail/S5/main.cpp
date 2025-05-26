@@ -11,13 +11,13 @@ int main(int argc, char** argv)
   if (argc != 3)
   {
     std::cerr << "wrong arguments count\n";
-    return false;
+    return 1;
   }
   std::ifstream file(argv[2]);
   if (!file)
   {
     std::cerr << "failed to open file \"" << argv[2] << "\"\n";
-    return false;
+    return 1;
   }
   rychkov::Map< int, std::string > map;
   int key = 0;
@@ -65,6 +65,7 @@ int main(int argc, char** argv)
     else
     {
       std::cerr << "wrong traverse name\n";
+      return 1;
     }
   }
   catch (const std::invalid_argument&)
