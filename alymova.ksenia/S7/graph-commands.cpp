@@ -30,12 +30,6 @@ void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  /*TwoThreeTree< std::string, std::string, std::less< std::string > > sorted;
-  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
-  {
-    sorted.insert(std::make_pair(it->first.first, it->first.first));
-    sorted.insert(std::make_pair(it->first.second, it->first.second));
-  }*/
   auto it = it_name->second.vertexes.begin();
   if (it != it_name->second.vertexes.end())
   {
@@ -65,13 +59,16 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
       sorted.insert(std::make_pair(it->first.second, it->second));
     }
   }
-  if (sorted.empty())
+  if (sorted.empty() && it_name->second.vertexes.find(vertex) == it_name->second.vertexes.end())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
   auto it = sorted.begin();
-  out << it->first << ' ' << it->second;
-  ++it;
+  if (it != sorted.end())
+  {
+    out << it->first << ' ' << it->second;
+    ++it;
+  }
   for (; it != sorted.end(); ++it)
   {
     out << '\n' << it->first << ' ' << it->second;
@@ -100,8 +97,11 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
     throw std::logic_error("<INVALID COMMAND>");
   }
   auto it = sorted.begin();
-  out << it->first << ' ' << it->second;
-  ++it;
+  if (it != sorted.end())
+  {
+    out << it->first << ' ' << it->second;
+    ++it;
+  }
   for (; it != sorted.end(); ++it)
   {
     out << '\n' << it->first << ' ' << it->second;
@@ -133,14 +133,15 @@ void alymova::CutCommand::operator()(GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  auto bound = it_name->second.edges.equal_range(std::make_pair(vertex1, vertex2));
+  /*auto bound = it_name->second.edges.equal_range(std::make_pair(vertex1, vertex2));
   if (bound.first == bound.second)
   {
     throw std::logic_error("<INVALID COMMAND>");
-  }
-  for (auto it = bound.first; it != bound.second; ++it)
+  }*/
+  std::pair< std::string, std::string > vertex_pair(vertex1, vertex2);
+  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
   {
-    if (it->second == weight)
+    if (it->first == vertex_pair && it->second == weight)
     {
       it_name->second.edges.erase(it);
       return;
@@ -168,11 +169,9 @@ void alymova::CreateCommand::operator()(GraphsSet& graphs)
   if (in)
   {
     graphs.insert(std::make_pair(graph_name, graph_new));
+    retur;
   }
-  else
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
+  throw std::logic_error("<INVALID COMMAND>");
 }
 
 alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
