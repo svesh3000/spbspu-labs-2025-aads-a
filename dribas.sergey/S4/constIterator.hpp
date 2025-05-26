@@ -97,8 +97,9 @@ namespace dribas
       while (node_ && before == node_->left) {
         before = node_;
         node_ = node_->parent;
-      }
+      } 
     }
+    return *this;
   }
 
   template < class Key, class T, class Compare >

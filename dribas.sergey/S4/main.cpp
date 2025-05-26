@@ -4,13 +4,13 @@
 #include <limits>
 #include "cmds.hpp"
 
-int main(int argc, char** argv)
+int main()
 {
-  if (argc != 2) {
-    std::cerr << "Error!! No enoughts arguments \n";
-    return 1;
-  }
-  std::ifstream file(argv[1]);
+  // if (argc != 2) {
+  //   std::cerr << "Error!! No enoughts arguments \n";
+  //   return 1;
+  // }
+  std::ifstream file("in.txt");
   using namespace dribas;
   dataset datas;
   std::string name, value;

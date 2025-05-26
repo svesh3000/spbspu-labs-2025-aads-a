@@ -93,6 +93,7 @@ namespace dribas
         node_ = node_->parent;
       }
     }
+    return *this;
   }
 
   template < class Key, class T, class Compare >

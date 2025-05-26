@@ -2,6 +2,11 @@
 
 void dribas::print(std::ostream& out , std::istream& input, const dataset& setdata)
 {
+  out << (++setdata.begin())->first;
+  out << (--setdata.end())->first;
+  auto i = ++setdata.begin();
+  auto j = --setdata.end();
+  out << (j == i);
   std::string name;
   input >> name;
   data tree = setdata.at(name);
