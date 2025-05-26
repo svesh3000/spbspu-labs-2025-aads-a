@@ -89,7 +89,7 @@ namespace kiselev
       return result;
     }
 
-    const Edge& getEdge() const
+    const Edge& getEdges() const
     {
       return edges;
     }

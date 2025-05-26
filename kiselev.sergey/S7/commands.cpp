@@ -1,7 +1,10 @@
 #include "commands.hpp"
+#include <cstddef>
+#include <list>
 #include <map>
 #include <stdexcept>
 #include <string>
+#include "graph.hpp"
 
 namespace
 {
@@ -18,7 +21,7 @@ namespace
     std::map< std::string, std::string > vertexes = graphIt->second.getVertexes();
     if (vertexes.find(vertex) == vertexes.end())
     {
-      throw std::logic_error("<INVALID COMMAND>")
+      throw std::logic_error("<INVALID COMMAND>");
     }
     std::map< std::string, std::map< unsigned int, unsigned int > > bound;
     if (b == "out")
@@ -37,6 +40,17 @@ namespace
         out << " " << weightIt->first;
       }
       out << "\n";
+    }
+  }
+
+  void addEdges(kiselev::Graph& newGraph, const kiselev::Graph::Edge& edges)
+  {
+    for (auto it = edges.begin(); it != edges.end(); ++it)
+    {
+      for (auto weightIt = it->second.begin(); weightIt != it->second.end(); ++weightIt)
+      {
+        newGraph.addEdge(it->first.first, it->first.second, *weightIt);
+      }
     }
   }
 }
@@ -101,4 +115,82 @@ void kiselev::cut(std::istream& in, Graphs& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
+}
+
+void kiselev::create(std::istream& in, Graphs& graphs)
+{
+  std::string graph;
+  in >> graph;
+  if (graphs.find(graph) != graphs.end())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  Graph newGraph;
+  size_t count;
+  in >> count;
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex;
+    newGraph.addEdge(vertex, vertex, 0);
+  }
+  graphs[graph] = newGraph;
+}
+
+void kiselev::merge(std::istream& in, Graphs& graphs)
+{
+  std::string newGraph;
+  std::string gr1;
+  std::string gr2;
+  in >> newGraph >> gr1 >> gr2;
+  if (graphs.find(newGraph) != graphs.end() || graphs.find(gr1) == graphs.end() || graphs.find(gr2) == graphs.end())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  Graph result;
+  addEdges(result, graphs.at(gr1).getEdges());
+  addEdges(result, graphs.at(gr2).getEdges());
+  graphs[newGraph] = result;
+}
+
+void kiselev::extract(std::istream& in, Graphs& graphs)
+{
+  std::string newGraph;
+  std::string graph;
+  size_t count;
+  in >> newGraph >> graph >> count;
+  if (graphs.find(newGraph) != graphs.end() || graphs.find(graph) == graphs.end())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  std::map< std::string, std::string > vertexes1;
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex;
+    in >> vertex;
+    vertexes1[vertex];
+  }
+  std::map< std::string, std::string > vertexes2 = graphs.at(graph).getVertexes();
+  for (auto vertexIt = vertexes1.begin(); vertexIt != vertexes1.end(); ++vertexIt)
+  {
+    if (vertexes2.find(vertexIt->first) == vertexes2.end())
+    {
+      throw std::logic_error("INVALID COMMAND");
+    }
+  }
+  Graph result;
+  Graph::Edge edge = graphs.at(graph).getEdges();
+  for (auto edgeIt = edge.begin(); edgeIt != edge.end(); ++edgeIt)
+  {
+    auto it1 = vertexes1.find(edgeIt->first.first);
+    auto it2 = vertexes1.find(edgeIt->first.second);
+    if (it1 != vertexes1.end() && it2 != vertexes1.end())
+    {
+      const std::list< unsigned int >& weights = edgeIt->second;
+      for (auto weightIt = weights.begin(); weightIt != weights.end(); ++weightIt)
+      {
+        result.addEdge(edgeIt->first.first, edgeIt->first.second, *weightIt);
+      }
+    }
+  }
+  graphs[newGraph] = result;
 }
