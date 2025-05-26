@@ -1,16 +1,28 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
-#include <string>
+#include <cstddef>
 #include <unordered_map>
 #include <list>
 #include <map>
+#include <string>
+#include <functional>
+#include <utility>
 namespace kiselev
 {
+  struct PairHash
+  {
+    size_t operator()(const std::pair< std::string, std::string >& pair) const
+    {
+      size_t h1 = std::hash< std::string >()(pair.first);
+      size_t h2 = std::hash< std::string >()(pair.second);
+      return h1 * 7 + h2;
+    }
+  };
   class Graph
   {
   public:
     using Vertexes = std::pair< std::string, std::string >;
-    using Edge = std::unordered_map< Vertexes, std::list< unsigned int > >;
+    using Edge = std::unordered_map< Vertexes, std::list< unsigned int >, PairHash >;
 
     void addEdge(const std::string& v1, const std::string& v2, unsigned int weight)
     {
