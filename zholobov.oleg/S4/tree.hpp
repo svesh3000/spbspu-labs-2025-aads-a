@@ -91,6 +91,7 @@ namespace zholobov {
     node_type* rotateLeft(node_type* node);
     node_type* rebalance(node_type* node);
     void rebalanceToRoot(node_type* fromNode);
+    void transplant(node_type* u, node_type* v);
 
     node_type* fakeRoot_;
     Compare cmp_;
@@ -361,21 +362,67 @@ namespace zholobov {
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(iterator position)
-  {}
+  {
+    erase(const_iterator(position));
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(const_iterator position)
-  {}
+  {
+    if (position == cend()) {
+      return end();
+    }
+    node_type* cur = position.node_;
+    assert(cur != nullptr);
+    ++position;
+    node_type* rebalanceFrom = nullptr;
+
+    if (cur->left == nullptr) {
+      rebalanceFrom = cur->parent;
+      transplant(cur, cur->right);
+    } else if (cur->right == nullptr) {
+      rebalanceFrom = cur->parent;
+      transplant(cur, cur->left);
+    } else {
+      node_type* successor = cur->right;
+      while (successor->left != nullptr) {
+        successor = successor->left;
+      }
+      if (successor->parent != cur) {
+        transplant(successor, successor->right);
+        successor->right = cur->right;
+        successor->right->parent = successor;
+      }
+      transplant(cur, successor);
+      successor->left = cur->left;
+      successor->left->parent = successor;
+      rebalanceFrom = successor;
+    }
+    delete cur;
+    --size_;
+    rebalanceToRoot(rebalanceFrom);
+    return position;
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::erase(const key_type& key)
   {
+    auto it = find(key);
+    if (it != cend()) {
+      erase(it);
+      return 1;
+    }
     return 0;
   }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(const_iterator first, const_iterator last)
-  {}
+  {
+    for (; first != last; ++first) {
+      erase(first);
+    }
+    return last;
+  }
 
   template < typename Key, typename T, typename Compare >
   void Tree< Key, T, Compare >::swap(Tree& other) noexcept
@@ -510,6 +557,19 @@ namespace zholobov {
       cur = p;
     }
     fakeRoot_->left = rebalance(fakeRoot_->left);
+  }
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::transplant(node_type* u, node_type* v)
+  {
+    if (u->parent->left == u) {
+      u->parent->left = v;
+    } else {
+      u->parent->right = v;
+    }
+    if (v != nullptr) {
+      v->parent = u->parent;
+    }
   }
 }
 
