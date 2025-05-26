@@ -116,6 +116,13 @@ namespace rychkov
     const_reverse_iterator rend() const noexcept;
     const_reverse_iterator crend() const noexcept;
 
+    template< class Unary >
+    Unary traverse_lnr(Unary f) const;
+    template< class Unary >
+    Unary traverse_rnl(Unary f) const;
+    template< class Unary >
+    Unary traverse_breadth(Unary f) const;
+
     iterator lower_bound(const key_type& key);
     const_iterator lower_bound(const key_type& key) const;
     iterator upper_bound(const key_type& key);

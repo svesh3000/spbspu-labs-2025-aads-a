@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <set.hpp>
+#include <map.hpp>
 
 BOOST_AUTO_TEST_SUITE(S5_traverse_test)
 
@@ -46,6 +47,9 @@ BOOST_AUTO_TEST_CASE(iterator_test)
   BOOST_TEST(std::equal(crbreadth{set.rbegin()}, crbreadth{}, rbreadth_data + 2));
   BOOST_TEST(std::equal(rbreadth_data + 2, rbreadth_data + set.size(), rbreadth{set.rbegin()}));
   BOOST_TEST(std::equal(rbreadth_data + 2, rbreadth_data + set.size(), crbreadth{set.crbegin()}));
+}
+BOOST_AUTO_TEST_CASE(traverse_test)
+{
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -12,5 +12,6 @@
 #include "map_base/indexers.hpp"
 #include "map_base/search.hpp"
 #include "map_base/erase.hpp"
+#include "map_base/traverses.hpp"
 
 #endif
