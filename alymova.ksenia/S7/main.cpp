@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <unordered_map>
 #include "graph.hpp"
 #include "graph-commands.hpp"
@@ -43,6 +44,7 @@ int main(int argc, char** argv)
       }
       catch (const std::exception& e)
       {
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
         std::cout << "<INVALID COMMAND>\n";
       }
     }
