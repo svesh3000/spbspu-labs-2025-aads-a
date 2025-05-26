@@ -1027,6 +1027,13 @@ namespace savintsev
   template< typename F >
   F TwoThreeTree< K, V, C >::traverse_lnr(F f) const
   {
+    return const_cast< TwoThreeTree* >(this)->traverse_lnr(f);
+  }
+
+  template< typename K, typename V, typename C >
+  template< typename F >
+  F TwoThreeTree< K, V, C >::traverse_lnr(F f)
+  {
     if (empty())
     {
       throw std::logic_error("Tree is empty");
@@ -1040,15 +1047,14 @@ namespace savintsev
 
   template< typename K, typename V, typename C >
   template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_lnr(F f)
+  F TwoThreeTree< K, V, C >::traverse_rnl(F f) const
   {
-    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
-    return copy.traverse_lnr(f);
+    return const_cast< TwoThreeTree* >(this)->traverse_rnl(f);
   }
 
   template< typename K, typename V, typename C >
   template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_rnl(F f) const
+  F TwoThreeTree< K, V, C >::traverse_rnl(F f)
   {
     if (empty())
     {
@@ -1067,15 +1073,14 @@ namespace savintsev
 
   template< typename K, typename V, typename C >
   template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_rnl(F f)
+  F TwoThreeTree< K, V, C >::traverse_breadth(F f) const
   {
-    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
-    return copy.traverse_rnl(f);
+    return const_cast< TwoThreeTree* >(this)->traverse_breadth(f);
   }
 
   template< typename K, typename V, typename C >
   template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_breadth(F f) const
+  F TwoThreeTree< K, V, C >::traverse_breadth(F f)
   {
     if (empty())
     {
@@ -1105,14 +1110,6 @@ namespace savintsev
     }
 
     return f;
-  }
-
-  template< typename K, typename V, typename C >
-  template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_breadth(F f)
-  {
-    const TwoThreeTree< K, V, C > copy = const_cast< TwoThreeTree< K, V, C > & >(*this);
-    return copy.traverse_rnl(f);
   }
 }
 
