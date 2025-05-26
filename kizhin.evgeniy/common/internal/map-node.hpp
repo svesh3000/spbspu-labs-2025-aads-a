@@ -22,7 +22,7 @@ namespace kizhin {
 
       Node() = default;
       Node(const Node&) = delete;
-      ~Node() { destroy(begin, end); }
+      ~Node() { kizhin::destroy(begin, end); }
       Node& operator=(const Node&) = delete;
     };
 
@@ -80,7 +80,7 @@ template < typename NodePtr >
 bool kizhin::detail::isLeaf(NodePtr node) noexcept
 {
   assert(node && "Attempt to check is nullptr node a leaf");
-  return node->children[0] == nullptr;
+  return !node->children[0] || isEmpty(node->children[0]);
 }
 
 template < typename NodePtr >
@@ -116,7 +116,7 @@ template < typename NodePtr >
 NodePtr kizhin::detail::treeMin(NodePtr root) noexcept
 {
   assert(root && "Root cannot be nullptr");
-  while (root->children[0]) {
+  while (!isLeaf(root)) {
     root = root->children[0];
   }
   return root;
@@ -171,19 +171,21 @@ std::tuple< NodePtr, ValPtr > kizhin::detail::nextIter(NodePtr node, ValPtr valu
 {
   assert(node && valuePtr && "Incrementing empty iterator");
   if (!isLeaf(node)) {
-    NodePtr rightSibling = node->children[(valuePtr - node->begin) + 1];
-    node = treeMin(rightSibling);
+    node = treeMin(node->children[(valuePtr - node->begin) + 1]);
     return std::make_tuple(node, node->begin);
   }
   if (valuePtr + 1 != node->end) {
     return std::make_tuple(node, ++valuePtr);
   }
+  NodePtr firstChild = node->children[1];
+  if (firstChild && isEmpty(firstChild)) {
+    return std::make_tuple(firstChild, firstChild->begin);
+  }
   while (node->parent) {
     NodePtr parent = node->parent;
     if (isLeft(node) || (size(parent) == 2 && isMiddle(node))) {
       valuePtr = isLeft(node) ? parent->begin : parent->begin + 1;
-      node = parent;
-      return std::make_tuple(node, valuePtr);
+      return std::make_tuple(parent, valuePtr);
     }
     node = parent;
   }
@@ -194,9 +196,11 @@ template < typename NodePtr, typename ValPtr >
 std::tuple< NodePtr, ValPtr > kizhin::detail::prevIter(NodePtr node, ValPtr valuePtr)
 {
   assert(node && valuePtr && "Decrementing empty iterator");
+  if (isEmpty(node)) {
+    return std::make_tuple(node->parent, node->parent->end - 1);
+  }
   if (!isLeaf(node)) {
-    NodePtr leftSibling = node->children[valuePtr - node->begin];
-    node = treeMax(leftSibling);
+    node = treeMax(node->children[valuePtr - node->begin]);
     return std::make_tuple(node, node->end - 1);
   }
   if (valuePtr != node->begin) {

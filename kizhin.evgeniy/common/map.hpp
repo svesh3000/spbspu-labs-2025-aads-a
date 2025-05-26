@@ -107,15 +107,17 @@ namespace kizhin {
 
   private:
     using Node = detail::Node< value_type >;
+    class EndNodeGuard;
 
     Node* root_ = nullptr;
     size_type size_ = 0;
     Comparator comparator_;
 
     void deallocate() noexcept;
+    Node* getEndNode() const noexcept;
 
     template < typename... Args >
-    [[nodiscard]] Node* emplaceToNode(Node*, Args&&...);
+    Node* emplaceToNode(Node*, Args&&...);
 
     Node* split(Node*);
     std::tuple< Node*, Node* > splitInTwo(const Node*) const;
@@ -169,11 +171,7 @@ public:
   using difference_type = std::ptrdiff_t;
   using pointer = conditional_t< Map::const_pointer, Map::pointer >;
   using reference = conditional_t< Map::const_reference, Map::reference >;
-#if defined(BIDIR_MAP_ITERATORS)
   using iterator_category = std::bidirectional_iterator_tag;
-#else
-  using iterator_category = std::forward_iterator_tag;
-#endif
 
   Iterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
@@ -184,10 +182,8 @@ public:
 
   Iterator& operator++();
   Iterator operator++(int);
-#if defined(BIDIR_MAP_ITERATORS)
   Iterator& operator--();
   Iterator operator--(int);
-#endif
 
   friend bool operator==(const Iterator& lhs, const Iterator& rhs) noexcept
   {
@@ -254,7 +250,7 @@ template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator++() -> Iterator&
 {
   assert(node_ && valuePtr_ && "Incrementing empty iterator");
-  std::tie(node_, valuePtr_) = nextIter(node_, valuePtr_);
+  std::tie(node_, valuePtr_) = detail::nextIter(node_, valuePtr_);
   return *this;
 }
 
@@ -267,13 +263,12 @@ auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator++(int) -> Iterator
   return result;
 }
 
-#if defined(BIDIR_MAP_ITERATORS)
 template < typename K, typename T, typename C >
 template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--() -> Iterator&
 {
   assert(node_ && valuePtr_ && "Decrementing empty iterator");
-  std::tie(node_, valuePtr_) = prevIter(node_, valuePtr_);
+  std::tie(node_, valuePtr_) = detail::prevIter(node_, valuePtr_);
   return *this;
 }
 
@@ -285,7 +280,6 @@ auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--(int) -> Iterator
   --(*this);
   return result;
 }
-#endif
 
 template < typename K, typename T, typename C >
 class kizhin::Map< K, T, C >::value_compare
@@ -373,7 +367,7 @@ typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::begin() noexce
 template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::end() noexcept
 {
-  return iterator{};
+  return iterator{ getEndNode() };
 }
 
 template < typename K, typename T, typename C >
@@ -390,7 +384,7 @@ template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::const_iterator kizhin::Map< K, T, C >::end()
     const noexcept
 {
-  return const_iterator{};
+  return const_iterator{ getEndNode() };
 }
 
 template < typename K, typename T, typename C >
@@ -519,9 +513,13 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   if (empty()) {
     root_ = new Node;
     detail::emplaceBack(root_, std::forward< Args >(args)...);
+    Node* endNode = new Node;
+    endNode->parent = root_;
+    root_->children.fill(endNode);
     ++size_;
     return std::make_pair(begin(), true);
   }
+  const EndNodeGuard guard(this);
   value_type value{ std::forward< Args >(args)... };
   Node* target = findTarget(hint.node_, value.first);
   pointer valuePtr = findKey(target, value.first);
@@ -632,9 +630,37 @@ auto kizhin::Map< K, T, C >::equalRange(const key_type& key) const
 }
 
 template < typename K, typename T, typename C >
+class kizhin::Map< K, T, C >::EndNodeGuard
+{
+public:
+  EndNodeGuard(const EndNodeGuard&) = delete;
+  EndNodeGuard(Map* owner) noexcept:
+    owner_(owner),
+    endNode_(owner->getEndNode())
+  {
+    endNode_->parent->children.fill(nullptr);
+  }
+  EndNodeGuard& operator=(const EndNodeGuard&) = delete;
+
+  ~EndNodeGuard()
+  {
+    Node* max = detail::treeMax(owner_->root_);
+    endNode_->parent = max;
+    max->children.fill(endNode_);
+  }
+
+private:
+  Map* owner_ = nullptr;
+  Node* endNode_ = nullptr;
+};
+
+template < typename K, typename T, typename C >
 void kizhin::Map< K, T, C >::deallocate() noexcept
 {
   assert(!empty() && "Attempt to deallocate empty tree");
+  Node* endNode = getEndNode();
+  endNode->parent->children.fill(nullptr);
+  delete endNode;
   Node* left = root_;
   while (root_->children[0]) {
     left = detail::treeMin(left);
@@ -646,9 +672,19 @@ void kizhin::Map< K, T, C >::deallocate() noexcept
 }
 
 template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::getEndNode() const noexcept
+{
+  if (empty()) {
+    return nullptr;
+  }
+  Node* max = detail::treeMax(root_);
+  return detail::isEmpty(max) ? max : max->children[0];
+}
+
+template < typename K, typename T, typename C >
 template < typename... Args >
-[[nodiscard]] typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T,
-    C >::emplaceToNode(Node* node, Args&&... args)
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::emplaceToNode(Node* node,
+    Args&&... args)
 {
   assert(node && "emplaceToNode: nullptr given");
   std::unique_ptr< Node > result = std::make_unique< Node >();
@@ -664,11 +700,9 @@ template < typename... Args >
 template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
 {
-  /* TODO: Must be strong exception safety */
-  using detail::size;
   assert(node && "Attempt to split nullptr node");
   assert(detail::size(node) > 2 && "Cannot split node with size less than 3");
-  assert((!node->parent || size(node->parent) < 3) && "Split: filled parent");
+  assert((!node->parent || detail::size(node->parent) < 3) && "Split: filled parent");
 
   Node* left = nullptr;
   Node* right = nullptr;
@@ -761,7 +795,7 @@ template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::validateHint(Node* hint,
     const key_type& key) const
 {
-  if (!hint || hint == root_) {
+  if (!hint || detail::isEmpty(hint) || hint == root_) {
     return root_;
   }
   bool isValid = true;
