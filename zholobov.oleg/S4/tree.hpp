@@ -2,6 +2,7 @@
 #define TREE_HPP
 
 #include <functional>
+#include <stdexcept>
 
 #include "node.hpp"
 #include "tree_iterators.hpp"
@@ -92,6 +93,10 @@ namespace zholobov {
     node_type* rebalance(node_type* node);
     void rebalanceToRoot(node_type* fromNode);
     void transplant(node_type* u, node_type* v);
+    void clearTree(node_type* node);
+    node_type* findByKey(key_type key);
+    node_type* findLowerBound(key_type key);
+    node_type* findUpperBound(key_type key);
 
     node_type* fakeRoot_;
     Compare cmp_;
@@ -257,11 +262,23 @@ namespace zholobov {
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::at(const key_type& key)
-  {}
+  {
+    auto result = find(key);
+    if (result == end()) {
+      throw std::out_of_range("Key not found");
+    }
+    return result.second;
+  }
 
   template < typename Key, typename T, typename Compare >
   const typename Tree< Key, T, Compare >::mapped_type& Tree< Key, T, Compare >::at(const key_type& key) const
-  {}
+  {
+    auto result = find(key);
+    if (result == cend()) {
+      throw std::out_of_range("Key not found");
+    }
+    return result.second;
+  }
 
   template < typename Key, typename T, typename Compare >
   template < class... Args >
@@ -426,51 +443,81 @@ namespace zholobov {
 
   template < typename Key, typename T, typename Compare >
   void Tree< Key, T, Compare >::swap(Tree& other) noexcept
-  {}
+  {
+    std::swap(fakeRoot_, other.fakeRoot_);
+    std::swap(cmp_, other.cmp_);
+    std::swap(size_, other.size_);
+  }
 
   template < typename Key, typename T, typename Compare >
   void Tree< Key, T, Compare >::clear() noexcept
-  {}
+  {
+    clearTree(fakeRoot_->left);
+    fakeRoot_->left = nullptr;
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::find(const key_type& key)
-  {}
+  {
+    node_type* node = findByKey(key);
+    return (node != nullptr) ? iterator(node) : end();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::find(const key_type& key) const
-  {}
+  {
+    node_type* node = findByKey(key);
+    return (node != nullptr) ? const_iterator(node) : cend();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::count(const key_type& key) const
   {
-    return 0;
+    node_type* node = findByKey(key);
+    return (node != nullptr) ? 1 : 0;
   }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::lower_bound(const key_type& key)
-  {}
+  {
+    node_type* result = findLowerBound(key);
+    return (result != nullptr) ? iterator(result) : end();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::lower_bound(const key_type& key) const
-  {}
+  {
+    node_type* result = findLowerBound(key);
+    return (result != nullptr) ? const_iterator(result) : cend();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::upper_bound(const key_type& key)
-  {}
+  {
+    node_type* result = findUpperBound(key);
+    return (result != nullptr) ? iterator(result) : end();
+  }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::const_iterator Tree< Key, T, Compare >::upper_bound(const key_type& key) const
-  {}
+  {
+    node_type* result = findUpperBound(key);
+    return (result != nullptr) ? const_iterator(result) : cend();
+  }
 
   template < typename Key, typename T, typename Compare >
   std::pair< typename Tree< Key, T, Compare >::iterator, typename Tree< Key, T, Compare >::iterator >
   Tree< Key, T, Compare >::equal_range(const key_type& key)
-  {}
+  {
+    return std::make_pair(lower_bound(key), upper_bound(key));
+  }
 
   template < typename Key, typename T, typename Compare >
   std::pair< typename Tree< Key, T, Compare >::const_iterator, typename Tree< Key, T, Compare >::const_iterator >
   Tree< Key, T, Compare >::equal_range(const key_type& key) const
-  {}
+  {
+    return std::make_pair(lower_bound(key), upper_bound(key));
+  }
 
   template < typename Key, typename T, typename Compare >
   int Tree< Key, T, Compare >::height(node_type* node)
@@ -571,6 +618,65 @@ namespace zholobov {
       v->parent = u->parent;
     }
   }
+
+  template < typename Key, typename T, typename Compare >
+  void Tree< Key, T, Compare >::clearTree(node_type* node)
+  {
+    if (node != nullptr) {
+      clearTree(node->left);
+      clearTree(node->right);
+      delete node;
+    }
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findByKey(key_type key)
+  {
+    node_type* cur = fakeRoot_->left;
+    while (cur) {
+      if (cmp_(key, cur->key)) {
+        cur = cur->left;
+      } else if (Cmp(cur->key, key)) {
+        cur = cur->right;
+      } else {
+        return cur;
+      }
+    }
+    return nullptr;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findLowerBound(key_type key)
+  {
+    node_type* cur = fakeRoot_->left;
+    node_type* result = nullptr;
+    while (cur) {
+      if (cmp_(cur->data.first, key)) {
+        cur = cur->right;
+      } else {
+        result = cur;
+        cur = cur->left;
+      }
+    }
+    return result;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findUpperBound(key_type key)
+  {
+    node_type* cur = fakeRoot_->left;
+    node_type* result = nullptr;
+    while (cur) {
+      if (Cmp(key, cur->key)) {
+        result = cur;
+        cur = cur->left;
+      } else {
+        cur = cur->right;
+      }
+    }
+    return result;
+  }
+
 }
 
 #endif
