@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <tree/tree-2-3.hpp>
 
 namespace alymova
 {
@@ -20,6 +21,7 @@ namespace alymova
   struct Graph
   {
     std::unordered_multimap< std::pair< std::string, std::string >, size_t, MyHash > edges;
+    TwoThreeTree< std::string, std::string, std::less< std::string > > vertexes;
   };
 
   std::istream& operator>>(std::istream& in, Graph& graph);

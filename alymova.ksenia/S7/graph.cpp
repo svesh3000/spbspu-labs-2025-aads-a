@@ -17,6 +17,8 @@ std::istream& alymova::operator>>(std::istream& in, Graph& graph)
     if (in)
     {
       graph.edges.insert(std::make_pair(std::make_pair(vertex1, vertex2), weidth));
+      graph.vertexes.insert(std::make_pair(vertex1, vertex1));
+      graph.vertexes.insert(std::make_pair(vertex2, vertex2));
     }
   }
   return in;
