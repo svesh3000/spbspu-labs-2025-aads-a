@@ -95,7 +95,7 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
       sorted.insert(std::make_pair(it->first.first, it->second));
     }
   }
-  if (sorted.empty())
+  if (sorted.empty() && it_name->second.vertexes.find(vertex) == it_name->second.vertexes.end())
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
