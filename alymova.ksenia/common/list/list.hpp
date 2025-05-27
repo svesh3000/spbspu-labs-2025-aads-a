@@ -6,14 +6,15 @@
 #include <utility>
 #include <initializer_list>
 #include <algorithm>
-#include "listNode.hpp"
+#include "iterators.hpp"
+//#include "listNode.hpp"
 
 namespace alymova
 {
-  template< typename T >
+  /*template< typename T >
   struct Iterator;
   template< typename T >
-  struct ConstIterator;
+  struct ConstIterator;*/
 
   template< typename T >
   class List
