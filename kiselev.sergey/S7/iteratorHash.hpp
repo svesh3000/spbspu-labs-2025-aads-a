@@ -16,7 +16,9 @@ namespace kiselev
     using reference = std::conditional_t< IsConst, const value&, value& >;
     using pointer = std::conditional_t< IsConst, const value*, value* >;
     using iterator = IteratorHash< Key, Value, Hash1, Hash2, Equal, IsConst >;
-    using table = HashTable< Key, Value, Hash1, Hash2, Equal >;
+    using Table = HashTable< Key, Value, Hash1, Hash2, Equal >;
+    using constTable = const HashTable< Key, Value, Hash1, Hash2, Equal >;
+    using TablePtr = std::conditional_t< IsConst, constTable*, Table* >;
 
     IteratorHash():
       table_(nullptr),
@@ -33,14 +35,14 @@ namespace kiselev
     iterator& operator=(const IteratorHash< Key, Value, Hash1, Hash2, Equal, OtherIsConst >& other) noexcept
     {
       table_ = other.table_;
-      index_ = other.index;
+      index_ = other.index_;
       return *this;
     }
 
     iterator& operator++() noexcept
     {
       ++index_;
-      while (index_ < table_->slots_.size() && table_->slots_[index_].status != table::Status::OCCUPIED)
+      while (index_ < table_->slots_.size() && table_->slots_[index_].status != Table::Status::OCCUPIED)
       {
         ++index_;
       }
@@ -57,7 +59,7 @@ namespace kiselev
     iterator& operator--() noexcept
     {
       --index_;
-      while (index_ > 0 && table_->slots_[index_].status != table::Status::OCCUPIED)
+      while (index_ > 0 && table_->slots_[index_].status != Table::Status::OCCUPIED)
       {
         --index_;
       }
@@ -90,9 +92,9 @@ namespace kiselev
       return !(*this == other);
     }
   private:
-    table* table_;
+    TablePtr table_;
     size_t index_;
-    IteratorHash(table* tab, size_t index) noexcept:
+    IteratorHash(TablePtr tab, size_t index) noexcept:
       table_(tab),
       index_(index)
     {}

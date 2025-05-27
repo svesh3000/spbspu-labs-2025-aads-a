@@ -7,12 +7,26 @@
 #include <type_traits>
 #include <vector>
 #include <utility>
-#include <boost/container_hash/hash.hpp>
+#include <cmath>
+#include <boost/hash2/fnv1a.hpp>
+#include <boost/hash2/hash_append.hpp>
+#include <boost/hash2/get_integral_result.hpp>
 #include "iteratorHash.hpp"
 
 namespace kiselev
 {
-  template< class Key, class Value, class Hash1 = std::hash< Key >, class Hash2 = boost::hash< Value >, class Equal = std::equal_to< Key > >
+  template< class Key, class Hash = boost::hash2::fnv1a_64 >
+  struct BoostHash
+  {
+    size_t operator()(Key const& key)
+    {
+      Hash h;
+      boost::hash2::hash_append(h, {}, key);
+      return boost::hash2::get_integral_result< size_t >(h);
+    }
+  };
+
+  template< class Key, class Value, class Hash1 = std::hash< Key >, class Hash2 = BoostHash< Key > , class Equal = std::equal_to< Key > >
   class HashTable
   {
   public:
@@ -77,12 +91,12 @@ namespace kiselev
       return *this;
     }
 
-    Value& operator[](const Key& key)
+    const Value& operator[](const Key& key) const
     {
-      Iterator res = insert({ key, Value() }).first;
-      return res->second;
+      ConstIterator it = find(key);
+      return it->second;
     }
-    Value& operator[](Key&& key)
+    Value& operator[](const Key& key)
     {
       Iterator res = insert({ std::move(key), Value() }).first;
       return res->second;
@@ -151,7 +165,7 @@ namespace kiselev
     {
       if (pos == end())
       {
-        return pos;
+        return Iterator(this, pos.index_);
       }
       if (pos.index_ >= slots_.size() || slots_[pos.index_].status != Status::OCCUPIED)
       {
@@ -160,7 +174,7 @@ namespace kiselev
       slots_[pos.index_].status = Status::DELETED;
       --count_;
       ++pos;
-      return pos;
+      return Iterator(this, pos.index_);
     }
     Iterator erase(ConstIterator first, ConstIterator last)
     {
@@ -168,7 +182,7 @@ namespace kiselev
       {
         first = erase(first);
       }
-      return Iterator(last.table_, last.index_);
+      return Iterator(this, last.index_);
     }
     size_t erase(const Key& key)
     {
@@ -190,8 +204,8 @@ namespace kiselev
         rehash(slots_.size() * 2);
       }
       size_t posIn = slots_.size();
-      size_t h1 = hash1(newVal.first);
-      size_t h2 = hash2(newVal.first);
+      size_t h1 = Hash1{}(newVal.first);
+      size_t h2 = Hash2{}(newVal.first);
       for (size_t i = 0; i < slots_.size(); ++i)
       {
         size_t pos = (h1 + i * h2) % slots_.size();
@@ -199,7 +213,7 @@ namespace kiselev
         {
           if (equal(slots_[pos].pair.first, newVal.first))
           {
-            return {Iterator(this, pos), false};
+            return { Iterator(this, pos), false };
           }
         }
         else
@@ -221,7 +235,7 @@ namespace kiselev
         return (emplace(std::forward< Args >(args)...));
       }
       slots_[posIn].pair = std::move(newVal);
-      slots_[posIn].status == Status::OCCUPIED;
+      slots_[posIn].status = Status::OCCUPIED;
       count_++;
       return { Iterator(this, posIn), true };
     }
@@ -243,15 +257,15 @@ namespace kiselev
       {
         return { hint, false };
       }
-      size_t h1 = hash1(newVal.first);
-      size_t h2 = hash2(newVal.first);
+      size_t h1 = Hash1{}(newVal.first);
+      size_t h2 = Hash2{}(newVal.first);
       size_t pos = (h1 + (hint.index_ - h1 % slots_.size()) * h2) % slots_.size();
       if (pos < slots_.size() && slots_[pos].status != Status::OCCUPIED)
       {
         slots_[pos].pair = std::move(newVal);
         slots_[pos].status = Status::OCCUPIED;
         count_++;
-        return {Iterator(this, pos), true};
+        return { Iterator(this, pos), true };
       }
       return emplace(std::forward< Args >(args)...);
     }
@@ -277,7 +291,7 @@ namespace kiselev
     }
 
     template< class InputIt >
-    std::pair< Iterator, bool > insert(InputIt first, InputIt last)
+    void insert(InputIt first, InputIt last)
     {
       HashTable< Key, Value, Hash1, Hash2, Equal > temp(*this);
       for (; first != last; ++first)
@@ -289,8 +303,8 @@ namespace kiselev
 
     Iterator find(const Key& key)
     {
-      size_t h1 = hash1(key);
-      size_t h2 = hash2(key);
+      size_t h1 = Hash1{}(key);
+      size_t h2 = Hash2{}(key);
       for (size_t i = 0; i < slots_.size(); ++i)
       {
         size_t pos = (h1 + i * h2) % slots_.size();
@@ -308,7 +322,21 @@ namespace kiselev
 
     ConstIterator find(const Key& key) const
     {
-      return ConstIterator(find(key));
+      size_t h1 = Hash1{}(key);
+      size_t h2 = Hash2{}(key);
+      for (size_t i = 0; i < slots_.size(); ++i)
+      {
+        size_t pos = (h1 + i * h2) % slots_.size();
+        if (slots_[pos].status == Status::EMPTY)
+        {
+            return cend();
+        }
+        if (slots_[pos].status == Status::OCCUPIED && equal(slots_[pos].pair.first, key))
+        {
+            return ConstIterator(this, pos);
+        }
+      }
+      return cend();
     }
 
     void clear() noexcept
@@ -324,7 +352,7 @@ namespace kiselev
 
     float loadFactor() const
     {
-      return count_ / slots_.size();
+      return static_cast< float >(count_) / slots_.size();
     }
 
     float maxLoadFactor() const
@@ -371,56 +399,12 @@ namespace kiselev
       Status status = Status::EMPTY;
     };
 
-    size_t findPos(const Key& key) const
-    {
-      size_t h1 = hash1(key);
-      size_t h2 = hash2(key);
-      for (size_t i = 0; i < slots_.size(); ++i)
-      {
-        size_t pos = (h1 + i * h2) % slots_.size();
-        if (slots_[pos].status == Status::EMPTY)
-        {
-          return pos;
-        }
-        if (slots_[pos].status == Status::OCCUPIED && equal(slots_[pos].pair.first, key))
-        {
-          return pos;
-        }
-      }
-      return slots_.size();
-    }
-
-    size_t findExisting(const Key& key)
-    {
-      size_t pos = findPos(key);
-      if (pos < slots_.size() && slots_[pos].status == Status::OCCUPIED)
-      {
-        return pos;
-      }
-      return slots_.size();
-    }
-
-    size_t findForInsert(const Key& key)
-    {
-      size_t h1 = hash1(key);
-      size_t h2 = hash2(key);
-      for (size_t i = 0; i < slots_.size(); ++i)
-      {
-        size_t pos = (h1 + i * h2) % slots_.size();
-        if (slots_[pos].status != Status::OCCUPIED)
-        {
-          return pos;
-        }
-      }
-      return slots_.size();
-    }
-
     std::vector< Slot > slots_;
     size_t count_;
     float maxLoadFactor_ = 0.6;
-    Hash1 hash1;
-    Hash2 hash2;
     Equal equal;
+    friend class IteratorHash< Key, Value, Hash1, Hash2, Equal, false >;
+    friend class IteratorHash< Key, Value, Hash1, Hash2, Equal, true >;
   };
 }
 #endif

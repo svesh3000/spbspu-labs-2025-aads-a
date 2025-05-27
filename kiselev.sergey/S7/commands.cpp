@@ -53,7 +53,7 @@ namespace
 
   void addEdges(kiselev::Graph& newGraph, const kiselev::Graph::Edge& edges)
   {
-    for (auto it = edges.begin(); it != edges.end(); ++it)
+    for (auto it = edges.cbegin(); it != edges.cend(); ++it)
     {
       for (auto weightIt = it->second.begin(); weightIt != it->second.end(); ++weightIt)
       {

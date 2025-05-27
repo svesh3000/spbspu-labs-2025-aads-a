@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <utility>
+#include "hashTable.hpp"
 namespace kiselev
 {
   struct PairHash
@@ -22,7 +23,7 @@ namespace kiselev
   {
   public:
     using Vertexes = std::pair< std::string, std::string >;
-    using Edge = std::unordered_map< Vertexes, std::list< unsigned int >, PairHash >;
+    using Edge = HashTable< Vertexes, std::list< unsigned int >, PairHash >;
 
     void addEdge(const std::string& v1, const std::string& v2, unsigned int weight)
     {
@@ -49,7 +50,7 @@ namespace kiselev
     std::map< std::string, std::string > getVertexes() const
     {
       std::map< std::string, std::string > vertexes;
-      for (auto it = edges.begin(); it != edges.end(); ++it)
+      for (auto it = edges.cbegin(); it != edges.cend(); ++it)
       {
         vertexes[it->first.first];
         vertexes[it->first.second];
@@ -60,7 +61,7 @@ namespace kiselev
     std::map< std::string, std::map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
     {
       std::map< std::string, std::map< unsigned int, unsigned int > > result;
-      for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
+      for (auto edgeIt = edges.cbegin(); edgeIt != edges.cend(); ++edgeIt)
       {
         if (edgeIt->first.first == v)
         {
@@ -76,7 +77,7 @@ namespace kiselev
     std::map< std::string, std::map< unsigned int, unsigned int > > getInBound(const std::string& v) const
     {
       std::map< std::string, std::map< unsigned int, unsigned int > > result;
-      for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
+      for (auto edgeIt = edges.cbegin(); edgeIt != edges.cend(); ++edgeIt)
       {
         if (edgeIt->first.second == v)
         {
