@@ -32,6 +32,11 @@ namespace
     {
       bound = graphIt->second.getInBound(vertex);
     }
+    if (bound.empty())
+    {
+      out << "\n";
+      return;
+    }
     for (auto it = bound.begin(); it != bound.end(); ++it)
     {
       out << it->first;
@@ -77,6 +82,11 @@ void kiselev::input(std::istream& in, Graphs& graphs)
 
 void kiselev::graphs(std::ostream& out, const Graphs& graphs)
 {
+  if (graphs.empty())
+  {
+    out << "\n";
+    return;
+  }
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
     out << it->first << "\n";
@@ -93,6 +103,11 @@ void kiselev::vertexes(std::ostream& out, std::istream& in, const Graphs& graphs
     std::logic_error("<INVALID COMMAND>");
   }
   std::map< std::string, std::string > vertexes = it->second.getVertexes();
+  if (vertexes.empty())
+  {
+    out << "\n";
+    return;
+  }
   for (auto iter = vertexes.begin(); iter != vertexes.end(); ++iter)
   {
     out << iter->first << "\n";
