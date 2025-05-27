@@ -21,8 +21,7 @@ namespace
     std::map< std::string, std::string > vertexes = graphIt->second.getVertexes();
     if (vertexes.find(vertex) == vertexes.end())
     {
-      out << "\n";
-      return;
+      throw std::logic_error("INVALID COMMAND");
     }
     std::map< std::string, std::map< unsigned int, unsigned int > > bound;
     if (b == "out")
@@ -33,13 +32,11 @@ namespace
     {
       bound = graphIt->second.getInBound(vertex);
     }
-    /*
     if (bound.empty())
     {
       out << "\n";
       return;
     }
-    */
     for (auto it = bound.begin(); it != bound.end(); ++it)
     {
       out << it->first;
