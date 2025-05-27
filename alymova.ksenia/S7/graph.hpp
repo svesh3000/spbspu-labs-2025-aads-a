@@ -24,14 +24,14 @@ namespace alymova
   struct Graph
   {
     std::unordered_multimap< std::pair< std::string, std::string >, size_t, MyHash > edges;
-    mutable List< std::string > vertexes;
+    List< std::string > vertexes;
 
     void addEdge(std::string vertex1, std::string vertex2, size_t weight);
     void cutEdge(std::string vertex1, std::string vertex2, size_t weight);
     void addVertex(std::string vertex);
     bool hasVertex(std::string vertex) const;
-    BoundMap getOutBound(std::string vertex);
-    BoundMap getInbound(std::string vertex);
+    BoundMap getOutbound(std::string vertex) const;
+    BoundMap getInbound(std::string vertex) const;
     void merge(const Graph& other);
   };
 

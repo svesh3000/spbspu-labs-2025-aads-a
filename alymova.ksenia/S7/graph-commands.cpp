@@ -6,7 +6,7 @@
 void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
 {
   List< std::string > names;
-  for (auto it = graphs.begin(); it != graphs.end(); ++it)
+  for (auto it = graphs.begin(); it != graphs.end(); it++)
   {
     names.push_back(it->first);
   }
@@ -14,12 +14,12 @@ void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
   auto it = names.begin();
   if (it != names.end())
   {
-    out << it->first;
-    ++it;
+    out << *it;
+    it++;
   }
-  for (; it != names.end(); ++it)
+  for (; it != names.end(); it++)
   {
-    out << '\n' << it->first;
+    out << '\n' << *it;
   }
 }
 
@@ -38,9 +38,9 @@ void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
   if (it != copy_vertexes.end())
   {
     out << *it;
-    ++it;
+    it++;
   }
-  for (; it != copy_vertexes.end(); ++it)
+  for (; it != copy_vertexes.end(); it++)
   {
     out << '\n' << *it;
   }
@@ -51,31 +51,31 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
   auto it_name = graphs.find(graph_name);
-  if (it_name == graphs.end() || !in)
+  if (it_name == graphs.end() || !it_name->second.hasVertex(vertex) || !in)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  TwoThreeTree< std::string, size_t, std::less< std::string > > sorted;
-  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
+
+  BoundMap outbound = it_name->second.getOutbound(vertex);
+  auto it = outbound.begin();
+  if (it != outbound.end())
   {
-    if (it->first.first == vertex)
+    out << it->first;
+    it->second.sort();
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
     {
-      sorted.insert(std::make_pair(it->first.second, it->second));
+      out << ' ' << *it_weight;
     }
+    it++;
   }
-  if (sorted.empty() && !it_name->second.hasVertex(vertex))
+  for (; it != outbound.end(); it++)
   {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  auto it = sorted.begin();
-  if (it != sorted.end())
-  {
-    out << it->first << ' ' << it->second;
-    ++it;
-  }
-  for (; it != sorted.end(); ++it)
-  {
-    out << '\n' << it->first << ' ' << it->second;
+    out << '\n' << it->first;
+    it->second.sort();
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
+    {
+      out << ' ' << *it_weight;
+    }
   }
 }
 
@@ -84,39 +84,30 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
   auto it_name = graphs.find(graph_name);
-  if (it_name == graphs.end() || !in)
+  if (it_name == graphs.end() || !it_name->second.hasVertex(vertex) || !in)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  TwoThreeTree< std::string, std::unordered_multimap< size_t, size_t >, std::less< std::string > > sorted;
-  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
-  {
-    if (it->first.second == vertex)
-    {
-      sorted[it->first.first].insert(std::make_pair(it->second, it->second));
-      //sorted.insert(std::make_pair(it->first.first, it->second));
-    }
-  }
-  if (sorted.empty() && !it_name->second.hasVertex(vertex))
-  {
-    throw std::logic_error("<INVALID COMMAND>");
-  }
-  auto it = sorted.begin();
-  if (it != sorted.end())
+
+  BoundMap inbound = it_name->second.getInbound(vertex);
+  auto it = inbound.begin();
+  if (it != inbound.end())
   {
     out << it->first;
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); ++it_weight)
+    it->second.sort();
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
     {
-      out << ' ' << it_weight->first;
+      out << ' ' << *it_weight;
     }
-    ++it;
+    it++;
   }
-  for (; it != sorted.end(); ++it)
+  for (; it != inbound.end(); it++)
   {
     out << '\n' << it->first;
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); ++it_weight)
+    it->second.sort();
+    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
     {
-      out << ' ' << it_weight->second;
+      out << ' ' << *it_weight;
     }
   }
 }
@@ -160,7 +151,7 @@ void alymova::CreateCommand::operator()(GraphsSet& graphs)
 
   Graph graph_new;
   std::string vertex;
-  for (size_t i = 0; i < vertexes_cnt; ++i)
+  for (size_t i = 0; i < vertexes_cnt; i++)
   {
     if (!(in >> vertex))
     {
@@ -200,7 +191,7 @@ void alymova::ExtractCommand::operator()(GraphsSet& graphs)
 
   Graph graph_new;
   std::string vertex;
-  for (size_t i = 0; i < vertexes_cnt; ++i)
+  for (size_t i = 0; i < vertexes_cnt; i++)
   {
     if (!(in >> vertex) || !it_name->second.hasVertex(vertex))
     {
@@ -208,7 +199,7 @@ void alymova::ExtractCommand::operator()(GraphsSet& graphs)
     }
     graph_new.addVertex(vertex);
   }
-  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); ++it)
+  for (auto it = it_name->second.edges.begin(); it != it_name->second.edges.end(); it++)
   {
     if (graph_new.hasVertex(it->first.first) && graph_new.hasVertex(it->first.second))
     {
