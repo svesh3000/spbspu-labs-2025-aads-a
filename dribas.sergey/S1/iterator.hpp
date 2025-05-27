@@ -10,12 +10,12 @@ namespace dribas
   template< class T >
   class List;
 
-  template< class T, bool ifConst >
+  template< class T >
   class Iterator: public std::iterator< std::bidirectional_iterator_tag, T >
   {
     friend class List< T >;
   public:
-    using iter = Iterator< T, ifConst >;
+    using iter = Iterator< T >;
 
     Iterator() noexcept;
     Iterator(const iter&) = default;
@@ -36,66 +36,66 @@ namespace dribas
     explicit Iterator(Node< T >* head) noexcept;
   };
 
-  template< class T, bool ifConst >
-  bool Iterator< T,  ifConst >::operator==(const iter& other) const noexcept
+  template< class T >
+  bool Iterator< T >::operator==(const iter& other) const noexcept
   {
     return head_ == other.head_;
   }
 
-  template< class T, bool ifConst >
-  bool Iterator< T,  ifConst >::operator!=(const iter& other) const noexcept
+  template< class T >
+  bool Iterator< T >::operator!=(const iter& other) const noexcept
   {
     return !(*this == other);
   }
 
-  template< class T, bool ifConst >
-  Iterator< T,  ifConst >::Iterator() noexcept:
+  template< class T >
+  Iterator< T >::Iterator() noexcept:
     head_(nullptr)
   {}
 
-  template< class T, bool ifConst >
-  Iterator< T,  ifConst >::Iterator(Node< T >* head) noexcept:
+  template< class T >
+  Iterator< T >::Iterator(Node< T >* head) noexcept:
     head_(head)
   {}
 
-  template< class T, bool ifConst >
-  typename Iterator< T,  ifConst >::iter& Iterator< T,  ifConst >::operator++() noexcept
+  template< class T >
+  typename Iterator< T >::iter& Iterator< T >::operator++() noexcept
   {
     head_ = head_->next_;
     return *this;
   }
 
-  template< class T, bool ifConst >
-  typename Iterator< T,  ifConst >::iter Iterator< T,  ifConst >::operator++(int) noexcept
+  template< class T >
+  typename Iterator< T >::iter Iterator< T >::operator++(int) noexcept
   {
     iter decr(*this);
     ++(*this);
     return decr;
   }
 
-  template< class T, bool ifConst >
-  typename Iterator< T,  ifConst >::iter& Iterator< T,  ifConst >::operator--() noexcept
+  template< class T >
+  typename Iterator< T >::iter& Iterator< T >::operator--() noexcept
   {
     head_ = head_->prev_;
     return *this;
   }
 
-  template< class T, bool ifConst >
-  typename Iterator< T,  ifConst >::iter Iterator< T,  ifConst >::operator--(int) noexcept
+  template< class T >
+  typename Iterator< T >::iter Iterator< T >::operator--(int) noexcept
   {
     iter precr(*this);
     --(*this);
     return precr;
   }
 
-  template< class T, bool ifConst >
-  T& Iterator< T,  ifConst >::operator*()
+  template< class T >
+  T& Iterator< T >::operator*()
   {
     return head_->data_;
   }
 
-  template< class T, bool ifConst >
-  T* Iterator< T,  ifConst >::operator->()
+  template< class T >
+  T* Iterator< T >::operator->()
   {
     return std::addressof(head_->data_);
   }

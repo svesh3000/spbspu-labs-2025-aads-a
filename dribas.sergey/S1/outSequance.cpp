@@ -46,6 +46,9 @@ void dribas::outSequanceNameSum(std::ostream& out, const Seq& sequance, bool& is
           if (*it_data > std::numeric_limits< int >::max() - sum) {
             isOverflow = true;
           }
+          if (*it_data < std::numeric_limits< int >::min() + sum) {
+            isOverflow = true;
+          }
           sum += *it_data;
         }
       }

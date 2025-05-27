@@ -6,6 +6,7 @@
 #include <list>
 #include "node.hpp"
 #include "iterator.hpp"
+#include "constIterator.hpp"
 
 
 namespace dribas
@@ -13,9 +14,11 @@ namespace dribas
   template< class T >
   class List final
   {
+    friend class Iterator< T >;
+    friend class ConstIterator< T >;
   public:
-    using iter = Iterator< T, false >;
-    using citer = Iterator< T, true >;
+    using iter = Iterator< T >;
+    using citer = ConstIterator< T >;
     List();
     List(const List< T >& rhs);
     List(List< T >&& rhs) noexcept;
@@ -148,13 +151,13 @@ namespace dribas
   }
 
   template< class T >
-  Iterator< T, false > dribas::List< T >::begin() noexcept
+  Iterator< T > dribas::List< T >::begin() noexcept
   {
     return iter(head_);
   }
 
   template< class T >
-  Iterator< T, false > dribas::List< T >::end() noexcept
+  Iterator< T > dribas::List< T >::end() noexcept
   {
     if (tail_) {
       return iter(tail_->next_);
@@ -164,13 +167,13 @@ namespace dribas
   }
 
   template< class T >
-  Iterator< T, true > dribas::List< T >::begin() const noexcept
+  ConstIterator< T > dribas::List< T >::begin() const noexcept
   {
     return citer(head_);
   }
 
   template< class T >
-  Iterator< T, true > dribas::List< T >::end() const noexcept
+  ConstIterator< T > dribas::List< T >::end() const noexcept
   {
     if (tail_) {
       return citer(tail_->next_);
@@ -180,13 +183,13 @@ namespace dribas
   }
 
   template< class T >
-  Iterator< T, true > dribas::List< T >::cbegin() const noexcept
+  ConstIterator< T > dribas::List< T >::cbegin() const noexcept
   {
     return citer(head_);
   }
 
   template< class T >
-  Iterator< T, true > List< T >::cend() const noexcept
+  ConstIterator< T > List< T >::cend() const noexcept
   {
     if (tail_) {
       return citer(tail_->next_);
@@ -239,12 +242,12 @@ namespace dribas
 
   template< class T >
   template< class Predicate >
-  void dribas::List< T >::remove_if(Predicate predicat) noexcept
+  void dribas::List< T >::remove_if(Predicate p) noexcept
   {
     Node< T >* current = head_;
     Node< T >* prev = nullptr;
     while (current) {
-      if (predicat(current->data_)) {
+      if (p(current->data_)) {
         Node< T >* toDelete = current;
         if (prev) {
           prev->next_ = current->next_;
