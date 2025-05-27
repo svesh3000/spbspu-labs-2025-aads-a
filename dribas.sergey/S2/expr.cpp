@@ -2,6 +2,7 @@
 #include <string>
 #include <limits>
 #include <cmath>
+#include <map>
 #include "stack.hpp"
 
 namespace
@@ -89,24 +90,32 @@ namespace
 
   bool isOperator(const std::string& in)
   {
-    return in == "+" || in == "-" || in == "/" || in == "|" || in == "*" || in == "%";
+    const std::string operations[6] = { "+", "-", "*", "/", "%", "|"};
+    for (std::string s: operations)
+    {
+      if (in == s)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
-  int getPrecedence(const std::string& op)
+  bool getPrecedence(const std::string& lhs, const std::string& rhs)
   {
-    if (op == "+" || op == "-") {
-      return 1;
-    } else if (op == "*" || op == "/") {
-      return 2;
-    } else if (op == "|") {
-      return 4;
-    } else if (op == "%") {
-      return 3;
+    std::map< std::string, int > precedence;
+    precedence["+"] = 1;
+    precedence["-"] = 1;
+    precedence["*"] = 2;
+    precedence["/"] = 2;
+    precedence["%"] = 3;
+    precedence["|"] = 4;
+    if (precedence.find(lhs) == precedence.end() || precedence.find(rhs) == precedence.end()) {
+      return false;
     }
-    return 0;
+    return precedence[lhs] > precedence[rhs];
   }
 }
-
 long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 {
   Stack<long long> operandStack;
@@ -198,7 +207,7 @@ dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQ
         operatorStack.pop();
       }
     } else if (isOperator(token)) {
-      while (!operatorStack.empty() && operatorStack.top() != "(" && getPrecedence(operatorStack.top()) >= getPrecedence(token)) {
+      while (!operatorStack.empty() && operatorStack.top() != "(" && getPrecedence(operatorStack.top(), token)) {
         postfixQueue.push(operatorStack.top());
         operatorStack.pop();
       }
@@ -222,7 +231,7 @@ dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQ
   return postfixQueue;
 }
 
-dribas::Queue< std::string > dribas::inputInfix(std::string input)
+dribas::Queue< std::string > dribas::inputInfix(std::string& input)
 {
   Queue< std::string > queue;
 
