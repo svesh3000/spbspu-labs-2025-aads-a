@@ -208,7 +208,7 @@ void alymova::ExtractCommand::operator()(GraphsSet& graphs)
   {
     if (graph_new.hasVertex(it->first.first) && graph_new.hasVertex(it->first.second))
     {
-      graph_new.addEdge(it->first.first, it->first.first, it->second);
+      graph_new.addEdge(it->first.first, it->first.second, it->second);
     }
   }
   graphs.insert(std::make_pair(name_new, graph_new));
