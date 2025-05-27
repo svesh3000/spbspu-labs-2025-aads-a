@@ -167,6 +167,7 @@ void kiselev::create(std::istream& in, Graphs& graphs)
   for (size_t i = 0; i < count; ++i)
   {
     std::string vertex;
+    in >> vertex;
     newGraph.addEdge(vertex, vertex, 0);
   }
   graphs[graph] = newGraph;
