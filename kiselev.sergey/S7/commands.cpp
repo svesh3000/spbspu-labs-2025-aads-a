@@ -21,7 +21,8 @@ namespace
     std::map< std::string, std::string > vertexes = graphIt->second.getVertexes();
     if (vertexes.find(vertex) == vertexes.end())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      out << "\n";
+      return;
     }
     std::map< std::string, std::map< unsigned int, unsigned int > > bound;
     if (b == "out")
@@ -32,11 +33,13 @@ namespace
     {
       bound = graphIt->second.getInBound(vertex);
     }
+    /*
     if (bound.empty())
     {
       out << "\n";
       return;
     }
+    */
     for (auto it = bound.begin(); it != bound.end(); ++it)
     {
       out << it->first;
@@ -103,7 +106,7 @@ void kiselev::vertexes(std::ostream& out, std::istream& in, const Graphs& graphs
   auto it = graphs.find(graph);
   if (it == graphs.end())
   {
-    std::logic_error("<INVALID COMMAND>");
+    throw std::logic_error("<INVALID COMMAND>");
   }
   std::map< std::string, std::string > vertexes = it->second.getVertexes();
   if (vertexes.empty())
