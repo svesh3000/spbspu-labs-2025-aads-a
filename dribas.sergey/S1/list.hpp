@@ -194,7 +194,7 @@ namespace dribas
   }
 
   template< class T >
-  List< T >::List(std::initializer_list< T > ilist): 
+  List< T >::List(std::initializer_list< T > ilist):
   head_(nullptr),
   tail_(nullptr),
   size_(0)
@@ -207,7 +207,7 @@ namespace dribas
   template< class T >
   template< class InputIterator >
   List< T >::List(InputIterator first, InputIterator last):
-    head_(nullptr), 
+    head_(nullptr),
     tail_(nullptr),
     size_(0)
   {
@@ -219,7 +219,7 @@ namespace dribas
 
   template< class T >
   List< T >::List(size_t n, const T& val):
-    head_(nullptr), 
+    head_(nullptr),
     tail_(nullptr),
     size_(0)
   {
