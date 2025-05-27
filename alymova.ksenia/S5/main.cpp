@@ -19,29 +19,29 @@ int main(int args, char** argv)
     return 1;
   }
 
-  TwoThreeTree< int, std::string, std::less< int > > dataset;
-  while (!file.eof() && !file.fail())
-  {
-    int key;
-    std::string value;
-    if (file >> key >> value && !value.empty())
-    {
-      dataset[key] = value;
-    }
-  }
-  if (file.fail() && !file.eof())
-  {
-    std::cerr << "<INCORRECT MAP>\n";
-    return 1;
-  }
-
-  if (dataset.empty())
-  {
-    std::cout << "<EMPTY>\n";
-    return 0;
-  }
   try
   {
+    TwoThreeTree< int, std::string, std::less< int > > dataset;
+    while (!file.eof() && !file.fail())
+    {
+      int key;
+      std::string value;
+      if (file >> key >> value && !value.empty())
+      {
+        dataset[key] = value;
+      }
+    }
+    if (file.fail() && !file.eof())
+    {
+      std::cerr << "<INCORRECT MAP>\n";
+      return 1;
+    }
+
+    if (dataset.empty())
+    {
+      std::cout << "<EMPTY>\n";
+      return 0;
+    }
     std::string round = argv[1];
     TreeSum result;
     if (round == "ascending")
