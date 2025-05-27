@@ -36,7 +36,9 @@ namespace alymova
   };
 
   std::istream& operator>>(std::istream& in, Graph& graph);
-  std::ostream& operator<<(std::ostream& in, const Graph& graph);
+  std::ostream& operator<<(std::ostream& out, const Graph& graph);
+  std::ostream& operator<<(std::ostream& out, const List< std::string >& list);
+  std::ostream& operator<<(std::ostream& out, const BoundMap& bound);
 }
 
 #endif

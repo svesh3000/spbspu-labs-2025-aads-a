@@ -11,16 +11,7 @@ void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
     names.push_back(it->first);
   }
   names.sort();
-  auto it = names.begin();
-  if (it != names.end())
-  {
-    out << *it;
-    it++;
-  }
-  for (; it != names.end(); it++)
-  {
-    out << '\n' << *it;
-  }
+  out << names;
 }
 
 void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
@@ -34,16 +25,7 @@ void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
   }
   List< std::string > copy_vertexes(it_name->second.vertexes);
   copy_vertexes.sort();
-  auto it = copy_vertexes.begin();
-  if (it != copy_vertexes.end())
-  {
-    out << *it;
-    it++;
-  }
-  for (; it != copy_vertexes.end(); it++)
-  {
-    out << '\n' << *it;
-  }
+  out << copy_vertexes;
 }
 
 void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
@@ -55,28 +37,8 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-
   BoundMap outbound = it_name->second.getOutbound(vertex);
-  auto it = outbound.begin();
-  if (it != outbound.end())
-  {
-    out << it->first;
-    it->second.sort();
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
-    {
-      out << ' ' << *it_weight;
-    }
-    it++;
-  }
-  for (; it != outbound.end(); it++)
-  {
-    out << '\n' << it->first;
-    it->second.sort();
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
-    {
-      out << ' ' << *it_weight;
-    }
-  }
+  out << outbound;
 }
 
 void alymova::InboundCommand::operator()(const GraphsSet& graphs)
@@ -88,28 +50,8 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-
   BoundMap inbound = it_name->second.getInbound(vertex);
-  auto it = inbound.begin();
-  if (it != inbound.end())
-  {
-    out << it->first;
-    it->second.sort();
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
-    {
-      out << ' ' << *it_weight;
-    }
-    it++;
-  }
-  for (; it != inbound.end(); it++)
-  {
-    out << '\n' << it->first;
-    it->second.sort();
-    for (auto it_weight = it->second.begin(); it_weight != it->second.end(); it_weight++)
-    {
-      out << ' ' << *it_weight;
-    }
-  }
+  out << inbound;
 }
 
 void alymova::BindCommand::operator()(GraphsSet& graphs)
@@ -216,8 +158,7 @@ alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
   while (in >> name)
   {
     Graph gr;
-    in >> gr;
-    if (in)
+    if (in >> gr)
     {
       graphs.insert(std::make_pair(name, gr));
     }
