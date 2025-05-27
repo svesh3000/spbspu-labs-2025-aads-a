@@ -113,7 +113,7 @@ namespace
     if (precedence.find(lhs) == precedence.end() || precedence.find(rhs) == precedence.end()) {
       return false;
     }
-    return precedence[lhs] > precedence[rhs];
+    return precedence[lhs] >= precedence[rhs];
   }
 }
 long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
