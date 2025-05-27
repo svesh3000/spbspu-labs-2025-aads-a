@@ -19,7 +19,7 @@ namespace
       throw std::logic_error("<INVALID COMMAND>");
     }
     std::map< std::string, std::string > vertexes = graphIt->second.getVertexes();
-    if (vertexes.find(vertex) == vertexes.end())
+    if (vertexes.empty() && vertexes.find(vertex) == vertexes.end())
     {
       throw std::logic_error("INVALID COMMAND");
     }
