@@ -1,5 +1,43 @@
 #include "graph.hpp"
 
+void alymova::Graph::addEdge(std::string vertex1, std::string vertex2, size_t weight)
+{
+  edges.insert(std::make_pair(std::make_pair(vertex1, vertex2), weight));
+  addVertex(vertex1);
+  addVertex(vertex2);
+}
+
+void alymova::Graph::cutEdge(std::string vertex1, std::string vertex2, size_t weight)
+{
+  std::pair< std::string, std::string > vertex_pair(vertex1, vertex2);
+  for (auto it = edges.begin(); it != edges.end(); ++it)
+  {
+    if (it->first == vertex_pair && it->second == weight)
+    {
+      edges.erase(it);
+      return;
+    }
+  }
+  throw std::logic_error("<INVALID COMMAND>");
+}
+
+void alymova::Graph::addVertex(std::string vertex)
+{
+  vertexes.insert(std::make_pair(vertex, vertex));
+}
+
+bool alymova::Graph::hasVertex(std::string vertex)
+{
+  return vertexes.find(vertex) != vertexes.end();
+}
+
+void alymova::Graph::merge(const Graph& other)
+{
+  for (auto it = other.edges.begin(); it != other.edges.end(); ++it)
+  {
+    addEdge(it->first.first, it->first.second, it->second);
+  }
+}
 std::istream& alymova::operator>>(std::istream& in, Graph& graph)
 {
   std::istream::sentry s(in);
@@ -9,16 +47,14 @@ std::istream& alymova::operator>>(std::istream& in, Graph& graph)
   }
   size_t cnt_edges;
   in >> cnt_edges;
+
   std::string vertex1, vertex2;
   size_t weidth;
   for (size_t i = 0; i < cnt_edges && in; i++)
   {
-    in >> vertex1 >> vertex2 >> weidth;
-    if (in)
+    if (in >> vertex1 >> vertex2 >> weidth)
     {
-      graph.edges.insert(std::make_pair(std::make_pair(vertex1, vertex2), weidth));
-      graph.vertexes.insert(std::make_pair(vertex1, vertex1));
-      graph.vertexes.insert(std::make_pair(vertex2, vertex2));
+      graph.addEdge(vertex1, vertex2, weidth);
     }
   }
   return in;
