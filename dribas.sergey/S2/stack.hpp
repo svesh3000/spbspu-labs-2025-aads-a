@@ -89,7 +89,6 @@ namespace dribas
       capacity_ = other.capacity_;
       size_ = other.size_;
       stack_ = other.stack_;
-      
       other.capacity_ = 0;
       other.size_ = 0;
       other.stack_ = nullptr;

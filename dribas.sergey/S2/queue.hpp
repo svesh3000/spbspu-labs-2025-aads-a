@@ -105,7 +105,7 @@ namespace dribas
       head_ = other.head_;
       tail_ = other.tail_;
       queue_ = other.queue_;
-      
+
       other.size_ = 0;
       other.capacity_ = 0;
       other.head_ = 0;
