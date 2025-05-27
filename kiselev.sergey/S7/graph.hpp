@@ -82,7 +82,7 @@ namespace kiselev
         {
           for (auto weightIt = edgeIt->second.begin(); weightIt != edgeIt->second.end(); ++weightIt)
           {
-            result[edgeIt->first.second][*weightIt]++;
+            result[edgeIt->first.first][*weightIt]++;
           }
         }
       }
