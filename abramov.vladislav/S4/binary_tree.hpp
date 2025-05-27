@@ -24,7 +24,7 @@ namespace abramov
     ConstIterator< Key, Value > cbegin() const;
     ConstIterator< Key, Value > cend() const;
     Iterator< Key, Value > find(const Key &k) noexcept;
-    ConstIterator< Key, Value > find(const Key &k, bool b = true) noexcept;
+    ConstIterator< Key, Value > сfind(const Key &k) noexcept;
     size_t count(const Key &k) const noexcept;
     range_t< Key, Value > equal_range(const Key &k) noexcept;
     crange_t< Key, Value > equal_range(const Key &k, bool b = true) noexcept;
@@ -56,62 +56,62 @@ namespace abramov
   {
     if (empty())
     {
-      root_ = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_, 1);
+      root_ = new Node< Key, Value >{ std::make_pair(key, value), nullptr, fake_, fake_ };
       ++size_;
       return;
     }
     Node< Key, Value > *root = root_;
-    Node< Key, Value > *node = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_, -1);
-    while (root->left != fake_ && root->right != fake_)
+    Node< Key, Value > *node = new Node< Key, Value >{ std::make_pair(key, value), nullptr, fake_, fake_ };
+    while (root->left_ != fake_ && root->right_ != fake_)
     {
-      if (cmp(key, root->data_))
+      if (cmp_(key, root->data_.first))
       {
-        root = root->left;
+        root = root->left_;
       }
       else
       {
-        root = root->right;
+        root = root->right_;
       }
     }
-    if (cmp(key, root->data))
+    if (cmp_(key, root->data_.first))
     {
-      if (root->left != fake_)
+      if (root->left_ != fake_)
       {
-        root = root->left;
-        if (cmp(key, root->data))
+        root = root->left_;
+        if (cmp_(key, root->data_.first))
         {
-          root->left = node;
+          root->left_ = node;
         }
         else
         {
-          root->rigth = node;
+          root->right_ = node;
         }
       }
       else
       {
-        root->left = node;
+        root->left_ = node;
       }
     }
     else
     {
-      if (root->right != fake_)
+      if (root->right_ != fake_)
       {
-        root = root->right;
-        if (cmp(key, root->data_))
+        root = root->right_;
+        if (cmp_(key, root->data_.first))
         {
-          root->left = node;
+          root->left_ = node;
         }
         else
         {
-          root->right = node;
+          root->right_ = node;
         }
       }
       else
       {
-        root->right = node;
+        root->right_ = node;
       }
     }
-    node->parent = root;
+    node->parent_ = root;
     ++size_;
   }
 
@@ -149,7 +149,7 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::find(const Key &k, bool b) noexcept
+  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::сfind(const Key &k) noexcept
   {
     Node< Key, Value > *node = findNode(k);
     return ConstIterator< Key, Value >(node);
@@ -243,13 +243,13 @@ namespace abramov
     Node< Key, Value > *root = root_;
     while (root != fake_)
     {
-      if (cmp(k, root->data_))
+      if (cmp_(k, root->data_.first))
       {
-        root = root->left;
+        root = root->left_;
       }
-      else if (!cmp(k, root->data_))
+      else if (!cmp_(k, root->data_.first))
       {
-        root = root->right;
+        root = root->right_;
       }
       else
       {
