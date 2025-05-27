@@ -42,7 +42,10 @@ namespace
       out << it->first;
       for (auto weightIt = it->second.begin(); weightIt != it->second.end(); ++weightIt)
       {
-        out << " " << weightIt->first;
+        for (size_t i = 0; i < weightIt->second; ++i)
+        {
+          out << " " << weightIt->first;
+        }
       }
       out << "\n";
     }
