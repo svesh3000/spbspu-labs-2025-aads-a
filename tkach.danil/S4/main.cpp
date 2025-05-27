@@ -2,6 +2,8 @@
 #include <fstream>
 #include <limits>
 #include <cstddef>
+#include <map>
+#include <functional>
 #include "AVLtree.hpp"
 #include "commands.hpp"
 
@@ -45,31 +47,17 @@ int main(const int argc, const char* const* const argv)
     return 1;
   }
   AvlTree< std::string, AvlTree< size_t, std::string > > data = inputDataSets(in);
+  std::map< std::string, std::function< void() > > cmds;
+  cmds["print"] = std::bind(print, std::ref(std::cin), std::cref(data), std::ref(std::cout));
+  cmds["intersect"] = std::bind(intersect, std::ref(std::cin), std::ref(data));
+  cmds["complement"] = std::bind(complement, std::ref(std::cin), std::ref(data));
+  cmds["unionTree"] = std::bind(unionTree, std::ref(std::cin), std::ref(data));
   std::string command;
-  while (std::cin >> command)
+  while (!(std::cin >> command).eof())
   {
     try
     {
-      if (command == "print")
-      {
-        print(std::cin, data, std::cout);
-      }
-      else if (command == "intersect")
-      {
-        intersect(std::cin, data);
-      }
-      else if (command == "complement")
-      {
-        complement(std::cin, data);
-      }
-      else if (command == "union")
-      {
-        unionTree(std::cin, data);
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      cmds.at(command)();
     }
     catch (const std::out_of_range&)
     {
@@ -83,6 +71,5 @@ int main(const int argc, const char* const* const argv)
     std::cin.clear();
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
-
   return 0;
 }
