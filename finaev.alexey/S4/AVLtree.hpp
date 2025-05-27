@@ -25,7 +25,7 @@ namespace finaev
     iter end() noexcept;
     cIter cBegin() const noexcept;
     cIter cEnd() const noexcept;
-    
+
     iter find(const key&);
     cIter find(const key&) const;
     void swap(AVLtree< key, value, Cmp >&) noexcept;
@@ -52,7 +52,7 @@ namespace finaev
     node_t* rotateRightLeft(node_t* root);
     node_t* rotateLeftRight(node_t* root);
     int getBalance(node_t* root);
-    node_t* balance(node_t* root); 
+    node_t* balance(node_t* root);
     std::pair< iter, bool > treeInsert(const key&, const value&);
   };
 
@@ -177,19 +177,19 @@ namespace finaev
   typename AVLtree< key, value, Cmp >::iter AVLtree< key, value, Cmp >::find(const key& k)
   {
     node_t* current = fakeroot_->left;
-    while (current) 
+    while (current)
     {
-      if (cmp_(k, current->data.first)) 
+      if (cmp_(k, current->data.first))
       {
         current = current->left;
-      } 
-      else if (cmp_(current->data.first, k)) 
+      }
+      else if (cmp_(current->data.first, k))
       {
         current = current->right;
-      } 
-      else 
+      }
+      else
       {
-        return iter(current); 
+        return iter(current);
       }
     }
     return end();
@@ -199,19 +199,19 @@ namespace finaev
   typename AVLtree< key, value, Cmp >::cIter AVLtree< key, value, Cmp >::find(const key& k) const
   {
     const node_t* current = fakeroot_->left;
-    while (current) 
+    while (current)
     {
-      if (cmp_(k, current->data.first)) 
+      if (cmp_(k, current->data.first))
       {
         current = current->left;
-      } 
-      else if (cmp_(current->data.first, k)) 
+      }
+      else if (cmp_(current->data.first, k))
       {
         current = current->right;
-      } 
-      else 
+      }
+      else
       {
-        return cIter(current); 
+        return cIter(current);
       }
     }
     return cEnd();
@@ -245,7 +245,7 @@ namespace finaev
     if (!root)
     {
       return;
-    }  
+    }
     int leftHeight = root->left ? root->left->height : 0;
     int rightHeight = root->right ? root->right->height : 0;
     root->height = 1 + std::max(leftHeight, rightHeight);
@@ -260,23 +260,23 @@ namespace finaev
     }
     node_t* newRoot = root->left;
     root->left = newRoot->right;
-    if (newRoot->right) 
+    if (newRoot->right)
     {
       newRoot->right->parent = root;
     }
     newRoot->parent = root->parent;
-    if (root == fakeroot_->left) 
+    if (root == fakeroot_->left)
     {
       fakeroot_->left = newRoot;
-      root_ = newRoot; 
-    } 
+      root_ = newRoot;
+    }
     else if (root->parent)
     {
-      if (root == root->parent->left) 
+      if (root == root->parent->left)
       {
         root->parent->left = newRoot;
-      } 
-      else 
+      }
+      else
       {
         root->parent->right = newRoot;
       }
@@ -297,23 +297,23 @@ namespace finaev
     }
     node_t* newRoot = root->right;
     root->right = newRoot->left;
-    if (newRoot->left) 
+    if (newRoot->left)
     {
       newRoot->left->parent = root;
     }
     newRoot->parent = root->parent;
-    if (root == fakeroot_->left) 
+    if (root == fakeroot_->left)
     {
       fakeroot_->left = newRoot;
-      root_ = newRoot; 
-    } 
+      root_ = newRoot;
+    }
     else if (root->parent)
     {
-      if (root == root->parent->left) 
+      if (root == root->parent->left)
       {
         root->parent->left = newRoot;
-      } 
-      else 
+      }
+      else
       {
         root->parent->right = newRoot;
       }
@@ -361,7 +361,7 @@ namespace finaev
     if (!root)
     {
       return 0;
-    } 
+    }
     int leftH = root->left ? root->left->height : 0;
     int rightH = root->right ? root->right->height : 0;
     return leftH - rightH;
@@ -374,24 +374,24 @@ namespace finaev
     {
       updateHeight(root);
       int balance = getBalance(root);
-      if (balance > 1) 
+      if (balance > 1)
       {
-        if (getBalance(root->left) >= 0) 
+        if (getBalance(root->left) >= 0)
         {
           root = rotateRight(root);
-        } 
-        else 
+        }
+        else
         {
           root = rotateLeftRight(root);
         }
       }
-      else if (balance < -1) 
+      else if (balance < -1)
       {
-        if (getBalance(root->right) <= 0) 
+        if (getBalance(root->right) <= 0)
         {
           root = rotateLeft(root);
-        } 
-        else 
+        }
+        else
         {
           root = rotateRightLeft(root);
         }
@@ -430,11 +430,11 @@ namespace finaev
       }
     }
     node_t* newNode = new node_t(k, v, parent);
-    if (cmp_(k, parent->data.first)) 
+    if (cmp_(k, parent->data.first))
     {
       parent->left = newNode;
-    } 
-    else 
+    }
+    else
     {
       parent->right = newNode;
     }
