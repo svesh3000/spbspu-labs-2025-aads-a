@@ -54,6 +54,27 @@ namespace
     }
   }
 }
+
+void kiselev::input(std::istream& in, Graphs& graphs)
+{
+  std::string graph;
+  while (in >> graph)
+  {
+    size_t count;
+    in >> count;
+    Graph newGraph;
+    for (size_t i = 0; i < count; i++)
+    {
+      std::string v1;
+      std::string v2;
+      unsigned int weight;
+      in >> v1 >> v2 >> weight;
+      newGraph.addEdge(v1, v2, weight);
+    }
+    graphs[graph] = newGraph;
+  }
+}
+
 void kiselev::graphs(std::ostream& out, const Graphs& graphs)
 {
   for (auto it = graphs.begin(); it != graphs.end(); ++it)

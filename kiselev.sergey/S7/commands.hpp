@@ -8,6 +8,7 @@
 namespace kiselev
 {
   using Graphs = std::map< std::string, Graph >;
+  void input(std::istream&, Graphs&);
   void graphs(std::ostream&, const Graphs&);
   void vertexes(std::ostream&, std::istream&, const Graphs&);
   void outBound(std::ostream&, std::istream&, const Graphs&);
