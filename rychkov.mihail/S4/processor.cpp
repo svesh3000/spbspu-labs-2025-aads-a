@@ -43,7 +43,7 @@ bool rychkov::S4ParseProcessor::init(ParserContext& context, int argc, char** ar
 bool rychkov::S4ParseProcessor::print(ParserContext& context)
 {
   std::string name;
-  if (!(context.in >> name) || !context.eol())
+  if (!(context.in >> name) || !eol(context.in))
   {
     return false;
   }
@@ -68,7 +68,7 @@ bool rychkov::S4ParseProcessor::print(ParserContext& context)
 bool rychkov::S4ParseProcessor::make_complement(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !eol(context.in) || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
@@ -89,7 +89,7 @@ bool rychkov::S4ParseProcessor::make_complement(ParserContext& context)
 bool rychkov::S4ParseProcessor::make_intersect(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !eol(context.in) || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }
@@ -110,7 +110,7 @@ bool rychkov::S4ParseProcessor::make_intersect(ParserContext& context)
 bool rychkov::S4ParseProcessor::make_union(ParserContext& context)
 {
   std::string name, lhs, rhs;
-  if (!(context.in >> name >> lhs >> rhs) || !context.eol() || !map.contains(lhs) || !map.contains(rhs))
+  if (!(context.in >> name >> lhs >> rhs) || !eol(context.in) || !map.contains(lhs) || !map.contains(rhs))
   {
     return false;
   }

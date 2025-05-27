@@ -8,13 +8,14 @@
 
 namespace rychkov
 {
+  bool eol(std::istream& in);
   struct ParserContext
   {
     std::istream& in;
     std::ostream& out;
     std::ostream& err;
 
-    bool eol();
+    void parse_error();
   };
   template< class Proc >
   class Parser
@@ -22,7 +23,7 @@ namespace rychkov
   public:
     using parser_processor = Proc;
     using call_signature = bool(parser_processor::*)(ParserContext&);
-    using map_type = rychkov::Map< std::string, call_signature >;
+    using map_type = Map< std::string, call_signature >;
 
     parser_processor processor;
     ParserContext context;
@@ -31,18 +32,34 @@ namespace rychkov
     Parser(ParserContext parse_context, P proc, M&& call_map):
       processor(std::forward< P >(proc)),
       context(parse_context),
-      call_map_(std::forward< M >(call_map))
+      call_map_(std::forward< M >(call_map)),
+      has_own_parser_(false)
+    {}
+    template< class P = parser_processor, class M = map_type >
+    Parser(ParserContext parse_context, P proc, M&& call_map, call_signature own_parser):
+      processor(std::forward< P >(proc)),
+      context(parse_context),
+      call_map_(std::forward< M >(call_map)),
+      has_own_parser_(true),
+      extern_parser_(own_parser)
     {}
 
     bool available() const noexcept
     {
-      return !call_map_.empty() && !context.in.eof() && !context.in.bad();
+      return !call_map_.empty() && context.in;
     }
     bool run()
     {
-      if (available() && context.in.fail())
+      if (has_own_parser_)
       {
-        context.in.clear();
+        if ((processor.*extern_parser_)(context))
+        {
+          return true;
+        }
+      }
+      if (!available())
+      {
+        return false;
       }
       std::string command;
       if (context.in >> command)
@@ -52,19 +69,19 @@ namespace rychkov
         {
           if ((call_p != call_map_.end()) && ((processor.*(call_p->second))(context)))
           {
-            return available();
+            return true;
           }
         }
         catch(...)
         {}
-        context.out << "<INVALID COMMAND>\n";
-        context.in.clear(context.in.rdstate() & ~std::ios::failbit);
-        context.in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        context.parse_error();
       }
-      return available();
+      return true;
     }
   private:
     const map_type call_map_;
+    bool has_own_parser_;
+    call_signature extern_parser_;
   };
 }
 
