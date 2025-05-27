@@ -18,7 +18,7 @@ namespace
         new (new_data + i) T(data[i + begin]);
       }
     }
-    catch(...)
+    catch (...)
     {
       for (size_t j = 0; j < i; ++j)
       {

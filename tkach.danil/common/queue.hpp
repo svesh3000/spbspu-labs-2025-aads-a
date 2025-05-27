@@ -10,12 +10,6 @@ namespace tkach
   class Queue
   {
   public:
-    Queue() = default;
-    Queue(const Queue< T >&) = default;
-    Queue(Queue< T >&&) noexcept = default;
-    ~Queue() = default;
-    Queue< T >& operator=(Queue< T >&&) noexcept = default;
-    Queue< T >& operator=(const Queue< T >&) = default;
     void pop();
     void push(const T& data);
     void push(T&& data);
