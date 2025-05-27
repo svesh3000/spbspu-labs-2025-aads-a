@@ -11,11 +11,11 @@ namespace dribas
   template< class Key, class T, class Compare = std::less< Key > >
   class Iterator
   {
-    friend class AVLTree< Key,T, Compare >;
+    friend class AVLTree< Key, T, Compare >;
   public:
     using valueType = std::pair< Key, T >;
-    using Tree = AVLTree< Key, T, Compare >;
-    using Node_t = Node< Key, T >;
+    using TreeType = AVLTree< Key, T, Compare >;
+    using NodeType = Node< Key, T >;
 
     Iterator() noexcept;
     valueType& operator*() noexcept;
@@ -25,25 +25,23 @@ namespace dribas
     Iterator& operator--() noexcept;
     Iterator operator--(int) noexcept;
 
-    bool operator==(const Iterator& other) const noexcept;
-    bool operator!=(const Iterator& other) const noexcept;
+    bool operator==(const Iterator&) const noexcept;
+    bool operator!=(const Iterator&) const noexcept;
 
   private:
-    Node_t* node_;
-    const Tree* tree_;
-    explicit Iterator(Node< Key, T >* node, const Tree* tree) noexcept;
+    NodeType* node_;
+    const TreeType* tree_;
+    explicit Iterator(NodeType*, const TreeType*) noexcept;
   };
 
   template< class Key, class T, class Compare >
   Iterator< Key, T, Compare >::Iterator() noexcept:
-    node_(nullptr),
-    tree_(nullptr)
+    node_(nullptr), tree_(nullptr)
   {}
 
   template< class Key, class T, class Compare >
-  Iterator< Key, T, Compare >::Iterator(Node< Key, T >* node, const Tree* tree) noexcept:
-    node_(node),
-    tree_(tree)
+  Iterator< Key, T, Compare >::Iterator(NodeType* node, const TreeType* tree) noexcept:
+    node_(node), tree_(tree)
   {}
 
   template< class Key, class T, class Compare >
@@ -58,8 +56,8 @@ namespace dribas
     return std::addressof(node_->value);
   }
 
-  template< class Key, class T, class Compare >
-  Iterator< Key, T, Compare >& Iterator< Key, T, Compare >::operator++() noexcept
+  template <class Key, class T, class Compare>
+  Iterator<Key, T, Compare>& Iterator<Key, T, Compare>::operator++() noexcept
   {
     if (!node_->right->isFake) {
       node_ = node_->right;
@@ -67,34 +65,47 @@ namespace dribas
         node_ = node_->left;
       }
     } else {
-      Node< Key, T >* prev = node_;
-      node_ = node_->parent;
-      while (node_ && prev == node_->right) {
-        prev = node_;
-        node_ = node_->parent;
+      auto* parent = node_->parent;
+      while (parent != nullptr && node_ == parent->right) {
+        node_ = parent;
+        parent = parent->parent;
       }
+      node_= parent;
+    }
+    if (!node_) {
+      node_ = tree_->fakeleaf_;
     }
     return *this;
   }
 
-  template< class Key, class T, class Compare >
-  Iterator< Key, T, Compare >& Iterator< Key, T, Compare >::operator--() noexcept
+  template <class Key, class T, class Compare>
+  Iterator<Key, T, Compare>& Iterator<Key, T, Compare>::operator--() noexcept
   {
+    if (node_ == tree_->fakeleaf_) {
+      node_ = tree_->root_;
+      while (node_ != tree_->fakeleaf_ && !node_->right->isFake) {
+          node_ = node_->right;
+      }
+      return *this;
+    
+    }
     if (!node_->left->isFake) {
       node_ = node_->left;
       while (!node_->right->isFake) {
         node_ = node_->right;
       }
     } else {
-      Node< Key, T >* before;
-      node_ = node_->parent;
-      while (node_ && before == node_->left) {
-        before = node_;
+      while ((node_->parent != nullptr) && (node_->parent->left == node_)) {
         node_ = node_->parent;
+      }
+      node_ = node_->parent;
+      if (!node_) {
+        node_ = tree_->fakeleaf_;
       }
     }
     return *this;
   }
+
 
   template < class Key, class T, class Compare >
   Iterator< Key, T, Compare > Iterator< Key, T, Compare >::operator--(int) noexcept

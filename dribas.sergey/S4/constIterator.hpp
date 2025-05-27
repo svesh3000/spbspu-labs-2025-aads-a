@@ -31,8 +31,8 @@ namespace dribas
 
   private:
     const Node< Key, T >* node_;
-    const Tree* tree_;
-    explicit ConstIterator(const Node< Key, T >*, const Tree*) noexcept;
+    const Node< Key, T >* tree_;
+    explicit ConstIterator(const Node< Key, T >*, const AVLTree< Key, T, Compare >*) noexcept;
   };
 
   template < class Key, class T, class Compare >
@@ -42,14 +42,12 @@ namespace dribas
 
   template < class Key, class T, class Compare >
   ConstIterator< Key, T, Compare >::ConstIterator() noexcept:
-    node_(nullptr),
-    tree_(nullptr)
+    node_(nullptr), tree_(nullptr)
   {}
 
   template < class Key, class T, class Compare >
-  ConstIterator<Key, T, Compare>::ConstIterator(const Node<Key, T>* node, const Tree* tree) noexcept:
-    node_(node),
-    tree_(tree)
+  ConstIterator<Key, T, Compare>::ConstIterator(const Node< Key, T >* node, const AVLTree< Key, T, Compare >* tree) noexcept:
+    node_(node), tree_(tree)
   {}
 
   template < class Key, class T, class Compare >
@@ -67,18 +65,21 @@ namespace dribas
   template <class Key, class T, class Compare>
   ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator++() noexcept
   {
-    if (!node_->right->isFake) {
+    if (node_->right != tree_->fakeleaf_) {
       node_ = node_->right;
       while (!node_->left->isFake) {
         node_ = node_->left;
       }
     } else {
-      const Node< Key, T >* prev = node_;
-      node_ = node_->parent;
-      while (node_ && prev == node_->right) {
-        prev = node_;
-        node_ = node_->parent;
+      auto* parent = node_->parent;
+      while (parent != nullptr && node_ == parent->right) {
+        node_ = parent;
+        parent = parent->parent;
       }
+      node_= parent;
+    }
+    if (!node_) {
+      node_ = tree_->fakeleaf_;
     }
     return *this;
   }
@@ -86,18 +87,27 @@ namespace dribas
   template <class Key, class T, class Compare>
   ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator--() noexcept
   {
+    if (node_ == tree_->fakeleaf_) {
+      node_ = tree_->root_;
+      while (node_ != tree_->fakeleaf_ && !node_->right->isFake) {
+          node_ = node_->right;
+      }
+      return *this;
+    
+    }
     if (!node_->left->isFake) {
       node_ = node_->left;
       while (!node_->right->isFake) {
         node_ = node_->right;
       }
     } else {
-      const Node< Key, T >* before;
-      node_ = node_->parent;
-      while (node_ && before == node_->left) {
-        before = node_;
+      while ((node_->parent != nullptr) && (node_->parent->left == node_)) {
         node_ = node_->parent;
-      } 
+      }
+      node_ = node_->parent;
+      if (!node_) {
+        node_ = tree_->fakeleaf_;
+      }
     }
     return *this;
   }
