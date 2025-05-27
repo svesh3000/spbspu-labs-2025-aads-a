@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     std::cout << "error open file: " << filename << "\n";
     return 1;
   }
-  std::map< std::string, std::map < int, std::string > > mainDict;
+  finaev::AVLtree< std::string, finaev::AVLtree < int, std::string > > mainDict;
   finaev::inDictionaries(inputFile, mainDict);
   inputFile.close();
   while (true)

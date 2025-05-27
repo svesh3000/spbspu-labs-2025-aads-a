@@ -8,7 +8,7 @@ void finaev::inDictionaries(std::istream& in, mainDict& dict)
     in >> name;
     std::string data = "";
     int key = 0;
-    std::map < int, std::string > temp;
+    finaev::AVLtree< int, std::string > temp;
     while (in && in.peek() != '\n')
     {
       in >> key >> data;

@@ -6,14 +6,14 @@ void finaev::printCMD(std::ostream& out, const mainDict& dict)
 {
   std::string name = "";
   std::cin >> name;
-  const std::map < int, std::string >& current = dict.at(name);
+  const finaev::AVLtree< int, std::string >& current = dict.at(name);
   if (current.empty())
   {
     std::cout << "<EMPTY>\n";
     return;
   }
   out << name;
-  for (auto i = current.cbegin(); i != current.cend(); ++i)
+  for (auto i = current.cBegin(); i != current.cEnd(); ++i)
   {
     out << " " << (*i).first << " " << (*i).second;
   }
@@ -27,7 +27,7 @@ void finaev::complementCMD(mainDict& dict)
   std::cin >> name >> dictName1 >> dictName2;
   auto dict1 = dict.at(dictName1);
   auto dict2 = dict.at(dictName2);
-  std::map < int, std::string > temp;
+  finaev::AVLtree< int, std::string > temp;
   for (auto i = dict1.begin(); i != dict1.end(); ++i)
   {
     int key = (*i).first;
@@ -45,7 +45,7 @@ void finaev::intersectCMD(mainDict& dict)
   std::cin >> name >> dictName1 >> dictName2;
   auto dict1 = dict.at(dictName1);
   auto dict2 = dict.at(dictName2);
-  std::map< int, std::string > temp;
+  finaev::AVLtree< int, std::string > temp;
   for (auto i = dict1.begin(); i != dict1.end(); ++i)
   {
     int key = (*i).first;
@@ -63,7 +63,7 @@ void finaev::unionCMD(mainDict& dict)
   std::cin >> name >> dictName1 >> dictName2;
   auto dict1 = dict.at(dictName1);
   auto dict2 = dict.at(dictName2);
-  std::map< int, std::string > temp;
+  finaev::AVLtree< int, std::string > temp;
   for (auto i = dict1.begin(); i != dict1.end(); ++i)
   {
     temp.insert(*i);
