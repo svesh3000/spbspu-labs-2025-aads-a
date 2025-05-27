@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
-#include "list.hpp"
-#include "iterators.hpp"
-#include "listNode.hpp"
+#include <list/list.hpp>
+#include <list/iterators.hpp>
+#include <list/listNode.hpp>
 
 BOOST_AUTO_TEST_CASE(test_constructors_operators)
 {
