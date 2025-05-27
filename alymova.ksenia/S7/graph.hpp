@@ -5,10 +5,11 @@
 #include <unordered_map>
 #include <utility>
 #include <tree/tree-2-3.hpp>
+#include <list/list.hpp>
 
 namespace alymova
 {
-  using BoundMap = TwoThreeTree< std::string, std::unordered_multimap< size_t, size_t >, std::less< std::string > >;
+  using BoundMap = TwoThreeTree< std::string, List< size_t >, std::less< std::string > >;
 
   struct MyHash
   {
@@ -23,12 +24,12 @@ namespace alymova
   struct Graph
   {
     std::unordered_multimap< std::pair< std::string, std::string >, size_t, MyHash > edges;
-    TwoThreeTree< std::string, std::string, std::less< std::string > > vertexes;
+    mutable List< std::string > vertexes;
 
     void addEdge(std::string vertex1, std::string vertex2, size_t weight);
     void cutEdge(std::string vertex1, std::string vertex2, size_t weight);
     void addVertex(std::string vertex);
-    bool hasVertex(std::string vertex);
+    bool hasVertex(std::string vertex) const;
     BoundMap getOutBound(std::string vertex);
     BoundMap getInbound(std::string vertex);
     void merge(const Graph& other);

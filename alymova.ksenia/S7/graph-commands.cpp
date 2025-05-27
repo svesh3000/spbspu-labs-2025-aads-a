@@ -1,21 +1,23 @@
 #include "graph-commands.hpp"
 #include <exception>
 #include <tree/tree-2-3.hpp>
+#include <list/list.hpp>
 
 void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
 {
-  TwoThreeTree< std::string, std::string, std::less< std::string > > sorted;
+  List< std::string > names;
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
-    sorted.insert(std::make_pair(it->first, it->first));
+    names.push_back(it->first);
   }
-  auto it = sorted.begin();
-  if (it != sorted.end())
+  names.sort();
+  auto it = names.begin();
+  if (it != names.end())
   {
     out << it->first;
     ++it;
   }
-  for (; it != sorted.end(); ++it)
+  for (; it != names.end(); ++it)
   {
     out << '\n' << it->first;
   }
@@ -30,15 +32,17 @@ void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  auto it = it_name->second.vertexes.begin();
-  if (it != it_name->second.vertexes.end())
+  List< std::string > copy_vertexes(it_name->second.vertexes);
+  copy_vertexes.sort();
+  auto it = copy_vertexes.begin();
+  if (it != copy_vertexes.end())
   {
-    out << it->first;
+    out << *it;
     ++it;
   }
-  for (; it != it_name->second.vertexes.end(); ++it)
+  for (; it != copy_vertexes.end(); ++it)
   {
-    out << '\n' << it->first;
+    out << '\n' << *it;
   }
 }
 
@@ -59,7 +63,7 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
       sorted.insert(std::make_pair(it->first.second, it->second));
     }
   }
-  if (sorted.empty() && it_name->second.vertexes.find(vertex) == it_name->second.vertexes.end())
+  if (sorted.empty() && !it_name->second.hasVertex(vertex))
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -93,7 +97,7 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
       //sorted.insert(std::make_pair(it->first.first, it->second));
     }
   }
-  if (sorted.empty() && it_name->second.vertexes.find(vertex) == it_name->second.vertexes.end())
+  if (sorted.empty() && !it_name->second.hasVertex(vertex))
   {
     throw std::logic_error("<INVALID COMMAND>");
   }

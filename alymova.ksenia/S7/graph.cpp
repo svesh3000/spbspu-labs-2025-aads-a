@@ -23,12 +23,20 @@ void alymova::Graph::cutEdge(std::string vertex1, std::string vertex2, size_t we
 
 void alymova::Graph::addVertex(std::string vertex)
 {
-  vertexes.insert(std::make_pair(vertex, vertex));
+  vertexes.push_back(vertex);
 }
 
-bool alymova::Graph::hasVertex(std::string vertex)
+bool alymova::Graph::hasVertex(std::string vertex) const
 {
-  return vertexes.find(vertex) != vertexes.end();
+  for (auto it = vertexes.begin(); it != vertexes.end(); ++it)
+  {
+    if (*it == vertex)
+    {
+      return true;
+    }
+  }
+  return false;
+  //return vertexes.find(vertex) != vertexes.end();
 }
 
 void alymova::Graph::merge(const Graph& other)

@@ -1,7 +1,6 @@
 #ifndef ITERATORS_HPP
 #define ITERATORS_HPP
 #include <cassert>
-//#include "list.hpp"
 #include "listNode.hpp"
 
 namespace alymova
