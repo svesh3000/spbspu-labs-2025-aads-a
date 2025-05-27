@@ -40,8 +40,6 @@ namespace abramov
 
     void clearNodes(Node< Key, Value > *root) noexcept;
     Node< Key, Value > *getMin(Node< Key, Value > *root) noexcept;
-    Node< Key, Value > *rotateLeft(Node< Key, Value > *root) noexcept;
-    Node< Key, Value > *rotateRight(Node< Key, Value > *root) noexcept;
     Node< Key, Value > *findNode(const Key &k) noexcept;
   };
 
@@ -237,36 +235,6 @@ namespace abramov
       root = root->left_;
     }
     return root;
-  }
-
-  template< class Key, class Value, class Cmp >
-  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::rotateLeft(Node< Key, Value > *root) noexcept
-  {
-    if (root == fake_ || !root || !root->right_)
-    {
-      return root;
-    }
-    Node< Key, Value > *new_root = root->right_;
-    root->parent_ = new_root;
-    new_root->parent_ = root->parent_;
-    root->right_ = new_root->left_;
-    new_root->left_ = root;
-    return new_root;
-  }
-
-  template< class Key, class Value, class Cmp >
-  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::rotateRight(Node< Key, Value > *root) noexcept
-  {
-    if (root == fake_ || !root || !root->left_)
-    {
-      return root;
-    }
-    Node< Key, Value > *new_root = root->left_;
-    root->parent_ = new_root;
-    new_root->parent_ = root->parent_;
-    root->left_ = new_root->right_;
-    new_root->right = root;
-    return new_root;
   }
 
   template< class Key, class Value, class Cmp >
