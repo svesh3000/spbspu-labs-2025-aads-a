@@ -51,7 +51,7 @@ int main(const int argc, const char* const* const argv)
   cmds["print"] = std::bind(print, std::ref(std::cin), std::cref(data), std::ref(std::cout));
   cmds["intersect"] = std::bind(intersect, std::ref(std::cin), std::ref(data));
   cmds["complement"] = std::bind(complement, std::ref(std::cin), std::ref(data));
-  cmds["unionTree"] = std::bind(unionTree, std::ref(std::cin), std::ref(data));
+  cmds["union"] = std::bind(unionTree, std::ref(std::cin), std::ref(data));
   std::string command;
   while (!(std::cin >> command).eof())
   {
