@@ -313,3 +313,71 @@ BOOST_AUTO_TEST_CASE(assignRangeFromEmpty)
   BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(ConstructWithZeroSize)
+{
+  const size_t n = 0;
+  const int val = 42;
+  dribas::List< int > lst(n, val);
+  BOOST_CHECK(lst.empty());
+  BOOST_CHECK_EQUAL(lst.size(), n);
+}
+
+BOOST_AUTO_TEST_CASE(ConstructWithPositiveSize)
+{
+  const size_t n = 5;
+  const std::string val = "test";
+  dribas::List< std::string > lst(n, val);
+  BOOST_CHECK(!lst.empty());
+  BOOST_CHECK_EQUAL(lst.size(), n);
+  for (const auto& item : lst) {
+    BOOST_CHECK_EQUAL(item, val);
+  }
+}
+
+
+BOOST_AUTO_TEST_CASE(ConstructFromVector)
+{
+  dribas::List< std::string > v;
+  v.push_back("1");
+  v.push_back("2");
+
+  dribas::List< std::string > lst(v.begin(), v.end());
+
+  BOOST_CHECK_EQUAL(lst.front(), "1");
+  BOOST_CHECK_EQUAL(lst.back(), "2");
+}
+
+BOOST_AUTO_TEST_CASE(InitializerListConstructor)
+{
+  dribas::List< int > lst = { 10, 20, 30 };
+  BOOST_CHECK_EQUAL(lst.size(), 3);
+  BOOST_CHECK_EQUAL(lst.front(), 10);
+  BOOST_CHECK_EQUAL(lst.back(), 30);
+}
+
+BOOST_AUTO_TEST_CASE(Insert)
+{
+  dribas::List< int > mylist;
+  for (int i = 1; i <= 5; ++i) {
+    mylist.push_back(i);
+  }
+
+  auto it = mylist.begin();
+  it++;
+
+  mylist.insert(it, 10);
+  BOOST_CHECK(*(--it) == 10);
+
+}
+
+BOOST_AUTO_TEST_CASE(Insert2)
+{
+
+  dribas::List< int > lst;
+  lst.insert(lst.begin(),{ 10, 20, 30 });
+  BOOST_CHECK_EQUAL(lst.size(), 3);
+  BOOST_CHECK_EQUAL(lst.front(), 10);
+  BOOST_CHECK_EQUAL(lst.back(), 30);
+}
+

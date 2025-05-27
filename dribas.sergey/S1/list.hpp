@@ -22,6 +22,10 @@ namespace dribas
     List();
     List(const List< T >& rhs);
     List(List< T >&& rhs) noexcept;
+    explicit List (size_t n, const T& val);
+    List(std::initializer_list< T > ilist);
+    template< class InputIterator >
+    List (InputIterator first, InputIterator last);
     ~List();
 
     iter begin() noexcept;
@@ -42,9 +46,18 @@ namespace dribas
     bool empty() const noexcept;
     size_t size() const noexcept;
 
+    iter insert(iter position, const T& val);
+    iter insert(iter position, size_t n, const T& val);
+    template< class InputIterator >
+    iter insert(iter position, InputIterator first, InputIterator last);
+    iter insert(iter position, std::initializer_list< T > il);
+
+
     template< class Predicate >
     void remove_if(Predicate) noexcept;
     void remove(const T&) noexcept;
+    iter erase(citer position);
+    iter erase(citer first, citer last);
     void splice(citer pos, List< T >& other) noexcept;
     void splice(citer pos, List< T >&& other) noexcept;
     void splice(citer pos, List< T >& other, citer it) noexcept;
@@ -68,6 +81,153 @@ namespace dribas
     Node < T >* tail_;
     size_t size_;
   };
+
+  template <class T>
+  Iterator< T > List< T >::erase(citer first, citer last)
+  {
+    if (first == last || empty()) {
+      return iterator(last.node_);
+    }
+    Node< T >* beforeFirst = first.node_->prev_;
+    Node< T >* afterLast = last.node_;
+    Node< T >* current = first.node_;
+    size_t count = 0;
+    while (current != last.node_) {
+      Node< T >* next = current->next_;
+      delete current;
+      current = next;
+      count++;
+    }
+    if (beforeFirst) {
+      beforeFirst->next_ = afterLast;
+    } else {
+      head_ = afterLast;
+    }
+    if (afterLast) {
+      afterLast->prev_ = beforeFirst;
+    } else {
+      tail_ = beforeFirst;
+    }
+    size_ -= count;
+    return iterator(afterLast);
+  }
+
+  template< class T >
+  Iterator< T > List< T >::erase(citer position)
+  {
+    if (position == cend() || empty()) {
+      return end();
+    }
+    Node< T >* toDelete = position.node_;
+    Node< T >* nextNode = toDelete->next_;
+    if (toDelete->prev_) {
+      toDelete->prev_->next_ = nextNode;
+    } else {
+      head_ = nextNode;
+    }
+    if (nextNode) {
+      nextNode->prev_ = toDelete->prev_;
+    } else {
+      tail_ = toDelete->prev_;
+    }
+    delete toDelete;
+    size_--;
+    return iterator(nextNode);
+  }
+
+  template< class T >
+  Iterator< T > List< T >::insert(iter position, size_t n, const T& val)
+  {
+    for (size_t i = 0; i < n; i++) {
+      insert(position, val);
+    }
+  }
+
+  template <class T>
+  template <class InputIterator>
+  Iterator<T> List<T>::insert(Iterator< T > position, InputIterator first, InputIterator last)
+  {
+    Iterator< T > result = end();
+    if (first != last) {
+      result = insert(position, *first);
+      ++first;
+    }
+    for (; first != last; ++first) {
+      insert(position, *first);
+    }
+    return result;
+  }
+
+  template< class T >
+  Iterator< T > List< T >::insert(iter position, const T& val)
+  {
+    Node< T >* newNode = new Node< T >{val, nullptr, nullptr};
+    if (empty()) {
+      head_ = tail_ = newNode;
+    } else if (position == begin()) {
+      newNode->next_ = head_;
+      head_->prev_ = newNode;
+      head_ = newNode;
+    } else if (position == end()) {
+      newNode->prev_ = tail_;
+      tail_->next_ = newNode;
+      tail_ = newNode;
+    } else {
+      Node< T >* current = position.head_;
+      newNode->next_ = current;
+      newNode->prev_ = current->prev_;
+      current->prev_->next_ = newNode;
+      current->prev_ = newNode;
+    }
+    size_++;
+    return Iterator< T >(newNode);
+}
+
+  template< class T >
+  Iterator< T > List< T >::insert(iter position, std::initializer_list< T > il)
+  {
+    iter result;
+    for (const auto& item : il) {
+      result = insert(position, item);
+    }
+    return result;
+  }
+
+  template< class T >
+  List< T >::List(std::initializer_list< T > ilist): 
+  head_(nullptr),
+  tail_(nullptr),
+  size_(0)
+  {
+    for (const auto& item : ilist) {
+      push_back(item);
+    }
+  }
+
+  template< class T >
+  template< class InputIterator >
+  List< T >::List(InputIterator first, InputIterator last):
+    head_(nullptr), 
+    tail_(nullptr),
+    size_(0)
+  {
+    for (auto i = first; i != last; i++)
+    {
+      push_back(*i);
+    }
+  }
+
+  template< class T >
+  List< T >::List(size_t n, const T& val):
+    head_(nullptr), 
+    tail_(nullptr),
+    size_(0)
+  {
+    for (size_t i = 0; i < n; i++) {
+      push_back(val);
+    }
+  }
+
   template < class T >
   void List< T >::splice(citer pos, List< T >& other, citer first, citer last) noexcept
   {

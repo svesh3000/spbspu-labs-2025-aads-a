@@ -17,7 +17,6 @@ namespace dribas
 
     ConstIterator() noexcept;
     ConstIterator(const citer&) = default;
-    ConstIterator(const Iterator< T >&) noexcept;
 
     citer& operator=(const citer&) = default;
     citer& operator++() noexcept;
@@ -34,11 +33,6 @@ namespace dribas
     const Node< T >* head_;
     explicit ConstIterator(const Node< T >*) noexcept;
   };
-
-  template< class T >
-  ConstIterator< T >::ConstIterator(const Iterator< T >& other) noexcept:
-    head_(other.head_)
-  {}
 
   template< class T >
   bool ConstIterator< T >::operator==(const citer& other) const noexcept
