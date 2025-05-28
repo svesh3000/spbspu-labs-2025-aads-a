@@ -26,7 +26,7 @@ namespace
     {
       throw std::logic_error("INVALID COMMAND");
     }
-    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > bound;
+    kiselev::Graph::MapHash bound;
     if (b == "out")
     {
       bound = graphIt->second.getOutBound(vertex);
