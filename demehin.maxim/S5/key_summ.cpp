@@ -1,6 +1,6 @@
 #include "key_summ.hpp"
-#include <calc_utils.hpp>
 #include <limits>
+#include <calc_utils.hpp>
 
 namespace
 {
