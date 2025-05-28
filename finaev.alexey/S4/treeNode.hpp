@@ -4,20 +4,20 @@
 
 namespace finaev
 {
-  template < class key, class value >
+  template < class Key, class Value >
   struct treeNode
   {
-    std::pair< key, value > data;
-    treeNode< key, value >* left;
-    treeNode< key, value >* right;
-    treeNode< key, value >* parent;
+    std::pair< Key, Value > data;
+    treeNode< Key, Value >* left;
+    treeNode< Key, Value >* right;
+    treeNode< Key, Value >* parent;
     int height;
-    treeNode(const key& k, const value& val, treeNode< key, value >* p);
+    treeNode(const Key& k, const Value& val, treeNode< Key, Value >* p);
   };
 
-  template < class key, class value >
-  treeNode< key, value >::treeNode(const key& k, const value& val, treeNode< key, value >* p):
-    data(std::pair< key, value >(k, val)),
+  template < class Key, class Value >
+  treeNode< Key, Value >::treeNode(const Key& k, const Value& val, treeNode< Key, Value >* p):
+    data(std::pair< Key, Value >(k, val)),
     left(nullptr),
     right(nullptr),
     parent(p),

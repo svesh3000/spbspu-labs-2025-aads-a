@@ -5,15 +5,15 @@
 
 namespace finaev
 {
-  template< class key, class value, class Cmp >
+  template< class Key, class Value, class Cmp >
   class AVLtree;
 
-  template< class key, class value, class Cmp >
-  class treeIterator: public std::iterator< std::bidirectional_iterator_tag, std::pair< key, value > >
+  template< class Key, class Value, class Cmp >
+  class treeIterator: public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
-    friend class AVLtree< key, value, Cmp >;
+    friend class AVLtree< Key, Value, Cmp >;
   public:
-    using this_t = treeIterator< key, value, Cmp >;
+    using this_t = treeIterator< Key, Value, Cmp >;
     treeIterator();
     ~treeIterator() = default;
     treeIterator(const this_t &) = default;
@@ -22,27 +22,27 @@ namespace finaev
     this_t operator++(int) noexcept;
     this_t & operator--() noexcept;
     this_t operator--(int) noexcept;
-    std::pair< key, value > & operator*() const;
-    std::pair< key, value > * operator->() const;
+    std::pair< Key, Value > & operator*() const;
+    std::pair< Key, Value > * operator->() const;
     bool operator==(const this_t &) const noexcept;
     bool operator!=(const this_t &) const noexcept;
   private:
-    treeNode< key, value >* node_;
-    explicit treeIterator(treeNode< key, value >*);
+    treeNode< Key, Value >* node_;
+    explicit treeIterator(treeNode< Key, Value >*);
   };
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp >::treeIterator():
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp >::treeIterator():
     node_(nullptr)
   {}
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp >::treeIterator(treeNode< key, value >* node):
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp >::treeIterator(treeNode< Key, Value >* node):
     node_(node)
   {}
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp >& treeIterator< key, value, Cmp >::operator++() noexcept
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp >& treeIterator< Key, Value, Cmp >::operator++() noexcept
   {
     if (node_->right)
     {
@@ -65,16 +65,16 @@ namespace finaev
     return *this;
   }
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp > treeIterator< key, value, Cmp >::operator++(int) noexcept
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp > treeIterator< Key, Value, Cmp >::operator++(int) noexcept
   {
-    treeIterator< key, value, Cmp > temp = *this;
+    treeIterator< Key, Value, Cmp > temp = *this;
     ++(*this);
     return temp;
   }
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp >& treeIterator< key, value, Cmp >::operator--() noexcept
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp >& treeIterator< Key, Value, Cmp >::operator--() noexcept
   {
     if (node_->left)
     {
@@ -97,34 +97,34 @@ namespace finaev
     return *this;
   }
 
-  template< class key, class value, class Cmp >
-  treeIterator< key, value, Cmp > treeIterator< key, value, Cmp >::operator--(int) noexcept
+  template< class Key, class Value, class Cmp >
+  treeIterator< Key, Value, Cmp > treeIterator< Key, Value, Cmp >::operator--(int) noexcept
   {
-    treeIterator< key, value, Cmp > result = *this;
+    treeIterator< Key, Value, Cmp > result = *this;
     --(*this);
     return result;
   }
 
-  template< class key, class value, class Cmp >
-  std::pair< key, value >& treeIterator< key, value, Cmp >::operator*() const
+  template< class Key, class Value, class Cmp >
+  std::pair< Key, Value >& treeIterator< Key, Value, Cmp >::operator*() const
   {
     return node_->data;
   }
 
-  template< class key, class value, class Cmp >
-  std::pair< key, value >* treeIterator< key, value, Cmp >::operator->() const
+  template< class Key, class Value, class Cmp >
+  std::pair< Key, Value >* treeIterator< Key, Value, Cmp >::operator->() const
   {
     return std::addressof(node_->data);
   }
 
-  template< class key, class value, class Cmp >
-  bool treeIterator< key, value, Cmp >::operator==(const this_t& other) const noexcept
+  template< class Key, class Value, class Cmp >
+  bool treeIterator< Key, Value, Cmp >::operator==(const this_t& other) const noexcept
   {
     return node_ == other.node_;
   }
 
-  template< class key, class value, class Cmp >
-  bool treeIterator< key, value, Cmp >::operator!=(const this_t& other) const noexcept
+  template< class Key, class Value, class Cmp >
+  bool treeIterator< Key, Value, Cmp >::operator!=(const this_t& other) const noexcept
   {
     return !(other == *this);
   }
