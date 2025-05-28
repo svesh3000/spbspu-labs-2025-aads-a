@@ -12,7 +12,7 @@
 #include "hashTable.hpp"
 namespace kiselev
 {
-  struct PairHash
+  struct PairHash1
   {
     size_t operator()(const std::pair< std::string, std::string >& pair) const
     {
@@ -21,11 +21,22 @@ namespace kiselev
       return h1 * 7 + h2;
     }
   };
+
+  struct PairHash2
+  {
+    size_t operator()(const std::pair< std::string, std::string >& pair) const
+    {
+      size_t h1 = BoostHash< std::string >()(pair.first);
+      size_t h2 = BoostHash< std::string >()(pair.second);
+      return h1 * 7 + h2;
+    }
+  };
+
   class Graph
   {
   public:
     using Vertexes = std::pair< std::string, std::string >;
-    using Edge = HashTable< Vertexes, std::list< unsigned int >, PairHash >;
+    using Edge = HashTable< Vertexes, std::list< unsigned int >, PairHash1, PairHash2 >;
 
     void addEdge(const std::string& v1, const std::string& v2, unsigned int weight)
     {
