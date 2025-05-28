@@ -37,6 +37,7 @@ namespace kiselev
   public:
     using Vertexes = std::pair< std::string, std::string >;
     using Edge = HashTable< Vertexes, std::list< unsigned int >, PairHash1, PairHash2 >;
+    using MapHash = std::map< std::string, HashTable< unsigned int, unsigned int, std::hash< unsigned int >, BoostHash< unsigned int > > >;
 
     void addEdge(const std::string& v1, const std::string& v2, unsigned int weight)
     {
@@ -71,12 +72,11 @@ namespace kiselev
       return vertexes;
     }
 
-    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
+    MapHash getOutBound(const std::string& v) const
     {
       return getBound(v, true);
     }
-
-    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getInBound(const std::string& v) const
+    MapHash getInBound(const std::string& v) const
     {
       return getBound(v, false);
     }
@@ -87,9 +87,9 @@ namespace kiselev
     }
   private:
     Edge edges;
-    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getBound(const std::string& v, bool isOut) const
+    MapHash getBound(const std::string& v, bool isOut) const
     {
-      std::map< std::string, std::unordered_map< unsigned int, unsigned int > > result;
+      MapHash result;
       for (auto it = edges.cbegin(); it != edges.cend(); ++it)
       {
         const std::string& current = isOut ? it->first.first : it->first.second;
