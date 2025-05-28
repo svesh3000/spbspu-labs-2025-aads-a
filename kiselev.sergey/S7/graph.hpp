@@ -2,11 +2,13 @@
 #define GRAPH_HPP
 #include <cstddef>
 #include <unordered_map>
+#include <unordered_set>
 #include <list>
 #include <map>
 #include <string>
 #include <functional>
 #include <utility>
+#include <vector>
 #include "hashTable.hpp"
 namespace kiselev
 {
@@ -47,47 +49,26 @@ namespace kiselev
       return size2 < size1;
     }
 
-    std::map< std::string, std::string > getVertexes() const
+    std::unordered_set< std::string > getVertexes() const
     {
-      std::map< std::string, std::string > vertexes;
+      std::unordered_set< std::string > vertexes;
+      vertexes.reserve(edges.size() * 2);
       for (auto it = edges.cbegin(); it != edges.cend(); ++it)
       {
-        vertexes[it->first.first];
-        vertexes[it->first.second];
+        vertexes.insert(it->first.first);
+        vertexes.insert(it->first.second);
       }
       return vertexes;
     }
 
-    std::map< std::string, std::map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
+    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
     {
-      std::map< std::string, std::map< unsigned int, unsigned int > > result;
-      for (auto edgeIt = edges.cbegin(); edgeIt != edges.cend(); ++edgeIt)
-      {
-        if (edgeIt->first.first == v)
-        {
-          for (auto weightIt = edgeIt->second.begin(); weightIt != edgeIt->second.end(); ++weightIt)
-          {
-            result[edgeIt->first.second][*weightIt]++;
-          }
-        }
-      }
-      return result;
+      return getBound(v, true);
     }
 
-    std::map< std::string, std::map< unsigned int, unsigned int > > getInBound(const std::string& v) const
+    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getInBound(const std::string& v) const
     {
-      std::map< std::string, std::map< unsigned int, unsigned int > > result;
-      for (auto edgeIt = edges.cbegin(); edgeIt != edges.cend(); ++edgeIt)
-      {
-        if (edgeIt->first.second == v)
-        {
-          for (auto weightIt = edgeIt->second.begin(); weightIt != edgeIt->second.end(); ++weightIt)
-          {
-            result[edgeIt->first.first][*weightIt]++;
-          }
-        }
-      }
-      return result;
+      return getBound(v, false);
     }
 
     const Edge& getEdges() const
@@ -96,6 +77,23 @@ namespace kiselev
     }
   private:
     Edge edges;
+    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getBound(const std::string& v, bool isOut) const
+    {
+      std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > result;
+      for (auto it = edges.cbegin(); it != edges.cend(); ++it)
+      {
+        const std::string& current = isOut ? it->first.first : it->first.second;
+        if (current == v)
+        {
+          std::string other = isOut ? it->first.second : it->first.first;
+          for (auto weightIt = it->second.begin(); weightIt != it->second.end(); ++weightIt)
+          {
+            result[other][*weightIt]++;
+          }
+        }
+      }
+      return result;
+    }
   };
 }
 #endif

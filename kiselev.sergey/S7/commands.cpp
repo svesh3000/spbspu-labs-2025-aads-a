@@ -4,6 +4,9 @@
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 #include "graph.hpp"
 
 namespace
@@ -18,12 +21,12 @@ namespace
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    std::map< std::string, std::string > vertexes = graphIt->second.getVertexes();
+    std::unordered_set< std::string > vertexes = graphIt->second.getVertexes();
     if (vertexes.empty() && vertexes.find(vertex) == vertexes.end())
     {
       throw std::logic_error("INVALID COMMAND");
     }
-    std::map< std::string, std::map< unsigned int, unsigned int > > bound;
+    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > bound;
     if (b == "out")
     {
       bound = graphIt->second.getOutBound(vertex);
@@ -105,7 +108,7 @@ void kiselev::vertexes(std::ostream& out, std::istream& in, const Graphs& graphs
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  std::map< std::string, std::string > vertexes = it->second.getVertexes();
+  std::unordered_set< std::string > vertexes = it->second.getVertexes();
   if (vertexes.empty())
   {
     out << "\n";
@@ -113,7 +116,7 @@ void kiselev::vertexes(std::ostream& out, std::istream& in, const Graphs& graphs
   }
   for (auto iter = vertexes.begin(); iter != vertexes.end(); ++iter)
   {
-    out << iter->first << "\n";
+    out << *iter << "\n";
   }
 }
 
@@ -202,17 +205,17 @@ void kiselev::extract(std::istream& in, Graphs& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  std::map< std::string, std::string > vertexes1;
+  std::unordered_set< std::string > vertexes1;
   for (size_t i = 0; i < count; ++i)
   {
     std::string vertex;
     in >> vertex;
-    vertexes1[vertex];
+    vertexes1.insert(vertex);
   }
-  std::map< std::string, std::string > vertexes2 = graphs.at(graph).getVertexes();
+  std::unordered_set< std::string > vertexes2 = graphs.at(graph).getVertexes();
   for (auto vertexIt = vertexes1.begin(); vertexIt != vertexes1.end(); ++vertexIt)
   {
-    if (vertexes2.find(vertexIt->first) == vertexes2.end())
+    if (vertexes2.find(*vertexIt) == vertexes2.end())
     {
       throw std::logic_error("INVALID COMMAND");
     }
