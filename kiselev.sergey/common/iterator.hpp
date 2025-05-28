@@ -1,7 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <iterator>
-#include <assert.h>
+#include <cassert>
 #include "treeNode.hpp"
 
 namespace kiselev
@@ -39,25 +39,29 @@ namespace kiselev
       bool operator!=(const iterator&) const noexcept;
     private:
       TreeNode< Key, Value >* node_;
-      explicit Iterator(TreeNode< Key, Value >*);
+      bool isEnd_;
+      Iterator(TreeNode< Key, Value >*, bool);
       friend class Iterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst >::Iterator():
-      node_(nullptr)
+      node_(nullptr),
+      isEnd_(false)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
     Iterator< Key, Value, Cmp, IsConst >::Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept:
-      node_(other.node_)
+      node_(other.node_),
+      isEnd_(other.isEnd_)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node):
-      node_(node)
+    Iterator< Key, Value, Cmp, IsConst >::Iterator(TreeNode< Key, Value >* node, bool isEnd):
+      node_(node),
+      isEnd_(isEnd)
     {}
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
@@ -66,6 +70,7 @@ namespace kiselev
       const Iterator< Key, Value, Cmp, OtherIsConst >& other) noexcept
     {
       node_ = other.node_;
+      isEnd_ = other.isEnd_;
       return *this;
     }
 
@@ -73,6 +78,7 @@ namespace kiselev
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator++() noexcept
     {
       assert(node_ != nullptr);
+      TreeNode< Key, Value >* temp = node_;
       if (node_->right)
       {
         node_ = node_->right;
@@ -80,13 +86,20 @@ namespace kiselev
         {
           node_ = node_->left;
         }
-        return *this;
       }
-      while (node_->parent && node_ == node_->parent->right)
+      else
       {
+        while (node_->parent && node_ == node_->parent->right)
+        {
+          node_ = node_->parent;
+        }
         node_ = node_->parent;
       }
-      node_ = node_->parent;
+      if (!node_)
+      {
+        node_ = temp;
+        isEnd_ = true;
+      }
       return *this;
     }
 
@@ -103,27 +116,33 @@ namespace kiselev
     Iterator< Key, Value, Cmp, IsConst >& Iterator< Key, Value, Cmp, IsConst >::operator--() noexcept
     {
       assert(node_ != nullptr);
-      if (node_->left)
+      if (isEnd_)
       {
-        node_ = node_->left;
-        while (node_->right)
-        {
-          node_ = node_->right;
-        }
-        return iterator(node_);
+        isEnd_ = false;
       }
-      while (node_->parent && node_ == node_->parent->left)
+      else
       {
+        if (node_->left)
+        {
+          node_ = node_->left;
+          while (node_->right)
+          {
+            node_ = node_->right;
+          }
+          return iterator(node_);
+        }
+        while (node_->parent && node_ == node_->parent->left)
+        {
+          node_ = node_->parent;
+        }
         node_ = node_->parent;
       }
-      node_ = node_->parent;
       return *this;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     Iterator< Key, Value, Cmp, IsConst > Iterator< Key, Value, Cmp, IsConst >::operator--(int) noexcept
     {
-      assert(node_ != nullptr);
       iterator result(*this);
       --(*this);
       return result;
@@ -146,7 +165,7 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     bool Iterator< Key, Value, Cmp, IsConst >::operator==(const iterator& other) const noexcept
     {
-      return node_ == other.node_;
+      return node_ == other.node_ && isEnd_ == other.isEnd_;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
