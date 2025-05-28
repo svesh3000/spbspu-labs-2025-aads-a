@@ -25,7 +25,7 @@ namespace abramov
     ConstIterator< Key, Value > cbegin() const;
     ConstIterator< Key, Value > cend() const;
     Iterator< Key, Value > find(const Key &k) noexcept;
-    ConstIterator< Key, Value > сfind(const Key &k) noexcept;
+    ConstIterator< Key, Value > cfind(const Key &k) const noexcept;
     size_t count(const Key &k) const noexcept;
     range_t< Key, Value > equal_range(const Key &k) noexcept;
     crange_t< Key, Value > equal_range(const Key &k, bool b = true) noexcept;
@@ -41,7 +41,9 @@ namespace abramov
 
     void clearNodes(Node< Key, Value > *root) noexcept;
     Node< Key, Value > *getMin(Node< Key, Value > *root) noexcept;
+    const Node< Key, Value > *cgetMin(const Node< Key, Value > *root) const noexcept;
     Node< Key, Value > *findNode(const Key &k) noexcept;
+    const Node< Key, Value > *cfindNode(const Key &k) const noexcept;
   };
 
   template< class Key, class Value, class Cmp >
@@ -56,6 +58,7 @@ namespace abramov
   BinarySearchTree< Key, Value, Cmp >::~BinarySearchTree() noexcept
   {
     clear();
+    delete fake_;
   }
 
   template< class Key, class Value, class Cmp >
@@ -110,7 +113,7 @@ namespace abramov
   template< class Key, class Value, class Cmp >
   ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::cbegin() const
   {
-    Node< Key, Value > *node = getMin(root_);
+    const Node< Key, Value > *node = cgetMin(root_);
     return ConstIterator< Key, Value >(node);
   }
 
@@ -128,16 +131,17 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
-  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::сfind(const Key &k) noexcept
+  ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::cfind(const Key &k) const noexcept
   {
-    Node< Key, Value > *node = findNode(k);
+    const Node< Key, Value > *node = cfindNode(k);
     return ConstIterator< Key, Value >(node);
   }
 
   template< class Key, class Value, class Cmp >
   size_t BinarySearchTree< Key, Value, Cmp >::count(const Key &k) const noexcept
   {
-    if (find(k) != end())
+    auto it = cend();
+    if (cfind(k) != cend())
     {
       return 1;
     }
@@ -190,7 +194,7 @@ namespace abramov
   template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::clearNodes(Node< Key, Value > *root) noexcept
   {
-    if (root != fake_)
+    if (root != fake_ && root)
     {
       clearNodes(root->left_);
       clearNodes(root->right_);
@@ -202,11 +206,12 @@ namespace abramov
   void BinarySearchTree< Key, Value, Cmp >::clear() noexcept
   {
     clearNodes(root_);
-    delete fake_;
+    size_ = 0;
+    root_ = nullptr;
   }
 
   template< class Key, class Value, class Cmp >
-  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::getMin(Node< Key, Value > *root) noexcept
+  const Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::cgetMin(const Node< Key, Value > *root) const noexcept
   {
     while (root->left_ != fake_)
     {
@@ -216,9 +221,16 @@ namespace abramov
   }
 
   template< class Key, class Value, class Cmp >
-  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::findNode(const Key &k) noexcept
+  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::getMin(Node< Key, Value > *root) noexcept
   {
-    Node< Key, Value > *root = root_;
+    using Tree = BinarySearchTree< Key, Value, Cmp >;
+    return const_cast< Node< Key, Value >* >(const_cast< Tree* >(this)->cgetMin(root));
+  }
+
+  template< class Key, class Value, class Cmp >
+  const Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::cfindNode(const Key &k) const noexcept
+  {
+    const Node< Key, Value > *root = root_;
     while (root != fake_)
     {
       if (cmp_(k, root->data_.first))
@@ -234,7 +246,14 @@ namespace abramov
         return root;
       }
     }
-    return nullptr;
+    return fake_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::findNode(const Key &k) noexcept
+  {
+    using Tree = BinarySearchTree< Key, Value, Cmp >;
+    return const_cast< Node< Key, Value >* >(const_cast< Tree* >(this)->cfindNode(k));
   }
 }
 #endif

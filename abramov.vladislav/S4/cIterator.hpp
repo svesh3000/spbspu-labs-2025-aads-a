@@ -9,7 +9,7 @@ namespace abramov
   struct ConstIterator: std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     ConstIterator();
-    ConstIterator(Node< Key, Value > *node);
+    ConstIterator(const Node< Key, Value > *node);
     ConstIterator(const ConstIterator< Key, Value > &c_iter) = default;
     ~ConstIterator() = default;
     ConstIterator< Key, Value > &operator=(const ConstIterator< Key, Value > &c_iter) = default;
@@ -22,7 +22,7 @@ namespace abramov
     const std::pair< Key, Value > &operator*() const noexcept;
     const std::pair< Key, Value > *operator->() const noexcept;
   private:
-    Node< Key, Value > *node_;
+    const Node< Key, Value > *node_;
   };
 
   template< class Key, class Value >
@@ -31,7 +31,7 @@ namespace abramov
   {}
 
   template< class Key, class Value >
-  ConstIterator< Key, Value >::ConstIterator(Node< Key, Value > *node):
+  ConstIterator< Key, Value >::ConstIterator(const Node< Key, Value > *node):
     node_(node)
   {}
 
