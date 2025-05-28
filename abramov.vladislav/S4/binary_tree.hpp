@@ -18,6 +18,7 @@ namespace abramov
   struct BinarySearchTree
   {
     BinarySearchTree();
+    ~BinarySearchTree() noexcept;
     void insert(const Key &key, const Value &value);
     Iterator< Key, Value > begin();
     Iterator< Key, Value > end();
@@ -52,66 +53,44 @@ namespace abramov
   {}
 
   template< class Key, class Value, class Cmp >
+  BinarySearchTree< Key, Value, Cmp >::~BinarySearchTree() noexcept
+  {
+    clear();
+  }
+
+  template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::insert(const Key &key, const  Value &value)
   {
+    Node< Key, Value > *node = new Node< Key, Value >(std::make_pair(key, value), nullptr, fake_, fake_);
     if (empty())
     {
-      root_ = new Node< Key, Value >{ std::make_pair(key, value), nullptr, fake_, fake_ };
+      root_ = node;
       ++size_;
       return;
     }
-    Node< Key, Value > *root = root_;
-    Node< Key, Value > *node = new Node< Key, Value >{ std::make_pair(key, value), nullptr, fake_, fake_ };
-    while (root->left_ != fake_ && root->right_ != fake_)
+    Node< Key, Value > *curr = root_;
+    Node< Key, Value > *parent = nullptr;
+    while (curr != fake_)
     {
-      if (cmp_(key, root->data_.first))
+      parent = curr;
+      if (cmp_(key, curr->data_.first))
       {
-        root = root->left_;
+        curr = curr->left_;
       }
-      else
+      else if (cmp_(curr->data_.first, key))
       {
-        root = root->right_;
+        curr = curr->right_;
       }
     }
-    if (cmp_(key, root->data_.first))
+    node->parent_ = parent;
+    if (cmp_(key, parent->data_.first))
     {
-      if (root->left_ != fake_)
-      {
-        root = root->left_;
-        if (cmp_(key, root->data_.first))
-        {
-          root->left_ = node;
-        }
-        else
-        {
-          root->right_ = node;
-        }
-      }
-      else
-      {
-        root->left_ = node;
-      }
+      parent->left_ = node;
     }
     else
     {
-      if (root->right_ != fake_)
-      {
-        root = root->right_;
-        if (cmp_(key, root->data_.first))
-        {
-          root->left_ = node;
-        }
-        else
-        {
-          root->right_ = node;
-        }
-      }
-      else
-      {
-        root->right_ = node;
-      }
+      parent->right_ = node;
     }
-    node->parent_ = root;
     ++size_;
   }
 
@@ -214,7 +193,7 @@ namespace abramov
     if (root != fake_)
     {
       clearNodes(root->left_);
-      clearNodes(root->rigth_);
+      clearNodes(root->right_);
       delete root;
     }
   }
@@ -222,8 +201,7 @@ namespace abramov
   template< class Key, class Value, class Cmp >
   void BinarySearchTree< Key, Value, Cmp >::clear() noexcept
   {
-    Node< Key, Value > *root = root_;
-    clearNodes(root);
+    clearNodes(root_);
     delete fake_;
   }
 
@@ -247,7 +225,7 @@ namespace abramov
       {
         root = root->left_;
       }
-      else if (!cmp_(k, root->data_.first))
+      else if (cmp_(root->data_.first, k))
       {
         root = root->right_;
       }
@@ -256,7 +234,7 @@ namespace abramov
         return root;
       }
     }
-    return fake_;
+    return nullptr;
   }
 }
 #endif
