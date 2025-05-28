@@ -2,7 +2,7 @@
 #define GRAPH_HPP
 #include <cstddef>
 #include <unordered_map>
-#include <unordered_set>
+#include <set>
 #include <list>
 #include <map>
 #include <string>
@@ -49,10 +49,9 @@ namespace kiselev
       return size2 < size1;
     }
 
-    std::unordered_set< std::string > getVertexes() const
+    std::set< std::string > getVertexes() const
     {
-      std::unordered_set< std::string > vertexes;
-      vertexes.reserve(edges.size() * 2);
+      std::set< std::string > vertexes;
       for (auto it = edges.cbegin(); it != edges.cend(); ++it)
       {
         vertexes.insert(it->first.first);
@@ -61,12 +60,12 @@ namespace kiselev
       return vertexes;
     }
 
-    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
+    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getOutBound(const std::string& v) const
     {
       return getBound(v, true);
     }
 
-    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getInBound(const std::string& v) const
+    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getInBound(const std::string& v) const
     {
       return getBound(v, false);
     }
@@ -77,9 +76,9 @@ namespace kiselev
     }
   private:
     Edge edges;
-    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > getBound(const std::string& v, bool isOut) const
+    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > getBound(const std::string& v, bool isOut) const
     {
-      std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > result;
+      std::map< std::string, std::unordered_map< unsigned int, unsigned int > > result;
       for (auto it = edges.cbegin(); it != edges.cend(); ++it)
       {
         const std::string& current = isOut ? it->first.first : it->first.second;

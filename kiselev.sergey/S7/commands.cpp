@@ -21,12 +21,12 @@ namespace
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    std::unordered_set< std::string > vertexes = graphIt->second.getVertexes();
+    std::set< std::string > vertexes = graphIt->second.getVertexes();
     if (vertexes.empty() && vertexes.find(vertex) == vertexes.end())
     {
       throw std::logic_error("INVALID COMMAND");
     }
-    std::unordered_map< std::string, std::unordered_map< unsigned int, unsigned int > > bound;
+    std::map< std::string, std::unordered_map< unsigned int, unsigned int > > bound;
     if (b == "out")
     {
       bound = graphIt->second.getOutBound(vertex);
@@ -108,7 +108,7 @@ void kiselev::vertexes(std::ostream& out, std::istream& in, const Graphs& graphs
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  std::unordered_set< std::string > vertexes = it->second.getVertexes();
+  std::set< std::string > vertexes = it->second.getVertexes();
   if (vertexes.empty())
   {
     out << "\n";
@@ -205,14 +205,14 @@ void kiselev::extract(std::istream& in, Graphs& graphs)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  std::unordered_set< std::string > vertexes1;
+  std::set< std::string > vertexes1;
   for (size_t i = 0; i < count; ++i)
   {
     std::string vertex;
     in >> vertex;
     vertexes1.insert(vertex);
   }
-  std::unordered_set< std::string > vertexes2 = graphs.at(graph).getVertexes();
+  std::set< std::string > vertexes2 = graphs.at(graph).getVertexes();
   for (auto vertexIt = vertexes1.begin(); vertexIt != vertexes1.end(); ++vertexIt)
   {
     if (vertexes2.find(*vertexIt) == vertexes2.end())
