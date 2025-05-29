@@ -10,6 +10,9 @@
 namespace abramov
 {
   template< class Key, class Value >
+  struct Iterator;
+
+  template< class Key, class Value >
   using range_t = std::pair< Iterator< Key, Value >, Iterator< Key, Value > >;
 
   template< class Key, class Value >
@@ -20,6 +23,7 @@ namespace abramov
   {
     BinarySearchTree();
     ~BinarySearchTree() noexcept;
+    Value &operator[](const Key &key) noexcept;
     void insert(const Key &key, const Value &value);
     Iterator< Key, Value > begin();
     Iterator< Key, Value > end();
@@ -98,6 +102,20 @@ namespace abramov
       parent->right_ = node;
     }
     ++size_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  Value &BinarySearchTree< Key, Value, Cmp >::operator[](const Key &key) noexcept
+  {
+    if (empty())
+    {
+      insert(key, Value());
+    }
+    else if (find(key) == end())
+    {
+      insert(key, Value());
+    }
+    return find(key)->second;
   }
 
   template< class Key, class Value, class Cmp >
