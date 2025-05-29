@@ -38,12 +38,12 @@ namespace zakirov
     bool empty() const noexcept;
     size_t size() const noexcept;
     void swap(FwdList & other) noexcept;
-    void splice_after(FwdIterator< T > pos, FwdList & fwdlst);
-    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i);
-    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last);
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept;
     void assign(size_t n, const T & val);
     template< typename InputIterator >
     void assign(InputIterator first, InputIterator last);
@@ -263,13 +263,13 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst) noexcept
   {
     splice_after(pos, fwdlst, fwdlst.before_begin(), fwdlst.end());
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i) noexcept
   {
     FwdListNode< T > * next_base = pos.node_->next_;
     FwdListNode< T > * next_new = i.node_->next_->next_;
@@ -286,7 +286,7 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept
   {
     FwdIterator< T > after_iter = first;
     ++after_iter;
@@ -300,25 +300,25 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst) noexcept
   {
     splice_after(pos, fwdlst);
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i) noexcept
   {
     splice_after(pos, fwdlst, i);
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept
   {
     splice_after(pos, fwdlst, first, last);
   }
 
   template< typename T >
-  void FwdList< T >::assign(size_t n, const T & val)
+  void FwdList< T >::assign(size_t n, const T & val) noexcept
   {
     FwdList< T > inserter(n, val);
     swap(inserter);
