@@ -9,7 +9,7 @@ namespace abramov
   struct ConstIterator: std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     ConstIterator();
-    ConstIterator(const Node< Key, Value > *node);
+    ConstIterator(const Node< Key, Value > *node, const Node< Key, Value > *fake);
     ConstIterator(const ConstIterator< Key, Value > &c_iter) = default;
     ~ConstIterator() = default;
     ConstIterator< Key, Value > &operator=(const ConstIterator< Key, Value > &c_iter) = default;
@@ -23,6 +23,7 @@ namespace abramov
     const std::pair< Key, Value > *operator->() const noexcept;
   private:
     const Node< Key, Value > *node_;
+    const Node< Key, Value > *fake_;
   };
 
   template< class Key, class Value >
@@ -31,28 +32,31 @@ namespace abramov
   {}
 
   template< class Key, class Value >
-  ConstIterator< Key, Value >::ConstIterator(const Node< Key, Value > *node):
-    node_(node)
+  ConstIterator< Key, Value >::ConstIterator(const Node< Key, Value > *node, const Node< Key, Value > *fake):
+    node_(node),
+    fake_(fake)
   {}
 
   template< class Key, class Value >
   ConstIterator< Key, Value > &ConstIterator< Key, Value >::operator++() noexcept
   {
-    if (node_->right_)
+    if (node_->right_ != fake_)
     {
       node_ = node_->right_;
-      while (node_->left_)
+      while (node_->left_ != fake_)
       {
         node_ = node_->left_;
       }
     }
     else
     {
-      while (node_->parent_ && node_->parent_->left_ != node_)
+      Node< Key, Value > *parent = node_->parent_;
+      while (node_->parent_ && node_ == parent->right_)
       {
-        node_ = node_->parent_;
+        node_ = parent;
+        parent = parent->parent_;
       }
-      node_ = node_->parent_;
+      node_ = parent;
     }
     return *this;
   }
@@ -68,21 +72,23 @@ namespace abramov
   template< class Key, class Value >
   ConstIterator< Key, Value > &ConstIterator< Key, Value >::operator--() noexcept
   {
-    if (node_->left_)
+    if (node_->left_ != fake_)
     {
       node_ = node_->left_;
-      while (node_->right_)
+      while (node_->right_ != fake_)
       {
-        node_ = node_->right;
+        node_ = node_->right_;
       }
     }
     else
     {
-      while (node_->parent_ && node_->parent_->right != node_)
+      Node< Key, Value > *parent = node_->parent_;
+      while (node_->parent_ && node_ == parent->left_)
       {
-        node_ = node_->parent_;
+        node_ = parent;
+        parent = parent->parent_;
       }
-      node_ = node_->parent_;
+      node_ = parent;
     }
     return *this;
   }
