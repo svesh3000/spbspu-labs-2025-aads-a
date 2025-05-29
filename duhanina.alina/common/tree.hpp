@@ -106,7 +106,7 @@ namespace duhanina
     Node_t* find(Node_t* node, const Key& k) const noexcept;
     Node_t* findMin(Node_t* node) const noexcept;
     Node_t* findMax(Node_t* node) const noexcept;
-    Node_t* remove(Node_t* node, Key& k) noexcept;
+    Node_t* remove(Node_t* node, const Key& k) noexcept;
     void clear(Node_t* node) noexcept;
     Node_t* copyTree(Node_t* node, Node_t* parent);
     Node_t* findNextNode(Node_t* node) const noexcept;
@@ -220,7 +220,6 @@ namespace duhanina
     if (this != std::addressof(other))
     {
       Node_t* oldFakeRoot = fakeRoot_;
-      Node_t* oldRoot = fakeRoot_->left;
       size_t oldSize = size_;
       try
       {
@@ -315,7 +314,7 @@ namespace duhanina
     auto* result = new Value(std::move(get(k)));
     setRoot(remove(getRoot(), k));
     size_--;
-    return result;
+    return *result;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -633,7 +632,7 @@ namespace duhanina
       }
       current = stack.top();
       stack.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       current = current->right;
     }
     return f;
@@ -654,7 +653,7 @@ namespace duhanina
       }
       current = stack.top();
       stack.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       current = current->right;
     }
     return f;
@@ -675,7 +674,7 @@ namespace duhanina
       }
       current = stack.top();
       stack.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       current = current->left;
     }
     return f;
@@ -696,7 +695,7 @@ namespace duhanina
       }
       current = stack.top();
       stack.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       current = current->left;
     }
     return f;
@@ -716,7 +715,7 @@ namespace duhanina
     {
       const Node_t* current = queue.front();
       queue.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       if (current->left)
       {
         queue.push(current->left);
@@ -743,7 +742,7 @@ namespace duhanina
     {
       Node_t* current = queue.front();
       queue.pop();
-      f(std::make_pair(current->data.first, current->data.second));
+      f(current->data);
       if (current->left)
       {
         queue.push(current->left);
@@ -942,7 +941,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, Key& k) noexcept
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, const Key& k) noexcept
   {
     if (!node)
     {

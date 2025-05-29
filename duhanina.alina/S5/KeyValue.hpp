@@ -8,13 +8,8 @@ namespace duhanina
 {
   struct KeySum
   {
-    long long result = 0;
-    void operator()(const std::pair< const long long, std::string >& key_value);
-  };
-
-  struct ValueCollector
-  {
-    std::string result;
+    long long key = 0;
+    std::string value;
     void operator()(const std::pair< const long long, std::string >& key_value);
   };
 }

@@ -60,25 +60,18 @@ namespace
 
   void printDict(const DictionaryStorage& storage, const std::string& name)
   {
-    try
+    Dictionary dict = storage.get(name);
+    if (dict.empty())
     {
-      Dictionary dict = storage.get(name);
-      if (dict.empty())
-      {
-        std::cout << "<EMPTY>\n";
-        return;
-      }
-      std::cout << name;
-      for (auto it = dict.begin(); it != dict.end(); ++it)
-      {
-        std::cout << " " << it->first << " " << it->second;
-      }
-      std::cout << "\n";
+      std::cout << "<EMPTY>\n";
+      return;
     }
-    catch (...)
+    std::cout << name;
+    for (auto it = dict.begin(); it != dict.end(); ++it)
     {
-      std::cout << "<INVALID COMMAND>\n";
+      std::cout << " " << it->first << " " << it->second;
     }
+    std::cout << "\n";
   }
 
   void complementOperation(DictionaryStorage& storage, const std::string& args)
@@ -150,14 +143,11 @@ namespace
   {
     duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
     initializeCommands(commands);
-    try
+    if (!commands.count(cmd))
     {
-      commands.at(cmd)(storage, args);
+      std::cerr << "<INVALID COMMAND>\n";
     }
-    catch (...)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    commands.at(cmd)(storage, args);
   }
 }
 
@@ -183,7 +173,14 @@ int main(int argc, char* argv[])
     size_t pos = 0;
     std::string cmd = readNextToken(line, pos);
     std::string args = line.substr(pos);
-    processCommand(storage, cmd, args);
+    try
+    {
+      processCommand(storage, cmd, args);
+    }
+    catch (...)
+    {
+    return 1;
+    }
   }
   return 0;
 }

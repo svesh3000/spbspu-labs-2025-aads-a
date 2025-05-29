@@ -33,28 +33,24 @@ int main(int argc, char* argv[])
   try
   {
     duhanina::KeySum key_sum;
-    duhanina::ValueCollector value_collector;
     if (mode == "ascending")
     {
       key_sum = tree.traverse_lnr(key_sum);
-      value_collector = tree.traverse_lnr(value_collector);
     }
     else if (mode == "descending")
     {
       key_sum = tree.traverse_rnl(key_sum);
-      value_collector = tree.traverse_rnl(value_collector);
     }
     else if (mode == "breadth")
     {
       key_sum = tree.traverse_breadth(key_sum);
-      value_collector = tree.traverse_breadth(value_collector);
     }
     else
     {
       std::cerr << "Invalid mode\n";
       return 1;
     }
-    std::cout << key_sum.result << " " << value_collector.result << "\n";
+    std::cout << key_sum.key << " " << key_sum.value << "\n";
   }
   catch (const std::overflow_error& e)
   {
