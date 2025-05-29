@@ -125,14 +125,12 @@ namespace lanovenko
   template< typename Key, typename Value, typename Comparator >
   inline TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::begin() const noexcept
   {
-    assert(root_);
     return TreeIterator< Key, Value, Comparator >(minValueNode(root_));
   }
 
   template< typename Key, typename Value, typename Comparator >
   inline TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::end() const noexcept
   {
-    assert(root_);
     return TreeIterator< Key, Value, Comparator >();
   }
 
