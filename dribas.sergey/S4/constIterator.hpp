@@ -5,9 +5,12 @@
 
 namespace dribas
 {
-  template <class Key, class T, class Compare> class Iterator;
-  template <class Key, class T, class Compare> class AVLTree;
-  template <class Key, class T> class Node;
+  template< class Key, class T, class Compare >
+  class AVLTree;
+  template< class Key, class T >
+  class Node;
+  template< class Key, class T, class Compare >
+  class Iterator;
 
   template < class Key, class T, class Compare = std::less< Key > >
   class ConstIterator
@@ -15,7 +18,8 @@ namespace dribas
     friend class AVLTree< Key, T, Compare >;
   public:
     using valueType = std::pair< Key, T >;
-    using Tree = AVLTree< Key, T, Compare >;
+    using TreeType = AVLTree< Key, T, Compare >;
+    using NodeType = Node< Key, T >;
 
     ConstIterator() noexcept;
     ConstIterator(const Iterator< Key, T, Compare >&) noexcept;
@@ -30,8 +34,8 @@ namespace dribas
     bool operator!=(const ConstIterator&) const noexcept;
 
   private:
-    const Node< Key, T >* node_;
-    const Node< Key, T >* tree_;
+    const NodeType* node_;
+    const TreeType* tree_;
     explicit ConstIterator(const Node< Key, T >*, const AVLTree< Key, T, Compare >*) noexcept;
   };
 
@@ -65,7 +69,7 @@ namespace dribas
   template <class Key, class T, class Compare>
   ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator++() noexcept
   {
-    if (node_->right != tree_->fakeleaf_) {
+    if (!node_->right->isFake) {
       node_ = node_->right;
       while (!node_->left->isFake) {
         node_ = node_->left;
@@ -90,10 +94,9 @@ namespace dribas
     if (node_ == tree_->fakeleaf_) {
       node_ = tree_->root_;
       while (node_ != tree_->fakeleaf_ && !node_->right->isFake) {
-          node_ = node_->right;
+        node_ = node_->right;
       }
       return *this;
-    
     }
     if (!node_->left->isFake) {
       node_ = node_->left;

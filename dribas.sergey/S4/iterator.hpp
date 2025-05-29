@@ -5,8 +5,10 @@
 
 namespace dribas
 {
-  template <class Key, class T, class Compare> class AVLTree;
-  template <class Key, class T> class Node;
+  template <class Key, class T, class Compare>
+  class AVLTree;
+  template <class Key, class T>
+  class Node;
 
   template< class Key, class T, class Compare = std::less< Key > >
   class Iterator
@@ -84,10 +86,9 @@ namespace dribas
     if (node_ == tree_->fakeleaf_) {
       node_ = tree_->root_;
       while (node_ != tree_->fakeleaf_ && !node_->right->isFake) {
-          node_ = node_->right;
+        node_ = node_->right;
       }
       return *this;
-    
     }
     if (!node_->left->isFake) {
       node_ = node_->left;

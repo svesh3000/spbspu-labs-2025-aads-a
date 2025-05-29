@@ -77,15 +77,24 @@ namespace dribas
     using NodeType = Node< Key, T >;
   public:
     AVLTree();
-    // AVLTree(const TreeType&);
-    // AVLTree(AVLTree&&);
+    AVLTree(const TreeType&);
+    AVLTree(TreeType&&) noexcept;
+    template< typename InputIt >
+    AVLTree(InputIt, InputIt);
+    explicit AVLTree(std::initializer_list< std::pair< Key, T > >);
     ~AVLTree();
 
-    // TreeType& operator=(const TreeType&);
-    // TreeType& operator=(TreeType&&);
-    // T& at(const Key&);
-    // const T& at(const Key&) const;
-    // T& operator[](const Key&);
+    TreeType& operator=(const TreeType&);
+    TreeType& operator=(TreeType&&) noexcept;
+    T& at(const Key&);
+    const T& at(const Key&) const;
+    T& operator[](const Key&);
+
+    std::pair< iterator, bool > insert(const std::pair< Key, T >& val);
+    std::pair< iterator, bool > insert(std::pair< Key, T >&& val);
+    template < class InputIterator > 
+    void insert(InputIterator first, InputIterator last);
+    void insert (std::initializer_list< std::pair< Key, T > > il);
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -99,13 +108,12 @@ namespace dribas
     //iterator emplace_hint(const_iterator hint, Args&&... args);
 
 
-    // std::pair< iterator, bool > insert(const std::pair< Key, T >&);
-    // void swap(AVLTree&);
+    void swap(AVLTree&) noexcept;
     void clear() noexcept;
-    // bool empty() const noexcept;
-    // size_t size() const noexcept;
-    // iterator find(const Key&);
-    // const_iterator find(const Key&) const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    iterator find(const Key&);
+    const_iterator find(const Key&) const;
 
   private:
     NodeType* fakeleaf_;
@@ -118,31 +126,207 @@ namespace dribas
     int getBalanceFactor(NodeType*) const noexcept;
     NodeType* rightRotate(NodeType*) noexcept;
     NodeType* leftRotate(NodeType*) noexcept;
-    // NodeType* findNode(const Key&) const;
+    NodeType* findNode(const Key&) const;
     void clearSubtree(NodeType*) noexcept;
   };
 
-  template< class Key, class T, class Cmp >
-  void AVLTree< Key, T, Cmp >::balanceTree(NodeType* node)
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >::AVLTree(std::initializer_list< std::pair< Key, T > > list):
+    AVLTree()
   {
-    while (node) {
-      NodeType* parent = node->parent;
-      bool isLeft = false;
-      if (parent != nullptr) {
-        isLeft = (parent->left == node);
-      }
-      node = balance(node);
-      if (parent != nullptr) {
-        if (isLeft) {
-          parent->left = node;
-        } else {
-          parent->right = node;
-        }
-      } else {
-        root_ = node;
-      }
-      node = parent;
+    for (auto it = list.begin(); it != list.end(); it++)
+    {
+      insert(*it);
     }
+  }
+
+  template< class Key, class T, class Compare >
+  template< typename InputIt >
+  AVLTree< Key, T, Compare >::AVLTree(InputIt first, InputIt last):
+    AVLTree()
+  {
+    for (auto it = first; it != last; it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< class Key, class T, class Compare >
+  void AVLTree< Key, T, Compare >::swap(TreeType& other) noexcept
+  {
+    std::swap(fakeleaf_, other.fakeleaf_);
+    std::swap(root_, other.root_);
+    std::swap(cmp_, other.cmp_);
+    std::swap(size_, other.size_);
+  }
+
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >::AVLTree(const TreeType& other):
+    fakeleaf_(new NodeType()),
+    root_(fakeleaf_),
+    cmp_(other.cmp_),
+    size_(0)
+  {
+    for (const auto& pair: other) {
+      this->insert(pair);
+    }
+  }
+
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >::AVLTree(TreeType&& other) noexcept:
+    fakeleaf_(std::exchange(other.fakeleaf_, nullptr)),
+    root_(std::exchange(other.root_, nullptr)),
+    cmp_(std::move(other.cmp_)),
+    size_(std::exchange(other.size_, 0))
+ {}
+
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >& AVLTree< Key, T, Compare >::operator=(const TreeType& other)
+  {
+    if (this != std::addressof(other)) {
+      AVLTree temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< class Key, class T, class Compare >
+  AVLTree< Key, T, Compare >& AVLTree< Key, T, Compare >::operator=(TreeType&& other) noexcept
+  {
+    if (this != std::addressof(other)) {
+      AVLTree temp(std::move(other));
+      swap(temp);
+    }
+    return *this;
+  }
+
+
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::find(const Key& key)
+  {
+    NodeType* node = findNode(key);
+    if (node != fakeleaf_) {
+      return iterator{ node, this };
+    } else {
+      return end();
+    }
+  }
+
+  template< class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::find(const Key& key) const
+  {
+    NodeType* node = findNode(key);
+    if (node != fakeleaf_) {
+      return const_iterator{ node, this };
+    } else {
+      return end();
+    }
+  }
+
+  template< class Key, class T, class Compare >
+  Node< Key, T >* AVLTree< Key, T, Compare >::findNode(const Key& key) const
+  {
+    NodeType* current = root_;
+    while (current != fakeleaf_) {
+      if (cmp_(key, current->value.first)) {
+        current = current->left;
+      } else if (cmp_(current->value.first, key)) {
+        current = current->right;
+      } else {
+        return current;
+      }
+    }
+    return fakeleaf_;
+  }
+
+  template< class Key, class T, class Cmp >
+  T& AVLTree< Key, T, Cmp >::operator[](const Key& key)
+  {
+    auto result = insert(std::make_pair(key, T()));
+    return result.first->second;
+  }
+
+  template< class Key, class T, class Cmp >
+  const T& AVLTree< Key, T, Cmp >::at(const Key& key) const 
+  {
+    NodeType* node = findNode(key);
+    if (node == fakeleaf_) {
+      throw std::out_of_range("Key not found in AVLTree");
+    }
+    return node->value.second;
+  }
+
+  template< class Key, class T, class Cmp >
+  T& AVLTree< Key, T, Cmp >::at(const Key& key)
+  {
+    NodeType* node = findNode(key);
+    if (node == fakeleaf_) {
+      throw std::out_of_range("Key not found in AVLTree");
+    }
+    return node->value.second;
+  }
+
+  template< class Key, class T, class Cmp >
+  void AVLTree< Key, T, Cmp >::insert(std::initializer_list< std::pair< Key, T > > il)
+  {
+    insert(il.begin(), il.end());
+  }
+
+  template< class Key, class T, class Cmp >
+  template < class InputIterator >
+  void AVLTree< Key, T, Cmp >::insert(InputIterator first, InputIterator last)
+  {
+    for (; first != last; ++first) {
+      insert(*first);
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  std::pair < Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(std::pair< Key, T >&& value)
+  {
+    return emplace(std::move(value.first), std::move(value.second));
+  }
+
+  template< class Key, class T, class Cmp >
+  std::pair < Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(const std::pair< Key, T >& value)
+  {
+    NodeType* current = root_;
+    NodeType* parent = nullptr;
+    while (current != fakeleaf_) {
+      parent = current;
+      if (value.first == current->value.first) {
+        return {iterator(current, this), false};
+      }
+      if (cmp_(value.first, current->value.first)) {
+        current = current->left;
+      } else {
+        current = current->right;
+      }
+    }
+    NodeType* newNode = new NodeType(value, fakeleaf_);
+    newNode->parent = parent;
+    if (parent == nullptr) {
+      root_ = newNode;
+    } else if (cmp_(value.first, parent->value.first)) {
+        parent->left = newNode;
+    } else {
+        parent->right = newNode;
+    }
+    size_++;
+    //balanceTree(newNode);
+    return {iterator(newNode, this), true};
+}
+
+  template< class Key, class T, class Cmp >
+  bool AVLTree< Key, T, Cmp >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< class Key, class T, class Cmp >
+  size_t AVLTree< Key, T, Cmp >::size() const noexcept
+  {
+    return size_;
   }
 
   template< class Key, class T, class Cmp >
@@ -205,12 +389,12 @@ namespace dribas
   AVLTree< Key, T, Cmp >::~AVLTree()
   {
     clearSubtree(root_);
-    delete[] reinterpret_cast< char* >(fakeleaf_);
+    delete fakeleaf_;
   } 
 
   template< class Key, class T, class Cmp >
   AVLTree< Key, T, Cmp >::AVLTree():
-    fakeleaf_(reinterpret_cast< NodeType* >(new char[sizeof(NodeType)])),
+    fakeleaf_(new NodeType()),
     root_(fakeleaf_),
     cmp_(),
     size_(0)
@@ -255,7 +439,7 @@ namespace dribas
       parent->right = newNode;
     }
   
-    balanceTree(newNode);
+    //balanceTree(newNode);
     size_++;
     return { iterator(newNode, this), true };
   }
@@ -264,7 +448,7 @@ namespace dribas
   void AVLTree< Key, T, Cmp >::updateHeight(NodeType* node) noexcept
   {
     auto current = node;
-    while (node != nullptr || node == fakeleaf_) {
+    if (node != nullptr) {
       node->height = std::max(node->right->height, node->left->height) + 1;
       node = node->parent;
     }
@@ -350,6 +534,29 @@ namespace dribas
       return leftRotate(node);
     }
     return node;
+  }
+
+  template< class Key, class T, class Cmp >
+  void AVLTree< Key, T, Cmp >::balanceTree(NodeType* node)
+  {
+    while (node) {
+      NodeType* parent = node->parent;
+      bool isLeft = false;
+      if (parent != nullptr) {
+        isLeft = (parent->left == node);
+      }
+      node = balance(node);
+      if (parent != nullptr) {
+        if (isLeft) {
+          parent->left = node;
+        } else {
+          parent->right = node;
+        }
+      } else {
+        root_ = node;
+      }
+      node = parent;
+    }
   }
 }
 #endif
