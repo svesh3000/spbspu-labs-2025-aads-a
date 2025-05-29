@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <cctype>
 #include <climits>
-#include "stack.hpp"
-#include "queue.hpp"
+#include <stack.hpp>
+#include <queue.hpp>
 
 namespace
 {

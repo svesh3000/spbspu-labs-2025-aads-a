@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "array.hpp"
+#include <array.hpp>
 
 using array_t = duhanina::DynamicArray< int >;
 
