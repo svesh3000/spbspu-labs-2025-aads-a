@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
   catch (...)
   {
     std::cout << "<INVALID COMMAND>\n";
-    continue;
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
   return 0;
 }
