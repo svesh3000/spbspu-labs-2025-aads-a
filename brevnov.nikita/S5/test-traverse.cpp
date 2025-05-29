@@ -10,7 +10,7 @@ using namespace brevnov;
 
 BOOST_AUTO_TEST_CASE(traverse)
 {
-  RBTree< int, std::string > tree({ { 10, "a" }, { 43, "b" }, { 25, "c" }, { 48, "d" }, { 9, "e" } });
+  AVLTree< int, std::string > tree({ { 10, "a" }, { 43, "b" }, { 25, "c" }, { 48, "d" }, { 9, "e" } });
   std::ostringstream iss;
   KeySum funLnr;
   funLnr = tree.traverse_lnr(funLnr);
