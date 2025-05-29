@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(LNRTraverseTest)
 
   ValueCollector vc;
   tree.traverse_lnr(vc);
-  BOOST_TEST(vc.result == "two three four five six seven eight");
+  BOOST_TEST(vc.result == "two three four five six seven eight ");
 
   KeySum ks;
   tree.traverse_lnr(ks);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(LNRTraverseTest)
   const auto& constTree = tree;
   ValueCollector vcConst;
   constTree.traverse_lnr(vcConst);
-  BOOST_TEST(vcConst.result == "two three four five six seven eight");
+  BOOST_TEST(vcConst.result == "two three four five six seven eight ");
 }
 
 BOOST_AUTO_TEST_CASE(RNLTraverseTest)
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(RNLTraverseTest)
 
   ValueCollector vc;
   tree.traverse_rnl(vc);
-  BOOST_TEST(vc.result == "eight seven six five four three two");
+  BOOST_TEST(vc.result == "eight seven six five four three two ");
 
   KeySum ks;
   tree.traverse_rnl(ks);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(RNLTraverseTest)
   const auto& constTree = tree;
   ValueCollector vcConst;
   constTree.traverse_rnl(vcConst);
-  BOOST_TEST(vcConst.result == "eight seven six five four three two");
+  BOOST_TEST(vcConst.result == "eight seven six five four three two ");
 }
 
 BOOST_AUTO_TEST_CASE(BreadthTraverseTest)
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(BreadthTraverseTest)
 
   ValueCollector vc;
   tree.traverse_breadth(vc);
-  BOOST_TEST(vc.result == "five three seven two four six eight");
+  BOOST_TEST(vc.result == "five three seven two four six eight ");
 
   KeySum ks;
   tree.traverse_breadth(ks);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(BreadthTraverseTest)
   const auto& constTree = tree;
   ValueCollector vcConst;
   constTree.traverse_breadth(vcConst);
-  BOOST_TEST(vcConst.result == "five three seven two four six eight");
+  BOOST_TEST(vcConst.result == "five three seven two four six eight ");
 }
 
 BOOST_AUTO_TEST_CASE(EmptyTreeTraverseTest)
