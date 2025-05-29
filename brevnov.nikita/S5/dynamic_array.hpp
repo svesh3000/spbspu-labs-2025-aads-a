@@ -47,12 +47,12 @@ namespace brevnov
     size_(0),
     begin_(0)
   {
-    data_ = new T*[capacity_];
+    data_ = new T*[capacity_]();
   }
 
   template< typename T >
   Dynamic_array< T >::Dynamic_array(const Dynamic_array< T >& arr):
-    data_(new T*[arr.capacity_]),
+    data_(new T*[arr.capacity_]()),
     capacity_(arr.capacity_),
     size_(arr.size_),
     begin_(arr.begin_)
@@ -82,7 +82,7 @@ namespace brevnov
 
   template< typename T >
   Dynamic_array< T >::Dynamic_array(size_t capacity):
-    data_(new T*[capacity]),
+    data_(new T*[capacity]()),
     capacity_(capacity),
     size_(0),
     begin_(0)
@@ -152,6 +152,7 @@ namespace brevnov
       throw std::logic_error("Empty for popBack()");
     }
     delete data_[begin_ + size_ - 1];
+    data_[begin_ + size_ - 1] = nullptr;
     --size_;
   }
 
@@ -163,8 +164,13 @@ namespace brevnov
       throw std::logic_error("Empty for popFront()");
     }
     delete data_[begin_];
+    data_[begin_] = nullptr;
     ++begin_;
     --size_;
+    if (empty())
+    {
+      begin_ = 0;
+    }
   }
 
   template< typename T >
@@ -194,7 +200,7 @@ namespace brevnov
   {
     while(!empty())
     {
-      popFront();
+      popBack();
     }
     size_ = 0;
     begin_ = 0;
