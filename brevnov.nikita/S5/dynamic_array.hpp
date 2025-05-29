@@ -63,6 +63,7 @@ namespace brevnov
     size_ = 0;
     begin_ = 0;
   }
+  
   template< typename T >
   void Dynamic_array< T >::swap(Dynamic_array< T >& arr) noexcept
   {

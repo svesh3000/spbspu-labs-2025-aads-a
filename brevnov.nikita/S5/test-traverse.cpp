@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(traverse)
   BOOST_TEST(iss.str() == "135 d b c a e");
   iss.str("");
   KeySum funBr;
-  funBreadth = tree.traverse_breadth(funBr);
+  funBr = tree.traverse_breadth(funBr);
   iss << funBr.sum << funBr.str;
   BOOST_TEST(iss.str() == "135 a b c d e");
 }
