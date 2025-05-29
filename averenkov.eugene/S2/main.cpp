@@ -1,214 +1,277 @@
 #include <iostream>
+#include <climits>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "BiTree.hpp"
+#include <cctype>
+#include <stdexcept>
+#include "stack.hpp"
+#include "queue.hpp"
 
-using Dictionary = Tree<int, std::string>;
-using DictionaryStorage = Tree<std::string, Dictionary>;
-using str = const std::string&;
 
-void loadDictionaries(str filename, DictionaryStorage& storage)
+using namespace averenkov;
+
+bool isOperator(char c)
 {
-  std::ifstream file(filename);
-  if (!file)
-  {
-    std::cerr << "file error\n";
-    return;
-  }
-
-  std::string line;
-  while (std::getline(file, line))
-  {
-    if (line.empty())
-    {
-      continue;
-    }
-
-    std::istringstream iss(line);
-    std::string dictName;
-    iss >> dictName;
-
-    Dictionary dict;
-    int key;
-    std::string value;
-    while (iss >> key >> value)
-    {
-      dict.push(key, value);
-    }
-
-    storage.push(dictName, dict);
-  }
+  return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
 }
 
-void printDictionary(const Dictionary& dict, str name)
+int precedence(char op)
 {
-  if (dict.empty())
-  {
-    std::cout << "<EMPTY>\n";
-    return;
-  }
-
-  std::cout << name;
-  for (auto it = dict.begin(); it != dict.end(); ++it)
-  {
-    std::cout << " " << it->first << " " << it->second;
-  }
-  std::cout << "\n";
+  if (op == '+' || op == '-') return 1;
+  if (op == '*' || op == '/' || op == '%') return 2;
+  return 0;
 }
 
-void complement(DictionaryStorage& storage, str newName, str name1, str name2)
+
+std::string infixToPostfix(const std::string& infix)
 {
-  auto dict1 = storage.find(name1);
-  auto dict2 = storage.find(name2);
+  Stack< char > stack;
+  std::string postfix;
+  std::string number;
+  bool isNegative = false;
 
-  if (dict1 == storage.end() || dict2 == storage.end())
+  for (size_t i = 0; i < infix.size(); ++i)
   {
-    std::cout << "<INVALID COMMAND>\n";
-    return;
-  }
+    char ch = infix[i];
 
-  Dictionary result;
-  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
-  {
-    if (dict2->second.find(it->first) == dict2->second.end())
+    if (std::isspace(ch)) continue;
+
+    if (std::isdigit(ch))
     {
-      result.push(it->first, it->second);
+      number += ch;
     }
-  }
-
-  storage.push(newName, result);
-}
-
-void intersect(DictionaryStorage& storage, str newName, str name1, str name2)
-{
-  auto dict1 = storage.find(name1);
-  auto dict2 = storage.find(name2);
-
-  if (dict1 == storage.end() || dict2 == storage.end())
-  {
-    std::cout << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  Dictionary result;
-  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
-  {
-    if (dict2->second.find(it->first) != dict2->second.end())
+    else if (ch == '-' && (i == 0 || infix[i - 1] == '('))
     {
-      result.push(it->first, it->second);
+      isNegative = true;
     }
-  }
-
-  storage.push(newName, result);
-}
-
-void unionDicts(DictionaryStorage& storage, str newName, str name1, str name2)
-{
-  auto dict1 = storage.find(name1);
-  auto dict2 = storage.find(name2);
-
-  if (dict1 == storage.end() || dict2 == storage.end())
-  {
-    std::cout << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  Dictionary result;
-  for (auto it = dict1->second.begin(); it != dict1->second.end(); ++it)
-  {
-    result.push(it->first, it->second);
-  }
-  for (auto it = dict2->second.begin(); it != dict2->second.end(); ++it)
-  {
-    if (result.find(it->first) == result.end())
+    else
     {
-      result.push(it->first, it->second);
-    }
-  }
-
-  storage.push(newName, result);
-}
-
-int main(int argc, char* argv[])
-{
-  if (argc != 2)
-  {
-    std::cerr << "Usage: " << argv[0] << " filename\n";
-    return 1;
-  }
-
-  DictionaryStorage dictionaries;
-  loadDictionaries(argv[1], dictionaries);
-
-  std::string line;
-  while (std::getline(std::cin, line))
-  {
-    std::istringstream iss(line);
-    std::string command;
-    iss >> command;
-
-    if (command == "print")
-    {
-      std::string dictName;
-      if (iss >> dictName)
+      if (!number.empty())
       {
-        auto dict = dictionaries.find(dictName);
-        if (dict != dictionaries.end())
+        if (isNegative)
         {
-          printDictionary(dict->second, dictName);
+          postfix += '-';
+          isNegative = false;
         }
-        else
+        postfix += number + " ";
+        number.clear();
+      }
+
+      if (ch == '(')
+      {
+        stack.push(ch);
+      }
+      else if (ch == ')')
+      {
+        while (!stack.empty() && stack.top() != '(')
         {
-          std::cout << "<INVALID COMMAND>\n";
+          postfix += stack.drop();
+          postfix += ' ';
         }
+        if (stack.empty())
+        {
+          throw std::runtime_error("parentheses error");
+        }
+        stack.drop();
+      }
+      else if (isOperator(ch))
+      {
+        while (!stack.empty() && precedence(stack.top()) >= precedence(ch))
+        {
+          postfix += stack.drop();
+          postfix += ' ';
+        }
+        stack.push(ch);
       }
       else
       {
-        std::cout << "<INVALID COMMAND>\n";
+        throw std::runtime_error("error character in expression");
       }
     }
-    else if (command == "complement")
+  }
+
+  if (!number.empty())
+  {
+    if (isNegative)
     {
-      std::string newName, name1, name2;
-      if (iss >> newName >> name1 >> name2)
-      {
-        complement(dictionaries, newName, name1, name2);
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      postfix += '-';
     }
-    else if (command == "intersect")
+    postfix += number + " ";
+  }
+
+  while (!stack.empty())
+  {
+    if (stack.top() == '(')
     {
-      std::string newName, name1, name2;
-      if (iss >> newName >> name1 >> name2)
-      {
-        intersect(dictionaries, newName, name1, name2);
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      throw std::runtime_error("parentheses error");
     }
-    else if (command == "union")
+    postfix += stack.drop();
+    postfix += ' ';
+  }
+
+  if (!postfix.empty() && postfix.back() == ' ')
+  {
+    postfix.pop_back();
+  }
+
+  return postfix;
+}
+
+long long evaluatePostfix(const std::string& postfix)
+{
+  Stack< long long > stack;
+  std::istringstream iss(postfix);
+  std::string token;
+
+  while (iss >> token)
+  {
+    if (std::isdigit(token[0]))
     {
-      std::string newName, name1, name2;
-      if (iss >> newName >> name1 >> name2)
+      stack.push(std::stoll(token));
+    }
+    else if (isOperator(token[0]))
+    {
+      try
       {
-        unionDicts(dictionaries, newName, name1, name2);
+        long long b = stack.drop();
+        long long a = stack.drop();
+        long long result;
+
+        switch (token[0])
+        {
+          case '+':
+            if (a > 0 && b > 0 && a > LLONG_MAX - b)
+            {
+              throw std::runtime_error("overflow error");
+            }
+            result = a + b;
+            break;
+          case '-':
+            if (b > 0 && a < LLONG_MIN + b)
+            {
+              throw std::runtime_error("overflow error");
+            }
+            result = a - b;
+            break;
+          case '*':
+            if ((a > 0 && b > 0 && a > LLONG_MAX / b) ||
+                (a > 0 && b < 0 && b < LLONG_MIN / a) ||
+                (a < 0 && b > 0 && a < LLONG_MIN / b) ||
+                (a < 0 && b < 0 && a < LLONG_MAX / b))
+            {
+              throw std::runtime_error("overflow error");
+            }            result = a * b;
+            break;
+          case '/':
+            if (b == 0)
+            {
+              throw std::runtime_error("division zero");
+            }
+            result = a / b;
+            break;
+          case '%':
+            if (b == 0)
+            {
+              throw std::runtime_error("modul zero");
+            }
+            result = (a % b + b) % b;
+            break;
+          default:
+            throw std::runtime_error("invalid operator");
+        }
+
+        stack.push(result);
       }
-      else
+      catch (const std::underflow_error& e)
       {
-        std::cout << "<INVALID COMMAND>\n";
+        throw std::runtime_error("expression error");
       }
     }
     else
     {
-      std::cout << "<INVALID COMMAND>\n";
+      throw std::runtime_error("invalid token");
     }
   }
 
+  return stack.drop();
+}
+
+
+void processExpressions(std::istream& input)
+{
+  Stack< long long > results;
+  std::string line;
+  std::string token;
+
+  while (input >> token)
+  {
+    if (token == "(" || token == ")" || isOperator(token[0]) || std::isdigit(token[0]))
+    {
+      line += token + " ";
+    }
+    else
+    {
+      throw std::runtime_error("invalid token");
+    }
+
+    if (input.peek() == '\n' || input.peek() == EOF)
+    {
+      if (!line.empty())
+      {
+        std::string postfix = infixToPostfix(line);
+        long long result = evaluatePostfix(postfix);
+        results.push(result);
+        line.clear();
+      }
+    }
+  }
+
+  std::cout << results.drop();
+
+  while (!results.empty())
+  {
+    std::cout << " " << results.drop();
+  }
+  std::cout << "\n";
+}
+
+int main(int argc, char* argv[])
+{
+  try
+  {
+    if (argc > 2)
+    {
+      std::cerr << "Error\n";
+      return 1;
+    }
+
+    if (argc == 2)
+    {
+      std::ifstream file(argv[1]);
+      if (!file)
+      {
+        std::cerr << "Error\n";
+        return 1;
+      }
+      processExpressions(file);
+    }
+    else
+    {
+      processExpressions(std::cin);
+    }
+  }
+
+  catch (const std::underflow_error& e)
+  {
+    std::cout << "\n";
+    return 0;
+  }
+
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   return 0;
 }
