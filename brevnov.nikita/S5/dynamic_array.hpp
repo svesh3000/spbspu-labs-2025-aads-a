@@ -1,5 +1,5 @@
-#ifndef DYNAMIC_ARRAY_HPP
-#define DYNAMIC_ARRAY_HPP
+#ifndef Dynamic_array_HPP
+#define Dynamic_array_HPP
 #include <stdexcept>
 #include <utility>
 
@@ -31,14 +31,46 @@ namespace brevnov
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    void reallocate();
-    void swap(Dynamic_array< T >&) noexcept;
   private:
     T** data_;
     size_t capacity_;
     size_t size_;
     size_t begin_;
+
+    void reallocate();
+    void swap(Dynamic_array< T >&) noexcept;
   };
+
+  template< typename T >
+  void Dynamic_array< T >::reallocate()
+  {
+    size_t newCapacity = capacity_ * 2;
+    Dynamic_array< T > newArr(newCapacity);
+    for (size_t i = 0; i < size_; ++i)
+    {
+      newArr.push(*data_[i + begin_]);
+    }
+    swap(newArr);
+  }
+
+  template< typename T >
+  void Dynamic_array< T >::clear() noexcept
+  {
+    while (!empty())
+    {
+      popBack();
+    }
+    size_ = 0;
+    begin_ = 0;
+  }
+  template< typename T >
+  void Dynamic_array< T >::swap(Dynamic_array< T >& arr) noexcept
+  {
+    std::swap(data_, arr.data_);
+    std::swap(capacity_, arr.capacity_);
+    std::swap(size_, arr.size_);
+    std::swap(begin_, arr.begin_);
+  }
 
   template< typename T >
   Dynamic_array< T >::Dynamic_array():
@@ -54,14 +86,14 @@ namespace brevnov
   Dynamic_array< T >::Dynamic_array(const Dynamic_array< T >& arr):
     data_(new T*[arr.capacity_]()),
     capacity_(arr.capacity_),
-    size_(arr.size_),
-    begin_(arr.begin_)
+    size_(0),
+    begin_(0)
   {
     try
     {
-      for (size_t i = 0; i < size_; ++i)
+      for (; size_ < arr.size(); ++size_)
       {
-        data_[i] = new T(*arr.data_[i + begin_]);
+        data_[size_] = new T(*arr.data_[size_ + arr.begin_]);
       }
     }
     catch (...)
@@ -93,7 +125,6 @@ namespace brevnov
   {
     clear();
     delete[] data_;
-    data_ = nullptr;
     capacity_ = 0;
   }
 
@@ -197,17 +228,6 @@ namespace brevnov
   }
 
   template< typename T >
-  void Dynamic_array< T >::clear() noexcept
-  {
-    while(!empty())
-    {
-      popFront();
-    }
-    size_ = 0;
-    begin_ = 0;
-  }
-
-  template< typename T >
   size_t Dynamic_array< T >::size() const noexcept
   {
     return size_;
@@ -219,25 +239,6 @@ namespace brevnov
     return size_ == 0;
   }
 
-  template< typename T >
-  void Dynamic_array< T >::reallocate()
-  {
-    size_t newCapacity = capacity_ * 2;
-    Dynamic_array< T > newArr(newCapacity);
-    for (size_t i = 0; i < size_; ++i)
-    {
-      newArr.push(*data_[i + begin_]);
-    }
-    swap(newArr);
-  }
-
-  template< typename T >
-  void Dynamic_array< T >::swap(Dynamic_array< T >& arr) noexcept
-  {
-    std::swap(data_, arr.data_);
-    std::swap(capacity_, arr.capacity_);
-    std::swap(size_, arr.size_);
-    std::swap(begin_, arr.begin_);
-  }
 }
+
 #endif
