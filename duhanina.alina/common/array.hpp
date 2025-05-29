@@ -1,6 +1,7 @@
 #ifndef ARRAY_HPP
 #define ARRAY_HPP
 
+#include <utility>
 #include <stdexcept>
 #include <cstddef>
 
@@ -15,6 +16,10 @@ namespace duhanina
 
     DynamicArray(const DynamicArray& other);
     DynamicArray(DynamicArray&& other) noexcept;
+
+    void swap(DynamicArray& other) noexcept;
+
+    DynamicArray& operator=(const DynamicArray&);
     DynamicArray& operator=(DynamicArray&& other) noexcept;
 
     void push_back(const T& value);
@@ -31,20 +36,20 @@ namespace duhanina
     T& back() noexcept;
 
    private:
-    T* data_;
     size_t capacity_;
     size_t length_;
+    size_t head_;
+    T* data_;
     void resize();
   };
 
   template < typename T >
   DynamicArray< T >::DynamicArray() noexcept:
-    data_(nullptr),
     capacity_(50),
-    length_(0)
-  {
-    data_ = new T[capacity_];
-  }
+    length_(0),
+    head_(0),
+    data_(new T[capacity_])
+  {}
 
   template < typename T >
   DynamicArray< T >::~DynamicArray()
@@ -54,65 +59,84 @@ namespace duhanina
 
   template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
-    data_(new T[other.capacity_]),
     capacity_(other.capacity_),
-    length_(other.length_)
+    length_(other.length_),
+    head_(0),
+    data_(new T[other.capacity_])
   {
     try
     {
       for (size_t i = 0; i < other.length_; ++i)
       {
-        data_[i] = other.data_[i];
+        data_[i] = other.data_[i + other.head_];
       }
     }
     catch (...)
     {
       delete[] data_;
-      data_ = nullptr;
-      length_ = 0;
-      capacity_ = 0;
       throw;
     }
   }
 
   template < typename T >
   DynamicArray< T >::DynamicArray(DynamicArray&& other) noexcept:
-    data_(other.data_),
     capacity_(other.capacity_),
-    length_(other.length_)
+    length_(other.length_),
+    head_(0),
+    data_(other.data_)
   {
     other.data_ = nullptr;
     other.capacity_ = 0;
     other.length_ = 0;
+    other.head_ = 0;
+  }
+
+  template< typename T >
+  void DynamicArray< T >::swap(DynamicArray< T >& other) noexcept
+  {
+    std::swap(data_, other.data_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(length_, other.length_);
+    std::swap(head_, other.head_);
+  }
+
+  template < typename T >
+  DynamicArray< T >& DynamicArray< T >::operator=(const DynamicArray& other)
+  {
+    DynamicArray< T > temp(other);
+    swap(temp);
+    return *this;
   }
 
   template < typename T >
   DynamicArray< T >& DynamicArray< T >::operator=(DynamicArray&& other) noexcept
   {
-    if (this != &other)
-    {
-      delete[] data_;
-      data_ = other.data_;
-      capacity_ = other.capacity_;
-      length_ = other.length_;
-      other.data_ = nullptr;
-      other.capacity_ = 0;
-      other.length_ = 0;
-    }
+    DynamicArray< T > temp(std::move(other));
+    swap(temp);
     return *this;
   }
 
   template < typename T >
   void DynamicArray< T >::resize()
   {
-    capacity_ *= 2;
-    T* new_data = new T[capacity_];
-    for (size_t i = 0; i < length_; ++i)
+    size_t new_capacity = capacity_ * 2;
+    T* new_data = nullptr;
+    try
     {
-      new_data[i] = data_[i];
+      new_data = new T[new_capacity];
+      for (size_t i = 0; i < length_; ++i)
+      {
+        new_data[i + head_] = data_[i + head_];
+      }
+    }
+    catch (...)
+    {
+      delete[] new_data;
+      throw;
     }
     delete[] data_;
     data_ = new_data;
+    capacity_ = new_capacity;
   }
 
   template < typename T >
@@ -122,7 +146,8 @@ namespace duhanina
     {
       resize();
     }
-    data_[length_++] = value;
+    data_[length_ + head_] = value;
+    ++length_;
   }
 
   template < typename T >
@@ -142,11 +167,8 @@ namespace duhanina
     {
       throw std::out_of_range("Array is empty");
     }
-    for (size_t i = 0; i < length_ - 1; ++i)
-    {
-      data_[i] = data_[i + 1];
-    }
-    length_--;
+    head_ = (head_ + 1) % capacity_;
+    --length_;
   }
 
   template < typename T >
@@ -164,25 +186,25 @@ namespace duhanina
   template < typename T >
   const T& DynamicArray< T >::front() const noexcept
   {
-    return data_[0];
+    return data_[head_];
   }
 
   template < typename T >
   T& DynamicArray< T >::front() noexcept
   {
-    return data_[0];
+    return data_[head_];
   }
 
   template < typename T >
   const T& DynamicArray< T >::back() const noexcept
   {
-    return data_[length_ - 1];
+    return data_[length_ + head_ - 1];
   }
 
   template < typename T >
   T& DynamicArray< T >::back() noexcept
   {
-    return data_[length_ - 1];
+    return data_[length_ + head_ - 1];
   }
 }
 

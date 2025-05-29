@@ -9,50 +9,16 @@ namespace duhanina
   class Queue
   {
   public:
-    Queue() = default;
-    ~Queue() = default;
-
-    Queue(const Queue& other);
-    Queue(Queue&& other) noexcept;
-    Queue& operator=(const Queue& other);
-
     bool empty() const noexcept;
-
     void push(const T& value);
-
     void pop();
-
     const T& front() const noexcept;
     T& front() noexcept;
-
-    const T& back() const noexcept;
-    T& back() noexcept;
-
     size_t size() const noexcept;
 
   private:
     DynamicArray< T > array_;
   };
-
-  template < typename T >
-  Queue< T >::Queue(const Queue& other):
-    array_(other.array_)
-  {}
-
-  template < typename T >
-  Queue< T >::Queue(Queue&& other) noexcept:
-    array_(std::move(other.array_))
-  {}
-
-  template < typename T >
-  Queue< T >& Queue< T >::operator=(const Queue& other)
-  {
-    if (this != &other)
-    {
-      array_ = other.array_;
-    }
-    return *this;
-  }
 
   template < typename T >
   bool Queue< T >::empty() const noexcept
@@ -82,18 +48,6 @@ namespace duhanina
   T& Queue< T >::front() noexcept
   {
     return array_.front();
-  }
-
-  template < typename T >
-  const T& Queue< T >::back() const noexcept
-  {
-    return array_.back();
-  }
-
-  template < typename T >
-  T& Queue< T >::back() noexcept
-  {
-    return array_.back();
   }
 
   template < typename T >
