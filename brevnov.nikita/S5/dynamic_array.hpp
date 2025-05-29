@@ -93,6 +93,7 @@ namespace brevnov
   {
     clear();
     delete[] data_;
+    data_ = nullptr;
     capacity_ = 0;
   }
 
@@ -200,7 +201,7 @@ namespace brevnov
   {
     while(!empty())
     {
-      popBack();
+      popFront();
     }
     size_ = 0;
     begin_ = 0;
