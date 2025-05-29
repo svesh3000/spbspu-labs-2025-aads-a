@@ -1,10 +1,27 @@
 #include <boost/test/unit_test.hpp>
+#include <boost/test/tools/detail/print_helper.hpp>
 #include <string>
 #include "binary_tree.hpp"
 
-BOOST_AUTO_TEST_CASE(test_true)
+namespace boost::test_tools::tt_detail
 {
-  BOOST_TEST(true);
+  template< class Key, class Value >
+  struct print_log_value< abramov::Iterator< Key, Value > >
+  {
+    void operator()(std::ostream &os, const abramov::Iterator< Key, Value > &iter)
+    {
+      os << "iter";
+    }
+  };
+
+  template< class Key, class Value >
+  struct print_log_value< abramov::ConstIterator< Key, Value > >
+  {
+    void operator()(std::ostream &os, const abramov::ConstIterator< Key, Value > &iter)
+    {
+      os << "cIter";
+    }
+  };
 }
 
 BOOST_AUTO_TEST_CASE(defaultconstructor_insert)
@@ -58,13 +75,13 @@ BOOST_AUTO_TEST_CASE(cfind)
   tree.insert(9, "b");
   tree.insert(8, "c");
   tree.insert(7, "d");
-  auto it = tree.find(12);
+  auto it = tree.cfind(12);
   BOOST_TEST(it->second == "a");
-  it = tree.find(9);
+  it = tree.cfind(9);
   BOOST_TEST(it->second == "b");
-  it = tree.find(8);
+  it = tree.cfind(8);
   BOOST_TEST(it->second == "c");
-  it = tree.find(7);
+  it = tree.cfind(7);
   BOOST_TEST(it->second == "d");
 }
 
@@ -117,4 +134,22 @@ BOOST_AUTO_TEST_CASE(clear)
   tree.insert(3, "b");
   tree.clear();
   BOOST_TEST(tree.empty());
+}
+
+BOOST_AUTO_TEST_CASE(equalrange)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(5, "a");
+  auto p = tree.equal_range(6);
+  BOOST_TEST(p.first == p.second);
+  BOOST_TEST(p.first == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(cequalrange)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(5, "a");
+  auto p = tree.cequal_range(6);
+  BOOST_TEST(p.first == p.second);
+  BOOST_TEST(p.first == tree.cend());
 }
