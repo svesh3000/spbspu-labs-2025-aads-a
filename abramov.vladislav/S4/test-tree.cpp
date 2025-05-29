@@ -33,6 +33,38 @@ BOOST_AUTO_TEST_CASE(defaultconstructor_insert)
   BOOST_TEST(it->second == "b");
 }
 
+BOOST_AUTO_TEST_CASE(erase_iter)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(10, "a");
+  tree.insert(8, "b");
+  tree.insert(12, "c");
+  tree.insert(5, "d");
+  tree.insert(14, "e");
+  tree.erase(tree.find(5));
+  BOOST_TEST(tree.find(5) == tree.end());
+  tree.erase(tree.find(8));
+  BOOST_TEST(tree.find(8) == tree.end());
+  tree.erase(tree.find(12));
+  BOOST_TEST(tree.find(12) == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(erase_key)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(10, "a");
+  tree.insert(8, "b");
+  tree.insert(12, "c");
+  tree.insert(5, "d");
+  tree.insert(14, "e");
+  tree.erase(5);
+  BOOST_TEST(tree.find(5) == tree.end());
+  tree.erase(12);
+  BOOST_TEST(tree.find(12) == tree.end());
+  tree.erase(8);
+  BOOST_TEST(tree.find(8) == tree.end());
+}
+
 BOOST_AUTO_TEST_CASE(begin)
 {
   abramov::BinarySearchTree< int, std::string > tree;

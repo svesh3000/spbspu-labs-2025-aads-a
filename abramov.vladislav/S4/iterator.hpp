@@ -2,9 +2,13 @@
 #define ITERATOR_HPP
 #include <iterator>
 #include "node.hpp"
+#include "binary_tree.hpp"
 
 namespace abramov
 {
+  template< class Key, class Value, class Cmp >
+  struct BinarySearchTree;
+
   template< class Key, class Value >
   struct Iterator: std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
@@ -24,6 +28,9 @@ namespace abramov
   private:
     Node< Key, Value > *node_;
     Node< Key, Value > *fake_;
+
+    template< class K, class V, class C >
+    friend struct BinarySearchTree;
   };
 
   template< class Key, class Value >

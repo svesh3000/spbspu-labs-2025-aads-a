@@ -11,6 +11,7 @@ namespace abramov
 {
   template< class Key, class Value >
   using range_t = std::pair< Iterator< Key, Value >, Iterator< Key, Value > >;
+
   template< class Key, class Value >
   using crange_t = std::pair< ConstIterator< Key, Value >, ConstIterator< Key, Value > >;
 
@@ -29,6 +30,8 @@ namespace abramov
     size_t count(const Key &k) const noexcept;
     range_t< Key, Value > equal_range(const Key &k) noexcept;
     crange_t< Key, Value > cequal_range(const Key &k) const noexcept;
+    void erase(Iterator< Key, Value > pos) noexcept;
+    void erase(const Key &k) noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
@@ -168,6 +171,77 @@ namespace abramov
       return std::make_pair(c_iter, c_iter);
     }
     return std::make_pair(c_iter, ++c_iter);
+  }
+
+  template< class Key, class Value, class Cmp >
+  void BinarySearchTree< Key, Value, Cmp >::erase(Iterator< Key, Value > pos) noexcept
+  {
+    if (pos == end())
+    {
+      return;
+    }
+    Node< Key, Value > *node = pos.node_;
+    Node< Key, Value > *parent = node->parent_;
+    if (node->left_ == fake_ && node->right_ == fake_)
+    {
+      if (parent)
+      {
+        if (parent->left_ == node)
+        {
+          parent->left_ = fake_;
+        }
+        else
+        {
+          parent->right_ = fake_;
+        }
+      }
+      else
+      {
+        root_ = nullptr;
+      }
+      delete node;
+      --size_;
+      return;
+    }
+    if (node->left_ == fake_ || node->right_ == fake_)
+    {
+      Node< Key, Value > *child = (node->left_ != fake_) ? node->left_ : node->right_;
+      if (parent)
+      {
+        if (parent->left_ == node)
+        {
+          parent->left_ = child;
+        }
+        else
+        {
+          parent->right_ = child;
+        }
+        child->parent_ = parent;
+      }
+      else
+      {
+        root_ = child;
+        child->parent_ = nullptr;
+      }
+      delete node;
+      --size_;
+      return;
+    }
+    Node< Key, Value > *successor = node->right_;
+    while (successor->left_ != fake_)
+    {
+      successor = successor->left_;
+    }
+    auto data = successor->data_;
+    erase(Iterator< Key, Value >(successor, fake_));
+    node->data_ = data;
+  }
+
+  template< class Key, class Value, class Cmp >
+  void BinarySearchTree< Key, Value, Cmp >::erase(const Key &k) noexcept
+  {
+    Iterator< Key, Value > pos = find(k);
+    erase(pos);
   }
 
   template< class Key, class Value, class Cmp >
