@@ -11,7 +11,7 @@ namespace lanovenko
   class Tree;
 
   template< typename Key, typename Value, typename Comparator >
-  class TreeIterator final: public std::iterator< std::forward_iterator_tag, Value >
+  class TreeIterator final : public std::iterator< std::forward_iterator_tag, Value >
   {
   public:
     using this_t = TreeIterator< Key, Value, Comparator >;
@@ -26,76 +26,71 @@ namespace lanovenko
     bool operator!=(const this_t& rhs) const;
     bool operator==(const this_t& rhs) const;
   private:
-    friend class Tree< Key, Value, Comparator >;
     TreeNode< Key, Value >* node_;
     explicit TreeIterator(TreeNode< Key, Value >* node);
+    friend class Tree< Key, Value, Comparator >;
   };
-}
 
-template< typename Key, typename Value, typename Comparator >
-lanovenko::TreeIterator< Key, Value, Comparator >::TreeIterator() :
-  node_(nullptr)
-{}
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator >::TreeIterator():
+    node_(nullptr)
+  {}
 
-template< typename Key, typename Value, typename Comparator >
-lanovenko::TreeIterator< Key, Value, Comparator >& lanovenko::TreeIterator< Key, Value, Comparator >::operator++()
-{
-  if (node_->right_)
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator >& TreeIterator< Key, Value, Comparator >::operator++()
   {
-    node_ = node_->right_;
-    while (node_->left_)
+    if (node_->right_)
     {
-      node_ = node_->left_;
+      node_ = Tree< Key, Value, Comparator >::minValueNode(node_->right_);
+      return *this;
     }
-    return *this;
-  }
-  else
-  {
-    while (node_->parent_ && node_->parent_->right_ == node_)
+    else
     {
+      while (node_->parent_ && node_->parent_->left_ != node_)
+      {
+        node_ = node_->parent_;
+      }
       node_ = node_->parent_;
+      return *this;
     }
-    node_ = node_->parent_;
-    return *this;
   }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator > TreeIterator< Key, Value, Comparator >::operator++(int)
+  {
+    this_t result(*this);
+    ++(*this);
+    return result;
+  }
+
+  template< class Key, class Value, class Cmp>
+  std::pair< Key, Value >& TreeIterator< Key, Value, Cmp >::operator*()
+  {
+    return node_->data_;
+  }
+
+  template< class Key, class Value, class Cmp>
+  std::pair< Key, Value >* TreeIterator< Key, Value, Cmp >::operator->()
+  {
+    return std::addressof(node_->data_);
+  }
+
+  template< class Key, class Value, class Cmp>
+  bool TreeIterator< Key, Value, Cmp >::operator==(const this_t& rhs) const
+  {
+    return node_ == rhs.node_;
+  }
+
+  template< class Key, class Value, class Cmp>
+  bool TreeIterator< Key, Value, Cmp >::operator!=(const this_t& rhs) const
+  {
+    return !(rhs == *this);
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator >::TreeIterator(TreeNode< Key, Value >* node):
+    node_(node)
+  {}
 }
-
-template< typename Key, typename Value, typename Comparator >
-lanovenko::TreeIterator< Key, Value, Comparator > lanovenko::TreeIterator< Key, Value, Comparator >::operator++(int)
-{
-  this_t result(*this);
-  ++(*this);
-  return result;
-}
-
-
-template< class Key, class Value, class Cmp>
-std::pair< Key, Value >& lanovenko::TreeIterator< Key, Value, Cmp >::operator*()
-{
-  return node_->data_;
-}
-
-template< class Key, class Value, class Cmp>
-std::pair< Key, Value >* lanovenko::TreeIterator< Key, Value, Cmp >::operator->()
-{
-  return std::addressof(node_->data_);
-}
-
-template< class Key, class Value, class Cmp>
-bool lanovenko::TreeIterator< Key, Value, Cmp >::operator==(const this_t& rhs) const
-{
-  return node_ == rhs.node_;
-}
-
-template< class Key, class Value, class Cmp>
-bool lanovenko::TreeIterator< Key, Value, Cmp >::operator!=(const this_t& rhs) const
-{
-  return !(rhs == *this);
-}
-
-template< typename Key, typename Value, typename Comparator >
-lanovenko::TreeIterator< Key, Value, Comparator >::TreeIterator(TreeNode< Key, Value >* node):
-  node_(node)
-{}
 
 #endif
