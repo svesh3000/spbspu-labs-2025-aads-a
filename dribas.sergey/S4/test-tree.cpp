@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(InsertLValuePair)
 
 BOOST_AUTO_TEST_CASE(InsertRValuePair)
 {
-  AVLTree<int, std::string> m;
+  AVLTree< int, std::string > m;
   auto result = m.insert({2, "two"});
   BOOST_CHECK(result.second);
   BOOST_CHECK_EQUAL(result.first->first, 2);
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(InsertRValuePair)
 
 BOOST_AUTO_TEST_CASE(InsertRValueDuplicate)
 {
-  AVLTree<int, std::string> m({{3, "three"}});
+  AVLTree< int, std::string > m({{3, "three"}});
   auto result = m.insert({3, "duplicate"});
   BOOST_CHECK(!result.second);
   BOOST_CHECK_EQUAL(result.first->second, "three");
@@ -152,8 +152,8 @@ BOOST_AUTO_TEST_CASE(InsertRValueDuplicate)
 
 BOOST_AUTO_TEST_CASE(InsertRange)
 {
-  AVLTree<int, std::string> source({{1, "one"}, {2, "two"}, {3, "three"}});
-  AVLTree<int, std::string> target;
+  AVLTree< int, std::string > source({{1, "one"}, {2, "two"}, {3, "three"}});
+  AVLTree< int, std::string > target;
   target.insert(source.begin(), source.end());
   BOOST_CHECK_EQUAL(target.size(), 3);
   BOOST_CHECK_EQUAL(target.at(2), "two");
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(InsertRange)
 
 BOOST_AUTO_TEST_CASE(InsertOverlappingRange)
 {
-  AVLTree <int, std::string > m({{1, "old"}, {3, "three"}});
+  AVLTree < int, std::string > m({{1, "old"}, {3, "three"}});
   std::vector< std::pair< int, std::string > > v({{1, "new"}, {2, "two"}});
   m.insert(v.begin(), v.end());
   BOOST_CHECK_EQUAL(m.size(), 3);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(InsertInitializerListToNonEmpty)
 BOOST_AUTO_TEST_CASE(InsertEmptyRange)
 {
   AVLTree< int, std::string > m({{1, "one"}});
-  std::vector< std::pair< int, std::string  >> empty_vec;
+  std::vector< std::pair< int, std::string > > empty_vec;
   m.insert(empty_vec.begin(), empty_vec.end());
   BOOST_CHECK_EQUAL(m.size(), 1);
 }

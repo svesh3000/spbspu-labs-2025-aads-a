@@ -1,14 +1,19 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
-#include "constIterator.hpp"
+#include <utility>
+#include <functional>
 
 namespace dribas
 {
-  template <class Key, class T, class Compare>
+  template< class Key, class T, class Compare >
   class AVLTree;
-  template <class Key, class T>
+
+  template< class Key, class T >
   class Node;
+
+  template< class Key, class T, class Compare >
+  class ConstIterator;
 
   template< class Key, class T, class Compare = std::less< Key > >
   class Iterator
@@ -59,8 +64,8 @@ namespace dribas
     return std::addressof(node_->value);
   }
 
-  template <class Key, class T, class Compare>
-  Iterator<Key, T, Compare>& Iterator<Key, T, Compare>::operator++() noexcept
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare >& Iterator< Key, T, Compare >::operator++() noexcept
   {
     if (!node_->right->isFake) {
       node_ = node_->right;
@@ -81,8 +86,8 @@ namespace dribas
     return *this;
   }
 
-  template <class Key, class T, class Compare>
-  Iterator<Key, T, Compare>& Iterator<Key, T, Compare>::operator--() noexcept
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare >& Iterator< Key, T, Compare >::operator--() noexcept
   {
     if (node_ == tree_->fakeleaf_) {
       node_ = tree_->root_;
@@ -109,7 +114,7 @@ namespace dribas
   }
 
 
-  template < class Key, class T, class Compare >
+  template< class Key, class T, class Compare >
   Iterator< Key, T, Compare > Iterator< Key, T, Compare >::operator--(int) noexcept
   {
     Iterator tmp = *this;
@@ -117,7 +122,7 @@ namespace dribas
     return tmp;
   }
 
-  template < class Key, class T, class Compare >
+  template< class Key, class T, class Compare >
   Iterator< Key, T, Compare > Iterator< Key, T, Compare >::operator++(int) noexcept
   {
     Iterator tmp = *this;
@@ -125,13 +130,13 @@ namespace dribas
     return tmp;
   }
 
-  template < class Key, class T, class Compare >
+  template< class Key, class T, class Compare >
   bool Iterator< Key, T, Compare >::operator==(const Iterator& other) const noexcept
   {
     return node_ == other.node_;
   }
 
-  template < class Key, class T, class Compare >
+  template< class Key, class T, class Compare >
   bool Iterator< Key, T, Compare >::operator!=(const Iterator& other) const noexcept
   {
     return !(node_ == other.node_);

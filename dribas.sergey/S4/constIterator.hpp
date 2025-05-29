@@ -1,15 +1,18 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
 
-#include "avlTree.hpp"
+#include <utility>
+#include <functional>
 
 namespace dribas
 {
-  template< class Key, class T, class Compare >
+  template < class Key, class T, class Compare >
   class AVLTree;
-  template< class Key, class T >
+
+  template < class Key, class T >
   class Node;
-  template< class Key, class T, class Compare >
+
+  template < class Key, class T, class Compare >
   class Iterator;
 
   template < class Key, class T, class Compare = std::less< Key > >
@@ -50,7 +53,7 @@ namespace dribas
   {}
 
   template < class Key, class T, class Compare >
-  ConstIterator<Key, T, Compare>::ConstIterator(const Node< Key, T >* node, const AVLTree< Key, T, Compare >* tree) noexcept:
+  ConstIterator< Key, T, Compare >::ConstIterator(const Node< Key, T >* node, const AVLTree< Key, T, Compare >* tree) noexcept:
     node_(node), tree_(tree)
   {}
 
@@ -66,8 +69,8 @@ namespace dribas
     return std::addressof(node_->value);
   }
 
-  template <class Key, class T, class Compare>
-  ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator++() noexcept
+  template < class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare >& ConstIterator< Key, T, Compare >::operator++() noexcept
   {
     if (!node_->right->isFake) {
       node_ = node_->right;
@@ -88,8 +91,8 @@ namespace dribas
     return *this;
   }
 
-  template <class Key, class T, class Compare>
-  ConstIterator<Key, T, Compare>& ConstIterator<Key, T, Compare>::operator--() noexcept
+  template < class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare >& ConstIterator< Key, T, Compare >::operator--() noexcept
   {
     if (node_ == tree_->fakeleaf_) {
       node_ = tree_->root_;
@@ -116,7 +119,7 @@ namespace dribas
   }
 
   template < class Key, class T, class Compare >
-  ConstIterator< Key, T, Compare > ConstIterator< Key, T, Compare >::operator--(int) noexcept
+  ConstIterator< Key, T, Compare >ConstIterator< Key, T, Compare >::operator--(int) noexcept
   {
     ConstIterator tmp = *this;
     --(*this);
@@ -124,7 +127,7 @@ namespace dribas
   }
 
   template < class Key, class T, class Compare >
-  ConstIterator< Key, T, Compare > ConstIterator< Key, T, Compare >::operator++(int) noexcept
+  ConstIterator< Key, T, Compare >ConstIterator< Key, T, Compare >::operator++(int) noexcept
   {
     ConstIterator tmp = *this;
     ++(*this);

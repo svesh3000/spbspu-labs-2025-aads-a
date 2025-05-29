@@ -12,8 +12,8 @@
 
 namespace dribas
 {
-  template <class Key, class T, class Compare> class Iterator;
-  template <class Key, class T, class Compare> class ConstIterator;
+  template< class Key, class T, class Compare > class Iterator;
+  template< class Key, class T, class Compare > class ConstIterator;
 
   template< class Key, class T >
   struct Node
@@ -93,7 +93,7 @@ namespace dribas
 
     std::pair< iterator, bool > insert(const std::pair< Key, T >& val);
     std::pair< iterator, bool > insert(std::pair< Key, T >&& val);
-    template < class InputIterator >
+    template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
     void insert (std::initializer_list< std::pair< Key, T > > il);
     iterator  erase (const_iterator position);
@@ -109,7 +109,7 @@ namespace dribas
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args&&... args);
-    template <class... Args>
+    template< class... Args >
     iterator emplace_hint(const_iterator hint, Args&&... args);
 
     std::pair< const_iterator, const_iterator > equal_range (const Key& k)const;
@@ -142,11 +142,11 @@ namespace dribas
     void clearSubtree(NodeType*) noexcept;
   };
 
-  template < class Key, class T, class Compare >
-  template < class... Args >
+  template< class Key, class T, class Compare >
+  template< class... Args >
   Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::emplace_hint(const_iterator hint, Args&&... args)
   {
-    NodeType* newNode = new NodeType(std::forward<Args>(args)...);
+    NodeType* newNode = new NodeType(std::forward< Args >(args)...);
     newNode->left = fakeleaf_;
     newNode->right = fakeleaf_;
     newNode->parent = nullptr;
@@ -540,7 +540,7 @@ namespace dribas
   }
 
   template< class Key, class T, class Cmp >
-  template < class InputIterator >
+  template< class InputIterator >
   void AVLTree< Key, T, Cmp >::insert(InputIterator first, InputIterator last)
   {
     for (; first != last; ++first) {
@@ -549,13 +549,13 @@ namespace dribas
   }
 
   template< class Key, class T, class Cmp >
-  std::pair < Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(std::pair< Key, T >&& value)
+  std::pair< Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(std::pair< Key, T >&& value)
   {
     return emplace(std::move(value.first), std::move(value.second));
   }
 
   template< class Key, class T, class Cmp >
-  std::pair < Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(const std::pair< Key, T >& value)
+  std::pair< Iterator< Key, T, Cmp >, bool > AVLTree< Key, T, Cmp >::insert(const std::pair< Key, T >& value)
   {
     NodeType* current = root_;
     NodeType* parent = nullptr;
@@ -756,7 +756,7 @@ namespace dribas
     return leftNode;
   }
 
-  template < class Key, class T, class Cmp >
+  template< class Key, class T, class Cmp >
   Node< Key, T >* AVLTree< Key, T, Cmp >::leftRotate(NodeType* node) noexcept
   {
     NodeType* rightNode = node->right;
@@ -782,18 +782,18 @@ namespace dribas
     return rightNode;
   }
 
-  template < class Key, class T, class Cmp >
+  template< class Key, class T, class Cmp >
   Node< Key, T >* AVLTree< Key, T, Cmp >::balance(NodeType* node) noexcept
   {
     updateHeight(node);
     int balance = getBalanceFactor(node);
     if (balance > 1) {
-      if (getBalanceFactor(node->left) < 0) {
+      if (getBalanceFactor(node->left)< 0) {
         node->left = leftRotate(node->left);
       }
       return rightRotate(node);
     }
-    if (balance < -1) {
+    if (balance< -1) {
       if (getBalanceFactor(node->right) > 0) {
         node->right = rightRotate(node->right);
       }
