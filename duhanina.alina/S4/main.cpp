@@ -51,7 +51,7 @@ namespace
         }
       }
       if (!name.empty())
-      {
+      {      std::cout << "<INVALID COMMAND>\n";
         storage.push(name, dict);
       }
     }
@@ -80,8 +80,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result;
     for (auto it = dict1.begin(); it != dict1.end(); ++it)
     {
@@ -99,8 +99,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result;
     for (auto it = dict1.begin(); it != dict1.end(); ++it)
     {
@@ -118,8 +118,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result = dict1;
     for (auto it = dict2.begin(); it != dict2.end(); ++it)
     {
@@ -143,11 +143,14 @@ namespace
   {
     duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
     initializeCommands(commands);
-    if (!commands.count(cmd))
+    try
+    {
+      commands.at(cmd)(storage, args);
+    }
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
-    commands.at(cmd)(storage, args);
   }
 }
 
