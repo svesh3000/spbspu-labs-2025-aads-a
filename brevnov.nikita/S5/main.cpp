@@ -7,8 +7,8 @@
 #include "tree.hpp"
 #include "keySum.hpp"
 
-using Tree = AVLTree< int, std::string >;
 using namespace brevnov;
+using Tree = AVLTree< int, std::string >;
 
 void input(std::istream& input, Tree& tree)
 {

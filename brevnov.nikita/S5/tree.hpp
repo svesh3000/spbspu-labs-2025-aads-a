@@ -462,13 +462,13 @@ namespace brevnov
   template< typename Key, typename Value, typename Cmp >
   typename AVLTree< Key, Value, Cmp >::BrIter AVLTree< Key, Value, Cmp >::brEnd() noexcept
   {
-    return BrIterator(nullptr);
+    return BrIter(nullptr);
   }
 
   template< typename Key, typename Value, typename Cmp >
   typename AVLTree< Key, Value, Cmp >::ConstBrIter AVLTree< Key, Value, Cmp >::brCend() const noexcept
   {
-    return ConstBrIterator(nullptr);
+    return ConstBrIter(nullptr);
   }
 
   template< typename Key, typename Value, typename Cmp >

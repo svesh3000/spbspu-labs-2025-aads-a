@@ -39,7 +39,7 @@ namespace brevnov
     Stack< Node* > stack_;
     explicit RnlIterator(Node*) noexcept;
     friend class RnlIterator< Key, Value, Cmp, !IsConst >;
-    friend class RBTree< Key, Value, Cmp >;
+    friend class AVLTree< Key, Value, Cmp >;
   };
 
   template< typename Key, typename Value, typename Cmp, bool IsConst >
