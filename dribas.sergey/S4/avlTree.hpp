@@ -92,7 +92,7 @@ namespace dribas
 
     std::pair< iterator, bool > insert(const std::pair< Key, T >& val);
     std::pair< iterator, bool > insert(std::pair< Key, T >&& val);
-    template < class InputIterator > 
+    template < class InputIterator >
     void insert(InputIterator first, InputIterator last);
     void insert (std::initializer_list< std::pair< Key, T > > il);
 
@@ -390,7 +390,7 @@ namespace dribas
   {
     clearSubtree(root_);
     delete fakeleaf_;
-  } 
+  }
 
   template< class Key, class T, class Cmp >
   AVLTree< Key, T, Cmp >::AVLTree():
