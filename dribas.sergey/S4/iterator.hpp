@@ -1,7 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
-#include "avlTree.hpp"
+#include "constIterator.hpp"
 
 namespace dribas
 {
@@ -13,6 +13,7 @@ namespace dribas
   template< class Key, class T, class Compare = std::less< Key > >
   class Iterator
   {
+    friend class ConstIterator< Key, T, Compare >;
     friend class AVLTree< Key, T, Compare >;
   public:
     using valueType = std::pair< Key, T >;

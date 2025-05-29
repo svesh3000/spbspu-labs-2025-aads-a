@@ -267,8 +267,8 @@ BOOST_AUTO_TEST_SUITE(AVLTreeMethodTests)
 
 BOOST_AUTO_TEST_CASE(SwapTest)
 {
-  AVLTree<int, std::string> tree1({{1, "one"}, {2, "two"}});
-  AVLTree<int, std::string> tree2({{3, "three"}});
+  AVLTree< int, std::string > tree1({{1, "one"}, {2, "two"}});
+  AVLTree< int, std::string > tree2({{3, "three"}});
   tree1.swap(tree2);
   BOOST_CHECK_EQUAL(tree1.size(), 1);
   BOOST_CHECK_EQUAL(tree2.size(), 2);
@@ -329,6 +329,126 @@ BOOST_AUTO_TEST_CASE(ConstFindTest)
   BOOST_CHECK_EQUAL(it1->second, "one");
   auto it2 = tree.find(99);
   BOOST_CHECK(it2 == tree.end());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AVLTreeEraseTests)
+
+BOOST_AUTO_TEST_CASE(EraseByIteratorSingleElement) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {3, "three"}});
+  auto it = tree.find(2);
+  auto next_it = tree.erase(it);
+  BOOST_CHECK_EQUAL(tree.size(), 2);
+  BOOST_CHECK(tree.find(2) == tree.end());
+  BOOST_CHECK_EQUAL(next_it->first, 3);
+  BOOST_CHECK_EQUAL(tree.find(1)->second, "one");
+  BOOST_CHECK_EQUAL(tree.find(3)->second, "three");
+}
+
+BOOST_AUTO_TEST_CASE(EraseByKey) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {3, "three"}});
+  size_t count = tree.erase(2);
+  BOOST_CHECK_EQUAL(count, 1);
+  BOOST_CHECK_EQUAL(tree.size(), 2);
+  BOOST_CHECK(tree.find(2) == tree.end());
+  count = tree.erase(99);
+  BOOST_CHECK_EQUAL(count, 0);
+  BOOST_CHECK_EQUAL(tree.size(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(EraseRange) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}});
+  auto first = tree.find(2);
+  auto last = tree.find(4);
+  auto next_it = tree.erase(first, last);
+  BOOST_CHECK_EQUAL(tree.size(), 2);
+  BOOST_CHECK_EQUAL(next_it->first, 4);
+  BOOST_CHECK(tree.find(2) == tree.end());
+  BOOST_CHECK(tree.find(3) == tree.end());
+  BOOST_CHECK_EQUAL(tree.find(1)->second, "one");
+  BOOST_CHECK_EQUAL(tree.find(4)->second, "four");
+}
+
+BOOST_AUTO_TEST_CASE(EraseAllElements) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}});
+  tree.erase(tree.begin(), tree.end());
+  BOOST_CHECK(tree.empty());
+  BOOST_CHECK_EQUAL(tree.size(), 0);
+  BOOST_CHECK(tree.begin() == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(EraseEmptyRange) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}});
+  BOOST_CHECK_EQUAL(tree.size(), 1);
+  BOOST_CHECK_EQUAL(tree.find(1)->second, "one");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AVLTreeRangeSearchTests)
+
+BOOST_AUTO_TEST_CASE(EqualRangeTest) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {2, "two_dup"}, {3, "three"}});
+  auto it1 = tree.equal_range(2).first;
+  BOOST_CHECK_EQUAL(it1->second, "two");
+  auto it3 = tree.equal_range(99).first;
+  BOOST_CHECK(it3 == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(LowerBoundTest) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {3, "three"}, {5, "five"}});
+  auto it1 = tree.lower_bound(2);
+  BOOST_CHECK_EQUAL(it1->first, 3);
+  auto it2 = tree.lower_bound(3);
+  BOOST_CHECK_EQUAL(it2->first, 3);
+  const auto& ctree = tree;
+  auto cit1 = ctree.lower_bound(4);
+  BOOST_CHECK_EQUAL(cit1->first, 5);
+  auto it3 = tree.lower_bound(6);
+  BOOST_CHECK(it3 == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(UpperBoundTest) 
+{
+  AVLTree< int, std::string > tree({{1, "one"}, {3, "three"}, {5, "five"}});
+  auto it1 = tree.upper_bound(2);
+  BOOST_CHECK_EQUAL(it1->first, 3);
+  auto it2 = tree.upper_bound(3);
+  BOOST_CHECK_EQUAL(it2->first, 5);
+  const auto& ctree = tree;
+  auto cit1 = ctree.upper_bound(4);
+  BOOST_CHECK_EQUAL(cit1->first, 5);
+  auto it3 = tree.upper_bound(5);
+  BOOST_CHECK(it3 == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(EmptyTreeTest) 
+{
+  AVLTree< int, std::string > emptyTree;
+  auto it2 = emptyTree.equal_range(1).first;
+  BOOST_CHECK(it2 == emptyTree.end());
+  auto it3 = emptyTree.lower_bound(1);
+  BOOST_CHECK(it3 == emptyTree.end());
+  auto it4 = emptyTree.upper_bound(1);
+  BOOST_CHECK(it4 == emptyTree.end());
+}
+
+BOOST_AUTO_TEST_CASE(DuplicateKeysTest) 
+{
+  AVLTree< int, std::string > tree({{1, "a"}, {2, "b"}, {2, "c"}, {2, "d"}, {3, "e"}});
+  auto lb = tree.lower_bound(2);
+  BOOST_CHECK_EQUAL(lb->first, 2);
+  BOOST_CHECK_EQUAL(lb->second, "b");
+  auto ub = tree.upper_bound(2);
+  BOOST_CHECK_EQUAL(ub->first, 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

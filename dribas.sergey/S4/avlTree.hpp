@@ -96,6 +96,9 @@ namespace dribas
     template < class InputIterator >
     void insert(InputIterator first, InputIterator last);
     void insert (std::initializer_list< std::pair< Key, T > > il);
+    iterator  erase (const_iterator position);
+    size_t erase (const Key& k);
+    iterator  erase (const_iterator first, const_iterator last);
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -106,8 +109,15 @@ namespace dribas
 
     template< class... Args >
     std::pair< iterator, bool > emplace(Args&&... args);
-    //iterator emplace_hint(const_iterator hint, Args&&... args);
+    template <class... Args>
+    iterator emplace_hint(const_iterator hint, Args&&... args);
 
+    std::pair< const_iterator, const_iterator > equal_range (const Key& k)const;
+    std::pair< iterator, iterator > equal_range (const Key& k);
+    iterator upper_bound (const Key& k);
+    const_iterator upper_bound (const Key& k) const;
+    iterator lower_bound(const Key& key);
+    const_iterator lower_bound(const Key& key) const;
 
     void swap(AVLTree&) noexcept;
     void clear() noexcept;
@@ -115,6 +125,7 @@ namespace dribas
     size_t size() const noexcept;
     iterator find(const Key&);
     const_iterator find(const Key&) const;
+    size_t count (const Key& k) const;
 
   private:
     NodeType* fakeleaf_;
@@ -130,6 +141,261 @@ namespace dribas
     NodeType* findNode(const Key&) const;
     void clearSubtree(NodeType*) noexcept;
   };
+
+  template < class Key, class T, class Compare >
+  template < class... Args >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::emplace_hint(const_iterator hint, Args&&... args)
+  {
+    NodeType* newNode = new NodeType(std::forward<Args>(args)...);
+    newNode->left = fakeleaf_;
+    newNode->right = fakeleaf_;
+    newNode->parent = nullptr;
+    newNode->height = 1;
+    if (root_ == fakeleaf_) {
+      root_ = newNode;
+      ++size_;
+      return iterator(newNode, this);
+    }
+    if (hint != cend()) {
+      const Key& newKey = newNode->value.first;
+      const_iterator next = hint;
+      ++next;
+      bool first = hint == cbegin() || !cmp_(newKey, (--const_iterator(hint))->first);
+      bool second = next == cend() || !cmp_(next->first, newKey);
+      if (first && second) {
+        NodeType* hintNode = const_cast< NodeType* >(hint.node_);
+        if (cmp_(newKey, hintNode->value.first)) {
+          if (hintNode->left == fakeleaf_) {
+            hintNode->left = newNode;
+            newNode->parent = hintNode;
+            ++size_;
+            //balanceTree(hintNode);
+            return iterator(newNode, this);
+          }
+        } else if (cmp_(hintNode->value.first, newKey)) {
+          if (hintNode->right == fakeleaf_) {
+            hintNode->right = newNode;
+            newNode->parent = hintNode;
+            ++size_;
+            //balanceTree(hintNode);
+            return iterator(newNode, this);
+          }
+        } else {
+          delete newNode;
+          return iterator(hintNode, this);
+        }
+      }
+    }
+    NodeType* current = root_;
+    NodeType* parent = nullptr;
+    while (current != fakeleaf_) {
+      parent = current;
+      if (cmp_(newNode->value.first, current->value.first)) {
+        current = current->left;
+      } else if (cmp_(current->value.first, newNode->value.first)) {
+        current = current->right;
+      } else {
+        delete newNode;
+        return iterator(current, this);
+      }
+    }
+    newNode->parent = parent;
+    if (cmp_(newNode->value.first, parent->value.first)) {
+      parent->left = newNode;
+    } else {
+      parent->right = newNode;
+    }
+    ++size_;
+    //balanceTree(newNode);
+    return iterator(newNode, this);
+  }
+
+  template< class Key, class T, class Compare >
+  std::pair< Iterator< Key, T, Compare >, Iterator< Key, T, Compare > >
+  AVLTree< Key, T, Compare >::equal_range(const Key& k)
+  {
+    iterator lower = lower_bound(k);
+    iterator upper = upper_bound(k);
+    return std::make_pair(lower, upper);
+  }
+
+  template< class Key, class T, class Compare >
+  std::pair< ConstIterator< Key, T, Compare >, ConstIterator< Key, T, Compare > >
+  AVLTree< Key, T, Compare >::equal_range(const Key& k) const
+  {
+    const_iterator lower = lower_bound(k);
+    const_iterator upper = upper_bound(k);
+    return std::make_pair(lower, upper);
+  }
+
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::lower_bound(const Key& k)
+  {
+    NodeType* current = root_;
+    NodeType* result = fakeleaf_;
+    while (current != fakeleaf_) {
+      if (!cmp_(current->value.first, k)) {
+        result = current;
+        current = current->left;
+      }
+      else {
+        current = current->right;
+      }
+    }
+    return iterator(result, this);
+  }
+
+  template< class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::lower_bound(const Key& k) const
+  {
+    NodeType* current = root_;
+    NodeType* result = fakeleaf_;
+    while (current != fakeleaf_)
+    {
+        if (!cmp_(current->value.first, k)) {
+          result = current;
+          current = current->left;
+        } else {
+          current = current->right;
+        }
+    }
+    return const_iterator(result, this);
+  }
+
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::upper_bound(const Key& k)
+  {
+    NodeType* current = root_;
+    NodeType* result = fakeleaf_;
+    while (current != fakeleaf_)
+    {
+        if (cmp_(k, current->value.first)) {
+          result = current;
+          current = current->left;
+        } else {
+          current = current->right;
+        }
+    }
+    return iterator(result, this);
+  }
+
+  template< class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::upper_bound(const Key& k) const
+  {
+    NodeType* current = root_;
+    NodeType* result = fakeleaf_;
+    while (current != fakeleaf_) {
+      if (cmp_(k, current->value.first)) {
+        result = current;
+        current = current->left;
+      } else {
+        current = current->right;
+      }
+    }
+    return const_iterator(result, this);
+  }
+
+  template< class Key, class T, class Compare >
+  size_t AVLTree< Key, T, Compare >::count(const Key& key) const
+  {
+    return find(key) != end();
+  }
+
+  template< class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::cend() const noexcept
+  {
+    return end();
+  }
+
+  template< class Key, class T, class Compare >
+  ConstIterator< Key, T, Compare > AVLTree< Key, T, Compare >::cbegin() const noexcept
+  {
+    return begin();
+  }
+
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::erase(const_iterator position)
+  {
+    if (position == cend()) {
+      return end();
+    }
+    NodeType* nodeToDelete = const_cast< NodeType* >(position.node_);
+    if (nodeToDelete == fakeleaf_) {
+      return end();
+    }
+    iterator result(nodeToDelete, this);
+    ++result;
+    if (nodeToDelete->left == fakeleaf_ && nodeToDelete->right == fakeleaf_) {
+      if (nodeToDelete->parent) {
+        if (nodeToDelete->parent->left == nodeToDelete) {
+          nodeToDelete->parent->left = fakeleaf_;
+        } else {
+          nodeToDelete->parent->right = fakeleaf_;
+        }
+        //balanceTree(nodeToDelete->parent);
+      } else {
+        root_ = fakeleaf_;
+      }
+      delete nodeToDelete;
+      --size_;
+      return result;
+    }
+    if (nodeToDelete->left == fakeleaf_ || nodeToDelete->right == fakeleaf_)
+    {
+      NodeType* child = (nodeToDelete->left != fakeleaf_) ? nodeToDelete->left : nodeToDelete->right;
+      if (nodeToDelete->parent) {
+        if (nodeToDelete->parent->left == nodeToDelete) {
+          nodeToDelete->parent->left = child;
+        } else {
+          nodeToDelete->parent->right = child;
+        }
+        child->parent = nodeToDelete->parent;
+        //balanceTree(nodeToDelete->parent);
+      } else {
+        root_ = child;
+        child->parent = nullptr;
+      }
+      delete nodeToDelete;
+      --size_;
+      return result;
+    }
+    NodeType* successor = nodeToDelete->right;
+    while (successor->left != fakeleaf_) {
+      successor = successor->left;
+    }
+    std::swap(nodeToDelete->value, successor->value);
+    if (successor->parent->left == successor) {
+      successor->parent->left = successor->right;
+    } else {
+      successor->parent->right = successor->right;
+    }
+    successor->right->parent = successor->parent;
+    //balanceTree(successor->parent);
+    delete successor;
+    --size_;
+    return result;
+  }
+
+  template< class Key, class T, class Compare >
+  size_t AVLTree< Key, T, Compare >::erase(const Key& k)
+  {
+    const_iterator it = find(k);
+    if (it == cend()) {
+      return 0;
+    }
+    erase(it);
+    return 1;
+  }
+
+  template< class Key, class T, class Compare >
+  Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::erase(const_iterator first, const_iterator last) {
+    iterator result(end());
+    while (first != last) {
+      const_iterator current = first++;
+      result = erase(current);
+    }
+    return result;
+  }
 
   template< class Key, class T, class Compare >
   AVLTree< Key, T, Compare >::AVLTree(std::initializer_list< std::pair< Key, T > > list):
@@ -207,7 +473,7 @@ namespace dribas
   {
     NodeType* node = findNode(key);
     if (node != fakeleaf_) {
-      return iterator{ node, this };
+      return iterator( node, this );
     } else {
       return end();
     }
