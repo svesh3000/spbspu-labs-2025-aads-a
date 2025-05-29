@@ -208,8 +208,7 @@ std::string infixToPostfix(const std::string& infix)
       }
       else if (isOperator(ch))
       {
-        while (!stack.empty() && stack.top() != '(' && 
-               precedenceFirst(stack.top(), ch))
+        while (!stack.empty() && stack.top() != '(' && precedenceFirst(stack.top(), ch))
         {
           postfix += stack.drop();
           postfix += ' ';
@@ -376,7 +375,6 @@ void processExpressions(std::istream& input)
   {
     // Пропускаем пустые строки
     if (line.empty()) continue;
-
     try {
       std::string postfix = infixToPostfix(line);
       long long result = evaluatePostfix(postfix);
@@ -386,7 +384,6 @@ void processExpressions(std::istream& input)
       throw;
     }
   }
-
   // Вывод результатов в обратном порядке
   if (!results.empty()) {
     Stack<long long> temp;
