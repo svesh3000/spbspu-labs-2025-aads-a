@@ -3,11 +3,17 @@
 
 namespace
 {
-  bool allItersEnds(const asafov::data_list_t::ConstIterator* begins, const asafov::data_list_t::ConstIterator* ends, size_t size)
+  struct IteratorPair
   {
-    for (size_t i = 0; i < size; i++)
+    asafov::data_list_t::ConstIterator current;
+    asafov::data_list_t::ConstIterator end;
+  };
+
+  bool allItersEnds(const asafov::ForwardList<IteratorPair>& iters)
+  {
+    for (const auto& pair : iters)
     {
-      if (begins[i] != ends[i])
+      if (pair.current != pair.end)
       {
         return false;
       }
@@ -16,107 +22,95 @@ namespace
   }
 }
 
-void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std::cout)
+void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
 {
   if (sequences.cbegin()->first == "")
   {
     out << "0\n";
     return;
   }
+
   if (sequences.cbegin()->second.empty())
   {
     out << sequences.cbegin()->first << "\n0\n";
     return;
   }
 
-  data_list_t::ConstIterator* begins = new data_list_t::ConstIterator[sequences.size() * 2];
-  data_list_t::ConstIterator* ends = begins + sequences.size();
+  ForwardList<IteratorPair> iterators;
 
-  sequence_list_t::ConstIterator seqiter = sequences.cbegin();
-  size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
-  begins[0] = iter->second.cbegin();
-  ends[0] = iter->second.cend();
+
+  IteratorPair firstPair{ iter->second.cbegin(), iter->second.cend() };
+  iterators.push_back(firstPair);
+
   ++iter;
-  ++size;
+
   for (; iter != sequences.cend(); ++iter)
   {
     out << ' ' << iter->first;
-    begins[size] = iter->second.cbegin();
-    ends[size] = iter->second.cend();
-    ++size;
+    IteratorPair pair{ iter->second.cbegin(), iter->second.cend() };
+    iterators.push_back(pair);
   }
-  if (sequences.size() != 0)
+
+  if (!sequences.empty())
   {
     out << '\n';
   }
 
   data_list_t sums;
   bool isAllItersEnds = true;
-  while (!allItersEnds(begins, ends, size))
+
+  while (!allItersEnds(iterators))
   {
     data_t sum = 0;
-    size_t pos = 0;
-    for (; pos < size;)
+    bool firstOutput = true;
+
+    for (auto& pair : iterators)
     {
-      if (begins[pos] != ends[pos])
+      if (pair.current != pair.end)
       {
-        if (sum > std::numeric_limits< data_t >::max() - *begins[pos])
+        if (sum > std::numeric_limits<data_t>::max() - *pair.current)
         {
           isAllItersEnds = false;
         }
         else
         {
-          sum += *begins[pos];
+          sum += *pair.current;
         }
-        out << *begins[pos];
-        ++begins[pos++];
-        break;
-      }
-      else
-      {
-        pos++;
-      }
-    }
-    for (; pos < size;)
-    {
-      if (begins[pos] != ends[pos])
-      {
-        if (sum > std::numeric_limits< data_t >::max() - *begins[pos])
+
+        if (firstOutput)
         {
-          isAllItersEnds = false;
+          out << *pair.current;
+          firstOutput = false;
         }
         else
         {
-          sum += *begins[pos];
+          out << ' ' << *pair.current;
         }
-        out << ' ' << *begins[pos];
-        ++begins[pos++];
-      }
-      else
-      {
-        pos++;
+
+        ++pair.current;
       }
     }
+
     out << '\n';
     sums.push_back(sum);
   }
 
-  if (isAllItersEnds == false)
+  if (!isAllItersEnds)
   {
     sums.clear();
-    delete[] begins;
-    throw std::overflow_error("owerflow!");
+    throw std::overflow_error("overflow!");
   }
 
   auto it = sums.cbegin();
   out << *it;
   ++it;
+
   for (; it != sums.cend(); ++it)
   {
     out << ' ' << *it;
   }
+
   out << '\n';
-  delete[] begins;
 }

@@ -146,7 +146,7 @@ namespace asafov
       }
       T* operator->()
       {
-        return std::addressof(current_->data_);
+        return const_cast<T&>(ConstIterator::operator->());
       }
 
       Iterator& operator++()
@@ -160,6 +160,7 @@ namespace asafov
         ConstIterator::operator++();
         return temp;
       }
+
     };
 
     ConstIterator begin() const noexcept
