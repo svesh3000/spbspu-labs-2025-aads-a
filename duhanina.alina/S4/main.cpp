@@ -143,14 +143,7 @@ namespace
   {
     duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
     initializeCommands(commands);
-    try
-    {
-      commands.at(cmd)(storage, args);
-    }
-    catch (...)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    commands.at(cmd)(storage, args);
   }
 }
 
@@ -167,16 +160,23 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::string line;
-  while (std::getline(std::cin, line))
+  try
   {
-    if (line.empty())
+    while (std::getline(std::cin, line))
     {
-      continue;
+      if (line.empty())
+      {
+        continue;
+      }
+      size_t pos = 0;
+      std::string cmd = readNextToken(line, pos);
+      std::string args = line.substr(pos);
+      processCommand(storage, cmd, args);
     }
-    size_t pos = 0;
-    std::string cmd = readNextToken(line, pos);
-    std::string args = line.substr(pos);
-    processCommand(storage, cmd, args);
+  }
+  catch (...)
+  {
+    std::cout << "<INVALID COMMAND>\n";
   }
   return 0;
 }
