@@ -42,18 +42,6 @@ namespace brevnov
   };
 
   template< typename T >
-  void Dynamic_array< T >::reallocate()
-  {
-    size_t newCapacity = capacity_ * 2;
-    Dynamic_array< T > newArr(newCapacity);
-    for (size_t i = 0; i < size_; ++i)
-    {
-      newArr.push(*data_[i + begin_]);
-    }
-    swap(newArr);
-  }
-
-  template< typename T >
   void Dynamic_array< T >::clear() noexcept
   {
     while (!empty())
@@ -63,7 +51,7 @@ namespace brevnov
     size_ = 0;
     begin_ = 0;
   }
-  
+
   template< typename T >
   void Dynamic_array< T >::swap(Dynamic_array< T >& arr) noexcept
   {
@@ -239,7 +227,18 @@ namespace brevnov
   {
     return size_ == 0;
   }
-
+  
+    template< typename T >
+  void Dynamic_array< T >::reallocate()
+  {
+    size_t newCapacity = capacity_ * 2;
+    Dynamic_array< T > newArr(newCapacity);
+    for (size_t i = 0; i < size_; ++i)
+    {
+      newArr.push(*data_[i + begin_]);
+    }
+    swap(newArr);
+  }
 }
 
 #endif
