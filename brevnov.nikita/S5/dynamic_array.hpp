@@ -227,8 +227,8 @@ namespace brevnov
   {
     return size_ == 0;
   }
-  
-    template< typename T >
+
+  template< typename T >
   void Dynamic_array< T >::reallocate()
   {
     size_t newCapacity = capacity_ * 2;
