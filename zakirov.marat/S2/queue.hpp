@@ -3,11 +3,12 @@
 #include <cstddef>
 #include <list>
 #include <stdexcept>
+#include <utility>
 #include "../S1/fwd_list.hpp"
 
 namespace zakirov
 {
-  template < typename T >
+  template < class T >
   class Queue
   {
   public:
@@ -25,117 +26,129 @@ namespace zakirov
     void push (T && value);
     void pop();
   private:
-    FwdList< T > data_;
-    FwdIterator< T > back_;
-    CFwdIterator< T > cback_;
-    FwdIterator< T > find_last(FwdList< T > & other);
-    CFwdIterator< T > cfind_last(const FwdList< T > & other);
+    template < class U >
+    void uni_push(U && value);
+    void add_capacity();
+    T * data_;
+    size_t first_;
+    size_t size_;
+    size_t capacity_;
   };
 
   template < typename T >
   Queue< T >::Queue():
-    back_(data_.before_begin()),
-    cback_(data_.cend())
+    data_(nullptr),
+    first_(0),
+    size_(0),
+    capacity_(0)
   {}
 
   template < typename T >
   Queue< T >::Queue(const Queue & other):
     data_(other.data_),
-    back_(find_last(data_)),
-    cback_(cfind_last(data_))
+    first_(other.first_),
+    size_(other.size_),
+    capacity_(other.capacity_)
   {}
 
   template < typename T >
   Queue< T >::Queue(Queue && other) noexcept:
-    data_(std::move(other.data_)),
-    back_(find_last(data_)),
-    cback_(cfind_last(data_))
+    Queue(other)
   {}
 
   template < typename T >
   bool Queue< T >::empty()
   {
-    return data_.empty();
+    return size_ == 0;
   }
 
   template < typename T >
   size_t Queue< T >::size()
   {
-    return data_.size();
+    return size_;
   }
 
   template < typename T >
   T & Queue< T >::front()
   {
-    return *(data_.begin());
+    return data_[0];
   }
 
   template < typename T >
   const T & Queue< T >::front() const
   {
-    return *(data_.cbegin());
+    return data_[0];
   }
 
   template < typename T >
   T & Queue< T >::back()
   {
-    return *back_;
+    return data_[size_ - 1];
   }
 
   template < typename T >
   const T & Queue< T >::back() const
   {
-    return *cback_;
+    return data_[size_ - 1];
+  }
+
+  template < class T >
+  template < class U >
+  void Queue< T >::uni_push(U && value)
+  {
+    if (first_ + size_ > capacity_)
+    {
+      if (first_ != 0)
+      {
+        for (size_t i = 0, j = first_; j < first_ + size_; ++i, ++j)
+        {
+          data_[i] = std::move(data_[j]);
+        }
+
+        first_ = 0;
+      }
+      else
+      {
+        add_capacity();
+      }
+    }
+
+    data_[first_ + size_] = std::forward< U >(value);
+    ++size_;
   }
 
   template < typename T >
-  void Queue< T >::push (const T & value)
+  void Queue< T >::push(const T & value)
   {
-    data_.insert_after(back_, value);
-    ++back_;
-    ++cback_;
+    uni_push(value);
   }
 
   template < typename T >
-  void Queue< T >::push (T && value)
+  void Queue< T >::push(T && value)
   {
-    data_.insert_after(back_, value);
-    ++back_;
-    ++cback_;
+    uni_push(std::move(value));
   }
 
   template < typename T >
   void Queue< T >::pop()
   {
-    data_.pop_front();
+    ++first_;
   }
 
   template < typename T >
-  FwdIterator< T > Queue< T >::find_last(FwdList< T > & data)
+  void Queue< T >::add_capacity()
   {
-    FwdIterator< T > last_el = data.before_begin();
-    FwdIterator< T > finder = data.begin();
-    while (finder != data.end())
+    size_t new_capacity = capacity_ * 2 + 1;
+    T * new_data = new T[new_capacity];
+    for (size_t i = 0, j = first_; j < first_ + size_; ++i, ++j)
     {
-      ++finder;
-      ++last_el;
+      new_data[i] = std::move(data_[j]);
     }
 
-    return last_el;
-  }
-
-  template < typename T >
-  CFwdIterator< T > Queue< T >::cfind_last(const FwdList< T > & data)
-  {
-    CFwdIterator< T > last_el = data.cend();
-    CFwdIterator< T > finder = data.cbegin();
-    while (finder != data.cend())
-    {
-      ++finder;
-      ++last_el;
-    }
-
-    return last_el;
+    delete[] data_;
+    data_ = new_data;
+    first_ = 0;
+    capacity_ = new_capacity;
   }
 }
 
