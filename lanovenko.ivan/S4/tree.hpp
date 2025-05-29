@@ -2,14 +2,18 @@
 #define TREE_HPP
 
 #include <cassert>
-#include <exception>
+#include <stdexcept>
 #include "tree_node.hpp"
 #include "tree_iterator.hpp"
+#include "tree_const_iterator.hpp"
 
 namespace lanovenko
 {
-  template<typename Key, typename Value, typename Comparator>
+  template< typename Key, typename Value, typename Comparator >
   class TreeIterator;
+
+  template< typename Key, typename Value, typename Comparator >
+  class TreeConstIterator;
 
   template< typename Key, typename Value, typename Comparator >
   class Tree
@@ -23,27 +27,34 @@ namespace lanovenko
     Tree< Key, Value, Comparator >& operator=(Tree< Key, Value, Comparator >&& rhs) noexcept;
     TreeIterator< Key, Value, Comparator > begin() const noexcept;
     TreeIterator< Key, Value, Comparator > end() const noexcept;
+    TreeConstIterator< Key, Value, Comparator > cbegin() const noexcept;
+    TreeConstIterator< Key, Value, Comparator > cend() const noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
     void clear() noexcept;
     void swap(Tree< Key, Value, Comparator >& rhs) noexcept;
     TreeIterator< Key, Value, Comparator > find(const Key& key) const;
     void insert(const std::pair< Key, Value >& value);
-    void erase(const std::pair< Key, Value >& value);
+    TreeIterator< Key, Value, Comparator > erase(TreeIterator< Key, Value, Comparator > position);
     Value& at(const Key& key);
+    size_t count(const Key& k) const;
     Value& operator[](const Key& key);
   private:
     TreeNode< Key, Value >* root_;
+    TreeNode< Key, Value >* fakeLeaf_;
     size_t size_;
     unsigned short int height(TreeNode< Key, Value >* node) const noexcept;
+    void fixHeight(TreeNode< Key, Value >* node) const noexcept;
     short int balanceFactor(TreeNode< Key, Value >* node) const noexcept;
+    TreeNode< Key, Value >* balance(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* rotateRight(TreeNode< Key, Value >* root) const noexcept;
     TreeNode< Key, Value >* rotateLeft(TreeNode< Key, Value >* root) const noexcept;
     TreeNode< Key, Value >* insert(TreeNode< Key, Value >* node, const std::pair< Key, Value >& value, Comparator cmp);
-    TreeNode< Key, Value >* minValueNode(TreeNode< Key, Value >* node) const;
+    static TreeNode< Key, Value >* minValueNode(TreeNode< Key, Value >* node);
     TreeNode< Key, Value >* erase(TreeNode< Key, Value >* node, const std::pair< Key, Value >& value, Comparator cmp);
     TreeIterator< Key, Value, Comparator > find(const Key& key, Comparator cmp) const;
     void clear(TreeNode< Key, Value >* root) noexcept;
+    friend class TreeIterator< Key, Value, Comparator >;
   };
 
   template< typename Key, typename Value, typename Comparator >
@@ -53,27 +64,39 @@ namespace lanovenko
   }
 
   template< typename Key, typename Value, typename Comparator >
-  Tree< Key, Value, Comparator >::Tree() :
+  Tree< Key, Value, Comparator >::Tree():
     root_(nullptr),
+    fakeLeaf_(new TreeNode< Key, Value >({ {}, {} })),
     size_(0)
   {}
 
   template< typename Key, typename Value, typename Comparator >
-  Tree< Key, Value, Comparator >::Tree(const Tree< Key, Value, Comparator >& rhs) :
-    root_(nullptr),
-    size_(rhs.size_)
+  Tree< Key, Value, Comparator >::Tree(const Tree< Key, Value, Comparator >& rhs):
+    Tree()
   {
-    for (TreeIterator< Key, Value, Comparator > it = rhs.begin(); it != rhs.end(); it++)
+    try
     {
-      insert(*it);
+      for (TreeIterator< Key, Value, Comparator > it = rhs.begin(); it != rhs.end(); it++)
+      {
+        insert(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
 
-  template<typename Key, typename Value, typename Comparator>
-  Tree<Key, Value, Comparator>::Tree(Tree<Key, Value, Comparator>&& rhs) noexcept :
+  template< typename Key, typename Value, typename Comparator >
+  Tree< Key, Value, Comparator >::Tree(Tree< Key, Value, Comparator >&& rhs) noexcept:
     root_(rhs.root_),
+    fakeLeaf_(rhs.fakeLeaf_),
     size_(rhs.size_)
-  {}
+  {
+    rhs.root_ = rhs.fakeLeaf_ = nullptr;
+    rhs.size_ = 0;
+  }
 
   template< typename Key, typename Value, typename Comparator >
   Tree< Key, Value, Comparator >& Tree< Key, Value, Comparator >::operator=(const Tree< Key, Value, Comparator >& rhs)
@@ -102,13 +125,27 @@ namespace lanovenko
   template< typename Key, typename Value, typename Comparator >
   inline TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::begin() const noexcept
   {
+    assert(root_);
     return TreeIterator< Key, Value, Comparator >(minValueNode(root_));
   }
 
   template< typename Key, typename Value, typename Comparator >
   inline TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::end() const noexcept
   {
+    assert(root_);
     return TreeIterator< Key, Value, Comparator >();
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  inline TreeConstIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::cbegin() const noexcept
+  {
+    return TreeConstIterator< Key, Value, Comparator >(minValueNode(root_));
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  inline TreeConstIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::cend() const noexcept
+  {
+    return TreeConstIterator< Key, Value, Comparator >();
   }
 
   template<typename Key, typename Value, typename Comparator>
@@ -128,13 +165,15 @@ namespace lanovenko
   void Tree< Key, Value, Comparator >::clear() noexcept
   {
     clear(root_);
-    root_ = nullptr;
+    delete fakeLeaf_;
+    fakeLeaf_ = root_ = nullptr;
   }
 
   template< typename Key, typename Value, typename Comparator >
   inline void Tree< Key, Value, Comparator >::swap(Tree< Key, Value, Comparator >& rhs) noexcept
   {
     std::swap(root_, rhs.root_);
+    std::swap(fakeLeaf_, rhs.fakeLeaf_);
     std::swap(size_, rhs.size_);
   }
 
@@ -147,26 +186,54 @@ namespace lanovenko
   template<typename Key, typename Value, typename Comparator>
   void Tree< Key, Value, Comparator >::insert(const std::pair< Key, Value >& value)
   {
-    root_ = insert(root_, value, Comparator{});
-    size_++;
+    try
+    {
+      root_ = insert(root_, value, Comparator{});
+      size_++;
+    }
+    catch (...)
+    {
+      clear();
+      throw;
+    }
   }
 
   template< typename Key, typename Value, typename Comparator >
-  void Tree< Key, Value, Comparator >::erase(const std::pair< Key, Value >& value)
+  TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::erase(TreeIterator< Key, Value, Comparator > position)
   {
-    root_ = erase(root_, value, Comparator{});
+    if (position == end() || find((*position).first) == end())
+    {
+      throw std::out_of_range("Wrong key");
+    }
+    root_ = erase(root_, *(position), Comparator{});
     size_--;
+    return ++position;
   }
 
-  template<typename Key, typename Value, typename Comparator>
-  inline Value& Tree<Key, Value, Comparator>::at(const Key& key)
+  template< typename Key, typename Value, typename Comparator >
+  inline Value& Tree< Key, Value, Comparator >::at(const Key& key)
   {
-    TreeIterator< Key, Value, Comparator > node = find(key);
-    if (node != end())
+    TreeIterator< Key, Value, Comparator > position = find(key);
+    if (position != end())
     {
-      return (*node).second;
+      return (*position).second;
     }
     throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  size_t Tree< Key, Value, Comparator >::count(const Key& k) const
+  {
+    size_t count = 0;
+    Comparator cmp = Comparator{};
+    for (auto it = cbegin(); it != cend(); ++it)
+    {
+      if (!cmp(k, it->first) && !cmp(it->first, k))
+      {
+        ++count;
+      }
+    }
+    return count;
   }
 
   template<typename Key, typename Value, typename Comparator>
@@ -187,10 +254,40 @@ namespace lanovenko
     return !node ? 0 : node->height_;
   }
 
+  template< typename Key, typename Value, typename Comparator >
+  inline void Tree< Key, Value, Comparator >::fixHeight(TreeNode< Key, Value >* node) const noexcept
+  {
+    unsigned short int hl = height(node->left_), hr = height(node->right_);
+    node->height_ = (hl > hr ? hl : hr) + 1;
+  }
+
   template<typename Key, typename Value, typename Comparator>
   inline short int Tree< Key, Value, Comparator >::balanceFactor(TreeNode< Key, Value >* node) const noexcept
   {
     return !node ? 0 : height(node->left_) - height(node->right_);
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeNode< Key, Value >* Tree< Key, Value, Comparator >::balance(TreeNode< Key, Value >* node)
+  {
+    short int balance = balanceFactor(node);
+    if (balance > 1)
+    {
+      if (balanceFactor(node->left_) < 0)
+      {
+        node->left_ = rotateLeft(node->left_);
+      }
+      node = rotateRight(node);
+    }
+    if (balance < -1)
+    {
+      if (balanceFactor(node->right_) > 0)
+      {
+        node->right_ = rotateRight(node->right_);
+      }
+      node = rotateLeft(node);
+    }
+    return node;
   }
 
   template< typename Key, typename Value, typename Comparator >
@@ -225,8 +322,8 @@ namespace lanovenko
       root->left_ = nullptr;
     }
     newRoot->right_ = root;
-    root->height_ = std::max(height(root->right_), height(root->left_)) + 1;
-    newRoot->height_ = std::max(height(newRoot->right_), height(newRoot->left_)) + 1;
+    fixHeight(root);
+    fixHeight(newRoot);
     return newRoot;
   }
 
@@ -262,23 +359,22 @@ namespace lanovenko
       root->right_ = nullptr;
     }
     newRoot->left_ = root;
-    root->height_ = std::max(height(root->right_), height(root->left_)) + 1;
-    newRoot->height_ = std::max(height(newRoot->right_), height(newRoot->left_)) + 1;
+    fixHeight(root);
+    fixHeight(newRoot);
     return newRoot;
   }
 
-  template<typename Key, typename Value, typename Comparator>
-  TreeNode<Key, Value>* Tree< Key, Value, Comparator >::insert(
-    TreeNode<Key, Value>* node,
-    const std::pair<Key, Value>& value,
+  template< typename Key, typename Value, typename Comparator >
+  TreeNode< Key, Value >* Tree< Key, Value, Comparator >::insert(
+    TreeNode< Key, Value >* node,
+    const std::pair< Key, Value >& value,
     Comparator cmp)
   {
     if (!node)
     {
-      return new TreeNode<Key, Value>(value);
+      return new TreeNode< Key, Value >{ {value.first, value.second} };
     }
-
-    if (cmp(value.first, node->data_.first))
+    else if (cmp(value.first, node->data_.first))
     {
       node->left_ = insert(node->left_, value, cmp);
       node->left_->parent_ = node;
@@ -293,53 +389,22 @@ namespace lanovenko
       node->data_.second = value.second;
       return node;
     }
-
-    node->height_ = std::max(height(node->left_), height(node->right_)) + 1;
-
-    short int balance = balanceFactor(node);
-
-    if (balance > 1 && cmp(value.first, node->left_->data_.first))
-    {
-      return rotateRight(node);
-    }
-
-    if (balance < -1 && cmp(node->right_->data_.first, value.first))
-    {
-      return rotateLeft(node);
-    }
-
-    if (balance > 1 && cmp(node->left_->data_.first, value.first))
-    {
-      node->left_ = rotateLeft(node->left_);
-      return rotateRight(node);
-    }
-
-    if (balance < -1 && cmp(value.first, node->right_->data_.first))
-    {
-      node->right_ = rotateRight(node->right_);
-      return rotateLeft(node);
-    }
-
-    return node;
-  }
-
-  template<typename Key, typename Value, typename Comparator>
-  TreeNode<Key, Value>* Tree<Key, Value, Comparator>::minValueNode(TreeNode<Key, Value>* node) const
-  {
-    TreeNode< Key, Value >* current = node;
-    if(!current)
-    {
-      return nullptr;
-    }
-    while (current->left_)
-    {
-      current = current->left_;
-    }
-    return current;
+    fixHeight(node);
+    return balance(node);
   }
 
   template< typename Key, typename Value, typename Comparator >
-  TreeNode< Key, Value >* erase(
+  TreeNode< Key, Value >* Tree< Key, Value, Comparator >::minValueNode(TreeNode< Key, Value >* node)
+  {
+    while (node && node->left_)
+    {
+      node = node->left_;
+    }
+    return node;
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeNode< Key, Value >* Tree< Key, Value, Comparator >::erase(
     TreeNode< Key, Value >* node,
     const std::pair< Key, Value >& value, Comparator cmp
   )
@@ -348,7 +413,6 @@ namespace lanovenko
     {
       return node;
     }
-
     if (cmp(value.first, node->data_.first))
     {
       node->left_ = erase(node->left_, value, cmp);
@@ -361,12 +425,11 @@ namespace lanovenko
     {
       if (!node->left_ || !node->right_)
       {
-        TreeNode<Key, Value>* temp = node->left_ ? node->left_ : node->right_;
-
+        TreeNode< Key, Value >* temp = node->left_ ? node->left_ : node->right_;
         if (!temp)
         {
-          temp = node;
-          node = nullptr;
+          delete node;
+          return nullptr;
         }
         else
         {
@@ -380,55 +443,22 @@ namespace lanovenko
       }
       else
       {
-        TreeNode<Key, Value>* temp = minValueNode(node->right_);
-
+        TreeNode< Key, Value >* temp = minValueNode(node->right_);
         node->data_ = temp->data_;
-
         node->right_ = erase(node->right_, temp->data_, cmp);
       }
     }
-
-    if (!node)
-    {
-      return node;
-    }
-
-    node->height_ = 1 + std::max(height(node->left_), height(node->right_));
-
-    short int balance = balanceFactor(node);
-
-    if (balance > 1 && balanceFactor(node->left_) >= 0)
-    {
-      return rotateRight(node);
-    }
-
-    if (balance > 1 && balanceFactor(node->left_) < 0)
-    {
-      node->left_ = rotateLeft(node->left_);
-      return rotateRight(node);
-    }
-
-    if (balance < -1 && balanceFactor(node->right_) <= 0)
-    {
-      return rotateLeft(node);
-    }
-
-    if (balance < -1 && balanceFactor(node->right_) > 0)
-    {
-      node->right_ = rotateRight(node->right_);
-      return rotateLeft(node);
-    }
-
-    return node;
+    fixHeight(node);
+    return balance(node);
   }
 
   template< typename Key, typename Value, typename Comparator >
-  inline TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::find(
+  TreeIterator< Key, Value, Comparator > Tree< Key, Value, Comparator >::find(
     const Key& key,
     Comparator cmp) const
   {
     TreeNode< Key, Value >* root = root_;
-    while (root != nullptr && key != root->data_.first)
+    while (root && key != root->data_.first)
     {
       if (cmp(key, root->data_.first))
       {
@@ -445,7 +475,7 @@ namespace lanovenko
   template< typename Key, typename Value, typename Comparator >
   void Tree< Key, Value, Comparator >::clear(TreeNode< Key, Value >* root) noexcept
   {
-    if (!root)
+    if (!root || root == fakeLeaf_)
     {
       return;
     }
