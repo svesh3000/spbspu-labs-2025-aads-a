@@ -67,8 +67,10 @@ std::string infixToPostfix(const std::string& infix)
   {
     char ch = infix[i];
 
-    if (std::isspace(ch)) continue;
-
+    if (std::isspace(ch))
+    {
+      continue;
+    }
     if (std::isdigit(ch))
     {
       number += ch;
@@ -228,7 +230,7 @@ long long evaluatePostfix(const std::string& postfix)
 }
 
 
-void processExpressions(std::istream& input)
+/*void processExpressions(std::istream& input)
 {
   Stack< long long > results;
   std::string line;
@@ -264,6 +266,34 @@ void processExpressions(std::istream& input)
     std::cout << " " << results.drop();
   }
   std::cout << "\n";
+}*/
+
+void processExpressions(std::istream& input)
+{
+  Stack< long long > results;
+  std::string line;
+
+  while (std::getline(input, line))
+  {
+    if (line.empty()) continue;
+    
+    try {
+      std::string postfix = infixToPostfix(line);
+      long long result = evaluatePostfix(postfix);
+      results.push(result);
+    }
+    catch (const std::exception& e) {
+      throw; // перебрасываем исключение для обработки в main
+    }
+  }
+
+  if (!results.empty()) {
+    std::cout << results.drop();
+    while (!results.empty()) {
+      std::cout << " " << results.drop();
+    }
+    std::cout << "\n";
+  }
 }
 
 int main(int argc, char* argv[])
