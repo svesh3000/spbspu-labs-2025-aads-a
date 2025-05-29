@@ -145,7 +145,7 @@ namespace
     initializeCommands(commands);
     if (!commands.count(cmd))
     {
-      std::cerr << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
     commands.at(cmd)(storage, args);
   }
@@ -173,14 +173,7 @@ int main(int argc, char* argv[])
     size_t pos = 0;
     std::string cmd = readNextToken(line, pos);
     std::string args = line.substr(pos);
-    try
-    {
-      processCommand(storage, cmd, args);
-    }
-    catch (...)
-    {
-    return 1;
-    }
+    processCommand(storage, cmd, args);
   }
   return 0;
 }
