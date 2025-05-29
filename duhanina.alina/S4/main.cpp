@@ -52,7 +52,7 @@ namespace
         }
       }
       if (!name.empty())
-      {      std::cout << "<INVALID COMMAND>\n";
+      {
         storage.push(name, dict);
       }
     }
@@ -178,8 +178,7 @@ int main(int argc, char* argv[])
   catch (...)
   {
     std::cout << "<INVALID COMMAND>\n";
-    return 1;
-//    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
   return 0;
 }
