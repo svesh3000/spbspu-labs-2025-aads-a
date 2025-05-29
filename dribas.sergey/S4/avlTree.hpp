@@ -347,7 +347,7 @@ namespace dribas
   {
     auto current = root_;
     if (current == fakeleaf_) {
-      const_iterator{ current, this };
+      return end();
     }
     while (current->left != fakeleaf_) {
       current = current->left;
@@ -360,7 +360,7 @@ namespace dribas
   {
     auto current = root_;
     if (current == fakeleaf_) {
-      iterator{ current, this };
+      return end();
     }
     while (current->left != fakeleaf_) {
       current = current->left;
