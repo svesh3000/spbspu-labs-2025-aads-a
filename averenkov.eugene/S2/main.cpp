@@ -56,7 +56,7 @@ bool precedenceFirst(char first, char second)
 }
 
 
-std::string infixToPostfix(const std::string& infix)
+/*std::string infixToPostfix(const std::string& infix)
 {
   Stack< char > stack;
   std::string postfix;
@@ -117,6 +117,105 @@ std::string infixToPostfix(const std::string& infix)
           postfix += ' ';
         }
         stack.push(ch);
+      }
+      else
+      {
+        throw std::runtime_error("error character in expression");
+      }
+    }
+  }
+
+  if (!number.empty())
+  {
+    if (isNegative)
+    {
+      postfix += '-';
+    }
+    postfix += number + " ";
+  }
+
+  while (!stack.empty())
+  {
+    if (stack.top() == '(')
+    {
+      throw std::runtime_error("parentheses error");
+    }
+    postfix += stack.drop();
+    postfix += ' ';
+  }
+
+  if (!postfix.empty() && postfix.back() == ' ')
+  {
+    postfix.pop_back();
+  }
+
+  return postfix;
+}*/
+std::string infixToPostfix(const std::string& infix)
+{
+  Stack<char> stack;
+  std::string postfix;
+  std::string number;
+  bool isNegative = false;
+  bool expectOperand = true; // Ожидаем операнд (число или открывающую скобку)
+
+  for (size_t i = 0; i < infix.size(); ++i)
+  {
+    char ch = infix[i];
+
+    if (std::isspace(ch)) continue;
+
+    if (std::isdigit(ch))
+    {
+      number += ch;
+      expectOperand = false;
+    }
+    else if (ch == '-' && expectOperand)
+    {
+      isNegative = true;
+    }
+    else
+    {
+      if (!number.empty())
+      {
+        if (isNegative)
+        {
+          postfix += '-';
+          isNegative = false;
+        }
+        postfix += number + " ";
+        number.clear();
+      }
+
+      if (ch == '(')
+      {
+        stack.push(ch);
+        expectOperand = true;
+      }
+      else if (ch == ')')
+      {
+        while (!stack.empty() && stack.top() != '(')
+        {
+          postfix += stack.drop();
+          postfix += ' ';
+        }
+        if (stack.empty())
+        {
+          throw std::runtime_error("parentheses error");
+        }
+        stack.drop();
+        expectOperand = false;
+      }
+      else if (isOperator(ch))
+      {
+        while (!stack.empty() && stack.top() != '(' && 
+               precedenceFirst(stack.top(), ch))
+        {
+          postfix += stack.drop();
+          postfix += ' ';
+        }
+        stack.push(ch);
+        expectOperand = true;
       }
       else
       {
@@ -270,31 +369,37 @@ long long evaluatePostfix(const std::string& postfix)
 
 void processExpressions(std::istream& input)
 {
-  Stack< long long > results;
+  Stack<long long> results;
   std::string line;
 
   while (std::getline(input, line))
   {
+    // Пропускаем пустые строки
     if (line.empty()) continue;
+
     try {
       std::string postfix = infixToPostfix(line);
       long long result = evaluatePostfix(postfix);
       results.push(result);
     }
     catch (const std::exception& e) {
-      throw; // перебрасываем исключение для обработки в main
+      throw;
     }
   }
 
+  // Вывод результатов в обратном порядке
   if (!results.empty()) {
-    std::cout << results.drop();
+    Stack<long long> temp;
     while (!results.empty()) {
-      std::cout << " " << results.drop();
+      temp.push(results.drop());
+    }
+    std::cout << temp.drop();
+    while (!temp.empty()) {
+      std::cout << " " << temp.drop();
     }
     std::cout << "\n";
   }
 }
-
 int main(int argc, char* argv[])
 {
   try
