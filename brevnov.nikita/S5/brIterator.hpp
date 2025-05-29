@@ -58,7 +58,8 @@ namespace brevnov
 
   template< typename Key, typename Value, typename Cmp, bool IsConst >
   template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-  BrIterator< Key, Value, Cmp, IsConst > BrIterator< Key, Value, Cmp, IsConst >::operator=(const BrIterator< Key, Value, Cmp, OtherIsConst >& copy)
+  BrIterator< Key, Value, Cmp, IsConst > BrIterator< Key, Value, Cmp, IsConst >::operator=(
+    const BrIterator< Key, Value, Cmp, OtherIsConst >& copy)
   {
     queue_ = copy.queue_;
     node_ = copy.node_;

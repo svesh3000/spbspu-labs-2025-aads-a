@@ -57,7 +57,8 @@ namespace brevnov
 
   template< typename Key, typename Value, typename Cmp, bool IsConst >
   template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-  LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator=(const LnrIterator< Key, Value, Cmp, OtherIsConst >& copy)
+  LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator=(
+    const LnrIterator< Key, Value, Cmp, OtherIsConst >& copy)
   {
     stack_ = copy.stack_;
     node_ = copy.node_;
