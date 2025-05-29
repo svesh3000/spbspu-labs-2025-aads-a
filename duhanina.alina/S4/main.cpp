@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <functional>
-#include "tree.hpp"
+#include <tree.hpp>
 
 
 using Dictionary = duhanina::Tree< size_t, std::string, std::less< size_t > >;
