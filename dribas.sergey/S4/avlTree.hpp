@@ -247,7 +247,7 @@ namespace dribas
   }
 
   template< class Key, class T, class Cmp >
-  const T& AVLTree< Key, T, Cmp >::at(const Key& key) const 
+  const T& AVLTree< Key, T, Cmp >::at(const Key& key) const
   {
     NodeType* node = findNode(key);
     if (node == fakeleaf_) {
@@ -438,7 +438,6 @@ namespace dribas
     } else {
       parent->right = newNode;
     }
-  
     //balanceTree(newNode);
     size_++;
     return { iterator(newNode, this), true };

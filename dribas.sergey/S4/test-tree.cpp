@@ -273,20 +273,18 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(AVLTreeMethodTests)
 
-BOOST_AUTO_TEST_CASE(SwapTest) 
+BOOST_AUTO_TEST_CASE(SwapTest)
 {
   AVLTree<int, std::string> tree1({{1, "one"}, {2, "two"}});
   AVLTree<int, std::string> tree2({{3, "three"}});
-  
   tree1.swap(tree2);
-  
   BOOST_CHECK_EQUAL(tree1.size(), 1);
   BOOST_CHECK_EQUAL(tree2.size(), 2);
   BOOST_CHECK_EQUAL(tree1.find(3)->second, "three");
   BOOST_CHECK_EQUAL(tree2.find(1)->second, "one");
 }
 
-BOOST_AUTO_TEST_CASE(ClearTest) 
+BOOST_AUTO_TEST_CASE(ClearTest)
 {
   AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}});
 
@@ -297,7 +295,7 @@ BOOST_AUTO_TEST_CASE(ClearTest)
   BOOST_CHECK(tree.find(1) == tree.end());
 }
 
-BOOST_AUTO_TEST_CASE(EmptyTest) 
+BOOST_AUTO_TEST_CASE(EmptyTest)
 {
   AVLTree< int, std::string > emptyTree;
   AVLTree< int, std::string > nonEmptyTree({{1, "one"}});
@@ -306,7 +304,7 @@ BOOST_AUTO_TEST_CASE(EmptyTest)
   BOOST_CHECK(!nonEmptyTree.empty());
 }
 
-BOOST_AUTO_TEST_CASE(SizeTest) 
+BOOST_AUTO_TEST_CASE(SizeTest)
 {
   AVLTree< int, std::string > tree;
 
@@ -319,7 +317,7 @@ BOOST_AUTO_TEST_CASE(SizeTest)
   BOOST_CHECK_EQUAL(tree.size(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(FindTest) 
+BOOST_AUTO_TEST_CASE(FindTest)
 {
   AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}});
 
@@ -331,7 +329,7 @@ BOOST_AUTO_TEST_CASE(FindTest)
   BOOST_CHECK(it2 == tree.end());
 }
 
-BOOST_AUTO_TEST_CASE(ConstFindTest) 
+BOOST_AUTO_TEST_CASE(ConstFindTest)
 {
   const AVLTree< int, std::string > tree({{1, "one"}});
   auto it1 = tree.find(1);
