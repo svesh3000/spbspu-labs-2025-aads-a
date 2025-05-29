@@ -1,5 +1,5 @@
-#ifndef Dynamic_array_HPP
-#define Dynamic_array_HPP
+#ifndef DYNAMIC_ARRAY_HPP
+#define DYNAMIC_ARRAY_HPP
 #include <stdexcept>
 #include <utility>
 
