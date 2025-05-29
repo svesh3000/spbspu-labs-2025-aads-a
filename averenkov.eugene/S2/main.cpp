@@ -276,7 +276,6 @@ void processExpressions(std::istream& input)
   while (std::getline(input, line))
   {
     if (line.empty()) continue;
-    
     try {
       std::string postfix = infixToPostfix(line);
       long long result = evaluatePostfix(postfix);
