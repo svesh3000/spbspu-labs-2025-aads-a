@@ -318,7 +318,7 @@ namespace zakirov
   }
 
   template< typename T >
-  void FwdList< T >::assign(size_t n, const T & val) noexcept
+  void FwdList< T >::assign(size_t n, const T & val)
   {
     FwdList< T > inserter(n, val);
     swap(inserter);
