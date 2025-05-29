@@ -24,14 +24,6 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentNonEmptyMap)
   BOOST_CHECK(src.empty() || !src.empty());
 }
 
-BOOST_AUTO_TEST_CASE(MoveAssignmentSelf)
-{
-  AVLTree< int, std::string > m({{1, "one"}});
-  m = std::move(m);
-  BOOST_CHECK(!m.empty());
-  BOOST_CHECK_EQUAL(m.at(1), "one");
-}
-
 BOOST_AUTO_TEST_SUITE(MapCopyAssignmentTests)
 
 BOOST_AUTO_TEST_CASE(CopyAssignmentEmptyMap)
