@@ -1,7 +1,5 @@
 #include "graph-commands.hpp"
 #include <exception>
-#include <tree/tree-2-3.hpp>
-#include <list/list.hpp>
 
 void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
 {

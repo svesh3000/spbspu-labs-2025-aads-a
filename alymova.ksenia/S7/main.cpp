@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include "graph.hpp"
 #include "graph-commands.hpp"
+#include "hash-table.hpp"
+#include "hash-functions.hpp"
 
 int main(int argc, char** argv)
 {
@@ -37,7 +39,7 @@ int main(int argc, char** argv)
       try
       {
         commands.at(command)(graphs);
-        if (command == "graphs" || command == "vertexes" || command == "inbound" || command == "outbound")
+        if (command == "graphs" || command == "vertexes" || command == "outbound" || command == "inbound")
         {
           std::cout << '\n';
         }
