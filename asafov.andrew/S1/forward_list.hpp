@@ -140,6 +140,7 @@ namespace asafov
     };
     class Iterator final: public ConstIterator
     {
+      public:
       T& operator*()
       {
         return const_cast<T&>(ConstIterator::operator*());
@@ -160,7 +161,6 @@ namespace asafov
         ConstIterator::operator++();
         return temp;
       }
-
     };
 
     ConstIterator begin() const noexcept

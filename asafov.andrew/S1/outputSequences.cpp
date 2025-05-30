@@ -66,8 +66,9 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out)
     data_t sum = 0;
     bool firstOutput = true;
 
-    for (auto& pair : iterators)
+    for (auto it = iterators.begin(); it != iterators.end(); ++it)
     {
+      IteratorPair& pair = *it;
       if (pair.current != pair.end)
       {
         if (sum > std::numeric_limits<data_t>::max() - *pair.current)
