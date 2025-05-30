@@ -301,44 +301,60 @@ namespace asafov
       {
         return;
       }
+
       Node* current = head_;
       Node* prev = tail_;
-      bool found = false;
+      bool changed;
+
       do
       {
-        if (condition(current->data_))
+        changed = false;
+        do
         {
-          found = true;
-          Node* toDelete = current;
-          if (current == head_)
+          if (condition(current->data_))
           {
-            head_ = head_->next_;
-            tail_->next_ = head_;
-          }
-          else if (current == tail_)
-          {
-            tail_ = prev;
-            tail_->next_ = head_;
+            Node* toDelete = current;
+            if (current == head_)
+            {
+              head_ = head_->next_;
+              tail_->next_ = head_;
+              if (head_ == tail_ && condition(tail_->data_))
+              {
+                prev = tail_;
+                current = head_;
+                continue;
+              }
+            }
+            else if (current == tail_)
+            {
+              tail_ = prev;
+              tail_->next_ = head_;
+            }
+            else
+            {
+              prev->next_ = current->next_;
+            }
+
+            current = current->next_;
+            delete toDelete;
+            size_--;
+            changed = true;
+            // Если список пуст
+            if (size_ == 0)
+            {
+              head_ = tail_ = nullptr;
+              return;
+            }
           }
           else
           {
-            prev->next_ = current->next_;
+            prev = current;
+            current = current->next_;
           }
-          current = current->next_;
-          delete toDelete;
-          size_--;
         }
-        else
-        {
-          prev = current;
-          current = current->next_;
-        }
+        while (current != head_);
       }
-      while (current != head_ && found && size_ > 0);
-      if (size_ == 0)
-      {
-        head_ = tail_ = nullptr;
-      }
+      while (changed);
     }
     void remove(const T& value) noexcept
     {
