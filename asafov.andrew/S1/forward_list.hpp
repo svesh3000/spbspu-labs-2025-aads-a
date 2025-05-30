@@ -141,6 +141,7 @@ namespace asafov
     class Iterator final: public ConstIterator
     {
     public:
+      using ConstIterator::ConstIterator;
       T& operator*()
       {
         return const_cast<T&>(ConstIterator::operator*());
@@ -161,16 +162,6 @@ namespace asafov
         ConstIterator::operator++();
         return temp;
       }
-    private:
-      friend class ForwardList;
-
-      Iterator(Node* node, Node* last):
-        current_(node),
-        last_(last)
-      {}
-
-      Node* current_;
-      Node* last_;
     };
 
     ConstIterator begin() const noexcept
