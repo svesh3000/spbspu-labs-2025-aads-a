@@ -6,7 +6,7 @@ namespace
   std::pair< finaev::List< size_t >, bool > listSumAndOverflow(finaev::List< finaev::List< size_t > > list)
   {
     bool isOverflow = 0;
-    finaev::List < size_t > listSum;
+    finaev::List< size_t > listSum;
     for (auto i = list.begin(); i != list.end(); ++i)
     {
       size_t res = 0;
@@ -55,7 +55,7 @@ finaev::List< finaev::List< size_t > > finaev::createRightList(List< std::pair< 
   return listOfLists;
 }
 
-void finaev::printList(finaev::List< size_t > list, std::ostream& out)
+void finaev::printList(List< size_t > list, std::ostream& out)
 {
   if (list.isEmpty())
   {
@@ -79,12 +79,12 @@ void finaev::printList(const List< std::string >& list, std::ostream& out)
   out << "\n";
 }
 
-bool finaev::isOverflow(List< finaev::List< size_t > > list)
+bool finaev::isOverflow(List< List< size_t > > list)
 {
   return listSumAndOverflow(list).second;
 }
 
-finaev::List< size_t > finaev::createListOfSum(List< finaev::List< size_t > > list)
+finaev::List< size_t > finaev::createListOfSum(List< List< size_t > > list)
 {
   return listSumAndOverflow(list).first;
 }

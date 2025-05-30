@@ -192,7 +192,7 @@ namespace finaev
   }
 
   template< class T >
-  void List < T >::popBack()
+  void List< T >::popBack()
   {
     Node< T >* toDelete = tail_;
     if (tail_)
