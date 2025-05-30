@@ -29,11 +29,11 @@ namespace duhanina
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    const T& front() const noexcept;
-    T& front() noexcept;
+    const T& front() const;
+    T& front();
 
-    const T& back() const noexcept;
-    T& back() noexcept;
+    const T& back() const;
+    T& back();
 
    private:
     size_t capacity_;
@@ -184,25 +184,25 @@ namespace duhanina
   }
 
   template < typename T >
-  const T& DynamicArray< T >::front() const noexcept
+  const T& DynamicArray< T >::front() const
   {
     return data_[head_];
   }
 
   template < typename T >
-  T& DynamicArray< T >::front() noexcept
+  T& DynamicArray< T >::front()
   {
     return data_[head_];
   }
 
   template < typename T >
-  const T& DynamicArray< T >::back() const noexcept
+  const T& DynamicArray< T >::back() const
   {
     return data_[length_ + head_ - 1];
   }
 
   template < typename T >
-  T& DynamicArray< T >::back() noexcept
+  T& DynamicArray< T >::back()
   {
     return data_[length_ + head_ - 1];
   }

@@ -12,8 +12,8 @@ namespace duhanina
     bool empty() const noexcept;
     void push(const T& value);
     void pop();
-    const T& front() const noexcept;
-    T& front() noexcept;
+    const T& front() const;
+    T& front();
     size_t size() const noexcept;
 
   private:
@@ -39,13 +39,13 @@ namespace duhanina
   }
 
   template < typename T >
-  const T& Queue< T >::front() const noexcept
+  const T& Queue< T >::front() const
   {
     return array_.front();
   }
 
   template < typename T >
-  T& Queue< T >::front() noexcept
+  T& Queue< T >::front()
   {
     return array_.front();
   }
