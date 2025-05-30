@@ -4,7 +4,8 @@
 #include <list>
 #include <stdexcept>
 #include <utility>
-#include "../S1/fwd_list.hpp"
+
+#include <iostream>
 
 namespace zakirov
 {
@@ -15,7 +16,7 @@ namespace zakirov
     Queue();
     Queue(const Queue & other);
     Queue(Queue && other) noexcept;
-    ~Queue() = default;
+    ~Queue();
     bool empty();
     size_t size();
     T & front();
@@ -57,6 +58,12 @@ namespace zakirov
   {}
 
   template < typename T >
+  Queue< T >::~Queue()
+  {
+    delete[] data_;
+  }
+
+  template < typename T >
   bool Queue< T >::empty()
   {
     return size_ == 0;
@@ -71,13 +78,13 @@ namespace zakirov
   template < typename T >
   T & Queue< T >::front()
   {
-    return data_[0];
+    return data_[first_];
   }
 
   template < typename T >
   const T & Queue< T >::front() const
   {
-    return data_[0];
+    return data_[first_];
   }
 
   template < typename T >
@@ -96,7 +103,7 @@ namespace zakirov
   template < class U >
   void Queue< T >::uni_push(U && value)
   {
-    if (first_ + size_ > capacity_)
+    if (first_ + size_ >= capacity_)
     {
       if (first_ != 0)
       {

@@ -5,12 +5,12 @@
 #include "stack.hpp"
 #include "queue.hpp"
 
-void zakirov::check_overflow(llint first, llint second, char oper)
+void zakirov::check_overflow(long long first, long long second, char oper)
 {
-  llint llint_max = std::numeric_limits< llint >::max();
-  llint llint_min = std::numeric_limits< llint >::min();
-  llint max_num = std::max(first, second);
-  llint min_num = std::min(first, second);
+  long long llint_max = std::numeric_limits< long long >::max();
+  long long llint_min = std::numeric_limits< long long >::min();
+  long long max_num = std::max(first, second);
+  long long min_num = std::min(first, second);
   if (oper == '+')
   {
     if ((max_num > 0 && min_num > 0) && (llint_max - max_num < min_num))
@@ -106,7 +106,7 @@ bool zakirov::check_priority(std::string symbol)
   return 0;
 }
 
-zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string > infix)
+zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string > & infix)
 {
   Stack< std::string > op_buffer;
   Queue< std::string > result;
@@ -172,7 +172,7 @@ zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string >
   return result;
 }
 
-zakirov::llint zakirov::transform_to_llint(const std::string & line)
+long long zakirov::transform_to_llint(const std::string & line)
 {
   Stack< char > num_buffer;
   bool flag = false;
@@ -183,14 +183,14 @@ zakirov::llint zakirov::transform_to_llint(const std::string & line)
     ++fillable_it;
   }
 
-  llint result = 0;
+  long long result = 0;
   for (; fillable_it != line.end(); ++fillable_it)
   {
     num_buffer.push(*fillable_it);
   }
 
   size_t size_b = num_buffer.size();
-  llint num_power = 1;
+  long long num_power = 1;
   if (flag)
   {
     num_power = -1;
@@ -205,7 +205,7 @@ zakirov::llint zakirov::transform_to_llint(const std::string & line)
   return result;
 }
 
-zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
+long long zakirov::calculate_postfix(long long first, long long second, char oper)
 {
   check_overflow(second, first, oper);
   if (oper == '/')
@@ -233,12 +233,12 @@ zakirov::llint zakirov::calculate_postfix(llint first, llint second, char oper)
   return second % first;
 }
 
-zakirov::llint zakirov::calculate_postfix_expression(Queue< std::string > postfix)
+long long zakirov::calculate_postfix_expression(Queue< std::string > & postfix)
 {
-  Stack< llint > result;
-  llint first_v = 0;
-  llint second_v = 0;
-  llint result_v = 0;
+  Stack< long long > result;
+  long long first_v = 0;
+  long long second_v = 0;
+  long long result_v = 0;
   while (!postfix.empty())
   {
     if (check_operand(postfix.front()))
