@@ -128,7 +128,7 @@ namespace asafov
        return !(*this == rhs);
       }
     private:
-      friend class ForwardList;\
+      friend class ForwardList;
 
       ConstIterator(Node* node, Node* last):
         current_(node),
@@ -140,7 +140,7 @@ namespace asafov
     };
     class Iterator final: public ConstIterator
     {
-      public:
+    public:
       T& operator*()
       {
         return const_cast<T&>(ConstIterator::operator*());
@@ -161,6 +161,11 @@ namespace asafov
         ConstIterator::operator++();
         return temp;
       }
+    private:
+      Iterator(Node* node, Node* last):
+        current_(node),
+        last_(last)
+      {}
     };
 
     ConstIterator begin() const noexcept
