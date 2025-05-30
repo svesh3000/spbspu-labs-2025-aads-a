@@ -162,6 +162,8 @@ namespace asafov
         return temp;
       }
     private:
+      friend class ForwardList;
+
       Iterator(Node* node, Node* last):
         current_(node),
         last_(last)
