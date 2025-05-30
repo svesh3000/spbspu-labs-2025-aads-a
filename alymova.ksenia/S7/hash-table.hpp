@@ -46,7 +46,7 @@ namespace alymova
     float load_factor() const noexcept;
     float max_load_factor() const noexcept;
     void max_load_factor(float mlf) noexcept; //resixe if new mlf
-    
+
     void clear() noexcept;
     void swap(HashTable& other);
   private:
@@ -132,7 +132,7 @@ namespace alymova
   {
     return size_ == 0;
   }
-  
+
   template< class Key, class Value, class Hash, class KeyEqual >
   size_t HashTable< Key, Value, Hash, KeyEqual >::size() const noexcept
   {
