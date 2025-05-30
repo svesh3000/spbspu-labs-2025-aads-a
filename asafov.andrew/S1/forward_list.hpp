@@ -166,6 +166,9 @@ namespace asafov
         current_(node),
         last_(last)
       {}
+
+      Node* current_;
+      Node* last_;
     };
 
     ConstIterator begin() const noexcept
