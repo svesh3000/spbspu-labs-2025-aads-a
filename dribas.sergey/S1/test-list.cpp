@@ -2,13 +2,6 @@
 #include "list.hpp"
 
 using namespace dribas;
-namespace
-{
-  bool isEven(int i)
-  {
-  return i == 1;
-  }
-}
 
 BOOST_AUTO_TEST_SUITE(Constructor)
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
@@ -92,10 +85,16 @@ BOOST_AUTO_TEST_CASE(removeIf)
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);
-  list.remove_if(isEven);
+  list.remove_if([=](int x) -> bool
+  {
+    return x == 1;
+  });
   BOOST_CHECK(list.front() == 2);
   list.clear();
-  list.remove_if(isEven);
+  list.remove_if([=](int x) -> bool
+  {
+    return x == 1;
+  });
   BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_CASE(remove )
