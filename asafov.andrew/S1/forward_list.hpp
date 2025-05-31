@@ -21,7 +21,7 @@ namespace asafov
     class Equal
     {
     public:
-      Equal(const T& value, Comparator cmp):
+      Equal(const T& value, Comparator cmp = std::less< T >):
         value_(value)
         cmp_(cmp)
       {}
@@ -173,7 +173,6 @@ namespace asafov
     {
       return Iterator(nullptr, tail_);
     }
-
     ConstIterator cbegin() const noexcept
     {
       return begin();
@@ -348,10 +347,10 @@ namespace asafov
       }
       while (changed);
     }
-  public:
+
     void remove(const T& value) noexcept
     {
-      remove_if(Equal(value, Comaparator()));
+      remove_if(Equal(value));
     }
     void assign(size_t count, const T& value)
     {
