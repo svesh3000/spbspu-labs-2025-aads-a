@@ -362,6 +362,7 @@ namespace asafov
   private:
     class Equal
     {
+    public:
       Equal(const T& value):
         value_(value)
         cmp_(Comaparator())
