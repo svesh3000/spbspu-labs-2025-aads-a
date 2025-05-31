@@ -3,6 +3,83 @@
 
 using Tree = duhanina::Tree< int, std::string, std::less< int > >;
 
+namespace
+{
+  Tree createTestTree()
+  {
+    Tree tree;
+    tree[1] = "one";
+    tree[5] = "five";
+    tree[3] = "three";
+    tree[7] = "seven";
+    tree[4] = "four";
+    tree[9] = "nine";
+    return tree;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(ForwardTraversal)
+{
+  Tree tree;
+  tree = createTestTree();
+  auto it = tree.begin();
+
+  BOOST_TEST((*it).first == 1);
+  BOOST_TEST((*it).second == "one");
+  ++it;
+
+  BOOST_TEST((*it).first == 3);
+  BOOST_TEST((*it).second == "three");
+  ++it;
+
+  BOOST_TEST((*it).first == 4);
+  BOOST_TEST((*it).second == "four");
+  ++it;
+
+  BOOST_TEST((*it).first == 5);
+  BOOST_TEST((*it).second == "five");
+  ++it;
+
+  BOOST_TEST((*it).first == 7);
+  BOOST_TEST((*it).second == "seven");
+  ++it;
+
+  BOOST_TEST((*it).first == 9);
+  BOOST_TEST((*it).second == "nine");
+  ++it;
+}
+
+BOOST_AUTO_TEST_CASE(ReverseTraversal)
+{
+  Tree tree;
+  tree = createTestTree();
+  auto it = tree.end();
+  --it;
+
+  BOOST_TEST((*it).first == 9);
+  BOOST_TEST((*it).second == "nine");
+  --it;
+
+  BOOST_TEST((*it).first == 7);
+  BOOST_TEST((*it).second == "seven");
+  --it;
+
+  BOOST_TEST((*it).first == 5);
+  BOOST_TEST((*it).second == "five");
+  --it;
+
+  BOOST_TEST((*it).first == 4);
+  BOOST_TEST((*it).second == "four");
+  --it;
+
+  BOOST_TEST((*it).first == 3);
+  BOOST_TEST((*it).second == "three");
+  --it;
+
+  BOOST_TEST((*it).first == 1);
+  BOOST_TEST((*it).second == "one");
+}
+
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
 {
   Tree tree;

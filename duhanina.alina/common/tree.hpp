@@ -86,7 +86,7 @@ namespace duhanina
     Node_t* find(Node_t* node, const Key& k) const noexcept;
     Node_t* findMin(Node_t* node) const noexcept;
     Node_t* findMax(Node_t* node) const noexcept;
-    Node_t* remove(Node_t* node, Key& k) noexcept;
+    Node_t* remove(Node_t* node, const Key& k) noexcept;
     void clear(Node_t* node) noexcept;
     Node_t* copyTree(Node_t* node, Node_t* parent);
     Node_t* findNextNode(Node_t* node) const noexcept;
@@ -168,7 +168,6 @@ namespace duhanina
     if (this != std::addressof(other))
     {
       Node_t* oldFakeRoot = fakeRoot_;
-      Node_t* oldRoot = fakeRoot_->left;
       size_t oldSize = size_;
       Node_t* newFakeRoot = nullptr;
       Node_t* newRoot = nullptr;
@@ -179,7 +178,6 @@ namespace duhanina
         fakeRoot_ = newFakeRoot;
         setRoot(newRoot);
         size_ = other.size_;
-        clear(oldRoot);
         delete oldFakeRoot;
       }
       catch (...)
@@ -200,7 +198,6 @@ namespace duhanina
     if (this != std::addressof(other))
     {
       Node_t* oldFakeRoot = fakeRoot_;
-      Node_t* oldRoot = fakeRoot_->left;
       size_t oldSize = size_;
       try
       {
@@ -295,7 +292,7 @@ namespace duhanina
     auto* result = new Value(std::move(get(k)));
     setRoot(remove(getRoot(), k));
     size_--;
-    return result;
+    return *result;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -784,7 +781,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, Key& k) noexcept
+  typename Tree< Key, Value, Compare >::Node_t* Tree< Key, Value, Compare >::remove(Node_t* node, const Key& k) noexcept
   {
     if (!node)
     {

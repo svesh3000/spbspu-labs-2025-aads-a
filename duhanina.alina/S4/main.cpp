@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include <functional>
 #include <tree.hpp>
 
@@ -60,25 +61,18 @@ namespace
 
   void printDict(const DictionaryStorage& storage, const std::string& name)
   {
-    try
+    Dictionary dict = storage.get(name);
+    if (dict.empty())
     {
-      Dictionary dict = storage.get(name);
-      if (dict.empty())
-      {
-        std::cout << "<EMPTY>\n";
-        return;
-      }
-      std::cout << name;
-      for (auto it = dict.begin(); it != dict.end(); ++it)
-      {
-        std::cout << " " << it->first << " " << it->second;
-      }
-      std::cout << "\n";
+      std::cout << "<EMPTY>\n";
+      return;
     }
-    catch (...)
+    std::cout << name;
+    for (auto it = dict.begin(); it != dict.end(); ++it)
     {
-      std::cout << "<INVALID COMMAND>\n";
+      std::cout << " " << it->first << " " << it->second;
     }
+    std::cout << "\n";
   }
 
   void complementOperation(DictionaryStorage& storage, const std::string& args)
@@ -87,8 +81,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result;
     for (auto it = dict1.begin(); it != dict1.end(); ++it)
     {
@@ -106,8 +100,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result;
     for (auto it = dict1.begin(); it != dict1.end(); ++it)
     {
@@ -125,8 +119,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-    Dictionary& dict1 = storage[name1];
-    Dictionary& dict2 = storage[name2];
+    Dictionary& dict1 = storage.get(name1);
+    Dictionary& dict2 = storage.get(name2);
     Dictionary result = dict1;
     for (auto it = dict2.begin(); it != dict2.end(); ++it)
     {
@@ -150,14 +144,7 @@ namespace
   {
     duhanina::Tree< std::string, DicFunc, std::less< std::string > > commands;
     initializeCommands(commands);
-    try
-    {
-      commands.at(cmd)(storage, args);
-    }
-    catch (...)
-    {
-      std::cout << "<INVALID COMMAND>\n";
-    }
+    commands.at(cmd)(storage, args);
   }
 }
 
@@ -174,16 +161,24 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::string line;
-  while (std::getline(std::cin, line))
+  try
   {
-    if (line.empty())
+    while (std::getline(std::cin, line))
     {
-      continue;
+      if (line.empty())
+      {
+        continue;
+      }
+      size_t pos = 0;
+      std::string cmd = readNextToken(line, pos);
+      std::string args = line.substr(pos);
+      processCommand(storage, cmd, args);
     }
-    size_t pos = 0;
-    std::string cmd = readNextToken(line, pos);
-    std::string args = line.substr(pos);
-    processCommand(storage, cmd, args);
+  }
+  catch (...)
+  {
+    std::cout << "<INVALID COMMAND>\n";
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
   return 0;
 }
