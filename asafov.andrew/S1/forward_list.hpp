@@ -5,7 +5,7 @@
 
 namespace asafov
 {
-  template< typename T >
+  template< typename T , typename Comparator = std::less< T > >
   class ForwardList
   {
     struct Node
@@ -55,29 +55,20 @@ namespace asafov
 
     ForwardList& operator=(const ForwardList& list)
     {
-      ForwardList temp;
-      for (auto&& data: list)
+      if (this != std::addressof(list))
       {
-        temp.push_back(data);
+        ForwardList temp(list);
+        swap(temp);
       }
-      clear();
-      swap(temp);
-      delete temp;
       return *this;
     }
     ForwardList& operator=(ForwardList&& list) noexcept
     {
-      if (this == &list)
+      if (this != std::addressof(list))
       {
-        return *this;
+        ForwardList temp(std::move(list));
+        swap(temp);
       }
-      clear();
-      head_ = list.head_;
-      tail_ = list.tail_;
-      size_ = list.size_;
-      list.head_ = nullptr;
-      list.tail_ = nullptr;
-      list.size_ = 0;
       return *this;
     }
 
@@ -88,8 +79,6 @@ namespace asafov
         current_(nullptr),
         last_(nullptr)
       {}
-      ConstIterator(const ConstIterator& data) = default;
-      ~ConstIterator() = default;
 
       T& operator*() const noexcept
       {
@@ -339,7 +328,6 @@ namespace asafov
             delete toDelete;
             size_--;
             changed = true;
-            // Если список пуст
             if (size_ == 0)
             {
               head_ = tail_ = nullptr;
@@ -358,11 +346,7 @@ namespace asafov
     }
     void remove(const T& value) noexcept
     {
-      auto f = [&value](const T& data) -> bool
-      {
-        return data == value;
-      };
-      remove_if(f);
+      remove_if(Equal(value));
     }
     void assign(size_t count, const T& value)
     {
@@ -376,6 +360,23 @@ namespace asafov
     }
 
   private:
+    class Equal
+    {
+      Equal(const T& value):
+        value_(value)
+        cmp_(Comaparator())
+      {}
+
+      operator(T other)
+      {
+        reurn !cmp_(value_, other) && !cmp_(value_, other);
+      }
+
+    private:
+      Const T& value_;
+      Comparator cmp_;
+    }
+
     Node* head_;
     Node* tail_;
     size_t size_;
