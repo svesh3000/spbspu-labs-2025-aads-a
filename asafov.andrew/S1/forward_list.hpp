@@ -74,8 +74,8 @@ namespace asafov
       }
       BasicIterator& operator++(int) noexcept
       {
-        ConstIterator temp = *this;
-        operator++();
+        BasicIterator temp(*this);
+        ++(*this);
         return temp;
       }
 
