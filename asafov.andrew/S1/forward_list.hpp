@@ -90,7 +90,7 @@ namespace asafov
     private:
       friend class ForwardList;
 
-      ConstIterator(node_t* node, node_t* last) noexcept:
+      BasicIterator(node_t* node, node_t* last) noexcept:
         current_(node),
         last_(last)
       {}
