@@ -344,21 +344,6 @@ namespace asafov
       }
       while (changed);
     }
-    void remove(const T& value) noexcept
-    {
-      remove_if(Equal(value));
-    }
-    void assign(size_t count, const T& value)
-    {
-      ForwardList temp;
-      for (size_t i = 0; i < count; ++i)
-      {
-        temp.push_back(value);
-      }
-      clear();
-      swap(temp);
-    }
-
   private:
     class Equal
     {
@@ -377,7 +362,23 @@ namespace asafov
       Const T& value_;
       Comparator cmp_;
     }
+  public:
+    void remove(const T& value) noexcept
+    {
+      remove_if(Equal(value));
+    }
+    void assign(size_t count, const T& value)
+    {
+      ForwardList temp;
+      for (size_t i = 0; i < count; ++i)
+      {
+        temp.push_back(value);
+      }
+      clear();
+      swap(temp);
+    }
 
+  private:
     Node* head_;
     Node* tail_;
     size_t size_;
