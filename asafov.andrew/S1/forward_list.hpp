@@ -348,14 +348,14 @@ namespace asafov
     class Equal
     {
     public:
-      Equal(const T& value):
+      Equal(const T& value, Comparator cmp):
         value_(value)
-        cmp_(Comaparator())
+        cmp_(cmp)
       {}
 
       operator(T other)
       {
-        reurn !cmp_(value_, other) && !cmp_(value_, other);
+        reurn !cmp_(value_, other) && !cmp_(other, value_);
       }
 
     private:
@@ -365,7 +365,7 @@ namespace asafov
   public:
     void remove(const T& value) noexcept
     {
-      remove_if(Equal(value));
+      remove_if(Equal(value, Comaparator()));
     }
     void assign(size_t count, const T& value)
     {
