@@ -64,7 +64,7 @@ namespace asafov
         }
         else if (current_ == nullptr)
         {
-          current_ = root_;
+          current_ = head_;
         }
         else
         {
