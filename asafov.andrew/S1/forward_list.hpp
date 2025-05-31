@@ -17,6 +17,88 @@ namespace asafov
       T data_;
       Node* next_;
     };
+
+    class Equal
+    {
+    public:
+      Equal(const T& value, Comparator cmp):
+        value_(value)
+        cmp_(cmp)
+      {}
+
+      operator(T other)
+      {
+        reurn !cmp_(value_, other) && !cmp_(other, value_);
+      }
+
+    private:
+      Const T& value_;
+      Comparator cmp_;
+    }
+
+    template< class value_t, class node_t >
+    class BasicIterator
+    {
+    public:
+      using iterator_category = std::forward_iterator_tag;
+
+      BasicIterator() noexcept:
+        current_(nullptr),
+        last_(nullptr)
+      {}
+
+      value_t& operator*() const noexcept
+      {
+        return current_->data_;
+      }
+      value_t* operator->() const noexcept
+      {
+        return std::addressof(current_->data_);
+      }
+
+      BasicIterator& operator++() noexcept
+      {
+        if (current_ && current_ != last_)
+        {
+          current_ = current_->next_;
+        }
+        else if (current_ == nullptr)
+        {
+          current_ = root_;
+        }
+        else
+        {
+          current_ = nullptr;
+        }
+        return *this;
+      }
+      BasicIterator& operator++(int) noexcept
+      {
+        ConstIterator temp = *this;
+        operator++();
+        return temp;
+      }
+
+      bool operator==(const BasicIterator& rhs) const noexcept
+      {
+        return current_ == rhs.current_ && last_ == rhs.last_;
+      }
+      bool operator!=(const BasicIterator& rhs) const noexcept
+      {
+       return !(*this == rhs);
+      }
+    private:
+      friend class ForwardList;
+
+      ConstIterator(node_t* node, node_t* last) noexcept:
+        current_(node),
+        last_(last)
+      {}
+
+      node_t* current_;
+      node_t* last_;
+    };
+
   public:
     ForwardList() noexcept:
       head_(nullptr),
@@ -72,86 +154,8 @@ namespace asafov
       return *this;
     }
 
-    class ConstIterator
-    {
-    public:
-      ConstIterator():
-        current_(nullptr),
-        last_(nullptr)
-      {}
-
-      T& operator*() const noexcept
-      {
-        return current_->data_;
-      }
-      T* operator->() const noexcept
-      {
-        return std::addressof(current_->data_);
-      }
-
-      ConstIterator& operator++()
-      {
-        if (current_ && current_ != last_)
-        {
-          current_ = current_->next_;
-        }
-        else
-        {
-          current_ = nullptr;
-        }
-        return *this;
-      }
-      ConstIterator& operator++(int)
-      {
-        ConstIterator temp = *this;
-        ConstIterator::operator++();
-        return temp;
-      }
-
-      bool operator==(const ConstIterator& rhs) const
-      {
-        return current_ == rhs.current_ && last_ == rhs.last_;
-      }
-      bool operator!=(const ConstIterator& rhs) const
-      {
-       return !(*this == rhs);
-      }
-    private:
-      friend class ForwardList;
-
-      ConstIterator(Node* node, Node* last):
-        current_(node),
-        last_(last)
-      {}
-
-      Node* current_;
-      Node* last_;
-    };
-    class Iterator final: public ConstIterator
-    {
-    public:
-      using ConstIterator::ConstIterator;
-      T& operator*()
-      {
-        return const_cast<T&>(ConstIterator::operator*());
-      }
-      T* operator->()
-      {
-        return const_cast<T&>(ConstIterator::operator->());
-      }
-
-      Iterator& operator++()
-      {
-        ConstIterator::operator++();
-        return *this;
-      }
-      Iterator& operator++(int)
-      {
-        ConstIterator temp = *this;
-        ConstIterator::operator++();
-        return temp;
-      }
-    };
+    using Iterator = BasicIterator< T, Node* >;
+    using ConstIterator = BasicIterator< const T, const Node* >;
 
     ConstIterator begin() const noexcept
     {
@@ -343,24 +347,6 @@ namespace asafov
         while (current != head_);
       }
       while (changed);
-    }
-  private:
-    class Equal
-    {
-    public:
-      Equal(const T& value, Comparator cmp):
-        value_(value)
-        cmp_(cmp)
-      {}
-
-      operator(T other)
-      {
-        reurn !cmp_(value_, other) && !cmp_(other, value_);
-      }
-
-    private:
-      Const T& value_;
-      Comparator cmp_;
     }
   public:
     void remove(const T& value) noexcept
