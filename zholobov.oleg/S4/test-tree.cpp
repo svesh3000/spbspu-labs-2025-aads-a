@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <list>
 
-#include "tree.hpp"
+#include <tree/tree.hpp>
 
 namespace {
   template < typename Key, typename Value, typename Cmp = std::less< Key > >

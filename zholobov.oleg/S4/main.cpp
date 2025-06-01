@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 
-#include "tree.hpp"
+#include <tree/tree.hpp>
 #include "tree_actions.hpp"
 
 namespace {

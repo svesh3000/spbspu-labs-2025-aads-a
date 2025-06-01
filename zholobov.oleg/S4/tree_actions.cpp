@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "tree_actions.hpp"
+
+#include <iostream>
 
 void zholobov::doPrint(std::ostream& out, std::istream& in, const NamedTrees& namedTrees)
 {

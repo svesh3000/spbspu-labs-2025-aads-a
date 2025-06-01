@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 
-#include "tree.hpp"
+#include <tree/tree.hpp>
 
 namespace zholobov {
 
