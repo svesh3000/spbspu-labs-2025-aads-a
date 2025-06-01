@@ -37,7 +37,7 @@ namespace asafov
       Comparator cmp_;
     };
 
-    template< class value_t, class node_t >
+    template< class value_t>
     class BasicIterator
     {
       friend class ForwardList;
@@ -66,7 +66,7 @@ namespace asafov
         }
         else if (current_ == nullptr)
         {
-          current_ = const_cast< node_t >(head_);
+          current_ = head_;
         }
         else
         {
@@ -90,13 +90,13 @@ namespace asafov
        return !(*this == rhs);
       }
     private:
-      BasicIterator(node_t* node, node_t* last) noexcept:
+      BasicIterator(Node* node, Node* last) noexcept:
         current_(node),
         last_(last)
       {}
 
-      node_t* current_;
-      node_t* last_;
+      Node* current_;
+      Node* last_;
     };
 
   public:
@@ -154,8 +154,8 @@ namespace asafov
       return *this;
     }
 
-    using Iterator = BasicIterator< T, Node* >;
-    using ConstIterator = BasicIterator< const T, Node* >;
+    using Iterator = BasicIterator< T >;
+    using ConstIterator = BasicIterator< const T >;
 
     Iterator begin() noexcept
     {
