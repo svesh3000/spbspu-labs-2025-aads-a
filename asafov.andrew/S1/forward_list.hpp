@@ -14,6 +14,7 @@ namespace asafov
         data_(value),
         next_(ptr)
       {}
+
       T data_;
       Node* next_;
     };
@@ -21,20 +22,21 @@ namespace asafov
     class Equal
     {
     public:
-      Equal(const T& value, Comparator cmp = std::less< T >):
+      Equal(const T& value, Comparator cmp = Comparator()):
         value_(value),
         cmp_(cmp)
       {}
 
-      bool operator(T other)
+      bool operator()(const T& other) const
       {
         reurn !cmp_(value_, other) && !cmp_(other, value_);
       }
 
     private:
-      Const T& value_;
+      const T& value_;
       Comparator cmp_;
     };
+
 
     template< class value_t, class node_t >
     class BasicIterator
@@ -64,7 +66,7 @@ namespace asafov
         }
         else if (current_ == nullptr)
         {
-          current_ = head_;
+          current_ = const_cast< node_t >(head_);
         }
         else
         {
@@ -98,6 +100,7 @@ namespace asafov
       node_t* current_;
       node_t* last_;
     };
+    friend class BasicIterator;
 
   public:
     ForwardList() noexcept:
@@ -159,11 +162,11 @@ namespace asafov
 
     ConstIterator begin() const noexcept
     {
-      return ConstIterator(head_, tail_);
+      return ConstIterator(const_cast< const Node* >(head_), const_cast< const Node* >(tail_));
     }
     ConstIterator end() const noexcept
     {
-      return ConstIterator(nullptr, tail_);
+      return ConstIterator(nullptr, const_cast< const Node* >(tail_));
     }
     Iterator begin() noexcept
     {
@@ -184,47 +187,35 @@ namespace asafov
 
     T& front()
     {
-      if (head_->data_)
-      {
-        return head_->data_;
-      }
-      else
+      if (!head_)
       {
         throw std::logic_error("list is empty!");
       }
+      return head_->data_;
     }
     const T& front() const
     {
-      if (head_->data_)
-      {
-        return head_->data_;
-      }
-      else
+      if (!head_)
       {
         throw std::logic_error("list is empty!");
       }
+      return head_->data_;
     }
     T& back()
     {
-      if (tail_->data_)
-      {
-        return tail_->data_;
-      }
-      else
+      if (!tail_)
       {
         throw std::logic_error("list is empty!");
       }
+      return tail_->data_;
     }
     const T& back() const
     {
-      if (tail_->data_)
-      {
-        return tail_->data_;
-      }
-      else
+      if (!tail_)
       {
         throw std::logic_error("list is empty!");
       }
+      return tail_->data_;
     }
     bool empty() const noexcept
     {
