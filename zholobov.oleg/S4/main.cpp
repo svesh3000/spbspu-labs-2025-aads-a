@@ -1,12 +1,31 @@
 #include <fstream>
 #include <iostream>
 
+#include "tree.hpp"
+
 namespace {
-  void readTrees(std::istream& input)
+  using TreeMap = zholobov::Tree< size_t, std::string >;
+  using NamedTrees = zholobov::Tree< std::string, TreeMap >;
+
+  NamedTrees readTrees(std::istream& input)
   {
-    if (input) {
-      std::cout << "Reading trees...\n";
+    NamedTrees result;
+    while (!input.eof()) {
+      input.clear();
+      TreeMap map;
+      std::string datasetName;
+      size_t key = 0;
+      input >> datasetName;
+      while (input.good()) {
+        std::string value;
+        input >> key >> value;
+        if (input) {
+          map.emplace(key, value);
+        }
+      }
+      result.emplace(datasetName, map);
     }
+    return result;
   }
 }
 

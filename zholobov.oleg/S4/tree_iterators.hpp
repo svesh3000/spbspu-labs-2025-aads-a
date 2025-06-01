@@ -1,6 +1,7 @@
 #ifndef TREE_ITERATORS_HPP
 #define TREE_ITERATORS_HPP
 
+#include <cassert>
 #include <functional>
 
 namespace zholobov {
