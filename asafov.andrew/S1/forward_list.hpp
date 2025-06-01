@@ -41,6 +41,8 @@ namespace asafov
     class BasicIterator
     {
     public:
+      using iterator_category = std::forward_iterator_tag;
+
       BasicIterator() noexcept:
         current_(nullptr),
         last_(nullptr)
@@ -156,14 +158,6 @@ namespace asafov
     using Iterator = BasicIterator< T, Node* >;
     using ConstIterator = BasicIterator< const T, const Node* >;
 
-    ConstIterator begin() const noexcept
-    {
-      return ConstIterator(const_cast< const Node* >(head_), const_cast< const Node* >(tail_));
-    }
-    ConstIterator end() const noexcept
-    {
-      return ConstIterator(nullptr, const_cast< const Node* >(tail_));
-    }
     Iterator begin() noexcept
     {
       return Iterator(head_, tail_);
@@ -174,11 +168,11 @@ namespace asafov
     }
     ConstIterator cbegin() const noexcept
     {
-      return begin();
+      return ConstIterator(head_, tail_);
     }
     ConstIterator cend() const noexcept
     {
-      return end();
+      return ConstIterator(nullptr, tail_);
     }
 
     T& front()
