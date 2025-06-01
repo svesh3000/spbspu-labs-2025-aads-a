@@ -34,7 +34,7 @@ namespace asafov
     private:
       Const T& value_;
       Comparator cmp_;
-    }
+    };
 
     template< class value_t, class node_t >
     class BasicIterator
