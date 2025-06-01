@@ -506,7 +506,7 @@ namespace lanovenko
       throw std::logic_error("<EMPTY>");
     }
     std::stack< TreeNode< Key, Value > * > stack;
-    TreeNode< Key, Value > * current = root_->left_;
+    TreeNode< Key, Value > * current = root_;
     bool leftDone = false;
     while (current != nullptr || !stack.empty())
     {
@@ -543,7 +543,7 @@ namespace lanovenko
       throw std::logic_error("<EMPTY>");
     }
     std::stack< TreeNode< Key, Value > * > stack;
-    TreeNode< Key, Value > * current = root_->left_;
+    TreeNode< Key, Value > * current = root_;
     bool rightDone = false;
     while (current != nullptr || !stack.empty())
     {
@@ -580,7 +580,7 @@ namespace lanovenko
       throw std::logic_error("<EMPTY>");
     }
     std::queue< TreeNode< Key, Value > * > queue;
-    queue.push(root_->left_);
+    queue.push(root_);
     while (!queue.empty())
     {
       TreeNode< Key, Value > * current = queue.front();
