@@ -2,14 +2,21 @@
 #include <limits>
 namespace
 {
-  bool allItersEnds(asafov::data_list_t::ConstIterator* begins, asafov::data_list_t::ConstIterator* ends, size_t size)
+  bool allItersEnds(
+    asafov::ForwardList<asafov::data_list_t::ConstIterator>& begins,
+    asafov::ForwardList<asafov::data_list_t::ConstIterator>& ends,
+    size_t size)
   {
+    auto beginIt = begins.begin();
+    auto endIt = ends.begin();
     for (size_t i = 0; i < size; i++)
     {
-      if (begins[i] != ends[i])
+      if (*beginIt != *endIt)
       {
         return false;
       }
+      ++beginIt;
+      ++endIt;
     }
     return true;
   }
@@ -28,20 +35,20 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     return;
   }
 
-  data_list_t::ConstIterator* begins = new data_list_t::ConstIterator[sequences.size() * 2];
-  data_list_t::ConstIterator* ends = &begins[sequences.size()];
+  ForwardList< data_list_t::ConstIterator > begins;
+  ForwardList< data_list_t::ConstIterator > ends;
   size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
-  begins[0] = iter->second.cbegin();
-  ends[0] = iter->second.cend();
+  begins.push_back(iter->second.cbegin());
+  ends.push_back(iter->second.cend());
   ++iter;
   ++size;
   for (; iter != sequences.cend(); ++iter)
   {
     out << ' ' << iter->first;
-    begins[size] = iter->second.cbegin();
-    ends[size] = iter->second.cend();
+    begins.push_back(iter->second.cbegin());
+    ends.push_back(iter->second.cend());
     ++size;
   }
   if (sequences.size() != 0)
@@ -55,44 +62,56 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   {
     data_t sum = 0;
     size_t pos = 0;
+    auto beginIt = begins.begin();
+    auto endIt = ends.begin();
     for (; pos < size;)
     {
-      if(begins[pos] != ends[pos])
+      if(*beginIt != *endIt)
       {
-        if(sum > std::numeric_limits<data_t>::max() - *begins[pos])
+        if(sum > std::numeric_limits<data_t>::max() - **beginIt)
         {
           isAllItersEnds = false;
         } else
         {
-          sum += *begins[pos];
+          sum += **beginIt;
         }
-        out << *begins[pos];
-        ++begins[pos++];
+        out << **beginIt;
+        ++(*beginIt);
+        ++beginIt;
+        ++endIt;
+        ++pos;
         break;
       }
       else
       {
-        pos++;
+        ++beginIt;
+        ++endIt;
+        ++pos;
       }
     }
     for (; pos < size;)
     {
-      if (begins[pos] != ends[pos])
+      if (*beginIt != *endIt)
       {
-        if (sum > std::numeric_limits<data_t>::max() - *begins[pos])
+        if (sum > std::numeric_limits<data_t>::max() - **beginIt)
         {
           isAllItersEnds = false;
         }
         else
         {
-          sum += *begins[pos];
+          sum += **beginIt;
         }
-        out << ' ' << *begins[pos];
-        ++begins[pos++];
+        out << ' ' << **beginIt;
+        ++(*beginIt);
+        ++beginIt;
+        ++endIt;
+        ++pos;
       }
       else
       {
-        pos++;
+        ++beginIt;
+        ++endIt;
+        ++pos;
       }
     }
     out << '\n';
@@ -102,7 +121,6 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
   if (isAllItersEnds == false)
   {
     sums.clear();
-    delete[] begins;
     throw std::overflow_error("owerflow!");
   }
 
@@ -114,5 +132,4 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     out << ' ' << *it;
   }
   out << '\n';
-  delete[] begins;
 }
