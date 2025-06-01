@@ -22,11 +22,11 @@ namespace asafov
     {
     public:
       Equal(const T& value, Comparator cmp = std::less< T >):
-        value_(value)
+        value_(value),
         cmp_(cmp)
       {}
 
-      operator(T other)
+      bool operator(T other)
       {
         reurn !cmp_(value_, other) && !cmp_(other, value_);
       }
