@@ -5,7 +5,7 @@
 
 namespace asafov
 {
-  template< typename T , typename Comparator = std::less< T > >
+  template< class T , class Comparator = std::less< T > >
   class ForwardList
   {
     struct Node
@@ -40,6 +40,7 @@ namespace asafov
     template< class value_t, class node_t >
     class BasicIterator
     {
+      friend class ForwardList;
     public:
       using iterator_category = std::forward_iterator_tag;
 
@@ -89,8 +90,6 @@ namespace asafov
        return !(*this == rhs);
       }
     private:
-      friend class ForwardList;
-
       BasicIterator(node_t* node, node_t* last) noexcept:
         current_(node),
         last_(last)
@@ -156,7 +155,7 @@ namespace asafov
     }
 
     using Iterator = BasicIterator< T, Node* >;
-    using ConstIterator = BasicIterator< const T, const Node* >;
+    using ConstIterator = BasicIterator< const T, Node* >;
 
     Iterator begin() noexcept
     {
