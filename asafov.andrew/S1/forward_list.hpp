@@ -64,10 +64,6 @@ namespace asafov
         {
           current_ = current_->next_;
         }
-        else if (current_ == nullptr)
-        {
-          current_ = head_;
-        }
         else
         {
           current_ = nullptr;
