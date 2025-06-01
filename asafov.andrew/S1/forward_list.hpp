@@ -29,7 +29,7 @@ namespace asafov
 
       bool operator()(const T& other) const
       {
-        reurn !cmp_(value_, other) && !cmp_(other, value_);
+        return !cmp_(value_, other) && !cmp_(other, value_);
       }
 
     private:
@@ -37,13 +37,10 @@ namespace asafov
       Comparator cmp_;
     };
 
-
     template< class value_t, class node_t >
     class BasicIterator
     {
     public:
-      using iterator_category = std::forward_iterator_tag;
-
       BasicIterator() noexcept:
         current_(nullptr),
         last_(nullptr)
@@ -100,7 +97,6 @@ namespace asafov
       node_t* current_;
       node_t* last_;
     };
-    friend class BasicIterator;
 
   public:
     ForwardList() noexcept:
