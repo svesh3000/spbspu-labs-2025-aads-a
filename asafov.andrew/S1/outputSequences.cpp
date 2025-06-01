@@ -30,7 +30,6 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
 
   data_list_t::ConstIterator* begins = new data_list_t::ConstIterator[sequences.size() * 2];
   data_list_t::ConstIterator* ends = &begins[sequences.size()];
-  sequence_list_t::ConstIterator seqiter = sequences.cbegin();
   size_t size = 0;
   auto iter = sequences.cbegin();
   out << iter->first;
