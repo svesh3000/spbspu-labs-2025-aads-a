@@ -18,6 +18,7 @@ namespace zholobov {
   public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = typename Node::value_type;
+    using difference_type = std::ptrdiff_t;
     using pointer = value_type*;
     using reference = value_type&;
 
@@ -44,6 +45,7 @@ namespace zholobov {
   public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = typename Node::value_type;
+    using difference_type = std::ptrdiff_t;
     using pointer = const value_type*;
     using reference = const value_type&;
     using this_t = TreeConstIterator< Node >;

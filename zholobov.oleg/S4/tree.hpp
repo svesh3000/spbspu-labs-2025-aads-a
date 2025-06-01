@@ -85,18 +85,18 @@ namespace zholobov {
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
 
   private:
-    int height(node_type* node);
+    int height(node_type* node) const;
     void updateHeight(node_type* node);
-    int getBalance(node_type* node);
+    int getBalance(node_type* node) const;
     node_type* rotateRight(node_type* node);
     node_type* rotateLeft(node_type* node);
     node_type* rebalance(node_type* node);
     void rebalanceToRoot(node_type* fromNode);
     void transplant(node_type* u, node_type* v);
     void clearTree(node_type* node);
-    node_type* findByKey(key_type key);
-    node_type* findLowerBound(key_type key);
-    node_type* findUpperBound(key_type key);
+    node_type* findByKey(key_type key) const;
+    node_type* findLowerBound(key_type key) const;
+    node_type* findUpperBound(key_type key) const;
 
     node_type* fakeRoot_;
     Compare cmp_;
@@ -268,7 +268,7 @@ namespace zholobov {
     if (result == end()) {
       throw std::out_of_range("Key not found");
     }
-    return result.second;
+    return result->second;
   }
 
   template < typename Key, typename T, typename Compare >
@@ -278,7 +278,7 @@ namespace zholobov {
     if (result == cend()) {
       throw std::out_of_range("Key not found");
     }
-    return result.second;
+    return result->second;
   }
 
   template < typename Key, typename T, typename Compare >
@@ -419,13 +419,13 @@ namespace zholobov {
     delete cur;
     --size_;
     rebalanceToRoot(rebalanceFrom);
-    return position;
+    return iterator(position.node_);
   }
 
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::size_type Tree< Key, T, Compare >::erase(const key_type& key)
   {
-    auto it = find(key);
+    const_iterator it = find(key);
     if (it != cend()) {
       erase(it);
       return 1;
@@ -436,10 +436,10 @@ namespace zholobov {
   template < typename Key, typename T, typename Compare >
   typename Tree< Key, T, Compare >::iterator Tree< Key, T, Compare >::erase(const_iterator first, const_iterator last)
   {
-    for (; first != last; ++first) {
-      erase(first);
+    while (first != last) {
+      first = erase(first);
     }
-    return last;
+    return iterator(last.node_);
   }
 
   template < typename Key, typename T, typename Compare >
@@ -522,7 +522,7 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
-  int Tree< Key, T, Compare >::height(node_type* node)
+  int Tree< Key, T, Compare >::height(node_type* node) const
   {
     return node ? node->height : 0;
   }
@@ -536,7 +536,7 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
-  int Tree< Key, T, Compare >::getBalance(node_type* node)
+  int Tree< Key, T, Compare >::getBalance(node_type* node) const
   {
     return node ? height(node->left) - height(node->right) : 0;
   }
@@ -634,10 +634,10 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
-  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findByKey(key_type key)
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findByKey(key_type key) const
   {
     node_type* cur = fakeRoot_->left;
-    while (cur) {
+    while (cur != nullptr) {
       if (cmp_(key, cur->data.first)) {
         cur = cur->left;
       } else if (cmp_(cur->data.first, key)) {
@@ -650,7 +650,7 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
-  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findLowerBound(key_type key)
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findLowerBound(key_type key) const
   {
     node_type* cur = fakeRoot_->left;
     node_type* result = nullptr;
@@ -666,7 +666,7 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
-  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findUpperBound(key_type key)
+  typename Tree< Key, T, Compare >::node_type* Tree< Key, T, Compare >::findUpperBound(key_type key) const
   {
     node_type* cur = fakeRoot_->left;
     node_type* result = nullptr;

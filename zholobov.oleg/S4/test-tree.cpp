@@ -120,9 +120,13 @@ BOOST_AUTO_TEST_CASE(iterators)
       {"this", 10}, {"that", 11}, {"zoom", 12}, {"these", 13}, {"ahead", 14}, {"those", 15}};
   BOOST_TEST(tree.begin()->first == "ahead");
   BOOST_TEST((--(tree.end()))->first == "zoom");
-
   BOOST_TEST(tree.cbegin()->first == "ahead");
   BOOST_TEST((--(tree.cend()))->first == "zoom");
+  auto it = tree.cend();
+  std::advance(it, -4);
+  BOOST_TEST(it->first == "these");
+  std::advance(it, 2);
+  BOOST_TEST(it->first == "those");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -187,6 +191,104 @@ BOOST_AUTO_TEST_CASE(insertion)
   zholobov::Tree< int, char > otherTree2;
   otherTree2.insert(++otherTree.cbegin(), --otherTree.cend());
   BOOST_TEST(toString(otherTree2) == "1 b 2 c 3 d 4 e 5 f 6 g 7 h 8 i");
+}
+
+BOOST_AUTO_TEST_CASE(removing)
+{
+  zholobov::Tree< int, char > tree;
+  auto hint = tree.cend();
+  for (int i = 0; i < 10; ++i) {
+    hint = tree.emplace_hint(hint, i, 'a' + i);
+  }
+  auto it = tree.cbegin();
+  std::advance(it, 4);
+  it = tree.erase(it);
+  BOOST_TEST(toString(tree) == "0 a 1 b 2 c 3 d 5 f 6 g 7 h 8 i 9 j");
+  auto from = it;
+  std::advance(from, -2);
+  tree.erase(from, ++it);
+  BOOST_TEST(toString(tree) == "0 a 1 b 6 g 7 h 8 i 9 j");
+  BOOST_TEST(tree.erase(100) == 0);
+  BOOST_TEST(tree.erase(8) == 1);
+  BOOST_TEST(toString(tree) == "0 a 1 b 6 g 7 h 9 j");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(Operations)
+
+BOOST_AUTO_TEST_CASE(swap)
+{
+  zholobov::Tree< std::string, int > tree{
+      {"this", 10}, {"that", 11}, {"zoom", 12}, {"these", 13}, {"ahead", 14}, {"those", 15}};
+  zholobov::Tree< std::string, int > other_tree{{"something", 3}, {"anything", 5}};
+  tree.swap(other_tree);
+  std::cout << toString(tree) << '\n';
+  std::cout << toString(other_tree) << '\n';
+  BOOST_TEST(toString(tree) == "anything 5 something 3");
+  BOOST_TEST(toString(other_tree) == "ahead 14 that 11 these 13 this 10 those 15 zoom 12");
+}
+
+BOOST_AUTO_TEST_CASE(access)
+{
+  zholobov::Tree< std::string, int > tree;
+  tree["first"] = 1;
+  tree["second"] = 2;
+  tree["third"] = 3;
+  tree["fourth"] = 4;
+  BOOST_TEST(toString(tree) == "first 1 fourth 4 second 2 third 3");
+  BOOST_TEST(tree["second"] == 2);
+  BOOST_TEST(tree.at("third") == 3);
+  try {
+    tree.at("zero");
+  } catch (const std::out_of_range& e) {
+    BOOST_TEST(e.what() == "Key not found");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(find)
+{
+  zholobov::Tree< std::string, int > tree{
+      {"this", 10}, {"that", 11}, {"zoom", 12}, {"these", 13}, {"ahead", 14}, {"those", 15}};
+  BOOST_TEST(tree.find("zoom")->first == "zoom");
+  BOOST_TEST(tree.find("zoom")->second == 12);
+  bool notFound = (tree.find("NONE") == tree.end());
+  BOOST_TEST(notFound);
+}
+
+BOOST_AUTO_TEST_CASE(count)
+{
+  zholobov::Tree< std::string, int > tree{
+      {"this", 10}, {"that", 11}, {"zoom", 12}, {"these", 13}, {"ahead", 14}, {"those", 15}};
+  BOOST_TEST(tree.count("zoom") == 1);
+  BOOST_TEST(tree.count("NONE") == 0);
+}
+
+BOOST_AUTO_TEST_CASE(lower_upper_bound)
+{
+  zholobov::Tree< int, std::string > tree{{1, "one"}, {2, "two"}, {3, "three"}, {5, "five"}, {6, "six"}};
+  BOOST_TEST(tree.lower_bound(3)->first == 3);
+  BOOST_TEST(tree.lower_bound(4)->first == 5);
+  BOOST_TEST(tree.lower_bound(5)->first == 5);
+  bool equalToEnd = (tree.cend() == tree.lower_bound(7));
+  BOOST_TEST(equalToEnd);
+
+  BOOST_TEST(tree.upper_bound(3)->first == 5);
+  BOOST_TEST(tree.upper_bound(4)->first == 5);
+  BOOST_TEST(tree.upper_bound(5)->first == 6);
+  equalToEnd = (tree.cend() == tree.upper_bound(6));
+  BOOST_TEST(equalToEnd);
+}
+
+BOOST_AUTO_TEST_CASE(equal_range)
+{
+  zholobov::Tree< int, std::string > tree{{1, "one"}, {2, "two"}, {3, "three"}, {5, "five"}, {6, "six"}};
+  auto range = tree.equal_range(3);
+  BOOST_TEST(range.first->first == 3);
+  BOOST_TEST(range.second->first == 5);
+  range = tree.equal_range(4);
+  BOOST_TEST(range.first->first == 5);
+  BOOST_TEST(range.second->first == 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
