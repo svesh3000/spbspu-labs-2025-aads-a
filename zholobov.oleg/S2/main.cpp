@@ -21,17 +21,17 @@ namespace {
   constexpr long max_value = std::numeric_limits< long >::max();
   constexpr long min_value = std::numeric_limits< long >::min();
 
-  long isAdditionOverflow(long lhs, long rhs)
+  bool isAdditionOverflow(long lhs, long rhs)
   {
     return (((rhs > 0) && (lhs > (max_value - rhs))) || ((rhs < 0) && (lhs < (min_value - rhs))));
   }
 
-  long isSubtractionOverflow(long lhs, long rhs)
+  bool isSubtractionOverflow(long lhs, long rhs)
   {
     return (((rhs > 0) && (lhs < (min_value + rhs))) || ((rhs < 0) && (lhs > (max_value + rhs))));
   }
 
-  long isMultiplicationOverflow(long lhs, long rhs)
+  bool isMultiplicationOverflow(long lhs, long rhs)
   {
     bool error = false;
     if (lhs > 0) {
@@ -50,12 +50,12 @@ namespace {
     return error;
   }
 
-  long isDivisionOverflow(long lhs, long rhs)
+  bool isDivisionOverflow(long lhs, long rhs)
   {
     return ((lhs == min_value) && (rhs == -1));
   }
 
-  long isModuloOverflow(long lhs, long rhs)
+  bool isModuloOverflow(long lhs, long rhs)
   {
     return ((lhs == min_value) && (rhs == -1));
   }
