@@ -84,6 +84,13 @@ namespace zholobov {
     std::pair< iterator, iterator > equal_range(const key_type& key);
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
 
+    template < typename F >
+    F traverse_lnr(F f) const;
+    template < typename F >
+    F traverse_rnl(F f) const;
+    template < typename F >
+    F traverse_breadth(F f) const;
+
   private:
     int height(node_type* node) const;
     void updateHeight(node_type* node);
@@ -679,6 +686,27 @@ namespace zholobov {
       }
     }
     return result;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_lnr(F f) const
+  {
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_rnl(F f) const
+  {
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_breadth(F f) const
+  {
+    return f;
   }
 
 }
