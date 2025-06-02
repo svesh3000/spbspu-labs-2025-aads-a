@@ -3,8 +3,8 @@
 #include <limits>
 #include <sstream>
 
-#include "queue.hpp"
-#include "stack.hpp"
+#include <queue.hpp>
+#include <stack.hpp>
 
 namespace {
   int operatorPriority(const std::string& op)

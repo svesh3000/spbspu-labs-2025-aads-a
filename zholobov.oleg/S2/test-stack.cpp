@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 
-#include "stack.hpp"
+#include <stack.hpp>
 
 template < typename T >
 std::string to_string(const zholobov::Stack< T >& stack)

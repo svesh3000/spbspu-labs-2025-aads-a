@@ -2,8 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 
-#include <stack>
-#include "array.hpp"
+#include <array.hpp>
 
 template < typename T >
 std::string to_string(const zholobov::Array< T >& array)

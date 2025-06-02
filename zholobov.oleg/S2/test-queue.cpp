@@ -1,8 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 
-#include <stack>
-#include "queue.hpp"
+#include <queue.hpp>
 
 template < typename T >
 std::string to_string(const zholobov::Queue< T >& queue)
