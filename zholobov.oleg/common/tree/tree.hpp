@@ -87,9 +87,15 @@ namespace zholobov {
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
 
     template < typename F >
+    F traverse_lnr(F f);
+    template < typename F >
     F traverse_lnr(F f) const;
     template < typename F >
+    F traverse_rnl(F f);
+    template < typename F >
     F traverse_rnl(F f) const;
+    template < typename F >
+    F traverse_breadth(F f);
     template < typename F >
     F traverse_breadth(F f) const;
 
@@ -531,6 +537,128 @@ namespace zholobov {
   }
 
   template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_lnr(F f)
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->left;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->right;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_lnr(F f) const
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->left;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->right;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_rnl(F f)
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->right;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->left;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_rnl(F f) const
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->right;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->left;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_breadth(F f)
+  {
+    node_type* root = fakeRoot_->left;
+    if (root != nullptr) {
+      zholobov::Queue< node_type* > nodeQueue;
+      nodeQueue.push(root);
+      while (!nodeQueue.empty()) {
+        node_type* current = nodeQueue.front();
+        nodeQueue.pop();
+        f(current->data);
+        if (current->left != nullptr) {
+          nodeQueue.push(current->left);
+        }
+        if (current->right != nullptr) {
+          nodeQueue.push(current->right);
+        }
+      }
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_breadth(F f) const
+  {
+    node_type* root = fakeRoot_->left;
+    if (root != nullptr) {
+      zholobov::Queue< node_type* > nodeQueue;
+      nodeQueue.push(root);
+      while (!nodeQueue.empty()) {
+        node_type* current = nodeQueue.front();
+        nodeQueue.pop();
+        f(current->data);
+        if (current->left != nullptr) {
+          nodeQueue.push(current->left);
+        }
+        if (current->right != nullptr) {
+          nodeQueue.push(current->right);
+        }
+      }
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
   int Tree< Key, T, Compare >::height(node_type* node) const
   {
     return node ? node->height : 0;
@@ -688,67 +816,6 @@ namespace zholobov {
       }
     }
     return result;
-  }
-
-  template < typename Key, typename T, typename Compare >
-  template < typename F >
-  F Tree< Key, T, Compare >::traverse_lnr(F f) const
-  {
-    zholobov::Stack< node_type* > nodeStack;
-    node_type* current = fakeRoot_->left;
-    while ((current != nullptr) || !nodeStack.empty()) {
-      while (current != nullptr) {
-        nodeStack.push(current);
-        current = current->left;
-      }
-      current = nodeStack.top();
-      nodeStack.pop();
-      f(current->data);
-      current = current->right;
-    }
-    return f;
-  }
-
-  template < typename Key, typename T, typename Compare >
-  template < typename F >
-  F Tree< Key, T, Compare >::traverse_rnl(F f) const
-  {
-    zholobov::Stack< node_type* > nodeStack;
-    node_type* current = fakeRoot_->left;
-    while ((current != nullptr) || !nodeStack.empty()) {
-      while (current != nullptr) {
-        nodeStack.push(current);
-        current = current->right;
-      }
-      current = nodeStack.top();
-      nodeStack.pop();
-      f(current->data);
-      current = current->left;
-    }
-    return f;
-  }
-
-  template < typename Key, typename T, typename Compare >
-  template < typename F >
-  F Tree< Key, T, Compare >::traverse_breadth(F f) const
-  {
-    node_type* root = fakeRoot_->left;
-    if (root != nullptr) {
-      zholobov::Queue< node_type* > nodeQueue;
-      nodeQueue.push(root);
-      while (!nodeQueue.empty()) {
-        node_type* current = nodeQueue.front();
-        nodeQueue.pop();
-        f(current->data);
-        if (current->left != nullptr) {
-          nodeQueue.push(current->left);
-        }
-        if (current->right != nullptr) {
-          nodeQueue.push(current->right);
-        }
-      }
-    }
-    return f;
   }
 
 }
