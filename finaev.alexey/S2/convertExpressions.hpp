@@ -2,8 +2,8 @@
 #define CONVERTEXPRESSIONS_HPP
 #include <string>
 #include <istream>
-#include "queue.hpp"
-#include "stack.hpp"
+#include <queue.hpp>
+#include <stack.hpp>
 #include "mathOperations.hpp"
 
 namespace finaev
