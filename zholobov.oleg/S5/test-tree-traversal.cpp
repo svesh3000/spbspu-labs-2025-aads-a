@@ -4,21 +4,24 @@
 
 namespace {
 
-  zholobov::Tree< int, std::string > createTestTree()
+  using TestTreeType = zholobov::Tree< int, std::string >;
+
+  TestTreeType createTestTree()
   {
-    zholobov::Tree< int, std::string > tree;
-    tree[0] = "zero";
-    tree[1] = "one";
-    tree[2] = "two";
-    tree[3] = "three";
-    tree[4] = "four";
-    tree[5] = "five";
-    tree[6] = "six";
-    tree[7] = "seven";
-    tree[8] = "eight";
-    tree[9] = "nine";
+    TestTreeType tree;
+    for (int i = 0; i < 10; ++i) {
+      tree[i] = std::to_string(i);
+    }
     return tree;
   }
+
+  struct KeySeq {
+    void operator()(const TestTreeType::value_type& val)
+    {
+      seq += (" " + val.second);
+    }
+    std::string seq;
+  };
 
 }
 
@@ -26,44 +29,50 @@ BOOST_AUTO_TEST_SUITE(Tree_Traversal)
 
 BOOST_AUTO_TEST_CASE(traversal_lnr)
 {
-  auto tree = createTestTree();
-  int sum = 0;
-  std::string result;
-  auto func = [&sum, &result](const decltype(tree)::value_type& val) {
-    sum += val.first;
-    result += (" " + val.second);
-  };
-  tree.traverse_lnr(func);
-  BOOST_TEST(sum == 45);
-  BOOST_TEST(result == " zero one two three four five six seven eight nine");
+  {
+    auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_lnr(func);
+    BOOST_TEST(func.seq == " 0 1 2 3 4 5 6 7 8 9");
+  }
+  {
+    const auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_lnr(func);
+    BOOST_TEST(func.seq == " 0 1 2 3 4 5 6 7 8 9");
+  }
 }
 
 BOOST_AUTO_TEST_CASE(traversal_rnl)
 {
-  auto tree = createTestTree();
-  int sum = 0;
-  std::string result;
-  auto func = [&sum, &result](const decltype(tree)::value_type& val) {
-    sum += val.first;
-    result += (" " + val.second);
-  };
-  tree.traverse_rnl(func);
-  BOOST_TEST(sum == 45);
-  BOOST_TEST(result == " nine eight seven six five four three two one zero");
+  {
+    auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_rnl(func);
+    BOOST_TEST(func.seq == " 9 8 7 6 5 4 3 2 1 0");
+  }
+  {
+    const auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_rnl(func);
+    BOOST_TEST(func.seq == " 9 8 7 6 5 4 3 2 1 0");
+  }
 }
 
 BOOST_AUTO_TEST_CASE(traversal_breadth)
 {
-  auto tree = createTestTree();
-  int sum = 0;
-  std::string result;
-  auto func = [&sum, &result](const decltype(tree)::value_type& val) {
-    sum += val.first;
-    result += (" " + val.second);
-  };
-  tree.traverse_breadth(func);
-  BOOST_TEST(sum == 45);
-  BOOST_TEST(result == " three one seven zero two five eight four six nine");
+  {
+    auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_breadth(func);
+    BOOST_TEST(func.seq == " 3 1 7 0 2 5 8 4 6 9");
+  }
+  {
+    const auto tree = createTestTree();
+    KeySeq func;
+    func = tree.traverse_breadth(func);
+    BOOST_TEST(func.seq == " 3 1 7 0 2 5 8 4 6 9");
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

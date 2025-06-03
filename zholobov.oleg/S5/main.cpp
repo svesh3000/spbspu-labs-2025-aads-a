@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <fstream>
 #include <iostream>
 
@@ -28,30 +29,30 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::string traversal{argv[1]};
-  std::ifstream input_file(argv[2]);
-  if (!input_file) {
+  std::ifstream inputFile(argv[2]);
+  if (!inputFile) {
     std::cerr << "Error opening file\n";
     return 1;
   }
-  TreeMap map = readTree(input_file);
+  const TreeMap map = readTree(inputFile);
   if (map.empty()) {
     std::cout << "<EMPTY>\n";
     return 0;
   }
 
   try {
-    zholobov::KeySum key_sum;
+    zholobov::KeySum keySum;
     if (traversal == "ascending") {
-      key_sum = map.traverse_lnr(key_sum);
+      keySum = map.traverse_lnr(keySum);
     } else if (traversal == "descending") {
-      key_sum = map.traverse_rnl(key_sum);
+      keySum = map.traverse_rnl(keySum);
     } else if (traversal == "breadth") {
-      key_sum = map.traverse_breadth(key_sum);
+      keySum = map.traverse_breadth(keySum);
     } else {
       std::cerr << "Invalid 1st parameter. Use one of [ascending|descending|breadth]\n";
       return 1;
     }
-    std::cout << key_sum.sum_ << key_sum.values_ << "\n";
+    std::cout << keySum.sum_ << keySum.values_ << "\n";
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;

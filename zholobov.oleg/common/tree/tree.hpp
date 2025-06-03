@@ -559,7 +559,7 @@ namespace zholobov {
   template < typename F >
   F Tree< Key, T, Compare >::traverse_lnr(F f) const
   {
-    zholobov::Stack< node_type* > nodeStack;
+    zholobov::Stack< const node_type* > nodeStack;
     const node_type* current = fakeRoot_->left;
     while ((current != nullptr) || !nodeStack.empty()) {
       while (current != nullptr) {
@@ -597,7 +597,7 @@ namespace zholobov {
   template < typename F >
   F Tree< Key, T, Compare >::traverse_rnl(F f) const
   {
-    zholobov::Stack< node_type* > nodeStack;
+    zholobov::Stack< const node_type* > nodeStack;
     const node_type* current = fakeRoot_->left;
     while ((current != nullptr) || !nodeStack.empty()) {
       while (current != nullptr) {
@@ -641,10 +641,10 @@ namespace zholobov {
   {
     const node_type* root = fakeRoot_->left;
     if (root != nullptr) {
-      zholobov::Queue< node_type* > nodeQueue;
+      zholobov::Queue< const node_type* > nodeQueue;
       nodeQueue.push(root);
       while (!nodeQueue.empty()) {
-        node_type* current = nodeQueue.front();
+        const node_type* current = nodeQueue.front();
         nodeQueue.pop();
         f(current->data);
         if (current->left != nullptr) {

@@ -10,8 +10,8 @@ namespace {
 
   bool isAdditionOverflow(long lhs, long rhs)
   {
-    constexpr long max_value = std::numeric_limits< long >::max();
-    constexpr long min_value = std::numeric_limits< long >::min();
+    constexpr long max_value = std::numeric_limits< KeyType >::max();
+    constexpr long min_value = std::numeric_limits< KeyType >::min();
     return (((rhs > 0) && (lhs > (max_value - rhs))) || ((rhs < 0) && (lhs < (min_value - rhs))));
   }
 
