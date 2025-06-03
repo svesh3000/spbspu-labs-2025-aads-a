@@ -2,7 +2,7 @@
 #define INPUTOUTDICT_HPP
 #include <istream>
 #include <string>
-#include "AVLtree.hpp"
+#include <AVLtree.hpp>
 
 
 namespace finaev
