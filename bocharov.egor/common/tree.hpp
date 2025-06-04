@@ -148,6 +148,28 @@ namespace bocharov
   {}
 
   template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp > & Tree< Key, T, Cmp >::operator=(const Tree< Key, T, Cmp > & rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      Tree< Key, T, Cmp > temp(rhs);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  Tree< Key, T, Cmp > & Tree< Key, T, Cmp >::operator=(Tree< Key, T, Cmp > && rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      Tree< Key, T, Cmp > temp(std::move(rhs));
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< typename Key, typename T, typename Cmp >
   Tree< Key, T, Cmp >::~Tree()
   {
     if (fakeRoot_ != nullptr)
