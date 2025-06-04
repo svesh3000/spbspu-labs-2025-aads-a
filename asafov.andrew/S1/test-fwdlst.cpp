@@ -72,6 +72,29 @@ BOOST_AUTO_TEST_CASE(back_test)
   BOOST_CHECK_EQUAL(list.back(), 3);
 }
 
+BOOST_AUTO_TEST_CASE(copy_constructor_test)
+{
+  asafov::ForwardList< size_t > list;
+  list.push_back(1);
+  list.push_back(2);
+  
+  asafov::ForwardList< size_t > copy(list);
+  BOOST_TEST(copy.size() == 2);
+  BOOST_CHECK_EQUAL(copy.front(), 1);
+  BOOST_CHECK_EQUAL(copy.back(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(move_constructor_test)
+{
+  asafov::ForwardList< size_t > list;
+  list.push_back(1);
+  list.push_back(2);
+  
+  asafov::ForwardList< size_t > moved(std::move(list));
+  BOOST_TEST(moved.size() == 2);
+  BOOST_TEST(list.empty());
+}
+
 BOOST_AUTO_TEST_CASE(empty_test)
 {
   asafov::ForwardList< size_t > list;
