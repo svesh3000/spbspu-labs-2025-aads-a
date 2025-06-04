@@ -77,11 +77,11 @@ BOOST_AUTO_TEST_CASE(copy_constructor_test)
   asafov::ForwardList< size_t > list;
   list.push_back(1);
   list.push_back(2);
-  
+  list.push_back(3);
   asafov::ForwardList< size_t > copy(list);
-  BOOST_TEST(copy.size() == 2);
+  BOOST_TEST(copy.size() == 3);
   BOOST_CHECK_EQUAL(copy.front(), 1);
-  BOOST_CHECK_EQUAL(copy.back(), 2);
+  BOOST_CHECK_EQUAL(copy.back(), 3);
 }
 
 BOOST_AUTO_TEST_CASE(move_constructor_test)
@@ -89,10 +89,41 @@ BOOST_AUTO_TEST_CASE(move_constructor_test)
   asafov::ForwardList< size_t > list;
   list.push_back(1);
   list.push_back(2);
-  
+  list.push_back(3);
   asafov::ForwardList< size_t > moved(std::move(list));
-  BOOST_TEST(moved.size() == 2);
+  BOOST_TEST(moved.size() == 3);
   BOOST_TEST(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(assignment_operator_lvalue_test)
+{
+  asafov::ForwardList< size_t > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  asafov::ForwardList< size_t > assigned = list;
+  BOOST_TEST(assigned.size() == 3);
+  BOOST_CHECK_EQUAL(assigned.front(), 1);
+  BOOST_CHECK_EQUAL(assigned.back(), 3);
+  list.push_back(4);
+  BOOST_TEST(assigned.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(assignment_operator_rvalue_test)
+{
+  asafov::ForwardList< size_t > createList()
+  {
+    asafov::ForwardList< size_t > temp;
+    temp.push_back(1);
+    temp.push_back(2);
+    temp.push_back(3);
+    return temp;
+  }
+
+  asafov::ForwardList< size_t > assigned = createList();
+  BOOST_TEST(assigned.size() == 3);
+  BOOST_CHECK_EQUAL(assigned.front(), 1);
+  BOOST_CHECK_EQUAL(assigned.back(), 3);
 }
 
 BOOST_AUTO_TEST_CASE(empty_test)
@@ -142,15 +173,15 @@ BOOST_AUTO_TEST_CASE(remove_test)
 
 BOOST_AUTO_TEST_CASE(remove_if_test)
 {
-  auto f = [](const size_t& a) -> bool
+  bool isOne(const size_t& a)
   {
-    return a == 1;
-  };
+    return 1 & a;
+  }
   asafov::ForwardList< size_t > list;
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);
-  list.remove_if(f);
+  list.remove_if(isOne);
   BOOST_TEST(list.size() == 2);
   BOOST_CHECK_EQUAL(list.front(), 2);
 }
