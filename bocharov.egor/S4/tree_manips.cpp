@@ -85,4 +85,33 @@ void bocharov::makeIntersect(std::istream & in, MapOfTrees & mapOfTrees)
   mapOfTrees[newName] = newMap;
 }
 
-
+void bocharov::makeUnion(std::istream & in, MapOfTrees & mapOfTrees)
+{
+  std::string newName, lhsName, rhsName;
+  in >> newName >> lhsName >> rhsName;
+  TreeMap newMap, lhsMap, rhsMap;
+  lhsMap = mapOfTrees.at(lhsName);
+  rhsMap = mapOfTrees.at(rhsName);
+  for (auto && key: lhsMap)
+  {
+    newMap.insert(key);
+  }
+  for (auto && key: rhsMap)
+  {
+    if (newMap.find(key.first) == newMap.end())
+    {
+      newMap.insert(key);
+    }
+  }
+  if (newName == lhsName)
+  {
+    mapOfTrees[lhsName] = newMap;
+    return;
+  }
+  else if (newName == rhsName)
+  {
+    mapOfTrees[rhsName] = newMap;
+    return;
+  }
+  mapOfTrees[newName] = newMap;
+}
