@@ -54,4 +54,17 @@ int main(int argc, char * argv[])
   commands["intersect"] = std::bind(bocharov::makeIntersect, std::ref(std::cin), std::ref(mapOfTrees));
   commands["union"] = std::bind(bocharov::makeUnion, std::ref(std::cin), std::ref(mapOfTrees));
   std::string command;
+  while (std::cin >> command)
+  {
+    try
+    {
+      commands.at(command)();
+    }
+    catch (const std::out_of_range &)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 }
