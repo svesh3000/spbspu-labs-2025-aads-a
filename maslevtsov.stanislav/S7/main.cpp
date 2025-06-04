@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <functional>
 #include <tree/definition.hpp>
 #include "graph.hpp"
 #include "bind_functor.hpp"

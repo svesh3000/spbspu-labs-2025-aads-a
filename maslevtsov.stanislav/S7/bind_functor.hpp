@@ -54,7 +54,7 @@ namespace maslevtsov {
     {
       if (in_ && out_) {
         iofunc_(*arg_, *in_, *out_);
-      } else if (*in_ && !out_) {
+      } else if (in_ && !out_) {
         ifunc_(const_cast< T& >(*arg_), *in_);
       } else if (!in_ && out_) {
         ofunc_(*arg_, *out_);

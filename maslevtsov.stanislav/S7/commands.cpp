@@ -20,8 +20,7 @@ void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
   for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
     names[i->first];
   }
-  out << names.cbegin()->first;
-  for (auto i = ++names.cbegin(); i != names.cend(); ++i) {
+  for (auto i = names.cbegin(); i != names.cend(); ++i) {
     out << i->first << '\n';
   }
 }
