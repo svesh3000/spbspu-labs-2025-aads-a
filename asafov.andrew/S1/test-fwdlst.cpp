@@ -176,7 +176,8 @@ BOOST_AUTO_TEST_CASE(remove_if_test)
   auto isOne = [](const size_t& a) -> bool
   {
     return 1 == a;
-  }
+  };
+
   asafov::ForwardList< size_t > list;
   list.push_back(1);
   list.push_back(2);
