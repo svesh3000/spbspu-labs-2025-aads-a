@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <functional>
 #include <limits>
 #include <tree/definition.hpp>
 #include "graph.hpp"
@@ -32,7 +31,7 @@ int main(int argc, char** argv)
       std::string vertice1, vertice2;
       unsigned weight = 0;
       fin >> vertice1 >> vertice2 >> weight;
-      graph.add_edge(vertice1, vertice2, weight);
+      graph.bind(vertice1, vertice2, weight);
     }
     graphs[graph_name] = graph;
   }
@@ -42,12 +41,13 @@ int main(int argc, char** argv)
   commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
   commands["outbound"] = IOFuncBinder< graphs_map_t >(print_outbound, graphs, std::cin, std::cout);
   commands["inbound"] = IOFuncBinder< graphs_map_t >(print_inbound, graphs, std::cin, std::cout);
+  commands["bind"] = IOFuncBinder< graphs_map_t >(bind_vertices, graphs, std::cin);
+  commands["cut"] = IOFuncBinder< graphs_map_t >(cut_vertices, graphs, std::cin);
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {
     try {
       commands.at(command)();
-      std::cout << '\n';
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();

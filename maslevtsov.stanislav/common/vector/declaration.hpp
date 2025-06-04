@@ -40,6 +40,8 @@ namespace maslevtsov {
     size_t size() const noexcept;
 
     void clear() noexcept;
+    iterator erase(iterator pos);
+    iterator erase(const_iterator pos);
     void push_back(const T& value);
     void push_back(T&& value);
     void pop_back() noexcept;

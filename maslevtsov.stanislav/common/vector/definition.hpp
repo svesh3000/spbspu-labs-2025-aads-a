@@ -164,6 +164,36 @@ void maslevtsov::Vector< T >::clear() noexcept
 }
 
 template< class T >
+typename maslevtsov::Vector< T >::iterator maslevtsov::Vector< T >::erase(iterator pos)
+{
+  return erase(const_iterator(pos.ptr_));
+}
+
+template< class T >
+typename maslevtsov::Vector< T >::iterator maslevtsov::Vector< T >::erase(const_iterator pos)
+{
+  if (pos == cend()) {
+    return end();
+  }
+  size_t index = 0;
+  for (auto i = cbegin(); i != pos; ++i) {
+    ++index;
+  }
+  if (index >= size_) {
+    throw std::out_of_range("iterator out of range");
+  }
+  for (size_t i = index; i < size_ - 1; ++i) {
+    data_[i] = std::move(data_[i + 1]);
+  }
+  --size_;
+  iterator it = begin();
+  for (size_t i = 0; i < index; ++i) {
+    ++it;
+  }
+  return it;
+}
+
+template< class T >
 void maslevtsov::Vector< T >::push_back(const T& value)
 {
   if (size_ == capacity_) {

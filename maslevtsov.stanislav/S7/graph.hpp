@@ -11,10 +11,11 @@ namespace maslevtsov {
   class Graph
   {
   public:
-    void add_edge(const std::string& vertice1, const std::string& vertice2, unsigned weight);
     Tree< std::string, int > get_vertices() const;
     Tree< std::string, Vector< unsigned > > get_outbound(const std::string& vertice) const;
     Tree< std::string, Vector< unsigned > > get_inbound(const std::string& vertice) const;
+    void bind(const std::string& vertice1, const std::string& vertice2, unsigned weight);
+    void cut(const std::string& vertice1, const std::string& vertice2, unsigned weight);
 
   private:
     using vertices_pair_t = std::pair< std::string, std::string >;

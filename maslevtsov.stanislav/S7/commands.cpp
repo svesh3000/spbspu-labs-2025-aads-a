@@ -22,7 +22,7 @@ void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
   }
   out << names.cbegin()->first;
   for (auto i = ++names.cbegin(); i != names.cend(); ++i) {
-    out << ' ' << i->first;
+    out << i->first << '\n';
   }
 }
 
@@ -32,9 +32,8 @@ void maslevtsov::print_vertices(const graphs_map_t& graphs, std::istream& in, st
   in >> graph_name;
   Graph graph = graphs.at(graph_name);
   Tree< std::string, int > names = graph.get_vertices();
-  out << names.cbegin()->first;
-  for (auto i = ++names.cbegin(); i != names.cend(); ++i) {
-    out << '\n' << i->first;
+  for (auto i = names.cbegin(); i != names.cend(); ++i) {
+    out << i->first << '\n';
   }
 }
 
@@ -48,11 +47,10 @@ void maslevtsov::print_outbound(const graphs_map_t& graphs, std::istream& in, st
     throw std::invalid_argument("non-existing vertice given");
   }
   Tree< std::string, Vector< unsigned > > outbound = graph.get_outbound(vertice_name);
-  out << outbound.cbegin()->first << ' ';
-  print_vector(outbound.cbegin()->second, out);
-  for (auto i = ++outbound.cbegin(); i != outbound.cend(); ++i) {
-    out << '\n' << i->first << ' ';
+  for (auto i = outbound.cbegin(); i != outbound.cend(); ++i) {
+    out << i->first << ' ';
     print_vector(i->second, out);
+    out << '\n';
   }
 }
 
@@ -66,10 +64,25 @@ void maslevtsov::print_inbound(const graphs_map_t& graphs, std::istream& in, std
     throw std::invalid_argument("non-existing vertice given");
   }
   Tree< std::string, Vector< unsigned > > inbound = graph.get_inbound(vertice_name);
-  out << inbound.cbegin()->first << ' ';
-  print_vector(inbound.cbegin()->second, out);
-  for (auto i = ++inbound.cbegin(); i != inbound.cend(); ++i) {
-    out << '\n' << i->first << ' ';
+  for (auto i = inbound.cbegin(); i != inbound.cend(); ++i) {
+    out << i->first << ' ';
     print_vector(i->second, out);
+    out << '\n';
   }
+}
+
+void maslevtsov::bind_vertices(graphs_map_t& graphs, std::istream& in)
+{
+  std::string graph_name, vertice1, vertice2;
+  unsigned weight = 0;
+  in >> graph_name >> vertice1 >> vertice2 >> weight;
+  graphs.at(graph_name).bind(vertice1, vertice2, weight);
+}
+
+void maslevtsov::cut_vertices(graphs_map_t& graphs, std::istream& in)
+{
+  std::string graph_name, vertice1, vertice2;
+  unsigned weight = 0;
+  in >> graph_name >> vertice1 >> vertice2 >> weight;
+  graphs.at(graph_name).cut(vertice1, vertice2, weight);
 }
