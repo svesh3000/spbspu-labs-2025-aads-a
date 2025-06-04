@@ -111,14 +111,14 @@ BOOST_AUTO_TEST_CASE(assignment_operator_lvalue_test)
 
 BOOST_AUTO_TEST_CASE(assignment_operator_rvalue_test)
 {
-  asafov::ForwardList< size_t > createList()
+  auto createList = []() -> asafov::ForwardList<size_t>
   {
-    asafov::ForwardList< size_t > temp;
+    asafov::ForwardList<size_t> temp;
     temp.push_back(1);
     temp.push_back(2);
     temp.push_back(3);
     return temp;
-  }
+  };
 
   asafov::ForwardList< size_t > assigned = createList();
   BOOST_TEST(assigned.size() == 3);
@@ -173,9 +173,9 @@ BOOST_AUTO_TEST_CASE(remove_test)
 
 BOOST_AUTO_TEST_CASE(remove_if_test)
 {
-  bool isOne(const size_t& a)
+  auto isOne = [](const size_t& a) -> bool
   {
-    return 1 & a;
+    return 1 == a;
   }
   asafov::ForwardList< size_t > list;
   list.push_back(1);
