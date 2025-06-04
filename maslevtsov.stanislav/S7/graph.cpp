@@ -63,7 +63,4 @@ void maslevtsov::Graph::cut(const std::string& vertice1, const std::string& vert
   if (!is_deleted) {
     throw std::invalid_argument("non-existing weight given");
   }
-  if (to_cut_it->second.empty()) {
-    edges_set_.erase(to_cut_it);
-  }
 }

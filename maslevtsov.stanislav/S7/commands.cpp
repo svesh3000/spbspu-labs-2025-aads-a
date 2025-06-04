@@ -20,8 +20,11 @@ void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
   for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
     names[i->first];
   }
-  for (auto i = names.cbegin(); i != names.cend(); ++i) {
+  for (auto i = ++names.cbegin(); i != names.cend(); ++i) {
     out << i->first << '\n';
+  }
+  if (names.empty()) {
+    out << '\n';
   }
 }
 
@@ -33,6 +36,9 @@ void maslevtsov::print_vertices(const graphs_map_t& graphs, std::istream& in, st
   Tree< std::string, int > names = graph.get_vertices();
   for (auto i = names.cbegin(); i != names.cend(); ++i) {
     out << i->first << '\n';
+  }
+  if (names.empty()) {
+    out << '\n';
   }
 }
 
