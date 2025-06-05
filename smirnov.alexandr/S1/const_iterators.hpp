@@ -7,13 +7,14 @@
 namespace smirnov
 {
   template < typename T >
+  class List;
+  template < typename T >
   class ConstIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     using this_t = ConstIterator< T >;
     ConstIterator() noexcept;
     ~ConstIterator() = default;
-    explicit ConstIterator(const Node< T > * node) noexcept;
     const T & operator*() const noexcept;
     const T * operator->() const noexcept;
     this_t & operator++() noexcept;
@@ -21,7 +22,9 @@ namespace smirnov
     bool operator==(const this_t &) const noexcept;
     bool operator!=(const this_t &) const noexcept;
   private:
+    friend class List < T >;
     const Node< T > * node_;
+    explicit ConstIterator(const Node< T > * node) noexcept;
   };
 
   template < typename T >

@@ -3,9 +3,9 @@
 
 void smirnov::printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences)
 {
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
-    if (it != sequences.begin())
+    if (it != sequences.cbegin())
     {
       out << " ";
     }
@@ -16,11 +16,11 @@ void smirnov::printName(std::ostream & out, const List< std::pair< std::string, 
 
 void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & sequences)
 {
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
-    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+    for (auto numIt = it->cbegin(); numIt != it->cend(); ++numIt)
     {
-      if (numIt != it->begin())
+      if (numIt != it->cbegin())
       {
         out << " ";
       }
@@ -33,10 +33,10 @@ void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & 
 void smirnov::printSums(std::ostream & out, const List< List< size_t > > & sequences)
 {
   List< size_t > sums;
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
     size_t sum = 0;
-    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+    for (auto numIt = it->cbegin(); numIt != it->cend(); ++numIt)
     {
       if (sum > std::numeric_limits< size_t >::max() - *numIt)
       {

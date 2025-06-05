@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include <cstddef>
 #include <stdexcept>
+#include <initializer_list>
 #include "const_iterators.hpp"
 #include "iterators.hpp"
 #include "node.hpp"
@@ -18,8 +19,8 @@ namespace smirnov
     List(List &&) noexcept;
     List< T > & operator=(const List< T > &);
     List< T > & operator=(List< T > &&) noexcept;
-    ConstIterator< T > begin() const noexcept;
-    ConstIterator< T > end() const noexcept;
+    ConstIterator< T > cbegin() const noexcept;
+    ConstIterator< T > cend() const noexcept;
     Iterator< T > begin() noexcept;
     Iterator< T > end() noexcept;
     T & front();
@@ -41,7 +42,7 @@ namespace smirnov
 
   template < typename T >
   List< T >::List():
-    fake_(new Node< T >()),
+    fake_(static_cast< Node< T >* >(operator new(sizeof(Node< T >)))),
     size_(0)
   {
     fake_->next = fake_;
@@ -58,7 +59,7 @@ namespace smirnov
   List< T >::List(const List< T > & other):
     List()
   {
-    for (ConstIterator< T > it = other.begin(); it != other.end(); ++it)
+    for (ConstIterator< T > it = other.cbegin(); it != other.cend(); ++it)
     {
       push_back(*it);
     }
@@ -69,8 +70,7 @@ namespace smirnov
     fake_(other.fake_),
     size_(other.size_)
   {
-    other.fake_ = new Node< T >();
-    other.fake_->next = other.fake_;
+    other.fake_ = nullptr;
     other.size_ = 0;
   }
 
@@ -102,13 +102,13 @@ namespace smirnov
   }
 
   template < typename T >
-  ConstIterator< T > List< T >::begin() const noexcept
+  ConstIterator< T > List< T >::cbegin() const noexcept
   {
     return ConstIterator< T >(fake_->next);
   }
 
   template < typename T >
-  ConstIterator< T > List< T >::end() const noexcept
+  ConstIterator< T > List< T >::cend() const noexcept
   {
     return ConstIterator< T >(fake_);
   }
@@ -237,18 +237,6 @@ namespace smirnov
   Iterator< T > List< T >::end() noexcept
   {
     return Iterator< T >(fake_);
-  }
-
-  template < typename T >
-  ConstIterator< T > List< T >::begin() const noexcept
-  {
-    return ConstIterator< T >(fake_->next);
-  }
-
-  template < typename T >
-  ConstIterator< T > List< T >::end() const noexcept
-  {
-    return ConstIterator< T >(fake_);
   }
 }
 #endif
