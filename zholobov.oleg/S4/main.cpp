@@ -14,12 +14,11 @@ namespace {
       input.clear();
       zholobov::TreeMap map;
       std::string datasetName;
-      size_t key = 0;
       input >> datasetName;
       while (input.good()) {
+        size_t key = 0;
         std::string value;
-        input >> key >> value;
-        if (input) {
+        if (input >> key >> value) {
           map.emplace(key, value);
         }
       }
