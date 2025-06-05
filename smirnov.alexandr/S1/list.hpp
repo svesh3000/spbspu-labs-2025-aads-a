@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include "const_iterators.hpp"
+#include "iterators.hpp"
 #include "node.hpp"
 
 namespace smirnov
@@ -19,6 +20,8 @@ namespace smirnov
     List< T > & operator=(List< T > &&) noexcept;
     ConstIterator< T > begin() const noexcept;
     ConstIterator< T > end() const noexcept;
+    Iterator< T > begin() noexcept;
+    Iterator< T > end() noexcept;
     T & front();
     const T & front() const;
     T & back();
@@ -222,6 +225,30 @@ namespace smirnov
   {
     std::swap(fake_, other.fake_);
     std::swap(size_, other.size_);
+  }
+
+  template < typename T >
+  Iterator< T > List< T >::begin() noexcept
+  {
+    return Iterator< T >(fake_->next);
+  }
+
+  template < typename T >
+  Iterator< T > List< T >::end() noexcept
+  {
+    return Iterator< T >(fake_);
+  }
+
+  template < typename T >
+  ConstIterator< T > List< T >::begin() const noexcept
+  {
+    return ConstIterator< T >(fake_->next);
+  }
+
+  template < typename T >
+  ConstIterator< T > List< T >::end() const noexcept
+  {
+    return ConstIterator< T >(fake_);
   }
 }
 #endif
