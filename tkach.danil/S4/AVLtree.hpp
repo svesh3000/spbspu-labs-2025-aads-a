@@ -25,8 +25,8 @@ namespace tkach
     const Value& operator[](const Key& key) const;
     Iterator< Key, Value, Cmp > insert(const std::pair< Key, Value > & pair);
     Iterator< Key, Value, Cmp > insert(std::pair< Key, Value > && pair);
-    Iterator< Key, Value, Cmp > insert(Citerator< Key, Value, Cmp > begin, Citerator< Key, Value, Cmp > end);
-    Iterator< Key, Value, Cmp > insert(Iterator< Key, Value, Cmp > begin, Iterator< Key, Value, Cmp > end);
+    template< class InputIt >
+    void insert(InputIt begin, InputIt end);
     void clear();
     Citerator< Key, Value, Cmp > find(const Key& key) const;
     Iterator< Key, Value, Cmp > find(const Key& key);
@@ -240,21 +240,14 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::insert(Citerator< Key, Value, Cmp > begin, Citerator< Key, Value, Cmp > end)
+  template< class InputIt >
+  void AvlTree< Key, Value, Cmp >::insert(InputIt begin, InputIt end)
   {
-    return insert(Iterator< Key, Value, Cmp >(begin.node_), Iterator< Key, Value, Cmp >(end.node_));
-  }
-
-  template< class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::insert(Iterator< Key, Value, Cmp > begin, Iterator< Key, Value, Cmp > end)
-  {
-    Iterator< Key, Value, Cmp > res;
     while (begin != end)
     {
-      res = insert((begin.node_)->data);
+      insert((begin.node_)->data);
       begin++;
     }
-    return res;
   }
 
   template< class Key, class Value, class Cmp >
