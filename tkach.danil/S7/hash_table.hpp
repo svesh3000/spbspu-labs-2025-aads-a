@@ -16,7 +16,14 @@ namespace tkach
     using CIter = CHashIterator< Key, Value, Hash, Equal >;
     using pair_t = std::pair< HashIterator< Key, Value, Hash, Equal >, bool >;
     HashTable();
+    template< class InputIt >
+    HashTable(InputIt begin, InputIt end);
+    HashTable(std::initializer_list< std::pair< Key, Value > > init_list);
     HashTable(size_t size);
+    Value& operator[](const Key& key);
+    const Value& operator[](const Key& key) const;
+    Value& at(const Key& key);
+    const Value& at(const Key& key) const;
     CIter cend();
     CIter cbegin();
     Iter end();
@@ -25,12 +32,19 @@ namespace tkach
     bool empty() const noexcept;
     pair_t insert(const std::pair< Key, Value >& pair);
     pair_t insert(std::pair< Key, Value >&& pair);
+    Iter insert(CIter, const Key&);
+    template< class InputIt >
+    void insert(InputIt first, InputIt last);
     size_t erase(const Key& key);
     Iter find(const Key& key);
     CIter find(const Key& key) const;
     Iter erase(Iter it);
     Iter erase(CIter it);
     Iter erase(CIter first, CIter last);
+    void rehash(size_t new_size);
+    float maxLoadFactor() const;
+    void maxLoadFactor(float ml);
+    float load_factor() const;
   private:
     enum class EntryState
     {
@@ -51,7 +65,6 @@ namespace tkach
     template< class... Args >
     pair_t emplace(Args&&... args);
     size_t fins_pos(const Key& key);
-    void rehash(size_t new_size);
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -64,6 +77,19 @@ namespace tkach
   HashTable<Key, Value, Hash, Equal >::HashTable(size_t size):
     table_(size),
     count_(0)
+  {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  template< class InputIt >
+  HashTable<Key, Value, Hash, Equal >::HashTable(InputIt begin, InputIt end):
+    HashTable()
+  {
+    insert(begin, end);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable<Key, Value, Hash, Equal >::HashTable(std::initializer_list< std::pair< Key, Value > > init_list):
+    HashTable(init_list.begin(), init_list.end())
   {}
 
   template< class Key, class Value, class Hash, class Equal >
@@ -115,12 +141,25 @@ namespace tkach
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  HashIterator< Key, Value, Hash, Equal > HashTable<Key, Value, Hash, Equal >::insert(CIter cit, const Key& key)
+  {
+
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  template< class InputIt >
+  void HashTable<Key, Value, Hash, Equal >::insert(InputIt first, InputIt last)
+  {
+  
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   template< class... Args >
   auto HashTable<Key, Value, Hash, Equal >::emplace(Args&&... args) -> pair_t
   {
     if (((count_ + 1) * 1.0) / table_.size() >= max_load_factor)
     {
-      rehash(table_.size() * 2);
+      rehash(table_.size() * 2 + 1);
     }
     std::pair< Key, Value > pair(std::forward< Args >(args)...);
     size_t pos = find_pos(pair.first);
@@ -226,7 +265,7 @@ namespace tkach
   template< class Key, class Value, class Hash, class Equal >
   HashIterator< Key, Value, Hash, Equal > HashTable<Key, Value, Hash, Equal >::find(const Key& key)
   {
-    return Citer(static_cast< const HashTable< Key, Value, Hash, Equal >* >(this)->find(key));
+    return Iter(static_cast< const HashTable< Key, Value, Hash, Equal >* >(this)->find(key));
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -250,6 +289,67 @@ namespace tkach
       }
     }
     return cend();   
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value& HashTable<Key, Value, Hash, Equal >::operator[](const Key& key)
+  {
+    Iter it = find(key);
+    if (it == end())
+    {
+      it = insert(std::make_pair(key, Value()));
+    }
+    return node->second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const Value& HashTable<Key, Value, Hash, Equal >::operator[](const Key& key) const
+  {
+    CIter cit = find(key);
+    return cit->second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value& HashTable<Key, Value, Hash, Equal >::at(const Key& key)
+  {
+    return const_cast< Value& >(static_cast< const HashTable<Key, Value, Hash, Equal >* >(this)->at(key));
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const Value& HashTable<Key, Value, Hash, Equal >::at(const Key& key) const
+  {
+    CIter it = find(key);
+    if (it != cend())
+    {
+      return node->second;
+    }
+    throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  float HashTable<Key, Value, Hash, Equal >::maxLoadFactor() const
+  {
+    return max_load_factor;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable<Key, Value, Hash, Equal >::maxLoadFactor(float ml)
+  {
+    if (ml <= 0.1f || ml >= 0.95f)
+    {
+      throw std::invalid_argument("Invalid load factor");
+    }
+    max_load_factor = ml;
+    if (load_factor >= max_load_factor)
+    {
+      rehash(2 * table_.size() + 1);
+    }
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  float HashTable<Key, Value, Hash, Equal >::load_factor() const
+  {
+    return table.empty() ? 0.0f : static_cast< float >(count_) / table_.size();
   }
 }
 #endif
