@@ -40,9 +40,12 @@ namespace tkach
     DynArray();
     DynArray(const DynArray& other);
     DynArray(DynArray&& other) noexcept;
+    DynArray(size_t capacity);
     ~DynArray();
     DynArray< T >& operator=(DynArray< T >&&) noexcept;
     DynArray< T >& operator=(const DynArray< T >&);
+    T& operator[](size_t index);
+    const T& operator[](size_t index) const;
     void pushBack(T&& data);
     void pushBack(const T& data);
     void popBack();
@@ -71,6 +74,14 @@ namespace tkach
     capacity_(5),
     begin_(0),
     data_(reinterpret_cast< T* >(new char[capacity_ * sizeof(T)]))
+  {}
+
+  template< typename T >
+  DynArray< T >::DynArray(size_t capacity):
+    size_(0),
+    capacity_(capacity),
+    begin_(0),
+    data_(reinterpret_cast< T* >(new char[capacity * sizeof(T)]))
   {}
 
   template< typename T >
@@ -130,6 +141,18 @@ namespace tkach
   DynArray< T >::~DynArray()
   {
     clear();
+  }
+
+  template< typename T >
+  T& DynArray< T >::operator[](size_t index)
+  {
+    return data_[begin_ + index];
+  }
+
+  template< typename T >
+  const T& DynArray< T >::operator[](size_t index) const
+  {
+    return data_[begin_ + index];
   }
 
   template< typename T >
