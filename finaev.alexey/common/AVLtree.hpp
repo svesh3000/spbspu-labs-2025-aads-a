@@ -522,7 +522,7 @@ namespace finaev
     }
     Stack< node_t* > stack;
     node_t* current = fakeroot_->left;
-    while (stack.isEmpty() || current)
+    while (!stack.isEmpty() || current)
     {
       while (current)
       {
