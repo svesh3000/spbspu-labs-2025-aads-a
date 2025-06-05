@@ -111,9 +111,9 @@ BOOST_AUTO_TEST_CASE(assignment_operator_lvalue_test)
 
 BOOST_AUTO_TEST_CASE(assignment_operator_rvalue_test)
 {
-  auto createList = []() -> asafov::ForwardList<size_t>
+  auto createList = []() -> asafov::ForwardList< size_t >
   {
-    asafov::ForwardList<size_t> temp;
+    asafov::ForwardList< size_t > temp;
     temp.push_back(1);
     temp.push_back(2);
     temp.push_back(3);

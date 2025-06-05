@@ -3,8 +3,8 @@
 namespace
 {
   bool allItersEnds(
-    asafov::ForwardList<asafov::data_list_t::ConstIterator>& begins,
-    asafov::ForwardList<asafov::data_list_t::ConstIterator>& ends,
+    asafov::ForwardList< asafov::data_list_t::ConstIterator >& begins,
+    asafov::ForwardList< asafov::data_list_t::ConstIterator >& ends,
     size_t size)
   {
     auto beginIt = begins.begin();
@@ -68,7 +68,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     {
       if (*beginIt != *endIt)
       {
-        if (sum > std::numeric_limits<data_t>::max() - **beginIt)
+        if (sum > std::numeric_limits< data_t >::max() - **beginIt)
         {
           isAllItersEnds = false;
         }
@@ -94,7 +94,7 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     {
       if (*beginIt != *endIt)
       {
-        if (sum > std::numeric_limits<data_t>::max() - **beginIt)
+        if (sum > std::numeric_limits< data_t >::max() - **beginIt)
         {
           isAllItersEnds = false;
         }
