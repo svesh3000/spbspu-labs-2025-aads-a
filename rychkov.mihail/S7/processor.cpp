@@ -1,7 +1,56 @@
 #include <iostream>
+#include <fstream>
 #include <set.hpp>
 #include "processor.hpp"
 
+size_t rychkov::PairHash::operator()(const std::pair< std::string, std::string >& value) const
+{
+  std::hash< std::string > hasher;
+  return hasher(value.first) ^ (hasher(value.second) << 1);
+}
+
+bool rychkov::S7ParseProcessor::init(ParserContext& context, int argc, char** argv)
+{
+  if (argc != 2)
+  {
+    context.err << "wrong arguments count\n";
+    return false;
+  }
+  std::ifstream file(argv[1]);
+  if (!file)
+  {
+    context.err << "failed to open file\n";
+    return false;
+  }
+  std::string name;
+  while (file >> name)
+  {
+    if (map.find(name) != map.end())
+    {
+      context.err << "found graph duplicate\n";
+      return false;
+    }
+    inner_map& graph = map.insert({name, {}}).first->second;
+    size_t count = 0;
+    if (!(file >> count))
+    {
+      context.err << "failed to read graph size\n";
+      return false;
+    }
+    for (size_t i = 0; i < count; i++)
+    {
+      std::string from, to;
+      int weight = 0;
+      if (!(file >> from >> to >> weight))
+      {
+        context.err << "failed to read edge\n";
+        return false;
+      }
+      graph[{from, to}].push_back(weight);
+    }
+  }
+  return true;
+}
 bool rychkov::S7ParseProcessor::graphs(ParserContext& context)
 {
   if (map.empty() || !eol(context.in))
@@ -183,5 +232,48 @@ bool rychkov::S7ParseProcessor::merge(ParserContext& context)
 }
 bool rychkov::S7ParseProcessor::extract(ParserContext& context)
 {
+  std::string result, rhs;
+  size_t count = 0;
+  if (!(context.in >> result >> rhs >> count) || (map.find(result) != map.end()))
+  {
+    return false;
+  }
+  inner_map& dest = map.insert({result, {}}).first->second;
+  inner_map& source = map.at(rhs);
+  Map< std::string, bool > points;
+  std::string temp;
+  for (size_t i = 0; i < count; i++)
+  {
+    if (!(context.in >> temp))
+    {
+      context.err << "failed to read vertex\n";
+      return false;
+    }
+    points.try_emplace(temp, false);
+  }
+  size_t intersect = 0;
+  for (const inner_map::value_type& i: source)
+  {
+    decltype(points)::iterator from = points.find(i.first.first), to = points.find(i.first.second);
+    if ((from != points.end()) && (to != points.end()))
+    {
+      if (!from->second)
+      {
+        from->second = true;
+        intersect++;
+      }
+      if (!to->second)
+      {
+        to->second = true;
+        intersect++;
+      }
+      dest.insert(i);
+    }
+  }
+  if ((intersect < count) || !eol(context.in))
+  {
+    map.erase(result);
+    return false;
+  }
   return true;
 }
