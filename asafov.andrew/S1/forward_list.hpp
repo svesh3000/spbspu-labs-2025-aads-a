@@ -19,9 +19,8 @@ namespace asafov
       Node* next_;
     };
 
-    class Equal
+    struct Equal
     {
-    public:
       Equal(const T& value, Comparator cmp = Comparator()):
         value_(value),
         cmp_(cmp)
@@ -32,7 +31,6 @@ namespace asafov
         return !cmp_(value_, other) && !cmp_(other, value_);
       }
 
-    private:
       const T& value_;
       Comparator cmp_;
     };

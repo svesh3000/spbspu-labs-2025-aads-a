@@ -66,12 +66,13 @@ void asafov::outputSequences(sequence_list_t& sequences, std::ostream& out = std
     auto endIt = ends.begin();
     for (; pos < size;)
     {
-      if(*beginIt != *endIt)
+      if (*beginIt != *endIt)
       {
-        if(sum > std::numeric_limits<data_t>::max() - **beginIt)
+        if (sum > std::numeric_limits<data_t>::max() - **beginIt)
         {
           isAllItersEnds = false;
-        } else
+        }
+        else
         {
           sum += **beginIt;
         }
