@@ -42,7 +42,7 @@ namespace smirnov
 
   template < typename T >
   List< T >::List():
-    fake_(static_cast< Node< T >* >(operator new(sizeof(Node< T >)))),
+    fake_(new Node< T >()),
     size_(0)
   {
     fake_->next = fake_;
@@ -70,7 +70,8 @@ namespace smirnov
     fake_(other.fake_),
     size_(other.size_)
   {
-    other.fake_ = nullptr;
+    other.fake_ = new Node<T>();
+    other.fake_->next = other.fake_;
     other.size_ = 0;
   }
 

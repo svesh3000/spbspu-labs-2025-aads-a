@@ -10,7 +10,7 @@ namespace smirnov
     T data;
     Node():
       next(nullptr),
-      data(T())
+      data()
     {}
     Node(const T & value):
       next(nullptr),
