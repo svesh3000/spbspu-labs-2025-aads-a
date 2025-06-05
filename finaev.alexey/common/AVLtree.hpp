@@ -574,7 +574,7 @@ namespace finaev
     queue.push(fakeroot_->left);
     while(!queue.isEmpty())
     {
-      node_t* current = queue.front();
+      node_t* current = queue.top();
       queue.pop();
       f(current->data);
       if (current->left)
