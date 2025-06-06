@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
-#include <tree/tree.hpp>
-#include <list/list.hpp>
+#include <string>
+#include <limits>
+#include <functional>
 #include "commands.hpp"
 
 namespace
@@ -73,5 +73,25 @@ int main(int argc, char* argv[])
   {
     std::cerr << "Input error\n";
     return 1;
+  }
+
+  demehin::Tree< std::string, std::function< void() > > cmds;
+  cmds["createdict"] = std::bind(demehin::createDict, std::ref(std::cin), std::ref(dicts));
+  cmds["deletedict"] = std::bind(demehin::deleteDict, std::ref(std::cin), std::ref(dicts));
+  cmds["printdict"] = std::bind(demehin::printDict, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+
+  std::string command;
+  while (std::cin >> command)
+  {
+    try
+    {
+      cmds.at(command)();
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 }
