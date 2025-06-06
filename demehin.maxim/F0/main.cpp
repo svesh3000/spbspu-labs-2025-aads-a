@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <tree/tree.hpp>
 #include <list/list.hpp>
+#include "commands.hpp"
 
 namespace
 {
@@ -13,7 +14,7 @@ namespace
   void inputDict(std::istream& in, dict_t& dicts)
   {
     std::string dict_name;
-    while (std::getline(in, dict_name)
+    while (std::getline(in, dict_name))
     {
       if (dict_name.empty())
       {
@@ -46,11 +47,31 @@ namespace
       dicts.insert(std::make_pair(dict_name, current_dict));
     }
   }
-
 }
 
 int main(int argc, char* argv[])
 {
+  if (argc != 2)
+  {
+    std::cerr << "ERROR: invalid number of parameters";
+    return 1;
+  }
+
+  if (std::string(argv[1]) == "--help")
+  {
+    demehin::printHelp(std::cout);
+    return 0;
+  }
+
+  std::ifstream file(argv[1]);
   dict_t dicts;
-  
+  try
+  {
+    inputDict(file, dicts);
+  }
+  catch (...)
+  {
+    std::cerr << "Input error\n";
+    return 1;
+  }
 }
