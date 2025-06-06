@@ -1,18 +1,21 @@
 #ifndef CONSTITERATOR_HPP
 #define CONSTITERATOR_HPP
+#include <iterator>
 #include <memory>
 #include "node.hpp"
-#include "iterator.hpp"
 
 namespace finaev
 {
-  template < class T >
-  struct constListIterator
+  template< class T >
+  class List;
+
+  template< class T >
+  struct constListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
+    friend class List< T >;
   public:
     using this_t = constListIterator< T >;
     constListIterator();
-    explicit constListIterator(const Node<T>* node);
     ~constListIterator() = default;
     const T& operator*() const;
     const T* operator->() const;
@@ -20,10 +23,11 @@ namespace finaev
     this_t operator++(int);
     this_t& operator--();
     this_t operator--(int);
-    bool operator==(const this_t& i) const;
-    bool operator!=(const this_t& i) const;
+    bool operator==(const this_t&) const;
+    bool operator!=(const this_t&) const;
   private:
     const Node< T >* node_;
+    explicit constListIterator(const Node< T >* node);
   };
 
   template < class T >

@@ -62,7 +62,7 @@ namespace finaev
     std::swap(size_, other.size_);
   }
 
-  template < class T >
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
     if (this == &other)
@@ -191,8 +191,8 @@ namespace finaev
     return size_;
   }
 
-  template < class T >
-  void List < T >::popBack()
+  template< class T >
+  void List< T >::popBack()
   {
     Node< T >* toDelete = tail_;
     if (tail_)
