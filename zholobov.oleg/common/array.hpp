@@ -26,7 +26,7 @@ namespace zholobov {
     T& back();
     void pop_front();
     void pop_back();
-    bool empty() const;
+    bool empty() const noexcept;
     void clear() noexcept;
     void swap(Array& other) noexcept;
 
@@ -51,18 +51,15 @@ zholobov::Array< T >::Array():
 
 template < typename T >
 zholobov::Array< T >::Array(const Array& other):
-  data_(nullptr),
-  capacity_(0),
-  head_(0),
-  size_(0)
+  Array()
 {
   if (other.size_ > 0) {
     try {
-      data_ = new T[other.capacity_];
+      data_ = static_cast< T* >(operator new[](other.capacity_ * sizeof(T)));
       capacity_ = other.capacity_;
       for (; size_ < other.size_; ++size_) {
         size_t pos = (other.head_ + size_) % other.capacity_;
-        data_[size_] = other.data_[pos];
+        new (data_ + size_) T(other.data_[pos]);
       }
     } catch (const std::exception& e) {
       clear();
@@ -73,10 +70,7 @@ zholobov::Array< T >::Array(const Array& other):
 
 template < typename T >
 zholobov::Array< T >::Array(Array&& other) noexcept:
-  data_(nullptr),
-  capacity_(0),
-  head_(0),
-  size_(0)
+  Array()
 {
   swap(other);
 }
@@ -114,7 +108,7 @@ void zholobov::Array< T >::push_back(const T& value)
     realloc();
   }
   size_t tail = (head_ + size_) % capacity_;
-  data_[tail] = value;
+  new (data_ + tail) T(value);
   ++size_;
 }
 
@@ -125,7 +119,7 @@ void zholobov::Array< T >::push_back(T&& value)
     realloc();
   }
   size_t tail = (head_ + size_) % capacity_;
-  data_[tail] = std::move(value);
+  new (data_ + tail) T(std::move(value));
   ++size_;
 }
 
@@ -185,7 +179,7 @@ void zholobov::Array< T >::pop_back()
 }
 
 template < typename T >
-bool zholobov::Array< T >::empty() const
+bool zholobov::Array< T >::empty() const noexcept
 {
   return size_ == 0;
 }
@@ -195,7 +189,11 @@ void zholobov::Array< T >::clear() noexcept
 {
   size_ = 0;
   if (data_ != nullptr) {
-    delete[] data_;
+    for (size_t i = 0; i < size_; ++i) {
+      size_t pos = (head_ + i) % capacity_;
+      data_[pos].~T();
+    }
+    operator delete[](data_);
     data_ = nullptr;
     capacity_ = 0;
   }
@@ -215,18 +213,26 @@ void zholobov::Array< T >::realloc()
 {
   size_t new_capacity = (capacity_ != 0) ? capacity_ * 2 : initial_capacity;
   T* new_data = nullptr;
+  size_t new_size = 0;
   try {
-    new_data = new T[new_capacity];
+    new_data = static_cast< T* >(operator new[](new_capacity * sizeof(T)));
+    for (; new_size < size_; ++new_size) {
+      size_t pos = (head_ + new_size) % capacity_;
+      new (new_data + new_size) T(std::move_if_noexcept(data_[pos]));
+    }
     for (size_t i = 0; i < size_; ++i) {
       size_t pos = (head_ + i) % capacity_;
-      new_data[i] = std::move(data_[pos]);
+      data_[pos].~T();
     }
-    delete[] data_;
+    operator delete[](data_);
     data_ = new_data;
-    head_ = 0;
     capacity_ = new_capacity;
+    head_ = 0;
   } catch (...) {
-    delete[] new_data;
+    for (size_t i = 0; i < new_size; ++i) {
+      new_data[i].~T();
+    }
+    operator delete[](new_data);
     throw;
   }
 }
