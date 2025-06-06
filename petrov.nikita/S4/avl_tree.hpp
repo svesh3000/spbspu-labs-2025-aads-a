@@ -283,23 +283,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   T & AVLTree< K, T, Cmp >::operator[](const K & key)
   {
-    auto temp = root_;
-    while (temp)
-    {
-      if (Cmp{}(key, temp->data.first))
-      {
-        temp = temp->left;
-      }
-      else if (Cmp{}(temp->data.first, key))
-      {
-        temp = temp->right;
-      }
-      else if (!(Cmp{}(key, temp->data.first) && Cmp{}(temp->data.first, key)))
-      {
-        break;
-      }
-    }
-    return temp->data.second;
+    return const_cast< T & >(static_cast< const AVLTree * >(this)->operator[](key));
   }
 
   template< typename K, typename T, typename Cmp >
@@ -546,7 +530,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   T & AVLTree< K, T, Cmp >::at(const K & key)
   {
-    return const_cast< T & >(static_cast< const T & >(this->at(key)));
+    return const_cast< T & >(static_cast< const AVLTree * >(this)->at(key));
   }
 
   template< typename K, typename T, typename Cmp >
