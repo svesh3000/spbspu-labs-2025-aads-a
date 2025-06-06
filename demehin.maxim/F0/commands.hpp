@@ -16,6 +16,8 @@ namespace demehin
   void printDict(std::istream&, std::ostream&, const dict_t&);
   void getTranslationEng(std::istream&, std::ostream&, const dict_t&);
   void getTranslationRu(std::istream&, std::ostream&, const dict_t&);
+  void deleteEng(std::istream&, dict_t&);
+  void addEng(std::istream&, dict_t&);
 }
 
 #endif

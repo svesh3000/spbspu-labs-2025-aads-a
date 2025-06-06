@@ -83,6 +83,8 @@ int main(int argc, char* argv[])
   cmds["printdict"] = std::bind(printDict, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["gettranslationeng"] = std::bind(getTranslationEng, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["gettranslationru"] = std::bind(getTranslationRu, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["deleteeng"] = std::bind(deleteEng, std::ref(std::cin), std::ref(dicts));
+  cmds["addeng"] = std::bind(addEng, std::ref(std::cin), std::ref(dicts));
 
   std::string command;
   while (std::cin >> command)

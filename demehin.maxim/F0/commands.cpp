@@ -23,6 +23,10 @@ void demehin::printHelp(std::ostream& out)
   out << "1. createdict < dictname > - create empty dictionary\n";
   out << "2. deletedict < dictname > - delete excisting dictionary\n";
   out << "3. printdict < dictname > - print dict content\n";
+  out << "4. gettranslationeng < dictname > < eng > - print translations of word eng\n";
+  out << "5. gettranslationru < dictname > < ru > - print translations of word ru\n";
+  out << "6. deleteeng < dictname > < eng > - delete word eng from dictionary\n";
+  out << "7. addeng < dictname > < eng > < N > < ru-1 > ... < ru-n > - add word eng with its N translations\n";
 }
 
 void demehin::createDict(std::istream& in, dict_t& dicts)
@@ -113,4 +117,38 @@ void demehin::getTranslationRu(std::istream& in, std::ostream& out, const dict_t
   out << ru_word << ":";
   printList(out, eng_list);
   out << "\n";
+}
+
+void demehin::deleteEng(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  in >> dict_name >> eng_word;
+  auto& dict = dicts.at(dict_name);
+  if (dict.erase(eng_word) == 0)
+  {
+    throw std::logic_error("no such english word");
+  }
+}
+
+void demehin::addEng(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  size_t translations_cnt;
+
+  in >> dict_name >> eng_word >> translations_cnt;
+
+  auto& dict = dicts.at(dict_name);
+  if (dict.count(eng_word) == 1)
+  {
+    throw std::logic_error("word already exist");
+  }
+
+  list_t translations;
+  for (size_t i = 0; i < translations_cnt; i++)
+  {
+    std::string ru_word;
+    in >> ru_word;
+    translations.push_back(ru_word);
+  }
+  dict.insert(std::make_pair(eng_word, translations));
 }
