@@ -165,6 +165,7 @@ void zholobov::Array< T >::pop_front()
   if (empty()) {
     throw std::out_of_range("Array is empty");
   }
+  front().~T();
   head_ = (head_ + 1) % capacity_;
   --size_;
 }
@@ -175,6 +176,7 @@ void zholobov::Array< T >::pop_back()
   if (empty()) {
     throw std::out_of_range("Array is empty");
   }
+  back().~T();
   --size_;
 }
 
