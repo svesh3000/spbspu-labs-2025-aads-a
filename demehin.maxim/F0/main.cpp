@@ -51,6 +51,8 @@ namespace
 
 int main(int argc, char* argv[])
 {
+  using namespace demehin;
+
   if (argc != 2)
   {
     std::cerr << "ERROR: invalid number of parameters";
@@ -75,10 +77,12 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  demehin::Tree< std::string, std::function< void() > > cmds;
-  cmds["createdict"] = std::bind(demehin::createDict, std::ref(std::cin), std::ref(dicts));
-  cmds["deletedict"] = std::bind(demehin::deleteDict, std::ref(std::cin), std::ref(dicts));
-  cmds["printdict"] = std::bind(demehin::printDict, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  Tree< std::string, std::function< void() > > cmds;
+  cmds["createdict"] = std::bind(createDict, std::ref(std::cin), std::ref(dicts));
+  cmds["deletedict"] = std::bind(deleteDict, std::ref(std::cin), std::ref(dicts));
+  cmds["printdict"] = std::bind(printDict, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["gettranslationeng"] = std::bind(getTranslationEng, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["gettranslationru"] = std::bind(getTranslationRu, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
 
   std::string command;
   while (std::cin >> command)
