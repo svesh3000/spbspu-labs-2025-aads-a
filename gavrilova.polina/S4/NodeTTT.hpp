@@ -13,12 +13,12 @@ namespace gavrilova {
     this_t* children[3];
     this_t* parent;
     bool is_3_node;
-    size_t key_count;
+    bool is_fake;
 
     NodeTwoThreeTree():
       parent(nullptr),
       is_3_node(false),
-      key_count(0)
+      is_fake(false)
     {
       children[0] = children[1] = children[2] = nullptr;
       data[0] = data[1] = std::pair< Key, Value >();
@@ -26,7 +26,7 @@ namespace gavrilova {
 
     bool is_leaf()
     {
-      return children[0] == nullptr;
+      return children[0]->is_fake;
     }
   };
 }

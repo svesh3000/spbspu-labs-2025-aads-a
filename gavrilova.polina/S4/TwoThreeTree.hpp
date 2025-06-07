@@ -10,12 +10,21 @@ namespace detail {
 
 }
 namespace gavrilova {
+
+  template < class Key, class Value, class Cmp = std::less< Key > >
+  struct Iterator;
+
+  template < class Key, class Value, class Cmp = std::less< Key > >
+  struct ConstIterator;
+
   template < class Key, class Value, class Cmp = std::less< Key > >
   class TwoThreeTree {
   public:
     using Node = NodeTwoThreeTree< Key, Value >;
     using this_t = TwoThreeTree< Key, Value, Cmp >;
     using pair = std::pair< Key, Value >;
+    using Iterator = gavrilova::Iterator< Key, Value, Cmp >;
+    using ConstIterator = gavrilova::ConstIterator< Key, Value, Cmp >;
 
     TwoThreeTree();
     TwoThreeTree(const TwoThreeTree& other);
@@ -27,6 +36,17 @@ namespace gavrilova {
     TwoThreeTree& operator=(TwoThreeTree&& other) noexcept;
     // TwoThreeTree &operator=(std::initializer_list<Value> init);
 
+    Iterator begin();
+    ConstIterator begin() const noexcept;
+    ConstIterator cbegin() const noexcept;
+    Iterator end();
+    ConstIterator end() const noexcept;
+    ConstIterator cend() const noexcept;
+
+    Value& operator[](const Key& key);
+    Value& at(const Key& key);
+    const Value& at(const Key& key) const;
+
     void push(const Key& key, const Value& value);
     Value get(const Key& key);
     Node* find(const Key& key);
@@ -35,7 +55,7 @@ namespace gavrilova {
 
     void swap(TwoThreeTree& other) noexcept;
     void clear() noexcept;
-    Node* get_node() { return fake_->children[0]; }
+    Node* get_node() { return (fake_->children[0] && !fake_->children[0]->is_fake) ? fake_->children[0] : nullptr; }
 
   private:
     Node* fake_;
@@ -48,6 +68,7 @@ namespace gavrilova {
     Node* split_leaf(Node* leaf, const Key& key, const Value& value);
     void split_and_up(Node* to_up);
     bool is_leaf(Node* node);
+    Node* copy_subtree(Node* node, Node* parent);
   };
 
   template < class Key, class Value, class Cmp >
@@ -55,18 +76,29 @@ namespace gavrilova {
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     size_(0)
   {
-    fake_->children[0] = nullptr;
-    fake_->children[1] = nullptr;
-    fake_->children[2] = nullptr;
+    fake_->children[0] = fake_;
+    fake_->children[1] = fake_;
+    fake_->children[2] = fake_;
     fake_->parent = fake_;
     fake_->is_3_node = false;
-    fake_->key_count = 0;
+    fake_->is_fake = true;
   }
 
   template < class Key, class Value, class Cmp >
   TwoThreeTree< Key, Value, Cmp >::TwoThreeTree(const TwoThreeTree& other):
     TwoThreeTree()
   {
+    Node* new_root = nullptr;
+    try {
+      if (!other.empty()) {
+        new_root = copy_subtree(other.fake_->children[0], fake_);
+      }
+      fake_->children[0] = new_root;
+      size_ = other.size_;
+    } catch (const std::bad_alloc&) {
+      clear();
+      throw;
+    }
   }
 
   template < class Key, class Value, class Cmp >
@@ -113,15 +145,57 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::begin()
+  {
+    return Iterator(cbegin());
+  }
+
+  template < class Key, class Value, class Cmp >
+  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::begin() const noexcept
+  {
+    return cbegin();
+  }
+
+  template < class Key, class Value, class Cmp >
+  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::cbegin() const noexcept
+  {
+    if (empty()) {
+      return cend();
+    }
+    Node* tmp = fake_->children[0];
+    while (tmp->left) {
+      tmp = tmp->left;
+    }
+    return ConstIterator(tmp, 0);
+  }
+
+  template < class Key, class Value, class Cmp >
+  Iterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::end()
+  {
+    return Iterator(cend());
+  }
+
+  template < class Key, class Value, class Cmp >
+  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::end() const noexcept
+  {
+    return cend();
+  }
+
+  template < class Key, class Value, class Cmp >
+  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::cend() const noexcept
+  {
+    return ConstIterator(fake_, 0);
+  }
+
+  template < class Key, class Value, class Cmp >
   void TwoThreeTree< Key, Value, Cmp >::push(const Key& key, const Value& value)
   {
     // std::cout << "! in push function\n";
     if (empty()) {
-      std::cout << "PUSH IN EMPTY\n";
+      // std::cout << "PUSH IN EMPTY\n";
       Node* new_node = new Node();
       pair new_pair{key, value};
       new_node->data[0] = new_pair;
-      new_node->key_count = 1;
       new_node->parent = fake_;
       new_node->children[0] = fake_;
       new_node->children[1] = fake_;
@@ -134,20 +208,20 @@ namespace gavrilova {
     Node* leaf = find_leaf(key);
     // std::cout << "FInd leaf: " << leaf->data[0].first << " " << leaf->data[1].first << "\n";
     if (!leaf->is_3_node) {
-      std::cout << "PUSH IN 2NODE \n";
+      // std::cout << "PUSH IN 2NODE \n";
       push_to_2node(leaf, key, value);
     } else {
-      std::cout << "PUSH IN 3NODE \n";
+      // std::cout << "PUSH IN 3NODE \n";
       Node* parent = leaf->parent;
       size_t ind = parent->children[0] == leaf ? 0 : 1;
       ind = parent->children[ind] == leaf ? ind : 2;
       Node* node = split_leaf(leaf, key, value);
-      std::cout << "after split_leaf: data[0] " << node->data[0].first << " ";
-      std::cout << ", child[0] " << node->children[0]->data[0].first << ", chilld[1] " << node->children[1]->data[0].first << "\n";
+      // std::cout << "after split_leaf: data[0] " << node->data[0].first << " ";
+      // std::cout << ", child[0] " << node->children[0]->data[0].first << ", chilld[1] " << node->children[1]->data[0].first << "\n";
       parent->children[ind] = node;
       node->parent = parent;
-      std::cout << "parent of node: data[0] " << parent->data[0].first << " " << parent->data[1].first;
-      std::cout << ", child[0] " << parent->children[0]->data[0].first << ", chilld[1]\n";
+      // std::cout << "parent of node: data[0] " << parent->data[0].first << " " << parent->data[1].first;
+      // std::cout << ", child[0] " << parent->children[0]->data[0].first << ", chilld[1]\n";
       split_and_up(node);
       // node_up(leaf->parent, middle_to_up, leaf, leaf->parent->children[2]);
     }
@@ -164,7 +238,7 @@ namespace gavrilova {
       throw std::logic_error("There is no nodes with so key");
     }
     if (!node->is_3_node) {
-      return node->data->second;
+      return node->data[0].second;
     } else {
       return (node->data[0].first == key ? node->data[0].second : node->data[1].second);
     }
@@ -181,9 +255,9 @@ namespace gavrilova {
     Node* current = fake_->children[0];
 
     while (current != fake_) {
-      std::cout << "WHILE IN FIND\n";
-      std::cout << "Current data: [0] " << current->data[0].first << " [1] " << current->data[1].first << "\n";
-      std::cout << "is_3_node: " << current->is_3_node << "\n";
+      // std::cout << "WHILE IN FIND\n";
+      // std::cout << "Current data: [0] " << current->data[0].first << " [1] " << current->data[1].first << "\n";
+      // std::cout << "is_3_node: " << current->is_3_node << "\n";
       if (!cmp_(key, current->data[0].first) &&
           !cmp_(current->data[0].first, key)) {
         // std::cout << "cond1\n";
@@ -304,7 +378,6 @@ namespace gavrilova {
       node->data[1] = {key, value};
     }
     node->is_3_node = true;
-    node->key_count = 2;
   }
 
   template < class Key, class Value, class Cmp >
@@ -318,18 +391,15 @@ namespace gavrilova {
     leaf->data[0] = temp[0];
     leaf->data[1] = {};
     leaf->is_3_node = false;
-    leaf->key_count = 1;
 
     Node* new_node = new Node();
     new_node->data[0] = temp[2];
-    new_node->key_count = 1;
 
     Node* middle = new Node();
     middle->data[0] = temp[1];
     middle->children[0] = leaf;
     middle->children[1] = new_node;
     middle->children[2] = fake_;
-    middle->key_count = 1;
     middle->parent = leaf->parent;
 
     leaf->parent = middle;
@@ -365,18 +435,18 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   void TwoThreeTree< Key, Value, Cmp >::split_and_up(Node* to_up)
   {
-    std::cout << "SPLIT AND UP: ";
+    // std::cout << "SPLIT AND UP: ";
     Node* parent = to_up->parent;
 
     if (parent == fake_) {
-      std::cout << "fake\n";
+      // std::cout << "fake\n";
       fake_->children[0] = to_up;
       return;
     }
     if (!parent->is_3_node) {
-      std::cout << "2node ";
+      // std::cout << "2node ";
       if (cmp_(to_up->data[0].first, parent->data[0].first)) {
-        std::cout << "1\n";
+        // std::cout << "1\n";
         parent->data[1] = parent->data[0];
         parent->data[0] = to_up->data[0];
         parent->is_3_node = true;
@@ -387,7 +457,7 @@ namespace gavrilova {
         parent->children[1] = to_up->children[1];
         delete to_up;
       } else if (cmp_(parent->data[0].first, to_up->data[0].first)) {
-        std::cout << "2\n";
+        // std::cout << "2\n";
         parent->data[1] = to_up->data[0];
         parent->is_3_node = true;
         to_up->children[0]->parent = parent;
@@ -398,17 +468,17 @@ namespace gavrilova {
       }
       return;
     } else {
-      std::cout << "to_up " << to_up->data[0].first << "\n";
-      std::cout << "ch0 " << parent->children[0]->data[0].first << "\n";
-      std::cout << "ch1 " << parent->children[1]->data[0].first << "\n";
-      std::cout << "ch2 " << parent->children[2]->data[0].first << "\n";
-      std::cout << "3node";
+      // std::cout << "to_up " << to_up->data[0].first << "\n";
+      // std::cout << "ch0 " << parent->children[0]->data[0].first << "\n";
+      // std::cout << "ch1 " << parent->children[1]->data[0].first << "\n";
+      // std::cout << "ch2 " << parent->children[2]->data[0].first << "\n";
+      // std::cout << "3node";
       Node* left_child_to_up = to_up->children[0];
       Node* right_child_to_up = to_up->children[1];
       pair data_to_up = to_up->data[0];
 
       if (parent->children[0] == to_up) {
-        std::cout << " 1\n";
+        // std::cout << " 1\n";
         to_up->parent = parent->parent;
         to_up->data[0] = parent->data[0];
 
@@ -418,7 +488,6 @@ namespace gavrilova {
         parent->children[1] = parent->children[2];
         parent->children[2] = fake_;
         parent->is_3_node = false;
-        parent->key_count = 1;
 
         Node* new_node = new Node();
         new_node->data[0] = data_to_up;
@@ -431,14 +500,13 @@ namespace gavrilova {
         to_up->children[0] = new_node;
         to_up->children[1] = parent;
       } else if (parent->children[2] == to_up) {
-        std::cout << " 2\n";
+        // std::cout << " 2\n";
         to_up->parent = parent->parent;
         to_up->data[0] = parent->data[1];
 
         parent->data[1] = {};
         parent->children[2] = fake_;
         parent->is_3_node = false;
-        parent->key_count = 1;
 
         Node* new_node = new Node();
         new_node->data[0] = data_to_up;
@@ -451,7 +519,7 @@ namespace gavrilova {
         to_up->children[0] = parent;
         to_up->children[1] = new_node;
       } else {
-        std::cout << " 3\n";
+        // std::cout << " 3\n";
         to_up->parent = parent->parent;
 
         Node* new_node = new Node();
@@ -464,7 +532,6 @@ namespace gavrilova {
         parent->children[1] = left_child_to_up;
         parent->children[2] = fake_;
         parent->is_3_node = false;
-        parent->key_count = 1;
 
         parent->parent = to_up;
         new_node->parent = to_up;
@@ -472,6 +539,32 @@ namespace gavrilova {
         to_up->children[1] = new_node;
       }
       split_and_up(to_up);
+    }
+  }
+
+  template < class Key, class Value, class Cmp >
+  typename TwoThreeTree< Key, Value, Cmp >::Node* TwoThreeTree< Key, Value, Cmp >::copy_subtree(Node* node, Node* parent)
+  {
+    if (!node || node->is_fake) {
+      return fake_;
+    }
+
+    Node* new_node = new Node();
+    try {
+      new_node->data[0] = node->data[0];
+      new_node->data[1] = node->data[1];
+      new_node->is_3_node = node->is_3_node;
+      new_node->is_fake = false;
+      new_node->parent = parent;
+
+      for (int i = 0; i < 3; ++i) {
+        new_node->children[i] = copy_subtree(node->children[i], new_node);
+      }
+
+      return new_node;
+    } catch (...) {
+      delete new_node;
+      throw;
     }
   }
 

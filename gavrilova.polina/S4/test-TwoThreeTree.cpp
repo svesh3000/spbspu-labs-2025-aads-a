@@ -1,11 +1,11 @@
 #include <boost/test/unit_test.hpp>
-#include "TwoThreeTree.hpp"
 #include <string>
-
+#include "TwoThreeTree.hpp"
+#include "ConstIterator.hpp"
+#include "Iterator.hpp"
 
 BOOST_AUTO_TEST_CASE(TestEmptyTree)
 {
-
   gavrilova::TwoThreeTree< int, std::string > tree;
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
@@ -62,21 +62,21 @@ BOOST_AUTO_TEST_CASE(TestInsertMultipleElements)
   }
 }
 
-// BOOST_AUTO_TEST_CASE(TestCopyConstructor)
-// {
-//   gavrilova::TwoThreeTree< int, std::string > tree1;
-//   tree1.push(10, "ten");
-//   tree1.push(5, "five");
-//   tree1.push(15, "fifteen");
+BOOST_AUTO_TEST_CASE(TestCopyConstructor)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree1;
+  tree1.push(10, "ten");
+  tree1.push(5, "five");
+  tree1.push(15, "fifteen");
 
-//   gavrilova::TwoThreeTree< int, std::string > tree2(tree1);
+  gavrilova::TwoThreeTree< int, std::string > tree2(tree1);
 
-//   BOOST_TEST(tree1.size() == tree2.size());
-//   BOOST_TEST(tree2.find(10) != nullptr);
-//   BOOST_TEST(tree2.get(10) == "ten");
-//   BOOST_TEST(tree2.find(5) != nullptr);
-//   BOOST_TEST(tree2.get(5) == "five");
-// }
+  BOOST_TEST(tree1.size() == tree2.size());
+  BOOST_TEST(tree2.find(10) != nullptr);
+  BOOST_TEST(tree2.get(10) == "ten");
+  BOOST_TEST(tree2.find(5) != nullptr);
+  BOOST_TEST(tree2.get(5) == "five");
+}
 
 BOOST_AUTO_TEST_CASE(TestMoveConstructor)
 {
@@ -92,19 +92,19 @@ BOOST_AUTO_TEST_CASE(TestMoveConstructor)
   BOOST_TEST(tree2.get(10) == "ten");
 }
 
-// BOOST_AUTO_TEST_CASE(TestAssignmentOperator)
-// {
-//   gavrilova::TwoThreeTree< int, std::string > tree1;
-//   tree1.push(10, "ten");
-//   tree1.push(5, "five");
+BOOST_AUTO_TEST_CASE(TestAssignmentOperator)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree1;
+  tree1.push(10, "ten");
+  tree1.push(5, "five");
 
-//   gavrilova::TwoThreeTree< int, std::string > tree2;
-//   tree2 = tree1;
+  gavrilova::TwoThreeTree< int, std::string > tree2;
+  tree2 = tree1;
 
-//   BOOST_TEST(tree1.size() == tree2.size());
-//   BOOST_TEST(tree2.find(10) != nullptr);
-//   BOOST_TEST(tree2.get(10) == "ten");
-// }
+  BOOST_TEST(tree1.size() == tree2.size());
+  BOOST_TEST(tree2.find(10) != nullptr);
+  BOOST_TEST(tree2.get(10) == "ten");
+}
 
 BOOST_AUTO_TEST_CASE(TestMoveAssignmentOperator)
 {
@@ -174,4 +174,85 @@ BOOST_AUTO_TEST_CASE(TestTreeStructureAfterInsertions)
   BOOST_TEST(tree.get(60) == "60");
   BOOST_TEST(tree.get(70) == "70");
   BOOST_TEST(tree.get(80) == "80");
+}
+
+BOOST_AUTO_TEST_CASE(TestIteratorForwardTraversal)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  tree.push(10, "ten");
+  tree.push(5, "five");
+  tree.push(15, "fifteen");
+
+  std::vector< std::pair< int, std::string > > expected = {
+      {5, "five"}, {10, "ten"}, {15, "fifteen"}};
+
+  auto it = tree.begin();
+  for (size_t i = 0; i < expected.size(); ++i, ++it) {
+    BOOST_CHECK(it != tree.end());
+    BOOST_TEST(it->first == expected[i].first);
+    BOOST_TEST(it->second == expected[i].second);
+  }
+  BOOST_CHECK(it == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(TestIteratorBackwardTraversal)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  tree.push(10, "ten");
+  tree.push(5, "five");
+  tree.push(15, "fifteen");
+
+  std::vector< std::pair< int, std::string > > expected = {
+      {15, "fifteen"}, {10, "ten"}, {5, "five"}};
+
+  auto it = tree.end();
+  --it;
+  for (size_t i = 0; i < expected.size(); ++i, --it) {
+    BOOST_TEST(it->first == expected[i].first);
+    BOOST_TEST(it->second == expected[i].second);
+    if (i != expected.size() - 1) {
+      BOOST_CHECK(it != tree.begin());
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TestIteratorEquality)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  tree.push(10, "ten");
+  tree.push(20, "twenty");
+
+  auto it1 = tree.begin();
+  auto it2 = tree.begin();
+
+  BOOST_CHECK(it1 == it2);
+  ++it1;
+  BOOST_CHECK(it1 != it2);
+}
+
+BOOST_AUTO_TEST_CASE(TestIteratorToEnd)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  tree.push(1, "a");
+  tree.push(2, "b");
+
+  auto it = tree.begin();
+  while (it != tree.end()) {
+    ++it;
+  }
+
+  BOOST_CHECK(it == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(TestIteratorDereference)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  tree.push(42, "answer");
+
+  auto it = tree.begin();
+  BOOST_CHECK(it != tree.end());
+  BOOST_TEST((*it).first == 42);
+  BOOST_TEST((*it).second == "answer");
+  BOOST_TEST(it->first == 42);
+  BOOST_TEST(it->second == "answer");
 }
