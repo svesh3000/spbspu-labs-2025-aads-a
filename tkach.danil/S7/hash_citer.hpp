@@ -7,10 +7,14 @@ namespace tkach
   template< class Key, class Value, class Hash, class Equal >
   class HashTable;
 
+  template< class Key, class Value, class Hash, class Equal >
+  class HashIterator;
+
   template< class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   class CHashIterator: public std::iterator< std::bidirectional_iterator_tag, Value >
   {
     friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashIterator< Key, Value, Hash, Equal >;
   public:
     using this_t = CHashIterator< Key, Value, Hash, Equal >;
     using Table =  HashTable< Key, Value, Hash, Equal >;
@@ -29,10 +33,17 @@ namespace tkach
   private:
     Table* ptr_table_;
     size_t pos_;
-    explicit CHashIterator(Table* table, size_t pos);
+    explicit CHashIterator(const Table* table, size_t pos);
+    explicit CHashIterator(HashIterator<Key, Value, Hash, Equal> other);
     void advance_to_prev_occupied();
     void advance_to_next_occupied();
   };
+
+  template<class Key, class Value, class Hash, class Equal>
+  CHashIterator<Key, Value, Hash, Equal>::CHashIterator(HashIterator<Key, Value, Hash, Equal> other):
+      ptr_table_(other.ptr_table_),
+      pos_(other.pos_)
+  {}
 
   template< class Key, class Value, class Hash, class Equal >
   void CHashIterator< Key, Value, Hash, Equal >::advance_to_prev_occupied()
@@ -46,7 +57,7 @@ namespace tkach
   template< class Key, class Value, class Hash, class Equal >
   void CHashIterator< Key, Value, Hash, Equal >::advance_to_next_occupied()
   {
-    while (ptr_table_ && pos_ < ptr_table_->size() && ptr_table_->table_[pos_].state != Table::EntryState::Occupied)
+    while (ptr_table_ && pos_ < ptr_table_->table_.size() && ptr_table_->table_[pos_].state != Table::EntryState::Occupied)
     {
       pos_++;
     }
@@ -59,8 +70,8 @@ namespace tkach
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  CHashIterator< Key, Value, Hash, Equal >::CHashIterator(Table* table, size_t pos):
-    ptr_table_(table),
+  CHashIterator< Key, Value, Hash, Equal >::CHashIterator(const Table* table, size_t pos):
+    ptr_table_(const_cast< Table* >(table)),
     pos_(pos)
   {
     advance_to_next_occupied();
@@ -69,7 +80,7 @@ namespace tkach
   template< class Key, class Value, class Hash, class Equal >
   CHashIterator< Key, Value, Hash, Equal >& CHashIterator< Key, Value, Hash, Equal >::operator++()
   {
-    if (pos_ >= ptr_table_->size())
+    if (pos_ >= ptr_table_->table_.size())
     {
       return *this;
     }
