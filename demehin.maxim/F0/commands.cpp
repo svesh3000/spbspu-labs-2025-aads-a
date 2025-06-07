@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <fstream>
 
 namespace
 {
@@ -48,6 +49,45 @@ namespace
     }
     return res;
   }
+
+  void writeDict(std::ostream& out, const std::string& dict_name, const demehin::tree_t& dict)
+  {
+    out << dict_name << "\n";
+    for (auto&& key: dict)
+    {
+      out << key.first;
+      for (auto&& ru_word: key.second)
+      {
+        out << " " << ru_word;
+      }
+      out << "\n";
+    }
+    out << "\n";
+  }
+
+  void processWriting(std::istream& in, const demehin::dict_t& dicts, std::ios_base::openmode mode)
+  {
+    std::string filename;
+    size_t dicts_cnt;
+    in >> filename >> dicts_cnt;
+
+    std::ofstream file(filename, mode);
+    if (!file)
+    {
+      throw std::logic_error("incorrect file");
+    }
+
+    for (size_t i = 0; i < dicts_cnt; i++)
+    {
+      std::string dict_name;
+      in >> dict_name;
+      auto it = dicts.find(dict_name);
+      if (it != dicts.end())
+      {
+        writeDict(file, dict_name, dicts.at(dict_name));
+      }
+    }
+  }
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -65,6 +105,16 @@ void demehin::printHelp(std::ostream& out)
   out << "10. union < newdict > < N > < dictname-1 > ... < dictname-n > - union of N dictionaries\n";
   out << "11. complement < newdict > < N > < dictname-1 > ... < dictname-n > - complemention of N dictionaries\n";
   out << "12. intersect < newdict > < N > < dictname-1 > ... < dictname-n > - intersection of N dictionaries\n";
+}
+
+void demehin::rewriteFile(std::istream& in, const dict_t& dicts)
+{
+  processWriting(in, dicts, std::ios::out);
+}
+
+void demehin::writeToFile(std::istream& in, const dict_t& dicts)
+{
+  processWriting(in, dicts, std::ios::app);
 }
 
 void demehin::createDict(std::istream& in, dict_t& dicts)

@@ -23,6 +23,8 @@ namespace demehin
   void makeUnion(std::istream&, dict_t&);
   void makeIntersect(std::istream&, dict_t&);
   void makeComplement(std::istream&, dict_t&);
+  void writeToFile(std::istream&, const dict_t&);
+  void rewriteFile(std::istream&, const dict_t&);
 }
 
 #endif
