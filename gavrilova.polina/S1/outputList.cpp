@@ -30,12 +30,12 @@ namespace {
 
   struct SelectFirst {
     template < typename Pair >
-    constexpr auto operator()(const Pair& pair) const 
+    constexpr auto operator()(const Pair& pair) const
     {
       return pair.first;
     }
   };
-  
+
   struct SelectSelf {
     template < typename T >
     constexpr const T& operator()(const T& value) const
@@ -43,7 +43,7 @@ namespace {
       return value;
     }
   };
-  
+
 }
 
 std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
