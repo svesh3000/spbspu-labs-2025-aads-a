@@ -5,9 +5,9 @@
 #include "node.hpp"
 #include "iterator.hpp"
 #include "cIterator.hpp"
-#include "../../S5/lnr_iterator.hpp"
-#include "../../S5/rnl_iterator.hpp"
-#include "../../S5/breadth_iterator.hpp"
+#include "lnr_iterator.hpp"
+#include "rnl_iterator.hpp"
+#include "breadth_iterator.hpp"
 
 namespace demehin
 {

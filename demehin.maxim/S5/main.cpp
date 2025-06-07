@@ -36,7 +36,6 @@ namespace
       throw std::logic_error("unknown command");
     }
   }
-
 }
 
 int main(int argc, char* argv[])
@@ -49,6 +48,7 @@ int main(int argc, char* argv[])
   std::ifstream file(argv[2]);
   Map tree;
   demehin::KeySumm res;
+
   try
   {
     inputTree(file, tree);

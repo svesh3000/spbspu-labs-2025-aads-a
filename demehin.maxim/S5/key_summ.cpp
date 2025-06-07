@@ -10,11 +10,8 @@ namespace
     int min = std::numeric_limits< int >::min();
     bool isOverflow = (a > 0 && b > 0) && (a > max - b);
     bool isUnderflow = (a < 0 && b < 0) && (a < min + b);
-    if (isOverflow || isUnderflow)
-    {
-      return true;
-    }
-    return false;
+
+    return isOverflow || isUnderflow;
   }
 }
 
