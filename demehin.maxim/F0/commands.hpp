@@ -25,6 +25,7 @@ namespace demehin
   void makeComplement(std::istream&, dict_t&);
   void writeToFile(std::istream&, const dict_t&);
   void rewriteFile(std::istream&, const dict_t&);
+  void printMostCommons(std::istream&, std::ostream&, const dict_t&);
 }
 
 #endif

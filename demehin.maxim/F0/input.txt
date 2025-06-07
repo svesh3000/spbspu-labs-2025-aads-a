@@ -8,6 +8,3 @@ apple ap app
 pear pe
 banana bab
 
-dict3
-banana ba
-grape gr

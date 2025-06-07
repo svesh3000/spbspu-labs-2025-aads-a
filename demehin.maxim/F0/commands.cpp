@@ -329,3 +329,55 @@ void demehin::makeComplement(std::istream& in, dict_t& dicts)
 
   dicts.insert(std::make_pair(new_name, res));
 }
+
+void demehin::printMostCommons(std::istream& in, std::ostream& out, const dict_t& dicts)
+{
+  int n, k;
+  in >> n >> k;
+  if (n <= 0 || k <= 0)
+  {
+    throw std::logic_error("incorrect count");
+  }
+
+  list_t dicts_names;
+  std::string dict_name;
+
+  for (int i = 0; i < k; i++)
+  {
+    in >> dict_name;
+    dicts_names.push_back(dict_name);
+  }
+
+  Tree< std::string, int > word_frequency;
+  for (auto&& name: dicts_names)
+  {
+    auto unit = dicts.at(name);
+    for (auto&& key: unit)
+    {
+      word_frequency[key.first]++;
+    }
+  }
+
+  Tree< int, list_t, std::greater< int > > freq_to_words;
+  for (auto&& key: word_frequency)
+  {
+    freq_to_words[key.second].push_back(key.first);
+  }
+
+  int cnt = 0;
+  for (auto&& key: freq_to_words)
+  {
+    for (auto&& word: key.second)
+    {
+      if (cnt++ >= n)
+      {
+        break;
+      }
+      out << word << " " << key.first << "\n";
+    }
+    if (cnt >= n)
+    {
+      break;
+    }
+  }
+}
