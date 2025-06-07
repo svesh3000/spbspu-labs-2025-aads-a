@@ -290,6 +290,8 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
     right_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[2]};
   } catch (const std::bad_alloc&) {
     delete left_node;
+    clear_subtree(left_child);
+    clear_subtree(right_child);
     throw;
   }
   if (node->left) {
@@ -354,6 +356,18 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   } else {
     return split_nodes(parent, values_to_split[1], left_node, right_node);
   }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
+{
+  if (!node) {
+    return;
+  }
+  clear_subtree(node->left);
+  clear_subtree(node->middle);
+  clear_subtree(node->right);
+  delete node;
 }
 
 template< class Key, class T, class Compare >
