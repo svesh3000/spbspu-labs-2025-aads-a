@@ -132,7 +132,7 @@ template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
 {
   Node* current = iterator::get_min_node(dummy_root_);
-  while (current && current != dummy_root_) {
+  while (current && !empty()) {
     Node* cur_parent = current->parent;
     Node* next = nullptr;
     if (cur_parent->left == current) {
@@ -354,7 +354,7 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
     delete node;
     return;
   } else {
-    return split_nodes(parent, values_to_split[1], left_node, right_node);
+    split_nodes(parent, values_to_split[1], left_node, right_node);
   }
 }
 
