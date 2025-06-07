@@ -8,10 +8,16 @@ namespace
   {
     int max = std::numeric_limits< int >::max();
     int min = std::numeric_limits< int >::min();
-    bool isOverflow = (a > 0 && b > 0) && (a > max - b);
-    bool isUnderflow = (a < 0 && b < 0) && (a < min + b);
+    if ((a > 0 && b > 0) && (a > max - b))
+    {
+      return true;
+    }
+    if ((a < 0 && b < 0) && (a < min + b))
+    {
+      return true;
+    }
 
-    return isOverflow || isUnderflow;
+    return false;
   }
 }
 
