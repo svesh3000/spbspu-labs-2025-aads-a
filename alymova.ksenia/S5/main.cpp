@@ -1,11 +1,27 @@
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <tree/tree-2-3.hpp>
 #include "tree-sum-functor.hpp"
+
+
+template< class Tree, class F >
+struct CallTraverse
+{
+  Tree tree;
+  F (Tree::*traverse)(F);
+
+  F operator()(F f)
+  {
+    return (tree.*traverse)(f);
+  }
+};
 
 int main(int args, char** argv)
 {
   using namespace alymova;
+  using DatasetType = TwoThreeTree< int, std::string, std::less< int > >;
+
   if (args != 3)
   {
     std::cerr << "<INCORRECT ARGUMENTS>\n";
@@ -21,7 +37,7 @@ int main(int args, char** argv)
 
   try
   {
-    TwoThreeTree< int, std::string, std::less< int > > dataset;
+    DatasetType dataset;
     while (!file.eof() && !file.fail())
     {
       int key;
@@ -44,25 +60,15 @@ int main(int args, char** argv)
     }
     std::string round = argv[1];
     TreeSum result;
-    if (round == "ascending")
-    {
-      result = dataset.traverse_lnr(result);
-    }
-    else if (round == "descending")
-    {
-      result = dataset.traverse_rnl(result);
-    }
-    else if (round == "breadth")
-    {
-      result = dataset.traverse_breadth(result);
-    }
-    else
-    {
-      throw std::logic_error("<INCORRECT ARGUMENT>");
-    }
+    TwoThreeTree< std::string, std::function< TreeSum(TreeSum) >, std::less< std::string > > commandset{
+      {"ascending", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_lnr}},
+      {"descending", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_rnl}},
+      {"breadth", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_breadth}}
+    };
+    result = commandset.at(round)(result);
     std::cout << result << '\n';
   }
-  catch(const std::exception& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;
