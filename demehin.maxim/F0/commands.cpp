@@ -15,6 +15,39 @@ namespace
       isFirst = false;
     }
   }
+
+  demehin::tree_t unionTwo(const demehin::tree_t& dict1, const demehin::tree_t& dict2)
+  {
+    demehin::tree_t res = dict1;
+    for (auto&& key: dict2)
+    {
+      res.insert(key);
+    }
+    return res;
+  }
+
+  demehin::tree_t intersectTwo(const demehin::tree_t& dict1, const demehin::tree_t& dict2)
+  {
+    demehin::tree_t res;
+    for (auto&& key: dict1)
+    {
+      if (dict2.find(key.first) != dict2.end())
+      {
+        res.insert(key);
+      }
+    }
+    return res;
+  }
+
+  demehin::tree_t complementTwo(const demehin::tree_t& dict1, const demehin::tree_t& dict2)
+  {
+    demehin::tree_t res = dict1;
+    for (auto&& key: dict2)
+    {
+      res.erase(key.first);
+    }
+    return res;
+  }
 }
 
 void demehin::printHelp(std::ostream& out)
@@ -29,6 +62,9 @@ void demehin::printHelp(std::ostream& out)
   out << "7. addeng < dictname > < eng > < N > < ru-1 > ... < ru-n > - add word eng with its N translations\n";
   out << "8. addru < dictname > < eng > < N > < ru-1 > ... < ru-n > - add N translations to eng\n";
   out << "9. deleteru < dictname > < eng > < N > < ru-1 > ... < ru-n > - delete N translations of eng\n";
+  out << "10. union < newdict > < N > < dictname-1 > ... < dictname-n > - union of N dictionaries\n";
+  out << "11. complement < newdict > < N > < dictname-1 > ... < dictname-n > - complemention of N dictionaries\n";
+  out << "12. intersect < newdict > < N > < dictname-1 > ... < dictname-n > - intersection of N dictionaries\n";
 }
 
 void demehin::createDict(std::istream& in, dict_t& dicts)
@@ -189,4 +225,57 @@ void demehin::addRu(std::istream& in, dict_t& dicts)
     in >> ru_word;
     translations.push_back(ru_word);
   }
+}
+
+void demehin::makeUnion(std::istream& in, dict_t& dicts)
+{
+  std::string new_name;
+  size_t dicts_cnt;
+  in >> new_name >> dicts_cnt;
+
+  tree_t res;
+  for (size_t i = 0; i < dicts_cnt; i++)
+  {
+    std::string dict_name;
+    in >> dict_name;
+    res = unionTwo(res, dicts.at(dict_name));
+  }
+
+  dicts.insert(std::make_pair(new_name, res));
+}
+
+void demehin::makeIntersect(std::istream& in, dict_t& dicts)
+{
+  std::string new_name, first_name;
+  size_t dicts_cnt;
+  in >> new_name >> dicts_cnt >> first_name;
+
+  tree_t res = dicts.at(first_name);
+
+  for (size_t i = 1; i < dicts_cnt; i++)
+  {
+    std::string dict_name;
+    in >> dict_name;
+    res = intersectTwo(res, dicts.at(dict_name));
+  }
+
+  dicts.insert(std::make_pair(new_name, res));
+}
+
+void demehin::makeComplement(std::istream& in, dict_t& dicts)
+{
+  std::string new_name, first_name;
+  size_t dicts_cnt;
+  in >> new_name >> dicts_cnt >> first_name;
+
+  tree_t res = dicts.at(first_name);
+
+  for (size_t i = 1; i < dicts_cnt; i++)
+  {
+    std::string dict_name;
+    in >> dict_name;
+    res = complementTwo(res, dicts.at(dict_name));
+  }
+
+  dicts.insert(std::make_pair(new_name, res));
 }

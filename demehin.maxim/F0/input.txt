@@ -1,9 +1,13 @@
-dictname-1
-eng-1 ru-11 ru-12
-eng-2 ru-21
+dict1
+apple ap
+banana ba
+orange or
 
-dictname-2
-eng-3 ru-31
-eng-4 ru-41 ru-42 ru-43
-eng-5 ru-51 ru-31
-eng-6
+dict2
+apple ap app
+pear pe
+banana bab
+
+dict3
+banana ba
+grape gr

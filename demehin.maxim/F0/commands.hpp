@@ -20,6 +20,9 @@ namespace demehin
   void addEng(std::istream&, dict_t&);
   void deleteRu(std::istream&, dict_t&);
   void addRu(std::istream&, dict_t&);
+  void makeUnion(std::istream&, dict_t&);
+  void makeIntersect(std::istream&, dict_t&);
+  void makeComplement(std::istream&, dict_t&);
 }
 
 #endif
