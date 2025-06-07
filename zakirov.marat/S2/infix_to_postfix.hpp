@@ -13,7 +13,7 @@ namespace zakirov
   Queue< std::string > transform_to_postfix(Queue< std::string > & infix);
   long long transform_to_llint(const std::string & line);
   long long calculate_postfix(long long first, long long second, char oper);
-  long long calculate_postfix_expression(Queue< std::string > & infix);
+  long long calculate_postfix_expression(const Queue< std::string > & infix);
 }
 
 #endif

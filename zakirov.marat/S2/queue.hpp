@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <utility>
 
-#include <iostream>
-
 namespace zakirov
 {
   template < class T >
@@ -14,8 +12,8 @@ namespace zakirov
   {
   public:
     Queue();
-    Queue(const Queue & other);
-    Queue(Queue && other) noexcept;
+    Queue(const Queue< T >  & other);
+    Queue(Queue< T >  && other) noexcept;
     ~Queue();
     bool empty();
     size_t size();
@@ -26,6 +24,7 @@ namespace zakirov
     void push (const T & value);
     void push (T && value);
     void pop();
+    void swap(Queue & other);
   private:
     template < class U >
     void uni_push(U && value);
@@ -45,16 +44,24 @@ namespace zakirov
   {}
 
   template < typename T >
-  Queue< T >::Queue(const Queue & other):
-    data_(other.data_),
+  Queue< T >::Queue(const Queue< T > & other):
+    data_(new T[other.capacity_]),
     first_(other.first_),
     size_(other.size_),
     capacity_(other.capacity_)
-  {}
+  {
+    for (size_t i = first_; i < first_ + size_; ++i)
+    {
+      data_[i] = other.data_[i];
+    }
+  }
 
   template < typename T >
-  Queue< T >::Queue(Queue && other) noexcept:
-    Queue(other)
+  Queue< T >::Queue(Queue< T > && other) noexcept:
+    data_(std::exchange(other.data_, nullptr)),
+    first_(std::exchange(other.first_, 0)),
+    size_(std::exchange(other.size_, 0)),
+    capacity_(std::exchange(other.capacity_, 0))
   {}
 
   template < typename T >
@@ -140,6 +147,7 @@ namespace zakirov
   void Queue< T >::pop()
   {
     ++first_;
+    --size_;
   }
 
   template < typename T >
@@ -156,6 +164,15 @@ namespace zakirov
     data_ = new_data;
     first_ = 0;
     capacity_ = new_capacity;
+  }
+
+  template < typename T >
+  void Queue< T >::swap(Queue< T > & other)
+  {
+    std::swap(data_, other.data_);
+    std::swap(first_, other.first_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
   }
 }
 

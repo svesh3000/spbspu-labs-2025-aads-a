@@ -233,28 +233,29 @@ long long zakirov::calculate_postfix(long long first, long long second, char ope
   return second % first;
 }
 
-long long zakirov::calculate_postfix_expression(Queue< std::string > & postfix)
+long long zakirov::calculate_postfix_expression(const Queue< std::string > & postfix)
 {
   Stack< long long > result;
+  Queue< std::string > postfix_temp(postfix);
   long long first_v = 0;
   long long second_v = 0;
   long long result_v = 0;
-  while (!postfix.empty())
+  while (!postfix_temp.empty())
   {
-    if (check_operand(postfix.front()))
+    if (check_operand(postfix_temp.front()))
     {
-      result.push(transform_to_llint(postfix.front()));
-      postfix.pop();
+      result.push(transform_to_llint(postfix_temp.front()));
+      postfix_temp.pop();
     }
-    else if (check_operator(postfix.front()))
+    else if (check_operator(postfix_temp.front()))
     {
       first_v = result.top();
       result.pop();
       second_v = result.top();
       result.pop();
-      result_v = calculate_postfix(first_v, second_v, postfix.front().front());
+      result_v = calculate_postfix(first_v, second_v, postfix_temp.front().front());
       result.push(result_v);
-      postfix.pop();
+      postfix_temp.pop();
     }
   }
 
