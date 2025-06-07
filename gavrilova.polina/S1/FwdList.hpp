@@ -147,8 +147,8 @@ namespace gavrilova {
   template < class T >
   FwdList< T >& FwdList< T >::operator=(std::initializer_list< T > init)
   {
-    clear();
-    assign(init);
+    FwdList< T > temp(init);
+    swap(temp);
     return *this;
   }
 

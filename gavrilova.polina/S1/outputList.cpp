@@ -27,16 +27,33 @@ namespace {
     }
     return out;
   }
+
+  struct SelectFirst {
+    template < typename Pair >
+    constexpr auto operator()(const Pair& pair) const 
+    {
+      return pair.first;
+    }
+  };
+  
+  struct SelectSelf {
+    template < typename T >
+    constexpr const T& operator()(const T& value) const
+    {
+      return value;
+    }
+  };
+  
 }
 
 std::ostream& gavrilova::outNames(std::ostream& out, gavrilova::FLPairs list)
 {
-  return outputListElements(out, list, [](const auto& pair) { return pair.first; });
+  return outputListElements(out, list, SelectFirst());
 }
 
 std::ostream& gavrilova::outFwdListULL(std::ostream& out, const FwdList< ULL >& list)
 {
-  return outputListElements(out, list, [](const auto& value) { return value; });
+  return outputListElements(out, list, SelectSelf());
 }
 
 gavrilova::FwdList< unsigned long long > gavrilova::outNumbers(std::ostream& out, FLPairs list, size_t maxLen, size_t n)
