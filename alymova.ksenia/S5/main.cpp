@@ -61,9 +61,9 @@ int main(int args, char** argv)
     std::string round = argv[1];
     TreeSum result;
     TwoThreeTree< std::string, std::function< TreeSum(TreeSum) >, std::less< std::string > > commandset{
-      {"ascending", CallTraverse< DatasetType, TreeSum >{dataset, DatasetType::traverse_lnr}},
-      {"descending", CallTraverse< DatasetType, TreeSum >{dataset, DatasetType::traverse_rnl}},
-      {"breadth", CallTraverse< DatasetType, TreeSum >{dataset, DatasetType::traverse_breadth}}
+      {"ascending", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_lnr}},
+      {"descending", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_rnl}},
+      {"breadth", CallTraverse< DatasetType, TreeSum >{dataset, &DatasetType::traverse_breadth}}
     };
     result = commandset.at(round)(result);
     std::cout << result << '\n';
