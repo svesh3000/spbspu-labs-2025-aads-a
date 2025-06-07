@@ -6,7 +6,7 @@
 
 template< class Key, class T, class Compare >
 maslevtsov::Tree< Key, T, Compare >::Tree():
-  dummy_root_(new Node{value_type(), value_type(), nullptr, nullptr, nullptr, nullptr, true}),
+  dummy_root_(new Node{nullptr, nullptr, nullptr, nullptr, true, value_type()}),
   size_(0),
   compare_(Compare())
 {}
@@ -60,12 +60,6 @@ T& maslevtsov::Tree< Key, T, Compare >::operator[](const Key& key)
 }
 
 template< class Key, class T, class Compare >
-T& maslevtsov::Tree< Key, T, Compare >::operator[](Key&& key)
-{
-  return insert(std::make_pair(std::move(key), T())).first->second;
-}
-
-template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
 {
   iterator it = find(key);
@@ -88,38 +82,38 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
 {
-  return {iterator::get_min_node(dummy_root_), true};
+  return iterator(iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::begin() const
 {
-  return {const_iterator::get_min_node(dummy_root_), true};
+  return const_iterator(const_iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::cbegin() const noexcept
 {
-  return {const_iterator::get_min_node(dummy_root_), true};
+  return const_iterator(const_iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
 {
-  return {dummy_root_, true};
+  return iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
 {
-  return {dummy_root_, true};
+  return const_iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::cend() const noexcept
 {
-  return {dummy_root_, true};
+  return const_iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
@@ -164,7 +158,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
 {
   if (empty()) {
-    Node* new_node = new Node{value, value, dummy_root_, nullptr, nullptr, nullptr, true};
+    Node* new_node = new Node{dummy_root_, nullptr, nullptr, nullptr, true, value};
     dummy_root_->left = new_node;
     ++size_;
     return {iterator(new_node, true), true};
@@ -290,10 +284,10 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   if (compare_(values_to_split[2].first, values_to_split[1].first)) {
     std::swap(values_to_split[2], values_to_split[1]);
   }
-  Node* left_node = new Node{values_to_split[0], values_to_split[0], nullptr, nullptr, nullptr, nullptr, true};
+  Node* left_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[0]};
   Node* right_node = nullptr;
   try {
-    right_node = new Node{values_to_split[2], values_to_split[2], nullptr, nullptr, nullptr, nullptr, true};
+    right_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[2]};
   } catch (const std::bad_alloc&) {
     delete left_node;
     throw;
@@ -333,7 +327,7 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   Node* parent = node->parent;
   if (parent == dummy_root_) {
     node->data1 = values_to_split[1];
-    node->data2 = values_to_split[1];
+    node->data2 = value_type();
     node->left = left_node;
     left_node->parent = node;
     node->right = right_node;

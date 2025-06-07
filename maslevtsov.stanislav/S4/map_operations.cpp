@@ -17,14 +17,6 @@ void maslevtsov::input_setmap(std::istream& in, setmap_t& map)
   }
 }
 
-void maslevtsov::fill_with_commands(commands_t& map)
-{
-  map.insert(std::make_pair("print", print_set));
-  map.insert(std::make_pair("complement", complement_sets));
-  map.insert(std::make_pair("intersect", intersect_sets));
-  map.insert(std::make_pair("union", union_sets));
-}
-
 void maslevtsov::print_set(std::istream& in, const setmap_t& map)
 {
   std::string setname;

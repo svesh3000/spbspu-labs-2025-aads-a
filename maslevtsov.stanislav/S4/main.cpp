@@ -26,21 +26,21 @@ int main(int argc, char** argv)
   }
   commands_t commands;
   try {
-    fill_with_commands(commands);
+    commands["print"] = print_set;
+    commands["complement"] = complement_sets;
+    commands["intersect"] = intersect_sets;
+    commands["union"] = union_sets;
   } catch (const std::bad_alloc&) {
     std::cerr << "<COMMANDS REGISTRATION ERROR>\n";
     return 1;
   }
   std::string command;
-  while (std::cin) {
-    std::cin >> command;
-    if (std::cin.eof()) {
-      break;
-    }
+  while ((std::cin >> command) && !std::cin.eof()) {
     try {
       commands.at(command)(std::cin, data_map);
     } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }

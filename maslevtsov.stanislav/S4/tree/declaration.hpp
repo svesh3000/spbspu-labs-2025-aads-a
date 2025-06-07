@@ -13,8 +13,8 @@ namespace maslevtsov {
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = TreeIterator< value_type, false >;
-    using const_iterator = TreeIterator< value_type, true >;
+    using iterator = TreeIterator< value_type, detail::IteratorType::NONCONSTANT >;
+    using const_iterator = TreeIterator< value_type, detail::IteratorType::CONSTANT >;
 
     Tree();
     Tree(const Tree& rhs);
@@ -25,7 +25,6 @@ namespace maslevtsov {
     Tree& operator=(Tree&& rhs) noexcept;
 
     T& operator[](const Key& key);
-    T& operator[](Key&& key);
     T& at(const Key& key);
     const T& at(const Key& key) const;
 
