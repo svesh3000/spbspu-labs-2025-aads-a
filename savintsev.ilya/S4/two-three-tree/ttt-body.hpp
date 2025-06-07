@@ -1037,7 +1037,7 @@ namespace savintsev
     }
     catch (...)
     {
-      remove_data_from_node(right, node->data[2]);
+      remove_data_from_node(left, node->data[0]);
       throw;
     }
 
