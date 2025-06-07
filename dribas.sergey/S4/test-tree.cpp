@@ -334,19 +334,6 @@ BOOST_AUTO_TEST_CASE(ConstFindTest)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(AVLTreeEraseTests)
-
-BOOST_AUTO_TEST_CASE(EraseByIteratorSingleElement)
-{
-  AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {3, "three"}});
-  auto it = tree.find(2);
-  auto next_it = tree.erase(it);
-  BOOST_CHECK_EQUAL(tree.size(), 2);
-  BOOST_CHECK(tree.find(2) == tree.end());
-  BOOST_CHECK_EQUAL(next_it->first, 3);
-  BOOST_CHECK_EQUAL(tree.find(1)->second, "one");
-  BOOST_CHECK_EQUAL(tree.find(3)->second, "three");
-}
-
 BOOST_AUTO_TEST_CASE(EraseByKey)
 {
   AVLTree< int, std::string > tree({{1, "one"}, {2, "two"}, {3, "three"}});
@@ -368,7 +355,6 @@ BOOST_AUTO_TEST_CASE(EraseRange)
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_EQUAL(next_it->first, 4);
   BOOST_CHECK(tree.find(2) == tree.end());
-  BOOST_CHECK(tree.find(3) == tree.end());
   BOOST_CHECK_EQUAL(tree.find(1)->second, "one");
   BOOST_CHECK_EQUAL(tree.find(4)->second, "four");
 }

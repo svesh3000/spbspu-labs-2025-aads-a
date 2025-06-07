@@ -125,7 +125,7 @@ namespace dribas
     size_t size() const noexcept;
     iterator find(const Key&);
     const_iterator find(const Key&) const;
-    size_t count (const Key& k) const;
+    size_t count(const Key& k) const;
 
   private:
     NodeType* fakeleaf_;
@@ -140,6 +140,8 @@ namespace dribas
     NodeType* leftRotate(NodeType*) noexcept;
     NodeType* findNode(const Key&) const;
     void clearSubtree(NodeType*) noexcept;
+    NodeType* removeNode(NodeType*, const Key&);
+    NodeType* findMin(NodeType*);
   };
 
   template< class Key, class T, class Compare >
@@ -169,7 +171,7 @@ namespace dribas
             hintNode->left = newNode;
             newNode->parent = hintNode;
             ++size_;
-            //balanceTree(hintNode);
+            balanceTree(hintNode);
             return iterator(newNode, this);
           }
         } else if (cmp_(hintNode->value.first, newKey)) {
@@ -177,7 +179,7 @@ namespace dribas
             hintNode->right = newNode;
             newNode->parent = hintNode;
             ++size_;
-            //balanceTree(hintNode);
+            balanceTree(hintNode);
             return iterator(newNode, this);
           }
         } else {
@@ -206,7 +208,7 @@ namespace dribas
       parent->right = newNode;
     }
     ++size_;
-    //balanceTree(newNode);
+    balanceTree(newNode);
     return iterator(newNode, this);
   }
 
@@ -252,12 +254,12 @@ namespace dribas
     NodeType* result = fakeleaf_;
     while (current != fakeleaf_)
     {
-        if (!cmp_(current->value.first, k)) {
-          result = current;
-          current = current->left;
-        } else {
-          current = current->right;
-        }
+      if (!cmp_(current->value.first, k)) {
+        result = current;
+        current = current->left;
+      } else {
+        current = current->right;
+      }
     }
     return const_iterator(result, this);
   }
@@ -269,12 +271,12 @@ namespace dribas
     NodeType* result = fakeleaf_;
     while (current != fakeleaf_)
     {
-        if (cmp_(k, current->value.first)) {
-          result = current;
-          current = current->left;
-        } else {
-          current = current->right;
-        }
+      if (cmp_(k, current->value.first)) {
+        result = current;
+        current = current->left;
+      } else {
+        current = current->right;
+      }
     }
     return iterator(result, this);
   }
@@ -316,63 +318,66 @@ namespace dribas
   template< class Key, class T, class Compare >
   Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::erase(const_iterator position)
   {
-    if (position == cend()) {
+    if (position == cend() || position.node_ == fakeleaf_) {
       return end();
     }
     NodeType* nodeToDelete = const_cast< NodeType* >(position.node_);
-    if (nodeToDelete == fakeleaf_) {
-      return end();
-    }
     iterator result(nodeToDelete, this);
     ++result;
+    NodeType* nodeToBalance = nullptr;
+
     if (nodeToDelete->left == fakeleaf_ && nodeToDelete->right == fakeleaf_) {
-      if (nodeToDelete->parent) {
-        if (nodeToDelete->parent->left == nodeToDelete) {
-          nodeToDelete->parent->left = fakeleaf_;
+      nodeToBalance = nodeToDelete->parent;
+      if (nodeToBalance) {
+        if (nodeToBalance->left == nodeToDelete) {
+          nodeToBalance->left = fakeleaf_;
         } else {
-          nodeToDelete->parent->right = fakeleaf_;
+          nodeToBalance->right = fakeleaf_;
         }
-        //balanceTree(nodeToDelete->parent);
       } else {
         root_ = fakeleaf_;
       }
       delete nodeToDelete;
       --size_;
-      return result;
-    }
-    if (nodeToDelete->left == fakeleaf_ || nodeToDelete->right == fakeleaf_)
-    {
+    } else if (nodeToDelete->left == fakeleaf_ || nodeToDelete->right == fakeleaf_) {
       NodeType* child = (nodeToDelete->left != fakeleaf_) ? nodeToDelete->left : nodeToDelete->right;
-      if (nodeToDelete->parent) {
-        if (nodeToDelete->parent->left == nodeToDelete) {
-          nodeToDelete->parent->left = child;
+      nodeToBalance = nodeToDelete->parent;
+      if (nodeToBalance) {
+        if (nodeToBalance->left == nodeToDelete) {
+          nodeToBalance->left = child;
         } else {
-          nodeToDelete->parent->right = child;
+          nodeToBalance->right = child;
         }
-        child->parent = nodeToDelete->parent;
-        //balanceTree(nodeToDelete->parent);
       } else {
         root_ = child;
-        child->parent = nullptr;
       }
+      child->parent = nodeToBalance;
       delete nodeToDelete;
       --size_;
-      return result;
-    }
-    NodeType* successor = nodeToDelete->right;
-    while (successor->left != fakeleaf_) {
-      successor = successor->left;
-    }
-    std::swap(nodeToDelete->value, successor->value);
-    if (successor->parent->left == successor) {
-      successor->parent->left = successor->right;
     } else {
-      successor->parent->right = successor->right;
+      NodeType* successor = nodeToDelete->right;
+      while (successor->left != fakeleaf_) {
+        successor = successor->left;
+      }
+      std::swap(nodeToDelete->value, successor->value);
+
+      nodeToBalance = successor->parent;
+      if (nodeToBalance->left == successor) {
+        nodeToBalance->left = successor->right;
+      } else {
+        nodeToBalance->right = successor->right;
+      }
+      if (successor->right != fakeleaf_) {
+        successor->right->parent = nodeToBalance;
+      }
+      delete successor;
+      --size_;
     }
-    successor->right->parent = successor->parent;
-    //balanceTree(successor->parent);
-    delete successor;
-    --size_;
+
+    if (nodeToBalance) {
+      balanceTree(nodeToBalance);
+    }
+
     return result;
   }
 
@@ -389,12 +394,10 @@ namespace dribas
 
   template< class Key, class T, class Compare >
   Iterator< Key, T, Compare > AVLTree< Key, T, Compare >::erase(const_iterator first, const_iterator last) {
-    iterator result(end());
     while (first != last) {
-      const_iterator current = first++;
-      result = erase(current);
+      first = erase(first);
     }
-    return result;
+    return iterator(const_cast<NodeType*>(first.node_), this);
   }
 
   template< class Key, class T, class Compare >
@@ -445,7 +448,7 @@ namespace dribas
     root_(std::exchange(other.root_, nullptr)),
     cmp_(std::move(other.cmp_)),
     size_(std::exchange(other.size_, 0))
- {}
+  {}
 
   template< class Key, class T, class Compare >
   AVLTree< Key, T, Compare >& AVLTree< Key, T, Compare >::operator=(const TreeType& other)
@@ -580,7 +583,7 @@ namespace dribas
         parent->right = newNode;
     }
     size_++;
-    //balanceTree(newNode);
+    balanceTree(newNode);
     return {iterator(newNode, this), true};
 }
 
@@ -705,7 +708,7 @@ namespace dribas
     } else {
       parent->right = newNode;
     }
-    //balanceTree(newNode);
+    balanceTree(newNode);
     size_++;
     return { iterator(newNode, this), true };
   }
@@ -713,18 +716,15 @@ namespace dribas
   template< class Key, class T, class Cmp >
   void AVLTree< Key, T, Cmp >::updateHeight(NodeType* node) noexcept
   {
-    auto current = node;
-    if (node != nullptr) {
-      node->height = std::max(node->right->height, node->left->height) + 1;
-      node = node->parent;
+    if (node != fakeleaf_) {
+      node->height = std::max(node->left->height, node->right->height) + 1;
     }
-    node = current;
   }
 
   template< class Key, class T, class Cmp >
   int AVLTree< Key, T, Cmp >::getBalanceFactor(NodeType* node) const noexcept
   {
-    if (node == fakeleaf_) {
+    if (node == fakeleaf_ || node == nullptr) {
       return 0;
     }
     return node->left->height - node->right->height;
@@ -734,22 +734,22 @@ namespace dribas
   Node< Key, T >* AVLTree< Key, T, Cmp >::rightRotate(NodeType* node) noexcept
   {
     NodeType* leftNode = node->left;
-    if (!leftNode->isFake) {
+    node->left = leftNode->right;
+    if (leftNode->right != fakeleaf_) {
       leftNode->right->parent = node;
     }
 
     leftNode->parent = node->parent;
-    node->parent = leftNode;
-    leftNode->right = node;
-    if (leftNode->parent != nullptr) {
-      if (leftNode->parent->left == node) {
-        leftNode->parent->left = leftNode;
-      } else {
-        leftNode->parent->right = leftNode;
-      }
-    } else {
+    if (node->parent == nullptr) {
       root_ = leftNode;
+    } else if (node->parent->left == node) {
+      node->parent->left = leftNode;
+    } else {
+      node->parent->right = leftNode;
     }
+    leftNode->right = node;
+    node->parent = leftNode;
+
     updateHeight(node);
     updateHeight(leftNode);
 
@@ -760,22 +760,22 @@ namespace dribas
   Node< Key, T >* AVLTree< Key, T, Cmp >::leftRotate(NodeType* node) noexcept
   {
     NodeType* rightNode = node->right;
-    if (!rightNode->isFake) {
+    node->right = rightNode->left;
+    if (rightNode->left != fakeleaf_) {
       rightNode->left->parent = node;
     }
 
     rightNode->parent = node->parent;
-    node->parent = rightNode;
-    rightNode->left = node;
-    if (rightNode->parent != nullptr) {
-      if (rightNode->parent->right == node) {
-        rightNode->parent->right = rightNode;
-      } else {
-        rightNode->parent->left = rightNode;
-      }
-    } else {
+    if (node->parent == nullptr) {
       root_ = rightNode;
+    } else if (node->parent->right == node) {
+      node->parent->right = rightNode;
+    } else {
+      node->parent->left = rightNode;
     }
+    rightNode->left = node;
+    node->parent = rightNode;
+
     updateHeight(node);
     updateHeight(rightNode);
 
@@ -785,15 +785,19 @@ namespace dribas
   template< class Key, class T, class Cmp >
   Node< Key, T >* AVLTree< Key, T, Cmp >::balance(NodeType* node) noexcept
   {
+    if (node == fakeleaf_) {
+      return fakeleaf_;
+    }
     updateHeight(node);
-    int balance = getBalanceFactor(node);
-    if (balance > 1) {
-      if (getBalanceFactor(node->left)< 0) {
+    int balanceFactor = getBalanceFactor(node);
+
+    if (balanceFactor > 1) {
+      if (getBalanceFactor(node->left) < 0) {
         node->left = leftRotate(node->left);
       }
       return rightRotate(node);
     }
-    if (balance< -1) {
+    if (balanceFactor < -1) {
       if (getBalanceFactor(node->right) > 0) {
         node->right = rightRotate(node->right);
       }
@@ -805,24 +809,15 @@ namespace dribas
   template< class Key, class T, class Cmp >
   void AVLTree< Key, T, Cmp >::balanceTree(NodeType* node)
   {
-    while (node) {
-      NodeType* parent = node->parent;
-      bool isLeft = false;
-      if (parent != nullptr) {
-        isLeft = (parent->left == node);
-      }
+    while (node != nullptr && node != fakeleaf_) {
       node = balance(node);
-      if (parent != nullptr) {
-        if (isLeft) {
-          parent->left = node;
-        } else {
-          parent->right = node;
-        }
-      } else {
+      if (node->parent == nullptr) {
         root_ = node;
+        break;
       }
-      node = parent;
+      node = node->parent;
     }
   }
+
 }
 #endif
