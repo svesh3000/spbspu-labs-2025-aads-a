@@ -521,7 +521,7 @@ namespace savintsev
         }
       }
     }
-    catch(...)
+    catch (...)
     {
       root = clear_nodes(root);
       throw;
@@ -1029,8 +1029,17 @@ namespace savintsev
         right->kids[i]->father = right;
       }
     }
+
     insert_data_in_node(left, node->data[0]);
-    insert_data_in_node(right, node->data[2]);
+    try
+    {
+      insert_data_in_node(right, node->data[2]);
+    }
+    catch (...)
+    {
+      remove_data_from_node(right, node->data[2]);
+      throw;
+    }
 
     if (node->father)
     {
