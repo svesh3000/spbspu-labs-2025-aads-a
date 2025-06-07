@@ -18,6 +18,7 @@ namespace savintsev
     Array & operator=(Array && rhs) noexcept;
 
     T & operator[](size_t n);
+    const T & operator[](size_t n) const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -32,8 +33,7 @@ namespace savintsev
     void pop_front();
     void pop_back() noexcept;
 
-    template< typename U >
-    friend void swap(Array< U > & x, Array< U > & y) noexcept;
+    void swap(Array & x) noexcept;
   private:
     T * data_ = nullptr;
     size_t size_ = 0;
@@ -42,12 +42,12 @@ namespace savintsev
   };
 
   template< typename T >
-  void swap(Array< T > & x, Array< T > & y) noexcept
+  void Array< T >::swap(Array & x) noexcept
   {
-    std::swap(x.data_, y.data_);
-    std::swap(x.size_, y.size_);
-    std::swap(x.start_, y.start_);
-    std::swap(x.capacity_, y.capacity_);
+    std::swap(data_, x.data_);
+    std::swap(size_, x.size_);
+    std::swap(start_, x.start_);
+    std::swap(capacity_, x.capacity_);
   }
 
   template< typename T >
@@ -93,7 +93,7 @@ namespace savintsev
     if (this != std::addressof(rhs))
     {
       Array temp(rhs);
-      swap(*this, temp);
+      swap(temp);
     }
     return *this;
   }
@@ -104,7 +104,7 @@ namespace savintsev
     if (this != std::addressof(rhs))
     {
       Array temp(std::move(rhs));
-      swap(*this, temp);
+      swap(temp);
     }
     return *this;
   }
@@ -117,6 +117,12 @@ namespace savintsev
 
   template< typename T >
   T & Array< T >::operator[](size_t n)
+  {
+    return data_[n + start_];
+  }
+
+  template< typename T >
+  const T & Array< T >::operator[](size_t n) const
   {
     return data_[n + start_];
   }
