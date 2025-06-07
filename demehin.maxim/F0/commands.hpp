@@ -18,6 +18,8 @@ namespace demehin
   void getTranslationRu(std::istream&, std::ostream&, const dict_t&);
   void deleteEng(std::istream&, dict_t&);
   void addEng(std::istream&, dict_t&);
+  void deleteRu(std::istream&, dict_t&);
+  void addRu(std::istream&, dict_t&);
 }
 
 #endif

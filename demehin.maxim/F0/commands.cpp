@@ -27,6 +27,8 @@ void demehin::printHelp(std::ostream& out)
   out << "5. gettranslationru < dictname > < ru > - print translations of word ru\n";
   out << "6. deleteeng < dictname > < eng > - delete word eng from dictionary\n";
   out << "7. addeng < dictname > < eng > < N > < ru-1 > ... < ru-n > - add word eng with its N translations\n";
+  out << "8. addru < dictname > < eng > < N > < ru-1 > ... < ru-n > - add N translations to eng\n";
+  out << "9. deleteru < dictname > < eng > < N > < ru-1 > ... < ru-n > - delete N translations of eng\n";
 }
 
 void demehin::createDict(std::istream& in, dict_t& dicts)
@@ -151,4 +153,40 @@ void demehin::addEng(std::istream& in, dict_t& dicts)
     translations.push_back(ru_word);
   }
   dict.insert(std::make_pair(eng_word, translations));
+}
+
+void demehin::deleteRu(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  size_t translations_cnt;
+
+  in >> dict_name >> eng_word >> translations_cnt;
+
+  auto& dict = dicts.at(dict_name);
+  auto& translations = dict.at(eng_word);
+
+  for (size_t i = 0; i < translations_cnt; i++)
+  {
+    std::string ru_word;
+    in >> ru_word;
+    translations.remove(ru_word);
+  }
+}
+
+void demehin::addRu(std::istream& in, dict_t& dicts)
+{
+  std::string dict_name, eng_word;
+  size_t translations_cnt;
+
+  in >> dict_name >> eng_word >> translations_cnt;
+
+  auto& dict = dicts.at(dict_name);
+  auto& translations = dict.at(eng_word);
+
+  for (size_t i = 0; i < translations_cnt; i++)
+  {
+    std::string ru_word;
+    in >> ru_word;
+    translations.push_back(ru_word);
+  }
 }
