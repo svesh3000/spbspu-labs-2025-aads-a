@@ -1,7 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include <cstddef>
-#include <list>
 #include <stdexcept>
 #include <utility>
 
@@ -12,8 +11,8 @@ namespace zakirov
   {
   public:
     Queue();
-    Queue(const Queue< T >  & other);
-    Queue(Queue< T >  && other) noexcept;
+    Queue(const Queue< T > & other);
+    Queue(Queue< T > && other) noexcept;
     ~Queue();
     bool empty();
     size_t size();
@@ -35,7 +34,7 @@ namespace zakirov
     size_t capacity_;
   };
 
-  template < typename T >
+  template < class T >
   Queue< T >::Queue():
     data_(nullptr),
     first_(0),
@@ -43,7 +42,7 @@ namespace zakirov
     capacity_(0)
   {}
 
-  template < typename T >
+  template < class T >
   Queue< T >::Queue(const Queue< T > & other):
     data_(new T[other.capacity_]),
     first_(other.first_),
@@ -56,7 +55,7 @@ namespace zakirov
     }
   }
 
-  template < typename T >
+  template < class T >
   Queue< T >::Queue(Queue< T > && other) noexcept:
     data_(std::exchange(other.data_, nullptr)),
     first_(std::exchange(other.first_, 0)),
@@ -64,43 +63,43 @@ namespace zakirov
     capacity_(std::exchange(other.capacity_, 0))
   {}
 
-  template < typename T >
+  template < class T >
   Queue< T >::~Queue()
   {
     delete[] data_;
   }
 
-  template < typename T >
+  template < class T >
   bool Queue< T >::empty()
   {
     return size_ == 0;
   }
 
-  template < typename T >
+  template < class T >
   size_t Queue< T >::size()
   {
     return size_;
   }
 
-  template < typename T >
+  template < class T >
   T & Queue< T >::front()
   {
     return data_[first_];
   }
 
-  template < typename T >
+  template < class T >
   const T & Queue< T >::front() const
   {
     return data_[first_];
   }
 
-  template < typename T >
+  template < class T >
   T & Queue< T >::back()
   {
     return data_[size_ - 1];
   }
 
-  template < typename T >
+  template < class T >
   const T & Queue< T >::back() const
   {
     return data_[size_ - 1];
@@ -131,26 +130,35 @@ namespace zakirov
     ++size_;
   }
 
-  template < typename T >
+  template < class T >
   void Queue< T >::push(const T & value)
   {
     uni_push(value);
   }
 
-  template < typename T >
+  template < class T >
   void Queue< T >::push(T && value)
   {
     uni_push(std::move(value));
   }
 
-  template < typename T >
+  template < class T >
   void Queue< T >::pop()
   {
     ++first_;
     --size_;
   }
 
-  template < typename T >
+  template < class T >
+  void Queue< T >::swap(Queue< T > & other)
+  {
+    std::swap(data_, other.data_);
+    std::swap(first_, other.first_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+  }
+
+  template < class T >
   void Queue< T >::add_capacity()
   {
     size_t new_capacity = capacity_ * 2 + 1;
@@ -164,15 +172,6 @@ namespace zakirov
     data_ = new_data;
     first_ = 0;
     capacity_ = new_capacity;
-  }
-
-  template < typename T >
-  void Queue< T >::swap(Queue< T > & other)
-  {
-    std::swap(data_, other.data_);
-    std::swap(first_, other.first_);
-    std::swap(size_, other.size_);
-    std::swap(capacity_, other.capacity_);
   }
 }
 

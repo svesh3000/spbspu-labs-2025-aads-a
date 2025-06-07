@@ -1,20 +1,19 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 #include <cstddef>
-#include <list>
 #include <stdexcept>
-#include "../S1/fwd_list.hpp"
+#include <utility>
 
 namespace zakirov
 {
-  template < typename T >
+  template < class T >
   class Stack
   {
   public:
     Stack();
     Stack(const Stack & other);
     Stack(Stack && other) noexcept;
-    ~Stack() = default;
+    ~Stack();
     bool empty();
     size_t size();
     T & top();
@@ -22,65 +21,130 @@ namespace zakirov
     void push (const T & value);
     void push (T && value);
     void pop();
+    void swap(Stack< T > & other);
   private:
-    FwdList< T > data_;
+    template < class U >
+    void uni_push(U && value);
+    void add_capacity();
+    T * data_;
+    size_t top_;
+    size_t size_;
+    size_t capacity_;
   };
 
-  template < typename T >
+  template < class T >
   Stack< T >::Stack():
-    data_()
+    data_(nullptr),
+    top_(0),
+    size_(0),
+    capacity_(0)
   {}
 
-  template < typename T >
+  template < class T >
   Stack< T >::Stack(const Stack & other):
-    data_(other.data_)
-  {}
+    data_(new T[other.capacity_]),
+    top_(other.top_),
+    size_(other.size_),
+    capacity_(other.capacity_)
+  {
+    for (size_t i = 0; i < top_; ++i)
+    {
+      data_[i] = other.data[i];
+    }
+  }
 
-  template < typename T >
+  template < class T >
   Stack< T >::Stack(Stack && other) noexcept:
-    data_(std::move(other.data_))
+    data_(std::exchange(other.data_, nullptr)),
+    top_(std::exchange(other.top_, 0)),
+    size_(std::exchange(other.size_, 0)),
+    capacity_(std::exchange(other.capacity_, 0))
   {}
 
-  template < typename T >
+  template < class T >
+  Stack< T >::~Stack()
+  {
+    delete[] data_;
+  }
+
+  template < class T >
   bool Stack< T >::empty()
   {
-    return data_.empty();
+    return size_ == 0;
   }
 
-  template < typename T >
+  template < class T >
   size_t Stack< T >::size()
   {
-    return data_.size();
+    return size_;
   }
 
-  template < typename T >
+  template < class T >
   T & Stack< T >::top()
   {
-    return *(data_.begin());
+    return data_[top_ - 1];
   }
 
-  template < typename T >
+  template < class T >
   const T & Stack< T >::top() const
   {
-    return *(data_.cbegin());
+    return data_[top_ - 1];
   }
 
-  template < typename T >
+  template < class T >
+  template < class U >
+  void Stack< T >::uni_push(U && value)
+  {
+    if (top_ >= capacity_)
+    {
+      add_capacity();
+    }
+
+    data_[top_] = std::forward< U >(value);
+    ++top_;
+  }
+
+  template < class T >
   void Stack< T >::push(const T & value)
   {
-    data_.push_front(value);
+    uni_push(value);
   }
 
-  template < typename T >
+  template < class T >
   void Stack< T >::push(T && value)
   {
-    data_.push_front(std::move(value));
+    uni_push(std::move(value));
   }
 
-  template < typename T >
+  template < class T >
   void Stack< T >::pop()
   {
-    data_.pop_front();
+    --top_;
+    --size_;
+  }
+
+  template < class T >
+  void Stack< T >::swap(Stack< T > & other)
+  {
+    std::swap(data_, other.data_);
+    std::swap(top_, other.top_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+  }
+
+  template < class T >
+  void Stack< T >::add_capacity()
+  {
+    size_t new_capacity = capacity_ * 2 + 1;
+    T * new_data = new T[new_capacity];
+    for (size_t i = 0; i < top_; ++i)
+    {
+      new_data[i] = std::move(data_[i]);
+    }
+
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
   }
 }
 
