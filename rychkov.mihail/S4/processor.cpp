@@ -2,27 +2,25 @@
 
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 
-bool rychkov::S4ParseProcessor::init(ParserContext& context, int argc, char** argv)
+rychkov::S4ParseProcessor::S4ParseProcessor(int argc, char** argv)
 {
   if (argc != 2)
   {
-    context.err << "wrong arguments count\n";
-    return false;
+    throw std::invalid_argument("wrong arguments count");
   }
   std::ifstream file(argv[1]);
   if (!file)
   {
-    context.err << "failed to open file \"" << argv[1] << "\"\n";
-    return false;
+    throw std::invalid_argument("failed to open file");
   }
   std::string name;
   while (file >> name)
   {
     if (map.contains(name))
     {
-      context.err << "map name repeated\n";
-      return false;
+      throw std::runtime_error("map name repeated");
     }
     inner_map& link = map[name];
     int key = 0;
@@ -31,14 +29,12 @@ bool rychkov::S4ParseProcessor::init(ParserContext& context, int argc, char** ar
       std::string str;
       if (!(file >> str))
       {
-        context.err << "failed to read string for key\n";
-        return false;
+        throw std::runtime_error("failed to read string for key");
       }
       link.try_emplace(key, std::move(str));
     }
     file.clear(file.rdstate() & ~std::ios::failbit);
   }
-  return true;
 }
 bool rychkov::S4ParseProcessor::print(ParserContext& context)
 {

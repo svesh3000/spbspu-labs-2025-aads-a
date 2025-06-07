@@ -55,7 +55,7 @@ namespace rychkov
             return available();
           }
         }
-        catch(...)
+        catch (...)
         {}
         context.out << "<INVALID COMMAND>\n";
         context.in.clear(context.in.rdstate() & ~std::ios::failbit);
