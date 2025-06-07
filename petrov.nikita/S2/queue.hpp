@@ -13,15 +13,8 @@ namespace petrov
   {
   public:
     using this_t = Queue< T >;
-    Queue()
-    {}
-    template< typename U >
-    Queue(this_t && rhs);
-    ~Queue() = default;
-    template< typename U >
-    this_t & operator=(this_t && rhs);
-    template< typename U >
-    void push(U && element);
+    template< typename T1 >
+    void push(T1 && element);
     void pop();
     T & front();
     const T & front() const;
@@ -34,25 +27,10 @@ namespace petrov
   };
 
   template< typename T >
-  template< typename U >
-  Queue< T >::Queue(this_t && rhs)
+  template< typename T1 >
+  void Queue< T >::push(T1 && element)
   {
-    dynamic_array(rhs.dynamic_array);
-  }
-
-  template< typename T >
-  template< typename U >
-  typename Queue< T >::this_t & Queue< T >::operator=(this_t && rhs)
-  {
-    dynamic_array = rhs.dynamic_array;
-    return *this;
-  }
-
-  template< typename T >
-  template< typename U >
-  void Queue< T >::push(U && element)
-  {
-    dynamic_array.push_back(element);
+    dynamic_array.push_back(std::forward< T1 >(element));
   }
 
   template< typename T >

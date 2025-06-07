@@ -1,10 +1,10 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include "dynamic_array.hpp"
 #include <cstddef>
 #include <memory>
 #include <stdexcept>
+#include "dynamic_array.hpp"
 
 namespace petrov
 {
@@ -13,15 +13,8 @@ namespace petrov
   {
   public:
     using this_t = Stack< T >;
-    Stack()
-    {}
-    template< typename U >
-    Stack(this_t && rhs);
-    ~Stack() = default;
-    template< typename U >
-    this_t & operator=(this_t && rhs);
-    template< typename U >
-    void push(U && element);
+    template< typename T1 >
+    void push(T1 && element);
     void pop();
     T & top();
     const T & top() const;
@@ -32,25 +25,10 @@ namespace petrov
   };
 
   template< typename T >
-  template< typename U >
-  Stack< T >::Stack(this_t && rhs)
+  template< typename T1 >
+  void Stack< T >::push(T1 && element)
   {
-    dynamic_array_(rhs.dynamic_array_);
-  }
-
-  template< typename T >
-  template< typename U >
-  typename Stack< T >::this_t & Stack< T >::operator=(this_t && rhs)
-  {
-    dynamic_array_ = rhs.dynamic_array_;
-    return *this;
-  }
-
-  template< typename T >
-  template< typename U >
-  void Stack< T >::push(U && element)
-  {
-    dynamic_array_.push_back(element);
+    dynamic_array_.push_back(std::forward< T1 >(element));
   }
 
   template< typename T >

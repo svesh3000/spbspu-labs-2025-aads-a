@@ -3,7 +3,7 @@
 
 #include <cstddef>
 #include <memory>
-#include <stdexcept>
+#include <utility>
 
 namespace petrov
 {
@@ -12,20 +12,15 @@ namespace petrov
   {
   public:
     using this_t = DynamicArray< T >;
-    DynamicArray():
-      massive_(nullptr),
-      capacity_(0),
-      size_(0),
-      front_index_(0)
-    {}
+    DynamicArray();
     DynamicArray(const this_t & rhs);
     DynamicArray(this_t && rhs);
     ~DynamicArray();
     this_t & operator=(const this_t & rhs);
     this_t & operator=(this_t && rhs);
     T & operator[](const size_t & pos);
-    template< typename U >
-    void push_back(U && val);
+    template< typename T1 >
+    void push_back(T1 && val);
     void pop_back();
     void pop_front();
     T & front();
@@ -43,6 +38,14 @@ namespace petrov
   };
 
   template< typename T >
+  DynamicArray< T >::DynamicArray():
+    massive_(nullptr),
+    capacity_(0),
+    size_(0),
+    front_index_(0)
+  {}
+
+  template< typename T >
   DynamicArray< T >::DynamicArray(const this_t & rhs):
     massive_(nullptr),
     capacity_(rhs.capacity_),
@@ -50,9 +53,17 @@ namespace petrov
     front_index_(rhs.front_index_)
   {
     massive_ = new T[rhs.capacity_];
-    for (size_t i = 0; i < rhs.size_; i++)
+    try
     {
-      massive_[i] = rhs.massive_[i];
+      for (size_t i = 0; i < rhs.size_; i++)
+      {
+        massive_[i] = rhs.massive_[i];
+      }
+    }
+    catch(...)
+    {
+      delete massive_;
+      throw std::exception();
     }
   }
 
@@ -86,6 +97,7 @@ namespace petrov
     capacity_ = rhs.capacity_;
     size_ = rhs.size_;
     front_index_ = rhs.front_index_;
+    rhs.massive_ = nullptr;
     return *this;
   }
 
@@ -96,33 +108,45 @@ namespace petrov
   }
 
   template< typename T >
-  template< typename U >
-  void DynamicArray< T >::push_back(U && val)
+  template< typename T1 >
+  void DynamicArray< T >::push_back(T1 && val)
   {
-    if (empty())
+    T * temp = nullptr;
+    try
     {
-      delete[] massive_;
-      capacity_ = 5;
-      massive_ = new T[capacity_];
-      massive_[size_++] = val;
-    }
-    else if (size_ == capacity_)
-    {
-      T * temp = new T[capacity_ *= 2];
-      size_t i = 0;
-      while (i < size_)
+      if (empty())
       {
-        temp[i] = massive_[i];
-        ++i;
+        temp = new T[5];
+        temp[size_] = std::forward< T1 >(val);
+        delete[] massive_;
+        massive_ = temp;
+        capacity_ = 5;
+        size_++;
       }
-      delete[] massive_;
-      massive_ = temp;
-      massive_[i] = val;
-      size_++;
+      else if (size_ == capacity_)
+      {
+        temp = new T[capacity_ * 2];
+        size_t i = 0;
+        while (i < size_)
+        {
+          temp[i] = massive_[i];
+          ++i;
+        }
+        temp[i] = std::forward< T1 >(val);
+        delete[] massive_;
+        massive_ = temp;
+        capacity_ *= 2;
+        size_++;
+      }
+      else
+      {
+        massive_[size_++] = std::forward< T1 >(val);
+      }
     }
-    else
+    catch(...)
     {
-      massive_[size_++] = val;
+      delete[] temp;
+      throw std::exception();
     }
   }
 

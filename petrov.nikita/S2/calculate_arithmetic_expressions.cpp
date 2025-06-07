@@ -5,11 +5,36 @@
 
 namespace
 {
-  long long int isdigit(std::string & string);
-
-  long long int isdigit(std::string & string)
+  bool isAnyOperation(std::string & token)
   {
-    return string.find_first_not_of("0123456789") == string.npos;
+    if (token == "**")
+    {
+      return true;
+    }
+    else if (token == "/")
+    {
+      return true;
+    }
+    else if (token == "*")
+    {
+      return true;
+    }
+    else if (token == "%")
+    {
+      return true;
+    }
+    else if (token == "+")
+    {
+      return true;
+    }
+    else if (token == "-")
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }
 
@@ -33,11 +58,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
   while (queue.front() != "|")
   {
     std::string token = queue.front();
-    if (isdigit(token))
-    {
-      new_queue.push(token);
-    }
-    else if (token == "(")
+    if (token == "(")
     {
       stack.push(token);
     }
@@ -98,8 +119,7 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
     }
     else if (token == "+" || token == "-")
     {
-      if (stack.empty() || stack.top() == "**" || stack.top() == "/"
-              || stack.top() == "*" || stack.top() == "%" || stack.top() == "+" || stack.top() == "-")
+      if (stack.empty() || isAnyOperation(stack.top()))
       {
         if (stack.empty())
         {
@@ -119,6 +139,10 @@ std::queue< std::string > petrov::transformInfixToPostfix(std::queue< std::strin
       {
         stack.push(token);
       }
+    }
+    else
+    {
+      new_queue.push(token);
     }
     queue.pop();
   }
@@ -144,11 +168,7 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
     while (!queue.empty())
     {
       std::string token = queue.front();
-      if (isdigit(token))
-      {
-        stack.push(std::stoll(token));
-      }
-      else if (token == "**")
+      if (token == "**")
       {
         long long int first_operand = stack.top();
         stack.pop();
@@ -254,6 +274,10 @@ long long int petrov::calculatePostfixExpression(std::queue< std::string > & que
           throw std::out_of_range("ERROR: Out of range");
         }
         stack.push(result);
+      }
+      else
+      {
+        stack.push(std::stoll(token));
       }
       queue.pop();
     }
