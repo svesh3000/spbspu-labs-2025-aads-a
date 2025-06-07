@@ -10,7 +10,7 @@ namespace gavrilova {
   template < class T >
   class Queue {
   public:
-    Queue() = default;
+    Queue();
 
     void push(const T& value);
     void push(T&& value);
@@ -19,15 +19,21 @@ namespace gavrilova {
     T& front();
     const T& front() const;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
     void swap(Queue& other) noexcept;
     void clear();
 
   private:
     ArrayBuffer< T > buffer_;
-    size_t head_ = 0;
+    size_t head_;
   };
+
+  template < class T >
+  Queue< T >::Queue():
+    buffer_(),
+    head_(0)
+  {}
 
   template < class T >
   void Queue< T >::push(const T& value)
@@ -65,13 +71,13 @@ namespace gavrilova {
   }
 
   template < class T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return head_ >= buffer_.size();
   }
 
   template < class T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return buffer_.size() - head_;
   }

@@ -11,6 +11,25 @@
 //   BOOST_TEST(list.size() == 0);
 // }
 
+BOOST_AUTO_TEST_CASE(test_initializer_list_constructor)
+{
+  gavrilova::FwdList< int > list{1, 2, 3};
+  BOOST_TEST(list.size() == 3);
+  BOOST_TEST(list.front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_constructor) {
+  gavrilova::FwdList<int> original{1, 2, 3};
+  gavrilova::FwdList<int> copy(original);
+  BOOST_TEST(original == copy);
+}
+
+BOOST_AUTO_TEST_CASE(test_move_constructor) {
+  gavrilova::FwdList<int> temp{1, 2, 3};
+  gavrilova::FwdList<int> moved(std::move(temp));
+  BOOST_TEST(moved.size() == 3);
+  BOOST_TEST(temp.empty());
+}
 // BOOST_AUTO_TEST_CASE(test_initializer_list_constructor)
 // {
 //   gavrilova::FwdList< int > list{1, 2, 3};
@@ -52,6 +71,22 @@
 //   BOOST_TEST((it != list.end()));
 // }
 
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  gavrilova::FwdList< int > list{1, 2, 3, 2};
+  list.remove(2);
+  BOOST_TEST(list.size() == 2);
+  BOOST_TEST(*list.begin() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_remove_if) {
+  gavrilova::FwdList<int> list{1, 2, 3, 4, 5};
+  list.remove_if([](int x)
+  {
+    return x % 2 == 0;
+  });
+  BOOST_TEST(list.size() == 3);
+}
 // BOOST_AUTO_TEST_CASE(test_remove)
 // {
 //   gavrilova::FwdList< int > list{1, 2, 3, 2};
@@ -72,6 +107,36 @@
 //   BOOST_TEST(*it == 1);
 // }
 
+BOOST_AUTO_TEST_CASE(test_copy_assignment_operator)
+{
+  gavrilova::FwdList<int> list1{1, 2, 3};
+  gavrilova::FwdList<int> list2;
+  list2 = list1;
+
+  BOOST_TEST(list1 == list2);
+
+  list2.pop_front();
+  BOOST_TEST(list2.front() == 2);
+  BOOST_TEST(list1.front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_self_assignment)
+{
+  gavrilova::FwdList<int> list{1, 2, 3};
+  BOOST_TEST(list.size() == 3);
+  BOOST_TEST(list.front() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_move_assignment)
+{
+  gavrilova::FwdList<int> src{4, 5, 6};
+  gavrilova::FwdList<int> dst;
+  dst = std::move(src);
+
+  BOOST_TEST(dst.size() == 3);
+  BOOST_TEST(dst.front() == 4);
+  BOOST_TEST(src.empty());
+}
 // BOOST_AUTO_TEST_CASE(test_assignment_operator)
 // {
 //   gavrilova::FwdList< int > list1{1, 2, 3};
@@ -208,3 +273,4 @@ BOOST_AUTO_TEST_CASE(TestIteratorDereference)
   BOOST_TEST(it->first == 42);
   BOOST_TEST(it->second == "answer");
 }
+
