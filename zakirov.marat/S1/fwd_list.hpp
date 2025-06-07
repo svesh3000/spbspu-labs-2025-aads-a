@@ -116,14 +116,11 @@ namespace zakirov
   template< typename T >
   FwdList< T > & FwdList< T >::operator=(const FwdList< T > & fwdlst)
   {
-    clear();
-    FwdIterator< T > inserter = begin();
-    CFwdIterator< T > left = fwdlst.cbegin();
-    CFwdIterator< T > right = fwdlst.cend();
-    for (; left != right; ++left, ++inserter)
+    if (this != std::addressof(fwdlst))
     {
-      insert_after(inserter, *left);
+      assign(fwdlst.cbegin(), fwdlst.cend());
     }
+
     return *this;
   }
 
@@ -132,6 +129,7 @@ namespace zakirov
   {
     if (this != std::addressof(fwdlst))
     {
+      clear();
       swap(fwdlst);
     }
 
@@ -241,12 +239,7 @@ namespace zakirov
   template< typename T >
   bool FwdList< T >::empty() const noexcept
   {
-    if (fake_node_->next_ == fake_node_)
-    {
-      return true;
-    }
-
-    return false;
+    return fake_node_->next_ == fake_node_;
   }
 
   template< typename T >

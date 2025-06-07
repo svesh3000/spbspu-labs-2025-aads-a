@@ -90,6 +90,19 @@ BOOST_AUTO_TEST_CASE(assignment_operator_lvalue)
   }
 }
 
+BOOST_AUTO_TEST_CASE(assignment_operator_lvalue_same)
+{
+  zakirov::FwdList< int > lvalue_data_lst({0, 1, 2, 3, 4});
+  lvalue_data_lst = lvalue_data_lst;
+  BOOST_TEST(lvalue_data_lst.empty() == false);
+  BOOST_TEST(lvalue_data_lst.size() == 5);
+  zakirov::FwdIterator< int > test_iter = lvalue_data_lst.begin();
+  for (size_t i = 0; i < 5; ++i, ++test_iter)
+  {
+    BOOST_TEST(*test_iter == i);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(assignment_operator_rvalue)
 {
   zakirov::FwdList< int > rvalue_data_lst({0, 1, 2, 3, 4});
