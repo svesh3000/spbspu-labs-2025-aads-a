@@ -1041,45 +1041,54 @@ namespace savintsev
       throw;
     }
 
-    if (node->father)
+    try
     {
-      node_type * parent = node->father;
-
-      insert_data_in_node(parent, node->data[1]);
-
-      if (parent->kids[0] == node)
+      if (node->father)
       {
-        parent->kids[3] = parent->kids[2];
-        parent->kids[2] = parent->kids[1];
-        parent->kids[1] = right;
-        parent->kids[0] = left;
-      }
-      else if (parent->kids[1] == node)
-      {
-        parent->kids[3] = parent->kids[2];
-        parent->kids[2] = right;
-        parent->kids[1] = left;
+        node_type * parent = node->father;
+
+        insert_data_in_node(parent, node->data[1]);
+
+        if (parent->kids[0] == node)
+        {
+          parent->kids[3] = parent->kids[2];
+          parent->kids[2] = parent->kids[1];
+          parent->kids[1] = right;
+          parent->kids[0] = left;
+        }
+        else if (parent->kids[1] == node)
+        {
+          parent->kids[3] = parent->kids[2];
+          parent->kids[2] = right;
+          parent->kids[1] = left;
+        }
+        else
+        {
+          parent->kids[3] = right;
+          parent->kids[2] = left;
+        }
+
+        delete node;
+        return parent;
       }
       else
       {
-        parent->kids[3] = right;
-        parent->kids[2] = left;
+        left->father = node;
+        right->father = node;
+        node->data[0] = node->data[1];
+        node->kids[0] = left;
+        node->kids[1] = right;
+        node->kids[2] = nullptr;
+        node->kids[3] = nullptr;
+        node->len = 1;
+        return node;
       }
-
-      delete node;
-      return parent;
     }
-    else
+    catch (...)
     {
-      left->father = node;
-      right->father = node;
-      node->data[0] = node->data[1];
-      node->kids[0] = left;
-      node->kids[1] = right;
-      node->kids[2] = nullptr;
-      node->kids[3] = nullptr;
-      node->len = 1;
-      return node;
+      remove_data_from_node(left, node->data[0]);
+      remove_data_from_node(right, node->data[2]);
+      throw;
     }
   }
 
