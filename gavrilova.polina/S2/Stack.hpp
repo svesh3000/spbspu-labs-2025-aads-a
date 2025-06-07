@@ -18,8 +18,8 @@ namespace gavrilova {
     T& top();
     const T& top() const;
     void pop();
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
     void swap(Stack& other) noexcept;
 
   private:
@@ -60,13 +60,13 @@ namespace gavrilova {
   }
 
   template < class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return buffer_.empty();
   }
 
   template < class T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return buffer_.size();
   }
