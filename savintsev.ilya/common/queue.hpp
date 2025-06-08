@@ -12,9 +12,9 @@ namespace savintsev
 
     bool empty() const noexcept;
 
-    void pop();
-    void push(const T & rhs);
-    void push(T && rhs);
+    void pop() noexcept;
+    template< typename U >
+    void push(U && rhs);
 
     size_t size() const noexcept;
 
@@ -47,21 +47,16 @@ namespace savintsev
   }
 
   template< typename T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
     queue_.pop_front();
   }
 
   template< typename T >
-  void Queue< T >::push(const T & rhs)
+  template< typename U >
+  void Queue< T >::push(U && rhs)
   {
-    queue_.push_back(rhs);
-  }
-
-  template< typename T >
-  void Queue< T >::push(T && rhs)
-  {
-    queue_.push_back(std::move(rhs));
+    queue_.push_back(std::forward< U >(rhs));
   }
 
   template< typename T >
