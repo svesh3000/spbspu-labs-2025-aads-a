@@ -1,5 +1,6 @@
 #ifndef HASH_ITERATORS_HPP
 #define HASH_ITERATORS_HPP
+#include <cassert>
 #include <iterator>
 #include "hash-node.hpp"
 
@@ -13,6 +14,8 @@ namespace alymova
     public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
   {
     using Node = detail::HashNode< Key, Value >;
+    using NodeType = typename HashTable< Key, Value, Hash, KeyEqual >::NodeType;
+    using T = std::pair< NodeType, Node >;
 
     HashConstIterator() = default;
     HashConstIterator& operator++() noexcept;
@@ -20,51 +23,53 @@ namespace alymova
     bool operator==(const HashConstIterator& other) const noexcept;
     bool operator!=(const HashConstIterator& other) const noexcept;
     const std::pair< Key, Value >& operator*() const noexcept;
-    const std::pair< Key, Value >& operator->() const noexcept;
-  private:
-    Node* node_;
+    const std::pair< Key, Value >* operator->() const noexcept;
+  protected:
+    T* node_;
+    T* end_;
 
-    HashConstIterator(Node* node) noexcept;
+    HashConstIterator(T* node, T* end) noexcept;
 
     friend class HashTable< Key, Value, Hash, KeyEqual >;
   };
 
   template< class Key, class Value, class Hash = std::hash< Key >, class KeyEqual = std::equal_to< Key > >
-  struct HashIterator:
-    public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
+  struct HashIterator final:
+    public HashConstIterator< Key, Value, Hash, KeyEqual >
   {
+    using Base = HashConstIterator< Key, Value, Hash, KeyEqual >;
     using Node = detail::HashNode< Key, Value >;
+    using NodeType = typename HashTable< Key, Value, Hash, KeyEqual >::NodeType;
+    using T = std::pair< NodeType, Node >;
 
-    HashIterator() = default;
-    HashIterator& operator++() noexcept;
-    HashIterator operator++(int) noexcept;
-    bool operator==(const HashIterator& other) const noexcept;
-    bool operator!=(const HashIterator& other) const noexcept;
+    HashIterator(T* node, T* end) noexcept;
+
     std::pair< Key, Value >& operator*() noexcept;
-    std::pair< Key, Value >& operator->() noexcept;
-  private:
-    Node* node_;
-
-    HashIterator(Node* node) noexcept;
-
-    friend class HashTable< Key, Value, Hash, KeyEqual >;
+    std::pair< Key, Value >* operator->() noexcept;
   };
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashConstIterator< Key, Value, Hash, KeyEqual >::HashConstIterator(Node* node) noexcept:
-    node_(node)
+  HashConstIterator< Key, Value, Hash, KeyEqual >::HashConstIterator(T* node, T* end) noexcept:
+    node_(node),
+    end_(end)
   {}
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual >&
     HashConstIterator< Key, Value, Hash, KeyEqual >::operator++() noexcept
   {
+    assert(node_ != end_ && "You try to access beyond table's bound");
+
     node_++;
-    while (node_->isEmpty)
+    if (node_ == end_)
     {
-      node_++;
+      return *this;
     }
-    return *this;
+    if (node_->first == NodeType::Fill)
+    {
+      return *this;
+    }
+    ++(*this);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -92,74 +97,39 @@ namespace alymova
   const std::pair< Key, Value >&
     HashConstIterator< Key, Value, Hash, KeyEqual>::operator*() const noexcept
   {
-    assert(node_->isEmpty && "You try to dereference empty node");
+    assert(node_->first != NodeType::Empty && "You try to dereference empty node");
 
-    return node_->data;
+    return node_->second.data;
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  const std::pair< Key, Value >&
+  const std::pair< Key, Value >*
     HashConstIterator< Key, Value, Hash, KeyEqual >::operator->() const noexcept
   {
-    assert(node_->isEmpty && "You try to dereference empty node");
+    assert(node_->first != NodeType::Empty && "You try to dereference empty node");
 
-    return std::addressof(node_->data);
+    return std::addressof(node_->second.data);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual >::HashIterator(Node* node) noexcept:
-    node_(node)
+  HashIterator< Key, Value, Hash, KeyEqual >::HashIterator(T* node, T* end) noexcept:
+    Base(node, end)
   {}
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual >&
-    HashIterator< Key, Value, Hash, KeyEqual >::operator++() noexcept
+  std::pair< Key, Value >& HashIterator< Key, Value, Hash, KeyEqual >::operator*() noexcept
   {
-    node_++;
-    while (node_->isEmpty)
-    {
-      node_++;
-    }
-    return *this;
+    assert(Base::node_->first != NodeType::Empty && "You try to dereference empty node");
+
+    return Base::node_->second.data;
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual >
-    HashIterator< Key, Value, Hash, KeyEqual >::operator++(int) noexcept
+  std::pair< Key, Value >* HashIterator< Key, Value, Hash, KeyEqual >::operator->() noexcept
   {
-    HashIterator old = *this;
-    ++(*this);
-    return old;
-  }
+    assert(Base::node_->first != NodeType::Empty && "You try to dereference empty node");
 
-  template< class Key, class Value, class Hash, class KeyEqual >
-  bool HashIterator< Key, Value, Hash, KeyEqual >::operator==(const HashIterator& other) const noexcept
-  {
-    return node_ == other.node_;
-  }
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  bool HashIterator< Key, Value, Hash, KeyEqual >::operator!=(const HashIterator& other) const noexcept
-  {
-    return !(*this == other);
-  }
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  std::pair< Key, Value >&
-    HashIterator< Key, Value, Hash, KeyEqual>::operator*() noexcept
-  {
-    assert(node_->isEmpty && "You try to dereference empty node");
-
-    return node_->data;
-  }
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  std::pair< Key, Value >&
-    HashIterator< Key, Value, Hash, KeyEqual >::operator->() noexcept
-  {
-    assert(node_->isEmpty && "You try to dereference empty node");
-
-    return std::addressof(node_->data);
+    return std::addressof(Base::node_->second.data);
   }
 }
 

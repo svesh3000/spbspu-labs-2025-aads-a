@@ -12,7 +12,6 @@ namespace alymova
     {
       std::pair< Key, Value > data;
       size_t psl;
-      bool isEmpty;
 
       void swap(HashNode< Key, Value >& other);
     };
@@ -22,7 +21,6 @@ namespace alymova
     {
       std::swap(data, other.data);
       std::swap(psl, other.psl);
-      std::swap(isEmpty, other.isEmpty);
     }
   }
 }

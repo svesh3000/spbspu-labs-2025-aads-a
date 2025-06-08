@@ -57,5 +57,16 @@ int main(int argc, char** argv)
     std::cerr << e.what() << '\n';
     return 1;
   }
+  /*HashTable< int, std::string > table;
+  std::pair< int, std::string > p1(1, "fffff");
+  std::pair< int, std::string > p2(2, "vvvvv");
+  table.insert(p1);
+  table.insert(p2);
+  for (auto it = table.begin(); it != table.end(); it++)
+  {
+    std::cout << it->first << '\n';
+  }
+  auto it = table.find(3);
+  std::cout << (it == table.end()) << '\n';*/
 }
 

@@ -9,11 +9,15 @@ namespace alymova
   template< class Key, class Value, class Hash = std::hash< Key >, class KeyEqual = std::equal_to< Key > >
   class HashTable
   {
+  public:
     using Hashtable = HashTable< Key, Value, Hash, KeyEqual >;
     using Iterator = HashIterator< Key, Value, Hash, KeyEqual >;
     using ConstIterator = HashConstIterator< Key, Value, Hash, KeyEqual >;
     using Node = detail::HashNode< Key, Value >;
-    using T = std::pair< Key, Value >;
+    enum NodeType: int {Empty, Fill};
+
+    using ValueType = std::pair< Key, Value >;
+    using T = std::pair< NodeType, Node >;
 
     HashTable();
     HashTable(const HashTable& other);
@@ -36,12 +40,15 @@ namespace alymova
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    Iterator insert(const T& value);
-    Iterator insert(T&& value);
+    Iterator insert(const ValueType& value);
+    Iterator insert(ValueType&& value);
 
     size_t erase(const Key& key);
     Iterator erase(Iterator pos);
     Iterator erase(ConstIterator pos);
+
+    Iterator find(const Key& key);
+    ConstIterator find(const Key& key) const;
 
     float load_factor() const noexcept;
     float max_load_factor() const noexcept;
@@ -52,18 +59,18 @@ namespace alymova
   private:
     float max_load_factor_ = 0.7;
     size_t size_;
-    size_t size_buffer_;
-    Node* array_;
+    size_t capacity_;
+    T* array_;
     Hash hasher;
 
-    std::pair< Node, bool > probing(const T& value, size_t home_slot);
+    std::pair< bool, T > robRich(const ValueType& value, size_t home_slot);
   };
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable():
     size_(0),
-    size_buffer_(11),
-    array_(new Node[size_buffer_]()),
+    capacity_(11),
+    array_(new T[capacity_]()),
     hasher()
   {
     clear();
@@ -94,7 +101,8 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::begin() noexcept
   {
-    return Iterator(array_);
+    ConstIterator it = cbegin();
+    return Iterator{it.node_, it.end_};
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -106,13 +114,19 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::cbegin() const noexcept
   {
-    return ConstIterator(array_);
+    ConstIterator it(array_, array_ + capacity_);
+    T* tmp = array_;
+    if (array_->first == NodeType::Empty)
+    {
+      ++it;
+    }
+    return it;
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::end() noexcept
   {
-    return Iterator(array_ + size_buffer_);
+    return Iterator(array_ + capacity_, array_ + capacity_);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -124,7 +138,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::cend() const noexcept
   {
-    return ConstIterator(array_ + size_buffer_);
+    return ConstIterator(array_ + capacity_, array_ + capacity_);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -140,30 +154,52 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(const T& value)
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(const ValueType& value)
   {
-    size_t home_index = hasher(value.first) % size_;
-    if (array_[home_index].isEmpty)
+    size_t home_index = hasher(value.first) % capacity_;
+    if (array_[home_index].first == NodeType::Empty)
     {
-      array_[home_index].data = value;
-      array_[home_index].psl = 0;
-      array_[home_index].isEmpty = false;
-      return Iterator(array_[home_index]);
+      array_[home_index].first = NodeType::Fill;
+      array_[home_index].second = Node{value, 0};
+      return Iterator(array_ + home_index, array_ + capacity_);
     }
-    std::pair< Node, bool > prob_res = probing(value, home_index);
-    if (!prob_res.second)
+    std::pair< bool, T > prob_res = robRich(value, home_index);
+    if (!prob_res.first)
     {}
-    if (!prob_res.second.isEmpty)
+    if (prob_res.second.first == NodeType::Fill)
     {
-      return insert(prob_res.first.data);
+      return insert(prob_res.second.second.data);
     }
-    return Iterator(prob_res.first);
+    return Iterator(&prob_res.second, array_ + capacity_);
   }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key)
+  {
+    ConstIterator it = static_cast< const HashTable& >(*this).find(key);
+    return Iterator(it.node_, it.end_);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
+  {
+    auto it = begin();
+    for (; it != end(); it++)
+    {
+      if (it->first == key)
+      {
+        return it;
+      }
+    }
+    return it;
+  }
+
+
 
   template< class Key, class Value, class Hash, class KeyEqual >
   float HashTable< Key, Value, Hash, KeyEqual >::load_factor() const noexcept
   {
-    return (size_ * 1.0) / (size_buffer_ * 1.0);
+    return (size_ * 1.0) / (capacity_ * 1.0);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -181,10 +217,9 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::clear() noexcept
   {
-    for (size_t i = 0; i < size_buffer_; i++)
+    for (size_t i = 0; i < capacity_; i++)
     {
-      array_[i].isEmpty = false;
-      array_[i].psl = 0;
+      array_[i].first = NodeType::Empty;
     }
     size_ = 0;
   }
@@ -193,26 +228,26 @@ namespace alymova
   void HashTable< Key, Value, Hash, KeyEqual >::swap(HashTable& other)
   {
     std::swap(size_, other.size_);
-    std::swap(size_buffer_, other.size_buffer_);
-    std::swap(hasher, other.hasher);
+    std::swap(capacity_, other.capacity_);
     std::swap(array_, other.array_);
+    std::swap(hasher, other.hasher);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  std::pair< detail::HashNode< Key, Value >, bool >
-    HashTable< Key, Value, Hash, KeyEqual >::probing(const T& value, size_t home_slot)
+  std::pair< bool, typename HashTable< Key, Value, Hash, KeyEqual >::T >
+    HashTable< Key, Value, Hash, KeyEqual >::robRich(const ValueType& value, size_t home_slot)
   {
-    Node node{value, 1, false};
-    for (size_t i = (home_slot + 1) % size_buffer_; i != home_slot; i = (i + 1) % size_buffer_)
+    std::pair< NodeType, Node > node{NodeType::Fill, Node{value, 1}};
+    for (size_t i = (home_slot + 1) % capacity_; i != home_slot; i = (i + 1) % capacity_)
     {
-      if (node.psl > array_[i].psl)
+      if (node.second.psl > array_[i].second.psl)
       {
         node.swap(array_[i]);
-        return {node, true};
+        return {true, node};
       }
-      node.psl++;
+      node.second.psl++;
     }
-    return {node, false};
+    return {false, node};
   }
 }
 
