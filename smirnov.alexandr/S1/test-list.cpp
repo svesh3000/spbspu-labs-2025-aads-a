@@ -120,13 +120,13 @@ BOOST_AUTO_TEST_CASE(IteratorTest)
   list.push_front(1);
 
   auto it = list.begin();
-  BOOST_CHECK(*it == 1);
+  BOOST_TEST(*it == 1);
   ++it;
-  BOOST_CHECK(*it == 2);
+  BOOST_TEST(*it == 2);
   ++it;
-  BOOST_CHECK(*it == 3);
+  BOOST_TEST(*it == 3);
   ++it;
-  BOOST_CHECK(it == list.end());
+  BOOST_TEST(it == list.end());
 }
 
 BOOST_AUTO_TEST_CASE(ConstIteratorTest)
@@ -137,12 +137,12 @@ BOOST_AUTO_TEST_CASE(ConstIteratorTest)
   list.push_front(1);
 
   auto it = list.cbegin();
-  BOOST_CHECK(*it == 1);
+  BOOST_TEST(*it == 1);
   ++it;
-  BOOST_CHECK(*it == 2);
+  BOOST_TEST(*it == 2);
   ++it;
-  BOOST_CHECK(*it == 3);
+  BOOST_TEST(*it == 3);
   ++it;
-  BOOST_CHECK(it == list.cend());
+  BOOST_TEST(it == list.cend());
 }
 

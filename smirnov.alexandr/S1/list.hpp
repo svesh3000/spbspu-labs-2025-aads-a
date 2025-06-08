@@ -63,11 +63,11 @@ namespace smirnov
     Node< T >* tail = fake_;
     while (current != other.fake_)
     {
-        Node< T >* newNode = new Node< T >(current->data);
-        tail->next = newNode;
-        tail = newNode;
-        current = current->next;
-        size_++;
+      Node< T >* newNode = new Node< T >(current->data);
+      tail->next = newNode;
+      tail = newNode;
+      current = current->next;
+      size_++;
     }
     tail->next = fake_;
   }
