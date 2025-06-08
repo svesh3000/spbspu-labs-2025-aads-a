@@ -230,7 +230,8 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(ConstIterator hint, const ValueType& value)
+  HashIterator< Key, Value, Hash, KeyEqual >
+    HashTable< Key, Value, Hash, KeyEqual >::insert(ConstIterator hint, const ValueType& value)
   {
     return emplace_hint(hint, std::forward< ValueType >(value));
   }
@@ -317,7 +318,7 @@ namespace alymova
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::erase(ConstIterator pos)
   {
     Iterator it(pos.node_, pos.end_);
-    return erase(it); 
+    return erase(it);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
