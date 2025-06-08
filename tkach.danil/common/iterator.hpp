@@ -9,7 +9,7 @@ namespace tkach
   class AvlTree;
 
   template< class Key, class Value, class Cmp = std::less< Key > >
-  class Iterator
+  class Iterator: public std::iterator< std::bidirectional_iterator_tag, Value >
   {
     friend class AvlTree< Key, Value, Cmp >;
   public:
@@ -20,6 +20,8 @@ namespace tkach
     this_t& operator=(const this_t&) = default;
     this_t& operator++();
     this_t operator++(int);
+    this_t& operator--();
+    this_t operator--(int);
     std::pair< Key, Value > & operator*();
     std::pair< Key, Value > * operator->();
     bool operator!=(const this_t& rhs) const;
@@ -67,6 +69,37 @@ namespace tkach
   {
     this_t result(*this);
     ++(*this);
+    return result;
+  }
+
+  template< class Key, class Value, class Cmp>
+  Iterator< Key, Value, Cmp >& Iterator< Key, Value, Cmp >::operator--()
+  {
+    if (node_->left)
+    {
+      node_ = node_->left;
+      while (node_->right)
+      {
+        node_ = node_->right;
+      }
+      return *this;
+    }
+    else
+    {
+      while (node_->parent && node_->parent->left == node_)
+      {
+        node_ = node_->parent;
+      }
+      node_ = node_->parent;
+      return *this;
+    }
+  }
+
+  template< class Key, class Value, class Cmp>
+  Iterator< Key, Value, Cmp > Iterator< Key, Value, Cmp >::operator--(int)
+  {
+    this_t result(*this);
+    --(*this);
     return result;
   }
 

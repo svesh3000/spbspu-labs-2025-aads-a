@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <functional>
+#include <map>
 #include <AVLtree.hpp>
 #include "key_summ.hpp"
 
@@ -34,27 +36,18 @@ int main(const int argc, const char* const* const argv)
     std::cout << "<EMPTY>\n";
     return 0;
   }
-  std::string cmd = argv[1];
+  std::map< std::string, std::function< KeySumm(KeySumm) > > cmds;
+  using avltree = AvlTree< int, std::string >;
+  using namespace std::placeholders;
+  using traverse_method = KeySumm (avltree::*)(KeySumm);
+  cmds["ascending"] = std::bind(static_cast< traverse_method >(&avltree::traverseLnr< KeySumm >), std::addressof(tree), _1);
+  cmds["descending"] = std::bind(static_cast< traverse_method >(&avltree::traverseRnl< KeySumm >), std::addressof(tree), _1);
+  cmds["breadth"] = std::bind(static_cast< traverse_method >(&avltree::traverseBreadth< KeySumm >), std::addressof(tree), _1);
+  std::string command = argv[1];
   KeySumm res;
   try
   {
-    if (cmd == "ascending")
-    {
-      res = tree.traverseLnr(res);
-    }
-    else if (cmd == "descending")
-    {
-      res = tree.traverseRnl(res);
-    }
-    else if (cmd == "breadth")
-    {
-      res = tree.traverseBreadth(res);
-    }
-    else
-    {
-      std::cerr << "<INVALID COMMAND>\n";
-      return 1;
-    }
+    res = cmds.at(command)(res);
   }
   catch (const std::exception& e)
   {
