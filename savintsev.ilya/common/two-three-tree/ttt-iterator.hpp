@@ -1,13 +1,16 @@
 #ifndef TTT_ITERATOR_H
 #define TTT_ITERATOR_H
 #include <iterator>
+#include <cassert>
 #include "ttt-node.hpp"
-#include "ttt-const-iterator.hpp"
 
 namespace savintsev
 {
   template< typename Key, typename Value, typename Compare >
   class TwoThreeTree;
+
+  template< typename Key, typename Value >
+  class BidirectConstIterator;
 
   template< typename Key, typename Value >
   class BidirectIterator
@@ -57,29 +60,29 @@ namespace savintsev
   typename BidirectIterator< Key, Value >::reference BidirectIterator< Key, Value >::operator*()
   {
     assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return node_->data_[pos_];
+    assert(pos_ < node_->len);
+    return node_->data[pos_];
   }
   template< typename Key, typename Value >
   typename BidirectIterator< Key, Value >::pointer BidirectIterator< Key, Value >::operator->()
   {
     assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return std::addressof(node_->data_[pos_]);
+    assert(pos_ < node_->len);
+    return std::addressof(node_->data[pos_]);
   }
     template< typename Key, typename Value >
   typename BidirectIterator< Key, Value >::reference BidirectIterator< Key, Value >::operator*() const
   {
     assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return node_->data_[pos_];
+    assert(pos_ < node_->len);
+    return node_->data[pos_];
   }
   template< typename Key, typename Value >
   typename BidirectIterator< Key, Value >::pointer BidirectIterator< Key, Value >::operator->() const
   {
     assert(node_ != nullptr);
-    assert(pos_ < node_->len_);
-    return std::addressof(node_->data_[pos_]);
+    assert(pos_ < node_->len);
+    return std::addressof(node_->data[pos_]);
   }
   template< typename Key, typename Value >
   BidirectIterator< Key, Value > & BidirectIterator< Key, Value >::operator++()
@@ -99,11 +102,11 @@ namespace savintsev
     if (!node_)
     {
       node_ = root_;
-      while (node_->kids_[node_->len_])
+      while (node_->kids[node_->len])
       {
-        node_ = node_->kids_[node_->len_];
+        node_ = node_->kids[node_->len];
       }
-      pos_ = node_->len_ - 1;
+      pos_ = node_->len - 1;
       return *this;
     }
 
@@ -140,12 +143,12 @@ namespace savintsev
     }
 
     node_ = root_;
-    while (node_->kids_[node_->len_])
+    while (node_->kids[node_->len])
     {
-      node_ = node_->kids_[node_->len_];
+      node_ = node_->kids[node_->len];
     }
 
-    pos_ = node_->len_ - 1;
+    pos_ = node_->len - 1;
     return *this;
   }
   template< typename Key, typename Value >
@@ -156,32 +159,32 @@ namespace savintsev
       return *this;
     }
 
-    if (pos_ < node_->len_ && node_->kids_[pos_ + 1])
+    if (pos_ < node_->len && node_->kids[pos_ + 1])
     {
-      node_ = node_->kids_[pos_ + 1];
-      while (node_->kids_[0])
+      node_ = node_->kids[pos_ + 1];
+      while (node_->kids[0])
       {
-        node_ = node_->kids_[0];
+        node_ = node_->kids[0];
       }
       pos_ = 0;
       return *this;
     }
 
-    if (pos_ < node_->len_ - 1)
+    if (pos_ < node_->len - 1)
     {
       ++pos_;
       return *this;
     }
 
-    while (node_->parent_)
+    while (node_->father)
     {
       size_t parent_pos = 0;
-      while (parent_pos <= node_->parent_->len_ && node_->parent_->kids_[parent_pos] != node_)
+      while (parent_pos <= node_->father->len && node_->father->kids[parent_pos] != node_)
       {
         ++parent_pos;
       }
-      node_ = node_->parent_;
-      if (parent_pos < node_->len_)
+      node_ = node_->father;
+      if (parent_pos < node_->len)
       {
         pos_ = parent_pos;
         return *this;
@@ -195,14 +198,14 @@ namespace savintsev
   {
     assert(node_ != nullptr);
 
-    if (node_->kids_[pos_])
+    if (node_->kids[pos_])
     {
-      node_ = node_->kids_[pos_];
-      while (node_->kids_[node_->len_])
+      node_ = node_->kids[pos_];
+      while (node_->kids[node_->len])
       {
-        node_ = node_->kids_[node_->len_];
+        node_ = node_->kids[node_->len];
       }
-      pos_ = node_->len_ - 1;
+      pos_ = node_->len - 1;
       return *this;
     }
 
@@ -212,15 +215,15 @@ namespace savintsev
       return *this;
     }
 
-    while (node_->parent_)
+    while (node_->father)
     {
-      auto parent = node_->parent_;
+      auto parent = node_->father;
       size_t i = 0;
-      while (i <= parent->len_ && parent->kids_[i] != node_)
+      while (i <= parent->len && parent->kids[i] != node_)
       {
         ++i;
       }
-      assert(i <= parent->len_);
+      assert(i <= parent->len);
 
       if (i > 0)
       {
