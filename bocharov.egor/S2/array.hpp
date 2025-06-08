@@ -58,7 +58,7 @@ namespace bocharov
   template< typename T >
   void Array< T >::clear() noexcept
   {
-    while(!empty())
+    while (!empty())
     {
       popFront();
     }
