@@ -121,25 +121,27 @@ void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::swap(MapBase& rhs)
   }
 }
 template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::clear()
+void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::clear() noexcept
 {
-  destroy_subtree(fake_children_[0]);
-  delete fake_children_[0];
+  iterator i = begin();
+  while (!i.node_->isfake())
+  {
+    if ((i.node_->isleaf()) || (i.pointed_ == i.node_->size()))
+    {
+      node_type* to_delete = i.node_;
+      i.move_up();
+      delete to_delete;
+    }
+    else
+    {
+      i.pointed_++;
+      for (; !i.node_->isleaf(); i.node_ = i.node_->children[i.pointed_], i.pointed_ = 0)
+      {}
+    }
+  }
   fake_children_[0] = nullptr;
-}
-template< class K, class T, class C, size_t N, bool IsSet, bool IsMulti >
-void rychkov::MapBase< K, T, C, N, IsSet, IsMulti >::destroy_subtree(node_type* node)
-{
-  if (node == nullptr)
-  {
-    return;
-  }
-  for (node_size_type i = 0; i <= node->size(); i++)
-  {
-    node_type* child = node->children[i];
-    destroy_subtree(child);
-    delete child;
-  }
+  size_ = 0;
+  cached_rbegin_ = cached_begin_ = fake_root();
 }
 
 #endif
