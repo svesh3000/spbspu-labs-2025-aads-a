@@ -3,6 +3,7 @@
 #include <string>
 #include <cmath>
 #include "hash_table.hpp"
+#include "graph.hpp"
 
 using namespace tkach;
 template< class Key, class Value >

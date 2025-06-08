@@ -103,15 +103,7 @@ namespace tkach
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::clear()
   {
-    for (size_t i = 0; i < table_.size(); ++i)
-    {
-      if (table_[i].state == EntryState::Occupied)
-      {
-        table_[i].pair.~pair< Key, Value >();
-      }
-      table_[i].state = EntryState::Empty;
-    }
-    count_ = 0;
+    erase(cbegin(), cend());
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -313,7 +305,6 @@ namespace tkach
     {
       return Iter(++it);
     }
-    table_[it.pos_].pair.~pair< Key, Value >();
     table_[it.pos_].state = EntryState::Deleted;
     --count_;
     ++it;
