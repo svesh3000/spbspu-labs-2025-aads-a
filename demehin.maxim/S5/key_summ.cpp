@@ -8,16 +8,14 @@ namespace
   {
     int max = std::numeric_limits< int >::max();
     int min = std::numeric_limits< int >::min();
-    if ((a > 0 && b > 0) && (a > max - b))
+    if (a > 0 && b > 0)
     {
-      return true;
+      return a > max - b;
     }
-    if ((a < 0 && b < 0) && (a < min + b))
+    if (a < 0 && b < 0)
     {
-      return true;
+      return a < min + b;
     }
-
-    return false;
   }
 }
 
