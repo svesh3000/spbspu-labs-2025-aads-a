@@ -56,8 +56,13 @@ namespace tkach
     F traverseRnl(F f);
     template< typename F >
     F traverseBreadth(F f);
+    Citerator< Key, Value, Cmp > lowerBound(const Key& key) const;
+    Citerator< Key, Value, Cmp > upperBound(const Key& key) const;
+    std::pair< Iterator< Key, Value >, Iterator< Key, Value > > equalRange(const Key& key);
+    std::pair< Citerator< Key, Value >, Citerator< Key, Value > > equalRange(const Key& key) const;
     bool empty() const noexcept;
-    size_t size();
+    size_t size() const noexcept;
+    size_t count(const Key& k) const;
   private:
     using pair_t = std::pair< tkach::TreeNode< Key, Value >*, tkach::TreeNode< Key, Value >* >;
     TreeNode< Key, Value >* root_;
