@@ -92,10 +92,7 @@ namespace zholobov {
       std::string token = tokens.front();
       tokens.pop();
 
-      long value = 0;
-      if (strToLong(token, value)) {
-        result.push(std::move(token));
-      } else if (token == "(") {
+      if (token == "(") {
         op_stack.push(std::move(token));
       } else if (token == ")") {
         while (!op_stack.empty() && op_stack.top() != "(") {
@@ -113,7 +110,7 @@ namespace zholobov {
         }
         op_stack.push(std::move(token));
       } else {
-        throw std::runtime_error("Invalid token");
+        result.push(std::move(token));
       }
     }
 
