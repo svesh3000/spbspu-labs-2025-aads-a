@@ -99,7 +99,7 @@ namespace alymova
     hasher(other.hasher)
   {
     clear();
-    for (size_t i = 0; i != other.capacity_(); i++)
+    for (size_t i = 0; i != other.capacity_; i++)
     {
       if (other.array_[i].first == NodeType::Fill)
       {
@@ -472,7 +472,9 @@ namespace alymova
     }
     std::pair< size_t, T > rob_res = rob_rich(home_index, node);
     if (rob_res.first == home_index)
-    {}
+    {
+      rehash();
+    }
     if (rob_res.second.first == NodeType::Fill)
     {
       return insert_node(rob_res.first, rob_res.second.second);
