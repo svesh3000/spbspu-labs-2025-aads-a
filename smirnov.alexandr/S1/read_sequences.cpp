@@ -2,6 +2,7 @@
 #include <cctype>
 #include <stdexcept>
 #include "list.hpp"
+#include "list_utils.hpp"
 
 void smirnov::readSequences(std::istream & in, List< std::pair< std::string, List< size_t > > > & sequences)
 {
@@ -15,7 +16,7 @@ void smirnov::readSequences(std::istream & in, List< std::pair< std::string, Lis
       try
       {
         size_t number = std::stoull(input);
-        list.push_back(number);
+        pushBack(list, number);
       }
       catch (const std::out_of_range & e)
       {
@@ -26,7 +27,7 @@ void smirnov::readSequences(std::istream & in, List< std::pair< std::string, Lis
     {
       if (!name.empty())
       {
-        sequences.push_back(std::make_pair(name, list));
+        pushBack(sequences, std::make_pair(name, list));
         list.clear();
       }
       name = input;
@@ -35,7 +36,7 @@ void smirnov::readSequences(std::istream & in, List< std::pair< std::string, Lis
 
   if (!name.empty())
   {
-    sequences.push_back(std::make_pair(name, list));
+    pushBack(sequences, std::make_pair(name, list));
   }
 }
 
@@ -61,12 +62,12 @@ void smirnov::newSequences(List< List< size_t > > & out, List< std::pair< std::s
         {
           ++numIt;
         }
-        numbers.push_back(*numIt);
+        pushBack(numbers, *numIt);
       }
     }
     if (!numbers.empty())
     {
-      out.push_back(numbers);
+      pushBack(out, numbers);
     }
   }
 }

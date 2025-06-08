@@ -6,17 +6,16 @@ namespace smirnov
   template< typename T >
   struct Node
   {
-    Node * next;
+    Node< T > * next;
     T data;
     Node():
-    next(nullptr),
-    data(T())
-  {}
-  Node(const T & value):
-    next(nullptr),
-    data(value)
-  {}
-  ~Node() = default;
+      next(nullptr),
+      data()
+    {}
+    Node(const T & value):
+      next(nullptr),
+      data(value)
+    {}
   };
 }
 #endif
