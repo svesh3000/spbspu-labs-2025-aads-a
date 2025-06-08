@@ -68,6 +68,7 @@ int main(int argc, char** argv)
   table.insert(p3);
   table.insert(p4);
   table.insert(p5);
+  table.erase(table.begin(), table.end());
   for (size_t i = 3; i < 20; i++)
   {
     std::pair< int, std::string > p(i, "gggg");

@@ -2,6 +2,7 @@
 #define HASH_TABLE_HPP
 #include <functional>
 #include <cmath>
+#include <cassert>
 #include "hash-node.hpp"
 #include "hash-iterators.hpp"
 
@@ -25,7 +26,7 @@ namespace alymova
     HashTable(HashTable&& other) noexcept;
     template< class InputIterator >
     HashTable(InputIterator first, InputIterator last);
-    HashTable(std::initializer_list< T > il);
+    HashTable(std::initializer_list< ValueType > il);
     ~HashTable() noexcept;
 
     HashTable& operator=(const HashTable& other);
@@ -43,6 +44,9 @@ namespace alymova
 
     Iterator insert(const ValueType& value);
     Iterator insert(ValueType&& value);
+    template< class InputIterator >
+    void insert(InputIterator first, InputIterator last);
+    Iterator insert(ConstIterator hint, const ValueType& value);
 
     template< class... Args >
     Iterator emplace(Args&&... args);
@@ -52,6 +56,7 @@ namespace alymova
     size_t erase(const Key& key);
     Iterator erase(Iterator pos);
     Iterator erase(ConstIterator pos);
+    Iterator erase(ConstIterator first, ConstIterator last);
 
     Iterator find(const Key& key);
     ConstIterator find(const Key& key) const;
@@ -61,7 +66,7 @@ namespace alymova
 
     float load_factor() const noexcept;
     float max_load_factor() const noexcept;
-    void max_load_factor(float mlf) noexcept; //resixe if new mlf
+    void max_load_factor(float mlf) noexcept;
     void rehash();
   private:
     float max_load_factor_ = 0.7;
@@ -70,6 +75,7 @@ namespace alymova
     T* array_;
     Hash hasher;
 
+    size_t get_home_index(const Key& key) const;
     std::pair< size_t, T > rob_rich(size_t home_index, const Node& value);
     Iterator insert_node(size_t index, const Node& node);
     size_t get_next_prime_capacity();
@@ -87,16 +93,42 @@ namespace alymova
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(const HashTable& other):
-    size_(other.size_),
+    size_(0),
     capacity_(other.capacity_),
     array_(new T[capacity_]()),
     hasher(other.hasher)
   {
-    for (auto it = other.begin(); it < other.end(); it++)
+    clear();
+    for (size_t i = 0; i != other.capacity_(); i++)
     {
-      array_.emplace(*it);
+      if (other.array_[i].first == NodeType::Fill)
+      {
+        array_[i] = other.array_[i];
+      }
     }
   }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(HashTable&& other) noexcept:
+    size_(std::exchange(other.size_, 0)),
+    capacity_(std::exchange(other.capacity_, 0)),
+    array_(std::exchange(other.array_, nullptr)),
+    hasher(other.hasher)
+  {}
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  template< class InputIterator >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(InputIterator first, InputIterator last):
+    HashTable()
+  {
+    insert(first, last);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(std::initializer_list< ValueType > il):
+    HashTable(il.begin(), il.end())
+  {}
+
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashTable< Key, Value, Hash, KeyEqual >::~HashTable() noexcept
@@ -188,6 +220,22 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
+  template< class InputIterator >
+  void HashTable< Key, Value, Hash, KeyEqual >::insert(InputIterator first, InputIterator last)
+  {
+    for (; first != last; first++)
+    {
+      emplace(*first);
+    }
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(ConstIterator hint, const ValueType& value)
+  {
+    return emplace_hint(hint, std::forward< ValueType >(value));
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
   template< class... Args >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::emplace(Args&&... args)
   {
@@ -196,7 +244,7 @@ namespace alymova
       rehash();
     }
     ValueType value(std::forward< Args >(args)...);
-    size_t home_index = hasher(value.first) % capacity_;
+    size_t home_index = get_home_index(value.first);
     ConstIterator hint(array_ + home_index, array_ + capacity_);
     return emplace_hint(hint, std::move(value));
     /*ValueType value(std::forward< Args >(args)...);
@@ -216,10 +264,72 @@ namespace alymova
       rehash();
     }
     ValueType value(std::forward< Args >(args)...);
-    size_t home_index = hint.node_ - array_;;
+    size_t home_index = hint.node_ - array_;
+    if (hint == end())
+    {
+      home_index = get_home_index(value.first);
+    }
     Node node{value, 0};
     size_++;
     return insert_node(home_index, node);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  size_t HashTable< Key, Value, Hash, KeyEqual >::erase(const Key& key)
+  {
+    size_t size_old = size_;
+    while (find(key) != end())
+    {
+      erase(find(key));
+    }
+    return size_old - size_;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::erase(Iterator pos)
+  {
+    assert(pos != end() && "You try to delete beyond table's bound");
+    pos.node_->first = NodeType::Empty;
+    size_t deleted_index = pos.node_ - array_;
+    size_t i = (deleted_index + 1) % capacity_;
+    while (array_[i].first != NodeType::Empty)
+    {
+      if (array_[i].second.psl == 0)
+      {
+        break;
+      }
+      size_t prev = i - 1;
+      if (i == 0)
+      {
+        prev = capacity_ - 1;
+      }
+      std::swap(array_[i], array_[prev]);
+      i = (i + 1) % capacity_;
+    }
+    if (pos.node_->first == NodeType::Empty)
+    {
+      ++pos;
+    }
+    return pos;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::erase(ConstIterator pos)
+  {
+    Iterator it(pos.node_, pos.end_);
+    return erase(it); 
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual >
+    HashTable< Key, Value, Hash, KeyEqual >::erase(ConstIterator first, ConstIterator last)
+  {
+    while (first != last)
+    {
+      first = erase(first);
+    }
+    Iterator it(first.node_, first.end_);
+    return it;
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -232,15 +342,26 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    auto it = begin();
+    size_t psl = 0;
+    size_t home_index = get_home_index(key);
+    Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
     {
+      if (it.node_->first == NodeType::Empty)
+      {
+        break;
+      }
+      if (it.node_->second.psl < psl)
+      {
+        break;
+      }
       if (it->first == key)
       {
         return it;
       }
+      psl++;
     }
-    return it;
+    return end();
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -302,6 +423,12 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
+  size_t HashTable< Key, Value, Hash, KeyEqual >::get_home_index(const Key& key) const
+  {
+    return hasher(key) % capacity_;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
   std::pair< size_t, typename HashTable< Key, Value, Hash, KeyEqual >::T >
     HashTable< Key, Value, Hash, KeyEqual >::rob_rich(size_t home_index, const Node& node)
   {
@@ -309,6 +436,11 @@ namespace alymova
     node_t.second.psl = 1;
     for (size_t i = (home_index + 1) % capacity_; i != home_index; i = (i + 1) % capacity_)
     {
+      if (node_t.first == NodeType::Empty)
+      {
+        node_t.swap(array_[i]);
+        return {i, node_t};
+      }
       if (node_t.second.psl > array_[i].second.psl)
       {
         node_t.swap(array_[i]);
