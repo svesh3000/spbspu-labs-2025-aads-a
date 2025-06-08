@@ -192,7 +192,43 @@ BOOST_AUTO_TEST_CASE(insert_test)
 
 BOOST_AUTO_TEST_CASE(erase_test)
 {
-  BOOST_TEST(true);
+  maslevtsov::Tree< int, int > tree;
+  tree[1] = 1;
+  auto it = tree.erase(tree.begin());
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 0);
+
+  tree[1] = 1;
+  tree[2] = 2;
+  it = tree.erase(--tree.end());
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 1);
+
+  tree[2] = 2;
+  it = tree.erase(tree.begin());
+  BOOST_TEST(it->first == 2);
+  BOOST_TEST(tree.size() == 1);
+
+  tree[1] = 1;
+  for (size_t i = 3; i < 10; i++) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.begin());
+  BOOST_TEST(it->first == 2);
+  BOOST_TEST(tree.begin()->first == 2);
+  BOOST_TEST(tree.size() == 8);
+
+  it = tree.erase(tree.find(3));
+  BOOST_TEST(it->first == 4);
+  BOOST_TEST(tree.size() == 7);
+
+  it = tree.erase(tree.find(5));
+  BOOST_TEST(it->first == 6);
+  BOOST_TEST(tree.size() == 6);
+
+  it = tree.erase(tree.find(7));
+  BOOST_TEST(it->first == 8);
+  BOOST_TEST(tree.size() == 5);
 }
 
 BOOST_AUTO_TEST_CASE(swap_test)

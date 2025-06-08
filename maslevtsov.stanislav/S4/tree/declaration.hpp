@@ -60,6 +60,10 @@ namespace maslevtsov {
 
     void split_nodes(Node* node, value_type& to_insert, Node* left_child = nullptr, Node* right_child = nullptr);
     void clear_subtree(Node* node) noexcept;
+
+    void erase_from_leaf(iterator pos) noexcept;
+    void balance_after_delete(Node* deleted) noexcept;
+
     std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };
 }
