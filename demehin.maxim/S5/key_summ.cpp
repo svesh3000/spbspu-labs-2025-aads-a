@@ -16,6 +16,8 @@ namespace
     {
       return a < min + b;
     }
+
+    return false;
   }
 }
 
