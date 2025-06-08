@@ -61,7 +61,7 @@ namespace savintsev
     size_type erase(const key_type & k);
 
     std::pair< const_iterator, const_iterator > equal_range(const key_type & k) const;
-    std::pair< iterator, iterator > equal_range(const key_type & k);
+    std::pair< iterator, iterator> equal_range(const key_type & k);
 
     template < typename F >
     F traverse_lnr(F f) const;
@@ -1153,51 +1153,6 @@ namespace savintsev
   }
 
   template< typename K, typename V, typename C >
-  std::pair
-  <
-    typename TwoThreeTree< K, V, C >::iterator,
-    bool
-  >
-  TwoThreeTree< K, V, C >::insert(const value_type & val)
-  {
-    auto result = lazy_find(val.first);
-    if (result.second)
-    {
-      return {result.first, false};
-    }
-    return insert_node(result.first.node_, val);
-  }
-
-  template< typename K, typename V, typename C >
-  template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_lnr(F f) const
-  {
-    return const_cast< TwoThreeTree* >(this)->traverse_lnr(f);
-  }
-
-  template< typename K, typename V, typename C >
-  template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_lnr(F f)
-  {
-    if (empty())
-    {
-      throw std::logic_error("Tree is empty");
-    }
-    for (auto it = begin(); it != end(); ++it)
-    {
-      f(*it);
-    }
-    return f;
-  }
-
-  template< typename K, typename V, typename C >
-  template< typename F >
-  F TwoThreeTree< K, V, C >::traverse_rnl(F f) const
-  {
-    return const_cast< TwoThreeTree* >(this)->traverse_rnl(f);
-  }
-
-  template< typename K, typename V, typename C >
   template< typename F >
   F TwoThreeTree< K, V, C >::traverse_rnl(F f)
   {
@@ -1240,16 +1195,16 @@ namespace savintsev
       node_type * current = queue.front();
       queue.pop();
 
-      for (size_t i = 0; i < current->len_; ++i)
+      for (size_t i = 0; i < current->len; ++i)
       {
-        f(current->data_[i]);
+        f(current->data[i]);
       }
 
-      for (size_t i = 0; i <= current->len_; ++i)
+      for (size_t i = 0; i <= current->len; ++i)
       {
-        if (current->kids_[i])
+        if (current->kids[i])
         {
-          queue.push(current->kids_[i]);
+          queue.push(current->kids[i]);
         }
       }
     }
