@@ -16,9 +16,9 @@ namespace smirnov
     List();
     ~List();
     List(const List< T > &);
-    List(List &&) noexcept;
+    List(List &&);
     List< T > & operator=(const List< T > &);
-    List< T > & operator=(List< T > &&) noexcept;
+    List< T > & operator=(List< T > &&);
     ConstIterator< T > cbegin() const noexcept;
     ConstIterator< T > cend() const noexcept;
     Iterator< T > begin() noexcept;
@@ -30,9 +30,7 @@ namespace smirnov
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T &);
-    void push_back(const T &);
     void pop_front();
-    void pop_back();
     void clear() noexcept;
     void swap(List &) noexcept;
   private:
@@ -42,7 +40,7 @@ namespace smirnov
 
   template < typename T >
   List< T >::List():
-    fake_(new Node< T >()),
+    fake_(static_cast< Node< T > * >(operator new(sizeof(Node< T >)))),
     size_(0)
   {
     fake_->next = fake_;
@@ -52,25 +50,35 @@ namespace smirnov
   List< T >::~List()
   {
     clear();
-    delete fake_;
+    operator delete(fake_);
   }
 
   template < typename T >
   List< T >::List(const List< T > & other):
-    List()
+    fake_(static_cast< Node< T > * >(operator new(sizeof(Node< T >)))),
+    size_(0)
   {
+    fake_->next = fake_;
+    List< T > temp;
     for (ConstIterator< T > it = other.cbegin(); it != other.cend(); ++it)
     {
-      push_back(*it);
+      temp.push_front(*it);
+    }
+    for (ConstIterator< T > it = temp.cbegin(); it != temp.cend(); ++it)
+    {
+      Node< T > * newNode = new Node< T >(*it);
+      newNode->next = fake_->next;
+      fake_->next = newNode;
+      size_++;
     }
   }
 
   template < typename T >
-  List< T >::List(List< T > && other) noexcept:
+  List< T >::List(List< T > && other):
     fake_(other.fake_),
     size_(other.size_)
   {
-    other.fake_ = new Node<T>();
+    other.fake_ = static_cast< Node< T > * >(operator new(sizeof(Node< T >)));
     other.fake_->next = other.fake_;
     other.size_ = 0;
   }
@@ -78,7 +86,7 @@ namespace smirnov
   template < typename T >
   List< T > & List< T >::operator=(const List< T > & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       List< T > temp(other);
       swap(temp);
@@ -87,15 +95,15 @@ namespace smirnov
   }
 
   template < typename T >
-  List< T > & List< T >::operator=(List< T > && other) noexcept
+  List< T > & List< T >::operator=(List< T > && other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       clear();
       delete fake_;
       fake_ = other.fake_;
       size_ = other.size_;
-      other.fake_ = new Node< T >();
+      other.fake_ = static_cast< Node< T > * >(operator new(sizeof(Node< T >)));
       other.fake_->next = other.fake_;
       other.size_ = 0;
     }
@@ -174,41 +182,12 @@ namespace smirnov
   }
 
   template < typename T >
-  void List< T >::push_back(const T & value)
-  {
-    Node< T > * newNode = new Node< T >(value);
-    Node< T > * current = fake_;
-    while (current->next != fake_)
-    {
-      current = current->next;
-    }
-    current->next = newNode;
-    newNode->next = fake_;
-    ++size_;
-  }
-
-  template < typename T >
   void List< T >::pop_front()
   {
     assert(!empty());
     Node< T > * temp = fake_->next;
     fake_->next = temp->next;
     delete temp;
-    --size_;
-  }
-
-  template < typename T >
-  void List< T >::pop_back()
-  {
-    assert(!empty());
-    Node< T > * current = fake_;
-    while (current->next->next != fake_)
-    {
-      current = current->next;
-    }
-    Node< T > * toDelete = current->next;
-    current->next = fake_;
-    delete toDelete;
     --size_;
   }
 

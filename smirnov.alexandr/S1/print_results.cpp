@@ -1,15 +1,19 @@
 #include "print_results.hpp"
+#include "list_utils.hpp"
 #include <limits>
 
 void smirnov::printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences)
 {
-  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
+  if (sequences.empty())
   {
-    if (it != sequences.cbegin())
-    {
-      out << " ";
-    }
-    out << it->first;
+    out << "\n";
+    return;
+  }
+  auto it = sequences.cbegin();
+  out << it->first;
+  for (auto it = ++sequences.cbegin(); it != sequences.cend(); ++it)
+  {
+    out << " " << it->first;
   }
   out << "\n";
 }
@@ -18,13 +22,16 @@ void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & 
 {
   for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
-    for (auto numIt = it->cbegin(); numIt != it->cend(); ++numIt)
+    if (it->empty())
     {
-      if (numIt != it->cbegin())
-      {
-        out << " ";
-      }
-      out << *numIt;
+      out << "\n";
+      continue;
+    }
+    auto numIt = it->cbegin();
+    out << *numIt;
+    for (auto numIt = ++it->cbegin(); numIt != it->cend(); ++numIt)
+    {
+      out << " " << *numIt;
     }
     out << "\n";
   }
@@ -44,15 +51,19 @@ void smirnov::printSums(std::ostream & out, const List< List< size_t > > & seque
       }
       sum += *numIt;
     }
-    sums.push_back(sum);
+    pushBack(sums, sum);
   }
   for (auto it = sums.begin(); it != sums.end(); ++it)
   {
-    if (it != sums.begin())
+    if (!sums.empty())
     {
-      out << " ";
+      auto it = sums.cbegin();
+      out << *it;
+      for (++it; it != sums.cend(); ++it)
+      {
+        out << " " << *it;
+      }
     }
-    out << *it;
+    out << "\n";
   }
-  out << "\n";
 }
