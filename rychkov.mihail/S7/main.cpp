@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 #include <parser.hpp>
 #include "processor.hpp"
 
@@ -17,12 +18,16 @@ int main(int argc, char** argv)
     {"merge", &processor::merge},
     {"extract", &processor::extract}
   };
-  parser_type parser{{std::cin, std::cout, std::cerr}, {}, std::move(call_map)};
-  if (!parser.processor.init(parser.context, argc, argv))
+  try
   {
+    parser_type parser{{std::cin, std::cout, std::cerr}, {argc, argv}, std::move(call_map)};
+    while (parser.run())
+    {}
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what();
     return 1;
   }
 
-  while (parser.run())
-  {}
 }

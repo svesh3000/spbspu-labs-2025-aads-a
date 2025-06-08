@@ -1,61 +1,58 @@
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 #include <set.hpp>
+#include <map.hpp>
 #include "processor.hpp"
 
-size_t rychkov::PairHash::operator()(const std::pair< std::string, std::string >& value) const
-{
-  std::hash< std::string > hasher;
-  return hasher(value.first) ^ (hasher(value.second) << 1);
-}
-
-bool rychkov::S7ParseProcessor::init(ParserContext& context, int argc, char** argv)
+rychkov::S7ParseProcessor::S7ParseProcessor(int argc, char** argv)
 {
   if (argc != 2)
   {
-    context.err << "wrong arguments count\n";
-    return false;
+    throw std::invalid_argument("wrong arguments count");
   }
   std::ifstream file(argv[1]);
   if (!file)
   {
-    context.err << "failed to open file\n";
-    return false;
+    throw std::invalid_argument("failed to open file");
   }
   std::string name;
   while (file >> name)
   {
     if (map.find(name) != map.end())
     {
-      context.err << "found graph duplicate\n";
-      return false;
+      throw std::logic_error("found graph duplicate");
     }
-    inner_map& graph = map.insert({name, {}}).first->second;
+    outer_mapped_type& graph = map.insert({name, {}}).first->second;
     size_t count = 0;
     if (!(file >> count))
     {
-      context.err << "failed to read graph size\n";
-      return false;
+      throw std::logic_error("failed to read graph size");
     }
     for (size_t i = 0; i < count; i++)
     {
       std::string from, to;
-      int weight = 0;
+      unsigned weight = 0;
       if (!(file >> from >> to >> weight))
       {
-        context.err << "failed to read edge\n";
-        return false;
+        throw std::logic_error("failed to read edge");
       }
-      graph[{from, to}].push_back(weight);
+      graph.first[{from, to}].insert(weight);
+      graph.second.insert(from);
+      graph.second.insert(to);
     }
   }
-  return true;
 }
 bool rychkov::S7ParseProcessor::graphs(ParserContext& context)
 {
-  if (map.empty() || !eol(context.in))
+  if (!eol(context.in))
   {
     return false;
+  }
+  if (map.empty())
+  {
+    context.out << '\n';
+    return true;
   }
   Set< std::string > graphs;
   for (const outer_map::value_type& i: map)
@@ -75,16 +72,14 @@ bool rychkov::S7ParseProcessor::vertexes(ParserContext& context)
   {
     return false;
   }
-  const inner_map& graph = map.at(name);
+  const vertexes_set& points = map.at(name).second;
   if (!eol(context.in))
   {
     return false;
   }
-  Set< std::string > points;
-  for (const inner_map::value_type& i: graph)
+  if (points.empty())
   {
-    points.insert(i.first.first);
-    points.insert(i.first.second);
+    context.out << '\n';
   }
   for (const std::string& i: points)
   {
@@ -99,29 +94,31 @@ bool rychkov::S7ParseProcessor::outbound(ParserContext& context)
   {
     return false;
   }
-  const inner_map& graph = map.at(name);
-  if (!eol(context.in))
+  const outer_mapped_type& graph = map.at(name);
+  if ((!graph.second.contains(point)) || !eol(context.in))
   {
     return false;
   }
-  MultiSet< std::pair< std::string, unsigned > > edges;
-  for (const inner_map::value_type& i: graph)
+  Map< std::string, weights_set > edges;
+  for (const inner_map::value_type& i: graph.first)
   {
     if (i.first.first == point)
     {
-      for (unsigned weight: i.second)
-      {
-        edges.emplace(i.first.second, weight);
-      }
+      edges[i.first.second].insert(i.second.begin(), i.second.end());
     }
   }
   if (edges.empty())
   {
-    return false;
+    context.out << '\n';
   }
   for (const decltype(edges)::value_type& i: edges)
   {
-    context.out << i.first << ' ' << i.second << '\n';
+    context.out << i.first;
+    for (unsigned j: i.second)
+    {
+      context.out << ' ' << j;
+    }
+    context.out << '\n';
   }
   return true;
 }
@@ -132,29 +129,31 @@ bool rychkov::S7ParseProcessor::inbound(ParserContext& context)
   {
     return false;
   }
-  const inner_map& graph = map.at(name);
-  if (!eol(context.in))
+  const outer_mapped_type& graph = map.at(name);
+  if ((!graph.second.contains(point)) || !eol(context.in))
   {
     return false;
   }
-  MultiSet< std::pair< std::string, unsigned > > edges;
-  for (const inner_map::value_type& i: graph)
+  Map< std::string, weights_set > edges;
+  for (const inner_map::value_type& i: graph.first)
   {
     if (i.first.second == point)
     {
-      for (unsigned weight: i.second)
-      {
-        edges.emplace(i.first.first, weight);
-      }
+      edges[i.first.first].insert(i.second.begin(), i.second.end());
     }
   }
   if (edges.empty())
   {
-    return false;
+    context.out << '\n';
   }
   for (const decltype(edges)::value_type& i: edges)
   {
-    context.out << i.first << ' ' << i.second << '\n';
+    context.out << i.first;
+    for (unsigned j: i.second)
+    {
+      context.out << ' ' << j;
+    }
+    context.out << '\n';
   }
   return true;
 }
@@ -166,12 +165,14 @@ bool rychkov::S7ParseProcessor::bind(ParserContext& context)
   {
     return false;
   }
-  inner_map& graph = map.at(name);
+  outer_mapped_type& graph = map.at(name);
   if (!eol(context.in))
   {
     return false;
   }
-  graph[{from, to}].push_back(weight);
+  graph.first[{from, to}].insert(weight);
+  graph.second.insert(from);
+  graph.second.insert(to);
   return true;
 }
 bool rychkov::S7ParseProcessor::cut(ParserContext& context)
@@ -182,7 +183,7 @@ bool rychkov::S7ParseProcessor::cut(ParserContext& context)
   {
     return false;
   }
-  inner_map& graph = map.at(name);
+  inner_map& graph = map.at(name).first;
   if (!eol(context.in))
   {
     return false;
@@ -198,21 +199,42 @@ bool rychkov::S7ParseProcessor::cut(ParserContext& context)
   }
   else
   {
-    if (to_erase->second.remove(weight) == 0)
+    for (weights_set::iterator i = to_erase->second.begin(); i != to_erase->second.end(); ++i)
     {
-      return false;
+      if (*i == weight)
+      {
+        to_erase->second.erase(i);
+        return true;
+      }
     }
+    return false;
   }
   return true;
 }
 bool rychkov::S7ParseProcessor::create(ParserContext& context)
 {
   std::string name;
-  if (!(context.in >> name) || (map.find(name) != map.end()) || !eol(context.in))
+  size_t count = 0;
+  if (!(context.in >> name >> count) || (map.find(name) != map.end()) || !eol(context.in))
   {
     return false;
   }
-  map.insert({name, {}});
+  outer_mapped_type& dest = map.insert({name, {}}).first->second;
+  std::string temp;
+  for (size_t i = 0; i < count; i++)
+  {
+    if (!(context.in >> temp))
+    {
+      map.erase(name);
+      return false;
+    }
+    dest.second.insert(temp);
+  }
+  if (!eol(context.in))
+  {
+    map.erase(name);
+    return false;
+  }
   return true;
 }
 bool rychkov::S7ParseProcessor::merge(ParserContext& context)
@@ -222,11 +244,15 @@ bool rychkov::S7ParseProcessor::merge(ParserContext& context)
   {
     return false;
   }
-  inner_map& left = map.at(lhs), right = map.at(rhs);
-  inner_map& res = map.insert({result, left}).first->second;
-  for (const inner_map::value_type& i: right)
+  outer_mapped_type& left = map.at(lhs), right = map.at(rhs);
+  outer_mapped_type& res = map.insert({result, left}).first->second;
+  for (const inner_map::value_type& i: right.first)
   {
-    res.insert(i);
+    res.first[i.first].insert(i.second.begin(), i.second.end());
+  }
+  for (const vertexes_set::value_type& i: right.second)
+  {
+    res.second.insert(i);
   }
   return true;
 }
@@ -238,42 +264,31 @@ bool rychkov::S7ParseProcessor::extract(ParserContext& context)
   {
     return false;
   }
-  inner_map& dest = map.insert({result, {}}).first->second;
-  inner_map& source = map.at(rhs);
-  Map< std::string, bool > points;
+  outer_mapped_type& dest = map.insert({result, {}}).first->second;
+  outer_mapped_type& source = map.at(rhs);
   std::string temp;
   for (size_t i = 0; i < count; i++)
   {
-    if (!(context.in >> temp))
+    if (!(context.in >> temp) || (source.second.find(temp) == source.second.end()))
     {
-      context.err << "failed to read vertex\n";
+      map.erase(result);
       return false;
     }
-    points.try_emplace(temp, false);
+    dest.second.insert(temp);
   }
-  size_t intersect = 0;
-  for (const inner_map::value_type& i: source)
-  {
-    decltype(points)::iterator from = points.find(i.first.first), to = points.find(i.first.second);
-    if ((from != points.end()) && (to != points.end()))
-    {
-      if (!from->second)
-      {
-        from->second = true;
-        intersect++;
-      }
-      if (!to->second)
-      {
-        to->second = true;
-        intersect++;
-      }
-      dest.insert(i);
-    }
-  }
-  if ((intersect < count) || !eol(context.in))
+  if (!eol(context.in))
   {
     map.erase(result);
     return false;
+  }
+  for (const inner_map::value_type& i: source.first)
+  {
+    decltype(source.second)::const_iterator from = source.second.find(i.first.first);
+    decltype(source.second)::const_iterator to = source.second.find(i.first.second);
+    if ((from != source.second.cend()) && (to != source.second.cend()))
+    {
+      dest.first.insert(i);
+    }
   }
   return true;
 }
