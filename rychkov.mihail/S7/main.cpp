@@ -5,28 +5,17 @@
 
 int main(int argc, char** argv)
 {
-  using processor = rychkov::S7ParseProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  parser_type::map_type call_map = {
-    {"graphs", &processor::graphs},
-    {"vertexes", &processor::vertexes},
-    {"outbound", &processor::outbound},
-    {"inbound", &processor::inbound},
-    {"bind", &processor::bind},
-    {"cut", &processor::cut},
-    {"create", &processor::create},
-    {"merge", &processor::merge},
-    {"extract", &processor::extract}
-  };
   try
   {
-    parser_type parser{{std::cin, std::cout, std::cerr}, {argc, argv}, std::move(call_map)};
-    while (parser.run())
+    rychkov::S7ParseProcessor processor{argc, argv};
+
+    rychkov::ParserContext context{std::cin, std::cout, std::cerr};
+    while (rychkov::Parser::parse(context, processor, rychkov::S7ParseProcessor::call_map))
     {}
   }
-  catch (const std::exception& e)
+  catch (const std::invalid_argument& e)
   {
-    std::cerr << e.what();
+    std::cerr << e.what() << '\n';
     return 1;
   }
 

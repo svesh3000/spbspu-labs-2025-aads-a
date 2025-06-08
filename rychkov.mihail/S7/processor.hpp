@@ -36,6 +36,8 @@ namespace rychkov
   class S7ParseProcessor
   {
   public:
+    static Parser::map_type< S7ParseProcessor > call_map;
+
     S7ParseProcessor(int argc, char** argv);
 
     bool graphs(ParserContext& context);
