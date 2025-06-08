@@ -1,24 +1,20 @@
 #include <iostream>
-#include <map.hpp>
+#include <exception>
 #include <parser.hpp>
 #include "processor.hpp"
 
 int main(int argc, char** argv)
 {
-  using processor = rychkov::S4ParseProcessor;
-  using parser_type = rychkov::Parser< processor >;
-  parser_type::map_type call_map = {
-    {"print", &processor::print},
-    {"complement", &processor::make_complement},
-    {"intersect", &processor::make_intersect},
-    {"union", &processor::make_union}
-  };
-  parser_type parser{{std::cin, std::cout, std::cerr}, {}, std::move(call_map)};
-  if (!parser.processor.init(parser.context, argc, argv))
+  try
   {
+    rychkov::S4ParseProcessor processor{argc, argv};
+    rychkov::ParserContext context{std::cin, std::cout, std::cerr};
+    while (rychkov::Parser::parse(context, processor, rychkov::S4ParseProcessor::call_map))
+    {}
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
     return 1;
   }
-
-  while (parser.run())
-  {}
 }

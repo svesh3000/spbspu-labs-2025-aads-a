@@ -6,33 +6,12 @@
 #include <boost/hash2/fnv1a.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/get_integral_result.hpp>
+#include <unordered_map.hpp>
 #include <set.hpp>
-#include <list.hpp>
 #include <parser.hpp>
 
 namespace rychkov
 {
-  template< class T = void >
-  struct Hash
-  {
-    size_t operator()(const T& value) const
-    {
-      boost::hash2::fnv1a_64 hasher;
-      boost::hash2::hash_append(hasher, {}, value);
-      return boost::hash2::get_integral_result< size_t >(hasher);
-    }
-  };
-  template<>
-  struct Hash< void >
-  {
-    template< class T >
-    size_t operator()(const T& value) const
-    {
-      boost::hash2::fnv1a_64 hasher;
-      boost::hash2::hash_append(hasher, {}, value);
-      return boost::hash2::get_integral_result< size_t >(hasher);
-    }
-  };
   class S7ParseProcessor
   {
   public:

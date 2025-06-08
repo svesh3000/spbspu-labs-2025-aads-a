@@ -10,7 +10,9 @@ namespace rychkov
   class S4ParseProcessor
   {
   public:
-    bool init(ParserContext& context, int argc, char** argv);
+    static Parser::map_type< S4ParseProcessor > call_map;
+
+    S4ParseProcessor(int argc, char** argv);
     bool print(ParserContext& context);
     bool make_complement(ParserContext& context);
     bool make_intersect(ParserContext& context);
