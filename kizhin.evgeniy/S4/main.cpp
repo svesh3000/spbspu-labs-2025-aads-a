@@ -1,23 +1,27 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include "args-parser.hpp"
 #include "command-processor.hpp"
 #include "io-utils.hpp"
 
 int main(int argc, char** argv)
 {
-  using namespace kizhin;
+  if (argc != 2 || argv[1][0] == '\0') {
+    std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    return 1;
+  }
+  const char* filename = argv[1];
   try {
-    const Args args = parseArgs(argc, argv, std::cerr);
-    const std::string& filename = args.filename;
     std::ifstream in(filename);
     if (!in.is_open()) {
-      throw std::logic_error("Failed to open file: " + filename);
+      std::cerr << "Failed to open file: " + std::string(filename) << '\n';
+      return 1;
     }
+    using namespace kizhin;
     DSContainer datasets;
     if (!(in >> datasets)) {
-      throw std::logic_error("Failed read data from file: " + filename);
+      std::cerr << "Failed to read data from file: " + std::string(filename) << '\n';
+      return 1;
     }
     processCommands(datasets, std::cin, std::cout);
   } catch (const std::exception& e) {
