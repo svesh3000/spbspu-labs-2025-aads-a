@@ -23,6 +23,7 @@ BOOST_AUTO_TEST_CASE(not_empty_tree)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+
 BOOST_AUTO_TEST_SUITE(size_method)
 
 BOOST_AUTO_TEST_CASE(no_element_tree)
@@ -78,6 +79,7 @@ BOOST_AUTO_TEST_CASE(ya_three_element_tree)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(clear_method)
 
@@ -144,8 +146,6 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(going_through_tree)
 
-
-
 BOOST_AUTO_TEST_CASE(one_element_avl_tree)
 {
   std::ostringstream out;
@@ -197,7 +197,6 @@ BOOST_AUTO_TEST_CASE(three_element_avl_tree)
   }
   BOOST_TEST(out.str() == "hicutecat");
 }
-
 
 BOOST_AUTO_TEST_CASE(five_element_avl_tree)
 {
@@ -253,5 +252,60 @@ BOOST_AUTO_TEST_CASE(eleven_element_avl_tree)
   BOOST_TEST(out.str() == "1234567891011");
 }
 
+BOOST_AUTO_TEST_CASE(stress_test)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  for (size_t i = 0; i < 1000000; ++i)
+  {
+    tree.insert({ i, i });
+  }
+  tree.clear();
+  out << tree.empty();
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(find_method)
+
+BOOST_AUTO_TEST_CASE(find_one_element_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 1, 1 });
+  auto it = tree.find(1);
+  out << *it;
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(find_eleven_element_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  for (size_t i = 1; i <= 11; ++i)
+  {
+    tree.insert({ i, i });
+  }
+  auto it_1 = tree.find(11);
+  auto it_2 = tree.find(7);
+  out << *it_1 << " " << *it_2;
+  BOOST_TEST(out.str() == "11 7");
+}
+
+BOOST_AUTO_TEST_CASE(find_five_element_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 1, "very" });
+  tree.insert({ 2, "hi" });
+  tree.insert({ 3, "cute" });
+  tree.insert({ 4, "tasty" });
+  tree.insert({ 5, "cat" });
+  auto it_1 = tree.find(2);
+  auto it_2 = tree.find(5);
+  out << *it_1 << " " << *it_2;
+  BOOST_TEST(out.str() == "hi cat");
+}
 
 BOOST_AUTO_TEST_SUITE_END()

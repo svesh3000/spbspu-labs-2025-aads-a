@@ -16,7 +16,7 @@ namespace petrov
     AVLTreeNode< K, T > * left;
     AVLTreeNode< K, T > * right;
     AVLTreeNode< K, T > * parent;
-    size_t height;
+    int height;
     void setHeight();
   };
 
@@ -114,7 +114,9 @@ namespace petrov
   private:
     node_t * root_;
     size_t size_;
-    void balance();
+    void balance(node_t * node);
+    void leftRotate(node_t * node);
+    void rightRotate(node_t * node);
     void clearBiTree(node_t * node) noexcept;
   };
 
@@ -410,13 +412,20 @@ namespace petrov
       {
         temp = temp->parent;
         temp->setHeight();
+        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
+        {
+          balance(temp);
+        }
+        else if (!temp->left && temp->right && temp->right->height > 1)
+        {
+          balance(temp);
+        }
+        else if (!temp->right && temp->left && temp->left->height > 1)
+        {
+          balance(temp);
+        }
+        temp->setHeight();
       }
-      /* 
-      if (std::abs(root_->left->height - root_->right_height) > 1)
-      {
-        balancing
-      }
-      */
       return std::pair< const_it_t, bool >{ const_it_t(temp), true };
     }
     return std::pair< const_it_t, bool >{ const_it_t(root_), true };
@@ -471,13 +480,20 @@ namespace petrov
       {
         temp = temp->parent;
         temp->setHeight();
+        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
+        {
+          balance(temp);
+        }
+        else if (!temp->left && temp->right && temp->right->height > 1)
+        {
+          balance(temp);
+        }
+        else if (!temp->right && temp->left && temp->left->height > 1)
+        {
+          balance(temp);
+        }
+        temp->setHeight();
       }
-      /* 
-      if (std::abs(root_->left->height - root_->right_height) > 1)
-      {
-        balancing
-      }
-      */
       return std::pair< const_it_t, bool >{ const_it_t(temp), true };
     }
     return std::pair< const_it_t, bool >{ const_it_t(root_), true };
@@ -579,6 +595,188 @@ namespace petrov
       delete root;
       root = nullptr;
       size_--;
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  void AVLTree< K, T, Cmp >::balance(node_t * node)
+  {
+    if (node->left && node->right)
+    {
+      if (Cmp{}(node->left->height, node->right->height))
+      {
+        node = node->right;
+        if (node->left && node->right && Cmp{}(node->left->height, node->right->height))
+        {
+          leftRotate(node);
+        }
+        else if (node->left && node->right)
+        {
+          rightRotate(node->left);
+          leftRotate(node->parent);
+        }
+        else if (!node->left)
+        {
+          if (!node->right->left)
+          {
+            leftRotate(node->right);
+          }
+          else
+          {
+            rightRotate(node->right->left);
+            leftRotate(node->right);
+          }
+        }
+        else if (!node->right)
+        {
+          if (!node->left->right)
+          {
+            rightRotate(node->left);
+          }
+          else
+          {
+            leftRotate(node->left->right);
+            rightRotate(node->left);
+          }
+        }
+      }
+      else
+      {
+        node = node->left;
+        if (node->left && node->right && Cmp{}(node->right->height, node->left->height))
+        {
+          rightRotate(node);
+        }
+        else if (node->left && node->right)
+        {
+          leftRotate(node->right);
+          rightRotate(node->parent);
+        }
+        else if (!node->left)
+        {
+          if (!node->right->left)
+          {
+            leftRotate(node->right);
+          }
+          else
+          {
+            rightRotate(node->right->left);
+            leftRotate(node->right);
+          }
+        }
+        else if (!node->right)
+        {
+          if (!node->left->right)
+          {
+            rightRotate(node->left);
+          }
+          else
+          {
+            leftRotate(node->left->right);
+            rightRotate(node->left);
+          }
+        }
+      }
+    }
+    else if (!node->left)
+    {
+      if (!node->right->left)
+      {
+        leftRotate(node->right);
+      }
+      else
+      {
+        rightRotate(node->right->left);
+        leftRotate(node->right);
+      }
+    }
+    else if (!node->right)
+    {
+      if (!node->left->right)
+      {
+        rightRotate(node->left);
+      }
+      else
+      {
+        leftRotate(node->left->right);
+        rightRotate(node->left);
+      }
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  void AVLTree< K, T, Cmp >::leftRotate(node_t * node)
+  {
+    auto grandpa = node->parent;
+    auto son = node->left;
+    if (grandpa->parent)
+    {
+      if (grandpa->parent->right == grandpa)
+      {
+        grandpa->parent->right = node;
+      }
+      else
+      {
+        grandpa->parent->left = node;
+      }
+      node->parent = grandpa->parent;
+      grandpa->right = son;
+      grandpa->parent = node;
+      node->left = grandpa;
+      if (son)
+      {
+        son->parent = grandpa;
+      }
+    }
+    else
+    {
+      root_ = node;
+      node->parent = nullptr;
+      grandpa->right = son;
+      grandpa->parent = node;
+      node->left = grandpa;
+      if (son)
+      {
+        son->parent = grandpa;
+      }
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  void AVLTree< K, T, Cmp >::rightRotate(node_t * node)
+  {
+    auto grandpa = node->parent;
+    auto son = node->right;
+    if (grandpa->parent)
+    {
+      if (grandpa->parent->right == grandpa)
+      {
+        grandpa->parent->right = node;
+      }
+      else
+      {
+        grandpa->parent->left = node;
+      }
+      node->parent = grandpa->parent;
+      grandpa->left = son;
+      grandpa->parent = node;
+      node->right = grandpa;
+      if (son)
+      {
+        son->parent = grandpa;
+      }
+    }
+    else
+    {
+      root_ = node;
+      node->parent = nullptr;
+      grandpa->left = son;
+      grandpa->parent = node;
+      node->right = grandpa;
+      if (son)
+      {
+        son->parent = grandpa;
+      }
     }
   }
 }
