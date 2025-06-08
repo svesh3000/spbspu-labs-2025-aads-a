@@ -44,38 +44,38 @@ BOOST_AUTO_TEST_CASE(CopyConstructorTest)
   smirnov::List< int > list2(list1);
 
   BOOST_TEST(list2.size() == 3);
-  BOOST_TEST(list2.front() == 3);
-  BOOST_TEST(list2.back() == 1);
+  BOOST_TEST(list2.front() == 1);
+  BOOST_TEST(list2.back() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(MoveConstructorTest)
 {
   smirnov::List< int > list1;
-  list1.push_front(1);
-  list1.push_front(2);
   list1.push_front(3);
+  list1.push_front(2);
+  list1.push_front(1);
 
   smirnov::List< int > list2(std::move(list1));
 
   BOOST_TEST(list2.size() == 3);
-  BOOST_TEST(list2.front() == 3);
-  BOOST_TEST(list2.back() == 1);
+  BOOST_TEST(list2.front() == 1);
+  BOOST_TEST(list2.back() == 3);
   BOOST_TEST(list1.empty());
 }
 
 BOOST_AUTO_TEST_CASE(CopyAssignmentTest)
 {
   smirnov::List< int > list1;
-  list1.push_front(1);
-  list1.push_front(2);
   list1.push_front(3);
+  list1.push_front(2);
+  list1.push_front(1);
 
   smirnov::List< int > list2;
   list2 = list1;
 
   BOOST_TEST(list2.size() == 3);
-  BOOST_TEST(list2.front() == 3);
-  BOOST_TEST(list2.back() == 1);
+  BOOST_TEST(list2.front() == 1);
+  BOOST_TEST(list2.back() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(MoveAssignmentTest)
