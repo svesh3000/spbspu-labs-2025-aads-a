@@ -1,13 +1,13 @@
 #ifndef UNORDERED_BASE_DECLARATION_HPP
 #define UNORDERED_BASE_DECLARATION_HPP
 
-#include <type_traits>
 #include <utility>
 
 #include <boost/hash2/fnv1a.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/get_integral_result.hpp>
 
+#include <type_traits.hpp>
 #include "iterator.hpp"
 
 namespace rychkov
@@ -58,10 +58,8 @@ namespace rychkov
     using pointer = value_type*;
     using const_pointer = const value_type*;
 
-    using iterator = UnorderedBaseIterator< value_type, false, false >;
-    using const_iterator = UnorderedBaseIterator< value_type, true, false >;
-    using reverse_iterator = UnorderedBaseIterator< value_type, false, true >;
-    using const_reverse_iterator = UnorderedBaseIterator< value_type, true, true >;
+    using iterator = UnorderedBaseIterator< value_type, false >;
+    using const_iterator = UnorderedBaseIterator< value_type, true >;
 
   private:
     static constexpr bool noexcept_default = std::is_nothrow_default_constructible< hasher >::value
@@ -71,9 +69,9 @@ namespace rychkov
 
   public:
     UnorderedBase() noexcept(noexcept_default);
-    explicit UnorderedBase(size_type cnt, hasher hash = {}, key_equal eq = {}) noexcept(noexcept_move);
     UnorderedBase(const UnorderedBase& rhs);
     UnorderedBase(UnorderedBase&& rhs) noexcept(noexcept_move);
+    explicit UnorderedBase(size_type cnt, hasher hash = {}, key_equal eq = {});
     UnorderedBase(std::initializer_list< value_type > init, hasher hash = {}, key_equal eq = {});
     template< class InputIt >
     UnorderedBase(InputIt from, InputIt to, hasher hash = {}, key_equal eq = {});
@@ -89,19 +87,17 @@ namespace rychkov
     float max_load_factor() const noexcept;
     void max_load_factor(float new_factor) noexcept;
 
+    size_type bucket_count() const noexcept;
+    size_type max_bucket_count() const noexcept;
+    size_type bucket_size() const noexcept;
+    size_type bucket(size_type index) const noexcept;
+
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
     const_iterator cbegin() const noexcept;
     iterator end() noexcept;
     const_iterator end() const noexcept;
     const_iterator cend() const noexcept;
-
-    reverse_iterator rbegin() noexcept;
-    const_reverse_iterator rbegin() const noexcept;
-    const_reverse_iterator crbegin() const noexcept;
-    reverse_iterator rend() noexcept;
-    const_reverse_iterator rend() const noexcept;
-    const_reverse_iterator crend() const noexcept;
 
     iterator find(const key_type& key);
     const_iterator find(const key_type& key) const;
@@ -141,7 +137,7 @@ namespace rychkov
     transparent_hash_key_t< std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& >, K1 >
         operator[](K1&& key);
 
-    void clear();
+    void clear() noexcept;
     void swap(UnorderedBase& rhs) noexcept(is_nothrow_swappable_v< hasher > && is_nothrow_swappable_v< key_equal >);
 
     void reserve(size_type cnt);
@@ -190,6 +186,37 @@ namespace rychkov
     template< bool IsSet2 = IsSet, class K1, class... Args >
     transparent_hash_key_t< std::enable_if_t< !IsSet && !IsSet2, std::pair< iterator, bool > >, K1 >
         try_emplace(const_iterator hint, K1&& key, Args&&... args);
+
+  private:
+    using stored_value = std::pair< bool, value_type >;
+    using temp_value = std::conditional_t< IsSet, key_type, std::pair< key_type, mapped_type > >;
+    static constexpr float default_max_factor = 0.75;
+
+    size_type capacity_, size_;
+    float max_factor_;
+    stored_value* data_;
+    unsigned char* raw_;
+    stored_value* cached_begin_;
+    stored_value* cached_rbegin_;
+    hasher hash_;
+    key_equal equal_;
+
+    void allocate(size_type new_capacity);
+
+    template< class K1 >
+    std::pair< const_iterator, bool > find_hint_pair(const K1& key) const;
+    template< class K1 >
+    std::pair< const_iterator, bool > correct_hint(const_iterator hint, const K1& key) const;
+
+    template< class... Args >
+    std::pair< iterator, bool > emplace_hint_impl(std::pair< const_iterator, bool > hint, Args&&... args);
+    template< bool IsSet2 = IsSet, class K1, class... Args >
+    std::enable_if_t< IsSet && IsSet2, std::pair< iterator, bool > > emplace_impl
+        (const_iterator hint, K1&& key, Args&&... args);
+
+    template< class V = value_type >
+    static const key_type& get_key(const V& value);
+    static const key_type& get_key(const key_type& key);
   };
 }
 
