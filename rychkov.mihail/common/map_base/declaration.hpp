@@ -170,7 +170,7 @@ namespace rychkov
     transparent_compare_key_t< std::enable_if_t< !IsSet && !IsSet2 && !IsMulti && !IsMulti2, mapped_type& >, K1 >
         operator[](K1&& key);
 
-    void clear();
+    void clear() noexcept;
     void swap(MapBase& rhs) noexcept(is_nothrow_swappable_v< value_compare >);
 
     iterator erase(const_iterator pos);
@@ -227,8 +227,8 @@ namespace rychkov
     using node_size_type = typename node_type::size_type;
 
     value_compare comp_;
-    node_type* cached_begin_ = nullptr;
-    node_type* cached_rbegin_ = nullptr;
+    node_type* cached_begin_;
+    node_type* cached_rbegin_;
     size_t size_;
 
     node_type*const fake_parent_ = nullptr;
@@ -240,7 +240,6 @@ namespace rychkov
     static void correct_emplace_result(node_type& left, node_type& right,
         node_size_type ins_point, const_iterator& hint);
     static void correct_erase_result(const_iterator to, const_iterator from, iterator& result, bool will_be_replaced);
-    static void destroy_subtree(node_type* node);
 
     template< class K1 >
     std::pair< const_iterator, const_iterator > lower_bound_impl(const K1& key) const;
