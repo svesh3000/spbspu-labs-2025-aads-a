@@ -1,6 +1,7 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 #include <functional>
+#include <cmath>
 #include "hash-node.hpp"
 #include "hash-iterators.hpp"
 
@@ -43,6 +44,11 @@ namespace alymova
     Iterator insert(const ValueType& value);
     Iterator insert(ValueType&& value);
 
+    template< class... Args >
+    Iterator emplace(Args&&... args);
+    template< class... Args >
+    Iterator emplace_hint(ConstIterator hint, Args&&... args);
+
     size_t erase(const Key& key);
     Iterator erase(Iterator pos);
     Iterator erase(ConstIterator pos);
@@ -50,12 +56,13 @@ namespace alymova
     Iterator find(const Key& key);
     ConstIterator find(const Key& key) const;
 
+    void clear() noexcept;
+    void swap(HashTable& other);
+
     float load_factor() const noexcept;
     float max_load_factor() const noexcept;
     void max_load_factor(float mlf) noexcept; //resixe if new mlf
-
-    void clear() noexcept;
-    void swap(HashTable& other);
+    void rehash();
   private:
     float max_load_factor_ = 0.7;
     size_t size_;
@@ -63,7 +70,9 @@ namespace alymova
     T* array_;
     Hash hasher;
 
-    std::pair< bool, T > robRich(const ValueType& value, size_t home_slot);
+    std::pair< size_t, T > rob_rich(size_t home_index, const Node& value);
+    Iterator insert_node(size_t index, const Node& node);
+    size_t get_next_prime_capacity();
   };
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -74,6 +83,19 @@ namespace alymova
     hasher()
   {
     clear();
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(const HashTable& other):
+    size_(other.size_),
+    capacity_(other.capacity_),
+    array_(new T[capacity_]()),
+    hasher(other.hasher)
+  {
+    for (auto it = other.begin(); it < other.end(); it++)
+    {
+      array_.emplace(*it);
+    }
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -156,21 +178,48 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(const ValueType& value)
   {
+    emplace(value);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(ValueType&& value)
+  {
+    emplace(std::forward< ValueType >(value));
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  template< class... Args >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::emplace(Args&&... args)
+  {
+    if (size_ > max_load_factor_ * capacity_)
+    {
+      rehash();
+    }
+    ValueType value(std::forward< Args >(args)...);
     size_t home_index = hasher(value.first) % capacity_;
-    if (array_[home_index].first == NodeType::Empty)
+    ConstIterator hint(array_ + home_index, array_ + capacity_);
+    return emplace_hint(hint, std::move(value));
+    /*ValueType value(std::forward< Args >(args)...);
+    size_t home_index = hasher(value.first) % capacity_;
+    Node node{value, 0};
+    size_++;
+    return insert_node(home_index, node);*/
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  template< class... Args >
+  HashIterator< Key, Value, Hash, KeyEqual >
+    HashTable< Key, Value, Hash, KeyEqual >::emplace_hint(ConstIterator hint, Args&&... args)
+  {
+    if (size_ > max_load_factor_ * capacity_)
     {
-      array_[home_index].first = NodeType::Fill;
-      array_[home_index].second = Node{value, 0};
-      return Iterator(array_ + home_index, array_ + capacity_);
+      rehash();
     }
-    std::pair< bool, T > prob_res = robRich(value, home_index);
-    if (!prob_res.first)
-    {}
-    if (prob_res.second.first == NodeType::Fill)
-    {
-      return insert(prob_res.second.second.data);
-    }
-    return Iterator(&prob_res.second, array_ + capacity_);
+    ValueType value(std::forward< Args >(args)...);
+    size_t home_index = hint.node_ - array_;;
+    Node node{value, 0};
+    size_++;
+    return insert_node(home_index, node);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -194,26 +243,6 @@ namespace alymova
     return it;
   }
 
-
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  float HashTable< Key, Value, Hash, KeyEqual >::load_factor() const noexcept
-  {
-    return (size_ * 1.0) / (capacity_ * 1.0);
-  }
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  float HashTable< Key, Value, Hash, KeyEqual >::max_load_factor() const noexcept
-  {
-    return max_load_factor_;
-  }
-
-  template< class Key, class Value, class Hash, class KeyEqual >
-  void HashTable< Key, Value, Hash, KeyEqual >::max_load_factor(float mlf) noexcept
-  {
-    max_load_factor_ = mlf;
-  }
-
   template< class Key, class Value, class Hash, class KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::clear() noexcept
   {
@@ -234,20 +263,112 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  std::pair< bool, typename HashTable< Key, Value, Hash, KeyEqual >::T >
-    HashTable< Key, Value, Hash, KeyEqual >::robRich(const ValueType& value, size_t home_slot)
+  float HashTable< Key, Value, Hash, KeyEqual >::load_factor() const noexcept
   {
-    std::pair< NodeType, Node > node{NodeType::Fill, Node{value, 1}};
-    for (size_t i = (home_slot + 1) % capacity_; i != home_slot; i = (i + 1) % capacity_)
+    return (size_ * 1.0) / (capacity_ * 1.0);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  float HashTable< Key, Value, Hash, KeyEqual >::max_load_factor() const noexcept
+  {
+    return max_load_factor_;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  void HashTable< Key, Value, Hash, KeyEqual >::max_load_factor(float mlf) noexcept
+  {
+    max_load_factor_ = mlf;
+    if (size_ > capacity_ * max_load_factor_)
     {
-      if (node.second.psl > array_[i].second.psl)
-      {
-        node.swap(array_[i]);
-        return {true, node};
-      }
-      node.second.psl++;
+      rehash();
     }
-    return {false, node};
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  void HashTable< Key, Value, Hash, KeyEqual >::rehash()
+  {
+    T* array_new = new T[get_next_prime_capacity()]();
+    std::swap(array_new, array_);
+    clear();
+    for (size_t i = 0; i < capacity_; i++)
+    {
+      if (array_new[i].first == NodeType::Fill)
+      {
+        insert(array_new[i].second.data);
+      }
+    }
+    capacity_ = get_next_prime_capacity();
+    delete[] array_new;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  std::pair< size_t, typename HashTable< Key, Value, Hash, KeyEqual >::T >
+    HashTable< Key, Value, Hash, KeyEqual >::rob_rich(size_t home_index, const Node& node)
+  {
+    std::pair< NodeType, Node > node_t{NodeType::Fill, node};
+    node_t.second.psl = 1;
+    for (size_t i = (home_index + 1) % capacity_; i != home_index; i = (i + 1) % capacity_)
+    {
+      if (node_t.second.psl > array_[i].second.psl)
+      {
+        node_t.swap(array_[i]);
+        return {i, node_t};
+      }
+      node_t.second.psl++;
+    }
+    return {home_index, node_t};
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert_node(size_t index, const Node& node)
+  {
+    size_t home_index;
+    if (index < node.psl)
+    {
+      home_index = capacity_ - node.psl;
+    }
+    else
+    {
+      home_index = index - node.psl;
+    }
+    if (array_[home_index].first == NodeType::Empty)
+    {
+      array_[home_index].first = NodeType::Fill;
+      array_[home_index].second = node;
+      return Iterator(array_ + home_index, array_ + capacity_);
+    }
+    std::pair< size_t, T > rob_res = rob_rich(home_index, node);
+    if (rob_res.first == home_index)
+    {}
+    if (rob_res.second.first == NodeType::Fill)
+    {
+      return insert_node(rob_res.first, rob_res.second.second);
+    }
+    return Iterator(array_ + rob_res.first, array_ + capacity_);
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  size_t HashTable< Key, Value, Hash, KeyEqual >::get_next_prime_capacity()
+  {
+    size_t new_cap = capacity_ * 2;
+
+    for (size_t i = new_cap + 1; i < std::pow(10, 7); i += 2)
+    {
+      bool prime = true;
+      for (size_t del = 3; del < std::round(std::sqrt(new_cap)) + 1; del++)
+      {
+        if (i % del == 0)
+        {
+          prime = false;
+          break;
+        }
+      }
+      if (prime)
+      {
+        return i;
+      }
+    }
+    return new_cap;
   }
 }
 

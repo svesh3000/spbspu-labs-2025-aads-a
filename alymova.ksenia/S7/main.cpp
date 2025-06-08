@@ -59,14 +59,23 @@ int main(int argc, char** argv)
   }
   /*HashTable< int, std::string > table;
   std::pair< int, std::string > p1(1, "fffff");
-  std::pair< int, std::string > p2(2, "vvvvv");
+  std::pair< int, std::string > p2(1, "vvvvv");
+  std::pair< int, std::string > p3(3, "vvvvv");
+  std::pair< int, std::string > p4(45, "vvvvv");
+  std::pair< int, std::string > p5(12, "vvvvv");
   table.insert(p1);
   table.insert(p2);
+  table.insert(p3);
+  table.insert(p4);
+  table.insert(p5);
+  for (size_t i = 3; i < 20; i++)
+  {
+    std::pair< int, std::string > p(i, "gggg");
+    table.insert(p);
+  }
   for (auto it = table.begin(); it != table.end(); it++)
   {
     std::cout << it->first << '\n';
-  }
-  auto it = table.find(3);
-  std::cout << (it == table.end()) << '\n';*/
+  }*/
 }
 
