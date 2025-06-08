@@ -11,6 +11,7 @@ namespace smirnov
       list.push_front(value);
       return;
     }
+
     List< T > temp;
     while (!list.empty())
     {

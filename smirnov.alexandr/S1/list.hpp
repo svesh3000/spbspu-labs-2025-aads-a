@@ -59,18 +59,17 @@ namespace smirnov
     size_(0)
   {
     fake_->next = fake_;
-    List< T > temp;
-    for (ConstIterator< T > it = other.cbegin(); it != other.cend(); ++it)
+    Node< T >* current = other.fake_->next;
+    Node< T >* tail = fake_;
+    while (current != other.fake_)
     {
-      temp.push_front(*it);
+        Node< T >* newNode = new Node< T >(current->data);
+        tail->next = newNode;
+        tail = newNode;
+        current = current->next;
+        size_++;
     }
-    for (ConstIterator< T > it = temp.cbegin(); it != temp.cend(); ++it)
-    {
-      Node< T > * newNode = new Node< T >(*it);
-      newNode->next = fake_->next;
-      fake_->next = newNode;
-      size_++;
-    }
+    tail->next = fake_;
   }
 
   template < typename T >

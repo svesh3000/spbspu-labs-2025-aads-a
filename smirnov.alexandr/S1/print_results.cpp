@@ -53,17 +53,14 @@ void smirnov::printSums(std::ostream & out, const List< List< size_t > > & seque
     }
     pushBack(sums, sum);
   }
-  for (auto it = sums.begin(); it != sums.end(); ++it)
+  if (!sums.empty())
   {
-    if (!sums.empty())
+    auto it = sums.cbegin();
+    out << *it;
+    for (++it; it != sums.cend(); ++it)
     {
-      auto it = sums.cbegin();
-      out << *it;
-      for (++it; it != sums.cend(); ++it)
-      {
-        out << " " << *it;
-      }
+      out << " " << *it;
     }
-    out << "\n";
   }
+  out << "\n";
 }
