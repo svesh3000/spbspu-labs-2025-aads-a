@@ -44,7 +44,6 @@ namespace tkach
     Iterator< Key, Value, Cmp > erase(Iterator< Key, Value, Cmp > begin, Iterator< Key, Value, Cmp > end);
     Iterator< Key, Value, Cmp > lowerBound(const Key& key);
     Iterator< Key, Value, Cmp > upperBound(const Key& key);
-<<<<<<< HEAD:tkach.danil/common/AVLtree.hpp
     template< typename F >
     F traverseLnr(F f) const;
     template< typename F >
@@ -59,15 +58,6 @@ namespace tkach
     F traverseBreadth(F f);
     bool empty() const noexcept;
     size_t size();
-=======
-    Citerator< Key, Value, Cmp > lowerBound(const Key& key) const;
-    Citerator< Key, Value, Cmp > upperBound(const Key& key) const;
-    std::pair< Iterator< Key, Value >, Iterator< Key, Value > > equalRange(const Key& key);
-    std::pair< Citerator< Key, Value >, Citerator< Key, Value > > equalRange(const Key& key) const;
-    bool empty() const noexcept;
-    size_t size() const noexcept;
-    size_t count(const Key& k) const;
->>>>>>> tkach.danil/S4:tkach.danil/S4/AVLtree.hpp
   private:
     using pair_t = std::pair< tkach::TreeNode< Key, Value >*, tkach::TreeNode< Key, Value >* >;
     TreeNode< Key, Value >* root_;

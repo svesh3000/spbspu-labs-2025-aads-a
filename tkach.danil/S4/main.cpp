@@ -2,13 +2,7 @@
 #include <fstream>
 #include <limits>
 #include <cstddef>
-<<<<<<< HEAD
 #include <AVLtree.hpp>
-=======
-#include <map>
-#include <functional>
-#include "AVLtree.hpp"
->>>>>>> tkach.danil/S4
 #include "commands.hpp"
 
 namespace
