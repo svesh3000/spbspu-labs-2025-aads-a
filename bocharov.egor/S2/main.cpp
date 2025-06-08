@@ -4,8 +4,8 @@
 #include "actions.hpp"
 
 int main(int argc, char * argv[])
-using namespace bocharov;
 {
+  using namespace bocharov;
   try
   {
     queue infixExprs;
