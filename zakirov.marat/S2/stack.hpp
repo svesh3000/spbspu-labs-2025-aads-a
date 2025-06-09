@@ -48,7 +48,7 @@ namespace zakirov
   {
     for (size_t i = 0; i < top_; ++i)
     {
-      data_[i] = other.data[i];
+      data_[i] = other.data_[i];
     }
   }
 
@@ -98,7 +98,7 @@ namespace zakirov
   template < class T >
   size_t Stack< T >::size()
   {
-    return top_ - 1;
+    return top_;
   }
 
   template < class T >
