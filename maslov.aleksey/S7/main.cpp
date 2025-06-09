@@ -41,7 +41,7 @@ namespace maslov
   {
     std::string graphName;
     in >> graphName;
-    Graph graph = graphs.at(graphName);
+    const Graph & graph = graphs.at(graphName);
     std::vector< std::string > vertexes = graph.getVertexes();
     if (vertexes.empty())
     {
@@ -57,7 +57,7 @@ namespace maslov
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
-    Graph graph = graphs.at(graphName);
+    const Graph & graph = graphs.at(graphName);
     if (!graph.hasVertex(vertexName))
     {
       throw std::logic_error("ERROR: there is no such vertex");
@@ -70,7 +70,7 @@ namespace maslov
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
-    Graph graph = graphs.at(graphName);
+    const Graph & graph = graphs.at(graphName);
     if (!graph.hasVertex(vertexName))
     {
       throw std::logic_error("ERROR: there is no such vertex");
@@ -84,9 +84,7 @@ namespace maslov
     std::string graphName, v1, v2;
     int weight;
     in >> graphName >> v1 >> v2 >> weight;
-    Graph graph = graphs.at(graphName);
-    graph.addVertex(v1);
-    graph.addVertex(v2);
+    Graph & graph = graphs.at(graphName);
     graph.addEdge(v1, v2, weight);
   }
 
@@ -95,7 +93,7 @@ namespace maslov
     std::string graphName, v1, v2;
     int weight;
     in >> graphName >> v1 >> v2 >> weight;
-    Graph graph = graphs.at(graphName);
+    Graph & graph = graphs.at(graphName);
     graph.deleteEdge(v1, v2, weight);
   }
 

@@ -100,11 +100,7 @@ namespace maslov
 
   void Graph::addEdge(const std::string & v1, const std::string & v2, int weight)
   {
-    if (hasEdge(v1, v2, weight))
-    {
-      return;
-    }
-    edges[{v1, v2}].push_back(weight);
+    edges[{v1, v2}].emplace_back(weight);
     vertexes.insert(v1);
     vertexes.insert(v2);
   }
