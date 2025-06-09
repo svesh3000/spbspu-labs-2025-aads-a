@@ -5,8 +5,10 @@
 
 namespace alymova
 {
-  using GraphsSet = std::unordered_map< std::string, Graph >;
-  using CommandsSet = std::unordered_map< std::string, std::function< void(GraphsSet&) > >;
+  //using GraphsSet = std::unordered_map< std::string, Graph >;
+  //using CommandsSet = std::unordered_map< std::string, std::function< void(GraphsSet&) > >;
+  using GraphsSet = HashTable< std::string, Graph >;
+  using CommandsSet = HashTable< std::string, std::function< void(GraphsSet&) > >;
 
   struct GraphsCommand
   {

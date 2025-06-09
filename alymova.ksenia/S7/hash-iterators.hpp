@@ -69,7 +69,7 @@ namespace alymova
     {
       return *this;
     }
-    ++(*this);
+    return ++(*this);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >

@@ -7,6 +7,7 @@
 #include <tree/tree-2-3.hpp>
 #include <list/list.hpp>
 #include "hash-functions.hpp"
+#include "hash-table.hpp"
 
 namespace alymova
 {
@@ -14,7 +15,8 @@ namespace alymova
 
   struct Graph
   {
-    std::unordered_multimap< std::pair< std::string, std::string >, size_t, PairHasher > edges;
+    //std::unordered_multimap< std::pair< std::string, std::string >, size_t, PairHasher > edges;
+    HashTable< std::pair< std::string, std::string >, size_t, PairHasher > edges;
     List< std::string > vertexes;
 
     void addEdge(std::string vertex1, std::string vertex2, size_t weight);

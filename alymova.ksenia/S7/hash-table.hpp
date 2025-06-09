@@ -58,6 +58,8 @@ namespace alymova
     Iterator erase(ConstIterator pos);
     Iterator erase(ConstIterator first, ConstIterator last);
 
+    Value& at(const Key& key);
+    const Value& at(const Key& key) const;
     Iterator find(const Key& key);
     ConstIterator find(const Key& key) const;
 
@@ -85,7 +87,7 @@ namespace alymova
   HashTable< Key, Value, Hash, KeyEqual >::HashTable():
     size_(0),
     capacity_(11),
-    array_(new T[capacity_]()),
+    array_(new T[capacity_]),
     hasher()
   {
     clear();
@@ -95,7 +97,7 @@ namespace alymova
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(const HashTable& other):
     size_(0),
     capacity_(other.capacity_),
-    array_(new T[capacity_]()),
+    array_(new T[capacity_]),
     hasher(other.hasher)
   {
     clear();
@@ -169,7 +171,6 @@ namespace alymova
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::cbegin() const noexcept
   {
     ConstIterator it(array_, array_ + capacity_);
-    T* tmp = array_;
     if (array_->first == NodeType::Empty)
     {
       ++it;
@@ -210,13 +211,13 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(const ValueType& value)
   {
-    emplace(value);
+    return emplace(value);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert(ValueType&& value)
   {
-    emplace(std::forward< ValueType >(value));
+    return emplace(std::forward< ValueType >(value));
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -290,6 +291,7 @@ namespace alymova
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::erase(Iterator pos)
   {
     assert(pos != end() && "You try to delete beyond table's bound");
+
     pos.node_->first = NodeType::Empty;
     size_t deleted_index = pos.node_ - array_;
     size_t i = (deleted_index + 1) % capacity_;
@@ -334,6 +336,23 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
+  Value& HashTable< Key, Value, Hash, KeyEqual >::at(const Key& key)
+  {
+    return const_cast< Value& >(static_cast< const HashTable& >(*this).at(key));
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
+  const Value& HashTable< Key, Value, Hash, KeyEqual >::at(const Key& key) const
+  {
+    auto it = find(key);
+    if (it == end())
+    {
+      throw std::out_of_range("Container does not have an element with the such key");
+    }
+    return it->second;
+  }
+
+  template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key)
   {
     ConstIterator it = static_cast< const HashTable& >(*this).find(key);
@@ -343,14 +362,21 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    size_t psl = 0;
+    for (auto it = begin(); it != end(); it++)
+    {
+      if (it->first == key)
+      {
+        return it;
+      }
+    }
+    /*size_t psl = 0;
     size_t home_index = get_home_index(key);
     Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
     {
       if (it.node_->first == NodeType::Empty)
       {
-        break;
+        continue;
       }
       if (it.node_->second.psl < psl)
       {
@@ -361,7 +387,7 @@ namespace alymova
         return it;
       }
       psl++;
-    }
+    }*/
     return end();
   }
 
@@ -409,7 +435,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::rehash()
   {
-    T* array_new = new T[get_next_prime_capacity()]();
+    T* array_new = new T[get_next_prime_capacity()];
     std::swap(array_new, array_);
     clear();
     for (size_t i = 0; i < capacity_; i++)
