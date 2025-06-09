@@ -4,7 +4,7 @@
 
 namespace shramko
 {
-  void outputQueue(std::ostream& out, QueueString queue)
+  void outputQueue(std::ostream& out, QueueString& queue)
   {
     if (queue.empty())
     {

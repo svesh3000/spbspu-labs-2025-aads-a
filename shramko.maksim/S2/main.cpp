@@ -2,8 +2,8 @@
 #include <fstream>
 #include <limits>
 #include <cstddef>
-#include "stack.hpp"
 #include "queue.hpp"
+#include "stack.hpp"
 #include "print.hpp"
 
 namespace
@@ -52,18 +52,23 @@ namespace
     while (pos2 != std::string::npos)
     {
       pos2 = infix.find(' ', pos);
-      temp = infix.substr(pos, pos2 - pos);
+      if (pos2 == std::string::npos)
+      {
+        if (pos < infix.size())
+        {
+          temp = infix.substr(pos);
+        }
+      }
+      else
+      {
+        temp = infix.substr(pos, pos2 - pos);
+      }
       if (!temp.empty())
       {
         queue.push(temp);
-        temp.clear();
       }
+      temp = "";
       pos = pos2 + 1;
-    }
-    if (!temp.empty())
-    {
-      queue.push(temp);
-      temp.clear();
     }
   }
 
@@ -80,13 +85,14 @@ namespace
     }
   }
 
-  shramko::QueueString convertInfToPost(shramko::QueueString inf)
+  shramko::QueueString convertInfToPost(shramko::QueueString& inf)
   {
     shramko::QueueString post_queue;
     shramko::StackString stack;
     while (!inf.empty())
     {
       std::string temp = inf.front();
+      inf.pop();
       try
       {
         std::stoll(temp);
@@ -105,17 +111,17 @@ namespace
             throw std::logic_error("no open bracket");
           }
           std::string stack_temp = stack.top();
+          stack.pop();
           while (stack_temp != "(")
           {
             post_queue.push(stack_temp);
-            stack.pop();
             if (stack.empty())
             {
               throw std::logic_error("no open bracket");
             }
             stack_temp = stack.top();
+            stack.pop();
           }
-          stack.pop();
         }
         else if (isOperator(temp))
         {
@@ -146,7 +152,6 @@ namespace
           throw std::logic_error("invalid character in expression");
         }
       }
-      inf.pop();
     }
     while (!stack.empty())
     {
@@ -168,8 +173,8 @@ namespace
 
   bool isOverflowedAdd(long long a, long long b)
   {
-    const long long max = std::numeric_limits< long long >::max();
-    const long long min = std::numeric_limits< long long >::min();
+    const long long max = std::numeric_limits<long long>::max();
+    const long long min = std::numeric_limits<long long>::min();
     if (a > 0 && b > 0)
     {
       return (max - a < b);
@@ -183,7 +188,7 @@ namespace
 
   bool isOverflowedSubstr(long long a, long long b)
   {
-    if (b == min)
+    if (b == std::numeric_limits<long long>::min())
     {
       return a > 0;
     }
@@ -192,8 +197,8 @@ namespace
 
   bool isOverflowedMult(long long a, long long b)
   {
-    const long long max = std::numeric_limits< long long >::max();
-    const long long min = std::numeric_limits< long long >::min();
+    const long long max = std::numeric_limits<long long>::max();
+    const long long min = std::numeric_limits<long long>::min();
 
     if (a == 0 || b == 0)
     {
@@ -234,16 +239,17 @@ namespace
 
   bool isOverflowedDivide(long long a, long long b)
   {
-    const long long min = std::numeric_limits< long long >::min();
+    const long long min = std::numeric_limits<long long>::min();
     return (a == min && b == -1);
   }
 
-  long long calculateExpr(shramko::QueueString post)
+  long long calculateExpr(shramko::QueueString& post)
   {
     shramko::StackLongLong stack;
     while (!post.empty())
     {
       std::string temp = post.front();
+      post.pop();
       try
       {
         stack.push(std::stoll(temp));
@@ -317,7 +323,6 @@ namespace
           throw std::invalid_argument("wrong postfix expression");
         }
       }
-      post.pop();
     }
     if (stack.size() != 1)
     {
@@ -350,12 +355,12 @@ int main(const int argc, const char* const* const argv)
     }
     while (!inf_exprs.empty())
     {
-      QueueString temp_inf = inf_exprs.front();
+      QueueString temp_inf = std::move(inf_exprs.front());
       inf_exprs.pop();
       if (!temp_inf.empty())
       {
-        QueueString temp_post = convertInfToPost(std::move(temp_inf));
-        results.push(calculateExpr(std::move(temp_post)));
+        QueueString temp_post = convertInfToPost(temp_inf);
+        results.push(calculateExpr(temp_post));
       }
     }
   }
@@ -364,7 +369,7 @@ int main(const int argc, const char* const* const argv)
     std::cerr << e.what() << "\n";
     return 1;
   }
-  outputStack(std::cout, std::move(results));
+  outputStack(std::cout, results);
   std::cout << "\n";
   return 0;
 }

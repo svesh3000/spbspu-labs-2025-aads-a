@@ -13,7 +13,7 @@ namespace shramko
     QueueString() noexcept;
     ~QueueString();
     QueueString(const QueueString&) = delete;
-    QueueString(QueueString&&) = delete;
+    QueueString(QueueString&&);
     QueueString& operator=(const QueueString&) = delete;
     QueueString& operator=(QueueString&&) = delete;
 

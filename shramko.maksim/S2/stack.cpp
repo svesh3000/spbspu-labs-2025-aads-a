@@ -91,7 +91,6 @@ namespace shramko
     next(n)
   {}
 
-
   StackLongLong::StackLongLong() noexcept:
     head_(nullptr),
     size_(0)

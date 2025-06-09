@@ -1,7 +1,24 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include "stack.hpp"
-#include "print.hpp"
+
+namespace shramko
+{
+  void outputStackString(std::ostream& out, StackString& stack)
+  {
+    if (stack.empty())
+    {
+      return;
+    }
+    out << stack.top();
+    stack.pop();
+    while (!stack.empty())
+    {
+      out << " " << stack.top();
+      stack.pop();
+    }
+  }
+}
 
 BOOST_AUTO_TEST_CASE(stack_basic_constructor_test)
 {
@@ -22,7 +39,7 @@ BOOST_AUTO_TEST_CASE(stack_pop_test)
   stack.pop();
   BOOST_TEST(stack.size() == 4);
   std::ostringstream out;
-  shramko::outputStack(out, stack);
+  shramko::outputStackString(out, stack);
   BOOST_TEST(out.str() == "4 3 2 1");
 }
 
@@ -32,9 +49,9 @@ BOOST_AUTO_TEST_CASE(stack_lvalue_push_test)
   std::string temp = "3";
   stack.push(temp);
   std::ostringstream out;
-  shramko::outputStack(out, stack);
+  shramko::outputStackString(out, stack);
   BOOST_TEST(out.str() == "3");
-  BOOST_TEST(stack.size() == 1);
+  BOOST_TEST(stack.size() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(stack_top_size_test)
