@@ -26,6 +26,7 @@ namespace petrov
     template< typename A, typename B, typename C >
     friend struct AVLTree;
   public:
+    using val_t = std::pair< const K, T >;
     using node_t = AVLTreeNode< K, T >;
     using this_t = ConstAVLTreeIterator< K, T, Cmp >;
     ConstAVLTreeIterator():
@@ -38,8 +39,8 @@ namespace petrov
     this_t operator++(int);
     this_t & operator--();
     this_t operator--(int);
-    const T & operator*() const;
-    const T * operator->() const;
+    const val_t & operator*() const;
+    const val_t * operator->() const;
     bool operator==(const this_t & rhs) const;
     bool operator!=(const this_t & rhs) const;
   private:
@@ -55,6 +56,7 @@ namespace petrov
     template< typename A, typename B, typename C >
     friend struct AVLTree;
   public:
+    using val_t = std::pair< const K, T >;
     using node_t = AVLTreeNode< K, T >;
     using this_t = AVLTreeIterator< K, T, Cmp >;
     AVLTreeIterator():
@@ -67,8 +69,8 @@ namespace petrov
     this_t operator++(int);
     this_t & operator--();
     this_t operator--(int);
-    T & operator*();
-    T * operator->();
+    val_t & operator*();
+    val_t * operator->();
     bool operator==(const this_t & rhs) const;
     bool operator!=(const this_t & rhs) const;
   private:
@@ -86,10 +88,7 @@ namespace petrov
     using node_t = AVLTreeNode< K, T >;
     using const_it_t = ConstAVLTreeIterator< K, T, Cmp >;
     using it_t = AVLTreeIterator< K, T, Cmp >;
-    AVLTree():
-      root_(nullptr),
-      size_(0)
-    {}
+    AVLTree();
     AVLTree(const this_t & rhs);
     AVLTree(this_t && rhs);
     ~AVLTree();
@@ -105,6 +104,8 @@ namespace petrov
     size_t size() const noexcept;
     std::pair< const_it_t, bool > insert(const std::pair< K, T > & val);
     std::pair< const_it_t, bool > insert(std::pair< K, T > && val);
+    it_t erase(it_t position);
+    size_t erase(const K & key);
     it_t find(const K & key);
     const_it_t find(const K & key) const;
     T & at(const K & key);
@@ -114,6 +115,7 @@ namespace petrov
   private:
     node_t * root_;
     size_t size_;
+    size_t erased_;
     void balance(node_t * node);
     void leftRotate(node_t * node);
     void rightRotate(node_t * node);
@@ -147,6 +149,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename ConstAVLTreeIterator< K, T, Cmp >::this_t & ConstAVLTreeIterator< K, T, Cmp >::operator++()
   {
+    assert(node_ != nullptr);
     if (!node_->parent || Cmp{}(node_->data.first, node_->parent->data.first))
     {
       if (node_->right)
@@ -185,17 +188,26 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  const T & ConstAVLTreeIterator< K, T, Cmp >::operator*() const
+  typename ConstAVLTreeIterator< K, T, Cmp >::this_t ConstAVLTreeIterator< K, T, Cmp >::operator++(int)
   {
     assert(node_ != nullptr);
-    return node_->data.second;
+    this_t result(*this);
+    ++(*this);
+    return result;
   }
 
   template< typename K, typename T, typename Cmp >
-  const T * ConstAVLTreeIterator< K, T, Cmp >::operator->() const
+  const typename ConstAVLTreeIterator< K, T, Cmp >::val_t & ConstAVLTreeIterator< K, T, Cmp >::operator*() const
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data.second);
+    return node_->data;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  const typename ConstAVLTreeIterator< K, T, Cmp >::val_t * ConstAVLTreeIterator< K, T, Cmp >::operator->() const
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->data);
   }
 
   template< typename K, typename T, typename Cmp >
@@ -213,6 +225,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTreeIterator< K, T, Cmp >::this_t & AVLTreeIterator< K, T, Cmp >::operator++()
   {
+    assert(node_ != nullptr);
     if (!node_->parent || Cmp{}(node_->data.first, node_->parent->data.first))
     {
       if (node_->right)
@@ -251,17 +264,26 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  T & AVLTreeIterator< K, T, Cmp >::operator*()
+  typename AVLTreeIterator< K, T, Cmp >::this_t AVLTreeIterator< K, T, Cmp >::operator++(int)
   {
     assert(node_ != nullptr);
-    return node_->data.second;
+    this_t result(*this);
+    ++(*this);
+    return result;
   }
 
   template< typename K, typename T, typename Cmp >
-  T * AVLTreeIterator< K, T, Cmp >::operator->()
+  typename AVLTreeIterator< K, T, Cmp >::val_t & AVLTreeIterator< K, T, Cmp >::operator*()
   {
     assert(node_ != nullptr);
-    return std::addressof(node_->data.second);
+    return node_->data;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTreeIterator< K, T, Cmp >::val_t * AVLTreeIterator< K, T, Cmp >::operator->()
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->data);
   }
 
   template< typename K, typename T, typename Cmp >
@@ -274,6 +296,22 @@ namespace petrov
   bool AVLTreeIterator< K, T, Cmp >::operator!=(const this_t & rhs) const
   {
     return !(*this == rhs);
+  }
+  
+  template< typename K, typename T, typename Cmp >
+  AVLTree< K, T, Cmp >::AVLTree():
+    root_(nullptr),
+    size_(0),
+    erased_(0)
+  {}
+
+  template< typename K, typename T, typename Cmp >
+  AVLTree< K, T, Cmp >::AVLTree(const this_t & rhs)
+  {
+    for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+    {
+      insert({ it->first, it->second });
+    }
   }
 
   template< typename K, typename T, typename Cmp >
@@ -483,20 +521,206 @@ namespace petrov
         if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
         {
           balance(temp);
+          temp->setHeight();
         }
         else if (!temp->left && temp->right && temp->right->height > 1)
         {
           balance(temp);
+          temp->setHeight();
         }
         else if (!temp->right && temp->left && temp->left->height > 1)
         {
           balance(temp);
+          temp->setHeight();
         }
-        temp->setHeight();
       }
       return std::pair< const_it_t, bool >{ const_it_t(temp), true };
     }
     return std::pair< const_it_t, bool >{ const_it_t(root_), true };
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::erase(it_t position)
+  {
+    auto return_it = position;
+    ++return_it;
+    node_t * balance_node_ptr = nullptr;
+    if (position.node_->left && position.node_->right)
+    {
+      auto temp = position.node_;
+      temp = temp->right;
+      if (temp->left)
+      {
+        while (temp->left)
+        {
+          temp = temp->left;
+        }
+        balance_node_ptr = temp->parent;
+        temp->parent->left = nullptr;
+        temp->parent = position.node_->parent;
+        temp->left = position.node_->left;
+        temp->right = position.node_->right;
+        temp->left->parent = temp;
+        temp->right->parent = temp;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+      else
+      {
+        balance_node_ptr = temp->parent;
+        temp->parent = position.node_->parent;
+        temp->left = position.node_->left;
+        temp->left->parent = temp;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+    }
+    else if (position.node_->left)
+    {
+      auto temp = position.node_;
+      temp = temp->left;
+      if (temp->right)
+      {
+        while (temp->right)
+        {
+          temp = temp->right;
+        }
+        balance_node_ptr = temp->parent;
+        temp->parent->right = nullptr;
+        temp->parent = position.node_->parent;
+        temp->left = position.node_->left;
+        temp->right = position.node_->right;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+      else
+      {
+        balance_node_ptr = temp->parent;
+        temp->parent = position.node_->parent;
+        temp->right = position.node_->right;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+    }
+    else if (position.node_->right)
+    {
+      auto temp = position.node_;
+      temp = temp->right;
+      if (temp->left)
+      {
+        while (temp->left)
+        {
+          temp = temp->left;
+        }
+        balance_node_ptr = temp->parent;
+        temp->parent->left = nullptr;
+        temp->parent = position.node_->parent;
+        temp->left = position.node_->left;
+        temp->right = position.node_->right;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+      else
+      {
+        balance_node_ptr = temp->parent;
+        temp->parent = position.node_->parent;
+        temp->left = position.node_->left;
+        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+        {
+          position.node_->parent->left = temp;
+        }
+        else if (position.node_->parent)
+        {
+          position.node_->parent->right = temp;
+        }
+        else
+        {
+          root_ = temp;
+        }
+      }
+    }
+    else
+    {
+      if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+      {
+        position.node_->parent->left = nullptr;
+      }
+      else if (position.node_->parent)
+      {
+        position.node_->parent->right = nullptr;
+      }
+      else
+      {
+        root_ = nullptr;
+      }
+    }
+    while (balance_node_ptr)
+    {
+      balance_node_ptr->setHeight();
+      balance_node_ptr = balance_node_ptr->parent;
+    }
+    delete position.node_;
+    size_--;
+    erased_++;
+    return return_it;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  size_t AVLTree< K, T, Cmp >::erase(const K & key)
+  {
+    it_t position = find(key);
+    erase(position);
+    return erased_;
   }
 
   template< typename K, typename T, typename Cmp >
@@ -603,10 +827,10 @@ namespace petrov
   {
     if (node->left && node->right)
     {
-      if (Cmp{}(node->left->height, node->right->height))
+      if (std::less< int >{}(node->left->height, node->right->height))
       {
         node = node->right;
-        if (node->left && node->right && Cmp{}(node->left->height, node->right->height))
+        if (node->left && node->right && std::less< int >{}(node->left->height, node->right->height))
         {
           leftRotate(node);
         }
@@ -643,7 +867,7 @@ namespace petrov
       else
       {
         node = node->left;
-        if (node->left && node->right && Cmp{}(node->right->height, node->left->height))
+        if (node->left && node->right && std::less< int >{}(node->right->height, node->left->height))
         {
           rightRotate(node);
         }

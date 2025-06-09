@@ -1,8 +1,8 @@
 #include <fstream>
-#include <map>
 #include <string>
 #include <iostream>
 #include <limits>
+#include "avl_tree.hpp"
 
 namespace
 {
@@ -23,14 +23,15 @@ namespace
 
 int main(int argc, const char * const * argv)
 {
+  using namespace petrov;
   if (!checkArguments(argc))
   {
     std::cerr << "ERROR: Incorrect number of arguments ";
     std::cerr << "\n";
     return 1;
   }
-  using subtree_t = std::map< int, std::string, std::less< int > >;
-  using maintree_t = std::map< std::string, subtree_t >;
+  using subtree_t = AVLTree< int, std::string, std::less< int > >;
+  using maintree_t = AVLTree< std::string, subtree_t >;
   maintree_t tree;
   std::ifstream input(argv[1]);
   while (!input.eof())
