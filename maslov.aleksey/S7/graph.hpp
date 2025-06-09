@@ -28,8 +28,8 @@ namespace maslov
     std::vector< std::string > getVertexes() const;
     bool hasVertex(const std::string & vertex) const;
     bool hasEdge(const std::string & v1, const std::string & v2, int weight) const;
-    std::vector< std::pair< std::string, int > > getOutbound(const std::string & vertex) const;
-    std::vector< std::pair< std::string, int > > getInbound(const std::string & vertex) const;
+    std::vector< std::pair< std::string, std::vector< int > > > getOutbound(const std::string & vertex) const;
+    std::vector< std::pair< std::string, std::vector< int > > > getInbound(const std::string & vertex) const;
     void merge(const Graph & graph);
     void extract(const Graph & graph, const std::set< std::string > & extractVertexes);
    private:
@@ -112,16 +112,23 @@ namespace maslov
     {
       throw std::logic_error("ERROR: there is no such edge");
     }
-    auto weights = it->second;
-    for (auto itWeight = weights.begin(); itWeight != weights.end(); itWeight++)
+    auto & weights = it->second;
+    auto itWeight = weights.begin();
+    while (itWeight != weights.end())
     {
       if (*itWeight == weight)
       {
-        weights.erase(itWeight);
-        return;
+        itWeight = weights.erase(itWeight);
+      }
+      else
+      {
+        ++itWeight;
       }
     }
-    throw std::logic_error("ERROR: there is no such edge");;
+    if (weights.empty())
+    {
+      edges.erase(it);
+    }
   }
 
   std::vector< std::string > Graph::getVertexes() const
@@ -129,34 +136,28 @@ namespace maslov
     return {vertexes.begin(), vertexes.end()};
   }
 
-  std::vector< std::pair< std::string, int > > Graph::getOutbound(const std::string & vertex) const
+  std::vector< std::pair< std::string, std::vector< int > > > Graph::getOutbound(const std::string & vertex) const
   {
-    std::vector< std::pair< std::string, int > > result;
+    std::vector< std::pair< std::string, std::vector< int > > > result;
     for (auto it = edges.begin(); it != edges.end(); it++)
     {
       if (it->first.first == vertex)
       {
-        for (int weight: it->second)
-        {
-          result.push_back({it->first.second, weight});
-        }
+        result.push_back({it->first.second, edges.at({it->first.first, it->first.second})});
       }
     }
     std::sort(result.begin(), result.end());
     return result;
   }
 
-  std::vector< std::pair< std::string, int > > Graph::getInbound(const std::string & vertex) const
+  std::vector< std::pair< std::string, std::vector< int > > > Graph::getInbound(const std::string & vertex) const
   {
-    std::vector< std::pair< std::string, int > > result;
+    std::vector< std::pair< std::string, std::vector< int > > > result;
     for (auto it = edges.begin(); it != edges.end(); it++)
     {
       if (it->first.second == vertex)
       {
-        for (int weight: it->second)
-        {
-          result.push_back({it->first.first, weight});
-        }
+        result.push_back({it->first.first, edges.at({it->first.first, it->first.second})});
       }
     }
     std::sort(result.begin(), result.end());

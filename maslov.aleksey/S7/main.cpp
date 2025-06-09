@@ -8,11 +8,16 @@
 
 namespace
 {
-  void printBounds(std::ostream & out, std::vector< std::pair< std::string, int > > bounds)
+  void printBounds(std::ostream & out, std::vector< std::pair< std::string, std::vector< int > > > bounds)
   {
     for (auto it = bounds.begin(); it != bounds.end(); it++)
     {
-      out << it->first << ' ' << it->second << '\n';
+      out << it->first;
+      for (auto itWeight = it->second.begin(); itWeight != it->second.end(); itWeight++)
+      {
+        out << ' ' << *itWeight;
+      }
+      out << '\n';
     }
   }
 }
@@ -125,8 +130,8 @@ namespace maslov
     {
       throw std::logic_error("ERROR: such a graph already exists");
     }
-    Graph graph1 = graphs.at(graphName1);
-    Graph graph2 = graphs.at(graphName2);
+    const Graph & graph1 = graphs.at(graphName1);
+    const Graph & graph2 = graphs.at(graphName2);
     Graph mergedGraph = graph1;
     mergedGraph.merge(graph2);
     graphs[newGraphName] = mergedGraph;
@@ -140,7 +145,7 @@ namespace maslov
     {
       throw std::logic_error("ERROR: such a graph already exists");
     }
-    Graph graph = graphs.at(graphName);
+    const Graph & graph = graphs.at(graphName);
     size_t countVertexes = 0;
     in >> countVertexes;
     std::set< std::string > vertexes;
