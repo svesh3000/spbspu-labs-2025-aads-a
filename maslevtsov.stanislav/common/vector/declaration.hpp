@@ -9,8 +9,8 @@ namespace maslevtsov {
   class Vector
   {
   public:
-    using iterator = VectorIterator< T, detail::IteratorType::NONCONSTANT >;
-    using const_iterator = VectorIterator< T, detail::IteratorType::CONSTANT >;
+    using iterator = VectorIterator< T, detail::VectorIteratorType::NONCONSTANT >;
+    using const_iterator = VectorIterator< T, detail::VectorIteratorType::CONSTANT >;
 
     Vector();
     Vector(const Vector& rhs);

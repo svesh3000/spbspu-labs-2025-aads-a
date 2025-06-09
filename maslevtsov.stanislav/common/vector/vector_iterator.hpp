@@ -5,7 +5,7 @@
 #include <type_traits>
 
 namespace detail {
-  enum class IteratorType
+  enum class VectorIteratorType
   {
     CONSTANT,
     NONCONSTANT,
@@ -13,7 +13,7 @@ namespace detail {
 }
 
 namespace maslevtsov {
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   class VectorIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
@@ -25,9 +25,9 @@ namespace maslevtsov {
     VectorIterator& operator--() noexcept;
     VectorIterator& operator--(int) noexcept;
 
-    typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T&, T& >::type
+    typename std::conditional< it_type == detail::VectorIteratorType::CONSTANT, const T&, T& >::type
       operator*() const noexcept;
-    typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T*, T* >::type
+    typename std::conditional< it_type == detail::VectorIteratorType::CONSTANT, const T*, T* >::type
       operator->() const noexcept;
 
     bool operator==(const VectorIterator& rhs) const noexcept;
@@ -39,14 +39,14 @@ namespace maslevtsov {
     explicit VectorIterator(T* ptr) noexcept;
   };
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   typename VectorIterator< T, it_type >::VectorIterator& VectorIterator< T, it_type >::operator++() noexcept
   {
     ++ptr_;
     return *this;
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   typename VectorIterator< T, it_type >::VectorIterator& VectorIterator< T, it_type >::operator++(int) noexcept
   {
     VectorIterator< T, it_type > result(*this);
@@ -54,14 +54,14 @@ namespace maslevtsov {
     return result;
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   typename VectorIterator< T, it_type >::VectorIterator& VectorIterator< T, it_type >::operator--() noexcept
   {
     --ptr_;
     return *this;
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   typename VectorIterator< T, it_type >::VectorIterator& VectorIterator< T, it_type >::operator--(int) noexcept
   {
     VectorIterator< T, it_type > result(*this);
@@ -69,33 +69,33 @@ namespace maslevtsov {
     return result;
   }
 
-  template< class T, detail::IteratorType it_type >
-  typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T&, T& >::type
+  template< class T, detail::VectorIteratorType it_type >
+  typename std::conditional< it_type == detail::VectorIteratorType::CONSTANT, const T&, T& >::type
     VectorIterator< T, it_type >::operator*() const noexcept
   {
     return *ptr_;
   }
 
-  template< class T, detail::IteratorType it_type >
-  typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T*, T* >::type
+  template< class T, detail::VectorIteratorType it_type >
+  typename std::conditional< it_type == detail::VectorIteratorType::CONSTANT, const T*, T* >::type
     VectorIterator< T, it_type >::operator->() const noexcept
   {
     return ptr_;
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   bool VectorIterator< T, it_type >::operator==(const VectorIterator& rhs) const noexcept
   {
     return ptr_ == rhs.ptr_;
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   bool VectorIterator< T, it_type >::operator!=(const VectorIterator& rhs) const noexcept
   {
     return !(*this == rhs);
   }
 
-  template< class T, detail::IteratorType it_type >
+  template< class T, detail::VectorIteratorType it_type >
   VectorIterator< T, it_type >::VectorIterator(T* ptr) noexcept:
     ptr_(ptr)
   {}
