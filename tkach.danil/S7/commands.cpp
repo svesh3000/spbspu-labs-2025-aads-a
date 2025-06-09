@@ -49,15 +49,18 @@ namespace tkach
     }
     for (auto it = tree_of_vert.cbegin(); it != tree_of_vert.cend(); ++it)
     {
-      out << it->first;
-      for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
+      if (!it->second.empty())
       {
-        for (size_t i = 0; i < it2->second; ++i)
+        out << it->first;
+        for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
         {
-          out << " " << it2->first;
+          for (size_t i = 0; i < it2->second; ++i)
+          {
+            out << " " << it2->first;
+          }
         }
+        out << "\n";
       }
-      out << "\n";
     }
   }
 
@@ -78,15 +81,18 @@ namespace tkach
     }
     for (auto it = tree_of_vert.cbegin(); it != tree_of_vert.cend(); ++it)
     {
-      out << it->first;
-      for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
+      if (!it->second.empty())
       {
-        for (size_t i = 0; i < it2->second; ++i)
+        out << it->first;
+        for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
         {
-          out << " " << it2->first;
+          for (size_t i = 0; i < it2->second; ++i)
+          {
+            out << " " << it2->first;
+          }
         }
+        out << "\n";
       }
-      out << "\n";
     }
   }
 

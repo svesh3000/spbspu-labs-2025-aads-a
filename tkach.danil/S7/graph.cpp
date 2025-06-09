@@ -20,10 +20,6 @@ namespace tkach
     {
       it->second.erase(it2);
     }
-    if (it->second.empty())
-    {
-      edges_.erase(edge_key);
-    }
     return true;
   }
 
