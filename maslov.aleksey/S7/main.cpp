@@ -57,7 +57,7 @@ namespace maslov
     auto outbounds = graph.getOutbound(vertexName);
     printBounds(out, outbounds);
   }
-  
+
   void getInbound(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs)
   {
     std::string graphName, vertexName;
@@ -121,7 +121,7 @@ namespace maslov
     Graph graph2 = graphs.at(graphName2);
     Graph mergedGraph = graph1;
     mergedGraph.merge(graph2);
-    graphs[newGraphName] = mergedGraph;  
+    graphs[newGraphName] = mergedGraph;
   }
 
   void extractGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
