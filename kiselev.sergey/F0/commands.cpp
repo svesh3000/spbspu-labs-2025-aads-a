@@ -165,7 +165,7 @@ void kiselev::doPrintDict(std::istream& in, std::ostream& out, const Dicts& dict
   auto dictIt = dicts.find(nameDict);
   if (dictIt == dicts.cend())
   {
-    out << "<DICTINARY NOT FOUND>\n";
+    out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
   out << nameDict << '\n';
