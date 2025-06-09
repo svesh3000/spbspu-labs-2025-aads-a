@@ -476,11 +476,7 @@ namespace tkach
   template< class Key, class Value, class Cmp >
   Value& AvlTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    Iterator< Key, Value, Cmp > node = find(key);
-    if (node == end())
-    {
-      node = insert(std::make_pair(key, Value()));
-    }
+    Iterator< Key, Value, Cmp > node = insert(std::make_pair(key, Value()));
     return node->second;
   }
 
