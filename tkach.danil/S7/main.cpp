@@ -61,6 +61,14 @@ int main(const int argc, const char* const* const argv)
   }
   std::map< std::string, std::function< void() > > cmds;
   cmds["graphs"] = std::bind(printGraphs, std::ref(std::cout), std::cref(data));
+  cmds["vertexes"] = std::bind(printVertexes, std::ref(std::cout), std::ref(std::cin), std::cref(data));
+  cmds["outbound"] = std::bind(printOutbound, std::ref(std::cout), std::ref(std::cin), std::cref(data));
+  cmds["inbound"] = std::bind(printInbound, std::ref(std::cout), std::ref(std::cin), std::cref(data));
+  cmds["bind"] = std::bind(bind, std::ref(std::cin), std::ref(data));
+  cmds["cut"] = std::bind(cut, std::ref(std::cin), std::ref(data));
+  cmds["merge"] = std::bind(merge, std::ref(std::cin), std::ref(data));
+  cmds["create"] = std::bind(create, std::ref(std::cin), std::ref(data));
+  cmds["extract"] = std::bind(extract, std::ref(std::cin), std::ref(data));
   std::string command;
   while (!(std::cin >> command).eof())
   {
