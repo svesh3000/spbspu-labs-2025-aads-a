@@ -232,7 +232,7 @@ typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T,
   }
   erase_from_leaf(pos);
   --size_;
-  return find(next_key);
+  return after_removed == end() ? end() : find(next_key);
 }
 
 template< class Key, class T, class Compare >
@@ -480,7 +480,7 @@ void maslevtsov::Tree< Key, T, Compare >::balance_after_delete(Node* deleted) no
         parent->left = parent->middle;
         parent->middle = nullptr;
       }
-    } else if (parent->right == deleted) {
+    } else {
       if (!parent->middle->is_two) {
         std::swap(deleted->data1, parent->data2);
         std::swap(parent->data2, parent->middle->data2);
@@ -606,6 +606,7 @@ void maslevtsov::Tree< Key, T, Compare >::balance_after_delete(Node* deleted) no
               std::swap(current->data1, cur_parent->data1);
               current->right = current->left;
               current->left = cur_parent->left->right;
+              cur_parent->left->right->parent = current;
               std::swap(cur_parent->data1, cur_parent->left->data2);
               cur_parent->left->is_two = true;
               cur_parent->left->right = cur_parent->left->middle;
@@ -641,6 +642,7 @@ void maslevtsov::Tree< Key, T, Compare >::balance_after_delete(Node* deleted) no
               std::swap(current->data1, cur_parent->data2);
               current->right = current->left;
               current->left = cur_parent->middle->right;
+              cur_parent->middle->right->parent = current;
               std::swap(cur_parent->data2, cur_parent->middle->data2);
               cur_parent->middle->is_two = true;
               cur_parent->middle->right = cur_parent->middle->middle;
@@ -651,10 +653,11 @@ void maslevtsov::Tree< Key, T, Compare >::balance_after_delete(Node* deleted) no
               std::swap(cur_parent->data2, cur_parent->middle->data2);
               cur_parent->middle->is_two = false;
               cur_parent->is_two = true;
+              cur_parent->middle->middle = cur_parent->middle->right;
               cur_parent->middle->right = cur_parent->right->left;
-              cur_parent->right->left->parent = cur_parent->middle->left;
+              cur_parent->right->left->parent = cur_parent->middle;
               cur_parent->right->left = nullptr;
-              delete cur_parent->left;
+              delete cur_parent->right;
               cur_parent->right = cur_parent->middle;
               cur_parent->middle = nullptr;
               is_balanced = true;

@@ -159,31 +159,38 @@ BOOST_AUTO_TEST_CASE(clear_test)
 BOOST_AUTO_TEST_CASE(insert_test)
 {
   maslevtsov::Tree< int, int > tree;
+
   auto it = tree.begin();
   it = tree.insert(std::make_pair(0, 0)).first;
   BOOST_TEST(it->first == 0);
   BOOST_TEST(it->second == 0);
   BOOST_TEST(tree.size() == 1);
+
   it = tree.insert(std::make_pair(1, 1)).first;
   BOOST_TEST(it->first == 1);
   BOOST_TEST(it->second == 1);
   BOOST_TEST(tree.size() == 2);
+
   it = tree.insert(std::make_pair(2, 2)).first;
   BOOST_TEST(it->first == 2);
   BOOST_TEST(it->second == 2);
   BOOST_TEST(tree.size() == 3);
+
   it = tree.insert(std::make_pair(3, 3)).first;
   BOOST_TEST(it->first == 3);
   BOOST_TEST(it->second == 3);
   BOOST_TEST(tree.size() == 4);
+
   it = tree.insert(std::make_pair(4, 4)).first;
   BOOST_TEST(it->first == 4);
   BOOST_TEST(it->second == 4);
   BOOST_TEST(tree.size() == 5);
+
   it = tree.insert(std::make_pair(5, 5)).first;
   BOOST_TEST(it->first == 5);
   BOOST_TEST(it->second == 5);
   BOOST_TEST(tree.size() == 6);
+
   it = tree.insert(std::make_pair(6, 6)).first;
   BOOST_TEST(it->first == 6);
   BOOST_TEST(it->second == 6);
@@ -193,42 +200,178 @@ BOOST_AUTO_TEST_CASE(insert_test)
 BOOST_AUTO_TEST_CASE(erase_test)
 {
   maslevtsov::Tree< int, int > tree;
+
   tree[1] = 1;
   auto it = tree.erase(tree.begin());
   BOOST_TEST((it == tree.end()));
-  BOOST_TEST(tree.size() == 0);
-
+  BOOST_TEST(tree.empty());
   tree[1] = 1;
   tree[2] = 2;
   it = tree.erase(--tree.end());
   BOOST_TEST((it == tree.end()));
   BOOST_TEST(tree.size() == 1);
-
   tree[2] = 2;
   it = tree.erase(tree.begin());
   BOOST_TEST(it->first == 2);
   BOOST_TEST(tree.size() == 1);
 
   tree[1] = 1;
-  for (size_t i = 3; i < 10; i++) {
+  tree[3] = 3;
+  it = tree.erase(tree.begin());
+  BOOST_TEST(it->first == 2);
+  BOOST_TEST(tree.size() == 2);
+  tree[1] = 1;
+  it = tree.erase(++tree.begin());
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 2);
+  tree[2] = 2;
+  it = tree.erase(--tree.end());
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 2);
+
+  tree[3] = 3;
+  tree[0] = 0;
+  it = tree.erase(++(++tree.begin()));
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 3);
+
+  tree[2] = 2;
+  tree[4] = 4;
+  it = tree.erase(tree.begin());
+  BOOST_TEST(it->first == 1);
+  BOOST_TEST(tree.size() == 4);
+  tree[0] = 0;
+  it = tree.erase(++(++tree.begin()));
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 4);
+  tree[2] = 2;
+  it = tree.erase(--tree.end());
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 4);
+  tree[4] = 4;
+  it = tree.erase(++tree.begin());
+  BOOST_TEST(it->first == 2);
+  BOOST_TEST(tree.size() == 4);
+  tree[1] = 1;
+  it = tree.erase(--(--tree.end()));
+  BOOST_TEST(it->first == 4);
+  BOOST_TEST(tree.size() == 4);
+
+  tree[3] = 3;
+  tree[5] = 5;
+  it = tree.erase(tree.find(2));
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 5);
+  tree[2] = 2;
+  it = tree.erase(tree.begin());
+  BOOST_TEST(it->first == 1);
+  BOOST_TEST(tree.size() == 5);
+  tree[0] = 0;
+  it = tree.erase(tree.find(3));
+  BOOST_TEST(it->first == 4);
+  BOOST_TEST(tree.size() == 5);
+  tree[3] = 3;
+  it = tree.erase(--tree.end());
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 5);
+
+  tree.clear();
+  for (int i = 0; i != 7; ++i) {
     tree[i] = i;
   }
   it = tree.erase(tree.begin());
-  BOOST_TEST(it->first == 2);
-  BOOST_TEST(tree.begin()->first == 2);
-  BOOST_TEST(tree.size() == 8);
-
-  it = tree.erase(tree.find(3));
-  BOOST_TEST(it->first == 4);
-  BOOST_TEST(tree.size() == 7);
-
-  it = tree.erase(tree.find(5));
-  BOOST_TEST(it->first == 6);
+  BOOST_TEST(it->first == 1);
+  BOOST_TEST(tree.size() == 6);
+  tree.clear();
+  for (int i = 0; i != 7; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(6));
+  BOOST_TEST((it == tree.end()));
   BOOST_TEST(tree.size() == 6);
 
+  tree.clear();
+  for (int i = 0; i != 9; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(2));
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 8);
+  tree.clear();
+  for (int i = 8; i >= 0; --i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(6));
+  BOOST_TEST(it->first == 7);
+  BOOST_TEST(tree.size() == 8);
+
+  tree.clear();
+  for (int i = 0; i != 7; ++i) {
+    tree[i] = i;
+  }
+  for (int i = 9; i != 13; ++i) {
+    tree[i] = i;
+  }
+  for (int i = 7; i != 9; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(2));
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 12);
+  tree.clear();
+  for (int i = 0; i != 7; ++i) {
+    tree[i] = i;
+  }
+  for (int i = 9; i != 13; ++i) {
+    tree[i] = i;
+  }
+  for (int i = 7; i != 9; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(12));
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 12);
+  tree.clear();
+  for (int i = 0; i != 3; ++i) {
+    tree[i] = i;
+  }
+  for (int i = 5; i != 13; ++i) {
+    tree[i] = i;
+  }
+  tree[3] = 3;
+  tree[4] = 4;
   it = tree.erase(tree.find(7));
   BOOST_TEST(it->first == 8);
-  BOOST_TEST(tree.size() == 5);
+  BOOST_TEST(tree.size() == 12);
+  tree.clear();
+  for (int i = 0; i != 13; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(4));
+  BOOST_TEST(it->first == 5);
+  BOOST_TEST(tree.size() == 12);
+
+  tree.clear();
+  for (int i = 0; i != 11; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(1));
+  BOOST_TEST(it->first == 2);
+  BOOST_TEST(tree.size() == 10);
+  tree.clear();
+  for (int i = 0; i != 11; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(4));
+  BOOST_TEST(it->first == 5);
+  BOOST_TEST(tree.size() == 10);
+  tree.clear();
+  for (int i = 0; i != 11; ++i) {
+    tree[i] = i;
+  }
+  it = tree.erase(tree.find(10));
+  BOOST_TEST((it == tree.end()));
+  BOOST_TEST(tree.size() == 10);
 }
 
 BOOST_AUTO_TEST_CASE(swap_test)
