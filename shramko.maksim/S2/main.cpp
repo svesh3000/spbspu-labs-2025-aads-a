@@ -3,6 +3,8 @@
 #include <limits>
 #include <cstddef>
 #include "stack.hpp"
+#include "queue.hpp"
+#include "print.hpp"
 
 namespace
 {
