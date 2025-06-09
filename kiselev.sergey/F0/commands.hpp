@@ -22,5 +22,7 @@ namespace kiselev
   void doSearchLetter(std::istream&, std::ostream&, const Dicts&);
   void doLoadDict(std::istream&, std::ostream&, Dicts&);
   void doClearDict(std::istream&, std::ostream&, Dicts&);
+  void doIntersectDict(std::istream&, std::ostream&, Dicts&);
+  void doComplementDict(std::istream&, std::ostream&, Dicts&);
 }
 #endif

@@ -19,6 +19,26 @@ namespace
     return out;
   }
 
+  void addTrans(kiselev::Dict& dict, std::string word, kiselev::List< std::string > list)
+  {
+    auto it = dict.find(word);
+    for (auto transIt = list.cbegin(); transIt != list.cend(); ++transIt)
+    {
+      bool isExists = false;
+      for (auto transIt2 = it->second.cbegin(); transIt2 != it->second.cend(); ++transIt2)
+      {
+        if (*transIt2 == *transIt)
+        {
+          isExists = true;
+          break;
+        }
+      }
+      if (!isExists)
+      {
+        it->second.pushBack((*transIt));
+      }
+    }
+  }
   kiselev::Dict unionTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
   {
     kiselev::Dict res = dict1;
@@ -33,22 +53,21 @@ namespace
       }
       else
       {
-        for (auto transIt = translations.cbegin(); transIt != translations.cend(); ++transIt)
-        {
-          bool isExists = false;
-          for (auto transIt2 = it2->second.cbegin(); transIt2 != it2->second.cend(); ++transIt2)
-          {
-            if (*transIt2 == *transIt)
-            {
-              isExists = true;
-              break;
-            }
-          }
-          if (!isExists)
-          {
-            it2->second.pushBack((*transIt));
-          }
-        }
+        addTrans(res, eng, translations);
+      }
+    }
+    return res;
+  }
+
+  kiselev::Dict intersectTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
+  {
+    kiselev::Dict res;
+    for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
+    {
+      if (dict2.find(it->first) != dict2.cend())
+      {
+        res.insert(*it);
+        addTrans(res, it->first, it->second);
       }
     }
     return res;
@@ -397,4 +416,70 @@ void kiselev::doClearDict(std::istream& in, std::ostream& out, Dicts& dicts)
     return;
   }
   it->second.clear();
+}
+
+void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string nameNewDict;
+  std::string firstDict;
+  std::string secondDict;
+  in >> nameNewDict >> firstDict >> secondDict;
+  if (dicts.find(nameNewDict) != dicts.end())
+  {
+    out << "<DICTIONARY ALREADY EXISTS>\n";
+    return;
+  }
+  auto first = dicts.find(firstDict);
+  auto second = dicts.find(secondDict);
+  if (first == dicts.end() || second == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  Dict res = intersectTwoDict(first->second, second->second);
+  std::string nextDict;
+  while (in >> nextDict)
+  {
+    auto it = dicts.find(nextDict);
+    if (it == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>\n";
+      return;
+    }
+    res = intersectTwoDict(res, it->second);
+    if (in.get() == '\n')
+    {
+      break;
+    }
+  }
+  dicts[nameNewDict] = res;
+}
+
+void kiselev::doComplementDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string nameNewDict;
+  std::string firstDict;
+  std::string secondDict;
+  in >> nameNewDict >> firstDict >> secondDict;
+  if (dicts.find(nameNewDict) != dicts.end())
+  {
+    out << "<DICTIONARY ALREADY EXISTS>\n";
+    return;
+  }
+  auto first = dicts.find(firstDict);
+  auto second = dicts.find(secondDict);
+  if (first == dicts.end() || second == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  Dict res;
+  for (auto it = first->second.end(); it != first->second.end(); ++it)
+  {
+    if (second->second.find(it->first) == second->second.end())
+    {
+      res.insert(*it);
+    }
+  }
+  dicts[nameNewDict] = res;
 }
