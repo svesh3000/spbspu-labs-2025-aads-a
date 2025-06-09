@@ -323,7 +323,7 @@ namespace petrov
     size_(rhs.size_),
     erased_(rhs.erased_)
   {
-    rhs.root_ = nullptr; 
+    rhs.root_ = nullptr;
   }
 
   template< typename K, typename T, typename Cmp >
