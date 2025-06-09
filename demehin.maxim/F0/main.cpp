@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   dict_t dicts;
   try
   {
-    if (!inputDict(file, dicts))
+    if (!inputDict(file, dicts) && !file.eof())
     {
       std::cerr << "<INVALID FILE>\n";
       return 1;
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
   catch (...)
   {
     std::cerr << "<RUNTIME ERROR>\n";
-    return 2;
+    return 1;
   }
 
   Tree< std::string, std::function< void() > > cmds;
