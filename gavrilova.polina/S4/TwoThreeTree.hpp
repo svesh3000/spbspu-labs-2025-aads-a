@@ -37,10 +37,8 @@ namespace gavrilova {
     // TwoThreeTree &operator=(std::initializer_list<Value> init);
 
     Iterator begin();
-    ConstIterator begin() const noexcept;
     ConstIterator cbegin() const noexcept;
     Iterator end();
-    ConstIterator end() const noexcept;
     ConstIterator cend() const noexcept;
 
     Value& operator[](const Key& key);
@@ -76,10 +74,10 @@ namespace gavrilova {
     fake_(reinterpret_cast< Node* >(new char[sizeof(Node)])),
     size_(0)
   {
-    fake_->children[0] = fake_;
-    fake_->children[1] = fake_;
-    fake_->children[2] = fake_;
-    fake_->parent = fake_;
+    fake_->children[0] = nullptr;
+    fake_->children[1] = nullptr;
+    fake_->children[2] = nullptr;
+    fake_->parent = nullptr;
     fake_->is_3_node = false;
     fake_->is_fake = true;
   }
@@ -147,44 +145,32 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   Iterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::begin()
   {
-    return Iterator(cbegin());
-  }
-
-  template < class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::begin() const noexcept
-  {
-    return cbegin();
+    if (empty()) {
+      return end();
+    }
+    Node* tmp = fake_->children[0];
+    while (tmp->children[0] != fake_) {
+      tmp = tmp->children[0];
+    }
+    return Iterator(tmp, 0, fake_);
   }
 
   template < class Key, class Value, class Cmp >
   ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::cbegin() const noexcept
   {
-    if (empty()) {
-      return cend();
-    }
-    Node* tmp = fake_->children[0];
-    while (tmp->left) {
-      tmp = tmp->left;
-    }
-    return ConstIterator(tmp, 0);
+    return begin();
   }
 
   template < class Key, class Value, class Cmp >
   Iterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::end()
   {
-    return Iterator(cend());
-  }
-
-  template < class Key, class Value, class Cmp >
-  ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::end() const noexcept
-  {
-    return cend();
+    return Iterator(fake_, 0, fake_);
   }
 
   template < class Key, class Value, class Cmp >
   ConstIterator< Key, Value, Cmp > TwoThreeTree< Key, Value, Cmp >::cend() const noexcept
   {
-    return ConstIterator(fake_, 0);
+    return ConstIterator(fake_, 0, fake_);
   }
 
   template < class Key, class Value, class Cmp >

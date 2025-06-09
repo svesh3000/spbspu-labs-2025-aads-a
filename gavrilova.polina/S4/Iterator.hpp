@@ -32,10 +32,11 @@ namespace gavrilova {
   private:
     Node* node_;
     int key_pos_;
+    Node* fake_;
 
     friend class TwoThreeTree< Key, Value, Cmp >;
     friend class ConstIterator< Key, Value, Cmp >;
-    explicit Iterator(Node* node, int key_pos = 0);
+    explicit Iterator(Node* node, int key_pos, Node* fake);
 
     Node* go_min(Node* start) const;
     Node* go_max(Node* start) const;
@@ -44,45 +45,51 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   Iterator< Key, Value, Cmp >::Iterator():
     node_(nullptr),
-    key_pos_(0)
+    key_pos_(0),
+    fake_(nullptr)
   {}
 
   template < class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp >::Iterator(Node* node, int key_pos):
+  Iterator< Key, Value, Cmp >::Iterator(Node* node, int key_pos, Node* fake):
     node_(node),
-    key_pos_(key_pos)
+    key_pos_(key_pos),
+    fake_(fake)
   {}
 
   template < class Key, class Value, class Cmp >
   typename Iterator< Key, Value, Cmp >::this_t& Iterator< Key, Value, Cmp >::operator++() noexcept
   {
-    assert(node_);
-
-    if (!node_->is_leaf()) {
-      Node* next = node_->children[key_pos_ + 1];
-      node_ = go_min(next);
+    if (node_->is_fake) {
       key_pos_ = 0;
       return *this;
     }
 
-    Node* cur = node_;
-    Node* parent = cur->parent;
-
-    while (parent) {
-      int max_pos = parent->is_3_node ? 2 : 1;
-      for (int i = 0; i < max_pos; ++i) {
-        if (parent->children[i] == cur && i < max_pos - 1) {
+    if (node_->is_leaf()) {
+      if (node_->is_3_node && key_pos_ == 0) {
+        key_pos_ = 1;
+      } else {
+        Node* parent = node_->parent;
+        Node* child = node_;
+        while (parent && !parent->is_fake && parent->children[0] != child) {
+          child = parent;
+          parent = parent->parent;
+        }
+        if (!parent || parent->is_fake) {
+          node_ = fake_;
+          key_pos_ = 0;
+        } else {
           node_ = parent;
-          key_pos_ = i;
-          return *this;
+          key_pos_ = (parent->children[0] == child) ? 0 : 1;
         }
       }
-      cur = parent;
-      parent = parent->parent;
+    } else {
+      if (key_pos_ == 0) {
+        node_ = go_min(node_->children[1]);
+      } else {
+        node_ = go_min(node_->children[2]);
+      }
+      key_pos_ = 0;
     }
-
-    node_ = nullptr;
-    key_pos_ = 0;
     return *this;
   }
 
@@ -97,34 +104,40 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   typename Iterator< Key, Value, Cmp >::this_t& Iterator< Key, Value, Cmp >::operator--() noexcept
   {
-    if (!node_) {
-      return *this;
-    }
-
-    if (!node_->is_leaf()) {
-      Node* next = node_->children[key_pos_];
-      node_ = go_max(next);
+    assert(node_);
+    if (node_->is_fake) {
+      node_ = go_max(fake_->children[0]);
+      assert(node_);
       key_pos_ = node_->is_3_node ? 1 : 0;
       return *this;
     }
 
-    Node* cur = node_;
-    Node* parent = cur->parent;
-
-    while (parent) {
-      for (int i = (parent->is_3_node ? 1 : 0); i >= 0; --i) {
-        if (parent->children[i + 1] == cur) {
+    if (node_->is_leaf()) {
+      if (node_->is_3_node && key_pos_ == 1) {
+        key_pos_ = 0;
+      } else {
+        Node* parent = node_->parent;
+        Node* child = node_;
+        while (parent && !parent->is_fake && parent->children[0] == child) {
+          child = parent;
+          parent = parent->parent;
+        }
+        if (!parent || parent->is_fake) {
+          node_ = fake_;
+          key_pos_ = 0;
+        } else {
           node_ = parent;
-          key_pos_ = i;
-          return *this;
+          key_pos_ = (parent->children[2] == child) ? 1 : 0;
         }
       }
-      cur = parent;
-      parent = parent->parent;
+    } else {
+      if (key_pos_ == 0) {
+        node_ = go_max(node_->children[0]);
+      } else {
+        node_ = go_max(node_->children[1]);
+      }
+      key_pos_ = node_->is_3_node ? 1 : 0;
     }
-
-    node_ = nullptr;
-    key_pos_ = 0;
     return *this;
   }
 

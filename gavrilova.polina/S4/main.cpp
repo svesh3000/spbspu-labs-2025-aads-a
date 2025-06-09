@@ -7,6 +7,10 @@
 #include <stdexcept>
 #include "commands.hpp"
 
+#include <vector>
+#include "Iterator.hpp"
+#include "TwoThreeTree.hpp"
+
 namespace {
 
   using TreeKey = std::map< size_t, std::string >;
