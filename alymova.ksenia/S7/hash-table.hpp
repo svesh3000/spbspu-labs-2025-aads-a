@@ -362,21 +362,22 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    for (auto it = begin(); it != end(); it++)
+    /*for (auto it = begin(); it != end(); it++)
     {
       if (it->first == key)
       {
         return it;
       }
-    }
-    /*size_t psl = 0;
+    }*/
+    size_t psl = 0;
     size_t home_index = get_home_index(key);
+    //std::cout << key << ':' << home_index << ' ' << capacity_ << '\n';
     Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
     {
       if (it.node_->first == NodeType::Empty)
       {
-        continue;
+        break;
       }
       if (it.node_->second.psl < psl)
       {
@@ -387,7 +388,7 @@ namespace alymova
         return it;
       }
       psl++;
-    }*/
+    }
     return end();
   }
 
@@ -435,17 +436,18 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::rehash()
   {
-    T* array_new = new T[get_next_prime_capacity()];
+    capacity_ = get_next_prime_capacity();
+    T* array_new = new T[capacity_];
     std::swap(array_new, array_);
     clear();
     for (size_t i = 0; i < capacity_; i++)
     {
       if (array_new[i].first == NodeType::Fill)
       {
+        //std::cout << i << " psl: " << array_new[i].second.psl << ' ';
         insert(array_new[i].second.data);
       }
     }
-    capacity_ = get_next_prime_capacity();
     delete[] array_new;
   }
 
@@ -479,7 +481,8 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::insert_node(size_t index, const Node& node)
+  HashIterator< Key, Value, Hash, KeyEqual >
+    HashTable< Key, Value, Hash, KeyEqual >::insert_node(size_t index, const Node& node)
   {
     size_t home_index;
     if (index < node.psl)

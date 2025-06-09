@@ -79,6 +79,17 @@ int main(int argc, char** argv)
   for (auto it = table.begin(); it != table.end(); it++)
   {
     std::cout << it->first << '\n';
-  }*/
+  }
+  HashTable< std::string, int > table1;
+  table1.emplace("graphs", 1);
+  table1.emplace("vertexes", 1);
+  table1.emplace("outbound", 1);
+  table1.emplace("inbound", 1);
+  table1.emplace("bind", 1);
+  table1.emplace("cut", 1);
+  table1.emplace("create", 1);
+  table1.emplace("merge", 1);
+  table1.emplace("extract", 1);
+  std::cout << (table1.find("vertexes") == table1.end()) << '\n';*/
 }
 
