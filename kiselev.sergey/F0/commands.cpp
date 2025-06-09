@@ -1,6 +1,5 @@
 #include "commands.hpp"
-#include <istream>
-#include <ostream>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <iostream>
@@ -213,7 +212,7 @@ void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
   auto second = dicts.find(secondDict);
   if (first == dicts.end() || second == dicts.end())
   {
-    out << "<DICTINARY NOT FOUND>\n";
+    out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
   Dict res = unionTwoDict(first->second, second->second);
@@ -233,4 +232,43 @@ void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
     }
   }
   dicts[nameNewDict] = res;
+}
+
+void kiselev::doSaveDict(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string fileName;
+  std::string dictName;
+  in >> dictName >> fileName;
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  std::ofstream file(fileName);
+  if (!file)
+  {
+    out << "<FILE ERROR>\n";
+    return;
+  }
+  file << dictName << "\n";
+  Dict dict = dictIt->second;
+  for (auto it = dict.cbegin(); it != dict.cend(); ++it)
+  {
+    file << it->first << " " << it->second << "\n";
+  }
+  file << "\n";
+}
+
+void kiselev::doCountWord(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  out << it->second.size() << "\n";
 }
