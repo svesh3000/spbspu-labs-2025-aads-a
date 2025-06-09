@@ -114,16 +114,22 @@ namespace maslov
     }
     auto & weights = it->second;
     auto itWeight = weights.begin();
+    bool deleted = false;
     while (itWeight != weights.end())
     {
       if (*itWeight == weight)
       {
         itWeight = weights.erase(itWeight);
+        deleted = true;
       }
       else
       {
         ++itWeight;
       }
+    }
+    if (!deleted)
+    {
+      throw std::logic_error("ERROR: there is no such weight");
     }
     if (weights.empty())
     {

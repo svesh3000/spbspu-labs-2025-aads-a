@@ -10,6 +10,10 @@ namespace
 {
   void printBounds(std::ostream & out, std::vector< std::pair< std::string, std::vector< int > > > bounds)
   {
+    if (bounds.empty())
+    {
+      out << '\n';
+    }
     for (auto it = bounds.begin(); it != bounds.end(); it++)
     {
       out << it->first;
