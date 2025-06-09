@@ -7,8 +7,6 @@
 
 namespace
 {
-  int checkArguments(const int argc);
-
   int checkArguments(const int argc)
   {
     if (argc == 2)

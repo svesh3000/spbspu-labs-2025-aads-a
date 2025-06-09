@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(make_stack_from_six_element_stack)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(push_method)
+BOOST_AUTO_TEST_SUITE(stack_push_method)
 
 BOOST_AUTO_TEST_CASE(push_one_element)
 {
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(push_sixth_elements)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(pop_method)
+BOOST_AUTO_TEST_SUITE(stack_pop_method)
 
 BOOST_AUTO_TEST_CASE(pop_one_element)
 {
