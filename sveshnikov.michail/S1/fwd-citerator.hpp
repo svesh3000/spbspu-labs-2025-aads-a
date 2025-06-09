@@ -6,10 +6,10 @@
 
 namespace sveshnikov
 {
-  template < typename T >
+  template< typename T >
   class FwdList;
 
-  template < typename T >
+  template< typename T >
   class ConstIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
@@ -30,17 +30,17 @@ namespace sveshnikov
     friend class FwdList< T >;
   };
 
-  template < typename T >
+  template< typename T >
   ConstIterator< T >::ConstIterator():
     node_(nullptr)
   {}
 
-  template < typename T >
+  template< typename T >
   ConstIterator< T >::ConstIterator(const node_t< T > *node):
     node_(node)
   {}
 
-  template < typename T >
+  template< typename T >
   ConstIterator< T > &ConstIterator< T >::operator++() noexcept
   {
     assert(node_ != nullptr);
@@ -48,7 +48,7 @@ namespace sveshnikov
     return *this;
   }
 
-  template < typename T >
+  template< typename T >
   ConstIterator< T > ConstIterator< T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
@@ -57,26 +57,26 @@ namespace sveshnikov
     return result;
   }
 
-  template < typename T >
+  template< typename T >
   bool ConstIterator< T >::operator==(const ConstIterator< T > &rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
-  template < typename T >
+  template< typename T >
   bool ConstIterator< T >::operator!=(const ConstIterator< T > &rhs) const noexcept
   {
     return !(rhs == *this);
   }
 
-  template < typename T >
+  template< typename T >
   const T &ConstIterator< T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
-  template < typename T >
+  template< typename T >
   const T *ConstIterator< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
