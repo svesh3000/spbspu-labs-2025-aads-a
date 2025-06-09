@@ -7,7 +7,7 @@
 
 template< class Key, class T, class Compare >
 maslevtsov::Tree< Key, T, Compare >::Tree():
-  dummy_root_(new Node{value_type(), value_type(), nullptr, nullptr, nullptr, nullptr, true}),
+  dummy_root_(new Node{nullptr, nullptr, nullptr, nullptr, true, value_type()}),
   size_(0),
   compare_(Compare())
 {}
@@ -61,12 +61,6 @@ T& maslevtsov::Tree< Key, T, Compare >::operator[](const Key& key)
 }
 
 template< class Key, class T, class Compare >
-T& maslevtsov::Tree< Key, T, Compare >::operator[](Key&& key)
-{
-  return insert(std::make_pair(std::move(key), T())).first->second;
-}
-
-template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key)
 {
   iterator it = find(key);
@@ -89,38 +83,38 @@ const T& maslevtsov::Tree< Key, T, Compare >::at(const Key& key) const
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::begin()
 {
-  return {iterator::get_min_node(dummy_root_), true};
+  return iterator(iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::begin() const
 {
-  return {const_iterator::get_min_node(dummy_root_), true};
+  return const_iterator(const_iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator
   maslevtsov::Tree< Key, T, Compare >::cbegin() const noexcept
 {
-  return {const_iterator::get_min_node(dummy_root_), true};
+  return const_iterator(const_iterator::get_min_node(dummy_root_), true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::end()
 {
-  return {dummy_root_, true};
+  return iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::end() const
 {
-  return {dummy_root_, true};
+  return const_iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
 typename maslevtsov::Tree< Key, T, Compare >::const_iterator maslevtsov::Tree< Key, T, Compare >::cend() const noexcept
 {
-  return {dummy_root_, true};
+  return const_iterator(dummy_root_, true);
 }
 
 template< class Key, class T, class Compare >
@@ -231,7 +225,7 @@ template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::clear() noexcept
 {
   Node* current = iterator::get_min_node(dummy_root_);
-  while (current && current != dummy_root_) {
+  while (current && !empty()) {
     Node* cur_parent = current->parent;
     Node* next = nullptr;
     if (cur_parent->left == current) {
@@ -257,7 +251,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
 {
   if (empty()) {
-    Node* new_node = new Node{value, value, dummy_root_, nullptr, nullptr, nullptr, true};
+    Node* new_node = new Node{dummy_root_, nullptr, nullptr, nullptr, true, value};
     dummy_root_->left = new_node;
     ++size_;
     return {iterator(new_node, true), true};
@@ -301,6 +295,56 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   split_nodes(current, to_insert);
   ++size_;
   return find_impl(value.first);
+}
+
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator maslevtsov::Tree< Key, T, Compare >::erase(iterator pos) noexcept
+{
+  if (pos == end()) {
+    return end();
+  }
+  if (size_ == 1) {
+    delete dummy_root_->left;
+    dummy_root_->left = nullptr;
+    --size_;
+    return end();
+  }
+  iterator after_removed = pos;
+  Key next_key = (++after_removed)->first;
+  if (pos.node_->left) {
+    Node* with_replacement = nullptr;
+    if (!pos.node_->is_two && !pos.is_first_) {
+      with_replacement = pos.node_->middle;
+    } else {
+      with_replacement = pos.node_->left;
+    }
+    Node* leaf = iterator::get_max_node(with_replacement);
+    iterator replacement_it(leaf, leaf->is_two ? true : false);
+    std::swap(*pos, *replacement_it);
+    pos = replacement_it;
+  }
+  erase_from_leaf(pos);
+  --size_;
+  return after_removed == end() ? end() : find(next_key);
+}
+
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::iterator
+  maslevtsov::Tree< Key, T, Compare >::erase(const_iterator pos) noexcept
+{
+  return erase(iterator(pos.node_, pos.is_first_));
+}
+
+template< class Key, class T, class Compare >
+typename maslevtsov::Tree< Key, T, Compare >::size_type
+  maslevtsov::Tree< Key, T, Compare >::erase(const Key& key) noexcept
+{
+  iterator it = find(key);
+  if (it == end()) {
+    return 0;
+  }
+  erase(it);
+  return 1;
 }
 
 template< class Key, class T, class Compare >
@@ -383,12 +427,14 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   if (compare_(values_to_split[2].first, values_to_split[1].first)) {
     std::swap(values_to_split[2], values_to_split[1]);
   }
-  Node* left_node = new Node{values_to_split[0], values_to_split[0], nullptr, nullptr, nullptr, nullptr, true};
+  Node* left_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[0]};
   Node* right_node = nullptr;
   try {
-    right_node = new Node{values_to_split[2], values_to_split[2], nullptr, nullptr, nullptr, nullptr, true};
+    right_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[2]};
   } catch (const std::bad_alloc&) {
     delete left_node;
+    clear_subtree(left_child);
+    clear_subtree(right_child);
     throw;
   }
   if (node->left) {
@@ -426,7 +472,7 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   Node* parent = node->parent;
   if (parent == dummy_root_) {
     node->data1 = values_to_split[1];
-    node->data2 = values_to_split[1];
+    node->data2 = value_type();
     node->left = left_node;
     left_node->parent = node;
     node->right = right_node;
@@ -451,7 +497,293 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
     delete node;
     return;
   } else {
-    return split_nodes(parent, values_to_split[1], left_node, right_node);
+    split_nodes(parent, values_to_split[1], left_node, right_node);
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
+{
+  if (!node) {
+    return;
+  }
+  clear_subtree(node->left);
+  clear_subtree(node->middle);
+  clear_subtree(node->right);
+  delete node;
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::erase_from_leaf(iterator pos) noexcept
+{
+  if (!pos.node_->is_two) {
+    if (pos.is_first_) {
+      std::swap(pos.node_->data1, pos.node_->data2);
+    }
+    pos.node_->is_two = true;
+    pos.node_->data2 = value_type();
+  } else {
+    Node* to_delete = pos.node_;
+    to_delete->data1 = value_type();
+    if (!to_delete->parent->is_two) {
+      balance_parent_three(to_delete);
+    } else {
+      balance_parent_two(to_delete);
+    }
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) noexcept
+{
+  Node* parent = deleted->parent;
+  if (parent->middle == deleted) {
+    if (!parent->right->is_two) {
+      std::swap(deleted->data1, parent->data2);
+      std::swap(parent->data2, parent->right->data1);
+      std::swap(parent->right->data1, parent->right->data2);
+      parent->right->data2 = value_type();
+      parent->right->is_two = true;
+    } else if (!parent->left->is_two) {
+      std::swap(deleted->data1, parent->data1);
+      std::swap(parent->data1, parent->left->data2);
+      parent->left->data2 = value_type();
+      parent->left->is_two = true;
+    } else {
+      std::swap(parent->data2, parent->right->data2);
+      std::swap(parent->right->data1, parent->right->data2);
+      parent->right->is_two = false;
+      parent->is_two = true;
+      parent->middle->data1 = value_type();
+      delete parent->middle;
+      parent->middle = nullptr;
+    }
+  } else if (parent->left == deleted) {
+    if (!parent->middle->is_two) {
+      std::swap(deleted->data1, parent->data1);
+      std::swap(parent->data1, parent->middle->data1);
+      std::swap(parent->middle->data1, parent->middle->data2);
+      parent->middle->data2 = value_type();
+      parent->middle->is_two = true;
+    } else {
+      std::swap(parent->data1, parent->middle->data2);
+      std::swap(parent->data1, parent->data2);
+      std::swap(parent->middle->data1, parent->middle->data2);
+      parent->middle->is_two = false;
+      parent->is_two = true;
+      parent->left->data1 = value_type();
+      delete parent->left;
+      parent->left = parent->middle;
+      parent->middle = nullptr;
+    }
+  } else {
+    if (!parent->middle->is_two) {
+      std::swap(deleted->data1, parent->data2);
+      std::swap(parent->data2, parent->middle->data2);
+      parent->middle->data2 = value_type();
+      parent->middle->is_two = true;
+    } else {
+      std::swap(parent->data2, parent->middle->data2);
+      parent->middle->is_two = false;
+      parent->is_two = true;
+      parent->right->data1 = value_type();
+      delete parent->right;
+      parent->right = parent->middle;
+      parent->middle = nullptr;
+    }
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_two(Node* deleted) noexcept
+{
+  Node* parent = deleted->parent;
+  if (parent->left == deleted && !parent->right->is_two) {
+    std::swap(parent->data1, parent->left->data1);
+    std::swap(parent->data1, parent->right->data1);
+    std::swap(parent->right->data1, parent->right->data2);
+    parent->right->data2 = value_type();
+    parent->right->is_two = true;
+  } else if (parent->right == deleted && !parent->left->is_two) {
+    std::swap(parent->data1, parent->right->data1);
+    std::swap(parent->data1, parent->left->data2);
+    parent->left->data2 = value_type();
+    parent->left->is_two = true;
+  } else {
+    balance_parent_bro_two(deleted);
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_bro_two(Node* deleted) noexcept
+{
+  Node* parent = deleted->parent;
+  deleted->data1 = value_type();
+  if (parent->left == deleted) {
+    delete deleted;
+    parent->left = nullptr;
+    std::swap(parent->data1, parent->right->data2);
+    std::swap(parent->right->data1, parent->right->data2);
+    std::swap(parent->left, parent->right);
+  } else {
+    delete deleted;
+    parent->right = nullptr;
+    std::swap(parent->data1, parent->left->data2);
+  }
+  parent->left->is_two = false;
+  Node* current = parent;
+  Node* cur_parent = current->parent;
+  bool is_balanced = false;
+  while (cur_parent != dummy_root_) {
+    if (cur_parent->is_two) {
+      is_balanced = balance_next_parent_two(current, cur_parent);
+    } else {
+      balance_next_parent_three(current, cur_parent);
+      is_balanced = true;
+    }
+    if (is_balanced) {
+      break;
+    }
+    current = cur_parent;
+    cur_parent = current->parent;
+  }
+  if (!is_balanced) {
+    dummy_root_->left = current->left;
+    current->left = nullptr;
+    delete current;
+    dummy_root_->left->parent = dummy_root_;
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_next_parent_three(Node* deleted, Node* next_parent) noexcept
+{
+  if (next_parent->left == deleted) {
+    if (!next_parent->middle->is_two) {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = next_parent->middle->left;
+      std::swap(next_parent->data1, next_parent->middle->data1);
+      std::swap(next_parent->middle->data1, next_parent->middle->data2);
+      next_parent->middle->is_two = true;
+      next_parent->middle->left = next_parent->middle->middle;
+      next_parent->middle->middle = nullptr;
+    } else {
+      std::swap(next_parent->data1, next_parent->middle->data2);
+      std::swap(next_parent->data1, next_parent->data2);
+      std::swap(next_parent->middle->data1, next_parent->middle->data2);
+      next_parent->middle->is_two = false;
+      next_parent->is_two = true;
+      next_parent->middle->middle = next_parent->middle->left;
+      next_parent->middle->left = next_parent->left->left;
+      next_parent->left->left->parent = next_parent->middle;
+      next_parent->left->left = nullptr;
+      delete next_parent->left;
+      next_parent->left = next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  } else if (next_parent->middle == deleted) {
+    if (!next_parent->left->is_two) {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->left->right;
+      next_parent->left->right->parent = deleted;
+      std::swap(next_parent->data1, next_parent->left->data2);
+      next_parent->left->is_two = true;
+      next_parent->left->right = next_parent->left->middle;
+      next_parent->left->middle = nullptr;
+    } else if (!next_parent->right->is_two) {
+      std::swap(deleted->data1, next_parent->data2);
+      deleted->right = next_parent->right->left;
+      std::swap(next_parent->data2, next_parent->right->data1);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = true;
+      next_parent->right->left = next_parent->right->middle;
+      next_parent->right->middle = nullptr;
+    } else {
+      std::swap(next_parent->data1, next_parent->left->data2);
+      std::swap(next_parent->data1, next_parent->data2);
+      next_parent->left->is_two = false;
+      next_parent->is_two = true;
+      next_parent->left->middle = next_parent->left->right;
+      next_parent->left->right = next_parent->middle->left;
+      next_parent->middle->left->parent = next_parent->left;
+      next_parent->middle->left = nullptr;
+      delete next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  } else {
+    if (!next_parent->middle->is_two) {
+      std::swap(deleted->data1, next_parent->data2);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->middle->right;
+      next_parent->middle->right->parent = deleted;
+      std::swap(next_parent->data2, next_parent->middle->data2);
+      next_parent->middle->is_two = true;
+      next_parent->middle->right = next_parent->middle->middle;
+      next_parent->middle->middle = nullptr;
+    } else {
+      std::swap(next_parent->data2, next_parent->middle->data2);
+      next_parent->middle->is_two = false;
+      next_parent->is_two = true;
+      next_parent->middle->middle = next_parent->middle->right;
+      next_parent->middle->right = next_parent->right->left;
+      next_parent->right->left->parent = next_parent->middle;
+      next_parent->right->left = nullptr;
+      delete next_parent->right;
+      next_parent->right = next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  }
+}
+
+template< class Key, class T, class Compare >
+bool maslevtsov::Tree< Key, T, Compare >::balance_next_parent_two(Node* deleted, Node* next_parent) noexcept
+{
+  if (next_parent->left == deleted) {
+    if (next_parent->right->is_two) {
+      std::swap(next_parent->data1, next_parent->right->data2);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = false;
+      next_parent->right->middle = next_parent->right->left;
+      next_parent->right->left = deleted->left;
+      deleted->left->parent = next_parent->right;
+      deleted->left = nullptr;
+      delete deleted;
+      next_parent->left = next_parent->right;
+      next_parent->right = nullptr;
+      return false;
+    } else {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = next_parent->right->left;
+      next_parent->right->left->parent = deleted;
+      std::swap(next_parent->data1, next_parent->right->data1);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = true;
+      next_parent->right->left = next_parent->right->middle;
+      next_parent->right->middle = nullptr;
+      return true;
+    }
+  } else {
+    if (next_parent->left->is_two) {
+      std::swap(next_parent->data1, next_parent->left->data2);
+      next_parent->left->is_two = false;
+      next_parent->left->middle = next_parent->left->right;
+      next_parent->left->right = deleted->left;
+      deleted->left->parent = next_parent->left;
+      deleted->left = nullptr;
+      delete deleted;
+      next_parent->right = nullptr;
+      return false;
+    } else {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->left->right;
+      std::swap(next_parent->data1, next_parent->right->data2);
+      next_parent->left->is_two = true;
+      next_parent->left->right = next_parent->right->middle;
+      next_parent->left->middle = nullptr;
+      return true;
+    }
   }
 }
 
