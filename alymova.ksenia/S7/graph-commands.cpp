@@ -1,7 +1,7 @@
 #include "graph-commands.hpp"
 #include <exception>
 
-void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
+void alymova::GraphsCommand::operator()(const GraphSet& graphs)
 {
   List< std::string > names;
   for (auto it = graphs.begin(); it != graphs.end(); it++)
@@ -12,7 +12,7 @@ void alymova::GraphsCommand::operator()(const GraphsSet& graphs)
   out << names;
 }
 
-void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
+void alymova::VertexesCommand::operator()(const GraphSet& graphs)
 {
   std::string name;
   in >> name;
@@ -26,7 +26,7 @@ void alymova::VertexesCommand::operator()(const GraphsSet& graphs)
   out << copy_vertexes;
 }
 
-void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
+void alymova::OutboundCommand::operator()(const GraphSet& graphs)
 {
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
@@ -39,7 +39,7 @@ void alymova::OutboundCommand::operator()(const GraphsSet& graphs)
   out << outbound;
 }
 
-void alymova::InboundCommand::operator()(const GraphsSet& graphs)
+void alymova::InboundCommand::operator()(const GraphSet& graphs)
 {
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
@@ -52,7 +52,7 @@ void alymova::InboundCommand::operator()(const GraphsSet& graphs)
   out << inbound;
 }
 
-void alymova::BindCommand::operator()(GraphsSet& graphs)
+void alymova::BindCommand::operator()(GraphSet& graphs)
 {
   std::string graph_name, vertex1, vertex2;
   size_t weight;
@@ -65,7 +65,7 @@ void alymova::BindCommand::operator()(GraphsSet& graphs)
   it_name->second.addEdge(vertex1, vertex2, weight);
 }
 
-void alymova::CutCommand::operator()(GraphsSet& graphs)
+void alymova::CutCommand::operator()(GraphSet& graphs)
 {
   std::string graph_name, vertex1, vertex2;
   size_t weight;
@@ -78,7 +78,7 @@ void alymova::CutCommand::operator()(GraphsSet& graphs)
   it_name->second.cutEdge(vertex1, vertex2, weight);
 }
 
-void alymova::CreateCommand::operator()(GraphsSet& graphs)
+void alymova::CreateCommand::operator()(GraphSet& graphs)
 {
   std::string graph_name;
   in >> graph_name;
@@ -102,7 +102,7 @@ void alymova::CreateCommand::operator()(GraphsSet& graphs)
   graphs.insert(std::make_pair(graph_name, graph_new));
 }
 
-void alymova::MergeCommand::operator()(GraphsSet& graphs)
+void alymova::MergeCommand::operator()(GraphSet& graphs)
 {
   std::string name_new, name1, name2;
   in >> name_new >> name1 >> name2;
@@ -117,7 +117,7 @@ void alymova::MergeCommand::operator()(GraphsSet& graphs)
   graphs.insert(std::make_pair(name_new, graph_new));
 }
 
-void alymova::ExtractCommand::operator()(GraphsSet& graphs)
+void alymova::ExtractCommand::operator()(GraphSet& graphs)
 {
   std::string name_new, name;
   in >> name_new >> name;
@@ -149,9 +149,9 @@ void alymova::ExtractCommand::operator()(GraphsSet& graphs)
   graphs.insert(std::make_pair(name_new, graph_new));
 }
 
-alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
+alymova::GraphSet alymova::readGraphsFile(std::istream& in)
 {
-  GraphsSet graphs;
+  GraphSet graphs;
   std::string name;
   while (in >> name)
   {
@@ -168,7 +168,7 @@ alymova::GraphsSet alymova::readGraphsFile(std::istream& in)
   return graphs;
 }
 
-alymova::CommandsSet alymova::complectCommands(std::istream& in, std::ostream& out)
+alymova::CommandSet alymova::complectCommands(std::istream& in, std::ostream& out)
 {
   return
   {

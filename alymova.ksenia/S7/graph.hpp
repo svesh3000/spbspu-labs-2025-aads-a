@@ -15,7 +15,6 @@ namespace alymova
 
   struct Graph
   {
-    //std::unordered_multimap< std::pair< std::string, std::string >, size_t, PairHasher > edges;
     HashTable< std::pair< std::string, std::string >, size_t, PairHasher > edges;
     List< std::string > vertexes;
 

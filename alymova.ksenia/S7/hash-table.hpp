@@ -249,11 +249,6 @@ namespace alymova
     size_t home_index = get_home_index(value.first);
     ConstIterator hint(array_ + home_index, array_ + capacity_);
     return emplace_hint(hint, std::move(value));
-    /*ValueType value(std::forward< Args >(args)...);
-    size_t home_index = hasher(value.first) % capacity_;
-    Node node{value, 0};
-    size_++;
-    return insert_node(home_index, node);*/
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -362,16 +357,8 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    /*for (auto it = begin(); it != end(); it++)
-    {
-      if (it->first == key)
-      {
-        return it;
-      }
-    }*/
     size_t psl = 0;
     size_t home_index = get_home_index(key);
-    //std::cout << key << ':' << home_index << ' ' << capacity_ << '\n';
     Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
     {
@@ -444,7 +431,6 @@ namespace alymova
     {
       if (array_new[i].first == NodeType::Fill)
       {
-        //std::cout << i << " psl: " << array_new[i].second.psl << ' ';
         insert(array_new[i].second.data);
       }
     }

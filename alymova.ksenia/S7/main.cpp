@@ -11,10 +11,8 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  //using GraphsSet = std::unordered_map< std::string, Graph >;
-  //using CommandsSet = std::unordered_map< std::string, std::function< void(GraphsSet&) > >;
-  using GraphsSet = HashTable< std::string, Graph >;
-  using CommandsSet = HashTable< std::string, std::function< void(GraphsSet&) > >;
+  using GraphSet = HashTable< std::string, Graph >;
+  using CommandSet = HashTable< std::string, std::function< void(GraphSet&) > >;
 
   if (argc != 2)
   {
@@ -31,10 +29,10 @@ int main(int argc, char** argv)
 
   try
   {
-    GraphsSet graphs = readGraphsFile(file);
+    GraphSet graphs = readGraphsFile(file);
     file.clear();
 
-    CommandsSet commands = complectCommands(std::cin, std::cout);
+    CommandSet commands = complectCommands(std::cin, std::cout);
     std::string command;
     while (!(std::cin >> command).eof())
     {
