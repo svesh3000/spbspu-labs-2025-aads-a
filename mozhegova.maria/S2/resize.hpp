@@ -10,21 +10,21 @@ namespace mozhegova
   T * resize(T * data, size_t & capacity)
   {
     {
-      size_t size = capacity;
-      capacity *= 2;
-      T * temp = new T[capacity];
+      size_t size = capacity * 2;
+      T * temp = new T[size];
       try
       {
-        for (size_t i = 0; i < size; i++)
+        for (size_t i = 0; i < capacity; i++)
         {
           temp[i] = data[i];
         }
       }
-      catch (const std::exception &)
+      catch (...)
       {
         delete[] temp;
         throw;
       }
+      capacity *= 2;
       delete[] data;
       return temp;
     }

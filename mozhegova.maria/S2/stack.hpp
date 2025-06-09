@@ -11,11 +11,11 @@ namespace mozhegova
   public:
     Stack();
     Stack(const Stack< T > &);
-    Stack(Stack< T > &&);
+    Stack(Stack< T > &&) noexcept;
     ~Stack();
 
     Stack< T > & operator=(const Stack< T > &);
-    Stack< T > & operator=(Stack< T > &&);
+    Stack< T > & operator=(Stack< T > &&) noexcept;
 
     void push(const T & value);
     void pop();
@@ -24,6 +24,8 @@ namespace mozhegova
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void swap(Stack< T > &) noexcept;
   private:
     size_t size_;
     size_t capacity_;
@@ -58,7 +60,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Stack< T >::Stack(Stack< T > && other):
+  Stack< T >::Stack(Stack< T > && other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
     data_(other.data_)
@@ -77,26 +79,21 @@ namespace mozhegova
   template< typename T >
   Stack< T > & Stack< T >::operator=(const Stack< T > & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       Stack< T > copy(other);
-      std::swap(size_, copy.size_);
-      std::swap(capacity_, copy.capacity_);
-      std::swap(data_, copy.data_);
+      swap(copy);
     }
     return *this;
   }
 
   template< typename T >
-  Stack< T > & Stack< T >::operator=(Stack< T > && other)
+  Stack< T > & Stack< T >::operator=(Stack< T > && other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      delete[] data_;
-      std::swap(size_, other.size_);
-      std::swap(capacity_, other.capacity_);
-      data_ = other.data_;
-      other.data_ = nullptr;
+      Stack< T > copy(std::move(other));
+      swap(copy);
     }
     return *this;
   }
@@ -151,6 +148,14 @@ namespace mozhegova
   size_t Stack< T >::size() const noexcept
   {
     return size_;
+  }
+
+  template< typename T >
+  void Stack< T >::swap(Stack< T > & other) noexcept
+  {
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(data_, other.data_);
   }
 }
 

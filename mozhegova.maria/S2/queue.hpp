@@ -11,11 +11,11 @@ namespace mozhegova
   public:
     Queue();
     Queue(const Queue< T > &);
-    Queue(Queue< T > &&);
+    Queue(Queue< T > &&) noexcept;
     ~Queue();
 
     Queue< T > & operator=(const Queue< T > &);
-    Queue< T > & operator=(Queue< T > &&);
+    Queue< T > & operator=(Queue< T > &&) noexcept;
 
     void push(const T & value);
     void pop();
@@ -24,6 +24,8 @@ namespace mozhegova
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void swap(Queue< T > &) noexcept;
   private:
     size_t size_;
     size_t capacity_;
@@ -53,7 +55,7 @@ namespace mozhegova
         data_[i] = other.data_[i];
       }
     }
-    catch(const std::exception &)
+    catch (const std::exception &)
     {
       delete[] data_;
       throw;
@@ -61,7 +63,7 @@ namespace mozhegova
   }
 
   template< typename T >
-  Queue< T >::Queue(Queue< T > && other):
+  Queue< T >::Queue(Queue< T > && other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
     first_(other.first_),
@@ -82,31 +84,21 @@ namespace mozhegova
   template< typename T >
   Queue< T > & Queue< T >::operator=(const Queue< T > & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       Queue< T > copy(other);
-      std::swap(size_, copy.size_);
-      std::swap(capacity_, copy.capacity_);
-      std::swap(first_, copy.first_);
-      std::swap(data_, copy.data_);
+      swap(copy);
     }
     return *this;
   }
 
   template< typename T >
-  Queue< T > & Queue< T >::operator=(Queue< T > && other)
+  Queue< T > & Queue< T >::operator=(Queue< T > && other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      delete[] data_;
-      capacity_ = other.capacity_;
-      size_ = other.size_;
-      first_ = other.first_;
-      data_ = other.data_;
-      other.capacity_ = 0;
-      other.size_ = 0;
-      other.first_ = 0;
-      other.data_ = nullptr;
+      Queue< T > copy(std::move(other));
+      swap(copy);
     }
     return *this;
   }
@@ -162,6 +154,15 @@ namespace mozhegova
   size_t Queue< T >::size() const noexcept
   {
     return size_;
+  }
+
+  template< typename T >
+  void Queue< T >::swap(Queue< T > & other) noexcept
+  {
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(first_, other.first_);
+    std::swap(data_, other.data_);
   }
 }
 

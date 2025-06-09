@@ -77,7 +77,7 @@ namespace
           std::stoll(token);
           stack.push(token);
         }
-        catch(const std::exception &)
+        catch (const std::exception &)
         {
           if (token == "(")
           {
