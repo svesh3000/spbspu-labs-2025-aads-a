@@ -5,8 +5,16 @@
 #include <type_traits>
 #include "tree_node.hpp"
 
+namespace detail {
+  enum class IteratorType
+  {
+    CONSTANT,
+    NONCONSTANT,
+  };
+}
+
 namespace maslevtsov {
-  template< class T, bool is_const >
+  template< class T, detail::IteratorType it_type >
   class TreeIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
@@ -23,8 +31,8 @@ namespace maslevtsov {
     TreeIterator& operator--();
     TreeIterator& operator--(int);
 
-    typename std::conditional< is_const, const T&, T& >::type operator*() const;
-    typename std::conditional< is_const, const T*, T* >::type operator->() const;
+    typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T&, T& >::type operator*() const;
+    typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T*, T* >::type operator->() const;
 
     bool operator==(const TreeIterator& rhs) const;
     bool operator!=(const TreeIterator& rhs) const;
@@ -33,18 +41,18 @@ namespace maslevtsov {
     TreeNode< T >* node_;
     bool is_first_;
 
-    TreeIterator(TreeNode< T >* node, bool is_first_);
+    explicit TreeIterator(TreeNode< T >* node, bool is_first_);
     static TreeNode< T >* get_min_node(TreeNode< T >* node);
     static TreeNode< T >* get_max_node(TreeNode< T >* node);
   };
 
-  template< class T, bool is_const >
-  TreeIterator< T, is_const >::TreeIterator():
+  template< class T, detail::IteratorType it_type >
+  TreeIterator< T, it_type >::TreeIterator():
     node_(nullptr)
   {}
 
-  template< class T, bool is_const >
-  typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator++()
+  template< class T, detail::IteratorType it_type >
+  typename TreeIterator< T, it_type >::TreeIterator& TreeIterator< T, it_type >::operator++()
   {
     if (!node_) {
       return *this;
@@ -91,16 +99,16 @@ namespace maslevtsov {
     return *this;
   }
 
-  template< class T, bool is_const >
-  typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator++(int)
+  template< class T, detail::IteratorType it_type >
+  typename TreeIterator< T, it_type >::TreeIterator& TreeIterator< T, it_type >::operator++(int)
   {
-    TreeIterator< T, is_const > result(*this);
+    TreeIterator< T, it_type > result(*this);
     ++(*this);
     return result;
   }
 
-  template< class T, bool is_const >
-  typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator--()
+  template< class T, detail::IteratorType it_type >
+  typename TreeIterator< T, it_type >::TreeIterator& TreeIterator< T, it_type >::operator--()
   {
     if (!node_) {
       return *this;
@@ -147,46 +155,48 @@ namespace maslevtsov {
     return *this;
   }
 
-  template< class T, bool is_const >
-  typename TreeIterator< T, is_const >::TreeIterator& TreeIterator< T, is_const >::operator--(int)
+  template< class T, detail::IteratorType it_type >
+  typename TreeIterator< T, it_type >::TreeIterator& TreeIterator< T, it_type >::operator--(int)
   {
-    TreeIterator< T, is_const > result(*this);
+    TreeIterator< T, it_type > result(*this);
     --(*this);
     return result;
   }
 
-  template< class T, bool is_const >
-  typename std::conditional< is_const, const T&, T& >::type TreeIterator< T, is_const >::operator*() const
+  template< class T, detail::IteratorType it_type >
+  typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T&, T& >::type
+    TreeIterator< T, it_type >::operator*() const
   {
     return is_first_ ? node_->data1 : node_->data2;
   }
 
-  template< class T, bool is_const >
-  typename std::conditional< is_const, const T*, T* >::type TreeIterator< T, is_const >::operator->() const
+  template< class T, detail::IteratorType it_type >
+  typename std::conditional< it_type == detail::IteratorType::CONSTANT, const T*, T* >::type
+    TreeIterator< T, it_type >::operator->() const
   {
     return is_first_ ? std::addressof(node_->data1) : std::addressof(node_->data2);
   }
 
-  template< class T, bool is_const >
-  bool TreeIterator< T, is_const >::operator==(const TreeIterator& rhs) const
+  template< class T, detail::IteratorType it_type >
+  bool TreeIterator< T, it_type >::operator==(const TreeIterator& rhs) const
   {
     return node_ == rhs.node_ && is_first_ == rhs.is_first_;
   }
 
-  template< class T, bool is_const >
-  bool TreeIterator< T, is_const >::operator!=(const TreeIterator& rhs) const
+  template< class T, detail::IteratorType it_type >
+  bool TreeIterator< T, it_type >::operator!=(const TreeIterator& rhs) const
   {
     return !(*this == rhs);
   }
 
-  template< class T, bool is_const >
-  TreeIterator< T, is_const >::TreeIterator(TreeNode< T >* node, bool is_first):
+  template< class T, detail::IteratorType it_type >
+  TreeIterator< T, it_type >::TreeIterator(TreeNode< T >* node, bool is_first):
     node_(node),
     is_first_(is_first)
   {}
 
-  template< class T, bool is_const >
-  TreeNode< T >* TreeIterator< T, is_const >::get_min_node(TreeNode< T >* node)
+  template< class T, detail::IteratorType it_type >
+  TreeNode< T >* TreeIterator< T, it_type >::get_min_node(TreeNode< T >* node)
   {
     TreeNode< T >* result = node;
     while (result && result->left) {
@@ -195,8 +205,8 @@ namespace maslevtsov {
     return result;
   }
 
-  template< class T, bool is_const >
-  TreeNode< T >* TreeIterator< T, is_const >::get_max_node(TreeNode< T >* node)
+  template< class T, detail::IteratorType it_type >
+  TreeNode< T >* TreeIterator< T, it_type >::get_max_node(TreeNode< T >* node)
   {
     TreeNode< T >* result = node;
     while (result && result->right) {

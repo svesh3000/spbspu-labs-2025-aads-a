@@ -13,8 +13,8 @@ namespace maslevtsov {
     using size_type = std::size_t;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = TreeIterator< value_type, false >;
-    using const_iterator = TreeIterator< value_type, true >;
+    using iterator = TreeIterator< value_type, detail::IteratorType::NONCONSTANT >;
+    using const_iterator = TreeIterator< value_type, detail::IteratorType::CONSTANT >;
 
     Tree();
     Tree(const Tree& rhs);
@@ -25,7 +25,6 @@ namespace maslevtsov {
     Tree& operator=(Tree&& rhs) noexcept;
 
     T& operator[](const Key& key);
-    T& operator[](Key&& key);
     T& at(const Key& key);
     const T& at(const Key& key) const;
 
@@ -73,6 +72,15 @@ namespace maslevtsov {
     Compare compare_;
 
     void split_nodes(Node* node, value_type& to_insert, Node* left_child = nullptr, Node* right_child = nullptr);
+    void clear_subtree(Node* node) noexcept;
+
+    void erase_from_leaf(iterator pos) noexcept;
+    void balance_parent_three(Node* deleted) noexcept;
+    void balance_parent_two(Node* deleted) noexcept;
+    void balance_parent_bro_two(Node* deleted) noexcept;
+    void balance_next_parent_three(Node* deleted, Node* next_parent) noexcept;
+    bool balance_next_parent_two(Node* deleted, Node* next_parent) noexcept;
+
     std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };
 }
