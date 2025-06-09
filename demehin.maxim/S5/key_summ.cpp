@@ -12,12 +12,8 @@ namespace
     {
       return a > max - b;
     }
-    if (a < 0 && b < 0)
-    {
-      return a < min + b;
-    }
 
-    return false;
+    return (a < 0 && b < 0) && (a < min + b);
   }
 }
 
