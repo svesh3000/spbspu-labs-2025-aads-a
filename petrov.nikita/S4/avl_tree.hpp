@@ -363,13 +363,13 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::cbegin() const
   {
+    auto temp = root_;
     if (empty())
     {
       return const_it_t();
     }
     else
     {
-      auto temp = root_;
       while (temp->left)
       {
         temp = temp->left;
@@ -387,13 +387,13 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::begin()
   {
+    auto temp = root_;
     if (empty())
     {
       return it_t();
     }
     else
     {
-      auto temp = root_;
       while (temp->left)
       {
         temp = temp->left;
