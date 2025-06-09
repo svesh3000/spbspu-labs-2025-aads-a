@@ -14,6 +14,8 @@ namespace zakirov
     Queue(const Queue< T > & other);
     Queue(Queue< T > && other) noexcept;
     ~Queue();
+    Queue< T > & operator=(const Queue< T > & other);
+    Queue< T > & operator=(Queue< T > && other) noexcept;
     bool empty();
     size_t size();
     T & front();
@@ -70,6 +72,30 @@ namespace zakirov
   }
 
   template < class T >
+  Queue< T > & Queue< T >::operator=(const Queue< T > & other)
+  {
+    if (this != std::addressof(other))
+    {
+      Queue< T > queue_temp(other);
+      swap(queue_temp);
+    }
+
+    return *this;
+  }
+
+  template < class T >
+  Queue< T > & Queue< T >::operator=(Queue< T > && other) noexcept
+  {
+    if (this != std::addressof(other))
+    {
+      Queue< T > queue_temp(std::move(other));
+      swap(queue_temp);
+    }
+
+    return *this;
+  }
+
+  template < class T >
   bool Queue< T >::empty()
   {
     return size_ == 0;
@@ -96,13 +122,13 @@ namespace zakirov
   template < class T >
   T & Queue< T >::back()
   {
-    return data_[size_ - 1];
+    return data_[first_ + size_ - 1];
   }
 
   template < class T >
   const T & Queue< T >::back() const
   {
-    return data_[size_ - 1];
+    return data_[first_ + size_ - 1];
   }
 
   template < class T >

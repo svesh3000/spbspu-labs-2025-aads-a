@@ -14,6 +14,8 @@ namespace zakirov
     Stack(const Stack & other);
     Stack(Stack && other) noexcept;
     ~Stack();
+    Stack< T > & operator=(const Stack< T > & other);
+    Stack< T > & operator=(Stack< T > && other) noexcept;
     bool empty();
     size_t size();
     T & top();
@@ -28,7 +30,6 @@ namespace zakirov
     void add_capacity();
     T * data_;
     size_t top_;
-    size_t size_;
     size_t capacity_;
   };
 
@@ -36,7 +37,6 @@ namespace zakirov
   Stack< T >::Stack():
     data_(nullptr),
     top_(0),
-    size_(0),
     capacity_(0)
   {}
 
@@ -44,7 +44,6 @@ namespace zakirov
   Stack< T >::Stack(const Stack & other):
     data_(new T[other.capacity_]),
     top_(other.top_),
-    size_(other.size_),
     capacity_(other.capacity_)
   {
     for (size_t i = 0; i < top_; ++i)
@@ -57,7 +56,6 @@ namespace zakirov
   Stack< T >::Stack(Stack && other) noexcept:
     data_(std::exchange(other.data_, nullptr)),
     top_(std::exchange(other.top_, 0)),
-    size_(std::exchange(other.size_, 0)),
     capacity_(std::exchange(other.capacity_, 0))
   {}
 
@@ -68,15 +66,39 @@ namespace zakirov
   }
 
   template < class T >
+  Stack< T > & Stack< T >::operator=(const Stack< T > & other)
+  {
+    if (this != std::addressof(other))
+    {
+      Stack< T > stack_temp(other);
+      swap(stack_temp);
+    }
+
+    return *this;
+  }
+
+  template < class T >
+  Stack< T > & Stack< T >::operator=(Stack< T > && other) noexcept
+  {
+    if (this != std::addressof(other))
+    {
+      Stack< T > stack_temp(std::move(other));
+      swap(stack_temp);
+    }
+
+    return *this;
+  }
+
+  template < class T >
   bool Stack< T >::empty()
   {
-    return size_ == 0;
+    return top_ == 0;
   }
 
   template < class T >
   size_t Stack< T >::size()
   {
-    return size_;
+    return top_ - 1;
   }
 
   template < class T >
@@ -120,7 +142,6 @@ namespace zakirov
   void Stack< T >::pop()
   {
     --top_;
-    --size_;
   }
 
   template < class T >
@@ -128,7 +149,6 @@ namespace zakirov
   {
     std::swap(data_, other.data_);
     std::swap(top_, other.top_);
-    std::swap(size_, other.size_);
     std::swap(capacity_, other.capacity_);
   }
 
