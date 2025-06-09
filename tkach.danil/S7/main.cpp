@@ -76,9 +76,9 @@ int main(const int argc, const char* const* const argv)
     {
       cmds.at(command)();
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
-      std::cout << e.what() << "\n";
+      std::cout << "<INVALID COMMAND>" << "\n";
     }
     std::cin.clear();
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

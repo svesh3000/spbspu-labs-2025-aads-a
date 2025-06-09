@@ -70,7 +70,7 @@ namespace tkach
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = temp.getOutBound(name_vert);
+    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = temp.getInBound(name_vert);
     if (tree_of_vert.empty())
     {
       out << "\n";
