@@ -79,7 +79,7 @@ namespace tkach
     size_t height(TreeNode< Key, Value >* node);
     void swap(AvlTree< Key, Value, Cmp >& other) noexcept;
     TreeNode< Key, Value >* eraseFrom(TreeNode< Key, Value >* root, const Key& key);
-    TreeNode< Key, Value >* balance(TreeNode< Key, Value >* root, const Key& key);
+    TreeNode< Key, Value >* balance(TreeNode< Key, Value >* root);
     template< class... Args >
     pair_t insertCmp(TreeNode< Key, Value >* root, const Key& key, Args&&... args);
   };
@@ -250,7 +250,7 @@ namespace tkach
       }
     }
     fixHeight(root);
-    return balance(root, key);
+    return balance(root);
   }
 
   template< class Key, class Value, class Cmp >
@@ -476,11 +476,7 @@ namespace tkach
   template< class Key, class Value, class Cmp >
   Value& AvlTree< Key, Value, Cmp >::operator[](const Key& key)
   {
-    Iterator< Key, Value, Cmp > node = find(key);
-    if (node == end())
-    {
-      node = insert(std::make_pair(key, Value()));
-    }
+    Iterator< Key, Value, Cmp > node = insert(std::make_pair(key, Value()));
     return node->second;
   }
 
@@ -514,24 +510,24 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::balance(TreeNode< Key, Value >* root, const Key& key)
+  TreeNode< Key, Value >* AvlTree< Key, Value, Cmp >::balance(TreeNode< Key, Value >* root)
   {
     int balance = height(root->left) - height(root->right);
     if (balance > 1)
     {
-      if (cmp_(root->right->data.first, key))
+      if (height(root->left->left) < height(root->left->right))
       {
         root->left = rotateLeft(root->left);
       }
-      root = rotateRight(root);
+      return rotateRight(root);
     }
     if (balance < -1)
     {
-      if (cmp_(key, root->right->data.first))
+      if (height(root->right->right) < height(root->right->left))
       {
         root->right = rotateRight(root->right);
       }
-      root = rotateLeft(root);
+      return rotateLeft(root);
     }
     return root;
   }
@@ -571,7 +567,7 @@ namespace tkach
       return std::make_pair(root, root);
     }
     fixHeight(root);
-    return std::make_pair(balance(root, key), inserted);
+    return std::make_pair(balance(root), inserted);
   }
 
   template< class Key, class Value, class Cmp >
