@@ -36,8 +36,12 @@ namespace tkach
   {
     std::string name_graph, name_vert;
     in >> name_graph >> name_vert;
-
-    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = tree_of_graphs.at(name_graph).getOutBound(name_vert);
+    Graph temp = tree_of_graphs.at(name_graph);
+    if (!temp.hasVert(name_vert))
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = temp.getOutBound(name_vert);
     if (tree_of_vert.empty())
     {
       out << "\n";
@@ -61,7 +65,12 @@ namespace tkach
   {
     std::string name_graph, name_vert;
     in >> name_graph >> name_vert;
-    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = tree_of_graphs.at(name_graph).getInBound(name_vert);
+    Graph temp = tree_of_graphs.at(name_graph);
+    if (!temp.hasVert(name_vert))
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    AvlTree< std::string, AvlTree< size_t, size_t > > tree_of_vert = temp.getOutBound(name_vert);
     if (tree_of_vert.empty())
     {
       out << "\n";
@@ -104,11 +113,12 @@ namespace tkach
   {
     std::string name_graph;
     size_t count = 0;
-    in >> name_graph >> count;
+    in >> name_graph;
     if (tree_of_graphs.find(name_graph) != tree_of_graphs.end())
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
+    in >> count;
     Graph temp;
     for (size_t i = 0; i < count; ++ i)
     {
