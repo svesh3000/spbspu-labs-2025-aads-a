@@ -306,12 +306,24 @@ namespace petrov
   {}
 
   template< typename K, typename T, typename Cmp >
-  AVLTree< K, T, Cmp >::AVLTree(const this_t & rhs)
+  AVLTree< K, T, Cmp >::AVLTree(const this_t & rhs):
+    root_(nullptr),
+    size_(0),
+    erased_(0)
   {
     for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
     {
       insert({ it->first, it->second });
     }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  AVLTree< K, T, Cmp >::AVLTree(this_t && rhs):
+    root_(rhs.root_),
+    size_(rhs.size_),
+    erased_(rhs.erased_)
+  {
+    rhs.root_ = nullptr; 
   }
 
   template< typename K, typename T, typename Cmp >
