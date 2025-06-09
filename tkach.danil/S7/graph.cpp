@@ -31,7 +31,7 @@ namespace tkach
   {
     edges_[std::make_pair(vert1, vert2)][weight]++;
   }
- 
+
   AvlTree< std::string, bool > Graph::getAllVert() const
   {
     AvlTree< std::string, bool > tree_of_verts;

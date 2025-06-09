@@ -205,7 +205,7 @@ namespace tkach
     {
       return {HashIterator< Key, Value, Hash, Equal >{this, pos}, false};
     }
-    table_[pos].pair = std::move(pair); 
+    table_[pos].pair = std::move(pair);
     table_[pos].state = EntryState::Occupied;
     count_++;
     return {HashIterator< Key, Value, Hash, Equal >{this, pos}, true};
@@ -225,7 +225,7 @@ namespace tkach
     }
     return emplace(std::move(temp_pair)).first;
   }
-  
+
   template< class Key, class Value, class Hash, class Equal >
   size_t HashTable< Key, Value, Hash, Equal >::find_pos(const Key& key, const HashDynAry< Slot >& table) const
   {
@@ -348,7 +348,7 @@ namespace tkach
         return cend();
       }
     }
-    return cend();   
+    return cend();
   }
 
   template< class Key, class Value, class Hash, class Equal >

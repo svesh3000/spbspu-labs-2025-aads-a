@@ -12,7 +12,7 @@ namespace tkach
     }
     for (auto it = tree_of_graphs.cbegin(); it != tree_of_graphs.cend(); ++it)
     {
-      out << it->first << "\n";  
+      out << it->first << "\n";
     }
   }
 

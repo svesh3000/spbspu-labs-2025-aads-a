@@ -30,7 +30,7 @@ namespace tkach
     bool hasVert(const std::string& vert_name) const;
     HashTable< std::pair< std::string, std::string >, AvlTree< size_t, size_t >, HashPair > gerGraphEdges() const;
   private:
-    HashTable< std::pair< std::string, std::string >, AvlTree< size_t, size_t >, HashPair > edges_; 
+    HashTable< std::pair< std::string, std::string >, AvlTree< size_t, size_t >, HashPair > edges_;
   };
 }
 #endif
