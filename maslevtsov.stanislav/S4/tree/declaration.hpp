@@ -62,7 +62,11 @@ namespace maslevtsov {
     void clear_subtree(Node* node) noexcept;
 
     void erase_from_leaf(iterator pos) noexcept;
-    void balance_after_delete(Node* deleted) noexcept;
+    void balance_parent_three(Node* deleted) noexcept;
+    void balance_parent_two(Node* deleted) noexcept;
+    void balance_parent_bro_two(Node* deleted) noexcept;
+    void balance_next_parent_three(Node* deleted, Node* next_parent) noexcept;
+    bool balance_next_parent_two(Node* deleted, Node* next_parent) noexcept;
 
     std::pair< iterator, bool > find_impl(const Key& key) const noexcept;
   };

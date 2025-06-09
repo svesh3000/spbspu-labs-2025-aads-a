@@ -432,248 +432,264 @@ void maslevtsov::Tree< Key, T, Compare >::erase_from_leaf(iterator pos) noexcept
   } else {
     Node* to_delete = pos.node_;
     to_delete->data1 = value_type();
-    balance_after_delete(to_delete);
+    if (!to_delete->parent->is_two) {
+      balance_parent_three(to_delete);
+    } else {
+      balance_parent_two(to_delete);
+    }
   }
 }
 
 template< class Key, class T, class Compare >
-void maslevtsov::Tree< Key, T, Compare >::balance_after_delete(Node* deleted) noexcept
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) noexcept
 {
   Node* parent = deleted->parent;
-  if (!parent->is_two) {
-    if (parent->middle == deleted) {
-      if (!parent->right->is_two) {
-        std::swap(deleted->data1, parent->data2);
-        std::swap(parent->data2, parent->right->data1);
-        std::swap(parent->right->data1, parent->right->data2);
-        parent->right->data2 = value_type();
-        parent->right->is_two = true;
-      } else if (!parent->left->is_two) {
-        std::swap(deleted->data1, parent->data1);
-        std::swap(parent->data1, parent->left->data2);
-        parent->left->data2 = value_type();
-        parent->left->is_two = true;
-      } else {
-        std::swap(parent->data2, parent->right->data2);
-        std::swap(parent->right->data1, parent->right->data2);
-        parent->right->is_two = false;
-        parent->is_two = true;
-        parent->middle->data1 = value_type();
-        delete parent->middle;
-        parent->middle = nullptr;
-      }
-    } else if (parent->left == deleted) {
-      if (!parent->middle->is_two) {
-        std::swap(deleted->data1, parent->data1);
-        std::swap(parent->data1, parent->middle->data1);
-        std::swap(parent->middle->data1, parent->middle->data2);
-        parent->middle->data2 = value_type();
-        parent->middle->is_two = true;
-      } else {
-        std::swap(parent->data1, parent->middle->data2);
-        std::swap(parent->data1, parent->data2);
-        std::swap(parent->middle->data1, parent->middle->data2);
-        parent->middle->is_two = false;
-        parent->is_two = true;
-        parent->left->data1 = value_type();
-        delete parent->left;
-        parent->left = parent->middle;
-        parent->middle = nullptr;
-      }
-    } else {
-      if (!parent->middle->is_two) {
-        std::swap(deleted->data1, parent->data2);
-        std::swap(parent->data2, parent->middle->data2);
-        parent->middle->data2 = value_type();
-        parent->middle->is_two = true;
-      } else {
-        std::swap(parent->data2, parent->middle->data2);
-        parent->middle->is_two = false;
-        parent->is_two = true;
-        parent->right->data1 = value_type();
-        delete parent->right;
-        parent->right = parent->middle;
-        parent->middle = nullptr;
-      }
-    }
-  } else {
-    if (parent->left == deleted && !parent->right->is_two) {
-      std::swap(parent->data1, parent->left->data1);
-      std::swap(parent->data1, parent->right->data1);
+  if (parent->middle == deleted) {
+    if (!parent->right->is_two) {
+      std::swap(deleted->data1, parent->data2);
+      std::swap(parent->data2, parent->right->data1);
       std::swap(parent->right->data1, parent->right->data2);
       parent->right->data2 = value_type();
       parent->right->is_two = true;
-    } else if (parent->right == deleted && !parent->left->is_two) {
-      std::swap(parent->data1, parent->right->data1);
+    } else if (!parent->left->is_two) {
+      std::swap(deleted->data1, parent->data1);
       std::swap(parent->data1, parent->left->data2);
       parent->left->data2 = value_type();
       parent->left->is_two = true;
     } else {
-      deleted->data1 = value_type();
-      if (parent->left == deleted) {
-        delete deleted;
-        parent->left = nullptr;
-        std::swap(parent->data1, parent->right->data2);
-        std::swap(parent->right->data1, parent->right->data2);
-        std::swap(parent->left, parent->right);
-      } else {
-        delete deleted;
-        parent->right = nullptr;
-        std::swap(parent->data1, parent->left->data2);
-      }
-      parent->left->is_two = false;
-      Node* current = parent;
-      Node* cur_parent = current->parent;
-      bool is_balanced = false;
-      while (cur_parent != dummy_root_) {
-        if (cur_parent->is_two) {
-          if (cur_parent->left == current) {
-            if (cur_parent->right->is_two) {
-              std::swap(cur_parent->data1, cur_parent->right->data2);
-              std::swap(cur_parent->right->data1, cur_parent->right->data2);
-              cur_parent->right->is_two = false;
-              cur_parent->right->middle = cur_parent->right->left;
-              cur_parent->right->left = current->left;
-              current->left->parent = cur_parent->right;
-              current->left = nullptr;
-              delete current;
-              cur_parent->left = cur_parent->right;
-              cur_parent->right = nullptr;
-            } else {
-              std::swap(current->data1, cur_parent->data1);
-              current->right = cur_parent->right->left;
-              cur_parent->right->left->parent = current;
-              std::swap(cur_parent->data1, cur_parent->right->data1);
-              std::swap(cur_parent->right->data1, cur_parent->right->data2);
-              cur_parent->right->is_two = true;
-              cur_parent->right->left = cur_parent->right->middle;
-              cur_parent->right->middle = nullptr;
-              is_balanced = true;
-              break;
-            }
-          } else {
-            if (cur_parent->left->is_two) {
-              std::swap(cur_parent->data1, cur_parent->left->data2);
-              cur_parent->left->is_two = false;
-              cur_parent->left->middle = cur_parent->left->right;
-              cur_parent->left->right = current->left;
-              current->left->parent = cur_parent->left;
-              current->left = nullptr;
-              delete current;
-              cur_parent->right = nullptr;
-            } else {
-              std::swap(current->data1, cur_parent->data1);
-              current->right = current->left;
-              current->left = cur_parent->left->right;
-              std::swap(cur_parent->data1, cur_parent->right->data2);
-              cur_parent->left->is_two = true;
-              cur_parent->left->right = cur_parent->right->middle;
-              cur_parent->left->middle = nullptr;
-              is_balanced = true;
-              break;
-            }
-          }
-        } else {
-          if (cur_parent->left == current) {
-            if (!cur_parent->middle->is_two) {
-              std::swap(current->data1, cur_parent->data1);
-              current->right = cur_parent->middle->left;
-              std::swap(cur_parent->data1, cur_parent->middle->data1);
-              std::swap(cur_parent->middle->data1, cur_parent->middle->data2);
-              cur_parent->middle->is_two = true;
-              cur_parent->middle->left = cur_parent->middle->middle;
-              cur_parent->middle->middle = nullptr;
-              is_balanced = true;
-              break;
-            } else {
-              std::swap(cur_parent->data1, cur_parent->middle->data2);
-              std::swap(cur_parent->data1, cur_parent->data2);
-              std::swap(cur_parent->middle->data1, cur_parent->middle->data2);
-              cur_parent->middle->is_two = false;
-              cur_parent->is_two = true;
-              cur_parent->middle->middle = cur_parent->middle->left;
-              cur_parent->middle->left = cur_parent->left->left;
-              cur_parent->left->left->parent = cur_parent->middle;
-              cur_parent->left->left = nullptr;
-              delete cur_parent->left;
-              cur_parent->left = cur_parent->middle;
-              cur_parent->middle = nullptr;
-              is_balanced = true;
-              break;
-            }
-          } else if (cur_parent->middle == current) {
-            if (!cur_parent->left->is_two) {
-              std::swap(current->data1, cur_parent->data1);
-              current->right = current->left;
-              current->left = cur_parent->left->right;
-              cur_parent->left->right->parent = current;
-              std::swap(cur_parent->data1, cur_parent->left->data2);
-              cur_parent->left->is_two = true;
-              cur_parent->left->right = cur_parent->left->middle;
-              cur_parent->left->middle = nullptr;
-              is_balanced = true;
-              break;
-            } else if (!cur_parent->right->is_two) {
-              std::swap(current->data1, cur_parent->data2);
-              current->right = cur_parent->right->left;
-              std::swap(cur_parent->data2, cur_parent->right->data1);
-              std::swap(cur_parent->right->data1, cur_parent->right->data2);
-              cur_parent->right->is_two = true;
-              cur_parent->right->left = cur_parent->right->middle;
-              cur_parent->right->middle = nullptr;
-              is_balanced = true;
-              break;
-            } else {
-              std::swap(cur_parent->data1, cur_parent->left->data2);
-              std::swap(cur_parent->data1, cur_parent->data2);
-              cur_parent->left->is_two = false;
-              cur_parent->is_two = true;
-              cur_parent->left->middle = cur_parent->left->right;
-              cur_parent->left->right = cur_parent->middle->left;
-              cur_parent->middle->left->parent = cur_parent->left;
-              cur_parent->middle->left = nullptr;
-              delete cur_parent->middle;
-              cur_parent->middle = nullptr;
-              is_balanced = true;
-              break;
-            }
-          } else {
-            if (!cur_parent->middle->is_two) {
-              std::swap(current->data1, cur_parent->data2);
-              current->right = current->left;
-              current->left = cur_parent->middle->right;
-              cur_parent->middle->right->parent = current;
-              std::swap(cur_parent->data2, cur_parent->middle->data2);
-              cur_parent->middle->is_two = true;
-              cur_parent->middle->right = cur_parent->middle->middle;
-              cur_parent->middle->middle = nullptr;
-              is_balanced = true;
-              break;
-            } else {
-              std::swap(cur_parent->data2, cur_parent->middle->data2);
-              cur_parent->middle->is_two = false;
-              cur_parent->is_two = true;
-              cur_parent->middle->middle = cur_parent->middle->right;
-              cur_parent->middle->right = cur_parent->right->left;
-              cur_parent->right->left->parent = cur_parent->middle;
-              cur_parent->right->left = nullptr;
-              delete cur_parent->right;
-              cur_parent->right = cur_parent->middle;
-              cur_parent->middle = nullptr;
-              is_balanced = true;
-              break;
-            }
-          }
-        }
-        current = cur_parent;
-        cur_parent = current->parent;
-      }
-      if (!is_balanced) {
-        dummy_root_->left = current->left;
-        current->left = nullptr;
-        delete current;
-        dummy_root_->left->parent = dummy_root_;
-      }
+      std::swap(parent->data2, parent->right->data2);
+      std::swap(parent->right->data1, parent->right->data2);
+      parent->right->is_two = false;
+      parent->is_two = true;
+      parent->middle->data1 = value_type();
+      delete parent->middle;
+      parent->middle = nullptr;
+    }
+  } else if (parent->left == deleted) {
+    if (!parent->middle->is_two) {
+      std::swap(deleted->data1, parent->data1);
+      std::swap(parent->data1, parent->middle->data1);
+      std::swap(parent->middle->data1, parent->middle->data2);
+      parent->middle->data2 = value_type();
+      parent->middle->is_two = true;
+    } else {
+      std::swap(parent->data1, parent->middle->data2);
+      std::swap(parent->data1, parent->data2);
+      std::swap(parent->middle->data1, parent->middle->data2);
+      parent->middle->is_two = false;
+      parent->is_two = true;
+      parent->left->data1 = value_type();
+      delete parent->left;
+      parent->left = parent->middle;
+      parent->middle = nullptr;
+    }
+  } else {
+    if (!parent->middle->is_two) {
+      std::swap(deleted->data1, parent->data2);
+      std::swap(parent->data2, parent->middle->data2);
+      parent->middle->data2 = value_type();
+      parent->middle->is_two = true;
+    } else {
+      std::swap(parent->data2, parent->middle->data2);
+      parent->middle->is_two = false;
+      parent->is_two = true;
+      parent->right->data1 = value_type();
+      delete parent->right;
+      parent->right = parent->middle;
+      parent->middle = nullptr;
+    }
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_two(Node* deleted) noexcept
+{
+  Node* parent = deleted->parent;
+  if (parent->left == deleted && !parent->right->is_two) {
+    std::swap(parent->data1, parent->left->data1);
+    std::swap(parent->data1, parent->right->data1);
+    std::swap(parent->right->data1, parent->right->data2);
+    parent->right->data2 = value_type();
+    parent->right->is_two = true;
+  } else if (parent->right == deleted && !parent->left->is_two) {
+    std::swap(parent->data1, parent->right->data1);
+    std::swap(parent->data1, parent->left->data2);
+    parent->left->data2 = value_type();
+    parent->left->is_two = true;
+  } else {
+    balance_parent_bro_two(deleted);
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_parent_bro_two(Node* deleted) noexcept
+{
+  Node* parent = deleted->parent;
+  deleted->data1 = value_type();
+  if (parent->left == deleted) {
+    delete deleted;
+    parent->left = nullptr;
+    std::swap(parent->data1, parent->right->data2);
+    std::swap(parent->right->data1, parent->right->data2);
+    std::swap(parent->left, parent->right);
+  } else {
+    delete deleted;
+    parent->right = nullptr;
+    std::swap(parent->data1, parent->left->data2);
+  }
+  parent->left->is_two = false;
+  Node* current = parent;
+  Node* cur_parent = current->parent;
+  bool is_balanced = false;
+  while (cur_parent != dummy_root_) {
+    if (cur_parent->is_two) {
+      is_balanced = balance_next_parent_two(current, cur_parent);
+    } else {
+      balance_next_parent_three(current, cur_parent);
+      is_balanced = true;
+    }
+    if (is_balanced) {
+      break;
+    }
+    current = cur_parent;
+    cur_parent = current->parent;
+  }
+  if (!is_balanced) {
+    dummy_root_->left = current->left;
+    current->left = nullptr;
+    delete current;
+    dummy_root_->left->parent = dummy_root_;
+  }
+}
+
+template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::balance_next_parent_three(Node* deleted, Node* next_parent) noexcept
+{
+  if (next_parent->left == deleted) {
+    if (!next_parent->middle->is_two) {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = next_parent->middle->left;
+      std::swap(next_parent->data1, next_parent->middle->data1);
+      std::swap(next_parent->middle->data1, next_parent->middle->data2);
+      next_parent->middle->is_two = true;
+      next_parent->middle->left = next_parent->middle->middle;
+      next_parent->middle->middle = nullptr;
+    } else {
+      std::swap(next_parent->data1, next_parent->middle->data2);
+      std::swap(next_parent->data1, next_parent->data2);
+      std::swap(next_parent->middle->data1, next_parent->middle->data2);
+      next_parent->middle->is_two = false;
+      next_parent->is_two = true;
+      next_parent->middle->middle = next_parent->middle->left;
+      next_parent->middle->left = next_parent->left->left;
+      next_parent->left->left->parent = next_parent->middle;
+      next_parent->left->left = nullptr;
+      delete next_parent->left;
+      next_parent->left = next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  } else if (next_parent->middle == deleted) {
+    if (!next_parent->left->is_two) {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->left->right;
+      next_parent->left->right->parent = deleted;
+      std::swap(next_parent->data1, next_parent->left->data2);
+      next_parent->left->is_two = true;
+      next_parent->left->right = next_parent->left->middle;
+      next_parent->left->middle = nullptr;
+    } else if (!next_parent->right->is_two) {
+      std::swap(deleted->data1, next_parent->data2);
+      deleted->right = next_parent->right->left;
+      std::swap(next_parent->data2, next_parent->right->data1);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = true;
+      next_parent->right->left = next_parent->right->middle;
+      next_parent->right->middle = nullptr;
+    } else {
+      std::swap(next_parent->data1, next_parent->left->data2);
+      std::swap(next_parent->data1, next_parent->data2);
+      next_parent->left->is_two = false;
+      next_parent->is_two = true;
+      next_parent->left->middle = next_parent->left->right;
+      next_parent->left->right = next_parent->middle->left;
+      next_parent->middle->left->parent = next_parent->left;
+      next_parent->middle->left = nullptr;
+      delete next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  } else {
+    if (!next_parent->middle->is_two) {
+      std::swap(deleted->data1, next_parent->data2);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->middle->right;
+      next_parent->middle->right->parent = deleted;
+      std::swap(next_parent->data2, next_parent->middle->data2);
+      next_parent->middle->is_two = true;
+      next_parent->middle->right = next_parent->middle->middle;
+      next_parent->middle->middle = nullptr;
+    } else {
+      std::swap(next_parent->data2, next_parent->middle->data2);
+      next_parent->middle->is_two = false;
+      next_parent->is_two = true;
+      next_parent->middle->middle = next_parent->middle->right;
+      next_parent->middle->right = next_parent->right->left;
+      next_parent->right->left->parent = next_parent->middle;
+      next_parent->right->left = nullptr;
+      delete next_parent->right;
+      next_parent->right = next_parent->middle;
+      next_parent->middle = nullptr;
+    }
+  }
+}
+
+template< class Key, class T, class Compare >
+bool maslevtsov::Tree< Key, T, Compare >::balance_next_parent_two(Node* deleted, Node* next_parent) noexcept
+{
+  if (next_parent->left == deleted) {
+    if (next_parent->right->is_two) {
+      std::swap(next_parent->data1, next_parent->right->data2);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = false;
+      next_parent->right->middle = next_parent->right->left;
+      next_parent->right->left = deleted->left;
+      deleted->left->parent = next_parent->right;
+      deleted->left = nullptr;
+      delete deleted;
+      next_parent->left = next_parent->right;
+      next_parent->right = nullptr;
+      return false;
+    } else {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = next_parent->right->left;
+      next_parent->right->left->parent = deleted;
+      std::swap(next_parent->data1, next_parent->right->data1);
+      std::swap(next_parent->right->data1, next_parent->right->data2);
+      next_parent->right->is_two = true;
+      next_parent->right->left = next_parent->right->middle;
+      next_parent->right->middle = nullptr;
+      return true;
+    }
+  } else {
+    if (next_parent->left->is_two) {
+      std::swap(next_parent->data1, next_parent->left->data2);
+      next_parent->left->is_two = false;
+      next_parent->left->middle = next_parent->left->right;
+      next_parent->left->right = deleted->left;
+      deleted->left->parent = next_parent->left;
+      deleted->left = nullptr;
+      delete deleted;
+      next_parent->right = nullptr;
+      return false;
+    } else {
+      std::swap(deleted->data1, next_parent->data1);
+      deleted->right = deleted->left;
+      deleted->left = next_parent->left->right;
+      std::swap(next_parent->data1, next_parent->right->data2);
+      next_parent->left->is_two = true;
+      next_parent->left->right = next_parent->right->middle;
+      next_parent->left->middle = nullptr;
+      return true;
     }
   }
 }
