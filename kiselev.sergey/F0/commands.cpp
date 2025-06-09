@@ -272,3 +272,129 @@ void kiselev::doCountWord(std::istream& in, std::ostream& out, const Dicts& dict
   }
   out << it->second.size() << "\n";
 }
+
+void kiselev::doSearchLetter(std::istream& in, std::ostream& out, const Dicts& dicts)
+{
+  std::string dictName;
+  std::string letters;
+  in >> dictName >> letters;
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  Dict dict = dictIt->second;
+  bool found = false;
+  for (auto it = dict.cbegin(); it != dict.cend(); ++it)
+  {
+    std::string eng = it->first;
+    if (eng.rfind(letters, 0) == 0)
+    {
+      found = true;
+      out << eng << " " << it->second << "\n";
+    }
+  }
+  if (!found)
+  {
+    out << "<WORD NOT FOUND>\n";
+  }
+}
+
+void kiselev::doLoadDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string fileName;
+  in >> fileName;
+  std::ifstream file(fileName);
+  if (!file)
+  {
+    out << "<FILE ERROR>\n";
+    return;
+  }
+  std::string dictName;
+  while (file >> dictName)
+  {
+    Dict dict;
+    std::string eng;
+    while (file >> eng)
+    {
+      List< std::string > ruswords;
+      std::string rusword;
+      while (file >> rusword)
+      {
+        ruswords.pushBack(rusword);
+        if (file.get() == '\n')
+        {
+          break;
+        }
+      }
+      dict[eng] = ruswords;
+      if (file.get() == '\n')
+      {
+        break;
+      }
+      else
+      {
+        file.unget();
+      }
+    }
+    auto it = dicts.find(dictName);
+    if (it != dicts.end())
+    {
+      bool isAllExist = true;
+      for (auto dictIt = dict.begin(); dictIt != dict.end(); ++dictIt)
+      {
+        std::string eng2 = dictIt->first;
+        List<  std::string > ruswords2 = dictIt->second;
+        auto it2 = it->second.find(eng2);
+        if (it2 == it->second.end())
+        {
+          it->second[eng2] = ruswords2;
+          isAllExist = false;
+        }
+        else
+        {
+          List< std::string > ruswords3 = it2->second;
+          for (auto rusIt = ruswords2.begin(); rusIt != ruswords2.end(); ++rusIt)
+          {
+            bool found = true;
+            for (auto rusIt2 = ruswords3.begin(); rusIt2 != ruswords3.end(); ++rusIt2)
+            {
+              if (*rusIt2 == *rusIt)
+              {
+                found = true;
+                break;
+              }
+            }
+            if (!found)
+            {
+              it2->second.pushBack(*rusIt);
+              isAllExist = false;
+            }
+          }
+        }
+      }
+      if (isAllExist)
+      {
+        out << "<DICTIONARY ALREADY EXISTS>\n";
+      }
+    }
+    else
+    {
+      dicts[dictName] = dict;
+    }
+  }
+}
+
+void kiselev::doClearDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.end())
+  {
+    out << "<DICTIONARY NOT FOUND>\n";
+    return;
+  }
+  it->second.clear();
+}
