@@ -21,11 +21,6 @@ namespace
     return -1;
   }
 
-  bool isHighPriority(const std::string& op1, const std::string& op2)
-  {
-    return getPriority(op1) > getPriority(op2);
-  }
-
   bool isOperator(const std::string& s)
   {
     if (s.empty())
@@ -166,11 +161,6 @@ namespace
     return post_queue;
   }
 
-  bool isSameSign(long long a, long long b)
-  {
-    return ((a > 0 && b > 0) || ((a < 0) && (b < 0)));
-  }
-
   bool isOverflowedAdd(long long a, long long b)
   {
     const long long max = std::numeric_limits<long long>::max();
@@ -188,7 +178,8 @@ namespace
 
   bool isOverflowedSubstr(long long a, long long b)
   {
-    if (b == std::numeric_limits<long long>::min())
+    const long long min_val = std::numeric_limits<long long>::min();
+    if (b == min_val)
     {
       return a > 0;
     }
