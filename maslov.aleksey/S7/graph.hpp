@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <set>
 #include <vector>
+#include <algorithm>
+#include <stdexcept>
 
 namespace maslov
 {
