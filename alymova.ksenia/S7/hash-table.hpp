@@ -357,7 +357,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    size_t psl = 0;
+    /*size_t psl = 0;
     size_t home_index = get_home_index(key);
     Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
@@ -375,6 +375,13 @@ namespace alymova
         return it;
       }
       psl++;
+    }*/
+    for (auto it = begin(); it != end(); it++)
+    {
+      if (it->first == key)
+      {
+        return it;
+      }
     }
     return end();
   }
