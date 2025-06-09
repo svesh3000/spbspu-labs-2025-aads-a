@@ -2,7 +2,7 @@
 #include <fstream>
 #include <limits>
 #include <cstddef>
-
+#include "stack.hpp"
 
 namespace
 {
