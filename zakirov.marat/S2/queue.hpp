@@ -10,22 +10,22 @@ namespace zakirov
   class Queue
   {
   public:
-    Queue();
+    Queue() noexcept;
     Queue(const Queue< T > & other);
     Queue(Queue< T > && other) noexcept;
     ~Queue();
     Queue< T > & operator=(const Queue< T > & other);
     Queue< T > & operator=(Queue< T > && other) noexcept;
-    bool empty();
-    size_t size();
-    T & front();
-    const T & front() const;
-    T & back();
-    const T & back() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    T & front() noexcept;
+    const T & front() const noexcept;
+    T & back() noexcept;
+    const T & back() const noexcept;
     void push (const T & value);
     void push (T && value);
-    void pop();
-    void swap(Queue & other);
+    void pop() noexcept;
+    void swap(Queue & other) noexcept;
   private:
     template < class U >
     void uni_push(U && value);
@@ -37,7 +37,7 @@ namespace zakirov
   };
 
   template < class T >
-  Queue< T >::Queue():
+  Queue< T >::Queue() noexcept:
     data_(nullptr),
     first_(0),
     size_(0),
@@ -96,37 +96,37 @@ namespace zakirov
   }
 
   template < class T >
-  bool Queue< T >::empty()
+  bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < class T >
-  size_t Queue< T >::size()
+  size_t Queue< T >::size() const noexcept
   {
     return size_;
   }
 
   template < class T >
-  T & Queue< T >::front()
+  T & Queue< T >::front() noexcept
   {
     return data_[first_];
   }
 
   template < class T >
-  const T & Queue< T >::front() const
+  const T & Queue< T >::front() const noexcept
   {
     return data_[first_];
   }
 
   template < class T >
-  T & Queue< T >::back()
+  T & Queue< T >::back() noexcept
   {
     return data_[first_ + size_ - 1];
   }
 
   template < class T >
-  const T & Queue< T >::back() const
+  const T & Queue< T >::back() const noexcept
   {
     return data_[first_ + size_ - 1];
   }
@@ -169,14 +169,14 @@ namespace zakirov
   }
 
   template < class T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
     ++first_;
     --size_;
   }
 
   template < class T >
-  void Queue< T >::swap(Queue< T > & other)
+  void Queue< T >::swap(Queue< T > & other) noexcept
   {
     std::swap(data_, other.data_);
     std::swap(first_, other.first_);

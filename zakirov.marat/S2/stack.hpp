@@ -10,20 +10,20 @@ namespace zakirov
   class Stack
   {
   public:
-    Stack();
+    Stack() noexcept;
     Stack(const Stack & other);
     Stack(Stack && other) noexcept;
     ~Stack();
     Stack< T > & operator=(const Stack< T > & other);
     Stack< T > & operator=(Stack< T > && other) noexcept;
-    bool empty();
-    size_t size();
-    T & top();
-    const T & top() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    T & top() noexcept;
+    const T & top() const noexcept;
     void push (const T & value);
     void push (T && value);
-    void pop();
-    void swap(Stack< T > & other);
+    void pop() noexcept;
+    void swap(Stack< T > & other) noexcept;
   private:
     template < class U >
     void uni_push(U && value);
@@ -34,7 +34,7 @@ namespace zakirov
   };
 
   template < class T >
-  Stack< T >::Stack():
+  Stack< T >::Stack() noexcept:
     data_(nullptr),
     top_(0),
     capacity_(0)
@@ -90,25 +90,25 @@ namespace zakirov
   }
 
   template < class T >
-  bool Stack< T >::empty()
+  bool Stack< T >::empty() const noexcept
   {
     return top_ == 0;
   }
 
   template < class T >
-  size_t Stack< T >::size()
+  size_t Stack< T >::size() const noexcept
   {
     return top_;
   }
 
   template < class T >
-  T & Stack< T >::top()
+  T & Stack< T >::top() noexcept
   {
     return data_[top_ - 1];
   }
 
   template < class T >
-  const T & Stack< T >::top() const
+  const T & Stack< T >::top() const noexcept
   {
     return data_[top_ - 1];
   }
@@ -139,13 +139,13 @@ namespace zakirov
   }
 
   template < class T >
-  void Stack< T >::pop()
+  void Stack< T >::pop() noexcept
   {
     --top_;
   }
 
   template < class T >
-  void Stack< T >::swap(Stack< T > & other)
+  void Stack< T >::swap(Stack< T > & other) noexcept
   {
     std::swap(data_, other.data_);
     std::swap(top_, other.top_);
