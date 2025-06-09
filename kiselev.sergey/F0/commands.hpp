@@ -16,5 +16,6 @@ namespace kiselev
   void doListDict(std::ostream&, const Dicts&);
   void doPrintDict(std::istream&, std::ostream&, const Dicts&);
   void doTranslateWord(std::istream&, std::ostream&, const Dicts&);
+  void doUnionDict(std::istream&, std::ostream&, Dicts&);
 }
 #endif

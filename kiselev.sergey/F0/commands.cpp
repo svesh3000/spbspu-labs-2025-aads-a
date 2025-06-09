@@ -19,6 +19,41 @@ namespace
     }
     return out;
   }
+
+  kiselev::Dict unionTwoDict(const kiselev::Dict& dict1, const kiselev::Dict& dict2)
+  {
+    kiselev::Dict res = dict1;
+    for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
+    {
+      std::string eng = it->first;
+      kiselev::List< std::string > translations = it->second;
+      auto it2 = res.find(eng);
+      if (it2 == res.end())
+      {
+        res[eng] = translations;
+      }
+      else
+      {
+        for (auto transIt = translations.cbegin(); transIt != translations.cend(); ++transIt)
+        {
+          bool isExists = false;
+          for (auto transIt2 = it2->second.cbegin(); transIt2 != it2->second.cend(); ++transIt2)
+          {
+            if (*transIt2 == *transIt)
+            {
+              isExists = true;
+              break;
+            }
+          }
+          if (!isExists)
+          {
+            it2->second.pushBack((*transIt));
+          }
+        }
+      }
+    }
+    return res;
+  }
 }
 
 void kiselev::doNewDict(std::istream& in, std::ostream& out, Dicts& dicts)
@@ -161,4 +196,41 @@ void kiselev::doTranslateWord(std::istream& in, std::ostream& out, const Dicts& 
   {
     out << "<WORD NOT FOUND>\n";
   }
+}
+
+void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
+{
+  std::string nameNewDict;
+  std::string firstDict;
+  std::string secondDict;
+  in >> nameNewDict >> firstDict >> secondDict;
+  if (dicts.find(nameNewDict) != dicts.end())
+  {
+    out << "<DICTIONARY ALREADY EXISTS>\n";
+    return;
+  }
+  auto first = dicts.find(firstDict);
+  auto second = dicts.find(secondDict);
+  if (first == dicts.end() || second == dicts.end())
+  {
+    out << "<DICTINARY NOT FOUND>\n";
+    return;
+  }
+  Dict res = unionTwoDict(first->second, second->second);
+  std::string nextDict;
+  while (in >> nextDict)
+  {
+    auto it = dicts.find(nextDict);
+    if (it == dicts.end())
+    {
+      out << "<DICTIONARY NOT FOUND>\n";
+      return;
+    }
+    res = unionTwoDict(res, it->second);
+    if (in.get() == '\n')
+    {
+      break;
+    }
+  }
+  dicts[nameNewDict] = res;
 }
