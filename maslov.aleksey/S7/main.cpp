@@ -26,6 +26,10 @@ namespace maslov
     {
       graphNames.push_back(it->first);
     }
+    if(graphNames.empty())
+    {
+      out << '\n';
+    }
     std::sort(graphNames.begin(), graphNames.end());
     for (auto it = graphNames.begin(); it != graphNames.end(); it++)
     {
@@ -39,6 +43,10 @@ namespace maslov
     in >> graphName;
     Graph graph = graphs.at(graphName);
     std::vector< std::string > vertexes = graph.getVertexes();
+    if (vertexes.empty())
+    {
+      out << '\n';
+    }
     for (auto it = vertexes.begin(); it != vertexes.end(); it++)
     {
       out << *it << '\n';
@@ -77,6 +85,8 @@ namespace maslov
     int weight;
     in >> graphName >> v1 >> v2 >> weight;
     Graph graph = graphs.at(graphName);
+    graph.addVertex(v1);
+    graph.addVertex(v2);
     graph.addEdge(v1, v2, weight);
   }
 
@@ -98,7 +108,6 @@ namespace maslov
       throw std::logic_error("ERROR: such a graph already exists");
     }
     Graph newGraph;
-    graphs[graphName] = newGraph;
     size_t vertexesCount = 0;
     in >> vertexesCount;
     std::string vertex;
@@ -107,6 +116,7 @@ namespace maslov
       in >> vertex;
       newGraph.addVertex(vertex);
     }
+    graphs[graphName] = newGraph;
   }
 
   void mergeGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs)

@@ -122,7 +122,7 @@ namespace maslov
       if (*itWeight == weight)
       {
         weights.erase(itWeight);
-        break;
+        return;
       }
     }
     throw std::logic_error("ERROR: there is no such edge");;
