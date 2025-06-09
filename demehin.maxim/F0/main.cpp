@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
   if (argc != 2)
   {
-    std::cerr << "ERROR: invalid number of parameters";
+    std::cerr << "ERROR: invalid number of parameters\n";
     return 1;
   }
 
