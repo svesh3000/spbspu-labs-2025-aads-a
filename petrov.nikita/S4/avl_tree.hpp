@@ -297,7 +297,7 @@ namespace petrov
   {
     return !(*this == rhs);
   }
-  
+
   template< typename K, typename T, typename Cmp >
   AVLTree< K, T, Cmp >::AVLTree():
     root_(nullptr),
@@ -358,9 +358,9 @@ namespace petrov
     }
     return const_it_t(temp);
   }
-  
+
   template< typename K, typename T, typename Cmp >
-  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::cend() const  
+  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::cend() const
   {
     return const_it_t();
   }
@@ -375,9 +375,9 @@ namespace petrov
     }
     return it_t(temp);
   }
-  
+
   template< typename K, typename T, typename Cmp >
-  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::end()  
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::end()
   {
     return it_t();
   }
