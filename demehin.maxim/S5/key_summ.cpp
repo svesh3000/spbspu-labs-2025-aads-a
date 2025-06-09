@@ -1,6 +1,6 @@
 #include "key_summ.hpp"
-#include <calc_utils.hpp>
 #include <limits>
+#include <calc_utils.hpp>
 
 namespace
 {
@@ -8,13 +8,12 @@ namespace
   {
     int max = std::numeric_limits< int >::max();
     int min = std::numeric_limits< int >::min();
-    bool isOverflow = (a > 0 && b > 0) && (a > max - b);
-    bool isUnderflow = (a < 0 && b < 0) && (a < min + b);
-    if (isOverflow || isUnderflow)
+    if (a > 0 && b > 0)
     {
-      return true;
+      return a > max - b;
     }
-    return false;
+
+    return (a < 0 && b < 0) && (a < min + b);
   }
 }
 

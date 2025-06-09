@@ -17,30 +17,27 @@ namespace
     }
   }
 
-  void traverseTree(Map& tree, demehin::KeySumm& res, const std::string& command)
+  void traverseLnr(const Map& tree, demehin::KeySumm& res)
   {
-    if (command == "ascending")
-    {
-      res = tree.traverse_lnr(res);
-    }
-    else if (command == "descending")
-    {
-      res = tree.traverse_rnl(res);
-    }
-    else if (command == "breadth")
-    {
-      res = tree.traverse_breadth(res);
-    }
-    else
-    {
-      throw std::logic_error("unknown command");
-    }
+    res = tree.traverse_lnr(res);
   }
 
+  void traverseRnl(const Map& tree, demehin::KeySumm& res)
+  {
+    res = tree.traverse_rnl(res);
+  }
+
+  void traverseBreadth(const Map& tree, demehin::KeySumm& res)
+  {
+    res = tree.traverse_breadth(res);
+  }
 }
 
 int main(int argc, char* argv[])
 {
+  using namespace demehin;
+  using namespace std::placeholders;
+
   if (argc != 3)
   {
     return 1;
@@ -48,7 +45,13 @@ int main(int argc, char* argv[])
 
   std::ifstream file(argv[2]);
   Map tree;
-  demehin::KeySumm res;
+  KeySumm res;
+  Tree< std::string, std::function< void(Map&, KeySumm&) > > cmds;
+
+  cmds["ascending"] = std::bind(traverseLnr, _1, _2);
+  cmds["descending"] = std::bind(traverseRnl, _1, _2);
+  cmds["breadth"] = std::bind(traverseBreadth, _1, _2);
+
   try
   {
     inputTree(file, tree);
@@ -62,7 +65,7 @@ int main(int argc, char* argv[])
       std::cout << "<EMPTY>\n";
       return 0;
     }
-    traverseTree(tree, res, argv[1]);
+    cmds.at(argv[1])(tree, res);
   }
   catch (const std::exception& e)
   {
