@@ -1,6 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <istream>
+#include <ostream>
 #include <string>
 #include "tree.hpp"
 #include "list.hpp"
@@ -8,10 +9,12 @@ namespace kiselev
 {
   using Dict = RBTree< std::string, List< std::string > >;
   using Dicts = RBTree< std::string, Dict >;
-  void doNewDict(std::istream&, Dicts&);
-  void doDeleteDict(std::istream&, Dicts&);
-  void doAddElement(std::istream&, Dicts&);
-  void doDeleteElement(std::istream&, Dicts&);
+  void doNewDict(std::istream&, std::ostream&, Dicts&);
+  void doDeleteDict(std::istream&, std::ostream&, Dicts&);
+  void doAddElement(std::istream&, std::ostream&, Dicts&);
+  void doDeleteElement(std::istream&, std::ostream&, Dicts&);
   void doListDict(std::ostream&, const Dicts&);
+  void doPrintDict(std::istream&, std::ostream&, const Dicts&);
+  void doTranslateWord(std::istream&, std::ostream&, const Dicts&);
 }
 #endif
