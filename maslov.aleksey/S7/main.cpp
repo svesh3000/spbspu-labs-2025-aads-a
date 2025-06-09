@@ -35,7 +35,22 @@ namespace maslov
   {}
 
   void readGraphs(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
-  {}
+  {
+    std::string graphName;
+    size_t edgeCount = 0;
+    while (in >> graphName >> edgeCount)
+    {
+      Graph graph;
+      for (size_t i = 0; i < edgeCount; ++i)
+      {
+        std::string vertexName1, vertexName2;
+        int weight;
+        in >> vertexName1 >> vertexName2 >> weight;
+        graph.addEdge(vertexName1, vertexName2, weight);
+      }
+      graphs[graphName] = graph;
+    }
+  }
 }
 
 int main(int argc, char * argv[])
