@@ -357,7 +357,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashConstIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    /*size_t psl = 0;
+    size_t psl = 0;
     size_t home_index = get_home_index(key);
     Iterator it(array_ + home_index, array_ + capacity_);
     for (; it != end(); it++)
@@ -375,14 +375,14 @@ namespace alymova
         return it;
       }
       psl++;
-    }*/
-    for (auto it = begin(); it != end(); it++)
+    }
+    /*for (auto it = begin(); it != end(); it++)
     {
       if (it->first == key)
       {
         return it;
       }
-    }
+    }*/
     return end();
   }
 
@@ -430,18 +430,28 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::rehash()
   {
+    size_t capacity_old = capacity_;
     capacity_ = get_next_prime_capacity();
-    T* array_new = new T[capacity_];
-    std::swap(array_new, array_);
-    clear();
-    for (size_t i = 0; i < capacity_; i++)
+    T* array_new = nullptr;
+    try
     {
-      if (array_new[i].first == NodeType::Fill)
+      array_new = new T[capacity_];
+      std::swap(array_new, array_);
+      clear();
+      for (size_t i = 0; i < capacity_old; i++)
       {
-        insert(array_new[i].second.data);
+        if (array_new[i].first == NodeType::Fill)
+        {
+          insert(array_new[i].second.data);
+        }
       }
     }
-    delete[] array_new;
+    catch(...)
+    {
+      delete[] array_new;
+      capacity_ = capacity_old;
+      throw;
+    }
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
