@@ -9,15 +9,19 @@ namespace zakirov
   {
   public:
     Postfix() = default;
+    Postfix(const Postfix & other) = default;
+    Postfix(Postfix && other) = default;
     Postfix(const std::string & infix);
-    Postfix & operator+(const Postfix & other);
-    Postfix & operator-(const Postfix & other);
-    Postfix & operator*(const Postfix & other);
-    Postfix & operator/(const Postfix & other);
-    Postfix & operator%(const Postfix & other);
+    ~Postfix() = default;
+    Postfix & operator=(const Postfix & other) = default;
+    Postfix operator+(const Postfix & other);
+    Postfix operator-(const Postfix & other);
+    Postfix operator*(const Postfix & other);
+    Postfix operator/(const Postfix & other);
+    Postfix operator%(const Postfix & other);
     long long operator()();
   private:
-    Postfix & unite_postfixes(const Postfix & other);
+    Postfix unite_postfixes(const Postfix & other);
     Queue< std::string > postfix;
   };
 }

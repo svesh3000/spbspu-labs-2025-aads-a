@@ -1,9 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include "infix_to_postfix.hpp"
-#include "io_stack.hpp"
 #include "stack.hpp"
 #include "queue.hpp"
+#include "postfix.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -13,26 +12,41 @@ int main(int argc, char ** argv)
     return 1;
   }
 
-  zakirov::Stack< zakirov::Queue < std::string > > stack_qs;
+  zakirov::Stack< zakirov::Postfix > stack_qs;
+  std::string reader;
   if (argc == 1)
   {
-    zakirov::scan_infix(std::cin, stack_qs);
+    while (std::cin)
+    {
+      getline(std::cin, reader);
+      if (!reader.empty())
+      {
+        stack_qs.push(zakirov::Postfix(reader));
+      }
+    }
   }
   else if (argc == 2)
   {
     std::ifstream file(argv[1]);
-    zakirov::scan_infix(file, stack_qs);
+    while (file)
+    {
+      getline(file, reader);
+      if (!reader.empty())
+      {
+        stack_qs.push(zakirov::Postfix(reader));
+      }
+    }
   }
 
   if (stack_qs.empty())
   {
-    std::cout <<'\n';
+    std::cout << '\n';
     return 0;
   }
 
   try
   {
-    std::cout << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
+    std::cout << stack_qs.top()();
   }
   catch (const std::invalid_argument & e)
   {
@@ -50,8 +64,7 @@ int main(int argc, char ** argv)
   {
     try
     {
-      std::cout << ' ' << zakirov::calculate_postfix_expression(transform_to_postfix(stack_qs.top()));
-      stack_qs.pop();
+      std::cout << ' ' << stack_qs.top()();
     }
     catch (const std::invalid_argument & e)
     {
@@ -63,6 +76,8 @@ int main(int argc, char ** argv)
       std::cerr << e.what() << '\n';
       return 1;
     }
+
+    stack_qs.pop();
   }
 
   std::cout << '\n';

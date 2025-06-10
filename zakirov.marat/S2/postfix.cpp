@@ -18,39 +18,44 @@ zakirov::Postfix::Postfix(const std::string & infix)
   postfix = transform_to_postfix(infix_queue);
 }
 
-zakirov::Postfix & zakirov::Postfix::operator+(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::operator+(const Postfix & other)
 {
-  unite_postfixes(other);
-  postfix.push("+");
-  return *this;
+  Postfix result(*this);
+  result.unite_postfixes(other);
+  result.postfix.push("+");
+  return result;
 }
 
-zakirov::Postfix & zakirov::Postfix::operator-(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::operator-(const Postfix & other)
 {
-  unite_postfixes(other);
-  postfix.push("-");
-  return *this;
+  Postfix result(*this);
+  result.unite_postfixes(other);
+  result.postfix.push("-");
+  return result;
 }
 
-zakirov::Postfix & zakirov::Postfix::operator*(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::operator*(const Postfix & other)
 {
-  unite_postfixes(other);
-  postfix.push("*");
-  return *this;
+  Postfix result(*this);
+  result.unite_postfixes(other);
+  result.postfix.push("*");
+  return result;
 }
 
-zakirov::Postfix & zakirov::Postfix::operator/(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::operator/(const Postfix & other)
 {
-  unite_postfixes(other);
-  postfix.push("/");
-  return *this;
+  Postfix result(*this);
+  result.unite_postfixes(other);
+  result.postfix.push("/");
+  return result;
 }
 
-zakirov::Postfix & zakirov::Postfix::operator%(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::operator%(const Postfix & other)
 {
-  unite_postfixes(other);
-  postfix.push("%");
-  return *this;
+  Postfix result(*this);
+  result.unite_postfixes(other);
+  result.postfix.push("%");
+  return result;
 }
 
 long long zakirov::Postfix::operator()()
@@ -59,7 +64,7 @@ long long zakirov::Postfix::operator()()
   return result;
 }
 
-zakirov::Postfix & zakirov::Postfix::unite_postfixes(const Postfix & other)
+zakirov::Postfix zakirov::Postfix::unite_postfixes(const Postfix & other)
 {
   Postfix temporary(other);
   while (!temporary.postfix.empty())

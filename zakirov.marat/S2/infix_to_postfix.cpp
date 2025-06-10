@@ -35,7 +35,7 @@ void zakirov::check_overflow(long long first, long long second, char oper)
   }
   else if (oper == '*')
   {
-    if (((max_num < 0 && min_num < 0) || (max_num > 0 && min_num > 0)) && (llint_max / max_num < min_num))
+    if (((max_num < 0 && min_num < 0) && (llint_max / min_num > min_num)) || ((max_num > 0 && min_num > 0) && (llint_max / max_num < min_num)))
     {
       throw std::overflow_error("Variable overflow");
     }
@@ -244,6 +244,11 @@ long long zakirov::calculate_postfix_expression(const Queue< std::string > & pos
     }
     else if (check_operator(postfix_temp.front()))
     {
+      if (result.size() < 2)
+      {
+        throw std::invalid_argument("Incorrect expression");
+      }
+
       first_v = result.top();
       result.pop();
       second_v = result.top();
