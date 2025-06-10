@@ -3,62 +3,63 @@
 #include <iostream>
 #include <limits>
 
-void dribas::getSequanceName(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance)
+using Seq = dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >;
+
+void dribas::outSequanceName(std::ostream& out, const Seq& sequance)
 {
-  for (size_t i = 0; i < sequance.size(); i++) {
-    if (i != 0) {
-      out << " ";
-    }
-    out << sequance.at(i)->data_.first;
+  out << sequance.begin()->first;
+  for (auto i = ++sequance.begin(); i != sequance.end(); i++) {
+    out << ' ' << i->first;
   }
 }
 
-void dribas::getSequanceNameSum(std::ostream& out, const List< std::pair< std::string, List< unsigned long long > > >& sequance)
-{
+void dribas::outSequanceNameSum(std::ostream& out, const Seq& sequance, bool& isOverflow) {
   size_t maxSize = 0;
-  for (size_t i = 0; i < sequance.size(); i++) {
-    if (sequance.at(i)) {
-      maxSize = std::max(maxSize, sequance.at(i)->data_.second.size());
-    }
+  for (auto i = sequance.begin(); i != sequance.end(); ++i) {
+    maxSize = std::max(maxSize, i->second.size());
   }
+
   if (maxSize == 0) {
     out << '0';
+    return;
   }
-  bool isOverflow = false;
+
   dribas::List< unsigned long long > sums;
-  unsigned long long sum = 0;
-  for (size_t i = 0; i < maxSize; i++) {
-    bool isFirst = true;
-    for (size_t j = 0; j < sequance.size(); j++) {
-      if (sequance.at(j) && i < sequance.at(j)->data_.second.size()) {
-        if (!isFirst) {
-          out << " ";
-        }
-        out << sequance.at(j)->data_.second.at(i)->data_;
-        sum += sequance.at(j)->data_.second.at(i)->data_;
-        if (sequance.at(j)->data_.second.at(i)->data_ > std::numeric_limits< int >::max()) {
-          isOverflow = true;
-        }
-        isFirst = false;
-      }
+  for (size_t i = 0; i < maxSize; ++i) {
+    auto first_elem = sequance.begin();
+    while (first_elem != sequance.end() && i >= first_elem->second.size()) {
+      ++first_elem;
     }
+    if (first_elem != sequance.end()) {
+      auto it_data = first_elem->second.begin();
+      std::advance(it_data, i);
+      out << *it_data;
+      unsigned long long sum = *it_data;
+      if (*it_data > std::numeric_limits< int >::max()) {
+        isOverflow = true;
+      }
+      for (auto j = ++first_elem; j != sequance.end(); ++j) {
+        if (i < j->second.size()) {
+          it_data = j->second.begin();
+          std::advance(it_data, i);
+          out << " " << *it_data;
+          if (*it_data > std::numeric_limits< int >::max() - sum) {
+            isOverflow = true;
+          }
+          sum += *it_data;
+        }
+      }
+      sums.push_back(sum);
+    }
+
     if (!(i == maxSize - 1 && isOverflow)) {
       out << '\n';
     }
-    sums.push_back(sum);
-    sum = 0;
   }
-  if (isOverflow) {
-    return;
-  }
-  bool isFirst = true;
-  for (size_t i = 0; i < sums.size(); i++) {
-    if (sums.at(i)) {
-      if (!isFirst) {
-        out << " ";
-      }
-      out << sums.at(i)->data_;
-      isFirst = false;
+  if (!isOverflow && !sums.empty()) {
+    out << sums.front();
+    for (auto it = ++sums.begin(); it != sums.end(); ++it) {
+      out << " " << *it;
     }
   }
 }
