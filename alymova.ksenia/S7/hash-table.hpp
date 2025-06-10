@@ -129,9 +129,21 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   template< class InputIterator >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(InputIterator first, InputIterator last):
-    HashTable()
+    //HashTable()
+    size_(0),
+    capacity_(11),
+    array_(new T[capacity_]),
+    hasher()
   {
-    insert(first, last);
+    try
+    {
+      insert(first, last);
+    }
+    catch (...)
+    {
+      delete[] array_;
+      throw;
+    }
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
