@@ -21,7 +21,15 @@ int main(int argc, char ** argv)
       getline(std::cin, reader);
       if (!reader.empty())
       {
-        stack_qs.push(zakirov::Postfix(reader));
+        try
+        {
+          stack_qs.push(zakirov::Postfix(reader));
+        }
+        catch (const std::invalid_argument & e)
+        {
+          std::cerr << e.what() << '\n';
+          return 1;
+        }
       }
     }
   }
@@ -33,7 +41,15 @@ int main(int argc, char ** argv)
       getline(file, reader);
       if (!reader.empty())
       {
-        stack_qs.push(zakirov::Postfix(reader));
+        try
+        {
+          stack_qs.push(zakirov::Postfix(reader));
+        }
+        catch (const std::invalid_argument & e)
+        {
+          std::cerr << e.what() << '\n';
+          return 1;
+        }
       }
     }
   }
