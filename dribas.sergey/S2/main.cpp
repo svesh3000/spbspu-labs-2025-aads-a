@@ -3,8 +3,8 @@
 #include <string>
 
 #include "expr.hpp"
-#include "queue.hpp"
-#include "stack.hpp"
+#include <queue.hpp>
+#include <stack.hpp>
 
 int main(int argc, char* argv[])
 {
