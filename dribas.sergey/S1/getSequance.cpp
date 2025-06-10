@@ -5,7 +5,7 @@
 #include "list.hpp"
 #include "iterator.hpp"
 
-dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >dribas::getSequance(std::istream& input, bool& overflow)
+dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >dribas::getSequance(std::istream& input)
 {
   List< std::pair< std::string, List< unsigned long long > > >allSequance;
   std::string sequance;
@@ -13,8 +13,8 @@ dribas::List< std::pair< std::string, dribas::List< unsigned long long > > >drib
     List< unsigned long long > numbers{};
     unsigned long long number = 0;
     while (input >> number) {
-      if (number > static_cast< unsigned long long >(std::numeric_limits< int >::max())) {
-        overflow = 1;
+      if (!input) {
+        throw std::invalid_argument("uncorrect numbers input");
       }
       numbers.push_back(number);
     }
