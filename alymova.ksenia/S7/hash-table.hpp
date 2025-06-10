@@ -77,10 +77,10 @@ namespace alymova
     T* array_;
     Hash hasher;
 
-    size_t get_home_index(const Key& key) const;
+    size_t get_home_index(const Key& key) const noexcept;
     std::pair< size_t, T > rob_rich(size_t home_index, const Node& value);
     Iterator insert_node(size_t index, const Node& node);
-    size_t get_next_prime_capacity();
+    size_t get_next_prime_capacity() const noexcept;
   };
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -105,7 +105,15 @@ namespace alymova
     {
       if (other.array_[i].first == NodeType::Fill)
       {
-        array_[i] = other.array_[i];
+        try
+        {
+          array_[i] = other.array_[i];
+        }
+        catch(const std::exception& e)
+        {
+          delete[] array_;
+          throw;
+        }
       }
     }
   }
@@ -123,7 +131,15 @@ namespace alymova
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(InputIterator first, InputIterator last):
     HashTable()
   {
-    insert(first, last);
+    try
+    {
+      insert(first, last);
+    }
+    catch(const std::exception& e)
+    {
+      delete[] array_;
+      throw;
+    }
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -455,7 +471,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  size_t HashTable< Key, Value, Hash, KeyEqual >::get_home_index(const Key& key) const
+  size_t HashTable< Key, Value, Hash, KeyEqual >::get_home_index(const Key& key) const noexcept
   {
     return hasher(key) % capacity_;
   }
@@ -515,14 +531,13 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  size_t HashTable< Key, Value, Hash, KeyEqual >::get_next_prime_capacity()
+  size_t HashTable< Key, Value, Hash, KeyEqual >::get_next_prime_capacity() const noexcept
   {
-    size_t new_cap = capacity_ * 2;
-
-    for (size_t i = new_cap + 1; i < std::pow(10, 7); i += 2)
+    size_t capacity_new = capacity_ * 2;
+    for (size_t i = capacity_new + 1; i < std::pow(10, 7); i += 2)
     {
       bool prime = true;
-      for (size_t del = 3; del < std::round(std::sqrt(new_cap)) + 1; del++)
+      for (size_t del = 3; del < std::round(std::sqrt(capacity_new)) + 1; del++)
       {
         if (i % del == 0)
         {
@@ -535,7 +550,7 @@ namespace alymova
         return i;
       }
     }
-    return new_cap;
+    return capacity_new;
   }
 }
 
