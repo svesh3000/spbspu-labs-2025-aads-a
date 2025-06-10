@@ -70,16 +70,16 @@ bool zakirov::check_operand(const std::string & line)
     }
     else if (!isdigit(*fillable_it))
     {
-      return 0;
+      return false;
     }
   }
 
   if (dot_counter > 1)
   {
-    return 0;
+    return false;
   }
 
-  return 1;
+  return true;
 }
 
 bool zakirov::check_operator(std::string symbol)
@@ -89,21 +89,16 @@ bool zakirov::check_operator(std::string symbol)
   {
     if (symbol.front() == operators[i] && symbol.size() == 1)
     {
-      return 1;
+      return true;
     }
   }
 
-  return 0;
+  return false;
 }
 
 bool zakirov::check_priority(std::string symbol)
 {
-  if (symbol == "*" || symbol == "/")
-  {
-    return 1;
-  }
-
-  return 0;
+  return symbol == "*" || symbol == "/";
 }
 
 zakirov::Queue< std::string > zakirov::transform_to_postfix(Queue< std::string > & infix)
