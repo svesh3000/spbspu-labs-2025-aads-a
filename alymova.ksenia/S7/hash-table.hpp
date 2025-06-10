@@ -109,7 +109,7 @@ namespace alymova
         {
           array_[i] = other.array_[i];
         }
-        catch(const std::exception& e)
+        catch (...)
         {
           delete[] array_;
           throw;
@@ -131,15 +131,7 @@ namespace alymova
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(InputIterator first, InputIterator last):
     HashTable()
   {
-    try
-    {
-      insert(first, last);
-    }
-    catch(const std::exception& e)
-    {
-      delete[] array_;
-      throw;
-    }
+    insert(first, last);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
