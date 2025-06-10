@@ -2,7 +2,6 @@
 #define PROCESSOR_HPP
 
 #include <string>
-#include <unordered_map>
 #include <boost/hash2/fnv1a.hpp>
 #include <boost/hash2/hash_append.hpp>
 #include <boost/hash2/get_integral_result.hpp>
@@ -31,7 +30,7 @@ namespace rychkov
   private:
     using edge = std::pair< std::string, std::string >;
     using weights_set = MultiSet< unsigned >;
-    using inner_map = std::unordered_map< edge, weights_set, Hash< edge > >;
+    using inner_map = UnorderedMap< edge, weights_set >;
 
     using vertexes_set = Set< std::string >;
     using outer_mapped_type = std::pair< inner_map, vertexes_set >;

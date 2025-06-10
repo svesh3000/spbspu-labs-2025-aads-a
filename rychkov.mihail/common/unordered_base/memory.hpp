@@ -28,6 +28,17 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::allocate(size_type ne
   }
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
+bool rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::extend(size_type new_capacity)
+{
+  size_type required_size = std::ceil(new_capacity / max_factor_);
+  if (required_size <= capacity_)
+  {
+    return false;
+  }
+  rehash(required_size * 2);
+  return true;
+}
+template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::reserve(size_type new_capacity)
 {
   rehash(std::ceil(new_capacity / max_factor_));
@@ -63,7 +74,6 @@ std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterat
     return {result, false};
   }
 
-  using temp_stored = std::pair< size_type, temp_value >;
   temp_stored temp = {0, {std::forward< Args >(args)...}};
   size_type slot = hash_(get_key(temp.second)) % capacity_, id = hint.first.data_ - data_;
   temp.first = (id >= slot ? id - slot : id + capacity_ - slot);
@@ -89,6 +99,50 @@ std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterat
   }
   size_++;
   return {result, true};
+}
+template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
+typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator
+    rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::erase(const_iterator pos)
+{
+  static_assert(std::is_nothrow_move_constructible< temp_value >::value, "");
+  pos.data_->second.~value_type();
+  iterator result = {pos.data_, pos.end_};
+  size_type expected_psl = pos.data_->first, shift = 0;
+  pos.data_->first = ~0ULL;
+
+  stored_value* erased = pos.data_;
+  stored_value* prev = erased;
+  while (true)
+  {
+    if (++pos.data_ == pos.end_)
+    {
+      pos.data_ = data_;
+    }
+    shift++;
+
+    if ((pos.data_->first != expected_psl + shift) || (pos.data_->first == ~0ULL))
+    {
+      new(std::addressof(erased->second)) value_type(std::move(reinterpret_cast< temp_stored* >(prev)->second));
+      prev->second.~value_type();
+      erased->first = expected_psl;
+      prev->first = ~0ULL;
+
+      if ((pos.data_->first == ~0ULL) || (pos.data_->first == 0))
+      {
+        size_--;
+        if (result.data_->first == ~0ULL)
+        {
+          return ++result;
+        }
+        return result;
+      }
+
+      erased = prev;
+      expected_psl = pos.data_->first - 1;
+      shift = 0;
+    }
+    prev = pos.data_;
+  }
 }
 
 #endif

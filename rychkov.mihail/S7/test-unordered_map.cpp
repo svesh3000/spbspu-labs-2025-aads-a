@@ -32,6 +32,42 @@ BOOST_AUTO_TEST_CASE(multiset_test)
   BOOST_TEST(set.count(8) == 0);
   BOOST_TEST(!set.contains(1));
   BOOST_TEST(!set.contains(8));
+  struct erasor
+  {
+    rychkov::UnorderedMultiSet< int >& set;
+    size_t counts[9] = {0, 0, 2, 3, 1, 1, 1, 1, 0};
+    void operator()(int num)
+    {
+      set.erase(set.find(num));
+      counts[num]--;
+      check();
+    }
+    void check()
+    {
+      size_t size = 0;
+      for (int i = 0; i < 9; i++)
+      {
+        size += counts[i];
+        BOOST_TEST(set.count(i) == counts[i]);
+      }
+      BOOST_TEST(set.size() == size);
+    }
+  };
+  erasor erase{set};
+  erase(5);
+  BOOST_TEST(set.erase(3) == 3);
+  erase.counts[3] = 0;
+  erase.check();
+  erase(2);
+  erase(2);
+  int rest = *set.begin();
+  set.erase(++set.begin(), set.end());
+  for (int i = 0; i < 9; i++)
+  {
+    erase.counts[i] = 0;
+  }
+  erase.counts[rest] = 1;
+  erase.check();
 }
 BOOST_AUTO_TEST_CASE(map_test)
 {

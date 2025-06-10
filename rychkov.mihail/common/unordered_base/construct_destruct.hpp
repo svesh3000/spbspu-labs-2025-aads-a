@@ -8,39 +8,39 @@
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase()
     noexcept(noexcept_default):
-  capacity_(0),
-  size_(0),
-  max_factor_(default_max_factor),
-  data_(nullptr),
-  raw_(nullptr),
-  cached_begin_(nullptr),
-  cached_rbegin_(nullptr)
+  capacity_{0},
+  size_{0},
+  max_factor_{default_max_factor},
+  data_{nullptr},
+  raw_{nullptr},
+  cached_begin_{nullptr},
+  cached_rbegin_{nullptr}
 {}
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(size_type cnt, hasher hash, key_equal eq):
-  capacity_(0),
-  size_(0),
-  max_factor_(default_max_factor),
-  data_(nullptr),
-  raw_(nullptr),
-  cached_begin_(nullptr),
-  cached_rbegin_(nullptr),
-  hash_(std::move(hash)),
-  equal_(std::move(eq))
+  capacity_{0},
+  size_{0},
+  max_factor_{default_max_factor},
+  data_{nullptr},
+  raw_{nullptr},
+  cached_begin_{nullptr},
+  cached_rbegin_{nullptr},
+  hash_{std::move(hash)},
+  equal_{std::move(eq)}
 {
   allocate(cnt);
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(UnorderedBase&& rhs) noexcept(noexcept_move):
-  capacity_(std::exchange(rhs.capacity_, 0)),
-  size_(std::exchange(rhs.size_, 0)),
-  max_factor_(std::exchange(rhs.max_factor_, default_max_factor)),
-  data_(std::exchange(rhs.data_, nullptr)),
-  raw_(std::exchange(rhs.raw_, nullptr)),
-  cached_begin_(std::exchange(rhs.cached_begin_, nullptr)),
-  cached_rbegin_(std::exchange(rhs.cached_rbegin_, nullptr)),
-  hash_(std::move(rhs.hash_)),
-  equal_(std::move(rhs.equal_))
+  capacity_{std::exchange(rhs.capacity_, 0)},
+  size_{std::exchange(rhs.size_, 0)},
+  max_factor_{std::exchange(rhs.max_factor_, default_max_factor + 0)},
+  data_{std::exchange(rhs.data_, nullptr)},
+  raw_{std::exchange(rhs.raw_, nullptr)},
+  cached_begin_{std::exchange(rhs.cached_begin_, nullptr)},
+  cached_rbegin_{std::exchange(rhs.cached_rbegin_, nullptr)},
+  hash_{std::move(rhs.hash_)},
+  equal_{std::move(rhs.equal_)}
 {}
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(const UnorderedBase& rhs):

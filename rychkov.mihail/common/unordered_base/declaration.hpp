@@ -190,6 +190,7 @@ namespace rychkov
   private:
     using stored_value = std::pair< size_type, value_type >;
     using temp_value = std::conditional_t< IsSet, key_type, std::pair< key_type, mapped_type > >;
+    using temp_stored = std::pair< size_type, temp_value >;
     static constexpr float default_max_factor = 0.5;
 
     size_type capacity_, size_;
@@ -202,6 +203,7 @@ namespace rychkov
     key_equal equal_;
 
     void allocate(size_type new_capacity);
+    bool extend(size_type new_capacity);
 
     template< class K1 >
     size_type count_impl(const K1& key) const;
