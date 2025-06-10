@@ -140,7 +140,7 @@ namespace rychkov
     void clear() noexcept;
     void swap(UnorderedBase& rhs) noexcept(is_nothrow_swappable_v< hasher > && is_nothrow_swappable_v< key_equal >);
 
-    void reserve(size_type cnt);
+    void reserve(size_type new_capacity);
     void rehash(size_type cnt);
 
     iterator erase(const_iterator pos);
@@ -188,9 +188,9 @@ namespace rychkov
         try_emplace(const_iterator hint, K1&& key, Args&&... args);
 
   private:
-    using stored_value = std::pair< bool, value_type >;
+    using stored_value = std::pair< size_type, value_type >;
     using temp_value = std::conditional_t< IsSet, key_type, std::pair< key_type, mapped_type > >;
-    static constexpr float default_max_factor = 0.75;
+    static constexpr float default_max_factor = 0.5;
 
     size_type capacity_, size_;
     float max_factor_;
@@ -203,6 +203,10 @@ namespace rychkov
 
     void allocate(size_type new_capacity);
 
+    template< class K1 >
+    size_type count_impl(const K1& key) const;
+    template< class K1 >
+    const_iterator find_impl(const K1& key) const;
     template< class K1 >
     std::pair< const_iterator, bool > find_hint_pair(const K1& key) const;
     template< class K1 >

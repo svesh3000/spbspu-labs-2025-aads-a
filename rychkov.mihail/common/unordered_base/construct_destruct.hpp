@@ -101,9 +101,17 @@ template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::swap(UnorderedBase& rhs)
     noexcept(is_nothrow_swappable_v< hasher > && is_nothrow_swappable_v< key_equal >)
 {
-  static_assert(!is_nothrow_swappable_v< hasher > && !is_nothrow_swappable_v< key_equal >, "");
-  std::swap(hash_, rhs.hash_);
-  std::swap(equal_, rhs.equal_);
+  static_assert(is_nothrow_swappable_v< hasher > || is_nothrow_swappable_v< key_equal >, "");
+  if (is_nothrow_swappable_v< hasher >)
+  {
+    std::swap(equal_, rhs.equal_);
+    std::swap(hash_, rhs.hash_);
+  }
+  else
+  {
+    std::swap(hash_, rhs.hash_);
+    std::swap(equal_, rhs.equal_);
+  }
   std::swap(capacity_, rhs.capacity_);
   std::swap(size_, rhs.size_);
   std::swap(max_factor_, rhs.max_factor_);
@@ -115,22 +123,26 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::swap(UnorderedBase& r
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::clear() noexcept
 {
-  erase(begin(), end());
-}
-template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
-void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::allocate(size_type new_capacity)
-{
-  if (new_capacity == 0)
+  for (size_type i = 0; i < capacity_; i++)
   {
-    raw_ = nullptr;
-    data_ = nullptr;
-    capacity_ = 0;
-    return;
+    if (data_[i].first == ~0ULL)
+    {
+      data_[i].first.~size_type();
+    }
+    else
+    {
+      data_[i].~stored_value();
+    }
   }
-  raw_ = new unsigned char[new_capacity * sizeof(stored_value) + alignof(stored_value) - 1];
-  data_ = reinterpret_cast< stored_value* >(reinterpret_cast< size_t >(raw_ + alignof(stored_value) - 1)
-        & ~(alignof(stored_value) - 1));
-  capacity_ = new_capacity;
+  delete[] raw_;
+
+  capacity_ = 0;
+  size_ = 0;
+  max_factor_ = default_max_factor;
+  raw_ = nullptr;
+  data_ = nullptr;
+  cached_begin_ = nullptr;
+  cached_rbegin_ = nullptr;
 }
 
 #endif

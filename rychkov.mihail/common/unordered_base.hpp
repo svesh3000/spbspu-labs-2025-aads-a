@@ -8,5 +8,6 @@
 #include "unordered_base/indexers.hpp"
 #include "unordered_base/insert.hpp"
 #include "unordered_base/search.hpp"
+#include "unordered_base/memory.hpp"
 
 #endif

@@ -6,13 +6,23 @@
 #include <utility>
 #include <tuple>
 
-/*template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
+template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 template< class K1 >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::const_iterator, bool >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::find_hint_pair(const K1& key) const
 {
+  size_type slot = hash_(key) % capacity_;
+  for (size_type i = 0; (data_[slot].first != ~0ULL) && (data_[slot].first >= i); i++,
+        slot = (++slot < capacity_ ? slot : slot - capacity_))
+  {
+    if ((data_[slot].first == i) && equal_(get_key(data_[slot + i].second), key))
+    {
+      return {{data_ + slot, data_ + capacity_}, IsMulti};
+    }
+  }
+  return {{data_ + slot, data_ + capacity_}, true};
 }
-
+/*
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 template< class K1 >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::const_iterator, bool >
@@ -25,6 +35,7 @@ template< class... Args >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::emplace(Args&&... args)
 {
+  reserve(size_ + 1);
   temp_value temp{std::forward< Args >(args)...};
   return emplace_hint_impl(find_hint_pair(get_key(temp)), std::move(temp));
 }
@@ -43,6 +54,7 @@ std::enable_if_t< !IsSet && !IsSet2,
       std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool > >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::try_emplace(const key_type& key, Args&&... args)
 {
+  reserve(size_ + 1);
   return emplace_hint_impl(find_hint_pair(key), std::piecewise_construct,
         std::forward_as_tuple(key), std::forward_as_tuple(std::forward< Args >(args)...));
 }
@@ -52,6 +64,7 @@ std::enable_if_t< !IsSet && !IsSet2,
       std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool > >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::try_emplace(key_type&& key, Args&&... args)
 {
+  reserve(size_ + 1);
   return emplace_hint_impl(find_hint_pair(key), std::piecewise_construct,
         std::forward_as_tuple(std::move(key)), std::forward_as_tuple(std::forward< Args >(args)...));
 }
@@ -62,6 +75,7 @@ typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::transparent_hash_
         std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool > >, K1 >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::try_emplace(K1&& key, Args&&... args)
 {
+  reserve(size_ + 1);
   return emplace_hint_impl(find_hint_pair(key), std::piecewise_construct,
         std::forward_as_tuple(std::forward< K1 >(key)), std::forward_as_tuple(std::forward< Args >(args)...));
 }
@@ -95,12 +109,14 @@ template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::insert(const value_type& value)
 {
+  reserve(size_ + 1);
   return emplace_hint_impl(find_hint_pair(get_key(value)), value);
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::insert(value_type&& value)
 {
+  reserve(size_ + 1);
   return emplace_hint_impl(find_hint_pair(get_key(value)), std::move(value));
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
@@ -110,6 +126,7 @@ std::enable_if_t< std::is_constructible
       std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator, bool > >
     rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::insert(V&& value)
 {
+  reserve(size_ + 1);
   return emplace(std::forward< V >(value));
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >

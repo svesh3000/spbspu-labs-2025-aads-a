@@ -35,7 +35,7 @@ namespace rychkov
 
     using vertexes_set = Set< std::string >;
     using outer_mapped_type = std::pair< inner_map, vertexes_set >;
-    using outer_map = std::unordered_map< std::string, outer_mapped_type >;
+    using outer_map = UnorderedMap< std::string, outer_mapped_type >;
 
     outer_map map;
   };
