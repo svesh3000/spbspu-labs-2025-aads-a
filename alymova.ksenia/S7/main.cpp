@@ -57,37 +57,5 @@ int main(int argc, char** argv)
     std::cerr << e.what() << '\n';
     return 1;
   }
-  /*HashTable< int, std::string > table;
-  std::pair< int, std::string > p1(1, "fffff");
-  std::pair< int, std::string > p2(1, "vvvvv");
-  std::pair< int, std::string > p3(3, "vvvvv");
-  std::pair< int, std::string > p4(45, "vvvvv");
-  std::pair< int, std::string > p5(12, "vvvvv");
-  table.insert(p1);
-  table.insert(p2);
-  table.insert(p3);
-  table.insert(p4);
-  table.insert(p5);
-  table.erase(table.begin(), table.end());
-  for (size_t i = 3; i < 20; i++)
-  {
-    std::pair< int, std::string > p(i, "gggg");
-    table.insert(p);
-  }
-  for (auto it = table.begin(); it != table.end(); it++)
-  {
-    std::cout << it->first << '\n';
-  }
-  HashTable< std::string, int > table1;
-  table1.emplace("graphs", 1);
-  table1.emplace("vertexes", 1);
-  table1.emplace("outbound", 1);
-  table1.emplace("inbound", 1);
-  table1.emplace("bind", 1);
-  table1.emplace("cut", 1);
-  table1.emplace("create", 1);
-  table1.emplace("merge", 1);
-  table1.emplace("extract", 1);
-  std::cout << (table1.find("vertexes") == table1.end()) << '\n';*/
 }
 
