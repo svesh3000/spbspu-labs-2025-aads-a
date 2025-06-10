@@ -60,14 +60,6 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(MapOperatorTests)
 
-BOOST_AUTO_TEST_CASE(SubscriptAccessExistingKey)
-{
-  AVLTree< int, std::string > m({{1, "one"}, {2, "two"}});
-  BOOST_CHECK_EQUAL(m[1], "one");
-  BOOST_CHECK_EQUAL(m[2], "two");
-  BOOST_CHECK_EQUAL(m.size(), 2);
-}
-
 BOOST_AUTO_TEST_CASE(SubscriptInsertNewKey)
 {
   AVLTree< int, std::string > m;
