@@ -116,10 +116,12 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(const Tree& other):
-    fakeRoot_(nullptr),
+    fakeRoot_(new Node_t(Key(), Value(), nullptr)),
     size_(0)
   {
-    Node_t* newRoot = nullptr;
+setRoot(copyTree(other.getRoot(), fakeRoot_));
+size_ = other.size_;
+/*    Node_t* newRoot = nullptr;
     Node_t* tempFakeRoot = nullptr;
     try
     {
@@ -134,7 +136,7 @@ namespace duhanina
       clear(newRoot);
       delete tempFakeRoot;
       throw;
-    }
+    }*/
   }
 
   template < typename Key, typename Value, typename Compare >
