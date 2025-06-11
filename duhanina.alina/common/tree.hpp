@@ -124,8 +124,15 @@ namespace duhanina
     fakeRoot_(other.fakeRoot_),
     size_(other.size_)
   {
-    other.setRoot(nullptr);
-    other.size_ = 0;
+    try
+    {
+      other.size_ = 0;
+      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
+    }
+    catch (...)
+    {
+      other.fakeRoot_ = nullptr;
+    }
   }
 
   template < typename Key, typename Value, typename Compare >
