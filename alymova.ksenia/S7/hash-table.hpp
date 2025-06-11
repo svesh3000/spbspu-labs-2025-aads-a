@@ -48,7 +48,7 @@ namespace alymova
     template< class... Args >
     Iterator emplace(Args&&... args);
     template< class... Args >
-    Iterator emplace_hint(ConstIterator hint, Args&&... args); //think about checking
+    Iterator emplace_hint(ConstIterator hint, Args&&... args);
 
     size_t erase(const Key& key);
     Iterator erase(Iterator pos);
@@ -270,8 +270,6 @@ namespace alymova
       return find(value.first);
     }
     return res;
-    //ConstIterator hint(array_ + home_index, array_ + capacity_);
-    //return emplace_hint(hint, std::move(value));
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -290,18 +288,8 @@ namespace alymova
           return hint;
         }
       }
-      //home_index = get_home_index(value.first);
     }
     return emplace(std::move(value));
-    /*Node node{value, 0};
-    Iterator res = insert_node(home_index, node);
-    size_++;
-    if (size_ > max_load_factor_ * capacity_)
-    {
-      rehash();
-      return find(value.first);
-    }
-    return res;*/
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
