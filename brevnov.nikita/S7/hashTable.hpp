@@ -214,7 +214,7 @@ namespace brevnov
             Slot help = slots_[pos];
             slots_[pos].pair = std::move(newVal);
             slots_[pos].dist = i;
-            return (emplace(help));
+            return (emplace(std::move(help.pair)));
           }
         }
         else
