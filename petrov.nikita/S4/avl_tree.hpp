@@ -120,6 +120,8 @@ namespace petrov
     void leftRotate(node_t * node);
     void rightRotate(node_t * node);
     void clearBiTree(node_t * node) noexcept;
+    template< typename Pair >
+    std::pair< const_it_t, bool > insertImpl(Pair && val);
   };
 
   template< typename K, typename T >
@@ -333,6 +335,25 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::this_t & AVLTree< K, T, Cmp >::operator=(const this_t & rhs)
+  {
+    this_t cpy(rhs);
+    swap(cpy);
+    return *this;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::this_t & AVLTree< K, T, Cmp >::operator=(this_t && rhs)
+  {
+    clear();
+    root_ = rhs.root_;
+    size_ = rhs.size_;
+    erased_ = rhs.erased_;
+    rhs.root_ = nullptr;
+    return *this;
+  }
+
+  template< typename K, typename T, typename Cmp >
   T & AVLTree< K, T, Cmp >::operator[](const K & key)
   {
     return const_cast< T & >(static_cast< const AVLTree * >(this)->operator[](key));
@@ -430,139 +451,13 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   std::pair< ConstAVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(const std::pair< K, T > & val)
   {
-    if (empty())
-    {
-      root_ = new node_t{ val, nullptr, nullptr, nullptr, 1 };
-      size_++;
-    }
-    else
-    {
-      auto temp = root_;
-      while (temp->left || temp->right)
-      {
-        if (temp->left && Cmp{}(val.first, temp->left->data.first))
-        {
-          temp = temp->left;
-        }
-        else if (temp->right && Cmp{}(temp->right->data.first, val.first))
-        {
-          temp = temp->right;
-        }
-        else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-        {
-          return std::pair< const_it_t, bool >{ const_it_t(temp), false };
-        }
-        else
-        {
-          break;
-        }
-      }
-      if (Cmp{}(val.first, temp->data.first))
-      {
-        temp->left = new node_t{ val, nullptr, nullptr, temp, 1 };
-        temp = temp->left;
-      }
-      else if (Cmp{}(temp->data.first, val.first))
-      {
-        temp->right = new node_t{ val, nullptr, nullptr, temp, 1 };
-        temp = temp->right;
-      }
-      else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-      {
-        return std::pair< const_it_t, bool >{ const_it_t(temp), false };
-      }
-      size_++;
-      while (temp->parent)
-      {
-        temp = temp->parent;
-        temp->setHeight();
-        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
-        {
-          balance(temp);
-        }
-        else if (!temp->left && temp->right && temp->right->height > 1)
-        {
-          balance(temp);
-        }
-        else if (!temp->right && temp->left && temp->left->height > 1)
-        {
-          balance(temp);
-        }
-        temp->setHeight();
-      }
-      return std::pair< const_it_t, bool >{ const_it_t(temp), true };
-    }
-    return std::pair< const_it_t, bool >{ const_it_t(root_), true };
+    return insertImpl(val);
   }
 
   template< typename K, typename T, typename Cmp >
   std::pair< ConstAVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(std::pair< K, T > && val)
   {
-    if (empty())
-    {
-      root_ = new node_t{ val, nullptr, nullptr, nullptr, 1 };
-      size_++;
-    }
-    else
-    {
-      auto temp = root_;
-      while (temp->left || temp->right)
-      {
-        if (temp->left && Cmp{}(val.first, temp->data.first))
-        {
-          temp = temp->left;
-        }
-        else if (temp->right && Cmp{}(temp->data.first, val.first))
-        {
-          temp = temp->right;
-        }
-        else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-        {
-          return std::pair< const_it_t, bool >{ const_it_t(temp), false };
-        }
-        else
-        {
-          break;
-        }
-      }
-      if (Cmp{}(val.first, temp->data.first))
-      {
-        temp->left = new node_t{ val, nullptr, nullptr, temp, 1 };
-        temp = temp->left;
-      }
-      else if (Cmp{}(temp->data.first, val.first))
-      {
-        temp->right = new node_t{ val, nullptr, nullptr, temp, 1 };
-        temp = temp->right;
-      }
-      else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-      {
-        return std::pair< const_it_t, bool >{ const_it_t(temp), false };
-      }
-      size_++;
-      while (temp->parent)
-      {
-        temp = temp->parent;
-        temp->setHeight();
-        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
-        {
-          balance(temp);
-          temp->setHeight();
-        }
-        else if (!temp->left && temp->right && temp->right->height > 1)
-        {
-          balance(temp);
-          temp->setHeight();
-        }
-        else if (!temp->right && temp->left && temp->left->height > 1)
-        {
-          balance(temp);
-          temp->setHeight();
-        }
-      }
-      return std::pair< const_it_t, bool >{ const_it_t(temp), true };
-    }
-    return std::pair< const_it_t, bool >{ const_it_t(root_), true };
+    return insertImpl(std::move(val));
   }
 
   template< typename K, typename T, typename Cmp >
@@ -1029,6 +924,86 @@ namespace petrov
       }
     }
   }
+
+  template< typename K, typename T, typename Cmp >
+  void AVLTree< K, T, Cmp >::swap(this_t & rhs) noexcept
+  {
+    std::swap(root_, rhs.root_);
+    std::swap(size_, rhs.size_);
+    std::swap(erased_, rhs.erased_);
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< typename Pair >
+  typename std::pair< ConstAVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insertImpl(Pair && val)
+  {
+    if (empty())
+    {
+      root_ = new node_t{ val, nullptr, nullptr, nullptr, 1 };
+      size_++;
+    }
+    else
+    {
+      auto temp = root_;
+      while (temp->left || temp->right)
+      {
+        if (temp->left && Cmp{}(val.first, temp->data.first))
+        {
+          temp = temp->left;
+        }
+        else if (temp->right && Cmp{}(temp->data.first, val.first))
+        {
+          temp = temp->right;
+        }
+        else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
+        {
+          return std::pair< const_it_t, bool >{ const_it_t(temp), false };
+        }
+        else
+        {
+          break;
+        }
+      }
+      if (Cmp{}(val.first, temp->data.first))
+      {
+        temp->left = new node_t{ val, nullptr, nullptr, temp, 1 };
+        temp = temp->left;
+      }
+      else if (Cmp{}(temp->data.first, val.first))
+      {
+        temp->right = new node_t{ val, nullptr, nullptr, temp, 1 };
+        temp = temp->right;
+      }
+      else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
+      {
+        return std::pair< const_it_t, bool >{ const_it_t(temp), false };
+      }
+      size_++;
+      while (temp->parent)
+      {
+        temp = temp->parent;
+        temp->setHeight();
+        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
+        {
+          balance(temp);
+          temp->setHeight();
+        }
+        else if (!temp->left && temp->right && temp->right->height > 1)
+        {
+          balance(temp);
+          temp->setHeight();
+        }
+        else if (!temp->right && temp->left && temp->left->height > 1)
+        {
+          balance(temp);
+          temp->setHeight();
+        }
+      }
+      return std::pair< const_it_t, bool >{ const_it_t(temp), true };
+    }
+    return std::pair< const_it_t, bool >{ const_it_t(root_), true };
+  }
+
 }
 
 #endif
