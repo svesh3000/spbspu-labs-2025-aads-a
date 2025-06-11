@@ -116,45 +116,16 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(const Tree& other):
-    fakeRoot_(new Node_t(Key(), Value(), nullptr)),
-    size_(0)
-  {
-setRoot(copyTree(other.getRoot(), fakeRoot_));
-size_ = other.size_;
-/*    Node_t* newRoot = nullptr;
-    Node_t* tempFakeRoot = nullptr;
-    try
-    {
-      tempFakeRoot = new Node_t(Key(), Value(), nullptr);
-      newRoot = copyTree(other.getRoot(), tempFakeRoot);
-      fakeRoot_ = tempFakeRoot;
-      setRoot(newRoot);
-      size_ = other.size_;
-    }
-    catch (...)
-    {
-      clear(newRoot);
-      delete tempFakeRoot;
-      throw;
-    }*/
-  }
+    Tree(other.cbegin(), other.cend())
+  {}
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(Tree&& other):
     fakeRoot_(other.fakeRoot_),
     size_(other.size_)
   {
-    try
-    {
-      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-      other.size_ = 0;
-    }
-    catch (...)
-    {
-      fakeRoot_ = nullptr;
-      size_ = 0;
-      throw;
-    }
+    other.setRoot(nullptr);
+    other.size_ = 0;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -167,29 +138,9 @@ size_ = other.size_;
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree< Key, Value, Compare >& other)
   {
-Tree< Key, Value, Compare> temp(other);
-swap(temp);
-return *this;
-/*    if (this != std::addressof(other))
-    {
-      Node_t* newFakeRoot = nullptr;
-      Node_t* newRoot = nullptr;
-      try
-      {
-        newFakeRoot = new Node_t(Key(), Value(), nullptr);
-        newRoot = copyTree(other.getRoot(), newFakeRoot);
-        fakeRoot_ = newFakeRoot;
-        setRoot(newRoot);
-        size_ = other.size_;
-      }
-      catch (...)
-      {
-        clear(newRoot);
-        delete newFakeRoot;
-        throw;
-      }
-    }
-    return *this;*/
+    Tree< Key, Value, Compare> temp(other);
+    swap(temp);
+    return *this;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -197,23 +148,8 @@ return *this;
   {
     if (this != std::addressof(other))
     {
-      Node_t* oldFakeRoot = fakeRoot_;
-      size_t oldSize = size_;
-      try
-      {
-        clear();
-        delete fakeRoot_;
-        fakeRoot_ = other.fakeRoot_;
-        size_ = other.size_;
-        other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-        other.size_ = 0;
-      }
-      catch (...)
-      {
-        fakeRoot_ = oldFakeRoot;
-        size_ = oldSize;
-        throw;
-      }
+      Tree< Key, Value, Compare > temp(std::move(other));
+      swap(temp);
     }
     return *this;
   }
