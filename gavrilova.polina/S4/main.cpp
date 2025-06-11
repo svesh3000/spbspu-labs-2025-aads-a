@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   gavrilova::Dataset datasets;
   try {
     loadDatasetsFromFile(argv[1], datasets);
-  }  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
   }
 
@@ -73,10 +73,12 @@ int main(int argc, char* argv[])
   while (std::cin >> command) {
     try {
       processCommand(command, datasets);
-    } catch (const std::exception& e) {
-      std::cerr << "Error: " << e.what() << "\n";
+    } catch (const std::invalid_argument&) {
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    } catch (const std::exception& e) {
+      std::cerr << "Error: " << e.what() << "\n";
     }
   }
 }

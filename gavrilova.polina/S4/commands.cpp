@@ -5,7 +5,12 @@ namespace gavrilova {
 
   void printDataset(std::ostream& out, const std::string& datasetName, Dataset& datasets)
   {
-    const KeyMap& data = datasets.at(datasetName);
+    try {
+      const KeyMap& data = datasets.at(datasetName);
+    } catch (const std::out_of_range&) {
+      throw std::invalid_argument("");
+    }
+
     if (data.empty()) {
       out << "<EMPTY>\n";
       return;
@@ -23,9 +28,14 @@ namespace gavrilova {
       const std::string& secondDatasetName,
       Dataset& datasets)
   {
+    try {
+      const auto& firstDataset = datasets.at(firstDatasetName);
+      const auto& secondDataset = datasets.at(secondDatasetName);
+    } catch (const std::out_of_range&) {
+      throw std::invalid_argument("");
+    }
+
     KeyMap newDataset;
-    const auto& firstDataset = datasets.at(firstDatasetName);
-    const auto& secondDataset = datasets.at(secondDatasetName);
 
     for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); it++) {
       if (secondDataset.find(it->first) == secondDataset.end()) {
@@ -39,9 +49,14 @@ namespace gavrilova {
   void intersectDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
       const std::string& secondDatasetName, Dataset& datasets)
   {
+    try {
+      const auto& firstDataset = datasets.at(firstDatasetName);
+      const auto& secondDataset = datasets.at(secondDatasetName);
+    } catch (const std::out_of_range&) {
+      throw std::invalid_argument("");
+    }
+
     KeyMap newDataset;
-    const auto& firstDataset = datasets.at(firstDatasetName);
-    const auto& secondDataset = datasets.at(secondDatasetName);
 
     for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); it++) {
       if (secondDataset.find(it->first) != secondDataset.end()) {
@@ -55,9 +70,14 @@ namespace gavrilova {
   void unionDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
       const std::string& secondDatasetName, Dataset& datasets)
   {
+    try {
+      const auto& firstDataset = datasets.at(firstDatasetName);
+      const auto& secondDataset = datasets.at(secondDatasetName);
+    } catch (const std::out_of_range&) {
+      throw std::invalid_argument("");
+    }
+
     KeyMap newDataset;
-    const auto& firstDataset = datasets.at(firstDatasetName);
-    const auto& secondDataset = datasets.at(secondDatasetName);
 
     for (const auto& dataset: {firstDataset, secondDataset}) {
       for (auto it = dataset.cbegin(); it != dataset.cend(); it++) {
