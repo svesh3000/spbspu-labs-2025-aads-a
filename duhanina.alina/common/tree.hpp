@@ -167,7 +167,10 @@ size_ = other.size_;
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree< Key, Value, Compare >& other)
   {
-    if (this != std::addressof(other))
+Tree< Key, Value, Compare> temp(other);
+swap(temp);
+return *this;
+/*    if (this != std::addressof(other))
     {
       Node_t* newFakeRoot = nullptr;
       Node_t* newRoot = nullptr;
@@ -186,7 +189,7 @@ size_ = other.size_;
         throw;
       }
     }
-    return *this;
+    return *this;*/
   }
 
   template < typename Key, typename Value, typename Compare >
