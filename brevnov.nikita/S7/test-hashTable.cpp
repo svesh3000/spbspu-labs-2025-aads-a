@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(hashTable)
   BOOST_TEST(table.size() == 3);
   table.erase(6);
   BOOST_TEST(table.size() == 2);
-  Table::Iterator it = table.find(7);
+  HTable::Iterator it = table.find(7);
   BOOST_CHECK(it == table.end());
   it = table.find(5);
   BOOST_TEST(it->second == "five");
