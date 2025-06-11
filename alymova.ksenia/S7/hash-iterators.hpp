@@ -14,8 +14,8 @@ namespace alymova
     public std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
   {
     using Node = detail::HashNode< Key, Value >;
-    using NodeType = typename HashTable< Key, Value, Hash, KeyEqual >::NodeType;
-    using T = std::pair< NodeType, Node >;
+    using NodeState = typename HashTable< Key, Value, Hash, KeyEqual >::NodeState;
+    using T = std::pair< NodeState, Node >;
 
     HashConstIterator() = default;
     HashConstIterator& operator++() noexcept;
@@ -39,8 +39,8 @@ namespace alymova
   {
     using Base = HashConstIterator< Key, Value, Hash, KeyEqual >;
     using Node = detail::HashNode< Key, Value >;
-    using NodeType = typename HashTable< Key, Value, Hash, KeyEqual >::NodeType;
-    using T = std::pair< NodeType, Node >;
+    using NodeState = typename HashTable< Key, Value, Hash, KeyEqual >::NodeState;
+    using T = std::pair< NodeState, Node >;
 
     HashIterator(T* node, T* end) noexcept;
 
@@ -65,7 +65,7 @@ namespace alymova
     {
       return *this;
     }
-    if (node_->first == NodeType::Fill)
+    if (node_->first == NodeState::Fill)
     {
       return *this;
     }
@@ -95,9 +95,9 @@ namespace alymova
 
   template< class Key, class Value, class Hash, class KeyEqual >
   const std::pair< Key, Value >&
-    HashConstIterator< Key, Value, Hash, KeyEqual>::operator*() const noexcept
+    HashConstIterator< Key, Value, Hash, KeyEqual >::operator*() const noexcept
   {
-    assert(node_->first != NodeType::Empty && "You try to dereference empty node");
+    assert(node_->first != NodeState::Empty && "You try to dereference empty node");
 
     return node_->second.data;
   }
@@ -106,7 +106,7 @@ namespace alymova
   const std::pair< Key, Value >*
     HashConstIterator< Key, Value, Hash, KeyEqual >::operator->() const noexcept
   {
-    assert(node_->first != NodeType::Empty && "You try to dereference empty node");
+    assert(node_->first != NodeState::Empty && "You try to dereference empty node");
 
     return std::addressof(node_->second.data);
   }
@@ -119,7 +119,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   std::pair< Key, Value >& HashIterator< Key, Value, Hash, KeyEqual >::operator*() noexcept
   {
-    assert(Base::node_->first != NodeType::Empty && "You try to dereference empty node");
+    assert(Base::node_->first != NodeState::Empty && "You try to dereference empty node");
 
     return Base::node_->second.data;
   }
@@ -127,7 +127,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   std::pair< Key, Value >* HashIterator< Key, Value, Hash, KeyEqual >::operator->() noexcept
   {
-    assert(Base::node_->first != NodeType::Empty && "You try to dereference empty node");
+    assert(Base::node_->first != NodeState::Empty && "You try to dereference empty node");
 
     return std::addressof(Base::node_->second.data);
   }
