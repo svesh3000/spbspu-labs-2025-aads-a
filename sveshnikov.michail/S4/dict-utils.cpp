@@ -32,3 +32,15 @@ sveshnikov::DataTree_t sveshnikov::loadDicts(char *filename)
   }
   return data;
 }
+
+sveshnikov::CommandHolder_t sveshnikov::getCommands()
+{
+  CommandHolder_t command_holder;
+
+  command_holder["print"] = print_dict;
+  command_holder["complement"] = complement_dict;
+  command_holder["intersect"] = intersect_dict;
+  command_holder["union"] = union_dict;
+
+  return command_holder;
+}
