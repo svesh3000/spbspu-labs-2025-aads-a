@@ -31,8 +31,8 @@ namespace gavrilova {
     void clear();
 
     bool empty() const noexcept;
-    size_t size() const;
-    size_t capacity() const;
+    size_t size() const noexcept;
+    size_t capacity() const noexcept;
 
     void swap(ArrayBuffer& other) noexcept;
 
@@ -71,7 +71,7 @@ namespace gavrilova {
   }
 
   template < class T >
-  ArrayBuffer< T >::ArrayBuffer(ArrayBuffer&& other) noexcept
+  ArrayBuffer< T >::ArrayBuffer(ArrayBuffer&& other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
     data_(other.data_)
