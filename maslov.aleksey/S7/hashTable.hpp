@@ -3,6 +3,8 @@
 
 #include <functional>
 #include <boost/hash2/xxhash.hpp>
+#include "iterator.hpp"
+#include "hashNode.hpp"
 
 namespace maslov
 {
@@ -24,30 +26,20 @@ namespace maslov
     template< class InputIt >
     void insert(InputIt first, InputIt last);
     */
-    size_t computexxhash(const Key & key) const
-    {
-      HS2 hasher;
-      hasher.update(std::addressof(key), sizeof(Key));
-      return hasher.result();
-    }
    private:
-    struct Entry
-    {
-      Key key;
-      T value;
-      bool occupied = false;
-      bool deleted = false;
-    };
-    Entry * slots_;
+    HashNode< Key, T > * slots_;
     size_t capacity_;
     size_t size_;
-    float maxLoadFactor_ = 0.7;
+    float maxLoadFactor_;
+    size_t computexxhash(const Key & key) const;
   };
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity = 10):
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity):
     slots_(new Entry[capacity]),
-    capacity_(capacity)
+    capacity_(capacity),
+    size_(0),
+    maxLoadFactor_(0.7)
   {}
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -81,7 +73,7 @@ namespace maslov
     {
       return;
     }
-    Entry * tmp = new Entry[newCapacity];
+    HashNode< Key, T > * tmp = new Entry[newCapacity];
     for (size_t i = 0; i < capacity_; ++i)
     {
       if (slots_[i].occupied && !slots_[i].deleted)
@@ -106,6 +98,14 @@ namespace maslov
     delete[] slots_;
     slots_ = std::move(tmp);
     capacity_ = newCapacity;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  size_t HashTable< Key, T, HS1, HS2, EQ >::computexxhash(const Key & key) const
+  {
+    HS2 hasher;
+    hasher.update(std::addressof(key), sizeof(Key));
+    return hasher.result();
   }
 }
 
