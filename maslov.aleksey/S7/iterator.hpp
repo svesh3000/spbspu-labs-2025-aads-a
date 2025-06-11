@@ -14,8 +14,16 @@ namespace maslov
   struct HashIterator
   {
     friend struct HashTable< Key, T, HS1, HS2, EQ >;
-    using node = HashNode< Key, Node >;
+    using node = HashNode< Key, T >;
     HashIterator();
+    std::pair< Key, T > & operator*() const
+    {
+      return slots_[current_].data;
+    }
+    std::pair< Key, T > * operator->() const
+    {
+      return std::addressof(slots_[current_].data);
+    }
    private:
     explicit HashIterator(node * slots, size_t cap, size_t curr);
     node * slots_;
@@ -41,8 +49,16 @@ namespace maslov
   struct HashCIterator
   {
     friend struct HashTable< Key, T, HS1, HS2, EQ >;
-    using node = HashNode< Key, Node >;
+    using node = HashNode< Key, T >;
     HashCIterator();
+    std::pair< Key, T > & operator*() const
+    {
+      return slots_[current_].data;
+    }
+    std::pair< Key, T > * operator->() const
+    {
+      return std::addressof(slots_[current_].data);
+    }
    private:
     explicit HashCIterator(node * slots, size_t cap, size_t curr);
     node * slots_;
