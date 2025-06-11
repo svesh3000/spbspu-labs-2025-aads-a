@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(TestAtNonExistentKey)
 BOOST_AUTO_TEST_CASE(TestInsertMultipleElements)
 {
   gavrilova::TwoThreeTree< int, std::string > tree;
-  const int count = 100;
+  const int count = 500;
 
   for (int i = 0; i < count; ++i) {
     tree.insert({i, "value_" + std::to_string(i)});

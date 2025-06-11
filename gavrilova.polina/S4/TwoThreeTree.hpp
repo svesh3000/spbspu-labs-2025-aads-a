@@ -328,11 +328,27 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   typename TwoThreeTree< Key, Value, Cmp >::Iterator TwoThreeTree< Key, Value, Cmp >::find(const Key& key)
   {
-    for (auto it = begin(); it != end(); it++)
-    {
-      if (!cmp_(key, it->first) && !cmp_(it->first, key))
-      {
-        return it;
+    if (empty()) {
+      return end();
+    }
+
+    Node* current = fake_->children[0];
+    while (current != fake_) {
+      if (!cmp_(key, current->data[0].first) && !cmp_(current->data[0].first, key)) {
+        return Iterator(current, 0, fake_);
+      }
+
+      if (current->is_3_node) {
+        if (!cmp_(key, current->data[1].first) && !cmp_(current->data[1].first, key)) {
+          return Iterator(current, 1, fake_);
+        }
+      }
+      if (cmp_(key, current->data[0].first)) {
+        current = current->children[0];
+      } else if (!current->is_3_node || cmp_(key, current->data[1].first)) {
+        current = current->children[1];
+      } else {
+        current = current->children[2];
       }
     }
     return end();
@@ -341,11 +357,27 @@ namespace gavrilova {
   template < class Key, class Value, class Cmp >
   typename TwoThreeTree< Key, Value, Cmp >::ConstIterator TwoThreeTree< Key, Value, Cmp >::find(const Key& key) const
   {
-    for (auto it = cbegin(); it != cend(); it++)
-    {
-      if (!cmp_(key, it->first) && !cmp_(it->first, key))
-      {
-        return it;
+    if (empty()) {
+      return cend();
+    }
+
+    const Node* current = fake_->children[0];
+    while (current != fake_) {
+      if (!cmp_(key, current->data[0].first) && !cmp_(current->data[0].first, key)) {
+        return ConstIterator(current, 0, fake_);
+      }
+
+      if (current->is_3_node) {
+        if (!cmp_(key, current->data[1].first) && !cmp_(current->data[1].first, key)) {
+          return ConstIterator(current, 1, fake_);
+        }
+      }
+      if (cmp_(key, current->data[0].first)) {
+        current = current->children[0];
+      } else if (!current->is_3_node || cmp_(key, current->data[1].first)) {
+        current = current->children[1];
+      } else {
+        current = current->children[2];
       }
     }
     return cend();
@@ -599,16 +631,7 @@ namespace gavrilova {
     new_promo_node->parent = grand_parent;
     parent->parent = new_promo_node;
     new_right_sibling->parent = new_promo_node;
-
-    if (grand_parent != fake_) {
-      if (grand_parent->children[0] == parent) {
-        grand_parent->children[0] = new_promo_node;
-      } else if (grand_parent->children[1] == parent) {
-        grand_parent->children[1] = new_promo_node;
-      } else {
-        grand_parent->children[2] = new_promo_node;
-      }
-    }
+    
     split_and_up(new_promo_node);
   }
 
