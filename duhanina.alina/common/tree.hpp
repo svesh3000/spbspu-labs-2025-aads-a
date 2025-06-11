@@ -167,8 +167,6 @@ namespace duhanina
   {
     if (this != std::addressof(other))
     {
-      Node_t* oldFakeRoot = fakeRoot_;
-      size_t oldSize = size_;
       Node_t* newFakeRoot = nullptr;
       Node_t* newRoot = nullptr;
       try
@@ -184,8 +182,6 @@ namespace duhanina
       {
         clear(newRoot);
         delete newFakeRoot;
-        fakeRoot_ = oldFakeRoot;
-        size_ = oldSize;
         throw;
       }
     }
