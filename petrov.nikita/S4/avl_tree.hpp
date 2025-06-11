@@ -939,7 +939,7 @@ namespace petrov
   {
     if (empty())
     {
-      root_ = new node_t{ val, nullptr, nullptr, nullptr, 1 };
+      root_ = new node_t{ std::forward< Pair >(val), nullptr, nullptr, nullptr, 1 };
       size_++;
     }
     else
@@ -966,12 +966,12 @@ namespace petrov
       }
       if (Cmp{}(val.first, temp->data.first))
       {
-        temp->left = new node_t{ val, nullptr, nullptr, temp, 1 };
+        temp->left = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp, 1 };
         temp = temp->left;
       }
       else if (Cmp{}(temp->data.first, val.first))
       {
-        temp->right = new node_t{ val, nullptr, nullptr, temp, 1 };
+        temp->right = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp, 1 };
         temp = temp->right;
       }
       else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
