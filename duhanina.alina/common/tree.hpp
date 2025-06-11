@@ -176,7 +176,6 @@ namespace duhanina
         fakeRoot_ = newFakeRoot;
         setRoot(newRoot);
         size_ = other.size_;
-        delete oldFakeRoot;
       }
       catch (...)
       {
