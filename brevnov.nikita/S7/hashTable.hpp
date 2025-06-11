@@ -20,8 +20,8 @@ namespace brevnov
   {
   public:
     using value = std::pair< Key, Value >;
-    using Iterator = IteratorHash< Key, Value, Hash1, Hash2, Equal, false >;
-    using ConstIterator = IteratorHash< Key, Value, Hash1, Hash2, Equal, true >;
+    using Iterator = IteratorHash< Key, Value, Hash, Equal, false >;
+    using ConstIterator = IteratorHash< Key, Value, Hash, Equal, true >;
 
     HashTable():
       slots_(10),
