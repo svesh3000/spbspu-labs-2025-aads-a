@@ -37,7 +37,7 @@ namespace brevnov
       HashTable()
     {
       maxLoadFactor_ = table.maxLoadFactor_;
-      for (ConstIterator it = table.cbegin(); it != table.cend(); i++)
+      for (ConstIterator it = table.cbegin(); it != table.cend(); it++)
       {
         insert(*it);
       }
@@ -94,7 +94,7 @@ namespace brevnov
 
     Value& at(const Key& key)
     {
-      return const_cast< Value& >(static_cast< const HashTable< Key, Value, Hash1, Hash2, Equal > >(*this).at(key));
+      return const_cast< Value& >(static_cast< const HashTable< Key, Value, Hash, Equal > >(*this).at(key));
     }
 
     const Value& at(const Key& key) const
@@ -381,7 +381,7 @@ namespace brevnov
       {
         return;
       }
-      HashTable< Key, Value, Hash1, Equal > newTable(count);
+      HashTable< Key, Value, Hash, Equal > newTable(count);
       newTable.insert(this->cbegin(), this->cend());
       swap(newTable);
     }
