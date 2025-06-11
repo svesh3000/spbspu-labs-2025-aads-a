@@ -43,7 +43,7 @@ template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(const UnorderedBase& rhs):
   UnorderedBase(rhs.capacity_, rhs.hash_, rhs.equal_)
 {
-  insert(begin(), end());
+  insert(rhs.begin(), rhs.end());
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase

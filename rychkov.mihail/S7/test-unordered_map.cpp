@@ -1,9 +1,9 @@
 #include <stdexcept>
 #include <iterator>
 #include <boost/test/unit_test.hpp>
+#include <mem_checker.hpp>
 #include <unordered_map.hpp>
 #include <unordered_set.hpp>
-#include <mem_checker.hpp>
 
 BOOST_AUTO_TEST_SUITE(S7_traverse_test)
 
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(traverse_stability_test)
   for (int i = 0; i < input_size; i++)
   {
     BOOST_TEST((*set.insert(set.end(), i) == i));
-    BOOST_TEST((*set.insert(i).first == i));
+    BOOST_TEST((*set.insert(set.end(), i) == i));
   }
   size_t counts[input_size]{};
   for (rychkov::MemChecker< Wrapper > i: set)
