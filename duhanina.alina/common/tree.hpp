@@ -1032,9 +1032,9 @@ namespace duhanina
     Node_t* newNode = nullptr;
     try
     {
+      newNode = new Node_t(node->data.first, node->data.second, parent);
       left_copy = copyTree(node->left, nullptr);
       right_copy = copyTree(node->right, nullptr);
-      newNode = new Node_t(node->data.first, node->data.second, parent);
       newNode->left = left_copy;
       newNode->right = right_copy;
       if (left_copy)
