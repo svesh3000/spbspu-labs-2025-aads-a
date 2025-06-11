@@ -8,14 +8,14 @@
 namespace gavrilova {
 
   template < class Key, class Value, class Cmp >
-  struct Iterator: public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > > {
-    using this_t = Iterator< Key, Value, Cmp >;
+  struct IteratorTTT: public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > > {
+    using this_t = IteratorTTT< Key, Value, Cmp >;
     using Node = NodeTwoThreeTree< Key, Value >;
     using value_type = std::pair< Key, Value >;
 
-    Iterator();
-    ~Iterator() = default;
-    Iterator(const this_t&) = default;
+    IteratorTTT();
+    ~IteratorTTT() = default;
+    IteratorTTT(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++() noexcept;
@@ -36,28 +36,28 @@ namespace gavrilova {
 
     friend class TwoThreeTree< Key, Value, Cmp >;
     friend class ConstIterator< Key, Value, Cmp >;
-    explicit Iterator(Node* node, int key_pos, Node* fake);
+    explicit IteratorTTT(Node* node, int key_pos, Node* fake);
 
     Node* go_min(Node* start) const;
     Node* go_max(Node* start) const;
   };
 
   template < class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp >::Iterator():
+  IteratorTTT< Key, Value, Cmp >::IteratorTTT():
     node_(nullptr),
     key_pos_(0),
     fake_(nullptr)
   {}
 
   template < class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp >::Iterator(Node* node, int key_pos, Node* fake):
+  IteratorTTT< Key, Value, Cmp >::IteratorTTT(Node* node, int key_pos, Node* fake):
     node_(node),
     key_pos_(key_pos),
     fake_(fake)
   {}
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::this_t& Iterator< Key, Value, Cmp >::operator++() noexcept
+  typename IteratorTTT< Key, Value, Cmp >::this_t& IteratorTTT< Key, Value, Cmp >::operator++() noexcept
   {
     if (node_->is_fake) {
       key_pos_ = 0;
@@ -94,7 +94,7 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::this_t Iterator< Key, Value, Cmp >::operator++(int) noexcept
+  typename IteratorTTT< Key, Value, Cmp >::this_t IteratorTTT< Key, Value, Cmp >::operator++(int) noexcept
   {
     this_t temp(*this);
     ++(*this);
@@ -102,7 +102,7 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::this_t& Iterator< Key, Value, Cmp >::operator--() noexcept
+  typename IteratorTTT< Key, Value, Cmp >::this_t& IteratorTTT< Key, Value, Cmp >::operator--() noexcept
   {
     assert(node_);
     if (node_->is_fake) {
@@ -142,7 +142,7 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::this_t Iterator< Key, Value, Cmp >::operator--(int) noexcept
+  typename IteratorTTT< Key, Value, Cmp >::this_t IteratorTTT< Key, Value, Cmp >::operator--(int) noexcept
   {
     this_t temp(*this);
     --(*this);
@@ -150,33 +150,33 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::value_type& Iterator< Key, Value, Cmp >::operator*() const
+  typename IteratorTTT< Key, Value, Cmp >::value_type& IteratorTTT< Key, Value, Cmp >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data[key_pos_];
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::value_type* Iterator< Key, Value, Cmp >::operator->() const
+  typename IteratorTTT< Key, Value, Cmp >::value_type* IteratorTTT< Key, Value, Cmp >::operator->() const
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data[key_pos_]);
   }
 
   template < class Key, class Value, class Cmp >
-  bool Iterator< Key, Value, Cmp >::operator==(const this_t& rhs) const
+  bool IteratorTTT< Key, Value, Cmp >::operator==(const this_t& rhs) const
   {
     return node_ == rhs.node_ && key_pos_ == rhs.key_pos_;
   }
 
   template < class Key, class Value, class Cmp >
-  bool Iterator< Key, Value, Cmp >::operator!=(const this_t& rhs) const
+  bool IteratorTTT< Key, Value, Cmp >::operator!=(const this_t& rhs) const
   {
     return !(*this == rhs);
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::Node* Iterator< Key, Value, Cmp >::go_min(Node* start) const
+  typename IteratorTTT< Key, Value, Cmp >::Node* IteratorTTT< Key, Value, Cmp >::go_min(Node* start) const
   {
     Node* cur = start;
     while (!cur->is_leaf()) {
@@ -186,7 +186,7 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename Iterator< Key, Value, Cmp >::Node* Iterator< Key, Value, Cmp >::go_max(Node* start) const
+  typename IteratorTTT< Key, Value, Cmp >::Node* IteratorTTT< Key, Value, Cmp >::go_max(Node* start) const
   {
     Node* cur = start;
     while (!cur->is_leaf()) {

@@ -30,7 +30,7 @@ namespace gavrilova {
     void pop_back();
     void clear();
 
-    bool empty() const;
+    bool empty() const noexcept;
     size_t size() const;
     size_t capacity() const;
 
@@ -55,11 +55,11 @@ namespace gavrilova {
   {}
 
   template < class T >
-  ArrayBuffer< T >::ArrayBuffer(const ArrayBuffer& other)
+  ArrayBuffer< T >::ArrayBuffer(const ArrayBuffer& other):
+    size_(other.size_),
+    capacity_(other.capacity_),
+    data_(new T[capacity_])
   {
-    size_ = other.size_;
-    capacity_ = other.capacity_;
-    data_ = new T[capacity_];
     for (size_t i = 0; i < size_; ++i) {
       try {
         data_[i] = other.data_[i];
@@ -72,10 +72,10 @@ namespace gavrilova {
 
   template < class T >
   ArrayBuffer< T >::ArrayBuffer(ArrayBuffer&& other) noexcept
+    size_(other.size_),
+    capacity_(other.capacity_),
+    data_(other.data_)
   {
-    size_ = other.size_;
-    capacity_ = other.capacity_;
-    data_ = other.data_;
     other.size_ = 0;
     other.capacity_ = 0;
     other.data_ = nullptr;
@@ -196,19 +196,19 @@ namespace gavrilova {
   }
 
   template < class T >
-  bool ArrayBuffer< T >::empty() const
+  bool ArrayBuffer< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template < class T >
-  size_t ArrayBuffer< T >::size() const
+  size_t ArrayBuffer< T >::size() const noexcept
   {
     return size_;
   }
 
   template < class T >
-  size_t ArrayBuffer< T >::capacity() const
+  size_t ArrayBuffer< T >::capacity() const noexcept
   {
     return capacity_;
   }

@@ -12,11 +12,11 @@ namespace gavrilova {
     using this_t = ConstIterator< Key, Value, Cmp >;
     using Node = NodeTwoThreeTree< Key, Value >;
     using value_type = const std::pair< Key, Value >;
-    using Iterator = Iterator< Key, Value, Cmp >;
+    using Iterator = IteratorTTT< Key, Value, Cmp >;
 
     ConstIterator();
     ConstIterator(const this_t&) = default;
-    ConstIterator(const Iterator& other);
+    ConstIterator(const Iterator& other) noexcept;
     ~ConstIterator() = default;
     this_t& operator=(const this_t&) = default;
 
@@ -37,9 +37,9 @@ namespace gavrilova {
     const Node* fake_;
 
     friend class TwoThreeTree< Key, Value, Cmp >;
-    friend class Iterator< Key, Value, Cmp >;
+    friend class IteratorTTT< Key, Value, Cmp >;
     explicit ConstIterator(const Node* node, int key_pos, const Node* fake);
-            
+
     const Node* go_min(const Node* start) const;
     const Node* go_max(const Node* start) const;
   };

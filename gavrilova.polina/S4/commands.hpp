@@ -1,17 +1,25 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-#include <cstring>
-#include <iostream>
-#include <map>
 
-namespace gavrilova
-{
-  using TreeKey = std::map< size_t, std::string >;
-  using DataTree = std::map< std::string, TreeKey >;
-  void print_dataset(std::ostream& out, std::string named, DataTree& dataset);
-  void complement(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees);
-  void intersect(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees);
-  void union_data(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees);
+#include <iostream>
+#include "ConstIterator.hpp"
+#include "Iterator.hpp"
+#include "TwoThreeTree.hpp"
+
+namespace gavrilova {
+  using KeyMap = TwoThreeTree< size_t, std::string >;
+  using Dataset = TwoThreeTree< std::string, KeyMap >;
+
+  void printDataset(std::ostream& out, const std::string& datasetName, Dataset& datasets);
+
+  void complementDataset(const std::string& newDatasetName, const std::string& firstDatasetName,
+      const std::string& secondDatasetName, Dataset& datasets);
+
+  void intersectDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
+      const std::string& secondDatasetName, Dataset& datasets);
+
+  void unionDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
+      const std::string& secondDatasetName, Dataset& datasets);
 }
 
 #endif

@@ -1,82 +1,70 @@
 #include "commands.hpp"
+#include <stdexcept>
 
-void gavrilova::print_dataset(std::ostream& out, std::string named, DataTree& dataset)
-{
-  TreeKey& tree = dataset.at(named);
-  if (tree.empty())
-  {
-    out << "<EMPTY>\n";
-    return;
-  }
-  out << named;
-  for (auto it = tree.cbegin(); it != tree.cend(); it++)
-  {
-    std::pair< size_t, std::string > now = *it;
-    out << " " << now.first << " " << now.second;
-  }
-  out << "\n";
-}
+namespace gavrilova {
 
-void gavrilova::complement(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees)
-{
-  TreeKey new_tree;
-  TreeKey& tree1 = set_trees.at(name_tree1);
-  TreeKey& tree2 = set_trees.at(name_tree2);
-  for (auto it = tree1.cbegin(); it != tree1.cend(); it++)
+  void printDataset(std::ostream& out, const std::string& datasetName, Dataset& datasets)
   {
-    if (tree2.find(it->first) == tree2.end())
-    {
-      std::pair< size_t, std::string > now = *it;
-      new_tree.insert(now);
+    const KeyMap& data = datasets.at(datasetName);
+    if (data.empty()) {
+      out << "<EMPTY>\n";
+      return;
     }
-  }
-  set_trees[name_new_tree] = new_tree;
-}
 
-void gavrilova::intersect(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees)
-{
-  TreeKey new_tree;
-  TreeKey& tree1 = set_trees.at(name_tree1);
-  TreeKey& tree2 = set_trees.at(name_tree2);
-  for (auto it = tree1.cbegin(); it != tree1.cend(); it++)
-  {
-    if (tree2.find(it->first) != tree2.end())
-    {
-      std::pair< size_t, std::string > now = *it;
-      new_tree.insert(now);
+    out << datasetName;
+    for (auto it = data.cbegin(); it != data.cend(); it++) {
+      out << " " << it->first << " " << it->second;
     }
+    out << "\n";
   }
-  set_trees[name_new_tree] = new_tree;
-}
 
-void gavrilova::union_data(std::string name_new_tree, std::string name_tree1, std::string name_tree2, DataTree& set_trees)
-{
-  TreeKey new_tree;
-  TreeKey& tree1 = set_trees.at(name_tree1);
-  TreeKey& tree2 = set_trees.at(name_tree2);
-  for (auto it = tree1.cbegin(); it != tree1.cend(); it++)
+  void complementDataset(const std::string& newDatasetName,
+      const std::string& firstDatasetName,
+      const std::string& secondDatasetName,
+      Dataset& datasets)
   {
-    if (tree2.find(it->first) == tree2.end())
-    {
-      std::pair< size_t, std::string > now = *it;
-      new_tree.insert(now);
+    KeyMap newDataset;
+    const auto& firstDataset = datasets.at(firstDatasetName);
+    const auto& secondDataset = datasets.at(secondDatasetName);
+
+    for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); it++) {
+      if (secondDataset.find(it->first) == secondDataset.end()) {
+        newDataset.insert(*it);
+      }
     }
+
+    datasets[newDatasetName] = std::move(newDataset);
   }
-  for (auto it = tree2.cbegin(); it != tree2.cend(); it++)
+
+  void intersectDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
+      const std::string& secondDatasetName, Dataset& datasets)
   {
-    if (tree1.find(it->first) == tree1.end())
-    {
-      std::pair< size_t, std::string > now = *it;
-      new_tree.insert(now);
+    KeyMap newDataset;
+    const auto& firstDataset = datasets.at(firstDatasetName);
+    const auto& secondDataset = datasets.at(secondDatasetName);
+
+    for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); it++) {
+      if (secondDataset.find(it->first) != secondDataset.end()) {
+        newDataset.insert(*it);
+      }
     }
+
+    datasets[newDatasetName] = std::move(newDataset);
   }
-  for (auto it = tree1.cbegin(); it != tree1.cend(); it++)
+
+  void unionDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
+      const std::string& secondDatasetName, Dataset& datasets)
   {
-    if (tree2.find(it->first) != tree2.end())
-    {
-      std::pair< size_t, std::string > now = *it;
-      new_tree.insert(now);
+    KeyMap newDataset;
+    const auto& firstDataset = datasets.at(firstDatasetName);
+    const auto& secondDataset = datasets.at(secondDatasetName);
+
+    for (const auto& dataset: {firstDataset, secondDataset}) {
+      for (auto it = dataset.cbegin(); it != dataset.cend(); it++) {
+        newDataset.insert(std::make_pair(it->first, it->second));
+      }
     }
+    datasets[newDatasetName] = std::move(newDataset);
   }
-  set_trees[name_new_tree] = new_tree;
+
 }
