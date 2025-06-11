@@ -15,20 +15,54 @@ std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::const_
   for (size_type i = 0; (data_[slot].first != ~0ULL) && (data_[slot].first >= i); i++,
         slot = (++slot < capacity_ ? slot : slot - capacity_))
   {
-    if ((data_[slot].first == i) && equal_(get_key(data_[slot + i].second), key))
+    if ((data_[slot].first == i) && equal_(get_key(data_[slot].second), key))
     {
       return {{data_ + slot, data_ + capacity_}, IsMulti};
     }
   }
   return {{data_ + slot, data_ + capacity_}, true};
 }
-/*
+
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 template< class K1 >
 std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::const_iterator, bool >
-    rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::correct_hint(const_iterator hint, const K1& key) const
+    rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::correct_hint(const_iterator hint, const K1& key)
 {
-}*/
+  if (extend(size_ + 1))
+  {
+    return find_hint_pair(key);
+  }
+  if (hint.data_ == hint.end_)
+  {
+    hint.data_--;
+  }
+  size_type slot = hash_(key) % capacity_, psl = hint.data_ - data_;
+  psl = (psl >= slot ? psl - slot : psl + capacity_ - slot);
+  if ((hint.data_->first != ~0ULL) && (hint.data_->first >= psl))
+  {
+    for (; (hint.data_->first != ~0ULL) && (hint.data_->first >= psl); psl++,
+          hint.data_ = (++hint.data_ == hint.end_ ? data_ : hint.data_))
+    {
+      if ((hint.data_->first == psl) && equal_(get_key(hint.data_->second), key))
+      {
+        return {hint, IsMulti};
+      }
+    }
+    return {hint, true};
+  }
+  stored_value* prev = hint.data_;
+  while (((hint.data_->first == ~0ULL) || (hint.data_->first <= psl)) && (psl != 0))
+  {
+    hint.data_ = (hint.data_ == data_ ? hint.end_ - 1 : hint.data_ - 1);
+    --psl;
+    prev = ((hint.data_->first < psl) || (hint.data_->first == ~0ULL) ? hint.data_ : prev);
+    if ((hint.data_->first == psl) && equal_(get_key(hint.data_->second), key))
+    {
+      return {hint, IsMulti};
+    }
+  }
+  return {{prev, hint.end_}, true};
+}
 
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 template< class... Args >
@@ -162,7 +196,7 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::insert(InputIter from
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::insert(std::initializer_list< value_type > list)
 {
-  reserve(size_ + list.size());
+  extend(size_ + list.size());
   insert(list.begin(), list.end());
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >

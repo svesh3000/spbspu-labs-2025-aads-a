@@ -198,7 +198,6 @@ namespace rychkov
     stored_value* data_;
     unsigned char* raw_;
     stored_value* cached_begin_;
-    stored_value* cached_rbegin_;
     hasher hash_;
     key_equal equal_;
 
@@ -209,16 +208,13 @@ namespace rychkov
     size_type count_impl(const K1& key) const;
     template< class K1 >
     const_iterator find_impl(const K1& key) const;
+
     template< class K1 >
     std::pair< const_iterator, bool > find_hint_pair(const K1& key) const;
     template< class K1 >
-    std::pair< const_iterator, bool > correct_hint(const_iterator hint, const K1& key) const;
-
+    std::pair< const_iterator, bool > correct_hint(const_iterator hint, const K1& key);
     template< class... Args >
     std::pair< iterator, bool > emplace_hint_impl(std::pair< const_iterator, bool > hint, Args&&... args);
-    template< bool IsSet2 = IsSet, class K1, class... Args >
-    std::enable_if_t< IsSet && IsSet2, std::pair< iterator, bool > > emplace_impl
-        (const_iterator hint, K1&& key, Args&&... args);
 
     template< class V = value_type >
     static const key_type& get_key(const V& value);

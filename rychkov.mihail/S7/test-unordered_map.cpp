@@ -1,7 +1,9 @@
 #include <stdexcept>
+#include <iterator>
 #include <boost/test/unit_test.hpp>
 #include <unordered_map.hpp>
 #include <unordered_set.hpp>
+#include <mem_checker.hpp>
 
 BOOST_AUTO_TEST_SUITE(S7_traverse_test)
 
@@ -51,6 +53,7 @@ BOOST_AUTO_TEST_CASE(multiset_test)
         BOOST_TEST(set.count(i) == counts[i]);
       }
       BOOST_TEST(set.size() == size);
+      BOOST_TEST(std::distance(set.begin(), set.end()) == size);
     }
   };
   erasor erase{set};
@@ -88,6 +91,44 @@ BOOST_AUTO_TEST_CASE(map_test)
   BOOST_TEST(map[9] == '9');
   BOOST_CHECK_THROW(map.at(3), std::out_of_range);
   BOOST_CHECK_THROW(map.at(8), std::out_of_range);
+}
+BOOST_AUTO_TEST_CASE(traverse_stability_test)
+{
+  struct Wrapper
+  {
+    int value;
+    Wrapper(int v):
+      value(v)
+    {}
+    bool operator==(int rhs) const noexcept
+    {
+      return value == rhs;
+    }
+    operator int() const noexcept
+    {
+      return value;
+    }
+  };
+
+  rychkov::MemTrack< Wrapper > observer{};
+  rychkov::UnorderedSet< rychkov::MemChecker< Wrapper >, rychkov::Hash< int > > set;
+  constexpr int input_size = 1000;
+  for (int i = 0; i < input_size; i++)
+  {
+    BOOST_TEST((*set.insert(set.end(), i) == i));
+    BOOST_TEST((*set.insert(i).first == i));
+  }
+  size_t counts[input_size]{};
+  for (rychkov::MemChecker< Wrapper > i: set)
+  {
+    BOOST_TEST(i.value >= 0);
+    BOOST_TEST(i.value < input_size);
+    counts[i.value]++;
+  }
+  for (int i = 0; i < input_size; i++)
+  {
+    BOOST_TEST(counts[i] == 1);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

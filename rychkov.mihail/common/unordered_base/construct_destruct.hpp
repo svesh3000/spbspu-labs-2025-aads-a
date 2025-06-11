@@ -13,8 +13,7 @@ rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase()
   max_factor_{default_max_factor},
   data_{nullptr},
   raw_{nullptr},
-  cached_begin_{nullptr},
-  cached_rbegin_{nullptr}
+  cached_begin_{nullptr}
 {}
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(size_type cnt, hasher hash, key_equal eq):
@@ -24,7 +23,6 @@ rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(size_type cn
   data_{nullptr},
   raw_{nullptr},
   cached_begin_{nullptr},
-  cached_rbegin_{nullptr},
   hash_{std::move(hash)},
   equal_{std::move(eq)}
 {
@@ -38,7 +36,6 @@ rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::UnorderedBase(UnorderedBas
   data_{std::exchange(rhs.data_, nullptr)},
   raw_{std::exchange(rhs.raw_, nullptr)},
   cached_begin_{std::exchange(rhs.cached_begin_, nullptr)},
-  cached_rbegin_{std::exchange(rhs.cached_rbegin_, nullptr)},
   hash_{std::move(rhs.hash_)},
   equal_{std::move(rhs.equal_)}
 {}
@@ -118,7 +115,6 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::swap(UnorderedBase& r
   std::swap(data_, rhs.data_);
   std::swap(raw_, rhs.raw_);
   std::swap(cached_begin_, rhs.cached_begin_);
-  std::swap(cached_rbegin_, rhs.cached_rbegin_);
 }
 template< class K, class T, class H, class E, bool IsSet, bool IsMulti >
 void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::clear() noexcept
@@ -142,7 +138,6 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::clear() noexcept
   raw_ = nullptr;
   data_ = nullptr;
   cached_begin_ = nullptr;
-  cached_rbegin_ = nullptr;
 }
 
 #endif

@@ -22,6 +22,7 @@ void rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::allocate(size_type ne
   data_ = reinterpret_cast< stored_value* >(reinterpret_cast< size_t >(raw_ + alignof(stored_value) - 1)
         & ~(alignof(stored_value) - 1));
   capacity_ = new_capacity;
+  cached_begin_ = data_ + capacity_;
   for (size_type i = 0; i < capacity_; i++)
   {
     new(&data_[i].first) size_type{~0ULL};
@@ -93,10 +94,6 @@ std::pair< typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterat
   {
     cached_begin_ = hint.first.data_;
   }
-  if ((cached_rbegin_ == nullptr) || (hint.first.data_ > cached_rbegin_))
-  {
-    cached_rbegin_ = hint.first.data_;
-  }
   size_++;
   return {result, true};
 }
@@ -129,6 +126,10 @@ typename rychkov::UnorderedBase< K, T, H, E, IsSet, IsMulti >::iterator
 
       if ((pos.data_->first == ~0ULL) || (pos.data_->first == 0))
       {
+        if (prev == cached_begin_)
+        {
+          cached_begin_ = (++begin()).data_;
+        }
         size_--;
         if (result.data_->first == ~0ULL)
         {
