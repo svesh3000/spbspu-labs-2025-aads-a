@@ -57,6 +57,9 @@ namespace brevnov
     void assign(InputIter first, InputIter last);
     void assign(std::initializer_list< T >);
 
+    Iter erase(ConstIter) noexcept;
+    Iter erase(ConstIter first, ConstIter last) noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
   private:
@@ -426,6 +429,40 @@ namespace brevnov
   {
     List< T > list(il);
     swap(list);
+  }
+
+  template< typename T >
+  typename List< T >::Iter List< T >::erase(ConstIter pos) noexcept
+  {
+    Iter it(pos.node_->next);
+    if (pos == cbegin())
+    {
+      head_ = head_->next;
+      pos.node_->next->prev = nullptr;
+    }
+    else if (pos.node_ == end_->prev)
+    {
+      end_->prev = pos.node_->prev;
+      pos.node_->prev->next = nullptr;
+    }
+    else
+    {
+      pos.node_->prev->next = pos.node_->next;
+      pos.node_->next->prev = pos.node_->prev;
+    }
+    delete pos.node_;
+    size_--;
+    return it;
+  }
+
+  template< typename T >
+  typename List< T >::Iter List< T >::erase(ConstIter first, ConstIter last) noexcept
+  {
+    for (; first != last;)
+    {
+      first = erase(first);
+    }
+    return Iter(last.node_);
   }
 }
 #endif
