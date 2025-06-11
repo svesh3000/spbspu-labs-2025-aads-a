@@ -631,7 +631,7 @@ namespace gavrilova {
     new_promo_node->parent = grand_parent;
     parent->parent = new_promo_node;
     new_right_sibling->parent = new_promo_node;
-    
+
     split_and_up(new_promo_node);
   }
 
