@@ -249,10 +249,10 @@ namespace alymova
   template< class... Args >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::emplace(Args&&... args)
   {
-    if (size_ > max_load_factor_ * capacity_)
+    /*if (size_ > max_load_factor_ * capacity_)
     {
       rehash();
-    }
+    }*/
     ValueType value(std::forward< Args >(args)...);
     size_t home_index = get_home_index(value.first);
     ConstIterator hint(array_ + home_index, array_ + capacity_);
@@ -264,10 +264,6 @@ namespace alymova
   HashIterator< Key, Value, Hash, KeyEqual >
     HashTable< Key, Value, Hash, KeyEqual >::emplace_hint(ConstIterator hint, Args&&... args)
   {
-    if (size_ > max_load_factor_ * capacity_)
-    {
-      rehash();
-    }
     ValueType value(std::forward< Args >(args)...);
     size_t home_index = hint.node_ - array_;
     if (hint == end())
@@ -276,7 +272,13 @@ namespace alymova
     }
     Node node{value, 0};
     size_++;
-    return insert_node(home_index, node);
+    Iterator res = insert_node(home_index, node);
+    if (size_ > max_load_factor_ * capacity_)
+    {
+      rehash();
+      return find(value.first);
+    }
+    return res;
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
@@ -293,6 +295,7 @@ namespace alymova
   template< class Key, class Value, class Hash, class KeyEqual >
   HashIterator< Key, Value, Hash, KeyEqual > HashTable< Key, Value, Hash, KeyEqual >::erase(Iterator pos)
   {
+    assert(size_ != 0 && "You try to delete from empty container");
     assert(pos != end() && "You try to delete beyond table's bound");
 
     pos.node_->first = NodeType::Empty;
@@ -315,6 +318,7 @@ namespace alymova
     {
       ++pos;
     }
+    size_--;
     return pos;
   }
 
