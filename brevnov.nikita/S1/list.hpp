@@ -15,8 +15,8 @@ namespace brevnov
     List(size_t n, const T& val);
     List(const List< T > & copy);
     List(List< T > && del);
-    template< typename InputIterator >
-    List(InputIterator begin, InputIterator end);
+    template< typename InputIter >
+    List(InputIter begin, InputIter end);
     List(std::initializer_list< T > il);
     ~List();
 
@@ -51,6 +51,11 @@ namespace brevnov
 
     void clear();
     void swap(List< T > & hl);
+
+    void assign(size_t, const T&);
+    template< typename InputIter >
+    void assign(InputIter first, InputIter last);
+    void assign(std::initializer_list< T >);
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -117,8 +122,8 @@ namespace brevnov
   }
 
   template< typename T >
-  template< typename InputIterator >
-  List< T >::List(InputIterator begin, InputIterator end):
+  template< typename InputIter >
+  List< T >::List(InputIter begin, InputIter end):
     List()
   {
     try
@@ -383,5 +388,44 @@ namespace brevnov
     return false;
   }
 
+  template< typename T >
+  bool List< T >::operator>(const List< T >& list) const
+  {
+    return list < *this;
+  }
+
+  template< typename T >
+  bool List< T >::operator<=(const List< T >& list) const
+  {
+    return !(*this > list);
+  }
+
+  template< typename T >
+  bool List< T >::operator>=(const List<T>& list) const
+  {
+    return !(*this < list);
+  }
+
+  template< typename T >
+  void List< T >::assign(size_t count, const T& data)
+  {
+    List< T > list(count, data);
+    swap(list);
+  }
+
+  template< typename T >
+  template< typename InputIter >
+  void List< T >::assign(InputIter first, InputIter last)
+  {
+    List< T > list(first, last);
+    swap(list);
+  }
+
+  template< typename T >
+  void List< T >::assign(std::initializer_list< T > il)
+  {
+    List< T > list(il);
+    swap(list);
+  }
 }
 #endif
