@@ -14,10 +14,11 @@ namespace maslov
     bool empty() const noexcept;
     size_t size() const noexcept;
     float loadFactor() const;
-    /*T & at( const Key & key );
-    const T & at( const Key & key ) const;
-    T & operator[]( const Key & key );
-    T & operator[]( Key && key );
+    void rehash(size_t newCapacity);
+    /*T & at(const Key & key);
+    const T & at(const Key & key) const;
+    T & operator[](const Key & key);
+    T & operator[](Key && key);
     void clear() noexcept;
     std::pair< iterator, bool > insert(const T & value);
     template< class InputIt >
@@ -34,20 +35,19 @@ namespace maslov
     {
       Key key;
       T value;
-      bool occupied;
-      bool deleted;
+      bool occupied = false;
+      bool deleted = false;
     };
     Entry * slots_;
     size_t capacity_;
     size_t size_;
-    float maxLoadFactor_;
+    float maxLoadFactor_ = 0.7;
   };
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity = 1):
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity = 10):
     slots_(new Entry[capacity]),
-    capacity_(capacity),
-    maxLoadFactor_(1.0)
+    capacity_(capacity)
   {}
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -72,6 +72,40 @@ namespace maslov
   float HashTable< Key, T, HS1, HS2, EQ >::loadFactor() const
   {
     return static_cast< float >(size_) / capacity_;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  void HashTable< Key, T, HS1, HS2, EQ >::rehash(size_t newCapacity)
+  {
+    if (newCapacity <= capacity_)
+    {
+      return;
+    }
+    Entry * tmp = new Entry[newCapacity];
+    for (size_t i = 0; i < capacity_; ++i)
+    {
+      if (slots_[i].occupied && !slots_[i].deleted)
+      {
+        const Key & key = slots_[i].key;
+        const T & value = slots_[i].value;
+        size_t h1 = HS1{}(key) % newCapacity;
+        size_t h2 = computexxhash(key) % (newCapacity - 1) + 1;
+        for (size_t j = 0; j < newCapacity; ++j)
+        {
+          size_t index = (h1 + j * h2) % newCapacity;
+          if (!tmp[index].occupied)
+          {
+            tmp[index].key = key;
+            tmp[index].value = value;
+            tmp[index].occupied = true;
+            break;
+          }
+        }
+      }
+    }
+    delete[] slots_;
+    slots_ = std::move(tmp);
+    capacity_ = newCapacity;
   }
 }
 
