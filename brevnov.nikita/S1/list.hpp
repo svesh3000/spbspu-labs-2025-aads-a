@@ -25,6 +25,11 @@ namespace brevnov
     List< T > & operator=(std::initializer_list< T > il);
 
     bool operator==(const List< T >&) const;
+    bool operator!=(const List< T >&) const;
+    bool operator<(const List< T >&) const;
+    bool operator>(const List< T >&) const;
+    bool operator<=(const List< T >&) const;
+    bool operator>=(const List< T >&) const;
 
     Iter begin() noexcept;
     ConstIter cbegin() const noexcept;
@@ -352,6 +357,28 @@ namespace brevnov
         }
       }
       return true;
+    }
+    return false;
+  }
+
+  template< typename T >
+  bool List< T >::operator!=(const List<T>& list) const
+  {
+    return !(*this == list);
+  }
+
+  template< typename T >
+  bool List< T >::operator<(const List< T >& list) const
+  {
+    size_t min = std::min(size_, list.size_);
+    ConstIter thisIt = cbegin();
+    ConstIter otherIt = list.cbegin();
+    for (size_t i = 0; i < min; ++i, ++thisIt, ++otherIt)
+    {
+      if (*thisIt != *otherIt)
+      {
+        return *thisIt < * otherIt;
+      }
     }
     return false;
   }
