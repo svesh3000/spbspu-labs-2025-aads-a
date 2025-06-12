@@ -65,7 +65,7 @@ namespace alymova
 
     float load_factor() const noexcept;
     float max_load_factor() const noexcept;
-    void max_load_factor(float mlf) noexcept;
+    void max_load_factor(float mlf);
     void rehash();
   private:
     enum NodeState: int {Empty, Fill};
@@ -322,6 +322,7 @@ namespace alymova
       {
         prev = capacity_ - 1;
       }
+      array_[i].second.psl--;
       std::swap(array_[i], array_[prev]);
       i = (i + 1) % capacity_;
     }
@@ -383,6 +384,10 @@ namespace alymova
   {
     size_t psl = 0;
     size_t home_index = get_home_index(key);
+    if (array_[home_index].first == NodeState::Empty)
+    {
+      return end();
+    }
     if (equal_(array_[home_index].second.get_key(), key))
     {
       return ConstIterator{array_ + home_index, array_ + capacity_};
@@ -435,7 +440,7 @@ namespace alymova
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >
-  void HashTable< Key, Value, Hash, KeyEqual >::max_load_factor(float mlf) noexcept
+  void HashTable< Key, Value, Hash, KeyEqual >::max_load_factor(float mlf)
   {
     max_load_factor_ = mlf;
     if (size_ > capacity_ * max_load_factor_)
@@ -486,7 +491,7 @@ namespace alymova
     node_t.second.psl++;
     for (size_t i = (home_index + 1) % capacity_; i != home_index; i = (i + 1) % capacity_)
     {
-      if (node_t.first == NodeState::Empty)
+      if (array_[i].first == NodeState::Empty)
       {
         node_t.swap(array_[i]);
         return {i, node_t};
