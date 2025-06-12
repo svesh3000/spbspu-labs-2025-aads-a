@@ -52,10 +52,6 @@ void maslevtsov::print_outbound(const graphs_map_t& graphs, std::istream& in, st
   }
   Tree< std::string, Vector< unsigned > > outbound = graph.get_outbound(vertice_name);
   for (auto i = outbound.cbegin(); i != outbound.cend(); ++i) {
-    if (i->second.empty()) {
-      out << '\n';
-      break;
-    }
     out << i->first << ' ';
     print_vector(i->second, out);
     out << '\n';
@@ -72,10 +68,6 @@ void maslevtsov::print_inbound(const graphs_map_t& graphs, std::istream& in, std
   }
   Tree< std::string, Vector< unsigned > > inbound = graph.get_inbound(vertice_name);
   for (auto i = inbound.cbegin(); i != inbound.cend(); ++i) {
-    if (i->second.empty()) {
-      out << '\n';
-      break;
-    }
     out << i->first << ' ';
     print_vector(i->second, out);
     out << '\n';

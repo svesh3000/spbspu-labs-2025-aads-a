@@ -63,7 +63,7 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
 {
   Tree< std::string, Vector< unsigned > > outbound;
   for (auto i = edges_set_.cbegin(); i != edges_set_.cend(); ++i) {
-    if (i->first.first == vertice) {
+    if (i->first.first == vertice && !i->second.empty()) {
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
         outbound[i->first.second].push_back(*j);
       }
@@ -78,7 +78,7 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
 {
   Tree< std::string, Vector< unsigned > > outbound;
   for (auto i = edges_set_.cbegin(); i != edges_set_.cend(); ++i) {
-    if (i->first.second == vertice) {
+    if (i->first.second == vertice && !i->second.empty()) {
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
         outbound[i->first.first].push_back(*j);
       }
