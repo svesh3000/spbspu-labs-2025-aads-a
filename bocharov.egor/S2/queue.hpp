@@ -11,8 +11,6 @@ namespace bocharov
   public:
     T & front();
     const T & front() const;
-    T & back();
-    const T & back() const;
 
     void pop() noexcept;
     void push(const T &);
@@ -36,18 +34,6 @@ namespace bocharov
   const T & Queue< T >::front() const
   {
     return arr_.front();
-  }
-
-  template< typename T >
-  T & Queue< T >::back()
-  {
-    return arr_.back();
-  }
-
-  template< typename T >
-  const T & Queue< T >::back() const
-  {
-    return arr_.back();
   }
 
   template< typename T >

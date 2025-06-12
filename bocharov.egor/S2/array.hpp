@@ -34,7 +34,7 @@ namespace bocharov
 
   private:
 
-    T ** data_;
+    T * data_;
     size_t capacity_;
     size_t size_;
     size_t begin_;
@@ -50,7 +50,7 @@ namespace bocharov
     Array< T > newArray(newCapacity);
     for (size_t i = 0; i < size_; ++i)
     {
-      newArray.push(*data_[i + begin_]);
+      newArray.push(data_[i + begin_]);
     }
     swap(newArray);
   }
@@ -58,10 +58,6 @@ namespace bocharov
   template< typename T >
   void Array< T >::clear() noexcept
   {
-    while(!empty())
-    {
-      popFront();
-    }
     size_ = 0;
     begin_ = 0;
   }
@@ -82,12 +78,12 @@ namespace bocharov
     size_(0),
     begin_(0)
   {
-    data_ = new T * [capacity_];
+    data_ = new T [capacity_];
   }
 
   template< typename T >
   Array< T >::Array(const Array< T > & arr):
-    data_(new T * [arr.capacity_]),
+    data_(new T [arr.capacity_]),
     capacity_(arr.capacity_),
     size_(arr.size_),
     begin_(arr.begin_)
@@ -96,12 +92,11 @@ namespace bocharov
     {
       for (size_t i = 0; i < size_; ++i)
       {
-        data_[i] = new T(*arr.data_[i + begin_]);
+        data_[i] = arr.data_[i + begin_];
       }
     }
     catch (...)
     {
-      clear();
       delete[] data_;
       throw;
     }
@@ -117,7 +112,7 @@ namespace bocharov
 
   template< typename T >
   Array< T >::Array(size_t capacity):
-    data_(new T * [capacity]),
+    data_(new T [capacity]),
     capacity_(capacity),
     size_(0),
     begin_(0)
@@ -126,7 +121,6 @@ namespace bocharov
   template< typename T >
   Array< T >::~Array()
   {
-    clear();
     delete[] data_;
     capacity_ = 0;
   }
@@ -160,7 +154,7 @@ namespace bocharov
     {
       throw std::logic_error("Empty for back()");
     }
-    return *(data_[begin_ + size_ - 1]);
+    return data_[begin_ + size_ - 1];
   }
 
   template< typename T >
@@ -170,7 +164,7 @@ namespace bocharov
     {
       throw std::logic_error("Empty for front()");
     }
-    return *(data_[begin_]);
+    return data_[begin_];
   }
 
   template< typename T >
@@ -186,7 +180,6 @@ namespace bocharov
     {
       throw std::logic_error("Empty for popBack()");
     }
-    delete data_[begin_ + size_ - 1];
     --size_;
   }
 
@@ -197,7 +190,6 @@ namespace bocharov
     {
       throw std::logic_error("Empty for popFront()");
     }
-    delete data_[begin_];
     ++begin_;
     --size_;
   }
@@ -209,7 +201,7 @@ namespace bocharov
     {
       reallocate();
     }
-    data_[begin_ + size_] = new T(data);
+    data_[begin_ + size_] = data;
     ++size_;
   }
 
@@ -220,7 +212,7 @@ namespace bocharov
     {
       reallocate();
     }
-    data_[begin_ + size_] = new T(std::move(data));
+    data_[begin_ + size_] = std::move(data);
     ++size_;
   }
 

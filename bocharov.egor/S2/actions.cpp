@@ -180,7 +180,7 @@ bocharov::stackNumber bocharov::calculationExpr(queue & postfixExprs)
       {
         try
         {
-          long long int number = stoll(partPostfix);
+          long long int number = std::stoll(partPostfix);
           numbers.push(number);
         }
         catch (...)

@@ -5,23 +5,24 @@
 
 int main(int argc, char * argv[])
 {
+  using namespace bocharov;
   try
   {
-    bocharov::queue infixExprs;
+    queue infixExprs;
     if (argc > 1)
     {
       std::ifstream file(argv[1]);
-      bocharov::inputExprs(file, infixExprs);
+      inputExprs(file, infixExprs);
     }
     else
     {
-      bocharov::inputExprs(std::cin, infixExprs);
+      inputExprs(std::cin, infixExprs);
     }
-    bocharov::queue postfixExprs = bocharov::convertExpr(infixExprs);
-    bocharov::stackNumber results = bocharov::calculationExpr(postfixExprs);
-    bocharov::outputResults(std::cout, results) << "\n";
+    queue postfixExprs = bocharov::convertExpr(infixExprs);
+    stackNumber results = bocharov::calculationExpr(postfixExprs);
+    outputResults(std::cout, results) << "\n";
   }
-  catch (std::exception & e)
+  catch (const std::exception & e)
   {
     std::cerr << e.what() << "\n";
     return 1;
