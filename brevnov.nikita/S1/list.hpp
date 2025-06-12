@@ -444,9 +444,9 @@ namespace brevnov
       head_ = head_->next;
       pos.node_->next->prev = nullptr;
     }
-    else if (pos.node_ == end_->prev)
+    else if (pos.node_ == tail_->prev)
     {
-      end_->prev = pos.node_->prev;
+      tail_->prev = pos.node_->prev;
       pos.node_->prev->next = nullptr;
     }
     else
