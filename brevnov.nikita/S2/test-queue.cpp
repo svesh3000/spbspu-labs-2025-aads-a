@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(front)
 BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   brevnov::Queue< int > test_queue;
-  test_queue2.push(9);
+  test_queue.push(9);
   BOOST_TEST(test_queue.front() == 9);
 }
 
