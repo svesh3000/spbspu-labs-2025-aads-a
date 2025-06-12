@@ -24,7 +24,9 @@ namespace
 
   int countDigits(long long int num)
   {
-    if (num == 0) return 1;
+    if (num == 0) {
+      return 1;
+    }
     int count = 0;
     num = std::abs(num);
     while (num != 0) {
@@ -88,20 +90,18 @@ namespace
     return result;
   }
 
-  bool isOperator(const std::string& in)
+  bool isOperator(std::string in)
   {
-    const std::string operations[6] = { "+", "-", "*", "/", "%", "|"};
-    for (std::string s: operations)
-    {
-      if (in == s)
-      {
+    const std::string operations[6] = { "+", "-", "*", "/", "%", "|" };
+    for (std::string s: operations) {
+      if (in == s) {
         return true;
       }
     }
     return false;
   }
 
-  bool getPrecedence(const std::string& lhs, const std::string& rhs)
+  bool getPrecedence(std::string lhs, std::string rhs)
   {
     std::map< std::string, int > precedence;
     precedence["+"] = 1;
@@ -118,7 +118,7 @@ namespace
 }
 long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 {
-  Stack<long long> operandStack;
+  Stack< long long > operandStack;
 
   while (!postfixQueue.empty()) {
     std::string token = postfixQueue.front();
@@ -186,8 +186,8 @@ long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 
 dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQueue)
 {
-  dribas::Stack< std::string > operatorStack;
-  dribas::Queue< std::string > postfixQueue;
+  Stack< std::string > operatorStack;
+  Queue< std::string > postfixQueue;
   bool hasError = false;
 
   while (!infixQueue.empty() && !hasError) {
