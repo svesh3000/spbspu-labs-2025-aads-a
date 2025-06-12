@@ -581,7 +581,7 @@ namespace brevnov
       pos.node_->prev->next = firstNode;
       firstNode->prev = pos.node_->prev;
       lastNode->next = pos.node_;
-      pos.node_->prev = lastNode; 
+      pos.node_->prev = lastNode;
     }
   }
 
