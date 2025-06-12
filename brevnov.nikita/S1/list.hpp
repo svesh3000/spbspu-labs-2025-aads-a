@@ -609,8 +609,8 @@ namespace brevnov
     else if (pos == cend())
     {
       node->prev = tail_;
-      tail->next = node;
-      tail = node;
+      tail_->next = node;
+      tail_ = node;
     }
     else
     {
