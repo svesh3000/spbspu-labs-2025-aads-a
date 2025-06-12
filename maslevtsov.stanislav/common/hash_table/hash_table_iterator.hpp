@@ -13,12 +13,18 @@ namespace detail {
 }
 
 namespace maslevtsov {
-  template< class T, detail::HashTableIteratorType it_type >
+  template< class Key, class T, class Hash, class KeyEqual >
+  class HashTable;
+
+  template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
   class HashTableIterator final: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
-    using reference_type = std::conditional< it_type == detail::HashTableIteratorType::CONSTANT, const T&, T& >::type;
-    using pointer_type = std::conditional< it_type == detail::HashTableIteratorType::CONSTANT, const T*, T* >::type;
+    using value_type = std::pair< Key, T >;
+    using reference_type = typename std::conditional< it_type == detail::HashTableIteratorType::CONSTANT,
+      const value_type&, value_type& >::type;
+    using pointer_type = typename std::conditional< it_type == detail::HashTableIteratorType::CONSTANT,
+      const value_type*, value_type* >::type;
 
     HashTableIterator();
 
@@ -32,16 +38,15 @@ namespace maslevtsov {
     bool operator!=(const HashTableIterator& rhs) const;
 
   private:
-    template< class Key, class Type, class Hash, class KeyEqual >
-    friend class HashTable;
+    friend class HashTable< Key, T, Hash, KeyEqual >;
 
-    using hash_table_t = std::conditional< it_type == detail::HashTableIteratorType::CONSTANT,
-      const HashTable< Key, Type, Hash, KeyEqual >, HashTable< Key, Type, Hash, KeyEqual > >::type;
+    using hash_table_t = typename std::conditional< it_type == detail::HashTableIteratorType::CONSTANT,
+      const HashTable< Key, T, Hash, KeyEqual >, HashTable< Key, T, Hash, KeyEqual > >::type;
 
     hash_table_t* table_;
     size_t index_;
 
-    explicit HashTableIterator(hash_table_t* table, size_t index_);
+    HashTableIterator(hash_table_t* table, size_t index_);
   };
 }
 

@@ -29,8 +29,8 @@ namespace maslevtsov {
   public:
     using value_type = std::pair< Key, T >;
     using size_type = std::size_t;
-    using iterator = HashTableIterator< value_type, detail::HashTableIteratorType::NONCONSTANT >;
-    using const_iterator = HashTableIterator< value_type, detail::HashTableIteratorType::CONSTANT >;
+    using iterator = HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
+    using const_iterator = HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
 
     HashTable() noexcept;
     template< class InputIt >
