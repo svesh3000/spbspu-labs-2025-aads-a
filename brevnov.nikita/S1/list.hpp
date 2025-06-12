@@ -64,6 +64,20 @@ namespace brevnov
     template< typename Predicate >
     void remove_if(Predicate) noexcept;
 
+    void splice(ConstIter, List< T >&) noexcept;
+    void splice(ConstIter, List< T >&&) noexcept;
+    void splice(ConstIter pos, List< T >&, ConstIter i) noexcept;
+    void splice(ConstIter pos, List< T >&&, ConstIter i) noexcept;
+    void splice(ConstIter pos, List< T >&, ConstIter first, ConstIter last) noexcept;
+    void splice(ConstIter pos, List< T >&&, ConstIter first, ConstIter last) noexcept;
+
+    Iter insert(ConstIter, const T&);
+    Iter insert(ConstIter, T&&);
+    Iter insert(ConstIter, size_t, const T&);
+    template< typename InputIter >
+    Iter insert(ConstIter pos, InputIter first, InputIter last);
+    Iter insert(ConstIter, std::initializer_list< T >);
+
     bool empty() const noexcept;
     size_t size() const noexcept;
   private:
@@ -444,12 +458,12 @@ namespace brevnov
       head_ = head_->next;
       pos.node_->next->prev = nullptr;
     }
-    else if (pos.node_ == tail_->prev)
+    else if (pos.node_ == tail_)
     {
-      tail_->prev = pos.node_->prev;
-      pos.node_->prev->next = nullptr;
+      tail_ = pos.node_->prev;
+      tail_->next = nullptr;
     }
-    else
+    else 
     {
       pos.node_->prev->next = pos.node_->next;
       pos.node_->next->prev = pos.node_->prev;
@@ -500,6 +514,154 @@ namespace brevnov
         ++it;
       }
     }
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIter pos, List< T >& list) noexcept
+  {
+    splice(pos, list, list.cbegin(), list.cend());
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIter pos, List< T >&& list) noexcept
+  {
+    splice(pos, list);
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIter pos, List< T >& list, ConstIter i) noexcept
+  {
+    splice(pos, list, i, std::next(i));
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIter pos, List< T >&& list, ConstIter i) noexcept
+  {
+    splice(pos, list, i);
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIter pos, List< T >& list, ConstIter first, ConstIter last) noexcept
+  {
+    Node< T >* firstNode = first.node_;
+    Node< T >* lastNode = last.node_->prev;
+    size_t dist = std::distance(first, last);
+    list.size_ -= dist;
+    size_ += dist;
+    firstNode->prev->next = lastNode->next;
+    lastNode->next->prev = firstNode->prev;
+    if (firstNode == list.head_)
+    {
+      list.head_ = last.node_;
+      list.head_->prev = nullptr;
+    }
+    if (lastNode == list.tail_->prev)
+    {
+      list.tail_->prev = first.node_->prev;
+      first.node_->prev->next = nullptr;
+    }
+    if (pos == cbegin())
+    {
+      lastNode->next = head_;
+      head_->prev = lastNode;
+      head_ = firstNode;
+      head_->prev = nullptr;
+    }
+    else if (pos == cend())
+    {
+      tail_->next = firstNode;
+      firstNode->prev = tail_;
+      lastNode->next = nullptr;
+      tail_ = lastNode;
+    }
+    else
+    {
+      pos.node_->prev->next = firstNode;
+      firstNode->prev = pos.node_->prev;
+      lastNode->next = pos.node_;
+      pos.node_->prev = lastNode; 
+    }
+  }
+
+  template< typename T >
+  void List< T >::splice(ConstIterator pos, List< T >&& list, ConstIterator first, ConstIterator last) noexcept
+  {
+    splice(pos, list, first, last);
+  }
+
+
+  template< typename T >
+  typename List< T >::Iter List< T >::insert(ConstIter pos, const T& data)
+  {
+    Node< T >* node = new Node< T >{ data, nullptr, nullptr };
+    if (empty())
+    {
+      head_ = node;
+      tail_ = head_;
+    }
+    else if (pos == cbegin())
+    {
+      node->next = head_;
+      head_->prev = node;
+      head_ = node;
+    }
+    else if (pos == cend())
+    {
+      node->prev = tail;
+      tail->next = node;
+      tail = node;
+    }
+    else
+    {
+      node->next = pos.node_;
+      node->prev = pos.node_->prev;
+      pos.node_->prev->next = node;
+      pos.node_->prev = node;
+    }
+    ++size_;
+    return Iter(node);
+  }
+
+  template< typename T >
+  typename List< T >::Iter List< T >::insert(ConstIter pos, T&& data)
+  {
+    return insert(pos, data);
+  }
+
+  template< typename T >
+  typename List< T >::Iter List< T >::insert(ConstIter pos, size_t n, const T& data)
+  {
+    if (n == 0)
+    {
+      return Iter(pos.node_);
+    }
+    Iter result = insert(pos, data);
+    if (n != 1)
+    {
+      List< T > temp(--n, data);
+      splice(pos, temp);
+    }
+    return result;
+  }
+
+  template< typename T >
+  template< typename InputIter >
+  typename List< T >::Iter List< T >::insert(ConstIter pos, InputIter first, InputIter last)
+  {
+    if (first == last)
+    {
+      return Iter(pos.node_);
+    }
+    Iter result = insert(pos, *first);
+    List< T > temp(++first, last);
+    splice(pos, temp);
+    return result;
+  }
+
+  template< typename T >
+  typename List< T >::Iter List< T >::insert(ConstIter pos, std::initializer_list< T > il)
+  {
+    return insert(pos, il.begin(), il.end());
   }
 }
 #endif
