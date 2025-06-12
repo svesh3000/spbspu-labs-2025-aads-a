@@ -12,7 +12,7 @@ namespace averenkov
   public:
     Array();
     Array(const Array &rhs);
-    Array(Array &&rhs) noexcept = default;
+    Array(Array &&rhs) noexcept;
     Array &operator=(const Array &rhs);
     ~Array();
 
@@ -66,27 +66,25 @@ namespace averenkov
     std::swap(temp, data_);
   }
 
+
+  template< class T >
+  Array< T >::Array(Array&& rhs) noexcept:
+    data_(rhs.data_),
+    size_(rhs.size_),
+    capacity_(rhs.capacity_)
+  {
+    rhs.data_ = nullptr;
+    rhs.size_ = 0;
+    rhs.capacity_ = 0;
+  }
+
   template< class T >
   Array< T >& Array< T >::operator=(const Array& rhs)
   {
     if (this != std::addressof(rhs))
     {
-      T* new_data = nullptr;
-      try
-      {
-        new_data = new T[rhs.capacity_];
-        for (size_t i = 0; i < rhs.size_; ++i)
-        {
-          new_data[i] = rhs.data_[i];
-        }
-      }
-      catch (...)
-      {
-        delete[] new_data;
-        return *this;
-      }
-      delete[] data_;
-      data_ = new_data;
+      Array< T > temp(rhs);
+      std::swap(data_, temp.data_);
       size_ = rhs.size_;
       capacity_ = rhs.capacity_;
     }

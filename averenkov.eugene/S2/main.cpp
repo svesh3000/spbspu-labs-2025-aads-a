@@ -108,19 +108,21 @@ averenkov::Queue< std::string > infixToPostfix(const std::string& infix)
     {
       while (!opStack.empty() && opStack.top() != '(')
       {
-        outputQueue.push(std::string(1, opStack.drop()));
+        outputQueue.push(std::string(1, opStack.top()));
+        opStack.pop();
       }
       if (opStack.empty())
       {
         throw std::runtime_error("Error");
       }
-      opStack.drop();
+      opStack.pop();
     }
     else if (isOperator(token[0]))
     {
       while (!opStack.empty() && opStack.top() != '(' && precedenceFirst(opStack.top(), token[0]))
       {
-        outputQueue.push(std::string(1, opStack.drop()));
+        outputQueue.push(std::string(1, opStack.top()));
+        opStack.pop();
       }
       opStack.push(token[0]);
     }
@@ -135,18 +137,19 @@ averenkov::Queue< std::string > infixToPostfix(const std::string& infix)
     {
       throw std::runtime_error("Error");
     }
-    outputQueue.push(std::string(1, opStack.drop()));
+    outputQueue.push(std::string(1, opStack.top()));
+    opStack.pop();
   }
   return outputQueue;
 }
 
-long long evaluatePostfix(averenkov::Queue<std::string>& postfixQueue)
+long long evaluatePostfix(averenkov::Queue< std::string >& postfixQueue)
 {
-  averenkov::Stack<long long> evalStack;
+  averenkov::Stack< long long > evalStack;
   while (!postfixQueue.empty())
   {
     std::string token = postfixQueue.front();
-    postfixQueue.drop();
+    postfixQueue.pop();
     if (std::isdigit(token[0]) || (token[0] == '-' && token.size() > 1))
     {
       long long num = 0;
@@ -169,8 +172,10 @@ long long evaluatePostfix(averenkov::Queue<std::string>& postfixQueue)
       {
         throw std::runtime_error("Error");
       }
-      long long b = evalStack.drop();
-      long long a = evalStack.drop();
+      long long b = evalStack.top();
+      evalStack.pop();
+      long long a = evalStack.top();
+      evalStack.pop();
       long long result;
       switch (token[0])
       {
@@ -223,7 +228,9 @@ long long evaluatePostfix(averenkov::Queue<std::string>& postfixQueue)
   {
     throw std::runtime_error("Expression error");
   }
-  return evalStack.drop();
+  auto temp = evalStack.top();
+  evalStack.pop();
+  return temp;
 }
 
 void processExpressions(std::istream& input)
@@ -249,10 +256,12 @@ void processExpressions(std::istream& input)
   }
   if (!results.empty())
   {
-    std::cout << results.drop();
+    std::cout << results.top();
+    results.pop();
     while (!results.empty())
     {
-      std::cout << " " << results.drop();
+      std::cout << " " << results.top();
+      results.pop();
     }
   }
   std::cout << "\n";
