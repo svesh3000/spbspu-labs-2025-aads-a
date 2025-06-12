@@ -6,22 +6,24 @@
 #include "list.hpp"
 
 using namespace brevnov;
-
-void createList(List< int >& list, int count)
+namespace
 {
-  for (int i = 0; i < count; ++i)
+  void createList(List< int >& list, int count)
   {
-    list.push_back(i);
+    for (int i = 0; i < count; ++i)
+    {
+      list.push_back(i);
+    }
   }
-}
 
-std::ostream& outputList(std::ostream& out, List< int >& list)
-{
-  for (List< int >::ConstIter it = list.cbegin(); it != list.cend(); ++it)
+  std::ostream& outputList(std::ostream& out, List< int >& list)
   {
-    out << *it;
+    for (List< int >::ConstIter it = list.cbegin(); it != list.cend(); ++it)
+    {
+      out << *it;
+    }
+    return out;
   }
-  return out;
 }
 BOOST_AUTO_TEST_SUITE(list)
 

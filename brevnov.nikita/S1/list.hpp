@@ -149,17 +149,9 @@ namespace brevnov
   List< T >::List(InputIter begin, InputIter end):
     List()
   {
-    try
+    for (; begin != end; ++begin)
     {
-      for (; begin != end; ++begin)
-      {
-        push_back(*begin);
-      }
-    }
-    catch (...)
-    {
-      clear();
-      throw;
+      push_back(*begin);
     }
   }
 
@@ -299,7 +291,7 @@ namespace brevnov
   template< class T >
   void List< T >::push_back(T &&data)
   {
-    push_back(data);
+    push_back(std::move(data));
   }
 
   template< class T >
