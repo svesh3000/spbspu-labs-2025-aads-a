@@ -104,9 +104,7 @@ void maslevtsov::create_graph(graphs_map_t& graphs, std::istream& in)
   Graph graph;
   for (size_t i = 0; i < edges_count; ++i) {
     std::string vertice;
-    if (!(in >> vertice)) {
-      throw std::invalid_argument("invalid vertice");
-    }
+    in >> vertice;
     graph.add_vertice(vertice);
   }
   graphs[graph_name] = graph;
@@ -114,25 +112,26 @@ void maslevtsov::create_graph(graphs_map_t& graphs, std::istream& in)
 
 void maslevtsov::merge_graphs(graphs_map_t& graphs, std::istream& in)
 {
-  std::string new_g, g1, g2;
-  in >> new_g >> g1 >> g2;
-  if (graphs.find(new_g) != graphs.end() || graphs.find(g1) == graphs.end() || graphs.find(g2) == graphs.end()) {
+  std::string new_gr_name, gr1_name, gr2_name;
+  in >> new_gr_name >> gr1_name >> gr2_name;
+  if (graphs.find(new_gr_name) != graphs.end()) {
     throw std::invalid_argument("invalid graph name");
   }
-  Graph new_gr(graphs[g1], graphs[g1]);
-  graphs[new_g] = new_gr;
+  Graph new_gr(graphs.at(gr1_name), graphs.at(gr2_name));
+  graphs[new_gr_name] = new_gr;
 }
 
 void maslevtsov::extract_from_graph(graphs_map_t& graphs, std::istream& in)
 {
   std::string new_gr_name, gr_name;
-  size_t vertice_count = 0;
-  in >> new_gr_name >> gr_name >> vertice_count;
-  if (graphs.find(new_gr_name) != graphs.end() || graphs.find(gr_name) == graphs.end()) {
+  in >> new_gr_name >> gr_name;
+  if (graphs.find(new_gr_name) != graphs.end()) {
     throw std::invalid_argument("invalid graph name");
   }
+  size_t vertice_count = 0;
+  in >> vertice_count;
   Vector< std::string > vertices;
-  Graph gr = graphs[gr_name];
+  Graph gr = graphs.at(gr_name);
   for (size_t i = 0; i != vertice_count; ++i) {
     std::string vertice;
     in >> vertice;

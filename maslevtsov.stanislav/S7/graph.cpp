@@ -105,7 +105,7 @@ bool maslevtsov::Graph::check_vertice_existence(const std::string& vertice)
 
 void maslevtsov::Graph::add_vertice(const std::string& vertice)
 {
-  if (!check_vertice_existence(vertice)) {
+  if (check_vertice_existence(vertice)) {
     return;
   }
   bind(vertice, vertice, 0);
