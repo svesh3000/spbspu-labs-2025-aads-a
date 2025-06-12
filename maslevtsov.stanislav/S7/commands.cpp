@@ -56,6 +56,9 @@ void maslevtsov::print_outbound(const graphs_map_t& graphs, std::istream& in, st
     print_vector(i->second, out);
     out << '\n';
   }
+  if (outbound.empty()) {
+    out << '\n';
+  }
 }
 
 void maslevtsov::print_inbound(const graphs_map_t& graphs, std::istream& in, std::ostream& out)
@@ -70,6 +73,9 @@ void maslevtsov::print_inbound(const graphs_map_t& graphs, std::istream& in, std
   for (auto i = inbound.cbegin(); i != inbound.cend(); ++i) {
     out << i->first << ' ';
     print_vector(i->second, out);
+    out << '\n';
+  }
+  if (inbound.empty()) {
     out << '\n';
   }
 }
