@@ -29,6 +29,10 @@ int main(int argc, char **argv)
     {
       comand_holder.at(command)(std::cin, dictionary_tree);
     }
+    catch (const std::out_of_range &e)
+    {
+      std::cerr << "<INVALID COMMAND>" << '\n';
+    }
     catch (const std::exception &e)
     {
       std::cerr << e.what() << '\n';

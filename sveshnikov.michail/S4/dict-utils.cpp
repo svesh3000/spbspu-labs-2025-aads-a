@@ -50,6 +50,10 @@ void sveshnikov::print_dict(std::istream &in, const DataTree_t &data)
   std::string dataset;
   in >> dataset;
   auto dict = data.find(dataset);
+  if (dict == data.cend())
+  {
+    throw std::out_of_range("<INVALID COMMAND>");
+  }
   if (dict->second.empty())
   {
     throw std::logic_error("<EMPTY>");
@@ -65,13 +69,44 @@ void sveshnikov::complement_dict(std::istream &in, DataTree_t &data)
 {
   std::string newdataset, dataset_1, dataset_2;
   in >> newdataset >> dataset_1 >> dataset_2;
-  Dict_t new_dict;
   auto dict1 = data.find(dataset_1);
-  auto dict2 = data.find(dataset_2);
+  if (dict1 == data.cend() || data.find(dataset_2) == data.cend())
+  {
+    throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  Dict_t new_dict = data.at(dataset_2);
   for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
   {
-    for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
+    if (new_dict.find(it->first) == new_dict.cend())
     {
+      new_dict[it->first] = it->second;
+    }
+    else
+    {
+      new_dict.erase(it->first);
     }
   }
+  data[newdataset] = new_dict;
+}
+
+void sveshnikov::intersect_dict(std::istream &in, DataTree_t &data)
+{
+  std::string newdataset, dataset_1, dataset_2;
+  in >> newdataset >> dataset_1 >> dataset_2;
+  auto dict1 = data.find(dataset_1), dict2 = data.find(dataset_2);
+  if (dict1 == data.cend() || dict2 == data.cend())
+  {
+    throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  Dict_t new_dict;
+  for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
+  {
+    if (dict2->second.find(it->first) != dict2->second.cend())
+    {
+      new_dict[it->first] = it->second;
+    }
+  }
+  data[newdataset] = new_dict;
 }
