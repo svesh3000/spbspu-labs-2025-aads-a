@@ -184,11 +184,11 @@ BOOST_AUTO_TEST_CASE(remove)
 {
   List< int > list;
   int i = 0;
-  list.pushBack(i);
+  list.push_back(i);
   list.remove(i);
   BOOST_TEST(list.empty());
   createList(list, 10);
-  list.pushBack(1);
+  list.push_back(1);
   list.remove(1);
   BOOST_TEST(list.size() == 9);
 }
@@ -337,10 +337,10 @@ BOOST_AUTO_TEST_CASE(operator_equal)
   createList(list2, 5);
   bool isEqual = list == list2;
   BOOST_TEST(isEqual);
-  list2.pushBack(1);
+  list2.push_back(1);
   isEqual = list == list2;
   BOOST_TEST(!isEqual);
-  list.pushBack(4);
+  list.push_back(4);
   isEqual = list == list2;
   BOOST_TEST(!isEqual);
 }
@@ -363,8 +363,8 @@ BOOST_AUTO_TEST_CASE(operator_less)
   List< int > list2 = { 0, 1, 2, 3 };
   bool isLess = list < list2;
   BOOST_TEST(!isLess);
-  list.pushBack(1);
-  list2.pushBack(3);
+  list.push_back(1);
+  list2.push_back(3);
   isLess = list < list2;
   BOOST_TEST(isLess);
 }
@@ -375,8 +375,8 @@ BOOST_AUTO_TEST_CASE(operator_more)
   List< int > list2 = { 1, 2, 3 };
   bool isMore = list > list2;
   BOOST_TEST(!isMore);
-  list.pushBack(6);
-  list2.pushBack(4);
+  list.push_back(6);
+  list2.push_back(4);
   isMore = list > list2;
   BOOST_TEST(isMore);
 }
@@ -387,14 +387,14 @@ BOOST_AUTO_TEST_CASE(operator_less_or_equal)
   List< int > list2 = { 1, 2, 3 };
   bool isLessOrEqual = list <= list2;
   BOOST_TEST(isLessOrEqual);
-  list.pushBack(4);
-  list2.pushBack(6);
+  list.push_back(4);
+  list2.push_back(6);
   isLessOrEqual = list <= list2;
   BOOST_TEST(isLessOrEqual);
-  list.popBack();
-  list2.popBack();
-  list.pushBack(7);
-  list2.pushBack(2);
+  list.pop_back();
+  list2.pop_back();
+  list.push_back(7);
+  list2.push_back(2);
   isLessOrEqual = list <= list2;
   BOOST_TEST(!isLessOrEqual);
 }
@@ -405,14 +405,14 @@ BOOST_AUTO_TEST_CASE(operator_more_or_equal)
   List< int > list2 = { 3, 4, 5 };
   bool isMoreOrEqual = list >= list2;
   BOOST_TEST(isMoreOrEqual);
-  list.pushFront(5);
-  list2.pushFront(3);
+  list.push_front(5);
+  list2.push_front(3);
   isMoreOrEqual = list >= list2;
   BOOST_TEST(isMoreOrEqual);
-  list.popFront();
-  list2.popFront();
-  list.pushFront(3);
-  list2.pushFront(6);
+  list.pop_front();
+  list2.pop_front();
+  list.push_front(3);
+  list2.push_front(6);
   isMoreOrEqual = list >= list2;
   BOOST_TEST(!isMoreOrEqual);
 }
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE(reverse)
   List< int > list;
   list.reverse();
   BOOST_TEST(list.empty());
-  list.pushBack(1);
+  list.push_back(1);
   createList(list, 4);
   list.reverse();
   std::ostringstream out;
