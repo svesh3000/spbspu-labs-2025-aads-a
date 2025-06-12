@@ -283,9 +283,9 @@ namespace alymova
       size_t hint_index = hint.node_ - array_;
       if (array_[hint_index].first == NodeState::Fill)
       {
-        if (equal_(array_[hint_index].second.get_key, value.key))
+        if (equal_(array_[hint_index].second.get_key(), value.first))
         {
-          return hint;
+          return {hint.node_, hint.end_};
         }
       }
     }
@@ -382,7 +382,6 @@ namespace alymova
   HashConstIterator< Key, Value, Hash, KeyEqual >
     HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    size_t psl = 0;
     size_t home_index = get_home_index(key);
     if (array_[home_index].first == NodeState::Empty)
     {
@@ -392,6 +391,7 @@ namespace alymova
     {
       return ConstIterator{array_ + home_index, array_ + capacity_};
     }
+    size_t psl = 1;
     for (size_t i = (home_index + 1) % capacity_; i != home_index; i = (i + 1) % capacity_)
     {
       if (array_[i].first == NodeState::Empty)

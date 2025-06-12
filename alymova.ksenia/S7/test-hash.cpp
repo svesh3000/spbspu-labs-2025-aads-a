@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <exception>
 #include "hash-table.hpp"
 
 BOOST_AUTO_TEST_CASE(test_constructors_operators)
@@ -36,6 +37,21 @@ BOOST_AUTO_TEST_CASE(test_constructors_operators)
   table1 = Map({{1, "ccc"}, {2, "ddd"}, {3, "ppp"}});
   BOOST_TEST(table1.size() == 3);
   BOOST_TEST(table1.begin()->second == "ccc");
+}
+BOOST_AUTO_TEST_CASE(test_clear_swap)
+{
+  using Map = alymova::HashTable< int, std::string >;
+
+  Map table1;
+  Map table2({{1, "aaa"}, {2, "bbb"}, {3, "ccc"}});
+  table1.swap(table2);
+  BOOST_TEST(table1.size() == 3);
+  BOOST_TEST(table1.begin()->first == 1);
+  BOOST_TEST(table2.empty());
+
+  table1.clear();
+  BOOST_TEST(table1.empty());
+  BOOST_TEST((table1.begin() == table1.end()));
 }
 BOOST_AUTO_TEST_CASE(test_iterators_size)
 {
@@ -87,6 +103,34 @@ BOOST_AUTO_TEST_CASE(test_load_factor_rehash)
   table2.rehash();
   BOOST_TEST(table2.empty());
 }
+BOOST_AUTO_TEST_CASE(test_find)
+{
+  using Map = alymova::HashTable< int, std::string >;
+
+  Map table1;
+  BOOST_TEST((table1.find(1) == table1.end()));
+
+  table1.emplace(1, "aaa");
+  BOOST_TEST(table1.find(1)->first == 1);
+
+  BOOST_TEST((table1.find(12) == table1.end()));
+
+  table1.emplace(2, "bbb");
+  BOOST_TEST((table1.find(12) == table1.end()));
+
+  table1.emplace(12, "rrr");
+  BOOST_TEST(table1.find(12)->first == 12);
+
+  BOOST_TEST(table1.at(12) == "rrr");
+  try
+  {
+    std::string value = table1.at(300);
+  }
+  catch (const std::out_of_range& e)
+  {
+    BOOST_TEST((table1.find(300) == table1.end()));
+  }
+}
 BOOST_AUTO_TEST_CASE(test_insert_emplace)
 {
   using Map = alymova::HashTable< int, std::string >;
@@ -122,4 +166,39 @@ BOOST_AUTO_TEST_CASE(test_insert_emplace)
   table1.emplace(5, "ttt");
   BOOST_TEST(table1.size() == 8);
   BOOST_TEST(table1.load_factor() < 0.4f);
+
+  auto hint1 = table1.cend();
+  table1.emplace_hint(hint1, 100, "qqq");
+  BOOST_TEST(table1.size() == 9);
+
+  hint1 = table1.find(100);
+  table1.emplace_hint(hint1, 10, "sss");
+  BOOST_TEST(table1.size() == 10);
+
+  table1.emplace_hint(hint1, 100, "xxx");
+  BOOST_TEST(table1.size() == 10);
+
+  Map table2;
+  std::pair< int, std::string > p1(1, "aaa");
+  auto it = table2.insert(p1);
+  BOOST_TEST(table2.size() == 1);
+  BOOST_TEST(table2.begin()->first == 1);
+  BOOST_TEST((it == table2.find(1)));
+
+  it = table2.insert({2, "bbb"});
+  BOOST_TEST(table2.size() == 2);
+  BOOST_TEST((it == table2.find(2)));
+
+  table2.insert(table1.begin(), table1.end());
+  BOOST_TEST(table2.size() == 12);
+  BOOST_TEST(table1.size() == 10);
+  BOOST_TEST((table1.begin() != table1.end()));
+
+  auto hint2 = table2.find(1);
+  table2.emplace_hint(hint2, 1, "ooo");
+  BOOST_TEST(table2.size() == 12);
+}
+BOOST_AUTO_TEST_CASE(test_erase)
+{
+  //using Map = alymova::HashTable< int, std::string >;
 }
