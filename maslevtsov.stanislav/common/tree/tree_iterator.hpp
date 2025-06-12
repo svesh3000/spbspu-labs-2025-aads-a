@@ -22,9 +22,6 @@ namespace maslevtsov {
     friend class Tree;
 
     TreeIterator();
-    TreeIterator(const TreeIterator& rhs) noexcept = default;
-    ~TreeIterator() = default;
-    TreeIterator& operator=(const TreeIterator& rhs) noexcept = default;
 
     TreeIterator& operator++();
     TreeIterator& operator++(int);
