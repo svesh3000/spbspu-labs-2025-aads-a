@@ -454,25 +454,31 @@ namespace brevnov
   template< typename T >
   typename List< T >::Iter List< T >::erase(ConstIter pos) noexcept
   {
-    Iter it(pos.node_->next);
-    if (pos == cbegin())
+    if (pos.node_ == nullptr || empty())
     {
-      head_ = head_->next;
-      pos.node_->next->prev = nullptr;
+      return end();
     }
-    else if (pos.node_ == tail_)
+    Node< T >* toDelete = pos.node_;
+    Node< T >* nextNode = toDelete->next;
+    if (toDelete == head_)
     {
-      tail_ = pos.node_->prev;
-      tail_->next = nullptr;
+      head_ = nextNode;
     }
-    else
+    if (toDelete == tail_)
     {
-      pos.node_->prev->next = pos.node_->next;
-      pos.node_->next->prev = pos.node_->prev;
+      tail_ = toDelete->prev;
     }
-    delete pos.node_;
+    if (toDelete->prev != nullptr)
+    {
+      toDelete->prev->next = nextNode;
+    }
+    if (nextNode != nullptr)
+    {
+      nextNode->prev = toDelete->prev;
+    }
+    delete toDelete;
     size_--;
-    return it;
+    return Iter(nextNode);
   }
 
   template< typename T >
