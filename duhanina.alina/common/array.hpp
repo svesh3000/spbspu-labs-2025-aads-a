@@ -41,6 +41,7 @@ namespace duhanina
     size_t head_;
     T* data_;
     void resize();
+    explicit DynamicArray(size_t);
   };
 
   template < typename T >
@@ -49,6 +50,14 @@ namespace duhanina
     length_(0),
     head_(0),
     data_(new T[capacity_])
+  {}
+
+  template< typename T >
+  DynamicArray< T >::DynamicArray(size_t size):
+    capacity_(size),
+    length_(size),
+    head_(0),
+    data_(new T[size]),
   {}
 
   template < typename T >
