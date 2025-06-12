@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     }
     catch (const std::out_of_range &e)
     {
-      std::cout << e.what() << '\n';
+      std::cout << "<INVALID COMMAND>" << '\n';
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     catch (std::exception &e)
