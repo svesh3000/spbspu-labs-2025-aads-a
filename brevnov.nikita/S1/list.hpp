@@ -60,6 +60,10 @@ namespace brevnov
     Iter erase(ConstIter) noexcept;
     Iter erase(ConstIter first, ConstIter last) noexcept;
 
+    void remove(const T&) noexcept;
+    template< typename Predicate >
+    void remove_if(Predicate) noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
   private:
@@ -463,6 +467,39 @@ namespace brevnov
       first = erase(first);
     }
     return Iter(last.node_);
+  }
+
+  template< typename T >
+  void List< T >::remove(const T& data) noexcept
+  {
+    for (ConstIter it = cbegin(); it != cend();)
+    {
+      if (it.node_->data == data)
+      {
+        it = erase(it);
+      }
+      else
+      {
+        it++;
+      }
+    }
+  }
+
+  template< typename T >
+  template< typename Predicate >
+  void List< T >::remove_if(Predicate pred) noexcept
+  {
+    for (ConstIter it = cbegin(); it != cend();)
+    {
+      if (pred(*it))
+      {
+        it = erase(it);
+      }
+      else
+      {
+        ++it;
+      }
+    }
   }
 }
 #endif
