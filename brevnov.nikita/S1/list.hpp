@@ -586,7 +586,7 @@ namespace brevnov
   }
 
   template< typename T >
-  void List< T >::splice(ConstIterator pos, List< T >&& list, ConstIterator first, ConstIterator last) noexcept
+  void List< T >::splice(ConstIter pos, List< T >&& list, ConstIter first, ConstIter last) noexcept
   {
     splice(pos, list, first, last);
   }
@@ -608,7 +608,7 @@ namespace brevnov
     }
     else if (pos == cend())
     {
-      node->prev = tail;
+      node->prev = tail_;
       tail->next = node;
       tail = node;
     }
@@ -675,7 +675,7 @@ namespace brevnov
     Node< T >* node = head_;
     head_ = tail_;
     tail_ = node;
-    ConstIterator it(head_);
+    ConstIter it(head_);
     for (; it != cend(); ++it)
     {
       node = it.node_->next;
