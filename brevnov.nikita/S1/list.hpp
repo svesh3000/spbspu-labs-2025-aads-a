@@ -298,7 +298,7 @@ namespace brevnov
   void List< T >::pop_back() noexcept
   {
     assert(!empty());
-    erase(ConstIterator(tail_));
+    erase(ConstIter(tail_));
   }
 
   template< class T >
