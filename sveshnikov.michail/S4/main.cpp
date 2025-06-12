@@ -1,3 +1,4 @@
+#include <limits>
 #include "dict-utils.hpp"
 
 int main(int argc, char **argv)
@@ -33,13 +34,10 @@ int main(int argc, char **argv)
         std::cout << '\n';
       }
     }
-    catch (const std::out_of_range &e)
-    {
-      std::cerr << e.what() << '\n';
-      std::cout << "<INVALID COMMAND>" << '\n';
-    }
     catch (const std::exception &e)
     {
+      std::cout << "<INVALID COMMAND>" << '\n';
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cerr << e.what() << '\n';
     }
   }

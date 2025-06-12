@@ -7,7 +7,7 @@ namespace
   {
     if (data.find(dict_name) == data.cend())
     {
-      throw std::out_of_range("Error: cannot find the dictionary!");
+      throw std::out_of_range("<INVALID COMMAND>");
     }
   }
 }
