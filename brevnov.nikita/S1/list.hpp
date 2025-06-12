@@ -527,7 +527,10 @@ namespace brevnov
   template< typename T >
   void List< T >::splice(ConstIter pos, List< T >& list) noexcept
   {
-    splice(pos, list, list.cbegin(), list.cend());
+    if (!list.empty())
+    {
+      splice(pos, list, list.cbegin(), list.cend());
+    }
   }
 
   template< typename T >
@@ -539,7 +542,10 @@ namespace brevnov
   template< typename T >
   void List< T >::splice(ConstIter pos, List< T >& list, ConstIter i) noexcept
   {
-    splice(pos, list, i, std::next(i));
+    if (i != list.cend())
+    {
+      splice(pos, list, i, std::next(i));
+    }
   }
 
   template< typename T >
