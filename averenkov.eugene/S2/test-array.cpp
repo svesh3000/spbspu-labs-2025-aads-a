@@ -4,11 +4,22 @@
 
 using array_int = averenkov::Array< int >;
 
-bool isSame(const array_int lhs, const array_int rhs)
+bool isEqual(const array_int& lhs, const array_int& rhs)
 {
-  if (!(lhs.front() == rhs.front() && lhs.back() == rhs.back()))
+  auto lhsC = lhs;
+  auto rhsC = rhs;
+  if (!(lhsC.size() == rhsC.size()))
   {
     return false;
+  }
+  while (!(lhsC.empty() && rhsC.empty()))
+  {
+    if (!(lhsC.front() == rhsC.front() && lhsC.back() == rhsC.back()))
+    {
+      return false;
+    }
+    lhsC.pop_back();
+    rhsC.pop_back();
   }
   return true;
 }
@@ -28,11 +39,11 @@ BOOST_AUTO_TEST_CASE(Constructors)
 
   array1.push_back(3);
   array_int array2(array1);
-  BOOST_TEST(isSame(array2, array1));
+  BOOST_TEST(isEqual(array2, array1));
 
   array_int array3;
   array3 = array1;
-  BOOST_TEST(isSame(array3, array1));
+  BOOST_TEST(isEqual(array3, array1));
 
   array_int array4(std::move(array1));
   BOOST_TEST(array4.front() == 3);
