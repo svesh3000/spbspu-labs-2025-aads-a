@@ -58,7 +58,7 @@ namespace maslov
   {
     assert(slots_ != nullptr);
     assert(current_ < capacity_);
-    assert(slots_[current_].occupied && !slots_[current_].deleted)
+    assert(slots_[current_].occupied && !slots_[current_].deleted);
     return slots_[current_].data;
   }
 
@@ -92,7 +92,7 @@ namespace maslov
   template< class Key, class T, class HS1, class HS2, class EQ >
   bool HashIterator< Key, T, HS1, HS2, EQ >::operator==(const thisT & rhs) const
   {
-    return slots_ == other.slots_ && current_ == other.current_;
+    return slots_ == rhs.slots_ && current_ == rhs.current_;
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -157,7 +157,7 @@ namespace maslov
   {
     assert(slots_ != nullptr);
     assert(current_ < capacity_);
-    assert(slots_[current_].occupied && !slots_[current_].deleted)
+    assert(slots_[current_].occupied && !slots_[current_].deleted);
     return slots_[current_].data;
   }
 
@@ -191,7 +191,7 @@ namespace maslov
   template< class Key, class T, class HS1, class HS2, class EQ >
   bool HashConstIterator< Key, T, HS1, HS2, EQ >::operator==(const thisT & rhs) const
   {
-    return slots_ == other.slots_ && current_ == other.current_;
+    return slots_ == rhs.slots_ && current_ == rhs.current_;
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
