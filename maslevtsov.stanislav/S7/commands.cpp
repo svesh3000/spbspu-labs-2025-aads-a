@@ -20,7 +20,7 @@ void maslevtsov::print_graphs(const graphs_map_t& graphs, std::ostream& out)
   for (auto i = graphs.cbegin(); i != graphs.cend(); ++i) {
     names[i->first];
   }
-  for (auto i = ++names.cbegin(); i != names.cend(); ++i) {
+  for (auto i = names.cbegin(); i != names.cend(); ++i) {
     out << i->first << '\n';
   }
   if (names.empty()) {
@@ -90,4 +90,57 @@ void maslevtsov::cut_vertices(graphs_map_t& graphs, std::istream& in)
   unsigned weight = 0;
   in >> graph_name >> vertice1 >> vertice2 >> weight;
   graphs.at(graph_name).cut(vertice1, vertice2, weight);
+}
+
+void maslevtsov::create_graph(graphs_map_t& graphs, std::istream& in)
+{
+  std::string graph_name;
+  in >> graph_name;
+  if (graphs.find(graph_name) != graphs.end()) {
+    throw std::invalid_argument("graph already exsist");
+  }
+  size_t edges_count = 0;
+  in >> edges_count;
+  Graph graph;
+  for (size_t i = 0; i < edges_count; ++i) {
+    std::string vertice;
+    if (!(in >> vertice)) {
+      throw std::invalid_argument("invalid vertice");
+    }
+    graph.add_vertice(vertice);
+  }
+  graphs[graph_name] = graph;
+}
+
+void maslevtsov::merge_graphs(graphs_map_t& graphs, std::istream& in)
+{
+  std::string new_g, g1, g2;
+  in >> new_g >> g1 >> g2;
+  if (graphs.find(new_g) != graphs.end() || graphs.find(g1) == graphs.end() || graphs.find(g2) == graphs.end()) {
+    throw std::invalid_argument("invalid graph name");
+  }
+  Graph new_gr(graphs[g1], graphs[g1]);
+  graphs[new_g] = new_gr;
+}
+
+void maslevtsov::extract_from_graph(graphs_map_t& graphs, std::istream& in)
+{
+  std::string new_gr_name, gr_name;
+  size_t vertice_count = 0;
+  in >> new_gr_name >> gr_name >> vertice_count;
+  if (graphs.find(new_gr_name) != graphs.end() || graphs.find(gr_name) == graphs.end()) {
+    throw std::invalid_argument("invalid graph name");
+  }
+  Vector< std::string > vertices;
+  Graph gr = graphs[gr_name];
+  for (size_t i = 0; i != vertice_count; ++i) {
+    std::string vertice;
+    in >> vertice;
+    if (!gr.check_vertice_existence(vertice)) {
+      throw std::invalid_argument("non-existing vertice given");
+    }
+    vertices.push_back(vertice);
+  }
+  Graph new_gr(graphs[gr_name], vertices);
+  graphs[new_gr_name] = new_gr;
 }

@@ -44,6 +44,9 @@ int main(int argc, char** argv)
   commands["inbound"] = IOFuncBinder< graphs_map_t >(print_inbound, graphs, std::cin, std::cout);
   commands["bind"] = IOFuncBinder< graphs_map_t >(bind_vertices, graphs, std::cin);
   commands["cut"] = IOFuncBinder< graphs_map_t >(cut_vertices, graphs, std::cin);
+  commands["create"] = IOFuncBinder< graphs_map_t >(create_graph, graphs, std::cin);
+  commands["merge"] = IOFuncBinder< graphs_map_t >(merge_graphs, graphs, std::cin);
+  commands["extract"] = IOFuncBinder< graphs_map_t >(extract_from_graph, graphs, std::cin);
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {

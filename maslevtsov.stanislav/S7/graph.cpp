@@ -1,5 +1,53 @@
 #include "graph.hpp"
 
+namespace {
+  void add_edges(maslevtsov::Graph& dist, const maslevtsov::Graph::edges_set_t& src)
+  {
+    for (auto i = src.cbegin(); i != src.cend(); ++i) {
+      for (size_t j = 0; j != i->second.size(); ++j) {
+        dist.bind(i->first.first, i->first.second, i->second[j]);
+      }
+    }
+  }
+
+  bool check_bind_existence(const std::string& vertice1, const std::string& vertice2,
+    const maslevtsov::Vector< std::string >& vertices)
+  {
+    bool has_vertice1 = false, has_vertice2 = false;
+    for (size_t i = 0; i != vertices.size(); ++i) {
+      if (vertices[i] == vertice1) {
+        has_vertice1 = true;
+      }
+      if (vertices[i] == vertice2) {
+        has_vertice2 = true;
+      }
+    }
+    if (has_vertice1 && has_vertice2) {
+      return true;
+    }
+    return false;
+  }
+}
+
+maslevtsov::Graph::Graph(const Graph& src1, const Graph& src2):
+  Graph()
+{
+  add_edges(*this, src1.edges_set_);
+  add_edges(*this, src2.edges_set_);
+}
+
+maslevtsov::Graph::Graph(const Graph& src, Vector< std::string >& vertices):
+  Graph()
+{
+  for (auto i = src.edges_set_.cbegin(); i != src.edges_set_.cend(); ++i) {
+    if (check_bind_existence(i->first.first, i->first.second, vertices)) {
+      for (size_t j = 0; j != i->second.size(); ++j) {
+        bind(i->first.first, i->first.second, i->second[j]);
+      }
+    }
+  }
+}
+
 maslevtsov::Tree< std::string, int > maslevtsov::Graph::get_vertices() const
 {
   Tree< std::string, int > vertices;
@@ -43,6 +91,24 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
 void maslevtsov::Graph::bind(const std::string& vertice1, const std::string& vertice2, unsigned weight)
 {
   edges_set_[std::make_pair(vertice1, vertice2)].push_back(weight);
+}
+
+bool maslevtsov::Graph::check_vertice_existence(const std::string& vertice)
+{
+  for (auto it = edges_set_.begin(); it != edges_set_.end(); ++it) {
+    if (it->first.first == vertice || it->first.second == vertice) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void maslevtsov::Graph::add_vertice(const std::string& vertice)
+{
+  if (!check_vertice_existence(vertice)) {
+    return;
+  }
+  bind(vertice, vertice, 0);
 }
 
 void maslevtsov::Graph::cut(const std::string& vertice1, const std::string& vertice2, unsigned weight)
