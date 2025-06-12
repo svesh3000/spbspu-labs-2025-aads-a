@@ -126,10 +126,10 @@ void maslevtsov::Graph::cut(const std::string& vertice1, const std::string& vert
       ++it;
     }
   }
+  if (to_cut_it->second.empty()) {
+    to_cut_it->second.push_back(0);
+  }
   if (!is_deleted) {
     throw std::invalid_argument("non-existing weight given");
-  }
-  if (to_cut_it->second.empty()) {
-    edges_set_.erase(to_cut_it);
   }
 }

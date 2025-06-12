@@ -47,8 +47,7 @@ void maslevtsov::print_outbound(const graphs_map_t& graphs, std::istream& in, st
   std::string graph_name, vertice_name;
   in >> graph_name >> vertice_name;
   Graph graph = graphs.at(graph_name);
-  Tree< std::string, int > names = graph.get_vertices();
-  if (names.find(vertice_name) == names.end()) {
+  if (!graph.check_vertice_existence(vertice_name)) {
     throw std::invalid_argument("non-existing vertice given");
   }
   Tree< std::string, Vector< unsigned > > outbound = graph.get_outbound(vertice_name);
@@ -64,8 +63,7 @@ void maslevtsov::print_inbound(const graphs_map_t& graphs, std::istream& in, std
   std::string graph_name, vertice_name;
   in >> graph_name >> vertice_name;
   Graph graph = graphs.at(graph_name);
-  Tree< std::string, int > names = graph.get_vertices();
-  if (names.find(vertice_name) == names.end()) {
+  if (!graph.check_vertice_existence(vertice_name)) {
     throw std::invalid_argument("non-existing vertice given");
   }
   Tree< std::string, Vector< unsigned > > inbound = graph.get_inbound(vertice_name);
