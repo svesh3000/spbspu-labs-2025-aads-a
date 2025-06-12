@@ -1,0 +1,5 @@
+#ifndef HASH_TABLE_DEFINITION_HPP
+#define HASH_TABLE_DEFINITION_HPP
+
+
+#endif

@@ -3,6 +3,7 @@
 #include <limits>
 #include <functional>
 #include <tree/definition.hpp>
+#include <hash_table/declaration.hpp>
 #include "graph.hpp"
 #include "bind_functor.hpp"
 #include "commands.hpp"
