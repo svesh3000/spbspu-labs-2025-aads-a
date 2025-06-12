@@ -78,6 +78,8 @@ namespace brevnov
     Iter insert(ConstIter pos, InputIter first, InputIter last);
     Iter insert(ConstIter, std::initializer_list< T >);
 
+    void reverse() noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
   private:
@@ -662,6 +664,25 @@ namespace brevnov
   typename List< T >::Iter List< T >::insert(ConstIter pos, std::initializer_list< T > il)
   {
     return insert(pos, il.begin(), il.end());
+  }
+
+  template< typename T >
+  void List< T >::reverse() noexcept
+  {
+    if (empty() || size_ == 1)
+    {
+      return;
+    }
+    Node< T >* node = head_;
+    head_ = tail_;
+    tail_ = node;
+    ConstIterator it(head_);
+    for (; it != cend(); ++it)
+    {
+      node = it.node_->next;
+      it.node_->next = it.node_->prev;
+      it.node_->prev = node;
+    }
   }
 }
 #endif
