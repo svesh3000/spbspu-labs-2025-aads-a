@@ -76,7 +76,7 @@ void sveshnikov::complement_dict(std::istream &in, DataTree_t &data)
   }
 
   Dict_t new_dict = data.at(dataset_2);
-  for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
+  for (auto it = dict1->second.cbegin(); it != dict1->second.cend();)
   {
     if (new_dict.find(it->first) == new_dict.cend())
     {
@@ -104,6 +104,27 @@ void sveshnikov::intersect_dict(std::istream &in, DataTree_t &data)
   for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
   {
     if (dict2->second.find(it->first) != dict2->second.cend())
+    {
+      new_dict[it->first] = it->second;
+    }
+  }
+  data[newdataset] = new_dict;
+}
+
+void sveshnikov::union_dict(std::istream &in, DataTree_t &data)
+{
+  std::string newdataset, dataset_1, dataset_2;
+  in >> newdataset >> dataset_1 >> dataset_2;
+  auto dict2 = data.find(dataset_2);
+  if (data.find(dataset_1) == data.cend() || dict2 == data.cend())
+  {
+    throw std::out_of_range("<INVALID COMMAND>");
+  }
+
+  Dict_t new_dict = data.at(dataset_1);
+  for (auto it = dict2->second.cbegin(); it != dict2->second.cend(); it++)
+  {
+    if (new_dict.find(it->first) == new_dict.cend())
     {
       new_dict[it->first] = it->second;
     }
