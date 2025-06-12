@@ -21,6 +21,8 @@ namespace maslov
     size_t size() const noexcept;
     float loadFactor() const;
     void rehash(size_t newCapacity);
+    iterator find(const Key & key);
+    cIterator find(const Key & key) const;
     /*T & at(const Key & key);
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
@@ -206,6 +208,32 @@ namespace maslov
   HashConstIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::cend() const
   {
     return cIterator(slots_, capacity_, capacity_);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::find(const Key & key)
+  {
+    auto pair = findPosition(key);
+    size_t pos = pair.first;
+    bool hasFind = pair.second;  
+    if (hasFind || pos == capacity_)
+    {
+      return end();
+    }
+    return iterator(slots_, capacity_, pos);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable<Key, T, HS1, HS2, EQ >::find(const Key & key) const
+  {
+    auto pair = findPosition(key);
+    size_t pos = pair.first;
+    bool hasFind = pair.second;
+    if (hasFind || pos == capacity_)
+    {
+      return cend();
+    }
+    return cIterator(slots_, capacity_, pos);
   }
 }
 

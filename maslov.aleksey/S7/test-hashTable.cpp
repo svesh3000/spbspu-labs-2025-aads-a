@@ -2,6 +2,24 @@
 #include <sstream>
 #include "hashTable.hpp"
 
+namespace maslov
+{
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  void printHashTable(std::ostream & out, const HashTable< Key, T, HS1, HS2, EQ > & hashTable)
+  {
+    if (hashTable.empty())
+    {
+      return;
+    }
+    auto it = hashTable.begin();
+    out << it->first << ' ' << it->second;
+    for (++it; it != hashTable.end(); ++it)
+    {
+      out << ' ' << it->first << ' ' << it->second;
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE(constructors)
 
 BOOST_AUTO_TEST_CASE(defaultConstructor)
@@ -48,4 +66,19 @@ BOOST_AUTO_TEST_CASE(rehash)
   hashTable.insert(2, "two");
   hashTable.rehash(10);
   BOOST_TEST(hashTable.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(find)
+{
+  maslov::HashTable< int, std::string > hashTable;
+  bool check1 = hashTable.find(1) == hashTable.end();
+  BOOST_TEST(check1);
+  hashTable.insert(1, "one");
+  hashTable.insert(2, "two");
+  auto it1 = hashTable.find(1);
+  BOOST_TEST(it1->first == 1);
+  BOOST_TEST(it1->second == "one");
+  auto it2 = hashTable.find(3);
+  bool check2 = it2 == hashTable.end();
+  BOOST_TEST(check2);
 }
