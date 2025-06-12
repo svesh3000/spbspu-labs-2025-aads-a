@@ -11,9 +11,10 @@ namespace maslov
   template< class Key, class T, class HS1 = std::hash< Key >, class HS2 = boost::hash2::xxhash_64, class EQ = std::equal_to< Key > >
   struct HashTable
   {
-    using cIterator = HashCIterator< Key, T, HS1, HS2, EQ >;
+    using cIterator = HashConstIterator< Key, T, HS1, HS2, EQ >;
     using iterator = HashIterator< Key, T, HS1, HS2, EQ >;
 
+    HashTable();
     HashTable(size_t capacity);
     ~HashTable();
     bool empty() const noexcept;
@@ -35,6 +36,11 @@ namespace maslov
     float maxLoadFactor_;
     size_t computexxhash(const Key & key) const;
   };
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable():
+    HashTable(10)
+  {}
 
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity):
