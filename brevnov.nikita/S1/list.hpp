@@ -460,21 +460,21 @@ namespace brevnov
     }
     Node< T >* toDelete = pos.node_;
     Node< T >* nextNode = toDelete->next;
-    if (toDelete == head_)
-    {
-      head_ = nextNode;
-    }
-    if (toDelete == tail_)
-    {
-      tail_ = toDelete->prev;
-    }
-    if (toDelete->prev != nullptr)
+    if (toDelete->prev)
     {
       toDelete->prev->next = nextNode;
     }
-    if (nextNode != nullptr)
+    else
+    {
+      head_ = nextNode;
+    }
+    if (nextNode)
     {
       nextNode->prev = toDelete->prev;
+    }
+    else
+    {
+      tail_ = toDelete->prev;
     }
     delete toDelete;
     size_--;
@@ -557,36 +557,32 @@ namespace brevnov
   template< typename T >
   void List< T >::splice(ConstIter pos, List< T >& list, ConstIter first, ConstIter last) noexcept
   {
-    if (first == last || &list == this)
+    if (first == last || &list == this || list.empty())
     {
       return;
     }
-    Node< T >* firstNode = first.node_;
-    Node< T >* lastNode = last.node_->prev;
-    size_t dist = std::distance(first, last);
-    if (firstNode == list.head_)
+    size_t dist = 0;
+    Node<T>* firstNode = first.node_;
+    Node<T>* lastNode = firstNode;
+    for (ConstIter it = first; it != last; ++it, ++dist)
     {
-      list.head_ = last.node_;
-      if (list.head_)
-      {
-        list.head_->prev = nullptr;
-      }
+      lastNode = it.node_;
+    }
+    if (firstNode->prev)
+    {
+      firstNode->prev->next = lastNode->next;
     }
     else
     {
-      firstNode->prev->next = last.node_;
+      list.head_ = lastNode->next;
     }
-    if (last.node_ == nullptr)
+    if (lastNode->next)
+    {
+      lastNode->next->prev = firstNode->prev;
+    }
+    else
     {
       list.tail_ = firstNode->prev;
-      if (list.tail_)
-      {
-        list.tail_->next = nullptr;
-      }
-    }
-    else
-    {
-      last.node_->prev = firstNode->prev;
     }
     if (pos == cbegin())
     {
@@ -617,10 +613,6 @@ namespace brevnov
     }
     list.size_ -= dist;
     size_ += dist;
-    if (list.empty())
-    {
-      list.tail_ = nullptr;
-    }
   }
 
   template< typename T >
