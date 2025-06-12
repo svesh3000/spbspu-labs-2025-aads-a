@@ -28,18 +28,19 @@ int main(int argc, char **argv)
     try
     {
       comand_holder.at(command)(std::cin, dictionary_tree);
+      if (command == "print")
+      {
+        std::cout << '\n';
+      }
     }
     catch (const std::out_of_range &e)
     {
-      std::cerr << "<INVALID COMMAND>" << '\n';
+      std::cerr << e.what() << '\n';
+      std::cout << "<INVALID COMMAND>" << '\n';
     }
     catch (const std::exception &e)
     {
       std::cerr << e.what() << '\n';
-    }
-    if (command == "print")
-    {
-      std::cout << '\n';
     }
   }
   return 0;

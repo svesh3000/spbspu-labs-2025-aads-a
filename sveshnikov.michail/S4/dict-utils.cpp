@@ -7,7 +7,7 @@ namespace
   {
     if (data.find(dict_name) == data.cend())
     {
-      throw std::out_of_range("<INVALID COMMAND>");
+      throw std::out_of_range("Error: cannot find the dictionary!");
     }
   }
 }
@@ -65,7 +65,8 @@ void sveshnikov::printDict(std::istream &in, const DataTree_t &data)
   auto dict = data.find(dataset);
   if (dict->second.empty())
   {
-    throw std::logic_error("<EMPTY>");
+    std::cout << "<EMPTY>";
+    return;
   }
   std::cout << dataset;
   for (auto it = dict->second.cbegin(); it != dict->second.cend(); it++)
@@ -83,7 +84,7 @@ void sveshnikov::complementDict(std::istream &in, DataTree_t &data)
 
   auto dict1 = data.find(dataset_1);
   Dict_t new_dict = data.at(dataset_2);
-  for (auto it = dict1->second.cbegin(); it != dict1->second.cend();)
+  for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
   {
     if (new_dict.find(it->first) == new_dict.cend())
     {
