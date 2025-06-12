@@ -273,93 +273,39 @@ namespace brevnov
   template< class T >
   void List< T >::push_back(const T &data)
   {
-    Node< T > * node = new Node< T >{data, nullptr, nullptr};
-    if (empty())
-    {
-      head_ = node;
-      tail_ = node;
-    }
-    else
-    {
-      tail_->next = node;
-      node->prev = tail_;
-      tail_ = node;
-    }
-    ++size_;
+    insert(cend(), data);
   }
 
   template< class T >
   void List< T >::push_back(T &&data)
   {
-    push_back(std::move(data));
+    insert(cend(), std::move(data));
   }
 
   template< class T >
   void List< T >::push_front(const T &data)
   {
-    Node< T > * node = new Node< T >{data, nullptr, nullptr};
-    if (empty())
-    {
-      head_ = node;
-      tail_ = node;
-    }
-    else
-    {
-      head_->prev = node;
-      node->next = head_;
-      head_ = node;
-    }
-    ++size_;
+    insert(cbegin(), data);
   }
 
   template< class T >
   void List< T >::push_front(T &&data)
   {
-    push_front(data);
+    insert(cbegin(), std::move(data));
   }
 
   template< class T >
   void List< T >::pop_back() noexcept
   {
-    if (!empty())
-    {
-      --size_;
-      if (head_ == tail_)
-      {
-        delete tail_;
-        head_ = nullptr;
-        tail_ = nullptr;
-      }
-      else
-      {
-        Node< T > * node = tail_->prev;
-        delete tail_;
-        tail_ = node;
-        tail_->next = nullptr;
-      }
-    }
+    assert(!empty());
+    erase(ConstIterator(tail_));
   }
 
   template< class T >
   void List< T >::pop_front() noexcept
   {
-    if (!empty())
-    {
-      --size_;
-      if (head_ == tail_)
-      {
-        delete head_;
-        head_ = nullptr;
-        tail_ = nullptr;
-      }
-      else
-      {
-        Node< T > * node = head_->next;
-        delete head_;
-        head_ = node;
-        head_->prev = nullptr;
-      }
-    }
+    assert(!empty());
+    erase(cbegin());
   }
 
   template< typename T >
