@@ -551,43 +551,69 @@ namespace brevnov
   template< typename T >
   void List< T >::splice(ConstIter pos, List< T >& list, ConstIter first, ConstIter last) noexcept
   {
+    if (first == last || &list == this)
+    {
+      return;
+    }
     Node< T >* firstNode = first.node_;
     Node< T >* lastNode = last.node_->prev;
     size_t dist = std::distance(first, last);
-    list.size_ -= dist;
-    size_ += dist;
-    firstNode->prev->next = lastNode->next;
-    lastNode->next->prev = firstNode->prev;
     if (firstNode == list.head_)
     {
       list.head_ = last.node_;
-      list.head_->prev = nullptr;
+      if (list.head_)
+      {
+        list.head_->prev = nullptr;
+      }
     }
-    if (lastNode == list.tail_->prev)
+    else
     {
-      list.tail_->prev = first.node_->prev;
-      first.node_->prev->next = nullptr;
+      firstNode->prev->next = last.node_;
+    }
+    if (last.node_ == nullptr)
+    {
+      list.tail_ = firstNode->prev;
+      if (list.tail_)
+      {
+        list.tail_->next = nullptr;
+      }
+    }
+    else
+    {
+      last.node_->prev = firstNode->prev;
     }
     if (pos == cbegin())
     {
+      firstNode->prev = nullptr;
       lastNode->next = head_;
-      head_->prev = lastNode;
+      if (head_)
+      {
+        head_->prev = lastNode;
+      }
       head_ = firstNode;
-      head_->prev = nullptr;
     }
     else if (pos == cend())
     {
-      tail_->next = firstNode;
-      firstNode->prev = tail_;
       lastNode->next = nullptr;
+      firstNode->prev = tail_;
+      if (tail_)
+      {
+        tail_->next = firstNode;
+      }
       tail_ = lastNode;
     }
     else
     {
-      pos.node_->prev->next = firstNode;
       firstNode->prev = pos.node_->prev;
       lastNode->next = pos.node_;
+      pos.node_->prev->next = firstNode;
       pos.node_->prev = lastNode;
+    }
+    list.size_ -= dist;
+    size_ += dist;
+    if (list.empty())
+    {
+      list.tail_ = nullptr;
     }
   }
 
