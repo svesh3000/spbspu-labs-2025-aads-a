@@ -60,3 +60,18 @@ void sveshnikov::print_dict(std::istream &in, const DataTree_t &data)
     std::cout << " " << it->first << " " << it->second;
   }
 }
+
+void sveshnikov::complement_dict(std::istream &in, DataTree_t &data)
+{
+  std::string newdataset, dataset_1, dataset_2;
+  in >> newdataset >> dataset_1 >> dataset_2;
+  Dict_t new_dict;
+  auto dict1 = data.find(dataset_1);
+  auto dict2 = data.find(dataset_2);
+  for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
+  {
+    for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
+    {
+    }
+  }
+}
