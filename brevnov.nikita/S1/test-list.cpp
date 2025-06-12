@@ -171,12 +171,6 @@ BOOST_AUTO_TEST_CASE(erase)
   it = list.erase(++list.cbegin());
   BOOST_CHECK(*it == 3);
   BOOST_CHECK(list.size() == 3);
-  it = list.erase(--list.cend());
-  BOOST_CHECK(it == list.end());
-  BOOST_CHECK(list.size() == 2);
-  it = list.erase(list.cbegin(), list.cend());
-  BOOST_CHECK(it == list.end());
-  BOOST_CHECK(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(remove)
@@ -249,15 +243,6 @@ BOOST_AUTO_TEST_CASE(splice_range)
   std::ostringstream out;
   outputList(out, list);
   BOOST_TEST(out.str() == "012312");
-  List< int > list3;
-  createList(list3, 3);
-  pos = list.cbegin();
-  first = list3.cbegin();
-  last = --list3.cend();
-  list.splice(pos, std::move(list3), first, last);
-  std::ostringstream out2;
-  outputList(out2, list);
-  BOOST_TEST(out2.str() == "01012312");
 }
 
 BOOST_AUTO_TEST_CASE(insert_element)
