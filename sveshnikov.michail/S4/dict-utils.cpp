@@ -1,6 +1,17 @@
 #include "dict-utils.hpp"
 #include <fstream>
 
+namespace
+{
+  void validateDict(std::string dict_name, const sveshnikov::DataTree_t &data)
+  {
+    if (data.find(dict_name) == data.cend())
+    {
+      throw std::out_of_range("<INVALID COMMAND>");
+    }
+  }
+}
+
 sveshnikov::DataTree_t sveshnikov::loadDicts(char *filename)
 {
   std::ifstream in(filename);
@@ -37,23 +48,21 @@ sveshnikov::CommandHolder_t sveshnikov::getCommands()
 {
   CommandHolder_t command_holder;
 
-  command_holder["print"] = print_dict;
-  command_holder["complement"] = complement_dict;
-  command_holder["intersect"] = intersect_dict;
-  command_holder["union"] = union_dict;
+  command_holder["print"] = printDict;
+  command_holder["complement"] = complementDict;
+  command_holder["intersect"] = intersectDict;
+  command_holder["union"] = unionDict;
 
   return command_holder;
 }
 
-void sveshnikov::print_dict(std::istream &in, const DataTree_t &data)
+void sveshnikov::printDict(std::istream &in, const DataTree_t &data)
 {
   std::string dataset;
   in >> dataset;
+  validateDict(dataset, data);
+
   auto dict = data.find(dataset);
-  if (dict == data.cend())
-  {
-    throw std::out_of_range("<INVALID COMMAND>");
-  }
   if (dict->second.empty())
   {
     throw std::logic_error("<EMPTY>");
@@ -65,16 +74,14 @@ void sveshnikov::print_dict(std::istream &in, const DataTree_t &data)
   }
 }
 
-void sveshnikov::complement_dict(std::istream &in, DataTree_t &data)
+void sveshnikov::complementDict(std::istream &in, DataTree_t &data)
 {
   std::string newdataset, dataset_1, dataset_2;
   in >> newdataset >> dataset_1 >> dataset_2;
-  auto dict1 = data.find(dataset_1);
-  if (dict1 == data.cend() || data.find(dataset_2) == data.cend())
-  {
-    throw std::out_of_range("<INVALID COMMAND>");
-  }
+  validateDict(dataset_1, data);
+  validateDict(dataset_2, data);
 
+  auto dict1 = data.find(dataset_1);
   Dict_t new_dict = data.at(dataset_2);
   for (auto it = dict1->second.cbegin(); it != dict1->second.cend();)
   {
@@ -90,16 +97,14 @@ void sveshnikov::complement_dict(std::istream &in, DataTree_t &data)
   data[newdataset] = new_dict;
 }
 
-void sveshnikov::intersect_dict(std::istream &in, DataTree_t &data)
+void sveshnikov::intersectDict(std::istream &in, DataTree_t &data)
 {
   std::string newdataset, dataset_1, dataset_2;
   in >> newdataset >> dataset_1 >> dataset_2;
-  auto dict1 = data.find(dataset_1), dict2 = data.find(dataset_2);
-  if (dict1 == data.cend() || dict2 == data.cend())
-  {
-    throw std::out_of_range("<INVALID COMMAND>");
-  }
+  validateDict(dataset_1, data);
+  validateDict(dataset_2, data);
 
+  auto dict1 = data.find(dataset_1), dict2 = data.find(dataset_2);
   Dict_t new_dict;
   for (auto it = dict1->second.cbegin(); it != dict1->second.cend(); it++)
   {
@@ -111,16 +116,14 @@ void sveshnikov::intersect_dict(std::istream &in, DataTree_t &data)
   data[newdataset] = new_dict;
 }
 
-void sveshnikov::union_dict(std::istream &in, DataTree_t &data)
+void sveshnikov::unionDict(std::istream &in, DataTree_t &data)
 {
   std::string newdataset, dataset_1, dataset_2;
   in >> newdataset >> dataset_1 >> dataset_2;
-  auto dict2 = data.find(dataset_2);
-  if (data.find(dataset_1) == data.cend() || dict2 == data.cend())
-  {
-    throw std::out_of_range("<INVALID COMMAND>");
-  }
+  validateDict(dataset_1, data);
+  validateDict(dataset_2, data);
 
+  auto dict2 = data.find(dataset_2);
   Dict_t new_dict = data.at(dataset_1);
   for (auto it = dict2->second.cbegin(); it != dict2->second.cend(); it++)
   {

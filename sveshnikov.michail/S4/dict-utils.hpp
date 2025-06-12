@@ -14,9 +14,9 @@ namespace sveshnikov
   DataTree_t loadDicts(char *filename);
   CommandHolder_t getCommands();
 
-  void print_dict(std::istream &in, const DataTree_t &data);
-  void complement_dict(std::istream &in, DataTree_t &data);
-  void intersect_dict(std::istream &in, DataTree_t &data);
-  void union_dict(std::istream &in, DataTree_t &data);
+  void printDict(std::istream &in, const DataTree_t &data);
+  void complementDict(std::istream &in, DataTree_t &data);
+  void intersectDict(std::istream &in, DataTree_t &data);
+  void unionDict(std::istream &in, DataTree_t &data);
 }
 #endif
