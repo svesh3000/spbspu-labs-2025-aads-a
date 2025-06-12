@@ -161,4 +161,23 @@ BOOST_AUTO_TEST_CASE(swap)
   BOOST_TEST(list2.size() == copyList.size());
 }
 
+BOOST_AUTO_TEST_CASE(erase)
+{
+  List< int > list;
+  createList(list, 20);
+  List< int >::ConstIter begin = list.cbegin();
+  List< int >::Iter it = list.erase(begin);
+  BOOST_CHECK(it == list.begin());
+  List< int>::ConstIter end = --list.cend();
+  it = list.erase(end);
+  BOOST_CHECK(it == list.end());
+  List< int >::ConstIter iter = ++list.cbegin();
+  it = list.erase(iter);
+  BOOST_CHECK(*it == 3);
+  begin = ++list.cbegin();
+  end = --list.cend();
+  it = list.erase(begin, end);
+  BOOST_CHECK(it == --list.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
