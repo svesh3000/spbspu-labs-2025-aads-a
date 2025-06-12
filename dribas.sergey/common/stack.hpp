@@ -86,7 +86,7 @@ namespace dribas
   {
     if (this != std::addressof(other)) {
       Stack< T > temp(std::move(other));
-      swap(temp); 
+      swap(temp);
     }
     return *this;
   }
