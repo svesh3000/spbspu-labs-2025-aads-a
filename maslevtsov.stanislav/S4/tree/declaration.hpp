@@ -11,8 +11,6 @@ namespace maslevtsov {
   public:
     using value_type = std::pair< Key, T >;
     using size_type = std::size_t;
-    using reference = value_type&;
-    using const_reference = const value_type&;
     using iterator = TreeIterator< value_type, detail::IteratorType::NONCONSTANT >;
     using const_iterator = TreeIterator< value_type, detail::IteratorType::CONSTANT >;
 
