@@ -33,16 +33,9 @@ namespace maslevtsov {
     using const_iterator = HashTableIterator< value_type, detail::HashTableIteratorType::CONSTANT >;
 
     HashTable() noexcept;
-    HashTable(const HashTable& rhs);
-    HashTable(HashTable&& rhs) noexcept;
     template< class InputIt >
     HashTable(InputIt first, InputIt last);
     HashTable(std::initializer_list< value_type > ilist);
-    ~HashTable() noexcept;
-
-    HashTable& operator=(const HashTable& rhs);
-    HashTable& operator=(HashTable&& rhs) noexcept;
-    HashTable& operator=(std::initializer_list< value_type > ilist);
 
     T& operator[](const Key& key);
     T& at(const Key& key);
@@ -83,7 +76,7 @@ namespace maslevtsov {
   private:
     Vector< detail::Slot< value_type > > slots_;
     size_type size_;
-    Hash hash_;
+    Hash hasher_;
     KeyEqual key_equal_;
     float max_load_factor_ = 1.0;
   };
