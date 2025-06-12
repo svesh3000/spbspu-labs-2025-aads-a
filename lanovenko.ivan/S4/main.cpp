@@ -2,9 +2,7 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
-#include "tree_node.hpp"
-#include "tree.hpp"
-#include "tree_iterator.hpp"
+#include <tree.hpp>
 #include "input_output_dictionaries.hpp"
 #include "command_processing.hpp"
 
