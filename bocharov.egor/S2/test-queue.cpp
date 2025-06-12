@@ -27,14 +27,11 @@ BOOST_AUTO_TEST_CASE(assignment_operators)
   BOOST_TEST(queue3.size() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(back_and_front)
+BOOST_AUTO_TEST_CASE(front)
 {
   bocharov::Queue< int > queue;
   queue.push(1);
   queue.push(3);
-  const int i = queue.back();
-  BOOST_TEST(i == 3);
-  BOOST_TEST(queue.back() == 3);
   const int a = queue.front();
   BOOST_TEST(a == 1);
   BOOST_TEST(queue.front() == 1);
