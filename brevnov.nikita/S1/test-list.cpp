@@ -164,20 +164,19 @@ BOOST_AUTO_TEST_CASE(swap)
 BOOST_AUTO_TEST_CASE(erase)
 {
   List< int > list;
-  createList(list, 20);
-  List< int >::ConstIter begin = list.cbegin();
-  List< int >::Iter it = list.erase(begin);
-  BOOST_CHECK(it == list.begin());
-  List< int>::ConstIter end = --list.cend();
-  it = list.erase(end);
-  BOOST_CHECK(it == list.end());
-  List< int >::ConstIter iter = ++list.cbegin();
-  it = list.erase(iter);
+  createList(list, 5);
+  auto it = list.erase(list.cbegin());
+  BOOST_CHECK(*it == 1);
+  BOOST_CHECK(list.size() == 4);
+  it = list.erase(++list.cbegin());
   BOOST_CHECK(*it == 3);
-  begin = ++list.cbegin();
-  end = --list.cend();
-  it = list.erase(begin, end);
-  BOOST_CHECK(it == --list.end());
+  BOOST_CHECK(list.size() == 3);
+  it = list.erase(--list.cend());
+  BOOST_CHECK(it == list.end());
+  BOOST_CHECK(list.size() == 2);
+  it = list.erase(list.cbegin(), list.cend());
+  BOOST_CHECK(it == list.end());
+  BOOST_CHECK(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(remove)
