@@ -465,7 +465,7 @@ namespace brevnov
       tail_ = pos.node_->prev;
       tail_->next = nullptr;
     }
-    else 
+    else
     {
       pos.node_->prev->next = pos.node_->next;
       pos.node_->next->prev = pos.node_->prev;
@@ -590,7 +590,6 @@ namespace brevnov
   {
     splice(pos, list, first, last);
   }
-
 
   template< typename T >
   typename List< T >::Iter List< T >::insert(ConstIter pos, const T& data)
