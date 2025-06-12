@@ -44,3 +44,19 @@ sveshnikov::CommandHolder_t sveshnikov::getCommands()
 
   return command_holder;
 }
+
+void sveshnikov::print_dict(std::istream &in, const DataTree_t &data)
+{
+  std::string dataset;
+  in >> dataset;
+  auto dict = data.find(dataset);
+  if (dict->second.empty())
+  {
+    throw std::logic_error("<EMPTY>");
+  }
+  std::cout << dataset;
+  for (auto it = dict->second.cbegin(); it != dict->second.cend(); it++)
+  {
+    std::cout << " " << it->first << " " << it->second;
+  }
+}
