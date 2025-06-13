@@ -1,6 +1,24 @@
 #include "graph.hpp"
 #include <stdexcept>
 
+namespace
+{
+  void bubbleSort(std::vector< std::pair< std::string, std::vector< int > > > & vec)
+  {
+    for (size_t i = 0; i < vec.size(); ++i)
+    {
+      for (size_t j = i + 1; j < vec.size(); ++j)
+      {
+        if (vec[j] < vec[i])
+        {
+          std::swap(vec[i], vec[j]);
+        }
+      }
+    }
+  }
+}
+
+
 void maslov::Graph::extract(const Graph & graph, const std::set< std::string > & extractVertexes)
 {
   for (auto it = extractVertexes.begin(); it != extractVertexes.end(); it++)
@@ -116,6 +134,7 @@ std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getOu
       result.push_back({it->first.second, edges.at({it->first.first, it->first.second})});
     }
   }
+  bubbleSort(result);
   return result;
 }
 
@@ -129,5 +148,6 @@ std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getIn
       result.push_back({it->first.first, edges.at({it->first.first, it->first.second})});
     }
   }
+  bubbleSort(result);
   return result;
 }
