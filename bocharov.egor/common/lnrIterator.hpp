@@ -7,7 +7,7 @@
 #include "iterator.hpp"
 #include "stack.hpp"
 #include "treeNode.hpp"
-namespace kiselev
+namespace bocharov
 {
   template< typename Key, typename Value, typename Cmp >
   class RBTree;
@@ -19,15 +19,15 @@ namespace kiselev
     {
     public:
       using value = std::pair< Key, Value >;
-      using reference = std::conditional_t< IsConst, const value&, value& >;
-      using pointer = std::conditional_t< IsConst, const value*, value* >;
+      using reference = std::conditional_t< IsConst, const value &, value & >;
+      using pointer = std::conditional_t< IsConst, const value *, value * >;
       using Node = TreeNode< Key, Value >;
 
       LnrIterator() noexcept;
       template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-      LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst >&);
+      LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst > &);
       template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
-      LnrIterator< Key, Value, Cmp, IsConst > operator=(const LnrIterator< Key, Value, Cmp, OtherIsConst >&);
+      LnrIterator< Key, Value, Cmp, IsConst > operator=(const LnrIterator< Key, Value, Cmp, OtherIsConst > &);
 
       LnrIterator< Key, Value, Cmp, IsConst > operator++();
       LnrIterator< Key, Value, Cmp, IsConst > operator++(int);
@@ -36,19 +36,19 @@ namespace kiselev
       reference operator*() const noexcept;
       pointer operator->() const noexcept;
 
-      bool operator==(const LnrIterator< Key, Value, Cmp, IsConst >&) const noexcept;
-      bool operator!=(const LnrIterator< Key, Value, Cmp, IsConst >&) const noexcept;
+      bool operator==(const LnrIterator< Key, Value, Cmp, IsConst > &) const noexcept;
+      bool operator!=(const LnrIterator< Key, Value, Cmp, IsConst > &) const noexcept;
     private:
-      Node* node_;
+      Node * node_;
       Stack< Node* > stack_;
-      explicit LnrIterator(Node*) noexcept;
+      explicit LnrIterator(Node *) noexcept;
       friend class LnrIterator< Key, Value, Cmp, !IsConst >;
       friend class RBTree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
-    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst >& oth):
+    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(const LnrIterator< Key, Value, Cmp, OtherIsConst > & oth):
       node_(oth.node_),
       stack_(oth.stack_)
     {}
@@ -62,14 +62,14 @@ namespace kiselev
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > >
     LnrIterator< Key, Value, Cmp, IsConst > LnrIterator< Key, Value, Cmp, IsConst >::operator=(
-      const LnrIterator< Key, Value, Cmp, OtherIsConst >& oth)
+      const LnrIterator< Key, Value, Cmp, OtherIsConst > & oth)
     {
       node_ = oth.node_;
       stack_ = oth.stack_;
     }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
-    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(Node* node) noexcept:
+    LnrIterator< Key, Value, Cmp, IsConst >::LnrIterator(Node * node) noexcept:
       node_(node),
       stack_()
     {}
@@ -126,6 +126,24 @@ namespace kiselev
       return node_->data;
     }
 
+    template< typename Key, typename Value, typename Cmp, bool IsConst >
+    typename LnrIterator< Key, Value, Cmp, IsConst >::pointer LnrIterator< Key, Value, Cmp, IsConst >::operator->() const noexcept
+    {
+      assert(node_ != nullptr);
+      return std::addressof(node_->data);
+    }
+
+    template< typename Key, typename Value, typename Cmp, bool IsConst >
+    bool LnrIterator< Key, Value, Cmp, IsConst >::operator==(const LnrIterator<Key, Value, Cmp, IsConst> & oth) const noexcept
+    {
+      return node_ == oth.node_;
+    }
+
+    template< typename Key, typename Value, typename Cmp, bool IsConst >
+    bool LnrIterator< Key, Value, Cmp, IsConst >::operator!=(const LnrIterator<Key, Value, Cmp, IsConst> & oth) const noexcept
+    {
+      return !(*this == oth);
+    }
   }
 }
 #endif
