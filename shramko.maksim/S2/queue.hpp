@@ -13,7 +13,7 @@ namespace shramko
     QueueString() noexcept;
     ~QueueString();
     QueueString(const QueueString&) = delete;
-    QueueString(QueueString&&);
+    QueueString(QueueString&&) = delete;
     QueueString& operator=(const QueueString&) = delete;
     QueueString& operator=(QueueString&&) = delete;
 
@@ -49,7 +49,7 @@ namespace shramko
     QueueOfQueueString& operator=(const QueueOfQueueString&) = delete;
     QueueOfQueueString& operator=(QueueOfQueueString&&) = delete;
 
-    void push(QueueString&& data);
+    void push(QueueString& data);
     void pop();
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -62,7 +62,7 @@ namespace shramko
     {
       QueueString data;
       Node* next;
-      explicit Node(QueueString&& d, Node* n = nullptr);
+      explicit Node(QueueString& d, Node* n = nullptr);
     };
     Node* head_;
     Node* tail_;

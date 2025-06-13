@@ -75,14 +75,13 @@ namespace
       inputInfix(in, temp_inf_expr);
       if (!temp_inf_expr.empty())
       {
-        queue.push(std::move(temp_inf_expr));
+        queue.push(temp_inf_expr);
       }
     }
   }
 
-  shramko::QueueString convertInfToPost(shramko::QueueString& inf)
+  void convertInfToPost(shramko::QueueString& inf, shramko::QueueString& post_queue)
   {
-    shramko::QueueString post_queue;
     shramko::StackString stack;
     while (!inf.empty())
     {
@@ -158,7 +157,6 @@ namespace
       post_queue.push(stack_temp);
       stack.pop();
     }
-    return post_queue;
   }
 
   bool isOverflowedAdd(long long a, long long b)
@@ -346,11 +344,20 @@ int main(const int argc, const char* const* const argv)
     }
     while (!inf_exprs.empty())
     {
-      QueueString temp_inf = std::move(inf_exprs.front());
+      shramko::QueueString temp_inf;
+      shramko::QueueString& front_ref = inf_exprs.front();
+      while (!front_ref.empty())
+      {
+        temp_inf.push(front_ref.front());
+        front_ref.pop();
+      }
+      
       inf_exprs.pop();
+      
       if (!temp_inf.empty())
       {
-        QueueString temp_post = convertInfToPost(temp_inf);
+        shramko::QueueString temp_post;
+        convertInfToPost(temp_inf, temp_post);
         results.push(calculateExpr(temp_post));
       }
     }

@@ -110,10 +110,18 @@ namespace shramko
     std::swap(size_, other.size_);
   }
 
-  QueueOfQueueString::Node::Node(QueueString&& d, Node* n):
-    data(std::move(d)),
+  QueueOfQueueString::Node::Node(QueueString& d, Node* n):
+    data(),
     next(n)
-  {}
+  {
+    shramko::QueueString temp;
+    while (!d.empty())
+    {
+      temp.push(d.front());
+      d.pop();
+    }
+    data.swap(temp);
+  }
 
   QueueOfQueueString::QueueOfQueueString() noexcept:
     head_(nullptr),
@@ -131,9 +139,9 @@ namespace shramko
     }
   }
 
-  void QueueOfQueueString::push(QueueString&& data)
+  void QueueOfQueueString::push(QueueString& data)
   {
-    Node* newNode = new Node(std::move(data));
+    Node* newNode = new Node(data);
     if (tail_)
     {
       tail_->next = newNode;
