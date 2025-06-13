@@ -202,7 +202,8 @@ namespace duhanina
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  std::pair< typename HashTable< Key, Value, Hash, Equal >::iterator, bool > HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& value)
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::iterator, bool >
+    HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& value)
   {
     return emplace(value.first, value.second);
   }
@@ -219,7 +220,8 @@ namespace duhanina
 
   template < class Key, class Value, class Hash, class Equal >
   template < typename K, typename V >
-  std::pair< typename HashTable< Key, Value, Hash, Equal >::iterator, bool > HashTable< Key, Value, Hash, Equal >::emplace(K&& key, V&& value)
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::iterator, bool >
+    HashTable< Key, Value, Hash, Equal >::emplace(K&& key, V&& value)
   {
     if (size_ + 1 > max_load_factor_ * buckets_.size())
     {
