@@ -82,3 +82,26 @@ BOOST_AUTO_TEST_CASE(find)
   bool check2 = it2 == hashTable.end();
   BOOST_TEST(check2);
 }
+
+BOOST_AUTO_TEST_SUITE(elementAccess)
+
+BOOST_AUTO_TEST_CASE(at)
+{
+  maslov::HashTable< int, std::string > hashTable;
+  hashTable.insert(1, "one");
+  hashTable.insert(2, "two");
+  BOOST_TEST(hashTable.at(1) == "one");
+  BOOST_TEST(hashTable.at(2) == "two");
+}
+
+BOOST_AUTO_TEST_CASE(operatorSquareBrackets)
+{
+  maslov::HashTable< int, std::string > hashTable;
+  hashTable[1] = "one";
+  hashTable[2] = "two";
+  BOOST_TEST(hashTable[1] == "one");
+  BOOST_TEST(hashTable[2] == "two");
+  BOOST_TEST(hashTable.size() == 2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

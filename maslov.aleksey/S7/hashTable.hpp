@@ -23,11 +23,11 @@ namespace maslov
     void rehash(size_t newCapacity);
     iterator find(const Key & key);
     cIterator find(const Key & key) const;
-    /*T & at(const Key & key);
+    T & at(const Key & key);
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
     T & operator[](Key && key);
-    void clear() noexcept;*/
+    void clear() noexcept;
     std::pair< iterator, bool > insert(const Key & key, const T & value);
     //template< class InputIt >
     //void insert(InputIt first, InputIt last);
@@ -56,7 +56,7 @@ namespace maslov
     slots_(new HashNode< Key, T >[capacity]),
     capacity_(capacity),
     size_(0),
-    maxLoadFactor_(0.7)
+    maxLoadFactor_(0.7f)
   {}
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -234,6 +234,53 @@ namespace maslov
       return cend();
     }
     return cIterator(slots_, capacity_, pos);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  T & HashTable< Key, T, HS1, HS2, EQ >::at(const Key & key)
+  {
+    auto it = find(key);
+    if (it == end())
+    {
+      throw std::out_of_range("ERROR: key not found");
+    }
+    return it->second;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  const T & HashTable< Key, T, HS1, HS2, EQ >::at(const Key & key) const
+  {
+    auto it = find(key);
+    if (it == cend())
+    {
+        throw std::out_of_range("ERROR: key not found");
+    }
+    return it->second;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  T & HashTable< Key, T, HS1, HS2, EQ >::operator[](const Key & key)
+  {
+    auto result = insert(key, T{});
+    return result.first->second;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  T & HashTable< Key, T, HS1, HS2, EQ >::operator[](Key && key)
+  {
+    auto result = insert(std::move(key), T{});
+    return result.first->second;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  void HashTable< Key, T, HS1, HS2, EQ >::clear() noexcept
+  {
+    for (size_t i = 0; i < capacity_; i++)
+    {
+      slots_[i].occupied = false;
+      slots_[i].deleted = false;
+    }
+    size_ = 0;
   }
 }
 
