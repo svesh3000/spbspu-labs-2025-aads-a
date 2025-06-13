@@ -11,7 +11,7 @@ namespace lanovenko
 {
   using map_t = Tree < std::string, Tree< int, std::string, std::less< int > >, std::less< std::string > >;
   void getDictionaries(std::istream& in, map_t&);
-  void printDictionary(map_t& dictionaries);
+  void printDictionary(const map_t& dictionaries);
 }
 
 #endif

@@ -15,7 +15,7 @@ void lanovenko::merge(map_t& dictionaries)
   {
     dataset_union.insert(pair);
   }
-  dictionaries.insert({ new_dataset, dataset_union });
+  dictionaries[new_dataset] = dataset_union;
 }
 
 void lanovenko::complement(map_t& dictionaries)
@@ -32,7 +32,7 @@ void lanovenko::complement(map_t& dictionaries)
       dataset_complement.insert(pair);
     }
   }
-  dictionaries.insert({ new_dataset, dataset_complement });
+  dictionaries[new_dataset] = dataset_complement;
 }
 
 void lanovenko::intersect(map_t& dictionaries)
@@ -49,26 +49,5 @@ void lanovenko::intersect(map_t& dictionaries)
       dataset_intersect.insert(pair);
     }
   }
-  dictionaries.insert({ new_dataset, dataset_intersect });
-}
-
-lanovenko::CommandType lanovenko::parseCommand(const std::string& cmd)
-{
-  if (cmd == "print")
-  {
-    return CommandType::PRINT;
-  }
-  if (cmd == "complement")
-  {
-    return CommandType::COMPLEMENT;
-  }
-  if (cmd == "intersect")
-  {
-    return CommandType::INTERSECT;
-  }
-  if (cmd == "union")
-  {
-    return CommandType::UNION;
-  }
-  return CommandType::INVALID;
+  dictionaries[new_dataset] = dataset_intersect;
 }

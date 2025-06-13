@@ -310,7 +310,7 @@ namespace lanovenko
     {
       return (*position).second;
     }
-    throw std::out_of_range("< INVALID COMMAND >");
+    throw std::out_of_range("Wrong key");
   }
 
   template< typename Key, typename Value, typename Comparator >
@@ -321,7 +321,7 @@ namespace lanovenko
     {
       return (*position).second;
     }
-    throw std::out_of_range("< INVALID COMMAND >");
+    throw std::out_of_range("Wrong key");
   }
 
   template< typename Key, typename Value, typename Comparator >

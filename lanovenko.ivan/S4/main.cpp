@@ -9,43 +9,35 @@
 int main(int argc, char** argv)
 {
   using namespace lanovenko;
-
   if (argc != 2)
   {
-    std::cerr << "< INVALID PARAMETRS COUNT >\n";
+    std::cerr << "<INVALID PARAMETRS COUNT>\n";
     return 1;
   }
   std::ifstream input(argv[1]);
-
   map_t dictionaries{};
   getDictionaries(input, dictionaries);
+
+  commands_t commands;
+  try
+  {
+    commands["print"] = printDictionary;
+    commands["complement"] = complement;
+    commands["union"] = merge;
+    commands["intersect"] = intersect;
+  }
+  catch(...)
+  {
+    std::cerr << "<OPERATION ERROR>";
+    return 1;
+  }
+
   std::string command = "";
   while (!(std::cin >> command).eof())
   {
-    CommandType cmdType = parseCommand(command);
     try
     {
-      switch (cmdType)
-      {
-      case CommandType::PRINT:
-        printDictionary(dictionaries);
-        break;
-      case CommandType::COMPLEMENT:
-        complement(dictionaries);
-        break;
-      case CommandType::INTERSECT:
-        intersect(dictionaries);
-        break;
-      case CommandType::UNION:
-        merge(dictionaries);
-        break;
-      case CommandType::INVALID:
-        std::cout << "<INVALID COMMAND>\n";
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        break;
-      default:
-        break;
-      }
+      commands.at(command)(dictionaries);
     }
     catch (...)
     {
