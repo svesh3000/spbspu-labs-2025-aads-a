@@ -54,7 +54,7 @@ namespace maslov
     void rehash(size_t newCapacity);
     float maxLoadFactor() const noexcept;
     void maxLoadFactor(float ml);
- 
+
     std::pair< iterator, bool > insert(const Key & key, const T & value);
     template< class InputIt >
     void insert(InputIt first, InputIt last);
@@ -221,7 +221,7 @@ namespace maslov
     }
     auto pair = findPosition(key);
     size_t pos = pair.first;
-    bool hasFind   = pair.second; 
+    bool hasFind   = pair.second;
     if (pos == capacity_)
     {
       throw std::runtime_error("ERROR: hash table is full");
@@ -306,7 +306,7 @@ namespace maslov
   {
     auto pair = findPosition(key);
     size_t pos = pair.first;
-    bool hasFind = pair.second;  
+    bool hasFind = pair.second;
     if (hasFind || pos == capacity_)
     {
       return end();
