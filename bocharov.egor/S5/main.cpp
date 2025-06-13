@@ -4,8 +4,9 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#include "tree.hpp"
+#include <tree.hpp>
 #include "keySum.hpp"
+
 namespace
 {
   using namespace bocharov;

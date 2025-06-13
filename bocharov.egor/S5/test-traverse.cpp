@@ -3,7 +3,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include "tree.hpp"
+#include <tree.hpp>
 #include "keySum.hpp"
 
 using namespace bocharov;
