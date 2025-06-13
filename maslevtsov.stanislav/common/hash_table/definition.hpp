@@ -57,9 +57,9 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   size_t hash_value2 = hasher_(key);
   for (size_t i = 0; i != slots_.size(); ++i) {
     size_t index = (hash_value1 + i * hash_value2) % slots_.size();
-    if (slots_[index].state == detail::SlotState::EMPTY)
+    if (slots_[index].state == SlotState::EMPTY)
       return end();
-    if (slots_[index].state == detail::SlotState::OCCUPIED && key_equal_(slots_[index].first, key))
+    if (slots_[index].state == SlotState::OCCUPIED && key_equal_(slots_[index].first, key))
       return iterator(this, index);
   }
   return end();

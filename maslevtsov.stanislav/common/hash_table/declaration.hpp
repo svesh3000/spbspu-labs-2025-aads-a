@@ -68,10 +68,10 @@ namespace maslevtsov {
       DELETED,
     };
 
-    template< class T >
+    template< class Type >
     struct Slot
     {
-      T data;
+      Type data;
       SlotState state = SlotState::EMPTY;
     };
 
