@@ -57,7 +57,7 @@ namespace duhanina
     capacity_(size),
     length_(size),
     head_(0),
-    data_(new T[size]),
+    data_(new T[size])
   {}
 
   template < typename T >
