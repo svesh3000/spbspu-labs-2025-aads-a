@@ -1,30 +1,37 @@
 #include "print_results.hpp"
 #include <limits>
+#include "list_utils.hpp"
 
 void smirnov::printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences)
 {
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  if (sequences.empty())
   {
-    if (it != sequences.begin())
-    {
-      out << " ";
-    }
-    out << it->first;
+    out << "\n";
+    return;
+  }
+  auto it = sequences.cbegin();
+  out << it->first;
+  for (auto it = ++sequences.cbegin(); it != sequences.cend(); ++it)
+  {
+    out << " " << it->first;
   }
   out << "\n";
 }
 
 void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & sequences)
 {
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
-    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+    if (it->empty())
     {
-      if (numIt != it->begin())
-      {
-        out << " ";
-      }
-      out << *numIt;
+      out << "\n";
+      continue;
+    }
+    auto numIt = it->cbegin();
+    out << *numIt;
+    for (auto numIt = ++it->cbegin(); numIt != it->cend(); ++numIt)
+    {
+      out << " " << *numIt;
     }
     out << "\n";
   }
@@ -33,10 +40,10 @@ void smirnov::printSequences(std::ostream & out, const List< List< size_t > > & 
 void smirnov::printSums(std::ostream & out, const List< List< size_t > > & sequences)
 {
   List< size_t > sums;
-  for (auto it = sequences.begin(); it != sequences.end(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
     size_t sum = 0;
-    for (auto numIt = it->begin(); numIt != it->end(); ++numIt)
+    for (auto numIt = it->cbegin(); numIt != it->cend(); ++numIt)
     {
       if (sum > std::numeric_limits< size_t >::max() - *numIt)
       {
@@ -44,15 +51,16 @@ void smirnov::printSums(std::ostream & out, const List< List< size_t > > & seque
       }
       sum += *numIt;
     }
-    sums.push_back(sum);
+    pushBack(sums, sum);
   }
-  for (auto it = sums.begin(); it != sums.end(); ++it)
+  if (!sums.empty())
   {
-    if (it != sums.begin())
-    {
-      out << " ";
-    }
+    auto it = sums.cbegin();
     out << *it;
+    for (++it; it != sums.cend(); ++it)
+    {
+      out << " " << *it;
+    }
   }
   out << "\n";
 }
