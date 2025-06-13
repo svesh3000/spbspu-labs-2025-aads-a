@@ -4,9 +4,11 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
-#include "breadthIterator.hpp"
-#include "cIterator.hpp"
+#include "node.hpp"
 #include "iterator.hpp"
+#include "cIterator.hpp"
+
+#include "breadthIterator.hpp"
 #include "lnrIterator.hpp"
 #include "node.hpp"
 #include "rnlIterator.hpp"
@@ -17,11 +19,12 @@ namespace bocharov
   class Tree
   {
   public:
-    using cIter = TreeConstIterator< Key, T, Cmp >;
-    using Iter = TreeConstIterator< Key, T, Cmp >;
+    using cIter = TreeIterator< Key, T, Cmp >;
+    using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
     using cIterPair = std::pair< cIter, cIter >;
+
     using LnrIterator = detail::LnrIterator< Key, T, Cmp, false >;
     using ConstLnrIterator = detail::LnrIterator< Key, T, Cmp, true >;
     using RnlIterator = detail::RnlIterator< Key, T, Cmp, false >;
@@ -55,7 +58,6 @@ namespace bocharov
     T & at(const Key &);
     const T & at(const Key &) const;
     T & operator[](const Key &);
-    const T & operator[](const Key &) const;
 
     Iter find(const Key &) noexcept;
     cIter find(const Key &) const noexcept;
@@ -225,7 +227,7 @@ namespace bocharov
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< typename Tree< Key, T, Cmp >::Iter, bool > Tree< Key, T, Cmp >::insert(const DataPair & value)
+  std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::insert(const DataPair & value)
   {
     return emplace(value);
   }
@@ -250,7 +252,7 @@ namespace bocharov
 
   template< typename Key, typename T, typename Cmp >
   template< typename... Args >
-  std::pair< typename Tree< Key, T, Cmp >::Iter, bool > Tree< Key, T, Cmp >::emplace(Args &&... args)
+  std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::emplace(Args &&... args)
   {
     Node * newNode = new Node(std::forward< Args >(args)...);
     const Key & key = newNode->data.first;
@@ -630,8 +632,8 @@ namespace bocharov
   template< typename Key, typename T, typename Cmp >
   T & Tree< Key, T, Cmp >::operator[](const Key & key)
   {
-    Iter it = insert(std::make_pair(key, T())).first;
-    return it->second;
+    auto toreturn = insert(std::make_pair(key, T()));
+    return toreturn.first->second;
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -762,6 +764,7 @@ namespace bocharov
   {
     return std::make_pair(lower_bound(key), upper_bound(key));
   }
+
 /////
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp>::LnrIterator Tree< Key, T, Cmp >::lnrBegin()
@@ -908,12 +911,6 @@ namespace bocharov
     return f;
   }
 
-  template< typename Key, typename T, typename Cmp >
-  const T & Tree< Key, T, Cmp >::operator[](const Key & key) const
-  {
-    cIter it = find(key);
-    return it->second;
-  }
 }
 
 #endif
