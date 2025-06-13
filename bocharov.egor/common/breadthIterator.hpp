@@ -3,8 +3,8 @@
 #include <cassert>
 #include <iterator>
 #include <utility>
+#include "node.hpp"
 #include "queue.hpp"
-#include "treeNode.hpp"
 
 namespace bocharov
 {

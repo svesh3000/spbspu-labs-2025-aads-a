@@ -4,9 +4,9 @@
 #include <cassert>
 #include <iterator>
 #include <utility>
-#include "iterator.hpp"
+#include "node.hpp"
 #include "stack.hpp"
-#include "treeNode.hpp"
+
 namespace bocharov
 {
   template< typename Key, typename Value, typename Cmp >
