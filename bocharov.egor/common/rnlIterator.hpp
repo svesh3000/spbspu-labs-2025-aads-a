@@ -115,7 +115,13 @@ namespace bocharov
       return *this;
     }
 
-
+    template< typename Key, typename Value, typename Cmp, bool IsConst >
+    RnlIterator< Key, Value, Cmp, IsConst > RnlIterator< Key, Value, Cmp, IsConst >::operator++(int)
+    {
+      RnlIterator< Key, Value, Cmp, IsConst > result(*this);
+      ++(*this);
+      return result;
+    }
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
     typename RnlIterator< Key, Value, Cmp, IsConst >::reference RnlIterator< Key, Value, Cmp, IsConst >::operator*() const noexcept
