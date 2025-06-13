@@ -5,8 +5,8 @@
 
 namespace alymova
 {
-  using GraphSet = HashTable< std::string, Graph >;
-  using CommandSet = HashTable< std::string, std::function< void(GraphSet&) > >;
+  using GraphSet = HashTable< std::string, Graph, Hasher< std::string > >;
+  using CommandSet = HashTable< std::string, std::function< void(GraphSet&) >, Hasher< std::string > >;
 
   struct GraphsCommand
   {

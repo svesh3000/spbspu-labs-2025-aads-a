@@ -425,6 +425,7 @@ namespace alymova
     std::swap(capacity_, other.capacity_);
     std::swap(array_, other.array_);
     std::swap(hasher_, other.hasher_);
+    std::swap(equal_, other.equal_);
   }
 
   template< class Key, class Value, class Hash, class KeyEqual >

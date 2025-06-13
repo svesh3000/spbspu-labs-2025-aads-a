@@ -1,13 +1,13 @@
 #include "graph.hpp"
 
-void alymova::Graph::addEdge(std::string vertex1, std::string vertex2, size_t weight)
+void alymova::Graph::addEdge(const std::string& vertex1, const std::string& vertex2, size_t weight)
 {
   edges.insert(std::make_pair(std::make_pair(vertex1, vertex2), weight));
   addVertex(vertex1);
   addVertex(vertex2);
 }
 
-void alymova::Graph::cutEdge(std::string vertex1, std::string vertex2, size_t weight)
+void alymova::Graph::cutEdge(const std::string& vertex1, const std::string& vertex2, size_t weight)
 {
   std::pair< std::string, std::string > vertex_pair(vertex1, vertex2);
   for (auto it = edges.begin(); it != edges.end(); it++)
@@ -21,7 +21,7 @@ void alymova::Graph::cutEdge(std::string vertex1, std::string vertex2, size_t we
   throw std::logic_error("<INVALID COMMAND>");
 }
 
-void alymova::Graph::addVertex(std::string vertex)
+void alymova::Graph::addVertex(const std::string& vertex)
 {
   if (!hasVertex(vertex))
   {
@@ -29,7 +29,7 @@ void alymova::Graph::addVertex(std::string vertex)
   }
 }
 
-bool alymova::Graph::hasVertex(std::string vertex) const
+bool alymova::Graph::hasVertex(const std::string& vertex) const
 {
   for (auto it = vertexes.begin(); it != vertexes.end(); it++)
   {
@@ -49,7 +49,7 @@ void alymova::Graph::merge(const Graph& other)
   }
 }
 
-alymova::BoundMap alymova::Graph::getOutbound(std::string vertex) const
+alymova::BoundMap alymova::Graph::getOutbound(const std::string& vertex) const
 {
   BoundMap outbound;
   for (auto it = edges.begin(); it != edges.end(); it++)
@@ -62,7 +62,7 @@ alymova::BoundMap alymova::Graph::getOutbound(std::string vertex) const
   return outbound;
 }
 
-alymova::BoundMap alymova::Graph::getInbound(std::string vertex) const
+alymova::BoundMap alymova::Graph::getInbound(const std::string& vertex) const
 {
   BoundMap inbound;
   for (auto it = edges.begin(); it != edges.end(); it++)

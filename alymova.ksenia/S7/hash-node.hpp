@@ -1,5 +1,5 @@
-#ifndef HASH_VECTOR_HPP
-#define HASH_VECTOR_HPP
+#ifndef HASH_NODE_HPP
+#define HASH_NODE_HPP
 #include <utility>
 #include <cstddef>
 

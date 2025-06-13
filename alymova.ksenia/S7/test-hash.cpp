@@ -200,5 +200,49 @@ BOOST_AUTO_TEST_CASE(test_insert_emplace)
 }
 BOOST_AUTO_TEST_CASE(test_erase)
 {
-  //using Map = alymova::HashTable< int, std::string >;
+  using Map = alymova::HashTable< int, std::string >;
+
+  Map table1({{1, "aaa"}});
+  auto it = table1.erase(table1.begin());
+  BOOST_TEST(table1.size() == 0);
+  BOOST_TEST((it == table1.end()));
+
+  table1.emplace(1, "aaa");
+  table1.emplace(2, "bbb");
+  it = table1.erase(table1.begin());
+  BOOST_TEST(table1.size() == 1);
+  BOOST_TEST(it->first == 2);
+
+  table1.emplace(2, "ccc");
+  table1.emplace(2, "ddd");
+  it = table1.erase(table1.begin());
+  BOOST_TEST(table1.size() == 2);
+  BOOST_TEST(it->second == "ccc");
+
+  table1.emplace(10, "ttt");
+  table1.emplace(10, "rrr");
+  it = table1.erase(table1.find(10));
+  BOOST_TEST(table1.size() == 3);
+  BOOST_TEST(it->second == "rrr");
+
+  it = table1.erase(table1.cbegin());
+  BOOST_TEST(table1.size() == 2);
+  BOOST_TEST(it->second == "ddd");
+
+  size_t cnt = table1.erase(100);
+  BOOST_TEST(table1.size() == 2);
+  BOOST_TEST(cnt == 0);
+
+  cnt = table1.erase(2);
+  BOOST_TEST(table1.size() == 1);
+  BOOST_TEST(table1.begin()->first == 10);
+  BOOST_TEST(cnt == 1);
+
+  it = table1.erase(table1.begin(), table1.begin());
+  BOOST_TEST(table1.size() == 1);
+  BOOST_TEST((it == table1.begin()));
+
+  it = table1.erase(table1.cbegin(), table1.cend());
+  BOOST_TEST(table1.empty());
+  BOOST_TEST((it == table1.end()));
 }

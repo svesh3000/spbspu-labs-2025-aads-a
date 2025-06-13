@@ -15,15 +15,15 @@ namespace alymova
 
   struct Graph
   {
-    HashTable< std::pair< std::string, std::string >, size_t, PairHasher > edges;
+    HashTable< std::pair< std::string, std::string >, size_t, PairHasher< std::string > > edges;
     List< std::string > vertexes;
 
-    void addEdge(std::string vertex1, std::string vertex2, size_t weight);
-    void cutEdge(std::string vertex1, std::string vertex2, size_t weight);
-    void addVertex(std::string vertex);
-    bool hasVertex(std::string vertex) const;
-    BoundMap getOutbound(std::string vertex) const;
-    BoundMap getInbound(std::string vertex) const;
+    void addEdge(const std::string& vertex1, const std::string& vertex2, size_t weight);
+    void cutEdge(const std::string& vertex1, const std::string& vertex2, size_t weight);
+    void addVertex(const std::string& vertex);
+    bool hasVertex(const std::string& vertex) const;
+    BoundMap getOutbound(const std::string& vertex) const;
+    BoundMap getInbound(const std::string& vertex) const;
     void merge(const Graph& other);
   };
 

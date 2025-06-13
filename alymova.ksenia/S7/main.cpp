@@ -2,7 +2,6 @@
 #include <fstream>
 #include <functional>
 #include <limits>
-#include <unordered_map>
 #include "graph.hpp"
 #include "graph-commands.hpp"
 #include "hash-table.hpp"
@@ -11,8 +10,8 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using GraphSet = HashTable< std::string, Graph >;
-  using CommandSet = HashTable< std::string, std::function< void(GraphSet&) > >;
+  using GraphSet = HashTable< std::string, Graph, Hasher< std::string > >;
+  using CommandSet = HashTable< std::string, std::function< void(GraphSet&) >, Hasher< std::string > >;
 
   if (argc != 2)
   {

@@ -42,10 +42,12 @@ namespace alymova
     using NodeState = typename HashTable< Key, Value, Hash, KeyEqual >::NodeState;
     using T = std::pair< NodeState, Node >;
 
-    HashIterator(T* node, T* end) noexcept;
-
     std::pair< Key, Value >& operator*() noexcept;
     std::pair< Key, Value >* operator->() noexcept;
+  private:
+    HashIterator(T* node, T* end) noexcept;
+
+    friend class HashTable< Key, Value, Hash, KeyEqual >;
   };
 
   template< class Key, class Value, class Hash, class KeyEqual >

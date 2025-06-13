@@ -21,11 +21,12 @@ namespace alymova
     }
   };
 
+  template< class T >
   struct PairHasher
   {
-    std::size_t operator()(const std::pair< std::string, std::string >& s) const
+    std::size_t operator()(const std::pair< T, T >& s) const
     {
-      size_t hash = Hasher< std::string >{}(s.first);
+      size_t hash = Hasher< T >{}(s.first);
       boost::hash_combine(hash, s.second);
       return hash;
     }
