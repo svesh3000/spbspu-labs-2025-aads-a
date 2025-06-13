@@ -17,7 +17,7 @@ void lanovenko::getDictionaries(std::istream& in, map_t& dictionaries)
   std::cin.clear();
 }
 
-void lanovenko::printDictionary(map_t& dictionaries)
+void lanovenko::printDictionary(const map_t& dictionaries)
 {
   std::string name = "";
   std::cin >> name;

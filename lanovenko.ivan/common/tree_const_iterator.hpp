@@ -16,28 +16,28 @@ namespace lanovenko
   public:
     using this_t = TreeConstIterator< Key, Value, Comparator >;
     ~TreeConstIterator() = default;
-    TreeConstIterator();
+    TreeConstIterator() noexcept;
     TreeConstIterator(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
-    this_t& operator++();
-    this_t operator++(int);
-    const std::pair< Key, Value >& operator*() const;
-    const std::pair< Key, Value >* operator->() const;
-    bool operator!=(const this_t& rhs) const;
-    bool operator==(const this_t& rhs) const;
+    this_t& operator++() noexcept;
+    this_t operator++(int) noexcept;
+    const std::pair< Key, Value >& operator*() const noexcept;
+    const std::pair< Key, Value >* operator->() const noexcept;
+    bool operator!=(const this_t& rhs) const noexcept;
+    bool operator==(const this_t& rhs) const noexcept;
   private:
     TreeNode< Key, Value >* node_;
-    explicit TreeConstIterator(TreeNode< Key, Value >* node);
+    explicit TreeConstIterator(TreeNode< Key, Value >* node) noexcept;
     friend class Tree< Key, Value, Comparator >;
   };
 
   template< typename Key, typename Value, typename Comparator >
-  TreeConstIterator< Key, Value, Comparator >::TreeConstIterator():
+  TreeConstIterator< Key, Value, Comparator >::TreeConstIterator() noexcept:
     node_(nullptr)
   {}
 
   template< typename Key, typename Value, typename Comparator >
-  TreeConstIterator< Key, Value, Comparator >& TreeConstIterator< Key, Value, Comparator >::operator++()
+  TreeConstIterator< Key, Value, Comparator >& TreeConstIterator< Key, Value, Comparator >::operator++() noexcept
   {
     if (node_->right_)
     {
@@ -56,7 +56,7 @@ namespace lanovenko
   }
 
   template< typename Key, typename Value, typename Comparator >
-  TreeConstIterator< Key, Value, Comparator > TreeConstIterator< Key, Value, Comparator >::operator++(int)
+  TreeConstIterator< Key, Value, Comparator > TreeConstIterator< Key, Value, Comparator >::operator++(int) noexcept
   {
     this_t result(*this);
     ++(*this);
@@ -64,31 +64,31 @@ namespace lanovenko
   }
 
   template< class Key, class Value, class Cmp>
-  const std::pair< Key, Value >& TreeConstIterator< Key, Value, Cmp >::operator*() const
+  const std::pair< Key, Value >& TreeConstIterator< Key, Value, Cmp >::operator*() const noexcept
   {
     return node_->data_;
   }
 
   template< class Key, class Value, class Cmp>
-  const std::pair< Key, Value >* TreeConstIterator< Key, Value, Cmp >::operator->() const
+  const std::pair< Key, Value >* TreeConstIterator< Key, Value, Cmp >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }
 
   template< class Key, class Value, class Cmp>
-  bool TreeConstIterator< Key, Value, Cmp >::operator==(const this_t& rhs) const
+  bool TreeConstIterator< Key, Value, Cmp >::operator==(const this_t& rhs) const noexcept
   {
     return node_ == rhs.node_;
   }
 
   template< class Key, class Value, class Cmp>
-  bool TreeConstIterator< Key, Value, Cmp >::operator!=(const this_t& rhs) const
+  bool TreeConstIterator< Key, Value, Cmp >::operator!=(const this_t& rhs) const noexcept
   {
     return !(rhs == *this);
   }
 
   template< typename Key, typename Value, typename Comparator >
-  TreeConstIterator< Key, Value, Comparator >::TreeConstIterator(TreeNode< Key, Value >* node):
+  TreeConstIterator< Key, Value, Comparator >::TreeConstIterator(TreeNode< Key, Value >* node) noexcept:
     node_(node)
   {}
 }

@@ -13,19 +13,18 @@ namespace lanovenko
     TreeNode* left_;
     TreeNode* right_;
     TreeNode* parent_;
-    TreeNode() = delete;
-    TreeNode(const std::pair< Key, Value >& data);
+    TreeNode() = default;
+    TreeNode(const std::pair< Key, Value >& data) noexcept;
   };
 }
 
 template< typename Key, typename Value >
-lanovenko::TreeNode< Key, Value >::TreeNode(const std::pair< Key, Value >& data):
+lanovenko::TreeNode< Key, Value >::TreeNode(const std::pair< Key, Value >& data) noexcept:
   data_(data),
   height_(1),
   left_(nullptr),
   right_(nullptr),
   parent_(nullptr)
 {}
-
 
 #endif
