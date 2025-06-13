@@ -1,8 +1,7 @@
+#include <functional>
 #include <iostream>
 #include <fstream>
-#include <functional>
 #include <limits>
-#include <map>
 #include "commands.hpp"
 
 namespace

@@ -2,8 +2,8 @@
 #define GRAPH_HPP
 
 #include <string>
-#include <set>
 #include <vector>
+#include <set>
 #include "hashTable.hpp"
 
 namespace maslov::detail

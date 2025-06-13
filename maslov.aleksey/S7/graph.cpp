@@ -1,5 +1,4 @@
 #include "graph.hpp"
-#include <algorithm>
 #include <stdexcept>
 
 void maslov::Graph::extract(const Graph & graph, const std::set< std::string > & extractVertexes)
@@ -117,7 +116,6 @@ std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getOu
       result.push_back({it->first.second, edges.at({it->first.first, it->first.second})});
     }
   }
-  std::sort(result.begin(), result.end());
   return result;
 }
 
@@ -131,6 +129,5 @@ std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getIn
       result.push_back({it->first.first, edges.at({it->first.first, it->first.second})});
     }
   }
-  std::sort(result.begin(), result.end());
   return result;
 }

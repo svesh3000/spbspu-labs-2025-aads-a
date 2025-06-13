@@ -1,7 +1,6 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 
-#include <functional>
 #include <boost/hash2/xxhash.hpp>
 #include "iterator.hpp"
 #include "hashNode.hpp"

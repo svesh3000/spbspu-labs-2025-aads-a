@@ -1,6 +1,5 @@
 #include "commands.hpp"
 #include <iostream>
-#include <algorithm>
 
 namespace
 {
@@ -22,25 +21,19 @@ namespace
   }
 }
 
-void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
+void maslov::getGraphs(std::ostream & out, const map & graphs)
   {
-    std::vector< std::string > graphNames;
-    for (auto it = graphs.cbegin(); it != graphs.cend(); it++)
-    {
-      graphNames.push_back(it->first);
-    }
-    if(graphNames.empty())
+    if(graphs.empty())
     {
       out << '\n';
     }
-    std::sort(graphNames.begin(), graphNames.end());
-    for (auto it = graphNames.begin(); it != graphNames.end(); it++)
+    for (auto it = graphs.cbegin(); it != graphs.cend(); it++)
     {
-      out << *it << '\n';
+      out << it->first << '\n';
     }
   }
 
-  void maslov::getVertexes(std::istream & in, std::ostream & out, const hashTable & graphs)
+  void maslov::getVertexes(std::istream & in, std::ostream & out, const map & graphs)
   {
     std::string graphName;
     in >> graphName;
@@ -56,7 +49,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     }
   }
 
-  void maslov::getOutbound(std::istream & in, std::ostream & out, const hashTable & graphs)
+  void maslov::getOutbound(std::istream & in, std::ostream & out, const map & graphs)
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
@@ -69,7 +62,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     printBounds(out, outbounds);
   }
 
-  void maslov::getInbound(std::istream & in, std::ostream & out, const hashTable & graphs)
+  void maslov::getInbound(std::istream & in, std::ostream & out, const map & graphs)
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
@@ -82,7 +75,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     printBounds(out, inbounds);
   }
 
-  void maslov::createEdge(std::istream & in, hashTable & graphs)
+  void maslov::createEdge(std::istream & in, map & graphs)
   {
     std::string graphName, v1, v2;
     int weight;
@@ -91,7 +84,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     graph.addEdge(v1, v2, weight);
   }
 
-  void maslov::deleteEdge(std::istream & in, hashTable & graphs)
+  void maslov::deleteEdge(std::istream & in, map & graphs)
   {
     std::string graphName, v1, v2;
     int weight;
@@ -100,7 +93,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     graph.deleteEdge(v1, v2, weight);
   }
 
-  void maslov::createGraph(std::istream & in, hashTable & graphs)
+  void maslov::createGraph(std::istream & in, map & graphs)
   {
     std::string graphName;
     in >> graphName;
@@ -120,7 +113,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     graphs[graphName] = newGraph;
   }
 
-  void maslov::mergeGraph(std::istream & in, hashTable & graphs)
+  void maslov::mergeGraph(std::istream & in, map & graphs)
   {
     std::string newGraphName, graphName1, graphName2;
     in >> newGraphName >> graphName1 >> graphName2;
@@ -135,7 +128,7 @@ void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
     graphs[newGraphName] = mergedGraph;
   }
 
-  void maslov::extractGraph(std::istream & in, hashTable & graphs)
+  void maslov::extractGraph(std::istream & in, map & graphs)
   {
     std::string newGraphName, graphName;
     in >> newGraphName >> graphName;
