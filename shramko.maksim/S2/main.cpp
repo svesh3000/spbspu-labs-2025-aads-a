@@ -351,9 +351,9 @@ int main(const int argc, const char* const* const argv)
         temp_inf.push(front_ref.front());
         front_ref.pop();
       }
-      
+
       inf_exprs.pop();
-      
+
       if (!temp_inf.empty())
       {
         shramko::QueueString temp_post;
