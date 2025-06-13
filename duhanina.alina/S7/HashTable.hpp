@@ -36,8 +36,13 @@ namespace duhanina
 
     void clear() noexcept;
     std::pair< iterator, bool > insert(const std::pair< Key, Value >& value);
-    iterator erase(const_iterator pos);
-    size_t erase(const Key& key);
+
+    template < typename InputIt >
+    void insert(InputIt first, InputIt last);
+
+    iterator erase(const_iterator pos) noexcept;
+    size_t erase(const Key& key) noexcept;
+    iterator erase(const_iterator first, const_iterator last) noexcept;
 
     template < typename K, typename V >
     std::pair< iterator, bool > emplace(K&& key, V&& value);
@@ -68,7 +73,6 @@ namespace duhanina
     Equal key_equal_;
 
     explicit HashTable(size_t bucket_count, const Hash& hash = Hash(), const Equal& equal = Equal());
-
     size_t probe(size_t hash, size_t i) const noexcept;
     void rehash(size_t new_capacity);
   };
@@ -204,6 +208,16 @@ namespace duhanina
   }
 
   template < class Key, class Value, class Hash, class Equal >
+  template < typename InputIt >
+  void HashTable< Key, Value, Hash, Equal >::insert(InputIt first, InputIt last)
+  {
+    for (; first != last; ++first)
+    {
+      insert(*first);
+    }
+  }
+
+  template < class Key, class Value, class Hash, class Equal >
   template < typename K, typename V >
   std::pair< typename HashTable< Key, Value, Hash, Equal >::iterator, bool > HashTable< Key, Value, Hash, Equal >::emplace(K&& key, V&& value)
   {
@@ -249,7 +263,7 @@ namespace duhanina
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::erase(const_iterator pos)
+  typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::erase(const_iterator pos) noexcept
   {
     if (pos == end())
     {
@@ -263,7 +277,7 @@ namespace duhanina
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  size_t HashTable< Key, Value, Hash, Equal >::erase(const Key& key)
+  size_t HashTable< Key, Value, Hash, Equal >::erase(const Key& key) noexcept
   {
     auto it = find(key);
     if (it != end())
@@ -272,6 +286,22 @@ namespace duhanina
       return 1;
     }
     return 0;
+  }
+
+  template < class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::iterator
+  HashTable< Key, Value, Hash, Equal >::erase(const_iterator first, const_iterator last) noexcept
+  {
+    iterator result = end();
+    if (first == last)
+    {
+      return result;
+    }
+    while (first != last)
+    {
+      result = erase(first++);
+    }
+    return result;
   }
 
   template < class Key, class Value, class Hash, class Equal >
