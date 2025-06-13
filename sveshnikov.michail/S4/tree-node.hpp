@@ -1,0 +1,32 @@
+#ifndef TREE_NODE_HPP
+#define TREE_NODE_HPP
+#include <utility>
+#include <cstddef>
+
+namespace sveshnikov
+{
+  template< class Key, class T >
+  struct tree_node_t
+  {
+    std::pair< Key, T > data_;
+    tree_node_t< Key, T > *right_;
+    tree_node_t< Key, T > *left_;
+    tree_node_t< Key, T > *parent_;
+    size_t height_;
+    int balance_factor_;
+
+    tree_node_t(const Key &key, const T &value);
+  };
+
+  template< class Key, class T >
+  tree_node_t< Key, T >::tree_node_t(const Key &key, const T &value):
+    data_(std::make_pair(key, value)),
+    right_(nullptr),
+    left_(nullptr),
+    parent_(nullptr),
+    height_(1),
+    balance_factor_(0)
+  {}
+}
+
+#endif
