@@ -11,9 +11,9 @@ namespace maslov
     {
       return;
     }
-    auto it = hashTable.begin();
+    auto it = hashTable.cbegin();
     out << it->first << ' ' << it->second;
-    for (++it; it != hashTable.end(); ++it)
+    for (++it; it != hashTable.cend(); ++it)
     {
       out << ' ' << it->first << ' ' << it->second;
     }
@@ -105,3 +105,32 @@ BOOST_AUTO_TEST_CASE(operatorSquareBrackets)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(erase)
+{
+  maslov::HashTable< int, std::string > hashTable;
+  hashTable.insert(1, "one");
+  hashTable.insert(2, "two");
+  hashTable.insert(3, "three");
+
+  auto it = hashTable.find(2);
+  auto nextIt = hashTable.erase(it);
+  BOOST_TEST(nextIt->first == 3);
+  std::ostringstream out1;
+  printHashTable(out1, hashTable);
+  BOOST_TEST(out1.str() == "1 one 3 three");
+
+  size_t num = hashTable.erase(3);
+  BOOST_TEST(num == 1);
+  std::ostringstream out2;
+  printHashTable(out2, hashTable);
+  BOOST_TEST(out2.str() == "1 one");
+
+  hashTable.insert(4, "four");
+  auto first = hashTable.find(1);
+  auto last = hashTable.find(4);
+  hashTable.erase(first, last);
+  std::ostringstream out3;
+  printHashTable(out3, hashTable);
+  BOOST_TEST(out3.str() == "4 four");
+}

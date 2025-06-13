@@ -31,6 +31,11 @@ namespace maslov
     std::pair< iterator, bool > insert(const Key & key, const T & value);
     //template< class InputIt >
     //void insert(InputIt first, InputIt last);
+    iterator erase(iterator pos);
+    iterator erase(cIterator pos);
+    template< class InputIt >
+    iterator erase(InputIt first, InputIt last);
+    size_t erase(const Key & key);
 
     iterator begin();
     cIterator cbegin() const;
@@ -281,6 +286,50 @@ namespace maslov
       slots_[i].deleted = false;
     }
     size_ = 0;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::erase(iterator pos)
+  {
+    if (pos == end())
+    {
+      return end();
+    }
+    size_t index = pos.current_;
+    slots_[index].occupied = false;
+    slots_[index].deleted = true;
+    size_--;
+    return iterator(slots_, capacity_, index);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::erase(cIterator pos)
+  {
+    return erase(iterator(slots_, capacity_, pos.current_));
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  template< class InputIt >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::erase(InputIt first, InputIt last)
+  {
+    iterator result;
+    for (auto it = first; it != last;)
+    {
+      result = erase(it++);
+    }
+    return result;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  size_t HashTable< Key, T, HS1, HS2, EQ >::erase(const Key & key)
+  {
+    auto it = find(key);
+    if (it != end())
+    {
+      erase(it);
+      return 1;
+    }
+    return 0;
   }
 }
 
