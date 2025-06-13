@@ -18,7 +18,7 @@ namespace bocharov
   class Tree
   {
   public:
-    using cIter = TreeConstIterator< Key, T, Cmp >;
+    using cIter = TreeIterator< Key, T, Cmp >;
     using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
