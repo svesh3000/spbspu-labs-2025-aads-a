@@ -6,22 +6,6 @@
 #include <vector/definition.hpp>
 #include "hash_table_iterator.hpp"
 
-namespace detail {
-  enum class SlotState
-  {
-    EMPTY,
-    OCCUPIED,
-    DELETED,
-  };
-
-  template< class T >
-  struct Slot
-  {
-    T data;
-    SlotState state = SlotState::EMPTY;
-  };
-}
-
 namespace maslevtsov {
   template< class Key, class T, class Hash = std::hash< Key >, class KeyEqual = std::equal_to< Key > >
   class HashTable
@@ -74,7 +58,24 @@ namespace maslevtsov {
     void rehash(size_type count);
 
   private:
-    Vector< detail::Slot< value_type > > slots_;
+    friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
+    friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
+
+    enum class SlotState
+    {
+      EMPTY,
+      OCCUPIED,
+      DELETED,
+    };
+
+    template< class T >
+    struct Slot
+    {
+      T data;
+      SlotState state = SlotState::EMPTY;
+    };
+
+    Vector< Slot< value_type > > slots_;
     size_type size_;
     Hash hasher_;
     KeyEqual key_equal_;
