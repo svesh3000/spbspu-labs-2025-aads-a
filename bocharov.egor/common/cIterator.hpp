@@ -9,6 +9,7 @@ namespace bocharov
   class Tree;
 
   template< typename Key, typename T, typename Cmp >
+  class TreeIterator;
 
   template< typename Key, typename T, typename Cmp >
   class TreeConstIterator
@@ -123,14 +124,14 @@ namespace bocharov
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename const TreeConstIterator< Key, T, Cmp >::DataPair & TreeConstIterator< Key, T, Cmp >::operator*() const
+  const typename TreeConstIterator< Key, T, Cmp >::DataPair & TreeConstIterator< Key, T, Cmp >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->data;
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename const TreeConstIterator< Key, T, Cmp >::DataPair * TreeConstIterator< Key, T, Cmp >::operator->() const noexcept
+  const typename TreeConstIterator< Key, T, Cmp >::DataPair * TreeConstIterator< Key, T, Cmp >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data);
