@@ -27,18 +27,35 @@ namespace tkach
     bool operator==(const this_t& rhs) const;
   private:
     Node< T >* node_;
-    explicit Citerator(Node< T >* node);
+    Node< T >* head_node_ptr_;
+    bool is_past_the_end_;
+    explicit Citerator(Node< T >* node, Node< T >* head_ptr, bool is_end_state);
   };
 
   template< typename T >
   Citerator< T >::Citerator():
-    node_(nullptr)
+    node_(nullptr),
+    head_node_ptr_(nullptr),
+    is_past_the_end_(true)
   {}
 
   template< typename T >
   Citerator< T >& Citerator< T >::operator++()
   {
+    if (is_past_the_end_)
+    {
+      return *this;
+    }
+    if (node_ == nullptr)
+    {
+      is_past_the_end_ = true;
+      return *this;
+    }
     node_ = node_->next_;
+    if (node_ == head_node_ptr_)
+    {
+      is_past_the_end_ = true;
+    }
     return *this;
   }
 
@@ -65,6 +82,14 @@ namespace tkach
   template< typename T >
   bool Citerator< T >::operator==(const this_t& rhs) const
   {
+    if (is_past_the_end_ && rhs.is_past_the_end_)
+    {
+        return true;
+    }
+    if (is_past_the_end_ != rhs.is_past_the_end_)
+    {
+        return false;
+    }
     return node_ == rhs.node_;
   }
 
@@ -75,8 +100,10 @@ namespace tkach
   }
 
   template< typename T >
-  Citerator< T >::Citerator(Node< T >* node):
-    node_(node)
+  Citerator< T >::Citerator(Node< T >* node, Node< T >* head_ptr, bool is_end_state):
+    node_(node),
+    head_node_ptr_(head_ptr),
+    is_past_the_end_(is_end_state)
   {}
 }
 

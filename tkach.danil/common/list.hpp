@@ -72,7 +72,14 @@ namespace tkach
     void pushBk(Args&&... args);
     template< class... Args >
     Iterator< T > insertAft(Citerator< T > pos, Args&&... args);
+    Node< T >* getHead() const noexcept;
   };
+
+  template< typename T >
+  Node< T >* List< T >::getHead() const noexcept
+  {
+    return tail_ ? tail_->next_ : nullptr;
+  }
 
   template< typename T >
   List< T >::List():
@@ -149,25 +156,29 @@ namespace tkach
   template< typename T >
   Iterator< T > List< T >::begin() noexcept
   {
-    return Iterator< T >(tail_->next_);
+    Node< T >* head = getHead();
+    return Iterator< T >(head, head, false);
   }
 
   template< typename T >
   Iterator< T > List< T >::end() noexcept
   {
-    return Iterator< T >(tail_->next_);
+    Node< T >* head = getHead();
+    return Iterator< T >(head, head, true);
   }
 
   template< typename T >
   Citerator< T > List< T >::cbegin() const noexcept
   {
-    return Citerator< T >(tail_->next_);
+    Node< T >* head = getHead();
+    return Citerator< T >(head, head, false);
   }
 
   template< typename T >
   Citerator< T > List< T >::cend() const noexcept
   {
-    return Citerator< T >(tail_->next_);
+    Node< T >* head = getHead();
+    return Citerator< T >(head, head, true);
   }
 
   template< typename T >
@@ -300,7 +311,7 @@ namespace tkach
     {
       return;
     }
-    eraseAfter(Citerator< T >(tail_));
+    eraseAfter(Citerator< T >(tail_, getHead(), false));
   }
 
   template< typename T >
@@ -331,8 +342,15 @@ namespace tkach
     {
       return;
     }
-    auto it = ++cbegin();
-    for (; it != cend();)
+    while (!empty() && p(tail_->next_->data_))
+    {
+      popFront();
+      if (empty())
+      {
+          return;
+      }
+    }
+    for (auto it = cbegin(); it != cend();)
     {
       if (p(*(std::next(it))))
       {
@@ -342,10 +360,6 @@ namespace tkach
       {
         it++;
       }
-    }
-    if (p(*(++it)))
-    {
-      eraseAfter(Citerator< T >(tail_->next_));
     }
   }
 
@@ -376,22 +390,21 @@ namespace tkach
       delete tail_;
       tail_ = nullptr;
       size_--;
-      return Iterator< T >();
+      return Iterator< T >(nullptr, nullptr, true);
     }
     else
     {
-      Iterator< T > it(pos.node_);
-      Node< T >* list_delete = it.node_->next_;
+      Node< T >* list_delete = pos.node_->next_;
       if (pos.node_->next_ == tail_)
       {
         tail_ = pos.node_;
       }
-      it.node_->next_ = list_delete->next_;
+      pos.node_->next_ = list_delete->next_;
       delete list_delete;
       size_--;
-      return Iterator< T >(it.node_->next_);
+      return Iterator< T >(pos.node_->next_, getHead(), false);
     }
-    return Iterator< T >();
+    return Iterator< T >(nullptr, nullptr, true);
   }
 
   template< typename T >
@@ -490,7 +503,7 @@ namespace tkach
   {
     if (empty())
     {
-      return Iterator< T >();
+      return Iterator< T >(nullptr, nullptr, true);
     }
     Node< T >* temp = pos.node_;
     Node< T >* new_node = new Node< T >{temp->next_, std::forward< Args >(args)...};
@@ -500,7 +513,7 @@ namespace tkach
     }
     temp->next_ = new_node;
     size_++;
-    return Iterator< T >(new_node);
+    return Iterator< T >(new_node, getHead(), false);
   }
 
   template< typename T >
@@ -525,7 +538,7 @@ namespace tkach
     {
       ++pos;
     }
-    return Iterator< T >(pos.node_);
+    return Iterator< T >(pos.node_, getHead(), false);
   }
 
   template< typename T >
@@ -542,7 +555,7 @@ namespace tkach
     {
       ++pos;
     }
-    return Iterator< T >(pos.node_);
+    return Iterator< T >(pos.node_, getHead(), false);
   }
 
   template< typename T >
@@ -567,7 +580,7 @@ namespace tkach
     {
       eraseAfter(first);
     }
-    return Iterator< T >(last.node_);
+    return Iterator< T >(last.node_, getHead(), last.is_past_the_end_);
   }
 }
 
