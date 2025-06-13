@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     commands["union"] = merge;
     commands["intersect"] = intersect;
   }
-  catch(...)
+  catch (...)
   {
     std::cerr << "<OPERATION ERROR>";
     return 1;

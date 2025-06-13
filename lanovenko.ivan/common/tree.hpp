@@ -49,7 +49,7 @@ namespace lanovenko
     iter find(const Key& key);
     cIter find(const Key& key) const;
     iter insert(const std::pair< Key, Value >& value);
-    iter erase(TreeIterator< Key, Value, Comparator > position) noexcept;
+    iter erase(iter position) noexcept;
     size_t erase(const Key& key);
     Value& at(const Key& key);
     const Value& at(const Key& key) const;
