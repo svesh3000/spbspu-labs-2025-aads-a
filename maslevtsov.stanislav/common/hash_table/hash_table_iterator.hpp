@@ -62,7 +62,8 @@ namespace maslevtsov {
     using hash_table_t = HashTable< Key, T, Hash, KeyEqual >;
 
     ++index_;
-    while (index_ < hash_table_->slots.size() && hash_table_->slots[index_].state != hash_table_t::SlotState::OCCUPIED) {
+    size_t slots_size = hash_table_->slots.size();
+    while (index_ < slots_size && hash_table_->slots[index_].state != hash_table_t::SlotState::OCCUPIED) {
       ++index_;
     }
     return *this;

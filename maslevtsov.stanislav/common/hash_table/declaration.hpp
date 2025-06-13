@@ -24,8 +24,8 @@ namespace maslevtsov {
     T& operator[](const Key& key);
     T& at(const Key& key);
     const T& at(const Key& key) const;
-    iterator find(const Key& key);
-    const_iterator find(const Key& key) const;
+    iterator find(const Key& key) noexcept;
+    const_iterator find(const Key& key) const noexcept;
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -46,14 +46,14 @@ namespace maslevtsov {
     std::pair< iterator, bool > emplace(Args&&... args);
     template< class... Args >
     iterator emplace_hint(const_iterator hint, Args&&... args);
-    iterator erase(iterator pos);
-    iterator erase(const_iterator pos);
-    iterator erase(const_iterator first, const_iterator last);
-    size_type erase(const Key& key);
+    iterator erase(iterator pos) noexcept;
+    iterator erase(const_iterator pos) noexcept;
+    iterator erase(const_iterator first, const_iterator last) noexcept;
+    size_type erase(const Key& key) noexcept;
     void swap(HashTable& other);
 
-    float load_factor() const;
-    float max_load_factor() const;
+    float load_factor() const noexcept;
+    float max_load_factor() const noexcept;
     void max_load_factor(float ml);
     void rehash(size_type count);
 
