@@ -630,8 +630,8 @@ namespace bocharov
   template< typename Key, typename T, typename Cmp >
   T & Tree< Key, T, Cmp >::operator[](const Key & key)
   {
-    auto toreturn = insert(std::make_pair(key, T()));
-    return toreturn.first->second;
+    Iter it = insert(std::make_pair(key, T())).first;
+    return it->second;
   }
 
   template< typename Key, typename T, typename Cmp >
