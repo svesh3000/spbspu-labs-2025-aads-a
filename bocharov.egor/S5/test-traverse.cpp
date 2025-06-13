@@ -10,7 +10,7 @@ using namespace bocharov;
 
 BOOST_AUTO_TEST_CASE(traverse)
 {
-  RBTree< int, std::string > tree({ { 10, "a" }, { 7, "b" }, { 15, "c" }, { 5, "d" }, { 8, "e" } });
+  Tree< int, std::string > tree({ { 10, "a" }, { 7, "b" }, { 15, "c" }, { 5, "d" }, { 8, "e" } });
   std::ostringstream iss;
   KeySum funLnr;
   funLnr = tree.traverse_lnr(funLnr);

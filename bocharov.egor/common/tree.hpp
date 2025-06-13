@@ -4,9 +4,12 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
-#include "node.hpp"
-#include "iterator.hpp"
+#include "breadthIterator.hpp"
 #include "cIterator.hpp"
+#include "iterator.hpp"
+#include "lnrIterator.hpp"
+#include "node.hpp"
+#include "rnlIterator.hpp"
 
 namespace bocharov
 {
@@ -19,6 +22,12 @@ namespace bocharov
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
     using cIterPair = std::pair< cIter, cIter >;
+    using LnrIterator = detail::LnrIterator< Key, T, Cmp, false >;
+    using ConstLnrIterator = detail::LnrIterator< Key, T, Cmp, true >;
+    using RnlIterator = detail::RnlIterator< Key, T, Cmp, false >;
+    using ConstRnlIterator = detail::RnlIterator< Key, T, Cmp, true >;
+    using BreadthIterator = detail::BreadthIterator< Key, T, Cmp, false >;
+    using ConstBreadthIterator = detail::BreadthIterator< Key, T, Cmp, true >;
 
     Tree();
     Tree(const Tree< Key, T, Cmp > &);
@@ -54,7 +63,31 @@ namespace bocharov
     cIter cbegin() const noexcept;
     Iter end() const noexcept;
     cIter cend() const noexcept;
+//////
 
+    LnrIterator lnrBegin();
+    ConstLnrIterator lnrCbegin() const;
+    LnrIterator lnrEnd() noexcept;
+    ConstLnrIterator lnrCend() const noexcept;
+
+    RnlIterator rnlBegin();
+    ConstRnlIterator rnlCbegin() const;
+    RnlIterator rnlEnd() noexcept;
+    ConstRnlIterator rnlCend() const noexcept;
+
+    BreadthIterator breadthBegin() noexcept;
+    ConstBreadthIterator breadthCbegin() const noexcept;
+    BreadthIterator breadthEnd() noexcept;
+    ConstBreadthIterator breadthCend() const noexcept;
+
+    template< typename F >
+    F traverse_lnr(F f) const;
+    template< typename F >
+    F traverse_rnl(F f) const;
+    template< typename F >
+    F traverse_breadth(F f) const;
+
+//////
     size_t size() const noexcept;
     bool empty() const noexcept;
     void clear() noexcept;
@@ -727,6 +760,151 @@ namespace bocharov
   typename Tree< Key, T, Cmp >::IterPair Tree< Key, T, Cmp >::equal_range(const Key & key) noexcept
   {
     return std::make_pair(lower_bound(key), upper_bound(key));
+  }
+/////
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp>::LnrIterator Tree< Key, T, Cmp >::lnrBegin()
+  {
+    if (empty())
+    {
+      return lnrEnd();
+    }
+    LnrIterator it(root_);
+    while (it.node->left)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstLnrIterator Tree< Key, T, Cmp >::lnrCbegin() const
+  {
+    if (empty())
+    {
+      return lnrCend();
+    }
+    LnrIterator it(root_);
+    while (it.node_->left)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->left;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::LnrIterator Tree< Key, T, Cmp >::lnrEnd() noexcept
+  {
+    return LnrIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstLnrIterator Tree< Key, T, Cmp >::lnrCend() const noexcept
+  {
+    return ConstLnrIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::RnlIterator Tree< Key, T, Cmp >::rnlBegin()
+  {
+    if (empty())
+    {
+      return rnlEnd();
+    }
+    RnlIterator it(root_);
+    while (it.node_->right)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstRnlIterator Tree< Key, T, Cmp >::rnlCbegin() const
+  {
+    if (empty())
+    {
+      return rnlCend();
+    }
+    ConstRnlIterator it(root_);
+    while(it.node_->right)
+    {
+      it.stack_.push(it.node_);
+      it.node_ = it.node_->right;
+    }
+    return it;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::RnlIterator Tree< Key, T, Cmp >::rnlEnd() noexcept
+  {
+    return RnlIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstRnlIterator Tree< Key, T, Cmp >::rnlCend() const noexcept
+  {
+    return ConstRnlIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::BreadthIterator Tree< Key, T, Cmp >::breadthBegin() noexcept
+  {
+    return BreadthIterator(root_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstBreadthIterator Tree< Key, T, Cmp >::breadthCbegin() const noexcept
+  {
+    return ConstBreadthIterator(root_);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::BreadthIterator Tree< Key, T, Cmp >::breadthEnd() noexcept
+  {
+    return BreadthIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  typename Tree< Key, T, Cmp >::ConstBreadthIterator Tree< Key, T, Cmp >::breadthCend() const noexcept
+  {
+    return ConstBreadthIterator(nullptr);
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_lnr(F f) const
+  {
+    for (ConstLnrIterator it = lnrCbegin(); it != lnrCend(); ++it)
+    {
+      f(*(it));
+    }
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_rnl(F f) const
+  {
+    for (ConstRnlIterator it = rnlCbegin(); it != rnlCend(); ++it)
+    {
+      f(*(it));
+    }
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F Tree< Key, T, Cmp >::traverse_breadth(F f) const
+  {
+    for (ConstBreadthIterator it = breadthCbegin(); it != breadthCend(); ++it)
+    {
+      f(*(it));
+    }
+    return f;
   }
 }
 

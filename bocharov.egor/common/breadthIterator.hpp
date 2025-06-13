@@ -9,7 +9,7 @@
 namespace bocharov
 {
   template< typename Key, typename Value, typename Cmp >
-  class RBTree;
+  class Tree;
 
   namespace detail
   {
@@ -41,7 +41,7 @@ namespace bocharov
       Queue< Node * > queue_;
       explicit BreadthIterator(Node *) noexcept;
       friend class BreadthIterator< Key, Value, Cmp, !IsConst >;
-      friend class RBTree< Key, Value, Cmp >;
+      friend class Tree< Key, Value, Cmp >;
     };
 
     template< typename Key, typename Value, typename Cmp, bool IsConst >
