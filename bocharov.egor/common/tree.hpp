@@ -10,7 +10,6 @@
 
 #include "breadthIterator.hpp"
 #include "lnrIterator.hpp"
-#include "node.hpp"
 #include "rnlIterator.hpp"
 
 namespace bocharov
@@ -19,7 +18,7 @@ namespace bocharov
   class Tree
   {
   public:
-    using cIter = TreeIterator< Key, T, Cmp >;
+    using cIter = TreeConstIterator< Key, T, Cmp >;
     using Iter = TreeIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
