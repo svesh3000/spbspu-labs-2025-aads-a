@@ -1,7 +1,7 @@
 #include <boost/test/tools/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
-#include "array.hpp"
+#include <array.hpp>
 
 BOOST_AUTO_TEST_SUITE()
 
