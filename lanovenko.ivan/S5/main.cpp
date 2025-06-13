@@ -22,7 +22,15 @@ int main(int argc, char * argv[])
   Tree< int, std::string, std::less< int > > biTree;
   while ((fileInput >> key >> value) && !fileInput.eof())
   {
-    biTree.insert({key, value});
+    try
+    {
+      biTree.insert({key, value});
+    }
+    catch(...)
+    {
+      std::cerr << "Option error\n";
+      return 1;
+    }
   }
   if (!fileInput.eof())
   {
