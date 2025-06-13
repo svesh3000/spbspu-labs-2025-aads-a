@@ -2,6 +2,7 @@
 #define HASH_TABLE_DEFINITION_HPP
 
 #include <utility>
+#include <boost/hash2/siphash.hpp>
 #include "declaration.hpp"
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -54,7 +55,9 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::find(const Key& key)
 {
   size_t hash_value1 = hasher_(key);
-  size_t hash_value2 = hasher_(key);
+  boost::hash2::siphash_64 siphasher;
+  siphasher.update(&key, sizeof(key));
+  size_t hash_value2 = siphasher.result();
   for (size_t i = 0; i != slots_.size(); ++i) {
     size_t index = (hash_value1 + i * hash_value2) % slots_.size();
     if (slots_[index].state == SlotState::EMPTY)
@@ -200,12 +203,35 @@ float maslevtsov::HashTable< Key, T, Hash, KeyEqual >::max_load_factor() const
   return max_load_factor;
 }
 
-// template< class Key, class T, class Hash, class KeyEqual >
-// void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::max_load_factor(float ml)
-// {}
+template< class Key, class T, class Hash, class KeyEqual >
+void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::max_load_factor(float ml)
+{
+  max_load_factor_ = ml;
+  while (load_factor() > max_load_factor_) {
+    rehash(slots_.size() * 2);
+  }
+}
 
-// template< class Key, class T, class Hash, class KeyEqual >
-// void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
-// {}
+template< class Key, class T, class Hash, class KeyEqual >
+void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
+{
+  if (count <= slots_.size()) {
+    return;
+  }
+  if (count <= 0 || (count & (count - 1)) != 0) {
+    size_t new_count = 1;
+    while (new_count < count) {
+      new_count *= 2;
+    }
+    count = new_count;
+  }
+  Vector< Slot< value_type > > new_slots(count);
+  for (size_t i = 0; i != slots_.size(); ++i) {
+    if (slots_[i].state = SlotState::OCCUPIED) {
+      insert(slots_[i].data);
+    }
+  }
+  slots_ = new_slots;
+}
 
 #endif

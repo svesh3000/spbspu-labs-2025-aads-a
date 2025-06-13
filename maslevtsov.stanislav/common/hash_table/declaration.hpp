@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <initializer_list>
-#include <vector/definition.hpp>
+#include <vector/declaration.hpp>
 #include "hash_table_iterator.hpp"
 
 namespace maslevtsov {
