@@ -17,8 +17,8 @@ namespace bocharov
   class Tree
   {
   public:
-    using cIter = TreeIterator< Key, T, Cmp >;
-    using Iter = TreeIterator< Key, T, Cmp >;
+    using cIter = TreeConstIterator< Key, T, Cmp >;
+    using Iter = TreeConstIterator< Key, T, Cmp >;
     using DataPair = std::pair< Key, T >;
     using IterPair = std::pair< Iter, Iter >;
     using cIterPair = std::pair< cIter, cIter >;
@@ -55,6 +55,7 @@ namespace bocharov
     T & at(const Key &);
     const T & at(const Key &) const;
     T & operator[](const Key &);
+    const T & operator[](const Key &) const;
 
     Iter find(const Key &) noexcept;
     cIter find(const Key &) const noexcept;
@@ -224,7 +225,7 @@ namespace bocharov
   }
 
   template< typename Key, typename T, typename Cmp >
-  std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::insert(const DataPair & value)
+  std::pair< typename Tree< Key, T, Cmp >::Iter, bool > Tree< Key, T, Cmp >::insert(const DataPair & value)
   {
     return emplace(value);
   }
@@ -249,7 +250,7 @@ namespace bocharov
 
   template< typename Key, typename T, typename Cmp >
   template< typename... Args >
-  std::pair< TreeIterator< Key, T, Cmp >, bool > Tree< Key, T, Cmp >::emplace(Args &&... args)
+  std::pair< typename Tree< Key, T, Cmp >::Iter, bool > Tree< Key, T, Cmp >::emplace(Args &&... args)
   {
     Node * newNode = new Node(std::forward< Args >(args)...);
     const Key & key = newNode->data.first;
@@ -905,6 +906,13 @@ namespace bocharov
       f(*(it));
     }
     return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  const T & Tree< Key, T, Cmp >::operator[](const Key & key) const
+  {
+    cIter it = find(key);
+    return it->second;
   }
 }
 

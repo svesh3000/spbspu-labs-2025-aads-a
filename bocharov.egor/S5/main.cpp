@@ -10,8 +10,8 @@
 namespace
 {
   using namespace bocharov;
-  using Tree = RBTree< int, std::string >;
-  void input(std::istream & input, Tree & tree)
+  using AVLTree = Tree< int, std::string >;
+  void input(std::istream & input, AVLTree & tree)
   {
     std::pair< int, std::string > pair;
     while (input >> pair.first >> pair.second)
@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
     return 1;
   }
   std::ifstream file(argv[2]);
-  Tree tree;
+  AVLTree tree;
   input(file, tree);
   if (!file.eof())
   {
@@ -43,11 +43,11 @@ int main(int argc, char ** argv)
   }
   else
   {
-    RBTree< std::string, std::function< KeySum(KeySum) > > traverse;
+    Tree< std::string, std::function< KeySum(KeySum) > > traverse;
     using namespace std::placeholders;
-    traverse["ascending"] = std::bind(& Tree::traverse_lnr< KeySum >, std::ref(tree), _1);
-    traverse["descending"] = std::bind(& Tree::traverse_rnl< KeySum >, std::ref(tree), _1);
-    traverse["breadth"] = std::bind(& Tree::traverse_breadth< KeySum >, std::ref(tree), _1);
+    traverse["ascending"] = std::bind(& AVLTree::traverse_lnr< KeySum >, std::ref(tree), _1);
+    traverse["descending"] = std::bind(& AVLTree::traverse_rnl< KeySum >, std::ref(tree), _1);
+    traverse["breadth"] = std::bind(& AVLTree::traverse_breadth< KeySum >, std::ref(tree), _1);
     try
     {
       KeySum funct;
