@@ -2,13 +2,13 @@
 #define GRAPH_HPP
 
 #include <string>
-#include <unordered_map>
 #include <set>
 #include <vector>
+#include "hashTable.hpp"
 
-namespace maslov
+namespace maslov::detail
 {
-  struct PairHash
+  struct PairHash1
   {
     size_t operator()(const std::pair< std::string, std::string > & pair) const
     {
@@ -18,6 +18,20 @@ namespace maslov
     }
   };
 
+  struct PairHash2
+  {
+    size_t operator()(const std::pair< std::string, std::string > & pair) const
+    {
+      boost::hash2::xxhash_64 hasher;
+      hasher.update(pair.first.data(), pair.first.size());
+      hasher.update(pair.second.data(), pair.second.size());
+      return hasher.result();
+    }
+  };
+}
+
+namespace maslov
+{
   struct Graph
   {
     void addEdge(const std::string & v1, const std::string & v2, int weight);
@@ -32,7 +46,7 @@ namespace maslov
     void extract(const Graph & graph, const std::set< std::string > & extractVertexes);
    private:
     std::set< std::string > vertexes;
-    std::unordered_map< std::pair< std::string, std::string >, std::vector< int >, PairHash > edges;
+    HashTable< std::pair< std::string, std::string >, std::vector< int >, detail::PairHash1, detail::PairHash2 > edges;
   };
 }
 

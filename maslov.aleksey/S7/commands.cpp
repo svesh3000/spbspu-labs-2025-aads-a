@@ -22,10 +22,10 @@ namespace
   }
 }
 
-void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string, Graph > & graphs)
+void maslov::getGraphs(std::ostream & out, const hashTable & graphs)
   {
     std::vector< std::string > graphNames;
-    for (auto it = graphs.begin(); it != graphs.end(); it++)
+    for (auto it = graphs.cbegin(); it != graphs.cend(); it++)
     {
       graphNames.push_back(it->first);
     }
@@ -40,7 +40,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     }
   }
 
-  void maslov::getVertexes(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs)
+  void maslov::getVertexes(std::istream & in, std::ostream & out, const hashTable & graphs)
   {
     std::string graphName;
     in >> graphName;
@@ -56,7 +56,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     }
   }
 
-  void maslov::getOutbound(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs)
+  void maslov::getOutbound(std::istream & in, std::ostream & out, const hashTable & graphs)
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
@@ -69,7 +69,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     printBounds(out, outbounds);
   }
 
-  void maslov::getInbound(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs)
+  void maslov::getInbound(std::istream & in, std::ostream & out, const hashTable & graphs)
   {
     std::string graphName, vertexName;
     in >> graphName >> vertexName;
@@ -82,7 +82,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     printBounds(out, inbounds);
   }
 
-  void maslov::createEdge(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
+  void maslov::createEdge(std::istream & in, hashTable & graphs)
   {
     std::string graphName, v1, v2;
     int weight;
@@ -91,7 +91,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     graph.addEdge(v1, v2, weight);
   }
 
-  void maslov::deleteEdge(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
+  void maslov::deleteEdge(std::istream & in, hashTable & graphs)
   {
     std::string graphName, v1, v2;
     int weight;
@@ -100,7 +100,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     graph.deleteEdge(v1, v2, weight);
   }
 
-  void maslov::createGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
+  void maslov::createGraph(std::istream & in, hashTable & graphs)
   {
     std::string graphName;
     in >> graphName;
@@ -120,7 +120,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     graphs[graphName] = newGraph;
   }
 
-  void maslov::mergeGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
+  void maslov::mergeGraph(std::istream & in, hashTable & graphs)
   {
     std::string newGraphName, graphName1, graphName2;
     in >> newGraphName >> graphName1 >> graphName2;
@@ -135,7 +135,7 @@ void maslov::getGraphs(std::ostream & out, const std::unordered_map< std::string
     graphs[newGraphName] = mergedGraph;
   }
 
-  void maslov::extractGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs)
+  void maslov::extractGraph(std::istream & in, hashTable & graphs)
   {
     std::string newGraphName, graphName;
     in >> newGraphName >> graphName;

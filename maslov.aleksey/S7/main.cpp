@@ -6,7 +6,7 @@
 
 namespace
 {
-  void readGraphs(std::istream & in, std::unordered_map< std::string, maslov::Graph > & graphs)
+  void readGraphs(std::istream & in, maslov::HashTable< std::string, maslov::Graph > & graphs)
   {
     std::string graphName;
     size_t edgeCount = 0;
@@ -39,8 +39,8 @@ int main(int argc, char * argv[])
     return 1;
   }
 
-  std::unordered_map< std::string, maslov::Graph > graphs;
-  std::unordered_map< std::string, std::function< void() > > cmds;
+  maslov::HashTable< std::string, maslov::Graph > graphs;
+  maslov::HashTable< std::string, std::function< void() > > cmds;
   cmds["graphs"] = std::bind(maslov::getGraphs, std::ref(std::cout), std::cref(graphs));
   cmds["vertexes"] = std::bind(maslov::getVertexes, std::ref(std::cin), std::ref(std::cout), std::cref(graphs));
   cmds["outbound"]  = std::bind(maslov::getOutbound, std::ref(std::cin), std::ref(std::cout), std::cref(graphs));

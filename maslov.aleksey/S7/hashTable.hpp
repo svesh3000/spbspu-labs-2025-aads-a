@@ -6,9 +6,23 @@
 #include "iterator.hpp"
 #include "hashNode.hpp"
 
+namespace maslov::detail
+{
+  template< class Key >
+  struct XXHash
+  {
+    size_t operator()(const Key & key) const
+    {
+      boost::hash2::xxhash_64 hasher;
+      hasher.update(std::addressof(key), sizeof(Key));
+      return hasher.result();
+    }
+  };
+}
+
 namespace maslov
 {
-  template< class Key, class T, class HS1 = std::hash< Key >, class HS2 = boost::hash2::xxhash_64, class EQ = std::equal_to< Key > >
+  template< class Key, class T, class HS1 = std::hash< Key >, class HS2 = detail::XXHash< Key >, class EQ = std::equal_to< Key > >
   struct HashTable
   {
     using cIterator = HashConstIterator< Key, T, HS1, HS2, EQ >;
@@ -16,39 +30,54 @@ namespace maslov
 
     HashTable();
     HashTable(size_t capacity);
+    HashTable(const HashTable & rhs);
+    HashTable(HashTable && rhs) noexcept;
+    template< class InputIt >
+    HashTable(InputIt firstIt, InputIt lastIt);
+    HashTable(std::initializer_list< std::pair< Key, T > > init);
     ~HashTable();
-    bool empty() const noexcept;
-    size_t size() const noexcept;
-    float loadFactor() const;
-    void rehash(size_t newCapacity);
-    iterator find(const Key & key);
-    cIterator find(const Key & key) const;
+
+    HashTable & operator=(const HashTable & rhs);
+    HashTable & operator=(HashTable && rhs) noexcept;
+
     T & at(const Key & key);
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
     T & operator[](Key && key);
-    void clear() noexcept;
+    iterator find(const Key & key);
+    cIterator find(const Key & key) const;
+
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+
+    float loadFactor() const;
+    void rehash(size_t newCapacity);
+    float maxLoadFactor() const noexcept;
+    void maxLoadFactor(float ml);
+ 
     std::pair< iterator, bool > insert(const Key & key, const T & value);
-    //template< class InputIt >
-    //void insert(InputIt first, InputIt last);
+    template< class InputIt >
+    void insert(InputIt first, InputIt last);
     iterator erase(iterator pos);
     iterator erase(cIterator pos);
     template< class InputIt >
     iterator erase(InputIt first, InputIt last);
     size_t erase(const Key & key);
+    void clear() noexcept;
 
     iterator begin();
     cIterator cbegin() const;
     iterator end();
     cIterator cend() const;
+
+    void swap(HashTable & rhs) noexcept;
    private:
     HashNode< Key, T > * slots_;
     size_t capacity_;
     size_t size_;
-    float maxLoadFactor_;
-    size_t computexxhash(const Key & key) const;
+    float maxLoadFactor_= 0.7f;
     std::pair< size_t, size_t > calculatePositions(const Key & key) const;
-    std::pair< size_t, bool > findPosition(const Key & key);
+    std::pair< size_t, bool > findPosition(const Key & key) const;
   };
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -60,14 +89,79 @@ namespace maslov
   HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity):
     slots_(new HashNode< Key, T >[capacity]),
     capacity_(capacity),
-    size_(0),
-    maxLoadFactor_(0.7f)
+    size_(0)
+  {}
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  template< class InputIt >
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(InputIt firstIt, InputIt lastIt):
+    HashTable()
+  {
+    insert(firstIt, lastIt);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(std::initializer_list< std::pair< Key, T > > init):
+    HashTable(init.begin(), init.end())
   {}
 
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashTable< Key, T, HS1, HS2, EQ >::~HashTable()
   {
     delete[] slots_;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(const HashTable & rhs):
+    slots_(new HashNode< Key, T >[rhs.capacity_]),
+    capacity_(rhs.capacity_),
+    size_(rhs.size_)
+  {
+    for (size_t i = 0; i < capacity_; ++i)
+    {
+      if (rhs.slots_[i].occupied && !rhs.slots_[i].deleted)
+      {
+        slots_[i] = rhs.slots_[i];
+      }
+    }
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ >::HashTable(HashTable && rhs) noexcept:
+    slots_(rhs.slots_),
+    capacity_(rhs.capacity_),
+    size_(rhs.size_)
+  {
+    rhs.slots_ = nullptr;
+    rhs.capacity_ = 0;
+    rhs.size_ = 0;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ > & HashTable< Key, T, HS1, HS2, EQ >::operator=(const HashTable & rhs)
+  {
+    if (this != std::addressof(rhs))
+    {
+      HashTable tmp(rhs);
+      swap(tmp);
+    }
+    return *this;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashTable< Key, T, HS1, HS2, EQ > & HashTable< Key, T, HS1, HS2, EQ >::operator=(HashTable && rhs) noexcept
+  {
+    if (this != std::addressof(rhs))
+    {
+      delete[] slots_;
+      slots_ = rhs.slots_;
+      capacity_ = rhs.capacity_;
+      size_ = rhs.size_;
+      rhs.slots_ = nullptr;
+      rhs.capacity_ = 0;
+      rhs.size_ = 0;
+    }
+    return *this;
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -119,14 +213,6 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  size_t HashTable< Key, T, HS1, HS2, EQ >::computexxhash(const Key & key) const
-  {
-    HS2 hasher;
-    hasher.update(std::addressof(key), sizeof(Key));
-    return hasher.result();
-  }
-
-  template< class Key, class T, class HS1, class HS2, class EQ >
   std::pair< HashIterator< Key, T, HS1, HS2, EQ >, bool > HashTable< Key, T, HS1, HS2, EQ >::insert(const Key & key, const T & value)
   {
     if (loadFactor() >= maxLoadFactor_)
@@ -156,12 +242,12 @@ namespace maslov
   std::pair< size_t, size_t > HashTable< Key, T, HS1, HS2, EQ >::calculatePositions(const Key & key) const
   {
     size_t h1 = HS1{}(key) % capacity_;
-    size_t h2 = computexxhash(key) % (capacity_ - 1) + 1;
+    size_t h2 = HS2{}(key) % (capacity_ - 1) + 1;
     return {h1, h2};
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  std::pair< size_t, bool > HashTable< Key, T, HS1, HS2, EQ >::findPosition(const Key & key)
+  std::pair< size_t, bool > HashTable< Key, T, HS1, HS2, EQ >::findPosition(const Key & key) const
   {
     auto pos = calculatePositions(key);
     size_t deleted = capacity_;
@@ -330,6 +416,43 @@ namespace maslov
       return 1;
     }
     return 0;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  void HashTable< Key, T, HS1, HS2, EQ >::swap(HashTable & rhs) noexcept
+  {
+    std::swap(slots_, rhs.slots_);
+    std::swap(capacity_, rhs.capacity_);
+    std::swap(size_, rhs.size_);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  float HashTable< Key, T, HS1, HS2, EQ >::maxLoadFactor() const noexcept
+  {
+    return maxLoadFactor_;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  void HashTable< Key, T, HS1, HS2, EQ >::maxLoadFactor(float ml)
+  {
+    if (ml > 0.0f && ml <= 1.0f)
+    {
+      maxLoadFactor_ = ml;
+      if (loadFactor() > maxLoadFactor_)
+      {
+        rehash(capacity_ * 2);
+      }
+    }
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  template< class InputIt >
+  void HashTable< Key, T, HS1, HS2, EQ >::insert(InputIt first, InputIt last)
+  {
+    for (auto it = first; it != last; ++it)
+    {
+      insert(it->first, it->second);
+    }
   }
 }
 

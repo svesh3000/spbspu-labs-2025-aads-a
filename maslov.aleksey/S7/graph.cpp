@@ -8,7 +8,7 @@ void maslov::Graph::extract(const Graph & graph, const std::set< std::string > &
   {
     addVertex(*it);
   }
-  for (auto it = graph.edges.begin(); it != graph.edges.end(); it++)
+  for (auto it = graph.edges.cbegin(); it != graph.edges.cend(); it++)
   {
     const auto vertexes = it->first;
     if (hasVertex(vertexes.first) && hasVertex(vertexes.second))
@@ -23,7 +23,7 @@ void maslov::Graph::extract(const Graph & graph, const std::set< std::string > &
 
 void maslov::Graph::merge(const Graph & graph)
 {
-  for (auto it = graph.edges.begin(); it != graph.edges.end(); it++)
+  for (auto it = graph.edges.cbegin(); it != graph.edges.cend(); it++)
   {
     for (auto itWeight = it->second.begin(); itWeight != it->second.end(); ++itWeight)
     {
@@ -49,7 +49,7 @@ bool maslov::Graph::hasVertex(const std::string & vertex) const
 bool maslov::Graph::hasEdge(const std::string & v1, const std::string & v2, int weight) const
 {
   auto it = edges.find({v1, v2});
-  if (it == edges.end())
+  if (it == edges.cend())
   {
     return false;
   }
@@ -110,7 +110,7 @@ std::vector< std::string > maslov::Graph::getVertexes() const
 std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getOutbound(const std::string & vertex) const
 {
   std::vector< std::pair< std::string, std::vector< int > > > result;
-  for (auto it = edges.begin(); it != edges.end(); it++)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
     if (it->first.first == vertex)
     {
@@ -124,7 +124,7 @@ std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getOu
 std::vector< std::pair< std::string, std::vector< int > > > maslov::Graph::getInbound(const std::string & vertex) const
 {
   std::vector< std::pair< std::string, std::vector< int > > > result;
-  for (auto it = edges.begin(); it != edges.end(); it++)
+  for (auto it = edges.cbegin(); it != edges.cend(); it++)
   {
     if (it->first.second == vertex)
     {

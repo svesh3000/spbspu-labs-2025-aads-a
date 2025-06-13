@@ -183,7 +183,7 @@ namespace maslov
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashConstIterator< Key, T, HS1, HS2, EQ > HashConstIterator< Key, T, HS1, HS2, EQ >::operator++(int)
   {
-    HashIterator< Key, T, HS1, HS2, EQ > tmp = *this;
+    HashConstIterator< Key, T, HS1, HS2, EQ > tmp = *this;
     ++(*this);
     return tmp;
   }

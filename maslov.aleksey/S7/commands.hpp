@@ -5,15 +5,16 @@
 
 namespace maslov
 {
-  void getGraphs(std::ostream & out, const std::unordered_map< std::string, Graph > & graphs);
-  void getVertexes(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs);
-  void getOutbound(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs);
-  void getInbound(std::istream & in, std::ostream & out, const std::unordered_map< std::string, Graph > & graphs);
-  void createEdge(std::istream & in, std::unordered_map< std::string, Graph > & graphs);
-  void deleteEdge(std::istream & in, std::unordered_map< std::string, Graph > & graphs);
-  void createGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs);
-  void mergeGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs);
-  void extractGraph(std::istream & in, std::unordered_map< std::string, Graph > & graphs);
+  using hashTable = maslov::HashTable< std::string, maslov::Graph >;
+  void getGraphs(std::ostream & out, const hashTable & graphs);
+  void getVertexes(std::istream & in, std::ostream & out, const hashTable & graphs);
+  void getOutbound(std::istream & in, std::ostream & out, const hashTable & graphs);
+  void getInbound(std::istream & in, std::ostream & out, const hashTable & graphs);
+  void createEdge(std::istream & in, hashTable & graphs);
+  void deleteEdge(std::istream & in, hashTable & graphs);
+  void createGraph(std::istream & in, hashTable & graphs);
+  void mergeGraph(std::istream & in, hashTable & graphs);
+  void extractGraph(std::istream & in, hashTable & graphs);
 }
 
 #endif
