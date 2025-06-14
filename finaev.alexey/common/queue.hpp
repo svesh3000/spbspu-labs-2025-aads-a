@@ -6,7 +6,7 @@
 
 namespace finaev
 {
-  template < class T >
+  template< class T >
   class Queue
   {
   public:
@@ -21,37 +21,37 @@ namespace finaev
     dynamicArr< T > arr_;
   };
 
-  template < class T >
+  template< class T >
   bool Queue< T >::isEmpty() const noexcept
   {
     return arr_.empty();
   }
 
-  template < class T >
+  template< class T >
   size_t Queue< T >::size() const noexcept
   {
     return arr_.size();
   }
 
-  template < class T >
+  template< class T >
   void Queue< T >::push(const T& rhs)
   {
     arr_.push(rhs);
   }
 
-  template < class T >
+  template< class T >
   void Queue< T >::pop()
   {
     arr_.pop_front();
   }
 
-  template < class T >
+  template< class T >
   T& Queue< T >::top()
   {
     return arr_.front();
   }
 
-  template < class T >
+  template< class T >
   const T& Queue< T >::top() const
   {
     return arr_.front();

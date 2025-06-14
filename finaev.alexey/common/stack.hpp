@@ -6,7 +6,7 @@
 
 namespace finaev
 {
-  template < class T >
+  template< class T >
   class Stack
   {
   public:
@@ -21,37 +21,37 @@ namespace finaev
     dynamicArr< T > arr_;
   };
 
-  template < class T >
+  template< class T >
   bool Stack< T >::isEmpty() const noexcept
   {
     return arr_.empty();
   }
 
-  template < class T >
+  template< class T >
   size_t Stack< T >::size() const noexcept
   {
     return arr_.size();
   }
 
-  template < class T >
+  template< class T >
   void Stack< T >::push(const T& rhs)
   {
     arr_.push(rhs);
   }
 
-  template < class T >
+  template< class T >
   void Stack< T >::pop()
   {
     arr_.pop_back();
   }
 
-  template < class T >
+  template< class T >
   T& Stack< T >::top()
   {
     return arr_.back();
   }
 
-  template < class T >
+  template< class T >
   const T& Stack< T >::top() const
   {
     return arr_.back();
