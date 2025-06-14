@@ -41,7 +41,7 @@ void finaev::countFinalResults(std::istream& in)
     finaev::Queue< std::string > inf;
     size_t start = 0;
     size_t end = str.find(' ', start);
-    while (end == std::string::npos)
+    while (end != std::string::npos)
     {
       std::string substring = str.substr(start, end - start);
       if (!substring.empty())
