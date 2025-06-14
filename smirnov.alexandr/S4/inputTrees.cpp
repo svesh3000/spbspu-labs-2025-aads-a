@@ -11,9 +11,9 @@ void smirnov::inputTrees(TreeOfTrees & trees, std::istream & input)
     BasicTree tree;
     while (input.peek() != '\n' && input >> key >> value)
     {
-      tree.insert({ key, value });
+      tree[key] = value;
     }
-    trees.insert({ dictName, tree });
-    input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    trees[dictName] = tree;
+    input.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   }
 }

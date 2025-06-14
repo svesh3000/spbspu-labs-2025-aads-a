@@ -1,14 +1,13 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-
 #include <iostream>
 #include <string>
-#include <map>
+#include "avlTree.hpp"
 
 namespace smirnov
 {
-  using BasicTree = std::map< int, std::string >;
-  using TreeOfTrees = std::map< std::string, BasicTree >;
+  using BasicTree = AvlTree< int, std::string >;
+  using TreeOfTrees = AvlTree< std::string, BasicTree >;
   void print(const TreeOfTrees & trees, std::istream & in, std::ostream & out);
   void complement(TreeOfTrees & trees, std::istream & in, std::ostream & out);
   void intersect(TreeOfTrees & trees, std::istream & in, std::ostream & out);
