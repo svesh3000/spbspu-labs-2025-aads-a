@@ -315,7 +315,7 @@ namespace smirnov
     if (!node)
     {
       ++size;
-      return new NodeType(key, value);
+      return new Node< Key, Value >(key, value);
     }
     if (comp_(key, node->data.first))
     {
