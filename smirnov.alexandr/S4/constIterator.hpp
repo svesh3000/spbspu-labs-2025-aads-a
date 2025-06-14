@@ -1,7 +1,7 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
-#include "node.hpp"
 #include <functional>
+#include "node.hpp"
 
 namespace smirnov
 {
