@@ -57,6 +57,8 @@ namespace maslov
     std::pair< iterator, bool > insert(const Key & key, const T & value);
     template< class InputIt >
     void insert(InputIt first, InputIt last);
+    iterator insert(cIterator, const std::pair< Key, T > & pair);
+    iterator insert(cIterator, std::pair< Key, T > && pair);
     iterator erase(iterator pos);
     iterator erase(cIterator pos);
     template< class InputIt >
@@ -70,6 +72,11 @@ namespace maslov
     cIterator cend() const;
 
     void swap(HashTable & rhs) noexcept;
+
+    template< class... Args >
+    std::pair< iterator, bool > emplace(Args &&... args);
+    template< class... Args >
+    iterator emplaceHint(cIterator hint, Args &&... args);
    private:
     HashNode< Key, T > * slots_;
     size_t capacity_;
@@ -214,27 +221,7 @@ namespace maslov
   template< class Key, class T, class HS1, class HS2, class EQ >
   std::pair< HashIterator< Key, T, HS1, HS2, EQ >, bool > HashTable< Key, T, HS1, HS2, EQ >::insert(const Key & key, const T & value)
   {
-    if (loadFactor() >= maxLoadFactor_)
-    {
-      rehash(capacity_ * 2);
-    }
-    auto pair = findPosition(key);
-    size_t pos = pair.first;
-    bool hasFind   = pair.second;
-    if (pos == capacity_)
-    {
-      throw std::runtime_error("ERROR: hash table is full");
-    }
-    if (hasFind)
-    {
-      slots_[pos].data.first = key;
-      slots_[pos].data.second = value;
-      slots_[pos].occupied = true;
-      slots_[pos].deleted = false;
-      size_++;
-      return {iterator(slots_, capacity_, pos), true};
-    }
-    return {iterator(slots_, capacity_, pos), false};
+    return emplace(key, value);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -452,6 +439,67 @@ namespace maslov
     {
       insert(it->first, it->second);
     }
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  template< class... Args >
+  std::pair< HashIterator< Key, T, HS1, HS2, EQ >, bool > HashTable< Key, T, HS1, HS2, EQ >::emplace(Args &&... args)
+  {
+    if (loadFactor() >= maxLoadFactor_)
+    {
+      rehash(capacity_ * 2);
+    }
+    std::pair< Key, T > temp(std::forward< Args >(args)...);
+    const Key & key = temp.first;
+    auto pair = findPosition(key);
+    size_t pos = pair.first;
+    bool hasFind = pair.second;
+
+    if (pos == capacity_)
+    {
+      throw std::runtime_error("ERROR: hash table is full");
+    }
+    if (hasFind)
+    {
+      slots_[pos].data = std::move(temp);
+      slots_[pos].occupied = true;
+      slots_[pos].deleted = false;
+      size_++;
+      return {iterator(slots_, capacity_, pos), true};
+    }
+    return {iterator(slots_, capacity_, pos), false};
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  template< class... Args >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::emplaceHint(cIterator hint, Args &&... args)
+  {
+    if (hint != cend())
+    {
+      const auto & slot = slots_[hint.current_];
+      if (slot.occupied && !slot.deleted)
+      {
+        std::pair< Key, T > temp(std::forward< Args >(args)...);
+        if (EQ{}(slot.data.first, temp.first))
+        {
+          return iterator(slots_, capacity_, hint.current_);
+        }
+        return emplace(std::move(temp)).first;
+      }
+    }
+    return emplace(std::forward< Args >(args)...).first;
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::insert(cIterator hint, const std::pair< Key, T > & pair)
+  {
+    return emplaceHint(hint, pair);
+  }
+
+  template< class Key, class T, class HS1, class HS2, class EQ >
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::insert(cIterator hint, std::pair< Key, T > && pair)
+  {
+    return emplaceHint(hint, std::move(pair));
   }
 }
 

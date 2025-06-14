@@ -178,6 +178,21 @@ BOOST_AUTO_TEST_CASE(insertRange)
   BOOST_TEST(out.str() == "1 one 2 two");
 }
 
+BOOST_AUTO_TEST_CASE(emplaceHint)
+{
+  maslov::HashTable< int, std::string > hashTable;
+  hashTable.insert(1, "one");
+  hashTable.insert(2, "two");
+  auto hint = hashTable.cbegin();
+  auto it1 = hashTable.emplaceHint(hint, 1, "first");
+  BOOST_TEST(it1->first == 1);
+  BOOST_TEST(it1->second == "one");
+
+  auto it2 = hashTable.emplaceHint(hint, 3, "three");
+  BOOST_TEST(it2->first == 3);
+  BOOST_TEST(it2->second == "three");
+}
+
 BOOST_AUTO_TEST_CASE(clear)
 {
   maslov::HashTable< int, std::string > hashTable(2);
