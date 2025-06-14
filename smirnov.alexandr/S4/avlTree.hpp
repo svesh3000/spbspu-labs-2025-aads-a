@@ -2,7 +2,6 @@
 #define AVL_TREE_HPP
 #include <cstddef>
 #include <stdexcept>
-#include <memory>
 #include "node.hpp"
 #include "constIterator.hpp"
 
@@ -22,7 +21,7 @@ namespace smirnov
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear() noexcept;
-    void swap(AvlTree& other) noexcept;
+    void swap(AvlTree & other) noexcept;
     Value & operator[](const Key & key);
     const Value & operator[](const Key & key) const;
     Value & at(const Key & key);
@@ -310,7 +309,8 @@ namespace smirnov
   }
 
   template < typename Key, typename Value, typename Compare >
-  Node< Key, Value > * AvlTree< Key, Value, Compare >::addOrGet(Node< Key, Value > * node, const Key & key, const Value & value, size_t & size)
+  Node< Key, Value > * AvlTree< Key, Value, Compare >::addOrGet(
+      Node< Key, Value > * node, const Key & key, const Value & value, size_t & size)
   {
     if (!node)
     {
