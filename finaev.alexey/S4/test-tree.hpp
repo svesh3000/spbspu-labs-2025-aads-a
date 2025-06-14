@@ -5,7 +5,7 @@
 
 namespace
 {
-  template< typename Key, typename Value, typename Cmp >
+  template< class Key, class Value, class Cmp >
   void printTree(std::ostream& out, finaev::AVLtree< Key, Value, Cmp > tree)
   {
     for (auto it = tree.cBegin(); it != tree.cEnd(); ++it)
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(tree_operations)
   tree.insert({"2", 2});
   tree.insert({"3", 3});
   auto it = tree.find("2");
-  BOOST_REQUIRE(it != tree.end()); 
+  BOOST_REQUIRE(it != tree.end());
   BOOST_TEST(it->first == "2");
   BOOST_TEST(it->second == 2);
 
