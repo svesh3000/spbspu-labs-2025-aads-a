@@ -1,6 +1,5 @@
 #include <iostream>
 #include <utility>
-#include <list>
 #include <limits>
 #include <iomanip>
 #include "list_manipulations.hpp"
@@ -19,7 +18,7 @@ int main()
     {
       temporaryList.push_back(element);
     }
-    std::pair<std::string, ForwardList<unsigned long long>> temporaryPair{ sequenceName, temporaryList };
+    std::pair< std::string, ForwardList< unsigned long long > > temporaryPair{ sequenceName, temporaryList };
     myList.push_back(temporaryPair);
     if (std::cin.eof())
     {
@@ -29,7 +28,7 @@ int main()
   }
   printSequencesName(myList, std::cout);
   size_t maxSize = 0;
-  for (auto it : myList)
+  for (const auto& it : myList)
   {
     if (maxSize < it.second.size())
     {
