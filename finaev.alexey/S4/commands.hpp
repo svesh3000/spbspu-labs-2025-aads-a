@@ -1,7 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <ostream>
-#include "AVLtree.hpp"
+#include <AVLtree.hpp>
 
 namespace finaev
 {
