@@ -22,14 +22,14 @@ namespace
   {
     if (b > 0)
     {
-      if (a < (std::numeric_limits<long long>::min() + b))
+      if (a < (std::numeric_limits< long long >::min() + b))
       {
         throw std::overflow_error("Underflow!\n");
       }
     }
     else if (b < 0)
     {
-      if (a > (std::numeric_limits<long long>::max() + b))
+      if (a > (std::numeric_limits< long long >::max() + b))
       {
         throw std::overflow_error("Overflow!\n");
       }
@@ -55,14 +55,14 @@ namespace
     }
     else if (a > 0 && b < 0)
     {
-      if (b < std::numeric_limits<int>::min() / a)
+      if (b < std::numeric_limits< int >::min() / a)
       {
         throw std::overflow_error("Overflow!\n");
       }
     }
     else if (a < 0 && b > 0)
     {
-      if (a < std::numeric_limits<int>::min() / b)
+      if (a < std::numeric_limits< int >::min() / b)
       {
         throw std::overflow_error("Overflow!\n");
       }
@@ -98,10 +98,10 @@ namespace
     if (a == 0)
     {
       if (b < 0)
-        {
-          throw std::invalid_argument("Zero cannot be raised to a negative power!\n");
-        }
-        return 0;
+      {
+        throw std::invalid_argument("Zero cannot be raised to a negative power!\n");
+      }
+      return 0;
     }
     if (a == 0 && b == 0)
     {
