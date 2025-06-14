@@ -1,16 +1,15 @@
 #include "convertExpressions.hpp"
 #include <stdexcept>
 #include <iostream>
-#include <sstream>
 
 namespace
 {
-  bool isExpression(std::string a)
+  bool isExpression(const std::string& a)
   {
     return ((a[0] == '+' || a[0] == '-' || a[0] == '*' || a[0] == '/' || a[0] == '%' || a[0] == '^') && a.size() == 1);
   }
 
-  bool isMorePriority(std::string a, std::string b)
+  bool isMorePriority(const std::string& a, const std::string& b)
   {
     if (b[0] == '^')
     {
@@ -42,17 +41,8 @@ void finaev::countFinalResults(std::istream& in)
     finaev::Queue< std::string > inf;
     size_t start = 0;
     size_t end = str.find(' ', start);
-    while (true)
+    while (end == std::string::npos)
     {
-      if (end == std::string::npos)
-      {
-        std::string substring = str.substr(start, str.size());
-        if (!substring.empty())
-        {
-          inf.push(substring);
-        }
-        break;
-      }
       std::string substring = str.substr(start, end - start);
       if (!substring.empty())
       {
@@ -60,6 +50,11 @@ void finaev::countFinalResults(std::istream& in)
       }
       start = end + 1;
       end = str.find(' ', start);
+    }
+    std::string substring = str.substr(start, str.size());
+    if (!substring.empty())
+    {
+      inf.push(substring);
     }
     finaev::Queue< std::string > post = fromInfToPost(inf);
     res.push(calculatePost(post));
@@ -147,20 +142,9 @@ long long finaev::calculatePost(finaev::Queue< std::string >& post)
     }
     else
     {
-      try
-      {
-        long long num = std::stoll(post.top(), nullptr, 10);
-        res.push(num);
-        post.pop();
-      }
-      catch (const std::out_of_range&)
-      {
-        throw std::overflow_error("Overflow\n");
-      }
-      catch(const std::invalid_argument&)
-      {
-        throw std::invalid_argument("invalid token\n");
-      }
+      long long num = std::stoll(post.top(), nullptr, 10);
+      res.push(num);
+      post.pop();
     }
   }
   return res.top();

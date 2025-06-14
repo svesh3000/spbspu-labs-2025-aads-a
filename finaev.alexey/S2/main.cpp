@@ -12,6 +12,7 @@ int main(int argc, char * argv[])
       return 1;
     }
     std::ifstream mainFile;
+    std::istream* input = std::addressof(std::cin);
     if (argc == 2)
     {
       mainFile.open(argv[1]);
@@ -19,15 +20,9 @@ int main(int argc, char * argv[])
       {
         throw std::logic_error("error main file open\n");
       }
+      input = &mainFile;
     }
-    if (mainFile.is_open())
-    {
-      finaev::countFinalResults(mainFile);
-    }
-    else
-    {
-      finaev::countFinalResults(std::cin);
-    }
+    finaev::countFinalResults(*input);
   }
   catch (const std::exception& e)
   {
