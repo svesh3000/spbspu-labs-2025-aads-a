@@ -143,9 +143,13 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   Value & AvlTree< Key, Value, Compare >::operator[](const Key & key)
   {
-    root_ = addOrGet(root_, key, Value(), size_);
     Node< Key, Value > * node = findNode(root_, key);
-    return std::addressof(node->data)->second;
+    if (!node)
+    {
+      root_ = addOrGet(root_, key, Value(), size_);
+      node = findNode(root_, key);
+    }
+    return node->data.second;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -332,6 +336,7 @@ namespace smirnov
     else
     {
       node->data.second = value;
+      return node;
     }
     return balance(node);
   }
