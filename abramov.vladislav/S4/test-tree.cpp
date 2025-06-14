@@ -33,10 +33,29 @@ BOOST_AUTO_TEST_CASE(defaultconstructor_insert)
   BOOST_TEST(it->second == "b");
 }
 
+BOOST_AUTO_TEST_CASE(copyconstructor)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(10, "a");
+  tree.insert(8, "b");
+  abramov::BinarySearchTree< int, std::string > copy_tree(tree);
+  BOOST_TEST(copy_tree.find(8)->second == "b");
+  BOOST_TEST(copy_tree.find(10)->second == "a");
+}
+
+BOOST_AUTO_TEST_CASE(copyoperator)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(10, "a");
+  tree.insert(8, "b");
+  abramov::BinarySearchTree< int, std::string > copy_tree = tree;
+  BOOST_TEST(copy_tree.find(8)->second == "b");
+  BOOST_TEST(copy_tree.find(10)->second == "a");
+}
+
 BOOST_AUTO_TEST_CASE(operatorbrackets)
 {
   abramov::BinarySearchTree< int, std::string > tree;
-  //tree.insert(10, "a");
   tree[10] = "a";
   tree[8] = "b";
   tree[12] = "c";

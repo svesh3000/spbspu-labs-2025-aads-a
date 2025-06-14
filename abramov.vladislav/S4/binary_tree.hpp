@@ -18,11 +18,19 @@ namespace abramov
   template< class Key, class Value >
   using crange_t = std::pair< ConstIterator< Key, Value >, ConstIterator< Key, Value > >;
 
+
  template< class Key, class Value, class Cmp = std::less< Key > >
   struct BinarySearchTree
   {
+    using node_t = Node< Key, Value >;
+    using tree_t = BinarySearchTree< Key, Value, Cmp >;
+
     BinarySearchTree();
+    BinarySearchTree(const BinarySearchTree< Key, Value, Cmp > &tree);
+    BinarySearchTree(BinarySearchTree< Key, Value, Cmp > &&tree) noexcept;
     ~BinarySearchTree() noexcept;
+    tree_t &operator=(const tree_t &tree);
+    tree_t &operator=(tree_t &&tree) noexcept;
     Value &operator[](const Key &key) noexcept;
     void insert(const Key &key, const Value &value);
     Iterator< Key, Value > begin();
@@ -47,6 +55,7 @@ namespace abramov
     size_t size_;
 
     void clearNodes(Node< Key, Value > *root) noexcept;
+    node_t *copyTree(node_t *node, node_t *parent, node_t *old_fake, node_t *fake);
     Node< Key, Value > *getMin(Node< Key, Value > *root) noexcept;
     const Node< Key, Value > *cgetMin(const Node< Key, Value > *root) const noexcept;
     Node< Key, Value > *findNode(const Key &k) noexcept;
@@ -60,6 +69,73 @@ namespace abramov
     cmp_(Cmp()),
     size_(0)
   {}
+
+  template< class Key, class Value, class Cmp >
+  BinarySearchTree< Key, Value, Cmp >::BinarySearchTree(const BinarySearchTree< Key, Value, Cmp > &tree):
+    root_(nullptr),
+    fake_(new Node< Key, Value >),
+    cmp_(tree.cmp_),
+    size_(tree.size_)
+  {
+    if (tree.root_ && tree.root_ != tree.fake_)
+    {
+      try
+      {
+        root_ = copyTree(tree.root_, nullptr, tree.fake_, fake_);
+      }
+      catch (const std::bad_alloc &)
+      {
+        delete fake_;
+        throw;
+      }
+    }
+    else
+    {
+      root_ = fake_;
+      size_ = 0;
+    }
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename BinarySearchTree< Key, Value, Cmp >::tree_t&
+  BinarySearchTree< Key, Value, Cmp >::operator=(const tree_t &tree)
+  {
+    if (this != std::addressof(tree))
+    {
+      BinarySearchTree< Key, Value, Cmp > tmp(tree);
+      swap(*this, tmp);
+    }
+    return *this;
+  }
+
+  template< class Key, class Value, class Cmp >
+  BinarySearchTree< Key, Value, Cmp >::BinarySearchTree(BinarySearchTree< Key, Value, Cmp > &&tree) noexcept:
+    root_(tree.root_),
+    fake_(tree.fake_),
+    cmp_(std::move(tree.cmp_)),
+    size_(tree.size_)
+  {
+    tree.root_ = nullptr;
+    tree.size_ = 0;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename BinarySearchTree< Key, Value, Cmp >::tree_t&
+  BinarySearchTree< Key, Value, Cmp >::operator=(tree_t &&tree) noexcept
+  {
+    if (this != std::addressof(tree))
+    {
+      clear();
+      delete fake_;
+      root_ = tree.root_;
+      fake_ = tree.fake_;
+      cmp_ = std::move(tree.cmp_);
+      size_ = tree.size_;
+      tree.root_ = nullptr;
+      tree.size_ = 0;
+    }
+    return *this;
+  }
 
   template< class Key, class Value, class Cmp >
   BinarySearchTree< Key, Value, Cmp >::~BinarySearchTree() noexcept
@@ -300,6 +376,29 @@ namespace abramov
     clearNodes(root_);
     size_ = 0;
     root_ = nullptr;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename BinarySearchTree< Key, Value, Cmp >::node_t*
+  BinarySearchTree< Key, Value, Cmp >::copyTree(node_t *node, node_t *parent, node_t *old_fake, node_t *fake)
+  {
+    if (!node || node == old_fake)
+    {
+      return fake;
+    }
+    node_t *new_node = nullptr;
+    try
+    {
+      new_node = new Node< Key, Value >(node->data_, parent, nullptr, nullptr);
+      new_node->left_ = copyTree(node->left_, new_node, old_fake, fake);
+      new_node->right_ = copyTree(node->right_, new_node, old_fake, fake);
+    }
+    catch (const std::bad_alloc &)
+    {
+      delete new_node;
+      throw;
+    }
+    return new_node;
   }
 
   template< class Key, class Value, class Cmp >
