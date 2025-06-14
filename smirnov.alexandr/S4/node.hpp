@@ -10,14 +10,16 @@ namespace smirnov
     std::pair< const Key, Value > data;
     Node * left;
     Node * right;
+    Node * parent;
     int height;
 
     Node(const Key & key, const Value & value):
       data(key, value),
       left(nullptr),
       right(nullptr),
+      parent(nullptr),
       height(1)
-      {}
+    {}
   };
 }
 #endif

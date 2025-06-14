@@ -145,14 +145,14 @@ namespace smirnov
   Value & AvlTree< Key, Value, Compare >::operator[](const Key & key)
   {
     root_ = addOrGet(root_, key, Value(), size_);
-    NodeType * node = findNode(root_, key);
+    Node< Key, Value > * node = findNode(root_, key);
     return std::addressof(node->data)->second;
   }
 
   template < typename Key, typename Value, typename Compare >
   const Value & AvlTree< Key, Value, Compare >::operator[](const Key & key) const
   {
-    NodeType * node = findNode(root_, key);
+    Node< Key, Value > * node = findNode(root_, key);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -163,7 +163,7 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   Value & AvlTree< Key, Value, Compare >::at(const Key & key)
   {
-    NodeType * node = findNode(root_, key);
+    Node< Key, Value > * node = findNode(root_, key);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -174,7 +174,7 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   const Value & AvlTree< Key, Value, Compare >::at(const Key & key) const
   {
-    NodeType * node = findNode(root_, key);
+    Node< Key, Value > * node = findNode(root_, key);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -197,7 +197,7 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   typename AvlTree< Key, Value, Compare >::const_iterator AvlTree< Key, Value, Compare >::find(const Key & key) const noexcept
   {
-    NodeType * node = findNode(root_, key);
+    Node< Key, Value > * node = findNode(root_, key);
     if (node)
     {
       return const_iterator(node);
@@ -254,9 +254,15 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   Node< Key, Value > * AvlTree< Key, Value, Compare >::rotateLeft(Node< Key, Value > * node)
   {
-    NodeType* newRoot = node->right;
+    Node< Key, Value > * newRoot = node->right;
     node->right = newRoot->left;
+    if (newRoot->left != nullptr)
+    {
+      newRoot->left->parent = node;
+    }
     newRoot->left = node;
+    newRoot->parent = node->parent;
+    node->parent = newRoot;
     updateHeight(node);
     updateHeight(newRoot);
     return newRoot;
@@ -265,9 +271,15 @@ namespace smirnov
   template < typename Key, typename Value, typename Compare >
   Node< Key, Value > * AvlTree< Key, Value, Compare >::rotateRight(Node< Key, Value > * node)
   {
-    NodeType* newRoot = node->left;
+    Node< Key, Value > * newRoot = node->left;
     node->left = newRoot->right;
+    if (newRoot->right != nullptr)
+    {
+      newRoot->right->parent = node;
+    }
     newRoot->right = node;
+    newRoot->parent = node->parent;
+    node->parent = newRoot;
     updateHeight(node);
     updateHeight(newRoot);
     return newRoot;
@@ -307,11 +319,15 @@ namespace smirnov
     }
     if (comp_(key, node->data.first))
     {
-      node->left = addOrGet(node->left, key, value, size);
+      Node< Key, Value > * leftChild = addOrGet(node->left, key, value, size);
+      node->left = leftChild;
+      leftChild->parent = node;
     }
     else if (comp_(node->data.first, key))
     {
-      node->right = addOrGet(node->right, key, value, size);
+      Node< Key, Value > * rightChild = addOrGet(node->right, key, value, size);
+      node->right = rightChild;
+      rightChild->parent = node;
     }
     else
     {

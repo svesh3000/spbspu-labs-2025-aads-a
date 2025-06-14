@@ -1,6 +1,6 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
-#include <functional>
+#include <memory>
 #include "node.hpp"
 
 namespace smirnov
@@ -13,55 +13,120 @@ namespace smirnov
     friend class AvlTree< Key, Value, Compare >;
   public:
     ConstIterator();
+    ~ConstIterator() = default;
     const std::pair< const Key, Value > & operator*() const;
     const std::pair< const Key, Value > * operator->() const;
     ConstIterator & operator++();
-    bool operator==(const ConstIterator & other) const;
-    bool operator!=(const ConstIterator & other) const;
+    ConstIterator operator++(int);
+    ConstIterator & operator--();
+    ConstIterator operator--(int);
+    bool operator==(const ConstIterator & rhs) const;
+    bool operator!=(const ConstIterator & rhs) const;
   private:
     explicit ConstIterator(Node< Key, Value > * node);
-    Node< Key, Value > * current_;
+    Node< Key, Value > * node_;
   };
 
   template < typename Key, typename Value, typename Compare >
   ConstIterator< Key, Value, Compare >::ConstIterator():
-    current_(nullptr)
+    node_(nullptr)
   {}
 
   template < typename Key, typename Value, typename Compare >
-  ConstIterator<Key, Value, Compare>::ConstIterator(Node< Key, Value > * node):
-    current_(node)
+  ConstIterator< Key, Value, Compare >::ConstIterator(Node< Key, Value > * node):
+    node_(node)
   {}
 
   template < typename Key, typename Value, typename Compare >
   const std::pair< const Key, Value > & ConstIterator< Key, Value, Compare >::operator*() const
   {
-    return current_->data;
+    return node_->data;
   }
 
   template < typename Key, typename Value, typename Compare >
   const std::pair< const Key, Value > * ConstIterator< Key, Value, Compare >::operator->() const
   {
-    return std::adressof(current_->data);
+    return std::addressof(node_->data);
   }
 
   template < typename Key, typename Value, typename Compare >
   ConstIterator< Key, Value, Compare > & ConstIterator< Key, Value, Compare >::operator++()
   {
-    current_ = nullptr;
+    if (!node_)
+    {
+      return *this;
+    }
+    if (node_->right)
+    {
+      node_ = node_->right;
+      while (node_->left)
+      {
+        node_ = node_->left;
+      }
+      return *this;
+    }
+    Node< Key, Value > * parent = node_->parent;
+    while (parent && node_ == parent->right)
+    {
+      node_ = parent;
+      parent = parent->parent;
+    }
+    node_ = parent;
     return *this;
   }
 
   template < typename Key, typename Value, typename Compare >
-  bool ConstIterator< Key, Value, Compare >::operator==(const ConstIterator & other) const
+  ConstIterator< Key, Value, Compare > ConstIterator< Key, Value, Compare >::operator++(int)
   {
-    return current_ == other.current_;
+    ConstIterator tmp(*this);
+    ++(*this);
+    return tmp;
   }
 
   template < typename Key, typename Value, typename Compare >
-  bool ConstIterator< Key, Value, Compare >::operator!=(const ConstIterator & other) const
+  ConstIterator< Key, Value, Compare > & ConstIterator< Key, Value, Compare >::operator--()
   {
-    return !(*this == other);
+    if (!node_)
+    {
+      return *this;
+    }
+    if (node_->left)
+    {
+      node_ = node_->left;
+      while (node_->right)
+      {
+        node_ = node_->right;
+      }
+      return *this;
+    }
+    Node< Key, Value > * parent = node_->parent;
+    while (parent && node_ == parent->left)
+    {
+      node_ = parent;
+      parent = parent->parent;
+    }
+    node_ = parent;
+    return *this;
+  }
+
+  template < typename Key, typename Value, typename Compare >
+  ConstIterator< Key, Value, Compare > ConstIterator< Key, Value, Compare >::operator--(int)
+  {
+    ConstIterator tmp(*this);
+    --(*this);
+    return tmp;
+  }
+
+  template < typename Key, typename Value, typename Compare >
+  bool ConstIterator< Key, Value, Compare >::operator==(const ConstIterator & rhs) const
+  {
+    return node_ == rhs.node_;
+  }
+
+  template < typename Key, typename Value, typename Compare >
+  bool ConstIterator< Key, Value, Compare >::operator!=(const ConstIterator & rhs) const
+  {
+    return !(*this == rhs);
   }
 }
 #endif
