@@ -28,7 +28,7 @@ int main()
   }
   printSequencesName(myList, std::cout);
   size_t maxSize = 0;
-  for (const auto& it : myList)
+  for (const auto& it: myList)
   {
     if (maxSize < it.second.size())
     {
