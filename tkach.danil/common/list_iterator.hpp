@@ -1,5 +1,5 @@
-#ifndef LIST_ITERATOR_HPP
-#define LIST_ITERATOR_HPP
+#ifndef LIST_ListIterator_HPP
+#define LIST_ListIterator_HPP
 
 #include <iterator>
 #include "node.hpp"
@@ -10,14 +10,14 @@ namespace tkach
   class List;
 
   template< typename T >
-  class Iterator: public std::iterator< std::forward_iterator_tag, T >
+  class ListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
     friend class List < T >;
   public:
-    using this_t = Iterator< T >;
-    Iterator();
-    Iterator(const this_t&) = default;
-    ~Iterator() = default;
+    using this_t = ListIterator< T >;
+    ListIterator();
+    ListIterator(const this_t&) = default;
+    ~ListIterator() = default;
     this_t& operator=(const this_t&) = default;
     this_t& operator++();
     this_t operator++(int);
@@ -31,18 +31,18 @@ namespace tkach
   Node< T >* node_;
   Node< T >* head_node_ptr_;
   bool is_past_the_end_;
-    explicit Iterator(Node< T >* node, Node< T >* head_ptr, bool is_end_state);
+    explicit ListIterator(Node< T >* node, Node< T >* head_ptr, bool is_end_state);
   };
 
   template< typename T >
-  Iterator< T >::Iterator():
+  ListIterator< T >::ListIterator():
     node_(nullptr),
     head_node_ptr_(nullptr),
     is_past_the_end_(true)
   {}
 
   template< typename T >
-  Iterator< T >& Iterator< T >::operator++()
+  ListIterator< T >& ListIterator< T >::operator++()
   {
     if (is_past_the_end_)
     {
@@ -62,7 +62,7 @@ namespace tkach
   }
 
   template< typename T >
-  Iterator< T > Iterator< T >::operator++(int)
+  ListIterator< T > ListIterator< T >::operator++(int)
   {
     this_t result(*this);
     ++(*this);
@@ -70,31 +70,31 @@ namespace tkach
   }
 
   template< typename T >
-  const T& Iterator< T >::operator*() const
+  const T& ListIterator< T >::operator*() const
   {
     return node_->data_;
   }
 
   template< typename T >
-  T& Iterator< T >::operator*()
+  T& ListIterator< T >::operator*()
   {
-    return const_cast< T& >(static_cast< const Iterator< T >* >(this)->operator*());
+    return const_cast< T& >(static_cast< const ListIterator< T >* >(this)->operator*());
   }
 
   template< typename T >
-  const T* Iterator< T >::operator->() const
+  const T* ListIterator< T >::operator->() const
   {
     return std::addressof(node_->data_);
   }
 
   template< typename T >
-  T* Iterator< T >::operator->()
+  T* ListIterator< T >::operator->()
   {
-    return const_cast< T* >(static_cast< const Iterator< T >* >(this)->operator->());
+    return const_cast< T* >(static_cast< const ListIterator< T >* >(this)->operator->());
   }
 
   template< typename T >
-  bool Iterator< T >::operator==(const this_t& rhs) const
+  bool ListIterator< T >::operator==(const this_t& rhs) const
   {
     if (is_past_the_end_ && rhs.is_past_the_end_)
     {
@@ -108,13 +108,13 @@ namespace tkach
   }
 
   template< typename T >
-  bool Iterator< T >::operator!=(const this_t& rhs) const
+  bool ListIterator< T >::operator!=(const this_t& rhs) const
   {
     return !(rhs == *this);
   }
 
   template< typename T >
-  Iterator< T >::Iterator(Node< T >* node, Node< T >* head_ptr, bool is_end_state):
+  ListIterator< T >::ListIterator(Node< T >* node, Node< T >* head_ptr, bool is_end_state):
     node_(node),
     head_node_ptr_(head_ptr),
     is_past_the_end_(is_end_state)

@@ -11,26 +11,17 @@
 int main(const int argc, const char* const* const argv)
 {
   using namespace tkach;
-  if (argc != 2)
+  if (argc != 1)
   {
-    std::cerr << "<ERROR: INCORRECT INPUT\n";
-    return 1;
-  }
-  std::fstream in(argv[1]);
-  if (!in.is_open())
-  {
-    std::cerr << "<FILE IS NOT OPEN>\n";
+    std::cerr << "<ERROR: INCORRECT INPUT>\n" << argv[0];
     return 1;
   }
   using namespace std::placeholders;
-  AvlTree< std::string, AvlTree< std::string, List < std::string > > > data = inputDataSets(in);
-  if (!in || !in.eof())
-  {
-    std::cerr << "Error: incorrect input\n";
-    return 1;
-  }
+  AvlTree< std::string, AvlTree< std::string, List< std::string > > > data;
   std::map< std::string, std::function< void() > > cmds;
-  cmds["graphs"] = std::bind(printGraphs, std::ref(std::cout), std::cref(data));
+  cmds["import"] = std::bind(import, std::ref(std::cin), std::ref(data));
+  cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(data));
+  cmds["printall"] = std::bind(printAll, std::ref(std::cout), std::ref(data));
   std::string command;
   while (!(std::cin >> command).eof())
   {
@@ -38,9 +29,9 @@ int main(const int argc, const char* const* const argv)
     {
       cmds.at(command)();
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
-      std::cout << "<INVALID COMMAND>" << "\n";
+      std::cout << e.what() << "\n";
     }
     std::cin.clear();
     std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

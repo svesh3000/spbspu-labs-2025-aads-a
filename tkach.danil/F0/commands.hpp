@@ -7,7 +7,11 @@
 
 namespace tkach
 {
-  void imprort(std::istream& in, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
+  using tree_of_words = AvlTree< std::string, List< std::string > >;
+  using tree_of_dict = AvlTree< std::string, tree_of_words >;
+  void import(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
+  void addWord(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
+  void printAll(std::ostream& out, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
 }
 
 #endif
