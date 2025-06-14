@@ -5,13 +5,15 @@
 
 namespace sveshnikov
 {
+  template< class Key, class T, class Cmp >
+  class AvlTree;
+
   template< class Key, class T >
   class Iter: public std::iterator< bidirectional_iterator_tag, Key, T >
   {
   public:
     using value_t = std::pair< Key, T >;
     Iter();
-    Iter(const tree_node_t< Key, T > *node);
     Iter(const Iter &rhs) = default;
     ~Iter() = default;
 
@@ -31,6 +33,11 @@ namespace sveshnikov
 
   private:
     const tree_node_t< Key, T > *node_;
+
+    Iter(const tree_node_t< Key, T > *node);
+
+    template< class Key, class T, class Cmp >
+    friend class AvlTree< class Key, class T, class Cmp >;
   };
 
   template< class Key, class T >
@@ -60,9 +67,16 @@ namespace sveshnikov
       auto current = node_;
       while (current->parent_ && current != current->parent_->left_)
       {
-        node_ = node_->parent_;
+        current = current->parent_;
       }
-      node_ = node_->parent_;
+      if (current->parent_)
+      {
+        node_ = current->parent_;
+      }
+      else
+      {
+        node_ = node_->right_;
+      }
     }
     return *this;
   }
@@ -80,6 +94,11 @@ namespace sveshnikov
   Iter< Key, T > &Iter< Key, T >::operator--() noexcept
   {
     assert(node_ != nullptr);
+    if (node_->height_ == 0)
+    {
+      node_ = node_->parent_;
+      return *this;
+    }
     if (node_->left_->height_ != 0)
     {
       node_ = node_->left_;
