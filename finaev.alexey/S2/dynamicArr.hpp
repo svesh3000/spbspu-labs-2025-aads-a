@@ -10,6 +10,7 @@ namespace finaev
   {
   public:
     dynamicArr();
+    ~dynamicArr();
     dynamicArr(const dynamicArr< T >&);
     dynamicArr(dynamicArr< T >&&) noexcept;
 
@@ -46,6 +47,13 @@ namespace finaev
     head_(0),
     data_(new T[capacity_])
   {}
+
+  template< class T >
+  dynamicArr< T >::~dynamicArr()
+  {
+    delete[] data_;
+    data_ = nullptr;
+  }
 
   template< class T >
   dynamicArr< T >::dynamicArr(const dynamicArr< T >& other):
