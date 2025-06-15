@@ -278,3 +278,151 @@ BOOST_AUTO_TEST_CASE(TestOperatorSquareBrackets)
   BOOST_TEST(tree.size() == 2);
   BOOST_TEST(tree.at(20) == "");
 }
+
+BOOST_AUTO_TEST_CASE(TestEraseByKey)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+
+  BOOST_TEST(tree.erase(42) == 0);
+
+  tree.insert({10, "ten"});
+  tree.insert({5, "five"});
+  tree.insert({15, "fifteen"});
+  tree.insert({3, "three"});
+  tree.insert({7, "seven"});
+  tree.insert({12, "twelve"});
+  tree.insert({20, "twenty"});
+
+  BOOST_TEST(tree.erase(42) == 0);
+  BOOST_TEST(tree.size() == 7);
+
+  BOOST_TEST(tree.erase(3) == 1);
+  BOOST_TEST(tree.size() == 6);
+  BOOST_CHECK(tree.find(3) == tree.end());
+
+  BOOST_TEST(tree.erase(12) == 1);
+  BOOST_TEST(tree.size() == 5);
+  BOOST_CHECK(tree.find(12) == tree.end());
+
+  BOOST_TEST(tree.erase(5) == 1);
+  BOOST_TEST(tree.size() == 4);
+  BOOST_CHECK(tree.find(5) == tree.end());
+
+  tree.insert({8, "eight"});
+  tree.insert({6, "six"});
+  BOOST_TEST(tree.erase(7) == 1);
+  BOOST_TEST(tree.size() == 5);
+  BOOST_CHECK(tree.find(7) == tree.end());
+
+  BOOST_TEST(tree.erase(10) == 1);
+  BOOST_TEST(tree.size() == 4);
+  BOOST_CHECK(tree.find(10) == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(TestEraseByIterator)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+
+  BOOST_CHECK_THROW(tree.erase(tree.end()), std::out_of_range);
+
+  tree.insert({10, "ten"});
+  tree.insert({5, "five"});
+  tree.insert({15, "fifteen"});
+  tree.insert({3, "three"});
+  tree.insert({7, "seven"});
+  tree.insert({12, "twelve"});
+  tree.insert({20, "twenty"});
+
+  auto it1 = tree.begin();
+  BOOST_CHECK_NO_THROW(tree.erase(it1));
+  BOOST_TEST(tree.size() == 6);
+  BOOST_CHECK(tree.find(3) == tree.end());
+
+  auto it2 = tree.find(7);
+  BOOST_REQUIRE(it2 != tree.end());
+  auto next_it = tree.erase(it2);
+  BOOST_TEST(tree.size() == 5);
+  BOOST_CHECK(tree.find(7) == tree.end());
+  BOOST_CHECK(next_it->first == 10);
+
+  auto it3 = tree.find(20);
+  BOOST_REQUIRE(it3 != tree.end());
+  BOOST_CHECK_NO_THROW(tree.erase(it3));
+  BOOST_TEST(tree.size() == 4);
+  BOOST_CHECK(tree.find(20) == tree.end());
+
+  auto it4 = tree.find(10);
+  BOOST_REQUIRE(it4 != tree.end());
+  BOOST_CHECK_NO_THROW(tree.erase(it4));
+  BOOST_TEST(tree.size() == 3);
+  BOOST_CHECK(tree.find(10) == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(TestEraseComplexCases)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+
+  tree.insert({50, "50"});
+  tree.insert({30, "30"});
+  tree.insert({70, "70"});
+  tree.insert({20, "20"});
+  tree.insert({40, "40"});
+  tree.insert({60, "60"});
+  tree.insert({80, "80"});
+  tree.insert({10, "10"});
+  tree.insert({25, "25"});
+  tree.insert({35, "35"});
+  tree.insert({45, "45"});
+  tree.insert({55, "55"});
+  tree.insert({65, "65"});
+  tree.insert({75, "75"});
+  tree.insert({85, "85"});
+
+  BOOST_TEST(tree.erase(10) == 1);
+  BOOST_TEST(tree.size() == 14);
+  BOOST_CHECK(tree.find(10) == tree.end());
+
+  BOOST_TEST(tree.erase(75) == 1);
+  BOOST_TEST(tree.size() == 13);
+  BOOST_CHECK(tree.find(75) == tree.end());
+
+  BOOST_TEST(tree.erase(25) == 1);
+  BOOST_TEST(tree.erase(20) == 1);
+  BOOST_TEST(tree.size() == 11);
+  BOOST_CHECK(tree.find(20) == tree.end());
+  BOOST_CHECK(tree.find(25) == tree.end());
+
+  BOOST_TEST(tree.erase(65) == 1);
+  BOOST_TEST(tree.erase(60) == 1);
+  BOOST_TEST(tree.size() == 9);
+  BOOST_CHECK(tree.find(60) == tree.end());
+  BOOST_CHECK(tree.find(65) == tree.end());
+
+  BOOST_TEST(tree.erase(50) == 1);
+  BOOST_TEST(tree.size() == 8);
+  BOOST_CHECK(tree.find(50) == tree.end());
+
+  std::vector< int > expected = {30, 35, 40, 45, 55, 70, 80, 85};
+  BOOST_TEST(tree.size() == expected.size());
+  for (int key: expected) {
+    BOOST_CHECK(tree.find(key) != tree.end());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TestEraseAllElements)
+{
+  gavrilova::TwoThreeTree< int, std::string > tree;
+  const int count = 100;
+
+  for (int i = 0; i < count; ++i) {
+    tree.insert({i, "val_" + std::to_string(i)});
+  }
+  BOOST_TEST(tree.size() == count);
+
+  for (int i = 0; i < count; ++i) {
+    BOOST_TEST(tree.erase(i) == 1);
+    BOOST_TEST(tree.size() == count - i - 1);
+    BOOST_CHECK(tree.find(i) == tree.end());
+  }
+  BOOST_TEST(tree.empty());
+}
