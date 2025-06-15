@@ -22,26 +22,28 @@ namespace
       }
 
       tree_t current_dict;
-      while (in.peek() != '\n' && in.peek() != EOF)
+      std::string key;
+      while (in >> key)
       {
-        std::string key;
-        in >> key;
-
         list_t translations;
         std::string val;
         while (in >> val)
         {
           translations.push_back(val);
-          if (in.peek() == '\n')
+          if (in.get() == '\n')
           {
             break;
           }
         }
 
         current_dict.insert(std::make_pair(key, translations));
-        if (in.peek() == '\n')
+        if (in.get() == '\n')
         {
-          in.get();
+          break;
+        }
+        else
+        {
+          in.unget();
         }
       }
       dicts.insert(std::make_pair(dict_name, current_dict));
