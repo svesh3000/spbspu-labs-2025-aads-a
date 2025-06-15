@@ -156,11 +156,8 @@ void demehin::printDict(std::istream& in, std::ostream& out, const dict_t& dicts
 
   for (auto&& key: dict)
   {
-    out << key.first;
-    for (auto&& translation: key.second)
-    {
-      out << " " << translation;
-    }
+    out << key.first << ":";
+    printList(out, key.second);
     out << "\n";
   }
 }
