@@ -42,6 +42,8 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  Collector< int, std::string > collector;
+
   try {
     ArrayBuffer< std::pair< int, std::string > > data = detail::parse_file< int, std::string >(argv[2]);
 
@@ -56,7 +58,6 @@ int main(int argc, char* argv[])
       return 0;
     }
 
-    Collector< int, std::string > collector;
     std::string order = argv[1];
     if (order == "ascending") {
       collector = tree.traverse_lnr(collector);
