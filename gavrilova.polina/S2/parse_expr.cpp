@@ -2,7 +2,7 @@
 #include <cctype>
 #include <climits>
 #include <stdexcept>
-#include "Stack.hpp"
+#include <Stack.hpp>
 
 namespace {
   bool is_operator(const std::string& str)

@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 
-#include "Queue.hpp"
-#include "Stack.hpp"
+#include <Queue.hpp>
+#include <Stack.hpp>
 #include "parse_expr.hpp"
 
 int main(int argc, char* argv[])
