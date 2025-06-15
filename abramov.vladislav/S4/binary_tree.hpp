@@ -91,7 +91,6 @@ namespace abramov
     }
     else
     {
-      root_ = fake_;
       size_ = 0;
     }
   }
@@ -156,7 +155,7 @@ namespace abramov
     }
     Node< Key, Value > *curr = root_;
     Node< Key, Value > *parent = nullptr;
-    while (curr != fake_)
+    while (curr && curr != fake_)
     {
       parent = curr;
       if (cmp_(key, curr->data_.first))
@@ -422,7 +421,7 @@ namespace abramov
   const Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::cfindNode(const Key &k) const noexcept
   {
     const Node< Key, Value > *root = root_;
-    while (root != fake_)
+    while (root && root != fake_)
     {
       if (cmp_(k, root->data_.first))
       {

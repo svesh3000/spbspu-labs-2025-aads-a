@@ -33,7 +33,9 @@ namespace abramov
 
   template< class Key, class Value >
   ConstIterator< Key, Value >::ConstIterator():
-    node_(nullptr)
+    node_(nullptr),
+    fake_(nullptr),
+    root_(nullptr)
   {}
 
   template< class Key, class Value >
@@ -46,7 +48,11 @@ namespace abramov
   template< class Key, class Value >
   ConstIterator< Key, Value > &ConstIterator< Key, Value >::operator++() noexcept
   {
-    if (node_->right_ != fake_)
+    if (node_ == cgetMax(root_))
+    {
+      node_ = fake_;
+    }
+    else if (node_->right_ != fake_)
     {
       node_ = node_->right_;
       while (node_->left_ != fake_)

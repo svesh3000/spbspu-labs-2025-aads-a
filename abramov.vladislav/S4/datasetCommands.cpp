@@ -28,7 +28,7 @@ void abramov::printDataSet(const std::string &name, const collections &dicts)
   {
     throw std::logic_error("No dictionary\n");
   }
-  tree dict = dicts.cfind(name)->second;
+  const tree &dict = dicts.cfind(name)->second;
   if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
@@ -48,8 +48,8 @@ abramov::tree abramov::complementDataSets(const std::string &s1, const std::stri
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  tree dict1 = dicts.cfind(s1)->second;
-  tree dict2 = dicts.cfind(s2)->second;
+  const tree &dict1 = dicts.cfind(s1)->second;
+  const tree &dict2 = dicts.cfind(s2)->second;
   tree res = tree();
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
@@ -67,8 +67,8 @@ abramov::tree abramov::intersectDataSets(const std::string &s1, const std::strin
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  tree dict1 = dicts.cfind(s1)->second;
-  tree dict2 = dicts.cfind(s2)->second;
+  const tree &dict1 = dicts.cfind(s1)->second;
+  const tree &dict2 = dicts.cfind(s2)->second;
   tree res = tree();
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
@@ -86,8 +86,8 @@ abramov::tree abramov::unionDataSets(const std::string &s1, const std::string &s
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  tree dict1 = dicts.cfind(s1)->second;
-  tree dict2 = dicts.cfind(s2)->second;
+  const tree &dict1 = dicts.cfind(s1)->second;
+  const tree &dict2 = dicts.cfind(s2)->second;
   tree res = tree();
   for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {

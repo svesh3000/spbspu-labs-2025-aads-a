@@ -132,6 +132,7 @@ BOOST_AUTO_TEST_CASE(cend)
   tree.insert(1, "a");
   auto it = --tree.cend();
   BOOST_TEST(it->second == "b");
+  BOOST_TEST(++it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(find)
