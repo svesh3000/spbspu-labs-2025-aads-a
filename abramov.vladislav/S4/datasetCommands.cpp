@@ -2,14 +2,14 @@
 #include <iostream>
 #include <limits>
 
-std::map< std::string, std::map< int, std::string > > abramov::getDataSets(std::ifstream &in)
+abramov::collections abramov::getDataSets(std::ifstream &in)
 {
-  std::map< std::string, std::map< int, std::string > > collection;
+  collections collection;
   while (in)
   {
     std::string name;
     in >> name;
-    std::map< int, std::string > dict;
+    tree dict;
     int k;
     std::string s;
     while(in && in.peek() != '\n')
@@ -22,38 +22,38 @@ std::map< std::string, std::map< int, std::string > > abramov::getDataSets(std::
   return collection;
 }
 
-void abramov::printDataSet(const std::string &name, const collection &dicts)
+void abramov::printDataSet(const std::string &name, const collections &dicts)
 {
-  if (dicts.find(name) == dicts.end())
+  if (dicts.cfind(name) == dicts.cend())
   {
     throw std::logic_error("No dictionary\n");
   }
-  std::map< int, std::string > dict = dicts.find(name)->second;
+  tree dict = dicts.cfind(name)->second;
   if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
     return;
   }
   std::cout << name << " ";
-  for (auto it = dict.begin(); it != --dict.end(); ++it)
+  for (auto it = dict.cbegin(); it != --dict.cend(); ++it)
   {
     std::cout << it->first << " " << it->second << " ";
   }
-  std::cout << (--dict.end())->first << " " << (--dict.end())->second << "\n";
+  std::cout << (--dict.cend())->first << " " << (--dict.cend())->second << "\n";
 }
 
-std::map< int, std::string > abramov::complementDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
+abramov::tree abramov::complementDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
 {
-  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  std::map< int, std::string > dict1 = dicts.find(s1)->second;
-  std::map< int, std::string > dict2 = dicts.find(s2)->second;
-  std::map< int, std::string > res = std::map< int, std::string >();
-  for (auto it = dict1.begin(); it != dict1.end(); ++it)
+  tree dict1 = dicts.cfind(s1)->second;
+  tree dict2 = dicts.cfind(s2)->second;
+  tree res = tree();
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
-    if (dict2.find(it->first) == dict2.end())
+    if (dict2.cfind(it->first) == dict2.cend())
     {
       res[it->first] = it->second;
     }
@@ -61,18 +61,18 @@ std::map< int, std::string > abramov::complementDataSets(const std::string &s1, 
   return res;
 }
 
-std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
+abramov::tree abramov::intersectDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
 {
-  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  std::map< int, std::string > dict1 = dicts.find(s1)->second;
-  std::map< int, std::string > dict2 = dicts.find(s2)->second;
-  std::map< int, std::string > res = std::map< int, std::string >();
-  for (auto it = dict1.begin(); it != dict1.end(); ++it)
+  tree dict1 = dicts.cfind(s1)->second;
+  tree dict2 = dicts.cfind(s2)->second;
+  tree res = tree();
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
-    if (dict2.find(it->first) != dict2.end())
+    if (dict2.cfind(it->first) != dict2.cend())
     {
       res[it->first] = it->second;
     }
@@ -80,22 +80,22 @@ std::map< int, std::string > abramov::intersectDataSets(const std::string &s1, c
   return res;
 }
 
-std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const std::string &s2, const collection &dicts)
+abramov::tree abramov::unionDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
 {
-  if (dicts.find(s1) == dicts.end() || dicts.find(s2) == dicts.end())
+  if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
     throw std::logic_error("No such dictionaries\n");
   }
-  std::map< int, std::string > dict1 = dicts.find(s1)->second;
-  std::map< int, std::string > dict2 = dicts.find(s2)->second;
-  std::map< int, std::string > res = std::map< int, std::string >();
-  for (auto it = dict1.begin(); it != dict1.end(); ++it)
+  tree dict1 = dicts.cfind(s1)->second;
+  tree dict2 = dicts.cfind(s2)->second;
+  tree res = tree();
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
     res[it->first] = it->second;
   }
-  for (auto it = dict2.begin(); it != dict2.end(); ++it)
+  for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
   {
-    if (res.find(it->first) == res.end())
+    if (res.cfind(it->first) == res.cend())
     {
       res[it->first] = it->second;
     }
@@ -103,7 +103,7 @@ std::map< int, std::string > abramov::unionDataSets(const std::string &s1, const
   return res;
 }
 
-void abramov::doCommand(const std::string &s, std::istream &in, collection &dicts)
+void abramov::doCommand(const std::string &s, std::istream &in, collections &dicts)
 {
   std::string s1;
   std::string s2;

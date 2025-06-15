@@ -1,5 +1,6 @@
 #include <iostream>
 #include "datasetCommands.hpp"
+
 int main(int argc, char **argv)
 {
   using namespace abramov;
@@ -14,7 +15,7 @@ int main(int argc, char **argv)
     std::cerr << "Incorrect filename\n";
     return 1;
   }
-  std::map< std::string, std::map< int, std::string > > dicts = getDataSets(input);
+  collections dicts = getDataSets(input);
   while (!std::cin.eof())
   {
     std::string s;

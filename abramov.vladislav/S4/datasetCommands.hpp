@@ -3,15 +3,17 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include "binary_tree.hpp"
 
 namespace abramov
 {
-  using collection = std::map< std::string, std::map< int, std::string > >;
-  std::map< std::string, std::map< int, std::string > > getDataSets(std::ifstream &in);
-  void printDataSet(const std::string &s, const collection &dicts);
-  std::map< int, std::string > complementDataSets(const std::string &s1, const std::string &s2, const collection &dicts);
-  std::map< int, std::string > intersectDataSets(const std::string &s1, const std::string &s2, const collection &dicts);
-  std::map< int, std::string > unionDataSets(const std::string &s1, const std::string &s2, const collection &dicts);
-  void doCommand(const std::string &s, std::istream &in, collection &dicts);
+  using tree = BinarySearchTree< int, std::string >;
+  using collections = BinarySearchTree< std::string, tree >;
+  collections getDataSets(std::ifstream &in);
+  void printDataSet(const std::string &s, const collections &dicts);
+  tree complementDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
+  tree intersectDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
+  tree unionDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
+  void doCommand(const std::string &s, std::istream &in, collections &dicts);
 }
 #endif

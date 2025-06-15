@@ -103,7 +103,7 @@ namespace abramov
     if (this != std::addressof(tree))
     {
       BinarySearchTree< Key, Value, Cmp > tmp(tree);
-      swap(*this, tmp);
+      swap(tmp);
     }
     return *this;
   }
