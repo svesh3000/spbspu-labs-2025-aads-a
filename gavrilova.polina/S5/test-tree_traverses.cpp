@@ -1,7 +1,7 @@
+#include <ArrayBuffer.hpp>
 #include <boost/test/unit_test.hpp>
 #include <limits>
 #include <string>
-#include <ArrayBuffer.hpp>
 #include <tree/ConstIterator.hpp>
 #include <tree/Iterator.hpp>
 #include <tree/TwoThreeTree.hpp>
