@@ -329,7 +329,7 @@ namespace gavrilova {
   template < class T >
   void FwdList< T >::splice(CIterator pos, FwdList< T >& other, CIterator first, CIterator last) noexcept
   {
-    if (this == &other || (first == last && first != CIterator(other.fake_))) {
+    if (this == std::addressof(other) || (first == last && first != CIterator(other.fake_))) {
       return;
     }
 
