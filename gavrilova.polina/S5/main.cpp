@@ -3,21 +3,24 @@
 #include <iostream>
 #include <string>
 
+#include <ArrayBuffer.hpp>
 #include <tree/ConstIterator.hpp>
 #include <tree/Iterator.hpp>
 #include <tree/TwoThreeTree.hpp>
 
+#include "Collector.hpp"
+
 namespace detail {
 
   template < typename Key, typename Value >
-  ArrayBuffer< std::pair< Key, Value > > parse_file(const std::string& filename)
+  gavrilova::ArrayBuffer< std::pair< Key, Value > > parse_file(const std::string& filename)
   {
     std::ifstream file(filename);
     if (!file.is_open()) {
       throw std::runtime_error("Error! Invalid opening file!");
     }
 
-    ArrayBuffer< std::pair< Key, Value > > data;
+    gavrilova::ArrayBuffer< std::pair< Key, Value > > data;
     Key key;
     Value value;
 
@@ -40,12 +43,12 @@ int main(int argc, char* argv[])
   }
 
   try {
-    ArrayBuffer< std::pair< int, std::string > > data = parse_file< int, std::string >(argv[2]);
+    ArrayBuffer< std::pair< int, std::string > > data = detail::parse_file< int, std::string >(argv[2]);
 
-    TwoThreeTree< Key, Value, Cmp > tree;
+    TwoThreeTree< int, std::string > tree;
 
     for (size_t i = 0; i < data.size(); ++i) {
-      tree.insert(data[i].first, data[i].second);
+      tree.insert({data[i].first, data[i].second});
     }
 
     if (tree.empty()) {
@@ -53,7 +56,8 @@ int main(int argc, char* argv[])
       return 0;
     }
 
-    Collector< Key, Value > collector;
+    Collector< int, std::string > collector;
+    std::string order = argv[1];
     if (order == "ascending") {
       collector = tree.traverse_lnr(collector);
     } else if (order == "descending") {
@@ -65,7 +69,7 @@ int main(int argc, char* argv[])
     }
 
     std::cout << collector.getSum();
-    const ArrayBuffer< Value >& values = collector.getBuffer();
+    const ArrayBuffer< std::string >& values = collector.getBuffer();
     for (size_t i = 0; i < values.size(); ++i) {
       std::cout << " " << values[i];
     }
