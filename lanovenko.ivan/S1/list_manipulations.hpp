@@ -15,6 +15,7 @@ namespace lanovenko
   bool isSumLimit(size_t a, size_t b);
   void printSumList(const ForwardList< int >& sumList, bool sumLimit, std::ostream& out);
   void printSequences(const list_of_pairs& temporary, size_t maxSize, bool& sumLimit, std::ostream& out);
+  void printRowsLists(const ForwardList< list_ull >& rowsLists, std::ostream& out);
 }
 
 #endif
