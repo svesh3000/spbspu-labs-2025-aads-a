@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <tree/avlTree.hpp>
+#include <tree/avlTee.hpp>
 #include <utils/stack.hpp>
 #include <utils/queue.hpp>
 
@@ -16,7 +16,7 @@ struct TestData
 
 BOOST_AUTO_TEST_CASE(test_lnr_traversal)
 {
-  AvlTree< int, std::string > tree;
+  smirnov::AvlTree< int, std::string > tree;
   tree[5] = "five";
   tree[3] = "three";
   tree[7] = "seven";
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_lnr_traversal)
 
 BOOST_AUTO_TEST_CASE(test_rnl_traversal)
 {
-  AvlTree< int, std::string > tree;
+  smirnov::AvlTree< int, std::string > tree;
   tree[5] = "five";
   tree[3] = "three";
   tree[7] = "seven";
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_rnl_traversal)
 
 BOOST_AUTO_TEST_CASE(test_breadth_traversal)
 {
-  AvlTree< int, std::string > tree;
+  smirnov::AvlTree< int, std::string > tree;
   tree[5] = "five";
   tree[3] = "three";
   tree[7] = "seven";
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_breadth_traversal)
 
 BOOST_AUTO_TEST_CASE(test_empty_tree_traversal)
 {
-  AvlTree< int, std::string > tree;
+  smirnov::AvlTree< int, std::string > tree;
   TestData data;
   data = tree.traverse_lnr(data);
   BOOST_TEST(data.keys.empty());
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(test_empty_tree_traversal)
 
 BOOST_AUTO_TEST_CASE(test_single_node_traversal)
 {
-  AvlTree< int, std::string > tree;
+  smirnov::AvlTree< int, std::string > tree;
   tree[1] = "one";
   TestData data;
   data = tree.traverse_lnr(data);
