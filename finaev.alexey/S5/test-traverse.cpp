@@ -8,7 +8,7 @@ using Tree = finaev::AVLtree< int, std::string >;
 BOOST_AUTO_TEST_CASE(traverses_test)
 {
   Tree tree;
-  
+
   tree.insert(std::make_pair(2, "second"));
   tree.insert(std::make_pair(1, "first"));
   tree.insert(std::make_pair(3, "third"));
