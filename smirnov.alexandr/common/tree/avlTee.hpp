@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <stdexcept>
 #include "constIterator.hpp"
+#include <utils/queue.hpp>
+#include <utils/stack.hpp>
 
 namespace smirnov
 {
