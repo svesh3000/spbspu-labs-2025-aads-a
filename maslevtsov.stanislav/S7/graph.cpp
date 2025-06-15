@@ -1,6 +1,23 @@
 #include "graph.hpp"
+#include <hash_table/definition.hpp>
+#include <vector/definition.hpp>
+#include <tree/definition.hpp>
 
 namespace {
+  void sort(maslevtsov::Vector< unsigned >& vector)
+  {
+    if (vector.empty()) {
+      return;
+    }
+    for (size_t i = 0; i < vector.size() - 1; ++i) {
+      for (size_t j = 0; j < vector.size() - i - 1; ++j) {
+        if (vector[j] > vector[j + 1]) {
+          std::swap(vector[j], vector[j + 1]);
+        }
+      }
+    }
+  }
+
   void add_edges(maslevtsov::Graph& dist, const maslevtsov::Graph::edges_set_t& src)
   {
     for (auto i = src.cbegin(); i != src.cend(); ++i) {
@@ -67,7 +84,7 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
         outbound[i->first.second].push_back(*j);
       }
-      detail::sort(outbound[i->first.second]);
+      sort(outbound[i->first.second]);
     }
   }
   return outbound;
@@ -82,7 +99,7 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
         outbound[i->first.first].push_back(*j);
       }
-      detail::sort(outbound[i->first.first]);
+      sort(outbound[i->first.first]);
     }
   }
   return outbound;

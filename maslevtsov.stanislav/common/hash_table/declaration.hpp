@@ -80,6 +80,8 @@ namespace maslevtsov {
     Hash hasher_;
     KeyEqual key_equal_;
     float max_load_factor_ = 1.0;
+
+    size_type find_index(const Key& key) const noexcept;
   };
 }
 

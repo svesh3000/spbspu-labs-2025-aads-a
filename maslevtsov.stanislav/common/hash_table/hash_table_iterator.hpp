@@ -29,7 +29,7 @@ namespace maslevtsov {
     HashTableIterator() noexcept;
 
     HashTableIterator& operator++() noexcept;
-    HashTableIterator& operator++(int) noexcept;
+    HashTableIterator operator++(int) noexcept;
 
     reference_type operator*() const noexcept;
     pointer_type operator->() const noexcept;
@@ -62,15 +62,15 @@ namespace maslevtsov {
     using hash_table_t = HashTable< Key, T, Hash, KeyEqual >;
 
     ++index_;
-    size_t slots_size = hash_table_->slots.size();
-    while (index_ < slots_size && hash_table_->slots[index_].state != hash_table_t::SlotState::OCCUPIED) {
+    size_t slots_size = hash_table_->slots_.size();
+    while (index_ < slots_size && hash_table_->slots_[index_].state != hash_table_t::SlotState::OCCUPIED) {
       ++index_;
     }
     return *this;
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
-  typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::HashTableIterator&
+  typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::HashTableIterator
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator++(int) noexcept
   {
     HashTableIterator< Key, T, Hash, KeyEqual, it_type > result(*this);
@@ -95,7 +95,7 @@ namespace maslevtsov {
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
   bool HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator==(const HashTableIterator& rhs) const noexcept
   {
-    return hash_table_ == rhs.hash_table_ && index_ = rhs.index_;
+    return hash_table_ == rhs.hash_table_ && index_ == rhs.index_;
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >

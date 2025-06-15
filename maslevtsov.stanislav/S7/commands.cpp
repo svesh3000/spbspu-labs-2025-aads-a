@@ -1,5 +1,7 @@
 #include "commands.hpp"
 #include <vector/definition.hpp>
+#include <tree/definition.hpp>
+#include <hash_table/definition.hpp>
 
 namespace {
   void print_vector(const maslevtsov::Vector< unsigned >& vector, std::ostream& out)

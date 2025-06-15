@@ -1,8 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include <functional>
-#include <tree/definition.hpp>
 #include <hash_table/definition.hpp>
 #include "graph.hpp"
 #include "bind_functor.hpp"
@@ -21,7 +19,6 @@ int main(int argc, char** argv)
   }
 
   using namespace maslevtsov;
-  using graphs_map_t = std::unordered_map< std::string, Graph, StringDoubleHash >;
 
   graphs_map_t graphs;
   std::string graph_name;
@@ -38,7 +35,7 @@ int main(int argc, char** argv)
     graphs[graph_name] = graph;
   }
 
-  std::unordered_map< std::string, IOFuncBinder< graphs_map_t >, StringDoubleHash > commands;
+  maslevtsov::HashTable< std::string, IOFuncBinder< graphs_map_t > > commands;
   commands["graphs"] = IOFuncBinder< graphs_map_t >(print_graphs, graphs, std::cout);
   commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
   commands["outbound"] = IOFuncBinder< graphs_map_t >(print_outbound, graphs, std::cin, std::cout);

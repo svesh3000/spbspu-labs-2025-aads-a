@@ -3,7 +3,19 @@
 
 #include <utility>
 #include <boost/hash2/siphash.hpp>
+#include <vector/definition.hpp>
 #include "declaration.hpp"
+
+namespace detail {
+  template< class Key >
+  size_t get_odd_step(const Key& key, size_t capacity)
+  {
+    boost::hash2::siphash_64 siphasher;
+    siphasher.update(&key, sizeof(key));
+    size_t odd_step = 1 + 2 * (siphasher.result() % (capacity / 2));
+    return odd_step;
+  }
+}
 
 template< class Key, class T, class Hash, class KeyEqual >
 maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable() noexcept:
@@ -54,49 +66,37 @@ template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::find(const Key& key) noexcept
 {
-  size_t index = hasher_(key);
-  boost::hash2::siphash_64 siphasher;
-  siphasher.update(&key, sizeof(key));
-  size_t odd_step = 1 + 2 * (siphasher.result() % (slots_.size() / 2));
-  for (size_t i = 0; i < slots_.size(); ++i) {
-    if (slots_[index].state == SlotState::EMPTY) {
-      return end();
-    }
-    if (slots_[index].state == SlotState::OCCUPIED && key_equal_(slots_[index].data.first, key)) {
-      return iterator(this, index);
-    }
-    index = (index + odd_step) % slots_.size();
-  }
-  return end();
+  size_t index = find_index(key);
+  return index == slots_.size() ? end() : iterator(this, index);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::const_iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::find(const Key& key) const noexcept
 {
-  iterator it = find(key);
-  return const_iterator(it.table_, it.index_);
+  size_t index = find_index(key);
+  return index == slots_.size() ? cend() : const_iterator(this, index);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::begin() noexcept
 {
-  return iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++iterator(this, 0) : iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::const_iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::begin() const noexcept
 {
-  return const_iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::const_iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::cbegin() const noexcept
 {
-  return const_iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -153,7 +153,7 @@ template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::insert(const_iterator hint, const value_type& value)
 {
-  return emplace_hint(hint, std::forward< value_type >(value));
+  return emplace_hint(hint, std::forward< const value_type& >(value));
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -172,16 +172,14 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
 {
   value_type value(std::forward< Args >(args)...);
   const Key& key = value.first;
-  if (load_factor() > max_load_factor_) {
+  if (load_factor() >= max_load_factor_) {
     rehash(slots_.size() * 2);
   }
-  size_t index = hasher_(key);
-  boost::hash2::siphash_64 siphasher;
-  siphasher.update(&key, sizeof(key));
-  size_t odd_step = 1 + 2 * (siphasher.result() % (slots_.size() / 2));
+  size_t index = hasher_(key) % slots_.size();
+  size_t odd_step = detail::get_odd_step(key, slots_.size());
   size_t first_deleted = slots_.size();
   for (size_t i = 0; i < slots_.size(); ++i) {
-    if (slots_[index] == SlotState::EMPTY) {
+    if (slots_[index].state == SlotState::EMPTY) {
       if (first_deleted != slots_.size()) {
         slots_[first_deleted].data = value;
         slots_[first_deleted].state = SlotState::OCCUPIED;
@@ -193,7 +191,7 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
         ++size_;
         return {iterator(this, index), true};
       }
-    } else if (slots_[index] == SlotState::DELETED) {
+    } else if (slots_[index].state == SlotState::DELETED) {
       if (first_deleted == slots_.size())
         first_deleted = index;
     } else if (key_equal_(slots_[index].data.first, key)) {
@@ -219,7 +217,7 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   const Key& key = value.first;
   if (hint != cend()) {
     if (slots_[hint.index_].state == SlotState::OCCUPIED && key_equal_(slots_[hint.index_].data.first, key)) {
-      return iterator(hint->hash_table_, hint->index_);
+      return iterator(this, hint.index_);
     }
   }
   return emplace(std::move(value)).first;
@@ -229,14 +227,6 @@ template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(iterator pos) noexcept
 {
-  const_iterator cpos(pos.hash_table_, pos.index_);
-  return erase(cpos);
-}
-
-template< class Key, class T, class Hash, class KeyEqual >
-typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
-  maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(const_iterator pos) noexcept
-{
   slots_[pos.index_].state = SlotState::DELETED;
   --size_;
   return ++pos;
@@ -244,20 +234,29 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
+  maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(const_iterator pos) noexcept
+{
+  return erase(iterator(this, pos.index_));
+}
+
+template< class Key, class T, class Hash, class KeyEqual >
+typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(const_iterator first, const_iterator last) noexcept
 {
-  while (first != last) {
-    first = erase(first);
+  iterator first_it(this, first.index_);
+  iterator last_it(this, last.index_);
+  while (first_it != last_it) {
+    first_it = erase(first_it);
   }
-  return iterator(this, last.index_);
+  return last_it;
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::size_type
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(const Key& key) noexcept
 {
-  const_iterator it = find(key);
-  if (it == cend()) {
+  iterator it = find(key);
+  if (it == end()) {
     return 0;
   }
   erase(it);
@@ -282,7 +281,7 @@ float maslevtsov::HashTable< Key, T, Hash, KeyEqual >::load_factor() const noexc
 template< class Key, class T, class Hash, class KeyEqual >
 float maslevtsov::HashTable< Key, T, Hash, KeyEqual >::max_load_factor() const noexcept
 {
-  return max_load_factor;
+  return max_load_factor_;
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -308,12 +307,36 @@ void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
     count = new_count;
   }
   Vector< Slot< value_type > > new_slots(count);
-  for (size_t i = 0; i != slots_.size(); ++i) {
-    if (slots_[i].state = SlotState::OCCUPIED) {
-      insert(slots_[i].data);
+  for (auto it = slots_.begin(); it != slots_.end(); ++it) {
+    if (it->state == SlotState::OCCUPIED) {
+      const Key& key = it->data.first;
+      size_t index = hasher_(key) % new_slots.size();
+      size_t odd_step = detail::get_odd_step(key, new_slots.size());
+      while (new_slots[index].state == SlotState::OCCUPIED) {
+        index = (index + odd_step) % new_slots.size();
+      }
+      new_slots[index] = *it;
     }
   }
   slots_ = new_slots;
+}
+
+template< class Key, class T, class Hash, class KeyEqual >
+typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::size_type
+  maslevtsov::HashTable< Key, T, Hash, KeyEqual >::find_index(const Key& key) const noexcept
+{
+  size_t index = hasher_(key) % slots_.size();
+  size_t odd_step = detail::get_odd_step(key, slots_.size());
+  for (size_t i = 0; i < slots_.size(); ++i) {
+    if (slots_[index].state == SlotState::EMPTY) {
+      return slots_.size();
+    }
+    if (slots_[index].state == SlotState::OCCUPIED && key_equal_(slots_[index].data.first, key)) {
+      return index;
+    }
+    index = (index + odd_step) % slots_.size();
+  }
+  return slots_.size();
 }
 
 #endif

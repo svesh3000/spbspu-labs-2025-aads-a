@@ -2,11 +2,11 @@
 #define COMMANDS_HPP
 
 #include <iostream>
-#include <unordered_map>
+#include <hash_table/declaration.hpp>
 #include "graph.hpp"
 
 namespace maslevtsov {
-  using graphs_map_t = std::unordered_map< std::string, Graph, StringDoubleHash >;
+  using graphs_map_t = maslevtsov::HashTable< std::string, Graph >;
 
   void print_graphs(const graphs_map_t& graphs, std::ostream& out);
   void print_vertices(const graphs_map_t& graphs, std::istream& in, std::ostream& out);
