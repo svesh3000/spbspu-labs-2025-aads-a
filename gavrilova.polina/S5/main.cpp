@@ -66,19 +66,17 @@ int main(int argc, char* argv[])
       collector = tree.traverse_breadth(collector);
     } else {
       std::cerr << "Invalid traversal order\n";
+      return 1;
     }
-
-    std::cout << collector.getSum();
-    const ArrayBuffer< std::string >& values = collector.getBuffer();
-    for (size_t i = 0; i < values.size(); ++i) {
-      std::cout << " " << values[i];
-    }
-    std::cout << "\n";
-  } catch (const std::overflow_error& e) {
-    std::cerr << e.what() << "\n";
-    return 1;
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;
   }
+
+  std::cout << collector.getSum();
+  const ArrayBuffer< std::string >& values = collector.getBuffer();
+  for (size_t i = 0; i < values.size(); ++i) {
+    std::cout << " " << values[i];
+  }
+  std::cout << "\n";
 }

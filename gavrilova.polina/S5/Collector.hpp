@@ -32,7 +32,7 @@ namespace gavrilova {
     if ((node.first > 0 && sum_ > std::numeric_limits< long long >::max() - node.first)) {
       throw std::overflow_error("Overflow in key sum");
     } else if ((node.first < 0 && sum_ < std::numeric_limits< long long >::min() - node.first)) {
-      throw std::overflow_error("Overflow in key sum");
+      throw std::underflow_error("Underflow in key sum");
     }
     sum_ += node.first;
     buffer_.push_back(node.second);
