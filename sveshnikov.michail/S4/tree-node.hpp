@@ -13,7 +13,6 @@ namespace sveshnikov
     tree_node_t< Key, T > *left_;
     tree_node_t< Key, T > *parent_;
     size_t height_;
-    int balance_factor_;
 
     tree_node_t();
     tree_node_t(const std::pair< Key, T > &val);
@@ -25,8 +24,7 @@ namespace sveshnikov
     right_(nullptr),
     left_(nullptr),
     parent_(nullptr),
-    height_(0),
-    balance_factor_(0)
+    height_(0)
   {}
 
   template< class Key, class T >
@@ -35,8 +33,7 @@ namespace sveshnikov
     right_(nullptr),
     left_(nullptr),
     parent_(nullptr),
-    height_(1),
-    balance_factor_(0)
+    height_(1)
   {}
 }
 

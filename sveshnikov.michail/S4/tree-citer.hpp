@@ -52,29 +52,21 @@ namespace sveshnikov
   ConstIter< Key, T > &ConstIter< Key, T >::operator++() noexcept
   {
     assert(node_ != nullptr);
-    if (node_->right_->height_ != 0)
+    if (node_->right_)
     {
       node_ = node_->right_;
-      while (node_->left_->height_ != 0)
+      while (node_->left_)
       {
         node_ = node_->left_;
       }
     }
     else
     {
-      auto current = node_;
-      while (current->parent_ && current != current->parent_->left_)
+      while (node_->parent_ && node_ != node_->parent_->left_)
       {
-        current = current->parent_;
+        node_ = node_->parent_;
       }
-      if (current->parent_)
-      {
-        node_ = current->parent_;
-      }
-      else
-      {
-        node_ = node_->right_;
-      }
+      node_ = node_->parent_;
     }
     return *this;
   }
@@ -92,22 +84,17 @@ namespace sveshnikov
   ConstIter< Key, T > &ConstIter< Key, T >::operator--() noexcept
   {
     assert(node_ != nullptr);
-    if (node_->height_ == 0)
-    {
-      node_ = node_->parent_;
-      return *this;
-    }
-    if (node_->left_->height_ != 0)
+    if (node_->left_)
     {
       node_ = node_->left_;
-      while (node_->right_->height_ != 0)
+      while (node_->right_)
       {
         node_ = node_->right_;
       }
     }
     else
     {
-      while (node_->parent_ && node_ != node_->parent_->right_)
+      while (node_->parent_ && node_ == node_->parent_->left_)
       {
         node_ = node_->parent_;
       }
