@@ -29,10 +29,10 @@ namespace gavrilova {
   template < typename Key, typename Value >
   void Collector< Key, Value >::operator()(const std::pair< Key, Value >& node)
   {
-    if ((node.first > 0 && sum_ > std::numeric_limits< long long >::max() - node.first)) {
-      throw std::overflow_error("Overflow in key sum");
-    } else if ((node.first < 0 && sum_ < std::numeric_limits< long long >::min() - node.first)) {
-      throw std::underflow_error("Underflow in key sum");
+    if ((node.first > 0 && sum_ > std::numeric_limits< int >::max() - node.first)) {
+      throw std::overflow_error("<OVERFLOW>");
+    } else if ((node.first < 0 && sum_ < std::numeric_limits< int >::min() - node.first)) {
+      throw std::underflow_error("UNDERFLOW");
     }
     sum_ += node.first;
     buffer_.push_back(node.second);
