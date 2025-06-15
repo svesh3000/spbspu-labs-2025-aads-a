@@ -2,7 +2,6 @@
 #define CONVERSION_HPP
 #include <string>
 #include <utils/queue.hpp>
-#include <utils/stack.hpp>
 
 namespace smirnov
 {
