@@ -1,0 +1,53 @@
+#ifndef COLLECTOR_HPP
+#define COLLECTOR_HPP
+
+#include <ArrayBuffer.hpp>
+#include <exception>
+
+namespace gavrilova {
+
+  template < typename Key, typename Value >
+  struct Collector {
+    Collector();
+    void operator()(const std::pair< Key, Value >& node);
+
+    long long getSum() const;
+    const ArrayBuffer< Value >& getBuffer() const;
+
+  private:
+    long long sum_;
+    ArrayBuffer< Value > buffer_;
+  };
+
+  template < typename Key, typename Value >
+  Collector< Key, Value >::Collector():
+    sum_(0),
+    buffer_()
+  {}
+
+  template < typename Key, typename Value >
+  void Collector< Key, Value >::operator()(const std::pair< Key, Value >& node)
+  {
+    if ((node.first > 0 && sum_ > std::numeric_limits< long long >::max() - node.first)) {
+      throw std::overflow_error("Overflow in key sum");
+    } else if ((node.first < 0 && sum_ < std::numeric_limits< long long >::min() - node.first)) {
+      throw std::overflow_error("Overflow in key sum");
+    }
+    sum_ += node.first;
+    buffer_.push_back(node.second);
+  }
+
+  template < typename Key, typename Value >
+  long long Collector< Key, Value >::getSum() const
+  {
+    return sum_;
+  }
+
+  template < typename Key, typename Value >
+  const ArrayBuffer< Value >& Collector< Key, Value >::getBuffer() const
+  {
+    return buffer_;
+  }
+
+}
+#endif
