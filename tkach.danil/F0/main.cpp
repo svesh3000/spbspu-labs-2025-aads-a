@@ -21,7 +21,8 @@ int main(const int argc, const char* const* const argv)
   std::map< std::string, std::function< void() > > cmds;
   cmds["import"] = std::bind(import, std::ref(std::cin), std::ref(data));
   cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(data));
-  cmds["printall"] = std::bind(printAll, std::ref(std::cout), std::ref(data));
+  cmds["printall"] = std::bind(printAll, std::ref(std::cout), std::cref(data));
+  cmds["removeword"] = std::bind(removeWord, std::ref(std::cin), std::ref(data));
   std::string command;
   while (!(std::cin >> command).eof())
   {

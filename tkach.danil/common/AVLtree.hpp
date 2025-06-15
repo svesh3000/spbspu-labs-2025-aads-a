@@ -39,7 +39,7 @@ namespace tkach
     Citerator< Key, Value, Cmp > cend() const;
     Iterator< Key, Value, Cmp > end();
     Iterator< Key, Value, Cmp > erase(Iterator< Key, Value, Cmp > it);
-    Iterator< Key, Value, Cmp > erase(const Key& key);
+    size_t erase(const Key& key);
     Iterator< Key, Value, Cmp > erase(Citerator< Key, Value, Cmp > begin, Citerator< Key, Value, Cmp > end);
     Iterator< Key, Value, Cmp > erase(Iterator< Key, Value, Cmp > begin, Iterator< Key, Value, Cmp > end);
     Iterator< Key, Value, Cmp > lowerBound(const Key& key);
@@ -276,7 +276,7 @@ namespace tkach
     Iterator< Key, Value, Cmp > res;
     while (begin != end)
     {
-      res = erase(begin->first);
+      res = erase(begin);
       begin++;
     }
     return res;
@@ -311,14 +311,15 @@ namespace tkach
   }
 
   template< class Key, class Value, class Cmp >
-  Iterator< Key, Value, Cmp > AvlTree< Key, Value, Cmp >::erase(const Key& key)
+  size_t AvlTree< Key, Value, Cmp >::erase(const Key& key)
   {
-    auto it = find(key);
-    auto it2 = it;
-    it2++;
-    root_ = eraseFrom(root_, key);
-    size_--;
-    return it2;
+    Iterator< Key, Value, Cmp > it = find(key);
+    if (it != end())
+    {
+      erase(it);
+      return 1;
+    }
+    return 0;
   }
 
   template< class Key, class Value, class Cmp >

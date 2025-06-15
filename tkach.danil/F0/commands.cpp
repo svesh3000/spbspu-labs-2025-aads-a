@@ -47,7 +47,7 @@ namespace
     }
     return translations;
   }
-  
+
   tkach::AvlTree< std::string, tkach::List< std::string > > mergeDicts(const tkach::List< const tree_of_words* >& source_dicts)
   {
     size_t size = source_dicts.size();
@@ -125,7 +125,7 @@ namespace tkach
         else
         {
           List< std::string > unique = mergeTranslations(translations, temp_dict[eng_word]);
-          temp_dict[eng_word] = unique; 
+          temp_dict[eng_word] = unique;
         }
         if (in2.peek() == '\n')
         {
@@ -216,7 +216,7 @@ namespace tkach
     }
   }
 
-  void printAll(std::ostream& out, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& data)
+  void printAll(std::ostream& out, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& data)
   {
     for (auto it = data.cbegin(); it != data.cend(); ++it)
     {
@@ -230,6 +230,30 @@ namespace tkach
         }
         out << "\n";
       }
+    }
+  }
+
+  void removeWord(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+  {
+    std::string dict_name;
+    std::string eng_word;
+    if (!(in >> dict_name) || dict_name.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    if (!(in >> eng_word) || eng_word.empty())
+    {
+      throw std::logic_error("<INVALID COMMAND>");
+    }
+    auto it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
+    }
+    bool removed = (it->second).erase(eng_word);
+    if (!removed)
+    {
+      throw std::logic_error("<INVALID WORD>");
     }
   }
 }
