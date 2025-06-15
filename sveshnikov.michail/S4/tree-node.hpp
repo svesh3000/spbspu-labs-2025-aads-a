@@ -16,7 +16,7 @@ namespace sveshnikov
     int balance_factor_;
 
     tree_node_t();
-    tree_node_t(const Key &key, const T &value);
+    tree_node_t(const std::pair< Key, T > &val);
   };
 
   template< class Key, class T >
@@ -30,8 +30,8 @@ namespace sveshnikov
   {}
 
   template< class Key, class T >
-  tree_node_t< Key, T >::tree_node_t(const Key &key, const T &value):
-    data_(std::make_pair(key, value)),
+  tree_node_t< Key, T >::tree_node_t(const std::pair< Key, T > &val):
+    data_(val),
     right_(nullptr),
     left_(nullptr),
     parent_(nullptr),
