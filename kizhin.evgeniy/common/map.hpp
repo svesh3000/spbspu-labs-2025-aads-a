@@ -278,7 +278,9 @@ template < typename K, typename T, typename C >
 template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator++(int) -> Iterator
 {
-  return std::exchange(*this, ++(*this));
+  Iterator result(*this);
+  ++(*this);
+  return result;
 }
 
 template < typename K, typename T, typename C >
@@ -294,7 +296,9 @@ template < typename K, typename T, typename C >
 template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--(int) -> Iterator
 {
-  return std::exchange(*this, --(*this));
+  Iterator result(*this);
+  --(*this);
+  return result;
 }
 
 template < typename K, typename T, typename C >
@@ -846,11 +850,10 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
     parent->children[0] = node;
     root_ = parent;
   }
-  parent = emplaceToNode(parent, *(node->begin + 1));
-  *std::remove(parent->children.begin(), parent->children.end(), node) = nullptr;
-  delete node;
-
   auto& children = parent->children;
+  parent = emplaceToNode(parent, *(node->begin + 1));
+  *std::remove(children.begin(), children.end(), node) = nullptr;
+  delete node;
   auto it = std::find(children.begin(), children.end(), nullptr);
   *(it++) = detail::updateParent(left);
   *(it++) = detail::updateParent(right);
