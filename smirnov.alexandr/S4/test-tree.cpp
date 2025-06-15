@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "avlTree.hpp"
+#include <tree/avlTee.hpp>
 
 using namespace smirnov;
 

@@ -2,7 +2,7 @@
 #define COMMANDS_HPP
 #include <iostream>
 #include <string>
-#include "avlTree.hpp"
+#include <tree/avlTee.hpp>
 
 namespace smirnov
 {

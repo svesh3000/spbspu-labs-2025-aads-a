@@ -2,7 +2,7 @@
 #define INPUT_TREES_HPP
 #include <istream>
 #include <string>
-#include "avlTree.hpp"
+#include <tree/avlTee.hpp>
 
 namespace smirnov
 {
