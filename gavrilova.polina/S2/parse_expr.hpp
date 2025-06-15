@@ -2,7 +2,7 @@
 #define PARSE_EXPR_HPP
 
 #include <string>
-#include "Queue.hpp"
+#include <Queue.hpp>
 
 namespace gavrilova {
   Queue< std::string > split(const std::string& line, const char& symb);
