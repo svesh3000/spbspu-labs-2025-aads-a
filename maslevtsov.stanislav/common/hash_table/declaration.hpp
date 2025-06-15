@@ -73,6 +73,10 @@ namespace maslevtsov {
     {
       Type data;
       SlotState state = SlotState::EMPTY;
+
+      Slot():
+        data()
+      {}
     };
 
     Vector< Slot< value_type > > slots_;

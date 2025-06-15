@@ -42,8 +42,14 @@ maslevtsov::Vector< T >::Vector(size_t size):
   size_(size),
   data_(new T[size])
 {
-  for (size_t i = 0; i < size; ++i) {
-    data_[i] = T();
+  try {
+    for (size_t i = 0; i < size; ++i) {
+      data_[i] = T();
+    }
+  } catch (...) {
+    delete[] data_;
+    data_ = nullptr;
+    throw;
   }
 }
 
