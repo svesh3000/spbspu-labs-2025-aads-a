@@ -181,12 +181,12 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
   for (size_t i = 0; i < slots_.size(); ++i) {
     if (slots_[index].state == SlotState::EMPTY) {
       if (first_deleted != slots_.size()) {
-        new (&slots_[index].data) value_type(std::move(value));
+        slots_[first_deleted].data = std::move(value);
         slots_[first_deleted].state = SlotState::OCCUPIED;
         ++size_;
         return {iterator(this, first_deleted), true};
       } else {
-        new (&slots_[index].data) value_type(std::move(value));
+        slots_[index].data = std::move(value);
         slots_[index].state = SlotState::OCCUPIED;
         ++size_;
         return {iterator(this, index), true};
@@ -201,7 +201,7 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
     index = (index + odd_step) % slots_.size();
   }
   if (first_deleted != slots_.size()) {
-    new (&slots_[index].data) value_type(std::move(value));
+    slots_[first_deleted].data = std::move(value);
     slots_[first_deleted].state = SlotState::OCCUPIED;
     ++size_;
     return {iterator(this, first_deleted), true};
