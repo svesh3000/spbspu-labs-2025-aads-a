@@ -64,7 +64,7 @@ void lanovenko::printSequences(const list_of_pairs& temporary, size_t maxSize, b
   {
     size_t res = 0;
     list_ull current;
-    for (const auto& pair : temporary)
+    for (const auto& pair: temporary)
     {
       if (!pair.second.empty() && i < pair.second.size())
       {
