@@ -21,9 +21,7 @@ template< class Key, class T, class Hash, class KeyEqual >
 maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable() noexcept:
   slots_(32),
   size_(0)
-{
-  clear();
-}
+{}
 
 template< class Key, class T, class Hash, class KeyEqual >
 template< class InputIt >
