@@ -9,7 +9,7 @@ template< class T >
 maslevtsov::Vector< T >::Vector():
   capacity_(64),
   size_(0),
-  data_(new T[capacity_])
+  data_(new T[capacity_]())
 {}
 
 template< class T >
@@ -217,6 +217,8 @@ void maslevtsov::Vector< T >::pop_back() noexcept
   if (empty()) {
     return;
   }
+  delete data_[size_ - 1];
+  data_[size_ - 1] = T();
   --size_;
 }
 
