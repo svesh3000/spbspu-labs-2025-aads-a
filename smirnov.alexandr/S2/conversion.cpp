@@ -42,7 +42,7 @@ smirnov::Queue< std::string > smirnov::infixToPostfix(const std::string & infix)
       try
       {
         size_t pos;
-        long num = std::stoll(token, &pos);
+        std::stoll(token, std::addressof(pos));
         if (pos != token.length())
         {
           throw std::invalid_argument("Invalid token");
