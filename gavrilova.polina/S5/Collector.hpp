@@ -3,6 +3,7 @@
 
 #include <ArrayBuffer.hpp>
 #include <exception>
+#include <limits>
 
 namespace gavrilova {
 
