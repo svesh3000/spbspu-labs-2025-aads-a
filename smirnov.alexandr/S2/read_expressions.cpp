@@ -1,11 +1,12 @@
 #include "read_expressions.hpp"
 #include <fstream>
 #include <iostream>
+#include <list/list_utils.hpp>
 #include "utils.hpp"
 
-std::list< std::string > smirnov::readExpressions(const std::string & filename)
+smirnov::List< std::string > smirnov::readExpressions(const std::string & filename)
 {
-  std::list< std::string > expressions;
+  smirnov::List< std::string > expressions;
   if (filename.empty())
   {
     processInput(std::cin, expressions);
@@ -22,13 +23,14 @@ std::list< std::string > smirnov::readExpressions(const std::string & filename)
   return expressions;
 }
 
-void smirnov::processInput(std::istream & in, std::list< std::string > & expressions) {
+void smirnov::processInput(std::istream & in, smirnov::List< std::string > & expressions)
+{
   std::string line;
   while (std::getline(in, line))
   {
     if (!line.empty())
     {
-      expressions.push_back(line);
+      pushBack(expressions, line);
     }
   }
 }

@@ -1,34 +1,34 @@
-#ifndef QUEUE_HPP
-#define QUEUE_HPP
-#include <list>
+#ifndef STACK_HPP
+#define STACK_HPP
 #include <stdexcept>
+#include <list/list.hpp>
 
 namespace smirnov
 {
   template< typename T >
-  class Queue
+  class Stack
   {
   public:
     void push(T rhs);
     T drop();
-    T front() const;
+    T top() const;
     bool empty() const;
   private:
-    std::list< T > data_;
+    List< T > data_;
   };
 
   template< typename T >
-  void Queue< T >::push(T rhs)
+  void Stack< T >::push(T rhs)
   {
-    data_.push_back(rhs);
+    data_.push_front(rhs);
   }
 
   template< typename T >
-  T Queue< T >::drop()
+  T Stack< T >::drop()
   {
     if (empty())
     {
-        throw std::runtime_error("Queue is empty");
+      throw std::runtime_error("Stack is empty");
     }
     T val = data_.front();
     data_.pop_front();
@@ -36,17 +36,17 @@ namespace smirnov
   }
 
   template< typename T >
-  T Queue< T >::front() const
+  T Stack< T >::top() const
   {
     if (empty())
     {
-      throw std::runtime_error("Queue is empty");
+      throw std::runtime_error("Stack is empty");
     }
     return data_.front();
   }
 
   template< typename T >
-  bool Queue< T >::empty() const
+  bool Stack< T >::empty() const
   {
     return data_.empty();
   }

@@ -1,6 +1,7 @@
 #ifndef LIST_UTILS_HPP
 #define LIST_UTILS_HPP
 #include "list.hpp"
+
 namespace smirnov
 {
   template < typename T >
