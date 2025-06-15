@@ -1,7 +1,7 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include <list>
 #include <stdexcept>
+#include <list/list.hpp>
 
 namespace smirnov
 {
@@ -14,7 +14,7 @@ namespace smirnov
     T top() const;
     bool empty() const;
   private:
-    std::list< T > data_;
+    List< T > data_;
   };
 
   template< typename T >

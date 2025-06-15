@@ -1,7 +1,7 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include <list>
 #include <stdexcept>
+#include <list/list.hpp>
 
 namespace smirnov
 {
@@ -14,7 +14,7 @@ namespace smirnov
     T front() const;
     bool empty() const;
   private:
-    std::list< T > data_;
+    List< T > data_;
   };
 
   template< typename T >

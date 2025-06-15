@@ -1,12 +1,12 @@
 #ifndef CONVERSION_HPP
 #define CONVERSION_HPP
 #include <string>
-#include "queue.hpp"
-#include "stack.hpp"
+#include <utils/queue.hpp>
+#include <utils/stack.hpp>
 
 namespace smirnov
 {
-  smirnov::Queue< std::string > infixToPostfix(const std::string & infix);
+  Queue< std::string > infixToPostfix(const std::string & infix);
   long long evaluatePostfix(Queue< std::string > & postfix);
 }
 #endif

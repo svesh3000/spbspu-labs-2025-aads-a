@@ -4,7 +4,6 @@
 #include <limits>
 #include "utils.hpp"
 
-
 smirnov::Queue< std::string > smirnov::infixToPostfix(const std::string & infix)
 {
   smirnov::Queue< std::string > output;
