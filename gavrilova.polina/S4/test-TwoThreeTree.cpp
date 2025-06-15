@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
-#include "ConstIterator.hpp"
-#include "Iterator.hpp"
-#include "TwoThreeTree.hpp"
+#include <tree/ConstIterator.hpp>
+#include <tree/Iterator.hpp>
+#include <tree/TwoThreeTree.hpp>
 
 BOOST_AUTO_TEST_CASE(TestEmptyTree)
 {

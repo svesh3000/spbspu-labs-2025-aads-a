@@ -2,9 +2,9 @@
 #define COMMANDS_HPP
 
 #include <iostream>
-#include "ConstIterator.hpp"
-#include "Iterator.hpp"
-#include "TwoThreeTree.hpp"
+#include <tree/ConstIterator.hpp>
+#include <tree/Iterator.hpp>
+#include <tree/TwoThreeTree.hpp>
 
 namespace gavrilova {
   using KeyMap = TwoThreeTree< size_t, std::string >;
