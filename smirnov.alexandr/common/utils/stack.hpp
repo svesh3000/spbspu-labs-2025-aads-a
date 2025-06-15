@@ -20,7 +20,7 @@ namespace smirnov
   template< typename T >
   void Stack< T >::push(T rhs)
   {
-    data_.push_back(rhs);
+    data_.push_front(rhs);
   }
 
   template< typename T >

@@ -12,12 +12,9 @@ int main(int argc, char * argv[])
   {
     filename = argv[1];
   }
-
   List< std::string > expressions = readExpressions(filename);
   List< long long > results;
-
-  List< std::string >::iterator it;
-  for (it = expressions.begin(); it != expressions.end(); ++it)
+  for (auto it = expressions.begin(); it != expressions.end(); ++it)
   {
     std::string expr = *it;
     try
@@ -34,7 +31,7 @@ int main(int argc, char * argv[])
   }
   if (!results.empty())
   {
-    List< long long >::iterator rit = results.begin();
+    auto rit = results.begin();
     std::cout << *rit;
     ++rit;
     for (; rit != results.end(); ++rit)

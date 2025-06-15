@@ -3,7 +3,7 @@
 #include <iostream>
 #include "utils.hpp"
 
-List< std::string > smirnov::readExpressions(const std::string & filename)
+smirnov::List< std::string > smirnov::readExpressions(const std::string & filename)
 {
   smirnov::List< std::string > expressions;
   if (filename.empty())
@@ -22,7 +22,8 @@ List< std::string > smirnov::readExpressions(const std::string & filename)
   return expressions;
 }
 
-void smirnov::processInput(std::istream & in, smirnov::List< std::string > & expressions) {
+void smirnov::processInput(std::istream & in, smirnov::List< std::string > & expressions)
+{
   std::string line;
   while (std::getline(in, line))
   {
