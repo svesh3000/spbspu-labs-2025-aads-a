@@ -1,7 +1,7 @@
 #ifndef CONST_ITERATOR_HPP
 #define CONST_ITERATOR_HPP
 #include <memory>
-#include "nodeTree.hpp"
+#include "node.hpp"
 
 namespace smirnov
 {
@@ -23,8 +23,8 @@ namespace smirnov
     bool operator==(const ConstIterator & rhs) const;
     bool operator!=(const ConstIterator & rhs) const;
   private:
-    explicit ConstIterator(NodeTree< Key, Value > * node);
-    NodeTree< Key, Value > * node_;
+    explicit ConstIterator(Node< Key, Value > * node);
+    Node< Key, Value > * node_;
   };
 
   template < typename Key, typename Value, typename Compare >
@@ -33,7 +33,7 @@ namespace smirnov
   {}
 
   template < typename Key, typename Value, typename Compare >
-  ConstIterator< Key, Value, Compare >::ConstIterator(NodeTree< Key, Value > * node):
+  ConstIterator< Key, Value, Compare >::ConstIterator(Node< Key, Value > * node):
     node_(node)
   {}
 
@@ -65,7 +65,7 @@ namespace smirnov
       }
       return *this;
     }
-    NodeTree< Key, Value > * parent = node_->parent;
+    Node< Key, Value > * parent = node_->parent;
     while (parent && node_ == parent->right)
     {
       node_ = parent;
@@ -99,7 +99,7 @@ namespace smirnov
       }
       return *this;
     }
-    NodeTree< Key, Value > * parent = node_->parent;
+    Node< Key, Value > * parent = node_->parent;
     while (parent && node_ == parent->left)
     {
       node_ = parent;
