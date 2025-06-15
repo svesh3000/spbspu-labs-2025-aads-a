@@ -1,6 +1,6 @@
 #include "print_results.hpp"
 #include <limits>
-#include <common/list/list_utils.hpp>
+#include <list/list_utils.hpp>
 
 void smirnov::printName(std::ostream & out, const List< std::pair< std::string, List< size_t > > > & sequences)
 {

@@ -1,8 +1,8 @@
 #include "read_sequences.hpp"
 #include <cctype>
 #include <stdexcept>
-#include <common/list/list.hpp>
-#include <common/list/list_utils.hpp>
+#include <list/list.hpp>
+#include <list/list_utils.hpp>
 
 void smirnov::readSequences(std::istream & in, List< std::pair< std::string, List< size_t > > > & sequences)
 {
