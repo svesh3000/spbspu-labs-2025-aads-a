@@ -192,8 +192,9 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
         return {iterator(this, index), true};
       }
     } else if (slots_[index].state == SlotState::DELETED) {
-      if (first_deleted == slots_.size())
+      if (first_deleted == slots_.size()) {
         first_deleted = index;
+      }
     } else if (key_equal_(slots_[index].data.first, key)) {
       return {iterator(this, index), false};
     }
