@@ -30,8 +30,8 @@ namespace smirnov
     {
       throw std::runtime_error("Stack is empty");
     }
-    T val = data_.back();
-    data_.pop_back();
+    T val = data_.front();
+    data_.pop_front();
     return val;
   }
 
@@ -42,7 +42,7 @@ namespace smirnov
     {
       throw std::runtime_error("Stack is empty");
     }
-    return data_.back();
+    return data_.front();
   }
 
   template< typename T >

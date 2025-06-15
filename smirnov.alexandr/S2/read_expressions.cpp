@@ -29,7 +29,7 @@ void smirnov::processInput(std::istream & in, smirnov::List< std::string > & exp
   {
     if (!line.empty())
     {
-      expressions.push_back(line);
+      expressions.push_front(line);
     }
   }
 }

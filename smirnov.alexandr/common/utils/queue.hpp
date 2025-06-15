@@ -20,7 +20,7 @@ namespace smirnov
   template< typename T >
   void Queue< T >::push(T rhs)
   {
-    data_.push_front(rhs);
+    data_.push_back(rhs);
   }
 
   template< typename T >
