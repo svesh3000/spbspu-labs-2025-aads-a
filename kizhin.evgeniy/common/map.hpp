@@ -588,7 +588,7 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   if (empty()) {
     return emplaceToEmpty(std::forward< Args >(args)...);
   }
-  const EndNodeGuard guard(this);
+  EndNodeGuard guard(this);
   value_type value{ std::forward< Args >(args)... };
   Node* target = findTarget(hint.node_, value.first);
   pointer valuePtr = findKey(target, value.first);
@@ -601,6 +601,7 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   while (detail::size(target) > 2) {
     target = split(target);
   }
+  guard.join();
   return std::make_pair(find(key), true);
 }
 
@@ -850,8 +851,8 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
     parent->children[0] = node;
     root_ = parent;
   }
-  auto& children = parent->children;
   parent = emplaceToNode(parent, *(node->begin + 1));
+  auto& children = parent->children;
   *std::remove(children.begin(), children.end(), node) = nullptr;
   delete node;
   auto it = std::find(children.begin(), children.end(), nullptr);
