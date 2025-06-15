@@ -46,10 +46,6 @@ namespace {
   }
 }
 
-maslevtsov::Graph::Graph():
-  edges_set_()
-{}
-
 maslevtsov::Graph::Graph(const Graph& src1, const Graph& src2):
   Graph()
 {

@@ -14,7 +14,7 @@ namespace maslevtsov {
     using vertices_pair_t = std::pair< std::string, std::string >;
     using edges_set_t = maslevtsov::HashTable< vertices_pair_t, Vector< unsigned >, PairKeyHash< std::string > >;
 
-    Graph();
+    Graph() = default;
     Graph(const Graph& src1, const Graph& src2);
     Graph(const Graph& src, Vector< std::string >& vertices);
 

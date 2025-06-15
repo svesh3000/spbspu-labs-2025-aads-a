@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     graphs[graph_name] = graph;
   }
 
-  maslevtsov::HashTable< std::string, IOFuncBinder< graphs_map_t > > commands;
+  HashTable< std::string, IOFuncBinder< graphs_map_t > > commands;
   commands["graphs"] = IOFuncBinder< graphs_map_t >(print_graphs, graphs, std::cout);
   commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
   commands["outbound"] = IOFuncBinder< graphs_map_t >(print_outbound, graphs, std::cin, std::cout);

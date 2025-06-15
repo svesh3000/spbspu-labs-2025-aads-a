@@ -40,12 +40,8 @@ template< class T >
 maslevtsov::Vector< T >::Vector(size_t size):
   capacity_(size),
   size_(size),
-  data_(new T[capacity_])
-{
-  for (size_t i = 0; i < size_; ++i) {
-    data_[i] = T();
-  }
-}
+  data_(new T[size])
+{}
 
 template< class T >
 maslevtsov::Vector< T >::~Vector()
@@ -205,7 +201,7 @@ void maslevtsov::Vector< T >::push_back(const T& value)
 template< class T >
 void maslevtsov::Vector< T >::push_back(T&& value)
 {
-  if (size_ == capacity_) {
+  if (size_ >= capacity_) {
     expand(capacity_ * 2);
   }
   data_[size_++] = std::move(value);
