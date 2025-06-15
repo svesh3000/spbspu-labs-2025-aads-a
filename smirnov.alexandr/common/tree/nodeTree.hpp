@@ -1,19 +1,19 @@
-#ifndef NODE_HPP
-#define NODE_HPP
+#ifndef NODE_TREE_HPP
+#define NODE_TREE_HPP
 #include <utility>
 
 namespace smirnov
 {
   template < typename Key, typename Value >
-  struct Node
+  struct NodeTree
   {
     std::pair< const Key, Value > data;
-    Node * left;
-    Node * right;
-    Node * parent;
+    NodeTree * left;
+    NodeTree * right;
+    NodeTree * parent;
     int height;
 
-    Node(const Key & key, const Value & value):
+    NodeTree(const Key & key, const Value & value):
       data(key, value),
       left(nullptr),
       right(nullptr),
