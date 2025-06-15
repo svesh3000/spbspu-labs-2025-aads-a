@@ -1,6 +1,7 @@
 #include "read_expressions.hpp"
 #include <fstream>
 #include <iostream>
+#include <list/list_utils.hpp>
 #include "utils.hpp"
 
 smirnov::List< std::string > smirnov::readExpressions(const std::string & filename)
@@ -29,7 +30,7 @@ void smirnov::processInput(std::istream & in, smirnov::List< std::string > & exp
   {
     if (!line.empty())
     {
-      expressions.push_front(line);
+      pushBack(expressions, line);
     }
   }
 }

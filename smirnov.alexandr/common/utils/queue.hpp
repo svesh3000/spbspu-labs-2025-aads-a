@@ -2,6 +2,7 @@
 #define QUEUE_HPP
 #include <stdexcept>
 #include <list/list.hpp>
+#include <list/list_utils.hpp>
 
 namespace smirnov
 {
@@ -20,7 +21,7 @@ namespace smirnov
   template< typename T >
   void Queue< T >::push(T rhs)
   {
-    data_.push_back(rhs);
+    pushBack(data_, rhs);
   }
 
   template< typename T >
