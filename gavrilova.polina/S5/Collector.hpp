@@ -16,7 +16,7 @@ namespace gavrilova {
     const ArrayBuffer< Value >& getBuffer() const;
 
   private:
-    long long sum_;
+    long long int sum_;
     ArrayBuffer< Value > buffer_;
   };
 
@@ -29,9 +29,9 @@ namespace gavrilova {
   template < typename Key, typename Value >
   void Collector< Key, Value >::operator()(const std::pair< Key, Value >& node)
   {
-    if ((node.first > 0 && sum_ > std::numeric_limits< int >::max() - node.first)) {
+    if ((node.first > 0 && sum_ > std::numeric_limits< long long int >::max() - node.first)) {
       throw std::overflow_error("<OVERFLOW>");
-    } else if ((node.first < 0 && sum_ < std::numeric_limits< int >::min() - node.first)) {
+    } else if ((node.first < 0 && sum_ < std::numeric_limits< long long int >::min() - node.first)) {
       throw std::underflow_error("UNDERFLOW");
     }
     sum_ += node.first;
