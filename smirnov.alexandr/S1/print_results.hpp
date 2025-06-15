@@ -2,7 +2,7 @@
 #define PRINT_RESULTS_HPP
 #include <iostream>
 #include <string>
-#include "list.hpp"
+#include <list/list.hpp>
 
 namespace smirnov
 {

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include "list.hpp"
+#include <list/list.hpp>
 #include "read_sequences.hpp"
 #include "print_results.hpp"
 
