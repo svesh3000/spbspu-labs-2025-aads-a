@@ -11,7 +11,7 @@ namespace
   using tree_t = demehin::Tree< std::string, list_t >;
   using dict_t = demehin::Tree< std::string, tree_t >;
 
-  std::istream& inputDict(std::istream& in, dict_t& dicts)
+  void inputDict(std::istream& in, dict_t& dicts)
   {
     std::string dict_name;
     while (std::getline(in, dict_name))
@@ -48,7 +48,6 @@ namespace
       }
       dicts.insert(std::make_pair(dict_name, current_dict));
     }
-    return in;
   }
 }
 
@@ -74,14 +73,11 @@ int main(int argc, char* argv[])
     std::cerr << "<INVALID FILE>\n";
     return 1;
   }
+
   dict_t dicts;
   try
   {
-    if (!inputDict(file, dicts) && !file.eof())
-    {
-      std::cerr << "<INVALID FILE>\n";
-      return 1;
-    }
+    inputDict(file, dicts);
   }
   catch (...)
   {
