@@ -13,7 +13,7 @@ namespace abramov
   struct Iterator: std::iterator< std::bidirectional_iterator_tag, std::pair< Key, Value > >
   {
     Iterator();
-    Iterator(Node< Key, Value > *node, Node< Key, Value > *fake);
+    Iterator(Node< Key, Value > *node, Node< Key, Value > *fake, Node< Key, Value > *root);
     Iterator(const Iterator< Key, Value > &iter) = default;
     ~Iterator() = default;
     Iterator< Key, Value > &operator=(const Iterator< Key, Value > &iter) = default;
@@ -28,20 +28,25 @@ namespace abramov
   private:
     Node< Key, Value > *node_;
     Node< Key, Value > *fake_;
+    Node< Key, Value > *root_;
 
     template< class K, class V, class C >
     friend struct BinarySearchTree;
+    Node< Key, Value > *getMax(Node< Key, Value > *root) noexcept;
   };
 
   template< class Key, class Value >
   Iterator< Key, Value >::Iterator():
-    node_(nullptr)
+    node_(nullptr),
+    fake_(nullptr),
+    root_(nullptr)
   {}
 
   template< class Key, class Value >
-  Iterator< Key, Value >::Iterator(Node< Key, Value > *node, Node< Key, Value > *fake):
+  Iterator< Key, Value >::Iterator(Node< Key, Value > *node, Node< Key, Value > *fake, Node< Key, Value > *root):
     node_(node),
-    fake_(fake)
+    fake_(fake),
+    root_(root)
   {}
 
   template< class Key, class Value >
@@ -79,7 +84,11 @@ namespace abramov
   template< class Key, class Value >
   Iterator< Key, Value > &Iterator< Key, Value >::operator--() noexcept
   {
-    if (node_->left_ != fake_)
+    if (node_ == fake_)
+    {
+      node_ = getMax(root_);
+    }
+    else if (node_->left_ != fake_)
     {
       node_ = node_->left_;
       while (node_->right_ != fake_)
@@ -130,6 +139,20 @@ namespace abramov
   std::pair< Key, Value > *Iterator< Key, Value >::operator->() noexcept
   {
     return std::addressof(node_->data_);
+  }
+
+  template< class Key, class Value >
+  Node< Key, Value > *Iterator< Key, Value >::getMax(Node< Key, Value > *root) noexcept
+  {
+    if (root == fake_ || !root)
+    {
+      return fake_;
+    }
+    while (root->right_ != fake_)
+    {
+      root = root->right_;
+    }
+    return root;
   }
 }
 #endif

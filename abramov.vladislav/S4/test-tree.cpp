@@ -116,6 +116,24 @@ BOOST_AUTO_TEST_CASE(cbegin)
   BOOST_TEST(it->second == "a");
 }
 
+BOOST_AUTO_TEST_CASE(end)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(5, "a");
+  tree.insert(1, "b");
+  auto it = --tree.end();
+  BOOST_TEST(it->second == "a");
+}
+
+BOOST_AUTO_TEST_CASE(cend)
+{
+  abramov::BinarySearchTree< int, std::string > tree;
+  tree.insert(5, "b");
+  tree.insert(1, "a");
+  auto it = --tree.cend();
+  BOOST_TEST(it->second == "b");
+}
+
 BOOST_AUTO_TEST_CASE(find)
 {
   abramov::BinarySearchTree< int, std::string > tree;

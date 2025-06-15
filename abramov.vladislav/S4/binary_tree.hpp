@@ -198,40 +198,40 @@ namespace abramov
   Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::begin()
   {
     Node< Key, Value > *node = getMin(root_);
-    return Iterator< Key, Value >(node, fake_);
+    return Iterator< Key, Value >(node, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
   Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::end()
   {
-    return Iterator< Key, Value >(fake_, fake_);
+    return Iterator< Key, Value >(fake_, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
   ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::cbegin() const
   {
     const Node< Key, Value > *node = cgetMin(root_);
-    return ConstIterator< Key, Value >(node, fake_);
+    return ConstIterator< Key, Value >(node, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
   ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp>::cend() const
   {
-    return ConstIterator< Key, Value >(fake_, fake_);
+    return ConstIterator< Key, Value >(fake_, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
   Iterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::find(const Key &k) noexcept
   {
     Node< Key, Value > *node = findNode(k);
-    return Iterator< Key, Value >(node, fake_);
+    return Iterator< Key, Value >(node, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
   ConstIterator< Key, Value > BinarySearchTree< Key, Value, Cmp >::cfind(const Key &k) const noexcept
   {
     const Node< Key, Value > *node = cfindNode(k);
-    return ConstIterator< Key, Value >(node, fake_);
+    return ConstIterator< Key, Value >(node, fake_, root_);
   }
 
   template< class Key, class Value, class Cmp >
@@ -327,7 +327,7 @@ namespace abramov
       successor = successor->left_;
     }
     auto data = successor->data_;
-    erase(Iterator< Key, Value >(successor, fake_));
+    erase(Iterator< Key, Value >(successor, fake_, root_));
     node->data_ = data;
   }
 
