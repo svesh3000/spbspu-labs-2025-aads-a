@@ -572,7 +572,7 @@ namespace gavrilova {
 
     while (!stack.empty()) {
       Node* node = stack.top().first;
-      LNRStage& stage = stack.top().second;  // ссылка для обновления
+      LNRStage& stage = stack.top().second;
 
       if (node == fake_) {
         stack.pop();
@@ -744,7 +744,7 @@ namespace gavrilova {
 
     return f;
   }
-  
+
   template < class Key, class Value, class Cmp >
   bool TwoThreeTree< Key, Value, Cmp >::is_leaf(Node* node) const
   {
