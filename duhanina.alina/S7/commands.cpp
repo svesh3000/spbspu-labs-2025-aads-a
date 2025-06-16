@@ -58,6 +58,11 @@ void duhanina::printOutbounds(std::ostream& out, std::istream& in, const MapOfGr
     throw std::invalid_argument("Invalid command");
   }
   Tree< Graph::Vertex, Graph::WeightsList, std::less< std::string > > outbound = it->second.getOutbound(vertex);
+  if (outbound.size() == 0)
+  {
+    out << "\n";
+    return;
+  }
   for (auto oit = outbound.begin(); oit != outbound.end(); ++oit)
   {
     out << oit->first;
@@ -80,6 +85,11 @@ void duhanina::printInbounds(std::ostream& out, std::istream& in, const MapOfGra
     throw std::invalid_argument("Invalid command");
   }
   Tree< Graph::Vertex, Graph::WeightsList, std::less< std::string > > inbound = it->second.getInbound(vertex);
+  if (inbound.size() == 0)
+  {
+    out << "\n";
+    return;
+  }
   for (auto iit = inbound.begin(); iit != inbound.end(); ++iit)
   {
     out << iit->first;
