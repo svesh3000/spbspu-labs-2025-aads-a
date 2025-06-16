@@ -3,11 +3,6 @@
 
 void duhanina::inputGraphs(std::istream& in, MapOfGraphs& graphs)
 {
-  if (graphs.empty())
-  {
-    out << "\n";
-    return;
-  }
   std::string name;
   size_t edgeCount;
   while (in >> name >> edgeCount)
@@ -30,6 +25,11 @@ void duhanina::inputGraphs(std::istream& in, MapOfGraphs& graphs)
 
 void duhanina::printGraphsNames(std::ostream& out, const MapOfGraphs& graphs)
 {
+  if (graphs.empty())
+  {
+    out << "\n";
+    return;
+  }
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
     out << it->first << "\n";
