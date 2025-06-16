@@ -55,7 +55,12 @@ int main(int argc, char* argv[])
       std::cerr << "Invalid traversal mode\n";
       return 1;
     }
-    std::cout << func.result << func.elems << "\n";
+    std::cout << func.result;
+    if (!func.elems.empty())
+    {
+      std::cout << " " << func.elems;
+    }
+    std::cout << "\n";
   }
   catch (const std::overflow_error & e)
   {
