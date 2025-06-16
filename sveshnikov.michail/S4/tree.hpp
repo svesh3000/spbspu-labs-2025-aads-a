@@ -29,8 +29,8 @@ namespace sveshnikov
     T &at(const Key &k);             // ok
     const T &at(const Key &k) const; // ok
 
-    void clear() noexcept;
-    void swap(AvlTree &x);
+    void clear() noexcept;                                                    // ok
+    void swap(AvlTree &x);                                                    // ok
     std::pair< Iter< Key, T >, bool > insert(const std::pair< Key, T > &val); // ok
     void erase(Iter< Key, T > position) noexcept;                             // ok
     size_t erase(const Key &k) noexcept;                                      // ok
@@ -48,6 +48,7 @@ namespace sveshnikov
 
     tree_node_t< Key, T > *getMinNode(tree_node_t< Key, T > *node);                     // ok
     tree_node_t< Key, T > *getMaxNode(tree_node_t< Key, T > *node);                     // ok
+    void clearRecursive(tree_node_t< Key, T > *node) noexcept;                          // ok
     void updateHeight(tree_node_t< Key, T > *node);                                     // ok
     tree_node_t< Key, T > *rotateRight(tree_node_t< Key, T > *node);                    // ok
     tree_node_t< Key, T > *rotateLeft(tree_node_t< Key, T > *node);                     // ok
@@ -202,6 +203,40 @@ namespace sveshnikov
       throw std::out_of_range("AvlTree::at");
     }
     return it->second;
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::clear() noexcept
+  {
+    clearRecursive(root_);
+    root_ = nullptr;
+    if (fake_leaf_)
+    {
+      fake_leaf_->parent_ = nullptr;
+      fake_leaf_->left_ = nullptr;
+      fake_leaf_->right_ = nullptr;
+    }
+    delete fake_leaf_;
+    size_ = 0;
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::clearRecursive(tree_node_t< Key, T > *node) noexcept
+  {
+    if (node && node != fake_leaf_)
+    {
+      clearRecursive(node->left_);
+      clearRecursive(node->right_);
+      delete node;
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::swap(AvlTree &x)
+  {
+    std::swap(root_, x.root_);
+    std::swap(fake_leaf_, x.fake_leaf_);
+    std::swap(size_, x.size_);
   }
 
   template< class Key, class T, class Cmp >
