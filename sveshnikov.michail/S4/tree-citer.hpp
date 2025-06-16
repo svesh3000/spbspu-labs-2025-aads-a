@@ -1,15 +1,16 @@
 #ifndef TREE_CITER_HPP
 #define TREE_CITER_HPP
 #include <iterator>
+#include <cassert>
 #include "tree-node.hpp"
 
 namespace sveshnikov
 {
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   class AvlTree;
 
-  template< class Key, class T >
-  class ConstIter: public std::iterator< bidirectional_iterator_tag, Key, T >
+  template< typename Key, typename T >
+  class ConstIter: public std::iterator< std::bidirectional_iterator_tag, std::pair< Key, T > >
   {
   public:
     using value_t = std::pair< Key, T >;
@@ -34,21 +35,21 @@ namespace sveshnikov
 
     ConstIter(const tree_node_t< Key, T > *node);
 
-    template< class Key, class T, class Cmp >
-    friend class AvlTree< class Key, class T, class Cmp >;
+    template< typename K, typename V, typename C >
+    friend class AvlTree;
   };
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T >::ConstIter():
     node_(nullptr)
   {}
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T >::ConstIter(const tree_node_t< Key, T > *node):
     node_(node)
   {}
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T > &ConstIter< Key, T >::operator++() noexcept
   {
     assert(node_ != nullptr);
@@ -71,7 +72,7 @@ namespace sveshnikov
     return *this;
   }
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T > ConstIter< Key, T >::operator++(int) noexcept
   {
     assert(node_ != nullptr);
@@ -80,7 +81,7 @@ namespace sveshnikov
     return result;
   }
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T > &ConstIter< Key, T >::operator--() noexcept
   {
     assert(node_ != nullptr);
@@ -103,7 +104,7 @@ namespace sveshnikov
     return *this;
   }
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   ConstIter< Key, T > ConstIter< Key, T >::operator--(int) noexcept
   {
     assert(node_ != nullptr);
@@ -112,27 +113,27 @@ namespace sveshnikov
     return result;
   }
 
-  template< class Key, class T >
-  const ConstIter< Key, T >::value_t &ConstIter< Key, T >::operator*() const noexcept
+  template< typename Key, typename T >
+  const typename ConstIter< Key, T >::value_t &ConstIter< Key, T >::operator*() const noexcept
   {
     assert(node_ != nullptr);
     return node_->data_;
   }
 
-  template< class Key, class T >
-  const ConstIter< Key, T >::value_t *ConstIter< Key, T >::operator->() const noexcept
+  template< typename Key, typename T >
+  const typename ConstIter< Key, T >::value_t *ConstIter< Key, T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
     return std::addressof(node_->data_);
   }
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   bool ConstIter< Key, T >::operator!=(const ConstIter &rhs) const noexcept
   {
     return node_ != rhs.node_;
   }
 
-  template< class Key, class T >
+  template< typename Key, typename T >
   bool ConstIter< Key, T >::operator==(const ConstIter &rhs) const noexcept
   {
     return node_ == rhs.node_;

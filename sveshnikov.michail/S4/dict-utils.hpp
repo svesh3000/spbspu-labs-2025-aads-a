@@ -2,14 +2,14 @@
 #define DICT_UTILS_HPP
 #include <iostream>
 #include <functional>
-#include <map>
+#include "tree.hpp"
 
 namespace sveshnikov
 {
-  using Dict_t = std::map< int, std::string >;
-  using DataTree_t = std::map< std::string, Dict_t >;
+  using Dict_t = sveshnikov::AvlTree< int, std::string >;
+  using DataTree_t = sveshnikov::AvlTree< std::string, Dict_t >;
   using CommandHolder_t =
-      std::map< std::string, std::function< void(std::istream &, DataTree_t &) > >;
+      sveshnikov::AvlTree< std::string, std::function< void(std::istream &, DataTree_t &) > >;
 
   DataTree_t loadDicts(char *filename);
   CommandHolder_t getCommands();

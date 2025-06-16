@@ -5,7 +5,7 @@
 
 namespace sveshnikov
 {
-  template< class Key, class T, class Cmp = std::less< Key > >
+  template< typename Key, typename T, typename Cmp = std::less< Key > >
   class AvlTree
   {
   public:
@@ -59,14 +59,14 @@ namespace sveshnikov
     tree_node_t< Key, T > *equal_range_impl(const Key &k) const noexcept;
   };
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp >::AvlTree():
     root_(nullptr),
     fake_leaf_(new tree_node_t< Key, T >{}),
     size_(0)
   {}
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp >::AvlTree(const AvlTree &x):
     AvlTree()
   {
@@ -76,7 +76,7 @@ namespace sveshnikov
     }
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp >::AvlTree(AvlTree &&x):
     root_(x.root_),
     fake_leaf_(x.fake_leaf_),
@@ -87,14 +87,14 @@ namespace sveshnikov
     x.size_ = 0;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp >::~AvlTree()
   {
     clear();
     delete fake_leaf_;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp > &AvlTree< Key, T, Cmp >::operator=(const AvlTree &x)
   {
     if (this != &x)
@@ -105,7 +105,7 @@ namespace sveshnikov
     return *this;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   AvlTree< Key, T, Cmp > &AvlTree< Key, T, Cmp >::operator=(AvlTree &&x)
   {
     clear();
@@ -113,7 +113,7 @@ namespace sveshnikov
     return *this;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMinNode(
       tree_node_t< Key, T > *node) const noexcept
   {
@@ -128,25 +128,25 @@ namespace sveshnikov
     return node;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   Iter< Key, T > AvlTree< Key, T, Cmp >::begin() noexcept
   {
     return Iter< Key, T >(getMinNode(root_));
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   ConstIter< Key, T > AvlTree< Key, T, Cmp >::begin() const noexcept
   {
     return cbegin();
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   ConstIter< Key, T > AvlTree< Key, T, Cmp >::cbegin() const noexcept
   {
     return ConstIter< Key, T >(getMinNode(root_));
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMaxNode(
       tree_node_t< Key, T > *node) const noexcept
   {
@@ -157,37 +157,37 @@ namespace sveshnikov
     return node;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   Iter< Key, T > AvlTree< Key, T, Cmp >::end() noexcept
   {
     return Iter< Key, T >(fake_leaf_);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   ConstIter< Key, T > AvlTree< Key, T, Cmp >::end() const noexcept
   {
     return cend();
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   ConstIter< Key, T > AvlTree< Key, T, Cmp >::cend() const noexcept
   {
     return ConstIter< Key, T >(fake_leaf_);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   size_t AvlTree< Key, T, Cmp >::size() const noexcept
   {
     return size_;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   bool AvlTree< Key, T, Cmp >::empty() const noexcept
   {
     return size_ == 0;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   T &AvlTree< Key, T, Cmp >::operator[](const Key &k)
   {
     Iter< Key, T > it = find(k);
@@ -198,13 +198,13 @@ namespace sveshnikov
     return it->second;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   T &AvlTree< Key, T, Cmp >::at(const Key &k)
   {
-    return const_cast< T & >(static_cast< const AvlTree & >(*this).at(k))
+    return const_cast< T & >(static_cast< const AvlTree & >(*this).at(k));
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   const T &AvlTree< Key, T, Cmp >::at(const Key &k) const
   {
     ConstIter< Key, T > it = find(k);
@@ -215,7 +215,7 @@ namespace sveshnikov
     return it->second;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::clear() noexcept
   {
     clear(root_);
@@ -223,7 +223,7 @@ namespace sveshnikov
     size_ = 0;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::clear(tree_node_t< Key, T > *node) noexcept
   {
     if (node && node != fake_leaf_)
@@ -234,7 +234,7 @@ namespace sveshnikov
     }
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::swap(AvlTree &x) noexcept
   {
     std::swap(root_, x.root_);
@@ -242,7 +242,7 @@ namespace sveshnikov
     std::swap(size_, x.size_);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   std::pair< Iter< Key, T >, bool > AvlTree< Key, T, Cmp >::insert(const std::pair< Key, T > &val)
   {
     Cmp cmp{};
@@ -293,7 +293,7 @@ namespace sveshnikov
     return std::make_pair(Iter< Key, T >(node), true);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::updateHeight(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
@@ -303,7 +303,7 @@ namespace sveshnikov
     node->height_ = std::max(left_h, right_h) + 1;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateRight(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
@@ -341,7 +341,7 @@ namespace sveshnikov
     return left_son;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateLeft(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
@@ -379,7 +379,7 @@ namespace sveshnikov
     return right_son;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   int AvlTree< Key, T, Cmp >::getBalanceFactor(tree_node_t< Key, T > *node) const noexcept
   {
     size_t left_height = node->left_ ? node->left_->height_ : 0;
@@ -387,7 +387,7 @@ namespace sveshnikov
     return left_height - right_height;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::balance(tree_node_t< Key, T > *node) noexcept
   {
     int balance_factor = getBalanceFactor(node);
@@ -410,7 +410,7 @@ namespace sveshnikov
     return node;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::rebalanceUpwards(tree_node_t< Key, T > *node) noexcept
   {
     while (node->parent_)
@@ -421,7 +421,7 @@ namespace sveshnikov
     }
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   void AvlTree< Key, T, Cmp >::erase(Iter< Key, T > position) noexcept
   {
     tree_node_t< Key, T > *node = position.node_;
@@ -486,7 +486,7 @@ namespace sveshnikov
     }
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   size_t AvlTree< Key, T, Cmp >::erase(const Key &k) noexcept
   {
     Iter< Key, T > it = find(k);
@@ -498,7 +498,7 @@ namespace sveshnikov
     return 0;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::equal_range_impl(const Key &k) const noexcept
   {
     Cmp cmp;
@@ -524,10 +524,11 @@ namespace sveshnikov
     return next;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   std::pair< ConstIter< Key, T >, ConstIter< Key, T > > AvlTree< Key, T, Cmp >::equal_range(
       const Key &k) const
   {
+    Cmp cmp;
     const tree_node_t< Key, T > *node = equal_range_impl(k);
     if (!node)
     {
@@ -536,12 +537,14 @@ namespace sveshnikov
     ConstIter< Key, T > it(node);
     ConstIter< Key, T > next = it;
     ++next;
-    return (!cmp(k, it->first) && !cmp(it->first, k)) ? {it, next} : {it, it};
+    bool is_find = !cmp(k, it->first) && !cmp(it->first, k);
+    return is_find ? std::make_pair(it, next) : std::make_pair(it, it);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   std::pair< Iter< Key, T >, Iter< Key, T > > AvlTree< Key, T, Cmp >::equal_range(const Key &k)
   {
+    Cmp cmp;
     tree_node_t< Key, T > *node = equal_range_impl(k);
     if (!node)
     {
@@ -550,27 +553,28 @@ namespace sveshnikov
     Iter< Key, T > it(node);
     Iter< Key, T > next = it;
     ++next;
-    return (!cmp(k, it->first) && !cmp(it->first, k)) ? {it, next} : {it, it};
+    bool is_find = !cmp(k, it->first) && !cmp(it->first, k);
+    return is_find ? std::make_pair(it, next) : std::make_pair(it, it);
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   Iter< Key, T > AvlTree< Key, T, Cmp >::find(const Key &k)
   {
-    std::pair< Iter, Iter > it_pair = equal_range(k);
+    std::pair< Iter< Key, T >, Iter< Key, T > > it_pair = equal_range(k);
     return (it_pair.first == it_pair.second) ? end() : it_pair.first;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   ConstIter< Key, T > AvlTree< Key, T, Cmp >::find(const Key &k) const
   {
-    std::pair< ConstIter, ConstIter > it_pair = equal_range(k);
+    std::pair< ConstIter< Key, T >, ConstIter< Key, T > > it_pair = equal_range(k);
     return (it_pair.first == it_pair.second) ? end() : it_pair.first;
   }
 
-  template< class Key, class T, class Cmp >
+  template< typename Key, typename T, typename Cmp >
   size_t AvlTree< Key, T, Cmp >::count(const Key &k) const
   {
-    std::pair< ConstIter, ConstIter > it_pair = equal_range(k);
+    std::pair< ConstIter< Key, T >, ConstIter< Key, T > > it_pair = equal_range(k);
     return (it_pair.first == it_pair.second) ? 0 : 1;
   }
 }
