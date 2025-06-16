@@ -34,7 +34,7 @@ namespace sveshnikov
   private:
     tree_node_t< Key, T > *node_;
 
-    Iter(const tree_node_t< Key, T > *node);
+    Iter(tree_node_t< Key, T > *node);
 
     template< class Key, class T, class Cmp >
     friend class AvlTree< class Key, class T, class Cmp >;
@@ -46,7 +46,7 @@ namespace sveshnikov
   {}
 
   template< class Key, class T >
-  Iter< Key, T >::Iter(const tree_node_t< Key, T > *node):
+  Iter< Key, T >::Iter(tree_node_t< Key, T > *node):
     node_(node)
   {}
 
@@ -64,7 +64,7 @@ namespace sveshnikov
     }
     else
     {
-      while (node_->parent_ && node_ != curr->parent_->left_)
+      while (node_->parent_ && node_ == node_->parent_->left_)
       {
         node_ = node_->parent_;
       }
