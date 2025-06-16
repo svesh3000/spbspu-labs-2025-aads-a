@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <stack>
 #include <queue>
-#include "node.hpp"
 #include "constIterator.hpp"
 
 namespace smirnov
