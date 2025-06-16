@@ -387,7 +387,7 @@ namespace smirnov
   {
     std::stack< Node< Key, Value > * > stack;
     Node< Key, Value > * current = root_;
-    while (current != nullptr || !stack.empty())
+    while (current != nillptr || !stack.empty())
     {
       while (current != nullptr)
       {
@@ -396,7 +396,7 @@ namespace smirnov
       }
       current = stack.top();
       stack.pop();
-      f(current->data);
+      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
       current = current->right;
     }
     return f;
@@ -417,7 +417,7 @@ namespace smirnov
       }
       current = stack.top();
       stack.pop();
-      f(current->data);
+      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
       current = current->left;
     }
     return f;
@@ -437,7 +437,7 @@ namespace smirnov
     {
       Node< Key, Value > * current = q.front();
       q.pop();
-      f(current->data);
+      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
       if (current->left != nullptr)
       {
         q.push(current->left);
