@@ -25,10 +25,9 @@ namespace sveshnikov
     size_t size() const noexcept; // ok
     bool empty() const noexcept;  // ok
 
-    T &operator[](const Key &k);
-    T &operator[](Key &&k);
-    T &at(const Key &k);
-    const T &at(const Key &k) const;
+    T &operator[](const Key &k);     // ok
+    T &at(const Key &k);             // ok
+    const T &at(const Key &k) const; // ok
 
     void clear() noexcept;
     void swap(AvlTree &x);
@@ -175,6 +174,34 @@ namespace sveshnikov
   bool AvlTree< Key, T, Cmp >::empty() const noexcept
   {
     return size_ == 0;
+  }
+
+  template< class Key, class T, class Cmp >
+  T &AvlTree< Key, T, Cmp >::operator[](const Key &k)
+  {
+    Iter< Key, T > it = find(k);
+    if (it == end())
+    {
+      it = insert(std::make_pair(k, T()));
+    }
+    return it->second;
+  }
+
+  template< class Key, class T, class Cmp >
+  T &AvlTree< Key, T, Cmp >::at(const Key &k)
+  {
+    return const_cast< T & >(static_cast< const AvlTree & >(*this).at(k))
+  }
+
+  template< class Key, class T, class Cmp >
+  const T &AvlTree< Key, T, Cmp >::at(const Key &k) const
+  {
+    ConstIter< Key, T > it = find(k);
+    if (it == end())
+    {
+      throw std::out_of_range("AvlTree::at");
+    }
+    return it->second;
   }
 
   template< class Key, class T, class Cmp >
