@@ -4,12 +4,16 @@
 
 void smirnov::KeySum::operator()(const std::pair< const int, std::string > & value)
 {
-  bool overflow = (result > 0 && value.first > std::numeric_limits< int >::max() - result);
-  bool underflow = (result < 0 && value.first < std::numeric_limits< int >::min() - result);
+  bool overflow = (value.first > 0 && result > std::numeric_limits< int >::max() - value.first);
+  bool underflow = (value.first < 0 && result < std::numeric_limits< int >::min() - value.first);
   if (overflow || underflow)
   {
     throw std::overflow_error("overflow");
   }
   result += value.first;
-  elems += ' ' + value.second;
+  if (!elems.empty())
+  {
+    elems += " ";
+  }
+  elems += value.second;
 }

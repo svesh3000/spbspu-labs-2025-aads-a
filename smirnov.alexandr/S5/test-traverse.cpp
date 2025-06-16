@@ -3,24 +3,19 @@
 #include <tree/avlTee.hpp>
 #include "key_sum.hpp"
 
-struct SimpleCollector
+BOOST_AUTO_TEST_CASE(test_lnr_traversal)
 {
-  void operator()(const std::pair< const int, std::string > & kv)
-  {
-    keys.push_back(kv.first);
-    values.push_back(kv.second);
-  }
-  std::vector< int > keys;
-  std::vector< std::string > values;
-};
+    smirnov::AvlTree<int, std::string> tree;
+    tree[5] = "five";
+    tree[3] = "three";
+    tree[7] = "seven";
+    tree[2] = "two";
+    tree[4] = "four";
+    tree[6] = "six";
+    tree[8] = "eight";
 
-BOOST_AUTO_TEST_CASE(test_simple_traversal)
-{
-  smirnov::AvlTree< int, std::string > tree;
-  tree[1] = "one";
-  tree[2] = "two";
-  SimpleCollector collector;
-  tree.traverse_lnr(collector);
-  BOOST_TEST(collector.keys.size() == 2);
-  BOOST_TEST(collector.values.size() == 2);
+    smirnov::KeySum collector;
+    collector = tree.traverse_lnr(collector);
+    BOOST_TEST(collector.result == 35);
+    BOOST_TEST(collector.elems == "two three four five six seven eight");
 }
