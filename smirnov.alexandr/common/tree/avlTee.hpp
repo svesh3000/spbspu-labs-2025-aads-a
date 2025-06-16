@@ -2,9 +2,9 @@
 #define AVL_TREE_HPP
 #include <cstddef>
 #include <stdexcept>
-#include <tree/constIterator.hpp>
 #include <utils/stack.hpp>
 #include <utils/queue.hpp>
+#include "constIterator.hpp"
 
 namespace smirnov
 {
