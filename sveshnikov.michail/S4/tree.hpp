@@ -33,8 +33,8 @@ namespace sveshnikov
     void clear() noexcept;
     void swap(AvlTree &x);
     std::pair< Iter< Key, T >, bool > insert(const std::pair< Key, T > &val); // ok
-    void erase(Iter< Key, T > position);
-    size_t erase(const Key &k);
+    void erase(Iter< Key, T > position) noexcept;                             // ok
+    size_t erase(const Key &k) noexcept;                                      // ok
 
     Iter< Key, T > find(const Key &k);
     ConstIter< Key, T > find(const Key &k) const;
@@ -47,15 +47,15 @@ namespace sveshnikov
     tree_node_t< Key, T > *fake_leaf_;
     size_t size_;
 
-    tree_node_t< Key, T > *getMinNode(tree_node_t< Key, T > *node);     // ok
-    tree_node_t< Key, T > *getMaxNode(tree_node_t< Key, T > *node);     // ok
-    void updateHeight(tree_node_t< Key, T > *node);                     // ok
-    tree_node_t< Key, T > *rotateRight(tree_node_t< Key, T > *node);    // ok
-    tree_node_t< Key, T > *rotateLeft(tree_node_t< Key, T > *node);     // ok
-    tree_node_t< Key, T > *bigRotateRight(tree_node_t< Key, T > *node); // ok
-    tree_node_t< Key, T > *bigRotateLeft(tree_node_t< Key, T > *node);  // ok
-    int getBalanceFactor(tree_node_t< Key, T > *node);                  // ok
-    void balance(tree_node_t< Key, T > *node);                          // ok
+    tree_node_t< Key, T > *getMinNode(tree_node_t< Key, T > *node);                     // ok
+    tree_node_t< Key, T > *getMaxNode(tree_node_t< Key, T > *node);                     // ok
+    void updateHeight(tree_node_t< Key, T > *node);                                     // ok
+    tree_node_t< Key, T > *rotateRight(tree_node_t< Key, T > *node);                    // ok
+    tree_node_t< Key, T > *rotateLeft(tree_node_t< Key, T > *node);                     // ok
+    int getBalanceFactor(tree_node_t< Key, T > *node);                                  // ok
+    void balance(tree_node_t< Key, T > *node);                                          // ok
+    void rebalanceUpwards(tree_node_t< Key, T > *node);                                 // ok
+    void replaceNodeInParent(tree_node_t< Key, T > *node, tree_node_t< Key, T > *repl); // ok
   };
 
   template< class Key, class T, class Cmp >
@@ -168,6 +168,7 @@ namespace sveshnikov
         }
         curr = next;
       }
+
       node->parent_ = curr;
       if (cmp(val.first, curr->data_.first))
       {
@@ -175,19 +176,14 @@ namespace sveshnikov
       }
       else
       {
+        if (curr->right_ && curr->right_->height_ == 0)
+        {
+          fake_leaf_->parent_ = node;
+          node->right_ = fake_leaf_;
+        }
         curr->right_ = node;
       }
-      if (cmp(curr->data_.first, val.first) && curr->right_ && curr->right_->height_ == 0)
-      {
-        fake_leaf_->parent_ = node;
-        node->right_ = fake_leaf_;
-      }
-      while (curr->parent)
-      {
-        updateHeight(curr);
-        balance(curr);
-        curr = curr->parent;
-      }
+      rebalanceUpwards(curr);
     }
     return std::make_pair(Iter< Key, T >(node), true);
   }
@@ -279,24 +275,6 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::bigRotateRight(tree_node_t< Key, T > *node)
-  {
-    assert(node != nullptr);
-    assert(node->left_ != nullptr);
-    node->left_ = rotateLeft(node->left_);
-    return rotateRight(node);
-  }
-
-  template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::bigRotateLeft(tree_node_t< Key, T > *node)
-  {
-    assert(node != nullptr);
-    assert(!node->right_);
-    node->right_ = rotateRight(node->right_);
-    return rotateLeft(node);
-  }
-
-  template< class Key, class T, class Cmp >
   int AvlTree< Key, T, Cmp >::getBalanceFactor(tree_node_t< Key, T > *node)
   {
     size_t left_height = node->left_ ? node->left_->height_ : 0;
@@ -310,35 +288,120 @@ namespace sveshnikov
     int balance_factor = getBalanceFactor(node);
     if (balance_factor > 1)
     {
-      if (getBalanceFactor(node->left_) >= 0)
+      if (getBalanceFactor(node->left_) < 0)
       {
-        rotateRight(node);
+        node->left_ = rotateLeft(node->left_);
       }
-      else
-      {
-        bigRotateRight(node);
-      }
+      node = rotateRight(node);
     }
     else if (balance_factor < -1)
     {
-      if (getBalanceFactor(node->right_) <= 0)
+      if (getBalanceFactor(node->right_) > 0)
       {
-        rotateLeft(node);
+        node->right_ = rotateRight(node->right_);
+      }
+      node = rotateLeft(node);
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::rebalanceUpwards(tree_node_t< Key, T > *node)
+  {
+    while (node->parent_)
+    {
+      updateHeight(node);
+      balance(node);
+      node = node->parent_;
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::replaceNodeInParent(tree_node_t< Key, T > *node,
+      tree_node_t< Key, T > *repl)
+  {
+    if (!node->parent_)
+    {
+      root_ = repl;
+    }
+    else if (node->parent_->left_ == node)
+    {
+      node->parent_->left_ = repl;
+    }
+    else
+    {
+      node->parent_->right_ = repl;
+    }
+
+    if (repl)
+    {
+      repl->parent_ = node->parent_;
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  void AvlTree< Key, T, Cmp >::erase(Iter< Key, T > position) noexcept
+  {
+    tree_node_t< Key, T > *node = position.node_;
+    tree_node_t< Key, T > *balance_start = nullptr;
+    tree_node_t< Key, T > *repl = nullptr;
+
+    if ((!node->right_ || node->right_ == fake_leaf_) && !node->left_)
+    {
+      repl = (node->right_ == fake_leaf_) ? fake_leaf_ : nullptr;
+      balance_start = node->parent_;
+    }
+    else if (node->left_ && node->right_ && node->right_ != fake_leaf_)
+    {
+      repl = getMinNode(node->right_);
+      balance_start = repl->parent_;
+      if (repl != node->right_)
+      {
+        repl->parent_->left_ = repl->right_;
+        if (repl->right_)
+        {
+          repl->right_->parent_ = repl->parent_;
+        }
+        repl->right_ = node->right_;
+        if (repl->right_)
+        {
+          repl->right_->parent_ = repl;
+        }
       }
       else
       {
-        bigRotateLeft(node);
+        balance_start = repl;
+      }
+      repl->left_ = node->left_;
+      if (repl->left_)
+      {
+        repl->left_->parent_ = repl;
       }
     }
-  }
-  /*
-    template< class Key, class T, class Cmp >
-    void AvlTree< Key, T, Cmp >::erase(Iter< Key, T > position)
+    else
     {
-      Iter< Key, T > it = find(val.first);
-      tree_node_t< Key, T > *curr = it.node_;
+      repl = node->left_ ? node->left_ : node->right_;
+      balance_start = node->parent_;
     }
-      */
+
+    replaceNodeInParent(node, repl);
+    delete node;
+    if (balance_start)
+    {
+      rebalanceUpwards(balance_start);
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  size_t AvlTree< Key, T, Cmp >::erase(const Key &k) noexcept
+  {
+    Iter< Key, T > it = find(k);
+    if (it != end())
+    {
+      erase(it);
+      return 1;
+    }
+    return 0;
+  }
 }
 
 #endif
