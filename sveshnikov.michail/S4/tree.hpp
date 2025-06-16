@@ -9,11 +9,11 @@ namespace sveshnikov
   class AvlTree
   {
   public:
-    explicit AvlTree(); // ok
-    AvlTree(const AvlTree &x);
-    AvlTree(AvlTree &&x);
-    AvlTree &operator=(const AvlTree &x);
-    AvlTree &operator=(AvlTree &&x);
+    explicit AvlTree();                   // ok
+    AvlTree(const AvlTree &x);            // ok
+    AvlTree(AvlTree &&x);                 // ok
+    AvlTree &operator=(const AvlTree &x); // ok
+    AvlTree &operator=(AvlTree &&x);      // ok
 
     Iter< Key, T > begin() noexcept;             // ok
     ConstIter< Key, T > begin() const noexcept;  // ok
@@ -64,6 +64,46 @@ namespace sveshnikov
     fake_leaf_(new tree_node_t< Key, T >{}),
     size_(0)
   {}
+
+  template< class Key, class T, class Cmp >
+  AvlTree< Key, T, Cmp >::AvlTree(const AvlTree &x):
+    AvlTree()
+  {
+    for (auto it = x.cbegin(); it != x.cend(); it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< class Key, class T, class Cmp >
+  AvlTree< Key, T, Cmp >::AvlTree(AvlTree &&x):
+    root_(x.root_),
+    fake_leaf_(x.fake_leaf_),
+    size_(x.size_)
+  {
+    x.root_ = nullptr;
+    x.fake_leaf_ = nullptr;
+    x.size_ = 0;
+  }
+
+  template< class Key, class T, class Cmp >
+  AvlTree< Key, T, Cmp > &AvlTree< Key, T, Cmp >::operator=(const AvlTree &x)
+  {
+    if (this != &x)
+    {
+      AvlTree rhs(x);
+      swap(rhs);
+    }
+    return *this;
+  }
+
+  template< class Key, class T, class Cmp >
+  AvlTree< Key, T, Cmp > &AvlTree< Key, T, Cmp >::operator=(AvlTree &&x)
+  {
+    clear();
+    swap(x);
+    return *this;
+  }
 
   template< class Key, class T, class Cmp >
   tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMinNode(tree_node_t< Key, T > *node)
