@@ -9,36 +9,36 @@ namespace sveshnikov
   class AvlTree
   {
   public:
-    explicit AvlTree();                   // ok
-    AvlTree(const AvlTree &x);            // ok
-    AvlTree(AvlTree &&x);                 // ok
-    AvlTree &operator=(const AvlTree &x); // ok
-    AvlTree &operator=(AvlTree &&x);      // ok
+    explicit AvlTree();
+    AvlTree(const AvlTree &x);
+    AvlTree(AvlTree &&x);
+    AvlTree &operator=(const AvlTree &x);
+    AvlTree &operator=(AvlTree &&x);
 
-    Iter< Key, T > begin() noexcept;             // ok
-    ConstIter< Key, T > begin() const noexcept;  // ok
-    ConstIter< Key, T > cbegin() const noexcept; // ok
-    Iter< Key, T > end() noexcept;               // ok
-    ConstIter< Key, T > end() const noexcept;    // ok
-    ConstIter< Key, T > cend() const noexcept;   // ok
+    Iter< Key, T > begin() noexcept;
+    ConstIter< Key, T > begin() const noexcept;
+    ConstIter< Key, T > cbegin() const noexcept;
+    Iter< Key, T > end() noexcept;
+    ConstIter< Key, T > end() const noexcept;
+    ConstIter< Key, T > cend() const noexcept;
 
-    size_t size() const noexcept; // ok
-    bool empty() const noexcept;  // ok
+    size_t size() const noexcept;
+    bool empty() const noexcept;
 
-    T &operator[](const Key &k);     // ok
-    T &at(const Key &k);             // ok
-    const T &at(const Key &k) const; // ok
+    T &operator[](const Key &k);
+    T &at(const Key &k);
+    const T &at(const Key &k) const;
 
-    void clear() noexcept;                                                    // ok
-    void swap(AvlTree &x);                                                    // ok
-    std::pair< Iter< Key, T >, bool > insert(const std::pair< Key, T > &val); // ok
-    void erase(Iter< Key, T > position) noexcept;                             // ok
-    size_t erase(const Key &k) noexcept;                                      // ok
+    void clear() noexcept;
+    void swap(AvlTree &x) noexcept;
+    std::pair< Iter< Key, T >, bool > insert(const std::pair< Key, T > &val);
+    void erase(Iter< Key, T > position) noexcept;
+    size_t erase(const Key &k) noexcept;
 
     Iter< Key, T > find(const Key &k);
     ConstIter< Key, T > find(const Key &k) const;
-    pair< ConstIter< Key, T >, ConstIter< Key, T > > equal_range(const Key &k) const;
-    pair< Iter< Key, T >, Iter< Key, T > > equal_range(const Key &k);
+    std::pair< ConstIter< Key, T >, ConstIter< Key, T > > equal_range(const Key &k) const;
+    std::pair< Iter< Key, T >, Iter< Key, T > > equal_range(const Key &k);
     size_t count(const Key &k) const;
 
   private:
@@ -46,16 +46,16 @@ namespace sveshnikov
     tree_node_t< Key, T > *fake_leaf_;
     size_t size_;
 
-    tree_node_t< Key, T > *getMinNode(tree_node_t< Key, T > *node);                     // ok
-    tree_node_t< Key, T > *getMaxNode(tree_node_t< Key, T > *node);                     // ok
-    void clearRecursive(tree_node_t< Key, T > *node) noexcept;                          // ok
-    void updateHeight(tree_node_t< Key, T > *node);                                     // ok
-    tree_node_t< Key, T > *rotateRight(tree_node_t< Key, T > *node);                    // ok
-    tree_node_t< Key, T > *rotateLeft(tree_node_t< Key, T > *node);                     // ok
-    int getBalanceFactor(tree_node_t< Key, T > *node);                                  // ok
-    void balance(tree_node_t< Key, T > *node);                                          // ok
-    void rebalanceUpwards(tree_node_t< Key, T > *node);                                 // ok
-    void replaceNodeInParent(tree_node_t< Key, T > *node, tree_node_t< Key, T > *repl); // ok
+    tree_node_t< Key, T > *getMinNode(tree_node_t< Key, T > *node) const noexcept;
+    tree_node_t< Key, T > *getMaxNode(tree_node_t< Key, T > *node) const noexcept;
+    void clear(tree_node_t< Key, T > *node) noexcept;
+    void updateHeight(tree_node_t< Key, T > *node) noexcept;
+    tree_node_t< Key, T > *rotateRight(tree_node_t< Key, T > *node) noexcept;
+    tree_node_t< Key, T > *rotateLeft(tree_node_t< Key, T > *node) noexcept;
+    int getBalanceFactor(tree_node_t< Key, T > *node) const noexcept;
+    void balance(tree_node_t< Key, T > *node) noexcept;
+    void rebalanceUpwards(tree_node_t< Key, T > *node) noexcept;
+    tree_node_t< Key, T > *equal_range_impl(const Key &k) const noexcept;
   };
 
   template< class Key, class T, class Cmp >
@@ -106,7 +106,8 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMinNode(tree_node_t< Key, T > *node)
+  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMinNode(
+      tree_node_t< Key, T > *node) const noexcept
   {
     if (node == nullptr)
     {
@@ -138,7 +139,8 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMaxNode(tree_node_t< Key, T > *node)
+  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::getMaxNode(
+      tree_node_t< Key, T > *node) const noexcept
   {
     while (node->right_->height_ != 0)
     {
@@ -221,7 +223,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::clearRecursive(tree_node_t< Key, T > *node) noexcept
+  void AvlTree< Key, T, Cmp >::clear(tree_node_t< Key, T > *node) noexcept
   {
     if (node && node != fake_leaf_)
     {
@@ -232,7 +234,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::swap(AvlTree &x)
+  void AvlTree< Key, T, Cmp >::swap(AvlTree &x) noexcept
   {
     std::swap(root_, x.root_);
     std::swap(fake_leaf_, x.fake_leaf_);
@@ -291,7 +293,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::updateHeight(tree_node_t< Key, T > *node)
+  void AvlTree< Key, T, Cmp >::updateHeight(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
     assert(node->height_ != 0);
@@ -301,7 +303,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateRight(tree_node_t< Key, T > *node)
+  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateRight(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
     assert(node->left_ != nullptr);
@@ -339,7 +341,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateLeft(tree_node_t< Key, T > *node)
+  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::rotateLeft(tree_node_t< Key, T > *node) noexcept
   {
     assert(node != nullptr);
     assert(node->right_ != nullptr);
@@ -377,7 +379,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  int AvlTree< Key, T, Cmp >::getBalanceFactor(tree_node_t< Key, T > *node)
+  int AvlTree< Key, T, Cmp >::getBalanceFactor(tree_node_t< Key, T > *node) const noexcept
   {
     size_t left_height = node->left_ ? node->left_->height_ : 0;
     size_t right_height = node->right_ ? node->right_->height_ : 0;
@@ -385,7 +387,7 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::balance(tree_node_t< Key, T > *node)
+  void AvlTree< Key, T, Cmp >::balance(tree_node_t< Key, T > *node) noexcept
   {
     int balance_factor = getBalanceFactor(node);
     if (balance_factor > 1)
@@ -407,36 +409,13 @@ namespace sveshnikov
   }
 
   template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::rebalanceUpwards(tree_node_t< Key, T > *node)
+  void AvlTree< Key, T, Cmp >::rebalanceUpwards(tree_node_t< Key, T > *node) noexcept
   {
     while (node->parent_)
     {
       updateHeight(node);
       balance(node);
       node = node->parent_;
-    }
-  }
-
-  template< class Key, class T, class Cmp >
-  void AvlTree< Key, T, Cmp >::replaceNodeInParent(tree_node_t< Key, T > *node,
-      tree_node_t< Key, T > *repl)
-  {
-    if (!node->parent_)
-    {
-      root_ = repl;
-    }
-    else if (node->parent_->left_ == node)
-    {
-      node->parent_->left_ = repl;
-    }
-    else
-    {
-      node->parent_->right_ = repl;
-    }
-
-    if (repl)
-    {
-      repl->parent_ = node->parent_;
     }
   }
 
@@ -485,7 +464,23 @@ namespace sveshnikov
       balance_start = node->parent_;
     }
 
-    replaceNodeInParent(node, repl);
+    if (!node->parent_)
+    {
+      root_ = repl;
+    }
+    else if (node->parent_->left_ == node)
+    {
+      node->parent_->left_ = repl;
+    }
+    else
+    {
+      node->parent_->right_ = repl;
+    }
+    if (repl)
+    {
+      repl->parent_ = node->parent_;
+    }
+
     delete node;
     if (balance_start)
     {
@@ -503,6 +498,81 @@ namespace sveshnikov
       return 1;
     }
     return 0;
+  }
+
+  template< class Key, class T, class Cmp >
+  tree_node_t< Key, T > *AvlTree< Key, T, Cmp >::equal_range_impl(const Key &k) const noexcept
+  {
+    tree_node_t< Key, T > *curr = root_;
+    tree_node_t< Key, T > *next = nullptr;
+    while (curr && curr != fake_leaf_)
+    {
+      if (cmp(k, curr->data_.first))
+      {
+        next = curr;
+        curr = curr->left_;
+      }
+      else if (cmp(curr->data_.first, k))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        next = curr;
+        break;
+      }
+    }
+    return next;
+  }
+
+  template< class Key, class T, class Cmp >
+  std::pair< ConstIter< Key, T >, ConstIter< Key, T > > AvlTree< Key, T, Cmp >::equal_range(
+      const Key &k) const
+  {
+    const tree_node_t< Key, T > *node = equal_range_impl(k);
+    if (!node)
+    {
+      return {cend(), cend()};
+    }
+    ConstIter< Key, T > it(node);
+    ConstIter< Key, T > next = it;
+    ++next;
+    return (!cmp(k, it->first) && !cmp(it->first, k)) ? {it, next} : {it, it};
+  }
+
+  template< class Key, class T, class Cmp >
+  std::pair< Iter< Key, T >, Iter< Key, T > > AvlTree< Key, T, Cmp >::equal_range(const Key &k)
+  {
+    tree_node_t< Key, T > *node = equal_range_impl(k);
+    if (!node)
+    {
+      return {end(), end()};
+    }
+    Iter< Key, T > it(node);
+    Iter< Key, T > next = it;
+    ++next;
+    return (!cmp(k, it->first) && !cmp(it->first, k)) ? {it, next} : {it, it};
+  }
+
+  template< class Key, class T, class Cmp >
+  Iter< Key, T > AvlTree< Key, T, Cmp >::find(const Key &k)
+  {
+    std::pair< Iter, Iter > it_pair = equal_range(k);
+    return (it_pair.first == it_pair.second) ? end() : it_pair.first;
+  }
+
+  template< class Key, class T, class Cmp >
+  ConstIter< Key, T > AvlTree< Key, T, Cmp >::find(const Key &k) const
+  {
+    std::pair< ConstIter, ConstIter > it_pair = equal_range(k);
+    return (it_pair.first == it_pair.second) ? end() : it_pair.first;
+  }
+
+  template< class Key, class T, class Cmp >
+  size_t AvlTree< Key, T, Cmp >::count(const Key &k) const
+  {
+    std::pair< ConstIter, ConstIter > it_pair = equal_range(k);
+    return (it_pair.first == it_pair.second) ? 0 : 1;
   }
 }
 
