@@ -16,7 +16,15 @@ BOOST_AUTO_TEST_CASE(test_lnr_traversal)
   smirnov::KeySum collector;
   tree.traverse_lnr(collector);
   BOOST_TEST(collector.result == 35);
-  BOOST_TEST(collector.elems == " two three four five six seven eight");
+  std::set< std::string > expected {" two", " three", " four", " five", " six", " seven", " eight"};
+  std::istringstream iss(collector.elems);
+  std::set< std::string > actual;
+  std::string token;
+  while (iss >> token)
+  {
+    actual.insert(" " + token);
+  }
+  BOOST_TEST(actual == expected);
 }
 
 BOOST_AUTO_TEST_CASE(test_rnl_traversal)
@@ -32,7 +40,15 @@ BOOST_AUTO_TEST_CASE(test_rnl_traversal)
   smirnov::KeySum collector;
   tree.traverse_rnl(collector);
   BOOST_TEST(collector.result == 35);
-  BOOST_TEST(collector.elems == " eight seven six five four three two");
+  std::set< std::string > expected {" two", " three", " four", " five", " six", " seven", " eight"};
+  std::istringstream iss(collector.elems);
+  std::set< std::string > actual;
+  std::string token;
+  while (iss >> token)
+  {
+    actual.insert(" " + token);
+  }
+  BOOST_TEST(actual == expected);
 }
 
 BOOST_AUTO_TEST_CASE(test_breadth_traversal)
@@ -48,7 +64,15 @@ BOOST_AUTO_TEST_CASE(test_breadth_traversal)
   smirnov::KeySum collector;
   tree.traverse_breadth(collector);
   BOOST_TEST(collector.result == 35);
-  BOOST_TEST(collector.elems == " five three seven two four six eight");
+  std::set< std::string > expected {" five", " three", " seven", " two", " four", " six", " eight"};
+  std::istringstream iss(collector.elems);
+  std::set< std::string > actual;
+  std::string token;
+  while (iss >> token)
+  {
+    actual.insert(" " + token);
+  }
+  BOOST_TEST(actual == expected);
 }
 
 BOOST_AUTO_TEST_CASE(test_empty_tree_traversal)

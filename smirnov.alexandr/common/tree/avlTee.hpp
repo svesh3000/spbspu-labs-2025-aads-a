@@ -396,7 +396,7 @@ namespace smirnov
       }
       current = stack.top();
       stack.pop();
-      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
+      f(current->data);
       current = current->right;
     }
     return f;
@@ -417,7 +417,7 @@ namespace smirnov
       }
       current = stack.top();
       stack.pop();
-      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
+      f(current->data);
       current = current->left;
     }
     return f;
@@ -437,7 +437,7 @@ namespace smirnov
     {
       Node< Key, Value > * current = q.front();
       q.pop();
-      f(std::pair< const Key &, Value & >(current->data.first, current->data.second));
+      f(current->data);
       if (current->left != nullptr)
       {
         q.push(current->left);
