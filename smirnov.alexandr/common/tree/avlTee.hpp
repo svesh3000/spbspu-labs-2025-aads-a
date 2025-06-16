@@ -2,9 +2,9 @@
 #define AVL_TREE_HPP
 #include <cstddef>
 #include <stdexcept>
-#include <stack>
-#include <queue>
-#include "constIterator.hpp"
+#include <tree/constIterator.hpp>
+#include <utils/stack.hpp>
+#include <utils/queue.hpp>
 
 namespace smirnov
 {
@@ -384,7 +384,7 @@ namespace smirnov
   template < typename F >
   F AvlTree< Key, Value, Compare >::traverse_lnr(F f) const
   {
-    std::stack< Node< Key, Value > * > stack;
+    Stack< Node< Key, Value > * > stack;
     Node< Key, Value > * current = root_;
     while (current != nullptr || !stack.empty())
     {
@@ -393,8 +393,7 @@ namespace smirnov
         stack.push(current);
         current = current->left;
       }
-      current = stack.top();
-      stack.pop();
+      current = stack.drop();
       f(current->data);
       current = current->right;
     }
@@ -405,7 +404,7 @@ namespace smirnov
   template < typename F >
   F AvlTree< Key, Value, Compare >::traverse_rnl(F f) const
   {
-    std::stack< Node< Key, Value > * > stack;
+    Stack< Node< Key, Value > * > stack;
     Node< Key, Value > * current = root_;
     while (current != nullptr || !stack.empty())
     {
@@ -414,8 +413,7 @@ namespace smirnov
         stack.push(current);
         current = current->right;
       }
-      current = stack.top();
-      stack.pop();
+      current = stack.drop();
       f(current->data);
       current = current->left;
     }
@@ -430,12 +428,11 @@ namespace smirnov
     {
       return f;
     }
-    std::queue< Node< Key, Value > * > q;
+    Queue< Node< Key, Value > * > q;
     q.push(root_);
     while (!q.empty())
     {
-      Node< Key, Value > * current = q.front();
-      q.pop();
+      Node< Key, Value > * current = q.drop();
       f(current->data);
       if (current->left != nullptr)
       {
