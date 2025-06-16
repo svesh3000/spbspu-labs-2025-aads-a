@@ -60,7 +60,7 @@ void duhanina::Graph::removeEdge(const Vertex& from, const Vertex& to, Weight we
   }
 }
 
-duhanina::Tree< duhanina::Graph::Vertex, duhanina::Graph::WeightsList, std::less< std::string > > duhanina::Graph::getOutbound(const Vertex& from) const
+duhanina::Tree< std::string, duhanina::Graph::WeightsList, std::less< std::string > > duhanina::Graph::getOutbound(const Vertex& from) const
 {
   Tree< Vertex, WeightsList, std::less< std::string > > result;
   for (auto eit = edges.cbegin(); eit != edges.cend(); ++eit)
@@ -74,7 +74,7 @@ duhanina::Tree< duhanina::Graph::Vertex, duhanina::Graph::WeightsList, std::less
   return result;
 }
 
-duhanina::Tree< duhanina::Graph::Vertex, duhanina::Graph::WeightsList, std::less< std::string > > duhanina::Graph::getInbound(const Vertex& to) const
+duhanina::Tree< std::string, duhanina::Graph::WeightsList, std::less< std::string > > duhanina::Graph::getInbound(const Vertex& to) const
 {
   Tree< Vertex, WeightsList, std::less< std::string > > result;
   for (auto eit = edges.cbegin(); eit != edges.cend(); ++eit)
