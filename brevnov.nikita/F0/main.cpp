@@ -40,9 +40,11 @@ int main(int argc, char** argv)
   commands.insert(std::make_pair("Transfer", std::bind(transfer, std::ref(std::cin), std::ref(std::cout), std::ref(league))));
   commands.insert(std::make_pair("StartTeam", std::bind(startTeam, std::ref(std::cin), std::ref(std::cout), std::ref(league))));
   commands.insert(std::make_pair("ViewPlayer", std::bind(viewPlayer, std::ref(std::cin), std::ref(std::cout), std::ref(league))));
-  commands.insert(std::make_pair("ViewTeamPosition", std::bind(viewTeamPosition, std::ref(std::cin), std::ref(std::cout), std::ref(league))));
+  commands.insert(std::make_pair("ViewTeamPosition", std::bind(viewTeamPosition, std::ref(std::cin),
+    std::ref(std::cout), std::ref(league))));
   commands.insert(std::make_pair("ViewMarket", std::bind(viewMarket, std::ref(std::cout), std::ref(league))));
-  commands.insert(std::make_pair("ViewMarketPosition", std::bind(viewMarketPosition, std::ref(std::cin), std::ref(std::cout), std::ref(league))));
+  commands.insert(std::make_pair("ViewMarketPosition", std::bind(viewMarketPosition, std::ref(std::cin),
+    std::ref(std::cout), std::ref(league))));
   std::string command;
   while (std::cin >> command)
   {
