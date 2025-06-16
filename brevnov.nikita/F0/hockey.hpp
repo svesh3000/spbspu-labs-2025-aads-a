@@ -42,6 +42,7 @@ namespace brevnov
     }
     return Position::CF;
   }
+
   struct Player
   {
     Player(std::string pos, size_t raiting, size_t price):
@@ -66,22 +67,22 @@ namespace brevnov
     AVLTree< std::string, Player > players_;
     size_t budget_;
   };
-  
+
   struct League
   {
     AVLTree< std::string, Player > fa_;
     AVLTree< std::string, Team > teams_;
   };
 
-  inline std::ostream& operator<<(std::ostream& os, const Player& player) 
+  inline std::ostream& operator<<(std::ostream& os, const Player& player)
   {
     switch (player.position_)
     {
       case Position::CF:
-        os << "Center Forward "; 
+        os << "Center Forward ";
         break;
       case Position::RF:
-        os << "Right Forward "; 
+        os << "Right Forward ";
         break;
       case Position::LF:
         os << "Left Forward ";
