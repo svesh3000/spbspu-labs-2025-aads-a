@@ -3,6 +3,11 @@
 
 void duhanina::inputGraphs(std::istream& in, MapOfGraphs& graphs)
 {
+  if (graphs.empty())
+  {
+    out << "\n";
+    return;
+  }
   std::string name;
   size_t edgeCount;
   while (in >> name >> edgeCount)
@@ -41,6 +46,11 @@ void duhanina::printVertexesNames(std::ostream& out, std::istream& in, const Map
     throw std::invalid_argument("Invalid command");
   }
   List< Graph::Vertex > vertices = it->second.getVertices();
+  if (vertices.empty())
+  {
+    out << "\n";
+    return;
+  }
   for (auto vit = vertices.begin(); vit != vertices.end(); ++vit)
   {
     out << *vit << "\n";
