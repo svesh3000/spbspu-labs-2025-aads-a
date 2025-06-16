@@ -193,7 +193,7 @@ namespace sveshnikov
     Iter< Key, T > it = find(k);
     if (it == end())
     {
-      it = insert(std::make_pair(k, T()));
+      it = insert(std::make_pair(k, T())).first;
     }
     return it->second;
   }
@@ -480,6 +480,7 @@ namespace sveshnikov
     }
 
     delete node;
+    size_--;
     if (balance_start)
     {
       rebalanceUpwards(balance_start);
