@@ -77,32 +77,32 @@ namespace
     return sPos;
   }
 
-  using Iter = brevnov::Iterator< std::string, brevnov::Player, std::less< std::string >, false>;
-  size_t sumRaiting(Iter pl1, Iter pl2, Iter pl3, Iter pl4, Iter pl5, Iter pl6)
+  void buyP(std::ostream& out, brevnov::League& league, brevnov::Team& club, size_t bud, brevnov::Position sPos)
   {
-    size_t result = (*pl1).second.raiting_ + (*pl2).second.raiting_ + (*pl3).second.raiting_;
-    result += (*pl4).second.raiting_ + (*pl5).second.raiting_ + (*pl6).second.raiting_;
-    return result;
-  }
-
-  size_t sumPrice(Iter pl1, Iter pl2, Iter pl3, Iter pl4, Iter pl5, Iter pl6)
-  {
-    size_t result = (*pl1).second.price_ + (*pl2).second.price_ + (*pl3).second.price_;
-    result += (*pl4).second.price_ + (*pl5).second.price_ + (*pl6).second.price_;
-    return result;
-  }
-
-  bool everyPosCheck(Iter pl1, Iter pl2, Iter pl3, Iter pl4, Iter pl5, Iter pl6)
-  {
-    return (*pl1).second.position_ == brevnov::Position::LF && (*pl2).second.position_ == brevnov::Position::RF
-      && (*pl3).second.position_ == brevnov::Position::CF && (*pl4).second.position_ == brevnov::Position::LB
-      && (*pl5).second.position_ == brevnov::Position::RB && (*pl6).second.position_ == brevnov::Position::G;
-  }
-
-  bool checkBuyTeam(Iter pl1, Iter pl2, Iter pl3, Iter pl4, Iter pl5, Iter pl6, size_t rait, size_t bud)
-  {
-    return everyPosCheck(pl1, pl2, pl3, pl4, pl5, pl6) && sumRaiting(pl1, pl2, pl3, pl4, pl5, pl6) > rait
-      && sumPrice(pl1, pl2, pl3, pl4, pl5, pl6) <= bud;
+    auto pl = league.fa_.begin();
+    auto maxpl = league.fa_.end();
+    size_t rait = 0;
+    while (pl != league.fa_.end())
+    {
+      brevnov::Player& p = (*pl).second;
+      if (p.position_ == sPos && p.price_ <= bud && p.raiting_ > rait)
+      {
+        maxpl = pl;
+        rait = p.raiting_;
+      }
+      pl++;
+    }
+    if (rait != 0)
+    {
+      club.budget_ -= (*maxpl).second.price_;
+      out << "Bought " << (*maxpl).first << " " << (*maxpl).second << "\n";
+      club.players_.insert((*maxpl));
+      league.fa_.erase(maxpl);
+    }
+    else
+    {
+      out << "Player not found!\n";
+    }
   }
 }
 
@@ -313,30 +313,7 @@ void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
     }
     else
     {
-      auto pl = league.fa_.begin();
-      auto maxpl = league.fa_.end();
-      size_t rait = 0;
-      while (pl != league.fa_.end())
-      {
-        Player& p = (*pl).second;
-        if (p.position_ == sPos && p.price_ <= bud && p.raiting_ > rait)
-        {
-          maxpl = pl;
-          rait = p.raiting_;
-        }
-        pl++;
-      }
-      if (rait != 0)
-      {
-        club.budget_ -= (*maxpl).second.price_;
-        out << "Bought " << (*maxpl).first << " " << (*maxpl).second << "\n";
-        club.players_.insert((*maxpl));
-        league.fa_.erase(maxpl);
-      }
-      else
-      {
-        out << "Player not found!\n";
-      }
+      buyP(out, league, club, bud, sPos);
     }
   }
   else
@@ -365,77 +342,12 @@ void brevnov::buyTeam(std::istream& in, std::ostream& out, League& league)
     }
     else
     {
-      auto pl1 = league.fa_.begin();
-      auto pl2 = league.fa_.begin();
-      auto pl3 = league.fa_.begin();
-      auto pl4 = league.fa_.begin();
-      auto pl5 = league.fa_.begin();
-      auto pl6 = league.fa_.begin();
-      auto maxpl1 = pl1;
-      auto maxpl2 = pl2;
-      auto maxpl3 = pl3;
-      auto maxpl4 = pl4;
-      auto maxpl5 = pl5;
-      auto maxpl6 = pl6;
-      size_t rait = 0;
-      while (pl1 != club.players_.end())
-      {
-        pl2 = club.players_.begin();
-        while (pl2 != club.players_.end())
-        {
-          pl3 = club.players_.begin();
-          while (pl3 != club.players_.end())
-          {
-            pl4 = club.players_.begin();
-            while (pl4 != club.players_.end())
-            {
-              pl5 = club.players_.begin();
-              while (pl5 != club.players_.end())
-              {
-                while (pl6 != club.players_.end())
-                {
-                  if (checkBuyTeam(pl1, pl2, pl3, pl4, pl5, pl6, rait, bud))
-                  {
-                    maxpl1 = pl1;
-                    maxpl2 = pl2;
-                    maxpl3 = pl3;
-                    maxpl4 = pl4;
-                    maxpl5 = pl5;
-                    maxpl6 = pl6;
-                    rait = sumRaiting(pl1, pl2, pl3, pl4, pl5, pl6);
-                  }
-                  pl6++;
-                }
-                pl5++;
-              }
-              pl4++;
-            }
-            pl3++;
-          }
-          pl2++;
-        }
-        pl1++;
-      }
-      club.budget_ -= sumPrice(maxpl1, maxpl2, maxpl3, maxpl4, maxpl5, maxpl6);
-      out << "Bought: for " << sumPrice(maxpl1, maxpl2, maxpl3, maxpl4, maxpl5, maxpl6) << "\n";
-      out << (*maxpl1).first << " " << (*maxpl1).second << "\n";
-      out << (*maxpl2).first << " " << (*maxpl2).second << "\n";
-      out << (*maxpl3).first << " " << (*maxpl3).second << "\n";
-      out << (*maxpl4).first << " " << (*maxpl4).second << "\n";
-      out << (*maxpl5).first << " " << (*maxpl5).second << "\n";
-      out << (*maxpl6).first << " " << (*maxpl6).second << "\n";
-      club.players_.insert(*maxpl1);
-      club.players_.insert(*maxpl2);
-      club.players_.insert(*maxpl3);
-      club.players_.insert(*maxpl4);
-      club.players_.insert(*maxpl5);
-      club.players_.insert(*maxpl6);
-      league.fa_.erase(maxpl1);
-      league.fa_.erase(maxpl2);
-      league.fa_.erase(maxpl3);
-      league.fa_.erase(maxpl4);
-      league.fa_.erase(maxpl5);
-      league.fa_.erase(maxpl6);
+      buyP(out, league, club, bud / 6, Position::LF);
+      buyP(out, league, club, bud / 6, Position::RF);
+      buyP(out, league, club, bud / 6, Position::CF);
+      buyP(out, league, club, bud / 6, Position::LB);
+      buyP(out, league, club, bud / 6, Position::RB);
+      buyP(out, league, club, bud / 6, Position::G);
     }
   }
   else
