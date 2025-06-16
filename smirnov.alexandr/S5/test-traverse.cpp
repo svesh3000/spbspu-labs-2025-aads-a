@@ -1,7 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include <tree/avlTee.hpp>
-#include <utils/stack.hpp>
-#include <utils/queue.hpp>
 
 struct TestData
 {
