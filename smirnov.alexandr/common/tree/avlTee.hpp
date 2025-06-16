@@ -387,7 +387,7 @@ namespace smirnov
   {
     std::stack< Node< Key, Value > * > stack;
     Node< Key, Value > * current = root_;
-    while (current != nillptr || !stack.empty())
+    while (current != nullptr || !stack.empty())
     {
       while (current != nullptr)
       {
