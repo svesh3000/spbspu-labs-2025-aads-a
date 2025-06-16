@@ -65,7 +65,6 @@ namespace bocharov
     cIter cbegin() const noexcept;
     Iter end() const noexcept;
     cIter cend() const noexcept;
-//////
 
     LnrIterator lnrBegin();
     ConstLnrIterator lnrCbegin() const;
@@ -89,7 +88,6 @@ namespace bocharov
     template< typename F >
     F traverse_breadth(F f) const;
 
-//////
     size_t size() const noexcept;
     bool empty() const noexcept;
     void clear() noexcept;
@@ -764,7 +762,6 @@ namespace bocharov
     return std::make_pair(lower_bound(key), upper_bound(key));
   }
 
-/////
   template< typename Key, typename T, typename Cmp >
   typename Tree< Key, T, Cmp>::LnrIterator Tree< Key, T, Cmp >::lnrBegin()
   {
