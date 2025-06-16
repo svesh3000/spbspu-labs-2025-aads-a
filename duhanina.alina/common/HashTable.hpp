@@ -4,21 +4,25 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
-#include <array.hpp>
+#include "array.hpp"
 #include "prime.hpp"
-#include "iterator.hpp"
+#include "bucket.hpp"
+#include "iteratorHash.hpp"
 
 namespace duhanina
 {
+  template <typename Key, typename Value, typename Hash, typename Equal, bool isConst>
+  class IteratorHash;
+
   template < class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   class HashTable
   {
+    friend class IteratorHash< Key, Value, Hash, Equal, true >;
+    friend class IteratorHash< Key, Value, Hash, Equal, false >;
   public:
-    template < bool IsConst >
-    class Iterator;
 
-    using iterator = Iterator< false >;
-    using const_iterator = Iterator< true >;
+    using iterator = IteratorHash< Key, Value, Hash, Equal, false >;
+    using const_iterator = IteratorHash< Key, Value, Hash, Equal, true >;
 
     HashTable();
 
@@ -40,9 +44,9 @@ namespace duhanina
     template < typename InputIt >
     void insert(InputIt first, InputIt last);
 
-    iterator erase(const_iterator pos) noexcept;
+    iterator erase(iterator pos) noexcept;
     size_t erase(const Key& key) noexcept;
-    iterator erase(const_iterator first, const_iterator last) noexcept;
+    iterator erase(iterator first, iterator last) noexcept;
 
     template < typename K, typename V >
     std::pair< iterator, bool > emplace(K&& key, V&& value);
@@ -59,14 +63,8 @@ namespace duhanina
     void rehashFactor(size_t count);
 
   private:
-    struct Bucket
-    {
-      std::pair< Key, Value > data;
-      bool occupied = false;
-      bool deleted = false;
-    };
 
-    DynamicArray< Bucket > buckets_;
+    DynamicArray< Bucket< Key, Value > > buckets_;
     size_t size_ = 0;
     float max_load_factor_ = 0.75;
     Hash hasher_;
@@ -87,7 +85,7 @@ namespace duhanina
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t new_capacity)
   {
     new_capacity = next_prime(new_capacity);
-    DynamicArray< Bucket > new_buckets(new_capacity);
+    DynamicArray< Bucket < Key, Value > > new_buckets(new_capacity);
     for (size_t i = 0; i < buckets_.size(); ++i)
     {
       if (buckets_[i].occupied && !buckets_[i].deleted)
@@ -124,25 +122,25 @@ namespace duhanina
   template < class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::begin() noexcept
   {
-    return iterator(buckets_.data(), buckets_.data() + buckets_.size());
+    return iterator(buckets_.data_, buckets_.data_ + buckets_.size());
   }
 
   template < class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::end() noexcept
   {
-    return iterator(buckets_.data() + buckets_.size(), buckets_.data() + buckets_.size());
+    return iterator(buckets_.data_ + buckets_.size(), buckets_.data_ + buckets_.size());
   }
 
   template < class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::const_iterator HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
   {
-    return const_iterator(buckets_.data(), buckets_.data() + buckets_.size());
+    return const_iterator(buckets_.data_, buckets_.data_ + buckets_.size());
   }
 
   template < class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::const_iterator HashTable< Key, Value, Hash, Equal >::cend() const noexcept
   {
-    return const_iterator(buckets_.data() + buckets_.size(), buckets_.data() + buckets_.size());
+    return const_iterator(buckets_.data_ + buckets_.size(), buckets_.data_ + buckets_.size());
   }
 
   template < class Key, class Value, class Hash, class Equal >
@@ -193,10 +191,10 @@ namespace duhanina
   template < class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::clear() noexcept
   {
-    for (auto& bucket: buckets_)
+    for (size_t i = 0; i < buckets_.size(); ++i)
     {
-      bucket.occupied = false;
-      bucket.deleted = false;
+      buckets_[i].occupied = false;
+      buckets_[i].deleted = false;
     }
     size_ = 0;
   }
@@ -242,9 +240,9 @@ namespace duhanina
           buckets_[index].occupied = true;
           buckets_[index].deleted = false;
           ++size_;
-          return { iterator(buckets_.data() + index, buckets_.data() + buckets_.size()), true };
+          return { iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size()), true };
         }
-        return { iterator(buckets_.data() + index, buckets_.data() + buckets_.size()), false };
+        return { iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size()), false };
       }
       if (buckets_[index].deleted && first_deleted == buckets_.size())
       {
@@ -261,11 +259,11 @@ namespace duhanina
     buckets_[index].occupied = true;
     buckets_[index].deleted = false;
     ++size_;
-    return { iterator(buckets_.data() + index, buckets_.data() + buckets_.size()), true };
+    return { iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size()), true };
   }
 
   template < class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::erase(const_iterator pos) noexcept
+  typename HashTable< Key, Value, Hash, Equal >::iterator HashTable< Key, Value, Hash, Equal >::erase(iterator pos) noexcept
   {
     if (pos == end())
     {
@@ -275,7 +273,7 @@ namespace duhanina
     buckets_[index].occupied = false;
     buckets_[index].deleted = true;
     --size_;
-    return iterator(buckets_.data() + index, buckets_.data() + buckets_.size());
+    return iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size());
   }
 
   template < class Key, class Value, class Hash, class Equal >
@@ -292,7 +290,7 @@ namespace duhanina
 
   template < class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::iterator
-  HashTable< Key, Value, Hash, Equal >::erase(const_iterator first, const_iterator last) noexcept
+  HashTable< Key, Value, Hash, Equal >::erase(iterator first, iterator last) noexcept
   {
     iterator result = end();
     if (first == last)
@@ -332,7 +330,7 @@ namespace duhanina
     {
       if (buckets_[index].occupied && key_equal_(buckets_[index].data.first, key))
       {
-        return iterator(buckets_.data() + index, buckets_.data() + buckets_.size());
+        return iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size());
       }
       ++i;
       index = probe(hash, i);
@@ -350,7 +348,7 @@ namespace duhanina
   {
     if (empty())
     {
-      return end();
+      return cend();
     }
     size_t hash = hasher_(key) % buckets_.size();
     size_t i = 0;
@@ -360,7 +358,7 @@ namespace duhanina
     {
       if (buckets_[index].occupied && key_equal_(buckets_[index].data.first, key))
       {
-        return const_iterator(buckets_.data() + index, buckets_.data() + buckets_.size());
+        return const_iterator(buckets_.data_ + index, buckets_.data_ + buckets_.size());
       }
       ++i;
       index = probe(hash, i);
