@@ -4,20 +4,21 @@
 namespace brevnov
 {
   bool checkPosition(std::string pos);
-  void addNewPlayer(std::istream&, std::ostream&, League&);
-  void addTeam(std::istream&, std::ostream&, League&);
-  void deleteTeam(std::istream&, std::ostream&, League&);
-  void endCareer(std::istream&, std::ostream&, League&);
-  void updateRating(std::istream&, std::ostream&, League&);
+  void input(std::istream& in, brevnov::League& league);
+  void addNewPlayer(std::istream&, League&);
+  void addTeam(std::istream&, League&);
+  void deleteTeam(std::istream&, League&);
+  void endCareer(std::istream&, League&);
+  void updateRating(std::istream&, League&);
   void buyPlayer(std::istream&, std::ostream&, League&);
   void buyPosition(std::istream&, std::ostream&, League&);
   void buyTeam(std::istream&, std::ostream&, League&);
-  void soldPlayer(std::istream&, std::ostream&, League&);
-  void soldTeam(std::istream&, std::ostream&, League&);
-  void deposit(std::istream&, std::ostream&, League&);
+  void soldPlayer(std::istream&, League&);
+  void soldTeam(std::istream&, League&);
+  void deposit(std::istream&, League&);
   void viewTeam(std::istream&, std::ostream&, League&);
   void viewPosition(std::istream&, std::ostream&, League&);
-  void Transfer(std::istream&, std::ostream&, League&);
+  void transfer(std::istream&, std::ostream&, League&);
   void startTeam(std::istream&, std::ostream&, League&);
   void viewPlayer(std::istream&, std::ostream&, League&);
   void viewTeamPosition(std::istream&, std::ostream&, League&);

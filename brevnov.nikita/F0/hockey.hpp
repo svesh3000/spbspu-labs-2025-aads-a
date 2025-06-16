@@ -1,71 +1,103 @@
 #ifndef HOCKEY_HPP
 #define HOCKEY_HPP
 #include <string>
+#include <iostream>
 #include "tree.hpp"
 namespace brevnov
 {
   enum class Position
   {
-    LF;
-    RF;
-    CF;
-    RB;
-    LB;
-    G;
+    LF,
+    RF,
+    CF,
+    RB,
+    LB,
+    G,
+  };
+  inline Position definePosition(std::string pos)
+  {
+    if (pos == "CF")
+    {
+      return Position::CF;
+    }
+    else if (pos == "RF")
+    {
+      return Position::RF;
+    }
+    else if (pos == "LF")
+    {
+      return Position::LF;
+    }
+    else if (pos == "RB")
+    {
+      return Position::RB;
+    }
+    else if (pos == "LB")
+    {
+      return Position::LB;
+    }
+    else if (pos == "G")
+    {
+      return Position::G;
+    }
+    return Position::CF;
   }
   struct Player
   {
-    Player(Team * team, std::string pos, size_t raiting, size_t price):
-      team_(team),
-      position_(Position::CF),
-      raiting_(raiting),
-      price_(price)
-    {
-      switch (pos)
-      [
-        case "CF": position_ = Position::CF;
-        case "RF": position_ = Position::RF;
-        case "LF": position_ = Position::LF;
-        case "RB": position_ = Position::RB;
-        case "LB": position_ = Position::LB;
-        case "G": position_ = Position::G;
-      ]
-    }
-
     Player(std::string pos, size_t raiting, size_t price):
-      team_(nullptr),
       position_(Position::CF),
       raiting_(raiting),
       price_(price)
     {
-      switch (pos)
-      [
-        case "CF": position_ = Position::CF;
-        case "RF": position_ = Position::RF;
-        case "LF": position_ = Position::LF;
-        case "RB": position_ = Position::RB;
-        case "LB": position_ = Position::LB;
-        case "G": position_ = Position::G;
-      ]
+      position_ = definePosition(pos);
     }
-    Team * team_;
+    friend std::ostream& operator<<(std::ostream& os, const Player& player);
     Position position_;
     size_t raiting_;
     size_t price_;
   };
+
   struct Team
   {
     Team(size_t budget):
-      players_(AVLTree< size_t, Player >())
+      players_(AVLTree< std::string, Player >()),
       budget_(budget)
     {}
     AVLTree< std::string, Player > players_;
     size_t budget_;
   };
+  
   struct League
   {
     AVLTree< std::string, Player > fa_;
-    AVLTRee< std::string, Team > teams_;
+    AVLTree< std::string, Team > teams_;
   };
+
+  inline std::ostream& operator<<(std::ostream& os, const Player& player) 
+  {
+    switch (player.position_)
+    {
+      case Position::CF:
+        os << "Center Forward "; 
+        break;
+      case Position::RF:
+        os << "Right Forward "; 
+        break;
+      case Position::LF:
+        os << "Left Forward ";
+        break;
+      case Position::RB:
+        os << "Right Back ";
+        break;
+      case Position::LB:
+        os << "Left Back ";
+        break;
+      case Position::G:
+        os << "Goalie ";
+        break;
+    }
+    os << player.raiting_ << " OVR " << player.price_ << " EURO";
+    return os;
+  }
 }
 #endif
