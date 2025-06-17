@@ -26,6 +26,11 @@ namespace duhanina
 
     HashTable();
 
+    template< typename InputIt >
+    HashTable(InputIt, InputIt);
+
+    explicit HashTable(std::initializer_list< std::pair< Key, Value > >);
+
     iterator begin() noexcept;
     iterator end() noexcept;
     const_iterator cbegin() const noexcept;
@@ -110,6 +115,22 @@ namespace duhanina
   template < class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable():
     HashTable(11)
+  {}
+
+  template< typename Key, typename Value, typename Hash, typename Equal >
+  template< typename InputIt >
+  HashTable< Key, Value, Hash, Equal >::HashTable(InputIt first, InputIt last):
+    HashTable()
+  {
+    for (auto it = first; it != last; it++)
+    {
+      insert(*it);
+    }
+  }
+
+  template< typename Key, typename Value, typename Hash, typename Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(std::initializer_list< std::pair< Key, Value > > ilist):
+    HashTable(ilist.begin(), ilist.end())
   {}
 
   template < class Key, class Value, class Hash, class Equal >
