@@ -63,7 +63,7 @@ void sveshnikov::printDict(std::istream &in, const DataTree_t &data)
   validateDict(dataset, data);
 
   auto dict = data.find(dataset);
-  if (dict->second.empty())
+  if (dict == data.end() || dict->second.empty())
   {
     std::cout << "<EMPTY>";
     return;

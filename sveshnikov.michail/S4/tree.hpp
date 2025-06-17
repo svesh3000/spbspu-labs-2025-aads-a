@@ -267,12 +267,7 @@ namespace sveshnikov
     }
 
     node->parent_ = curr;
-    if (!root_)
-    {
-      fake_leaf_->parent_ = node;
-      node->right_ = fake_leaf_;
-    }
-    else if (curr->right_ == fake_leaf_ && cmp(curr->data_.first, val.first))
+    if (!root_ || (curr->right_ == fake_leaf_ && cmp(curr->data_.first, val.first)))
     {
       fake_leaf_->parent_ = node;
       node->right_ = fake_leaf_;
