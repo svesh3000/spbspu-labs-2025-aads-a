@@ -73,7 +73,7 @@ duhanina::Tree< std::string, duhanina::Graph::WeightsList, std::less< std::strin
   }
   return result;
 }
-
+/*
 duhanina::Tree< std::string, duhanina::Graph::WeightsList, std::less< std::string > > duhanina::Graph::getInbound(const Vertex& to) const
 {
   Tree< Vertex, WeightsList, std::less< std::string > > result;
@@ -83,6 +83,32 @@ duhanina::Tree< std::string, duhanina::Graph::WeightsList, std::less< std::strin
     {
       WeightsList sorted = eit->second;
       result.insert(std::make_pair(eit->first.first, sorted));
+    }
+  }
+  return result;
+}*/
+
+duhanina::Tree<std::string, duhanina::Graph::WeightsList, std::less<std::string>> duhanina::Graph::getInbound(const Vertex& to) const
+{
+  Tree< Vertex, WeightsList, std::less< std::string > > result;
+  for (auto eit = edges.cbegin(); eit != edges.cend(); ++eit)
+  {
+    const auto& edge = eit->first;
+    if (edge.second == to)
+    {
+      auto res_it = result.find(edge.first);
+      if (res_it != result.end())
+      {
+        const auto& weights = eit->second;
+        for (auto wit = weights.cbegin(); wit != weights.cend(); ++wit)
+        {
+          res_it->second.push_back(*wit);
+        }
+      }
+      else
+      {
+        result.insert(std::make_pair(edge.first, eit->second));
+      }
     }
   }
   return result;
