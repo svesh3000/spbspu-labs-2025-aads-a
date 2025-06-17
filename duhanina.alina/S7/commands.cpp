@@ -154,10 +154,7 @@ void duhanina::create(std::istream& in, MapOfGraphs& graphs)
   for (size_t i = 0; i < vertexCount; ++i)
   {
     std::string vertex;
-    if (!(in >> vertex))
-    {
-      throw std::invalid_argument("error");
-    }
+    in >> vertex;
     newGraph.addVertex(vertex);
   }
   graphs[graphName] = newGraph;
