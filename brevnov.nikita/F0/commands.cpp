@@ -53,6 +53,10 @@ namespace
         std::cerr << "Team already exist!\n";
       }
     }
+    else
+    {
+      std::cerr << "Not correct budget!\n";
+    }
   }
 
   brevnov::Position viewM(std::istream& in, std::ostream& out, brevnov::League& league)
