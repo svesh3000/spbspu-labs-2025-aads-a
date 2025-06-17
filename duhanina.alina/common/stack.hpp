@@ -14,6 +14,7 @@ namespace duhanina
     void pop();
     const T& top() const;
     T& top();
+
     size_t size() const noexcept;
 
   private:

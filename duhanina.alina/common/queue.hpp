@@ -14,6 +14,7 @@ namespace duhanina
     void pop();
     const T& front() const;
     T& front();
+
     size_t size() const noexcept;
 
   private:
@@ -40,12 +41,14 @@ namespace duhanina
 
   template < typename T >
   const T& Queue< T >::front() const
+
   {
     return array_.front();
   }
 
   template < typename T >
   T& Queue< T >::front()
+
   {
     return array_.front();
   }
