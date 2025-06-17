@@ -449,7 +449,14 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
 
 void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
 {
-  Position sPos = viewM(in, out, league);
+  try
+  {
+    Position sPos = viewM(in, out, league);
+  }
+  catch(const std::logic_error& e)
+  {
+    return;
+  }
   auto club = league.teams_.begin();
   while (club != league.teams_.end())
   {
@@ -632,5 +639,12 @@ void brevnov::viewMarket(std::ostream& out, League& league)
 
 void brevnov::viewMarketPosition(std::istream& in, std::ostream& out, League& league)
 {
-  viewM(in, out, league);
+  try
+  {
+    viewM(in, out, league);
+  }
+  catch(const std::logic_error& e)
+  {
+    return;
+  }
 }
