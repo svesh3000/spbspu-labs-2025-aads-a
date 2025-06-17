@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
     std::cerr << "Invalid arguments\n";
     return 1;
   }
+
   std::string mode(argv[1]);
   std::string filename(argv[2]);
   duhanina::Tree< long long, std::string, std::less< long long > > tree;
