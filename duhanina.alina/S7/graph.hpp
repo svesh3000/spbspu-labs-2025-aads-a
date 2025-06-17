@@ -9,6 +9,14 @@
 
 namespace duhanina
 {
+  struct EdgeHash
+  {
+    size_t operator()(const std::pair< std::string, std::string >& e) const
+    {
+      return std::hash< std::string >()(e.first) ^ (std::hash< std::string >()(e.second) << 1);
+    }
+  };
+
   class Graph
   {
   public:
@@ -26,16 +34,9 @@ namespace duhanina
     Tree< Vertex, WeightsList, std::less< Vertex > > getInbound(const Vertex& to) const;
     List< Vertex > getVertices() const;
     size_t vertexCount() const;
+    const HashTable< Edge, WeightsList, EdgeHash >& getAllEdges() const;
 
   private:
-    struct EdgeHash
-    {
-      size_t operator()(const Edge& e) const
-      {
-        return std::hash< Vertex >()(e.first) ^ (std::hash< Vertex >()(e.second) << 1);
-      }
-    };
-
     HashTable< Edge, WeightsList, EdgeHash > edges;
     Tree< Vertex, bool, std::less< Vertex > > vertices;
   };

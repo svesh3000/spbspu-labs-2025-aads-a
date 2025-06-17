@@ -144,47 +144,131 @@ void duhanina::cut(std::istream& in, MapOfGraphs& graphs)
 void duhanina::create(std::istream& in, MapOfGraphs& graphs)
 {
   std::string graphName;
-  in >> graphName;
+  size_t vertexCount;
+  in >> graphName >> vertexCount;
   if (graphs.find(graphName) != graphs.end())
   {
-    throw std::invalid_argument("Invalid command");
+    throw std::invalid_argument("error");
   }
-  graphs.insert(std::make_pair(graphName, Graph()));
+  Graph newGraph;
+  for (size_t i = 0; i < vertexCount; ++i)
+  {
+    std::string vertex;
+    if (!(in >> vertex))
+    {
+      throw std::invalid_argument("error");
+    }
+    newGraph.addVertex(vertex);
+  }
+  graphs[graphName] = newGraph;
 }
-/*
+
 void duhanina::merge(std::istream& in, MapOfGraphs& graphs)
 {
   std::string newName;
   std::string name1;
   std::string name2;
   in >> newName >> name1 >> name2;
-  if (graphs.find(newName) != graphs.end() || graphs.find(name1) == graphs.end() || graphs.find(name2) == graphs.end())
+  if (graphs.find(newName) != graphs.end())
   {
-    throw std::invalid_argument("Invalid command");
+    throw std::invalid_argument("error");
+  }
+  if (graphs.find(name1) == graphs.end() || graphs.find(name2) == graphs.end())
+  {
+    throw std::invalid_argument("error");
   }
   const Graph& g1 = graphs.at(name1);
   const Graph& g2 = graphs.at(name2);
-  Graph newGraph;
-  graphs.insert(std::make_pair(newName, newGraph));
+  Graph mergedGraph;
+  auto vertices1 = g1.getVertices();
+  for (auto vit = vertices1.begin(); vit != vertices1.end(); ++vit)
+  {
+    mergedGraph.addVertex(*vit);
+  }
+  auto edges1 = g1.getAllEdges();
+  for (auto eit = edges1.begin(); eit != edges1.end(); ++eit)
+  {
+    const auto& edge = eit->first;
+    const auto& weights = eit->second;
+    for (auto wit = weights.begin(); wit != weights.end(); ++wit)
+    {
+      mergedGraph.addEdge(edge.first, edge.second, *wit);
+    }
+  }
+  auto vertices2 = g2.getVertices();
+  for (auto vit = vertices2.begin(); vit != vertices2.end(); ++vit)
+  {
+    mergedGraph.addVertex(*vit);
+  }
+  auto edges2 = g2.getAllEdges();
+  for (auto eit = edges2.begin(); eit != edges2.end(); ++eit)
+  {
+    const auto& edge = eit->first;
+    const auto& weights = eit->second;
+    for (auto wit = weights.begin(); wit != weights.end(); ++wit)
+    {
+      mergedGraph.addEdge(edge.first, edge.second, *wit);
+    }
+  }
+  graphs[newName] = mergedGraph;
 }
 
 void duhanina::extract(std::istream& in, MapOfGraphs& graphs)
 {
   std::string newName;
   std::string oldName;
-  size_t count;
-  in >> newName >> oldName >> count;
-  if (graphs.find(newName) != graphs.end() || graphs.find(oldName) == graphs.end())
+  size_t vertexCount;
+  in >> newName >> oldName >> vertexCount;
+  if (graphs.find(newName) != graphs.end())
   {
-    throw std::invalid_argument("Invalid command");
+    throw std::invalid_argument("error");
   }
-  List< Graph::Vertex > vertices;
-  for (size_t i = 0; i < count; ++i)
+  if (graphs.find(oldName) == graphs.end())
   {
-    std::string v;
-    in >> v;
-    vertices.push_back(v);
+    throw std::invalid_argument("error");
   }
-  graphs.insert(std::make_pair(newName, Graph()));
+  const Graph& source = graphs.at(oldName);
+  Graph extractedGraph;
+  List< std::string > vertices;
+  for (size_t i = 0; i < vertexCount; ++i)
+  {
+    std::string vertex;
+    if (!(in >> vertex))
+    {
+      throw std::invalid_argument("error");
+    }
+    if (!source.hasVertex(vertex))
+    {
+      throw std::invalid_argument("error");
+    }
+    vertices.push_back(vertex);
+    extractedGraph.addVertex(vertex);
+  }
+  auto allEdges = source.getAllEdges();
+  for (auto eit = allEdges.begin(); eit != allEdges.end(); ++eit)
+  {
+    const auto& edge = eit->first;
+    const auto& weights = eit->second;
+    bool hasFrom = false;
+    bool hasTo = false;
+    for (auto vit = vertices.begin(); vit != vertices.end(); ++vit)
+    {
+      if (*vit == edge.first)
+      {
+        hasFrom = true;
+      }
+      if (*vit == edge.second)
+      {
+        hasTo = true;
+      }
+    }
+    if (hasFrom && hasTo)
+    {
+      for (auto wit = weights.begin(); wit != weights.end(); ++wit)
+      {
+        extractedGraph.addEdge(edge.first, edge.second, *wit);
+      }
+    }
+  }
+  graphs[newName] = extractedGraph;
 }
-*/

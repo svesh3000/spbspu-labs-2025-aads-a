@@ -102,3 +102,8 @@ size_t duhanina::Graph::vertexCount() const
 {
   return vertices.size();
 }
+
+const duhanina::HashTable< duhanina::Graph::Edge, duhanina::Graph::WeightsList, duhanina::EdgeHash >& duhanina::Graph::getAllEdges() const
+{
+  return edges;
+}
