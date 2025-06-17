@@ -12,8 +12,8 @@ namespace duhanina
     bool empty() const noexcept;
     void push(const T& value);
     void pop();
-    const T& top() const noexcept;
-    T& top() noexcept;
+    const T& top() const;
+    T& top();
     size_t size() const noexcept;
 
   private:
@@ -39,13 +39,13 @@ namespace duhanina
   }
 
   template < typename T >
-  const T& Stack< T >::top() const noexcept
+  const T& Stack< T >::top() const
   {
     return array_.back();
   }
 
   template < typename T >
-  T& Stack< T >::top() noexcept
+  T& Stack< T >::top()
   {
     return array_.back();
   }

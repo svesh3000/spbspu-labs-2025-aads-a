@@ -170,11 +170,7 @@ namespace
     {
       std::string token = postfix.front();
       postfix.pop();
-      if (std::isdigit(token[0]))
-      {
-        operands.push(std::stoll(token));
-      }
-      else if (isOperator(token))
+      if (isOperator(token))
       {
         long long operand2 = operands.top();
         operands.pop();
@@ -203,7 +199,7 @@ namespace
       }
       else
       {
-        throw std::runtime_error("Invalid token");
+        operands.push(std::stoll(token));
       }
     }
     if (operands.size() != 1)
