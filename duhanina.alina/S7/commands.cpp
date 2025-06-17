@@ -4,7 +4,7 @@
 void duhanina::inputGraphs(std::istream& in, MapOfGraphs& graphs)
 {
   std::string name;
-  size_t edgeCount;
+  size_t edgeCount = 0;
   while (in >> name >> edgeCount)
   {
     Graph currentGraph;
@@ -144,12 +144,13 @@ void duhanina::cut(std::istream& in, MapOfGraphs& graphs)
 void duhanina::create(std::istream& in, MapOfGraphs& graphs)
 {
   std::string graphName;
-  size_t vertexCount;
-  in >> graphName >> vertexCount;
+  in >> graphName;
   if (graphs.find(graphName) != graphs.end())
   {
     throw std::invalid_argument("error");
   }
+  size_t vertexCount = 0;
+  in >> vertexCount;
   Graph newGraph;
   for (size_t i = 0; i < vertexCount; ++i)
   {
@@ -214,7 +215,7 @@ void duhanina::extract(std::istream& in, MapOfGraphs& graphs)
 {
   std::string newName;
   std::string oldName;
-  size_t vertexCount;
+  size_t vertexCount = 0;
   in >> newName >> oldName >> vertexCount;
   if (graphs.find(newName) != graphs.end())
   {
