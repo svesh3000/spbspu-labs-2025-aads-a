@@ -7,7 +7,7 @@
 #include <initializer_list>
 #include <utility>
 
-#include <xxh3.h>
+#include <boost/hash2/fnv1a.hpp>
 
 #include "robinConstIterator.hpp"
 #include "robinIterator.hpp"
@@ -15,10 +15,16 @@
 
 namespace dribas
 {
-  struct XXHasher{
-    template< class Key >
-    size_t operator()(const Key& key) const {
-      return XXH64(&key, sizeof(Key), 0);
+  struct fnv1a{
+    template<class Key>
+    size_t operator()(const Key& key) const noexcept {
+        const char* data = reinterpret_cast<const char*>(&key);
+        size_t hash = 14695981039346656037ULL;
+        for (size_t i = 0; i < sizeof(Key); ++i) {
+          hash ^= static_cast< size_t >(data[i]);
+          hash *= 1099511628211ULL;
+        }
+        return hash;
     }
   };
 
@@ -46,7 +52,7 @@ namespace dribas
   {}
 
 
-template< class Key, class T, class Hash = XXHasher >
+template< class Key, class T, class Hash = fnv1a >
 class RobinHoodHashTable{
 public:
   using value_type = std::pair< const Key, T >;

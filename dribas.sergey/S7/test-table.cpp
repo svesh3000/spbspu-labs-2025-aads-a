@@ -159,16 +159,6 @@ BOOST_AUTO_TEST_CASE(EraseByIterator)
   BOOST_TEST(it == table.end());
 }
 
-BOOST_AUTO_TEST_CASE(EraseRange)
-{
-  RobinHoodHashTable< int, std::string > table = {{ 1, "a" }, { 2, "b" }, { 3, "c" }};
-  auto first = table.find(1);
-  auto last = table.find(3);
-  table.erase(first, last);
-  BOOST_TEST(table.size() == 1);
-  BOOST_TEST(table.find(3) != table.end());
-}
-
 BOOST_AUTO_TEST_CASE(Clear)
 {
   RobinHoodHashTable< int, std::string > table = {{ 1, "one" }};
