@@ -29,7 +29,7 @@ namespace duhanina
 
     T& operator[](size_t) noexcept;
     const T& operator[](size_t) const noexcept;
-
+    
     void push_back(const T& value);
     void pop_back();
     void pop_front();
