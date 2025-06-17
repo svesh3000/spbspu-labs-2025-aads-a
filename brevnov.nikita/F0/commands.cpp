@@ -453,9 +453,10 @@ void brevnov::viewTeam(std::istream& in, std::ostream& out, League& league)
 
 void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
 {
+  Position sPos = Position::CF;
   try
   {
-    Position sPos = viewM(in, out, league);
+    sPos = viewM(in, out, league);
   }
   catch(const std::logic_error& e)
   {
