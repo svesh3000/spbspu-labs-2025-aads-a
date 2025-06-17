@@ -274,10 +274,7 @@ RobinHoodHashTable< Key, T, Hash >::erase(iterator pos)
   if (pos == end()) {
     return end();
   }
-
   Entry< Key, T >* entry_ptr = reinterpret_cast<Entry< Key, T >*>(&(*pos));
-
-
   if (entry_ptr->state == EntryState::OCCUPIED) {
     entry_ptr->state = EntryState::DELETED;
     num_elements_--;
