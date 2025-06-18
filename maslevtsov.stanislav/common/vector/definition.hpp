@@ -16,7 +16,7 @@ template< class T >
 maslevtsov::Vector< T >::Vector(const Vector& rhs):
   capacity_(rhs.capacity_),
   size_(rhs.size_),
-  data_(new T[capacity_])
+  data_(new T[rhs.capacity_])
 {
   try {
     for (size_t i = 0; i < rhs.size_; ++i) {
@@ -41,17 +41,7 @@ maslevtsov::Vector< T >::Vector(size_t size):
   capacity_(size),
   size_(size),
   data_(new T[size])
-{
-  try {
-    for (size_t i = 0; i < size; ++i) {
-      data_[i] = T();
-    }
-  } catch (...) {
-    delete[] data_;
-    data_ = nullptr;
-    throw;
-  }
-}
+{}
 
 template< class T >
 maslevtsov::Vector< T >::~Vector()

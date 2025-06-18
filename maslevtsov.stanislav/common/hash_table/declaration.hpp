@@ -75,7 +75,8 @@ namespace maslevtsov {
       SlotState state = SlotState::EMPTY;
 
       Slot():
-        data()
+        data(),
+        state(SlotState::EMPTY)
       {}
     };
 
