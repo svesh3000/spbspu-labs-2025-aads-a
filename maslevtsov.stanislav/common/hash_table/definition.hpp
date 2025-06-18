@@ -39,8 +39,7 @@ maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable(std::initializer_list
 template< class Key, class T, class Hash, class KeyEqual >
 T& maslevtsov::HashTable< Key, T, Hash, KeyEqual >::operator[](const Key& key)
 {
-  value_type pair = std::make_pair(key, T());
-  return insert(pair).first->second;
+  return insert(std::make_pair(key, T())).first->second;
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -176,7 +175,11 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
   if (load_factor() >= max_load_factor_) {
     rehash(slots_.size() * 2);
   }
-  size_t index = hasher_(key) % slots_.size();
+  size_t index = find_index(key);
+  if (index != slots_.size()) {
+    return {iterator(this, index), false};
+  }
+  index = hasher_(key) % slots_.size();
   size_t odd_step = detail::get_odd_step(key, slots_.size());
   size_t first_deleted = slots_.size();
   for (size_t i = 0; i < slots_.size(); ++i) {
@@ -196,8 +199,6 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
       if (first_deleted == slots_.size()) {
         first_deleted = index;
       }
-    } else if (key_equal_(slots_[index].data.first, key)) {
-      return {iterator(this, index), false};
     }
     index = (index + odd_step) % slots_.size();
   }
