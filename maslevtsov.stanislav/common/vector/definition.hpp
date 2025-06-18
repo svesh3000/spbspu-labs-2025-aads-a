@@ -9,7 +9,7 @@ template< class T >
 maslevtsov::Vector< T >::Vector():
   capacity_(64),
   size_(0),
-  data_(new T[capacity_])
+  data_(new T[64])
 {}
 
 template< class T >
@@ -24,7 +24,6 @@ maslevtsov::Vector< T >::Vector(const Vector& rhs):
     }
   } catch (...) {
     delete[] data_;
-    data_ = nullptr;
     throw;
   }
 }
@@ -53,7 +52,8 @@ template< class T >
 typename maslevtsov::Vector< T >::Vector& maslevtsov::Vector< T >::operator=(const Vector& rhs)
 {
   if (this != &rhs) {
-    Vector(rhs).swap(*this);
+    Vector< T > copied_rhs(rhs);
+    swap(copied_rhs);
   }
   return *this;
 }
@@ -62,7 +62,8 @@ template< class T >
 typename maslevtsov::Vector< T >::Vector& maslevtsov::Vector< T >::operator=(Vector&& rhs) noexcept
 {
   if (this != &rhs) {
-    Vector(std::move(rhs)).swap(*this);
+    Vector< T > copied_rhs(std::move(rhs));
+    swap(copied_rhs);
   }
   return *this;
 }
@@ -192,7 +193,7 @@ typename maslevtsov::Vector< T >::iterator maslevtsov::Vector< T >::erase(const_
 template< class T >
 void maslevtsov::Vector< T >::push_back(const T& value)
 {
-  if (size_ == capacity_) {
+  if (size_ >= capacity_) {
     expand(capacity_ * 2);
   }
   data_[size_++] = value;
@@ -213,8 +214,6 @@ void maslevtsov::Vector< T >::pop_back() noexcept
   if (empty()) {
     return;
   }
-  delete data_[size_ - 1];
-  data_[size_ - 1] = T();
   --size_;
 }
 
