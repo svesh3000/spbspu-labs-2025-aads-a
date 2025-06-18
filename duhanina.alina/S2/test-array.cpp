@@ -3,44 +3,111 @@
 
 using array_t = duhanina::DynamicArray< int >;
 
-BOOST_AUTO_TEST_CASE(array)
+BOOST_AUTO_TEST_CASE(DefaultConstructor)
 {
-  array_t array;
-  BOOST_TEST(array.size() == 0);
-  BOOST_TEST(array.empty());
-  array.push_back(1);
-  array.push_back(4);
-  BOOST_TEST(array.back() == 4);
-  BOOST_TEST(array.size() == 2);
-  array.pop_back();
-  BOOST_TEST(array.front() == 1);
-  array.push_back(3);
-  array.push_back(6);
-  array.pop_front();
-  BOOST_TEST(array.front() == 3);
-  BOOST_TEST(array.back() == 6);
+  array_t arr;
+  BOOST_TEST(arr.empty());
+}
 
-  array_t array1;
-  array1.push_back(2);
-  array1.push_back(5);
-  array_t copyArray(array1);
-  BOOST_TEST(copyArray.size() == 2);
-  BOOST_TEST(copyArray.back() == 5);
-  BOOST_TEST(array1.size() == 2);
+BOOST_AUTO_TEST_CASE(PushBackAndSize)
+{
+  array_t arr;
+  arr.push_back(1);
+  BOOST_TEST(arr.size() == 1);
+  BOOST_TEST(arr.back() == 1);
 
-  array_t array2;
-  array2.push_back(88);
-  array2.push_back(3);
-  array_t moveArray(std::move(array2));
-  BOOST_TEST(moveArray.size() == 2);
-  BOOST_TEST(moveArray.back() == 3);
-  BOOST_TEST(array2.size() == 0);
+  arr.push_back(2);
+  BOOST_TEST(arr.size() == 2);
+  BOOST_TEST(arr.back() == 2);
+}
 
-  array_t array3;
-  array3.push_back(11);
-  array3.push_back(33);
-  array_t moveArray1 = std::move(array3);
-  BOOST_TEST(moveArray1.size() == 2);
-  BOOST_TEST(moveArray1.back() == 33);
-  BOOST_TEST(array3.size() == 0);
+BOOST_AUTO_TEST_CASE(FrontAndBack)
+{
+  array_t arr;
+  arr.push_back(1);
+  arr.push_back(2);
+  arr.push_back(3);
+  BOOST_TEST(arr.front() == 1);
+  BOOST_TEST(arr.back() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(PopBack)
+{
+  array_t arr;
+  arr.push_back(1);
+  arr.push_back(2);
+  arr.pop_back();
+  BOOST_TEST(arr.size() == 1);
+  BOOST_TEST(arr.back() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(PopFront)
+{
+  array_t arr;
+  arr.push_back(1);
+  arr.push_back(2);
+  arr.push_back(3);
+  arr.pop_front();
+  BOOST_TEST(arr.size() == 2);
+  BOOST_TEST(arr.front() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(CopyConstructor)
+{
+  array_t orig;
+  orig.push_back(1);
+  orig.push_back(2);
+  array_t copy(orig);
+  BOOST_TEST(copy.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(MoveConstructor)
+{
+  array_t orig;
+  orig.push_back(1);
+  orig.push_back(2);
+  array_t moved(std::move(orig));
+  BOOST_TEST(moved.size() == 2);
+  BOOST_TEST(orig.empty());
+}
+
+BOOST_AUTO_TEST_CASE(CopyAssignment)
+{
+  array_t a1;
+  a1.push_back(1);
+  a1.push_back(2);
+  array_t a2;
+  a2 = a1;
+  BOOST_TEST(a2.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(MoveAssignment)
+{
+  array_t a1;
+  a1.push_back(1);
+  a1.push_back(2);
+  array_t a2;
+  a2 = std::move(a1);
+  BOOST_TEST(a2.size() == 2);
+  BOOST_TEST(a1.empty());
+}
+
+BOOST_AUTO_TEST_CASE(ResizeTest)
+{
+  array_t arr;
+  const size_t initCapacity = 50;
+  for (size_t i = 0; i < initCapacity; ++i)
+  {
+    arr.push_back(1);
+  }
+  BOOST_TEST(arr.size() == initCapacity);
+  arr.push_back(2);
+  BOOST_TEST(arr.size() == initCapacity + 1);
+}
+
+BOOST_AUTO_TEST_CASE(Empty)
+{
+  array_t arr;
+  BOOST_TEST(arr.empty());
+  BOOST_TEST(arr.size() == 0);
 }
