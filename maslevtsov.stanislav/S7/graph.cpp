@@ -111,7 +111,8 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
 
 void maslevtsov::Graph::bind(const std::string& vertice1, const std::string& vertice2, unsigned weight)
 {
-  edges_set_[std::make_pair(vertice1, vertice2)].push_back(weight);
+  Vector< unsigned > to_push = edges_set_[std::make_pair(vertice1, vertice2)];
+  to_push.push_back(weight);
 }
 
 bool maslevtsov::Graph::check_vertice_existence(const std::string& vertice)

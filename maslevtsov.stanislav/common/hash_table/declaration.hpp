@@ -68,10 +68,9 @@ namespace maslevtsov {
       DELETED,
     };
 
-    template< class Type >
     struct Slot
     {
-      Type data;
+      value_type data;
       SlotState state = SlotState::EMPTY;
 
       Slot():
@@ -80,7 +79,7 @@ namespace maslevtsov {
       {}
     };
 
-    Vector< Slot< value_type > > slots_;
+    Vector< Slot > slots_;
     size_type size_;
     Hash hasher_;
     KeyEqual key_equal_;

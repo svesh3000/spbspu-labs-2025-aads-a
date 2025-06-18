@@ -39,7 +39,8 @@ maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable(std::initializer_list
 template< class Key, class T, class Hash, class KeyEqual >
 T& maslevtsov::HashTable< Key, T, Hash, KeyEqual >::operator[](const Key& key)
 {
-  return insert(std::make_pair(key, T())).first->second;
+  value_type pair = std::make_pair(key, T());
+  return insert(pair).first->second;
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -307,7 +308,7 @@ void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
     }
     count = new_count;
   }
-  Vector< Slot< value_type > > new_slots(count);
+  Vector< Slot > new_slots(count);
   for (auto it = slots_.begin(); it != slots_.end(); ++it) {
     if (it->state == SlotState::OCCUPIED) {
       const Key& key = it->data.first;
