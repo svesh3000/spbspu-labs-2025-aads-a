@@ -28,6 +28,9 @@ namespace kizhin {
   private:
     template < bool isConst >
     class Iterator;
+
+    template < bool isConst >
+    class HeavyIterator;
     template < bool isConst >
     class LmrIterator;
     template < bool isConst >
@@ -340,7 +343,7 @@ auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--(int) -> Iterator
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-class kizhin::Map< K, T, C >::LmrIterator
+class kizhin::Map< K, T, C >::HeavyIterator
 {
 private:
   template < typename T1, typename T2 >
@@ -353,19 +356,42 @@ public:
   using reference = conditional_t< Map::const_reference, Map::reference >;
   using iterator_category = std::forward_iterator_tag;
 
-  LmrIterator() noexcept = default;
-  template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
-  LmrIterator(const Iterator< RhsConst >& rhs):
-    values_(rhs.values_),
-    valuePtr_(rhs.valuePtr_)
-  {}
-
   pointer operator->() const noexcept { return std::addressof(**this); }
   reference operator*() const noexcept
   {
-    assert(valuePtr_ && "Dereferencing empty LmrIterator");
+    assert(valuePtr_ && "Dereferencing empty HeavyIterator");
     return *valuePtr_;
   }
+  operator Map::Iterator< IsConst >() { return { node_, valuePtr_ }; }
+
+  friend bool operator==(const HeavyIterator& lhs, const HeavyIterator& rhs) noexcept
+  {
+    return lhs.node_ == rhs.node_ && lhs.valuePtr_ == rhs.valuePtr_;
+  }
+
+  friend bool operator!=(const HeavyIterator& lhs, const HeavyIterator& rhs) noexcept
+  {
+    return !(lhs == rhs);
+  }
+
+protected:
+  Node* node_ = nullptr;
+  pointer valuePtr_ = nullptr;
+};
+
+template < typename K, typename T, typename C >
+template < bool IsConst >
+class kizhin::Map< K, T, C >::LmrIterator: public HeavyIterator< IsConst >
+{
+public:
+  using pointer = typename HeavyIterator< IsConst >::pointer;
+
+  LmrIterator() noexcept = default;
+  template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
+  LmrIterator(const Iterator< RhsConst >& rhs):
+    HeavyIterator< IsConst >(rhs),
+    values_(rhs.values_)
+  {}
 
   LmrIterator& operator++();
   LmrIterator operator++(int)
@@ -375,28 +401,20 @@ public:
     return result;
   }
 
-  friend bool operator==(const LmrIterator& lhs, const LmrIterator& rhs) noexcept
-  {
-    return lhs.values_ == rhs.values_ && lhs.valuePtr_ == rhs.valuePtr_;
-  }
-
-  friend bool operator!=(const LmrIterator& lhs, const LmrIterator& rhs) noexcept
-  {
-    return !(lhs == rhs);
-  }
-
 private:
   friend class Map;
 
   Stack< std::pair< Node*, pointer > > values_{};
-  pointer valuePtr_ = nullptr;
+  using HeavyIterator< IsConst >::valuePtr_;
+  using HeavyIterator< IsConst >::node_;
 
   LmrIterator(Node*);
 };
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-kizhin::Map< K, T, C >::LmrIterator< IsConst >::LmrIterator(Node* root)
+kizhin::Map< K, T, C >::LmrIterator< IsConst >::LmrIterator(Node* root):
+  HeavyIterator< IsConst >()
 {
   while (root && !detail::isEmpty(root)) {
     values_.emplace(root, root->begin);
@@ -411,17 +429,18 @@ auto kizhin::Map< K, T, C >::LmrIterator< IsConst >::operator++() -> LmrIterator
 {
   if (values_.empty()) {
     valuePtr_ = nullptr;
+    node_ = nullptr;
     return *this;
   }
-  Node* node = values_.top().first;
+  node_ = values_.top().first;
   valuePtr_ = values_.top().second;
   values_.pop();
   Node* next = nullptr;
-  if (valuePtr_ == node->begin && detail::isThree(node)) {
-    values_.emplace(node, valuePtr_ + 1);
-    next = node->children[1];
+  if (valuePtr_ == node_->begin && detail::isThree(node_)) {
+    values_.emplace(node_, valuePtr_ + 1);
+    next = node_->children[1];
   } else {
-    next = node->children[detail::size(node)];
+    next = node_->children[detail::size(node_)];
   }
   while (next && !detail::isEmpty(next)) {
     values_.emplace(next, next->begin);
@@ -432,32 +451,17 @@ auto kizhin::Map< K, T, C >::LmrIterator< IsConst >::operator++() -> LmrIterator
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-class kizhin::Map< K, T, C >::RmlIterator
+class kizhin::Map< K, T, C >::RmlIterator: public HeavyIterator< IsConst >
 {
-private:
-  template < typename T1, typename T2 >
-  using conditional_t = std::conditional_t< IsConst, T1, T2 >;
-
 public:
-  using value_type = Map::value_type;
-  using difference_type = std::ptrdiff_t;
-  using pointer = conditional_t< Map::const_pointer, Map::pointer >;
-  using reference = conditional_t< Map::const_reference, Map::reference >;
-  using iterator_category = std::forward_iterator_tag;
+  using pointer = typename HeavyIterator< IsConst >::pointer;
 
   RmlIterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
   RmlIterator(const Iterator< RhsConst >& rhs):
-    values_(rhs.values_),
-    valuePtr_(rhs.valuePtr_)
+    HeavyIterator< IsConst >(rhs),
+    values_(rhs.values_)
   {}
-
-  pointer operator->() const noexcept { return std::addressof(**this); }
-  reference operator*() const noexcept
-  {
-    assert(valuePtr_ && "Dereferencing empty RmlIterator");
-    return *valuePtr_;
-  }
 
   RmlIterator& operator++();
   RmlIterator operator++(int)
@@ -467,28 +471,20 @@ public:
     return result;
   }
 
-  friend bool operator==(const RmlIterator& lhs, const RmlIterator& rhs) noexcept
-  {
-    return lhs.values_ == rhs.values_ && lhs.valuePtr_ == rhs.valuePtr_;
-  }
-
-  friend bool operator!=(const RmlIterator& lhs, const RmlIterator& rhs) noexcept
-  {
-    return !(lhs == rhs);
-  }
-
 private:
   friend class Map;
 
   Stack< std::pair< Node*, pointer > > values_{};
-  pointer valuePtr_ = nullptr;
+  using HeavyIterator< IsConst >::valuePtr_;
+  using HeavyIterator< IsConst >::node_;
 
   RmlIterator(Node*);
 };
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-kizhin::Map< K, T, C >::RmlIterator< IsConst >::RmlIterator(Node* root)
+kizhin::Map< K, T, C >::RmlIterator< IsConst >::RmlIterator(Node* root):
+  HeavyIterator< IsConst >()
 {
   while (root && !detail::isEmpty(root)) {
     values_.emplace(root, root->end - 1);
@@ -503,17 +499,18 @@ auto kizhin::Map< K, T, C >::RmlIterator< IsConst >::operator++() -> RmlIterator
 {
   if (values_.empty()) {
     valuePtr_ = nullptr;
+    node_ = nullptr;
     return *this;
   }
-  Node* node = values_.top().first;
+  node_ = values_.top().first;
   valuePtr_ = values_.top().second;
   values_.pop();
   Node* next = nullptr;
-  if (valuePtr_ != node->begin) {
-    values_.emplace(node, valuePtr_ + 1);
-    next = node->children[valuePtr_ == node->begin + 1];
+  if (valuePtr_ != node_->begin) {
+    values_.emplace(node_, valuePtr_ + 1);
+    next = node_->children[valuePtr_ == node_->begin + 1];
   } else {
-    next = node->children[0];
+    next = node_->children[0];
   }
   while (next && !detail::isEmpty(next)) {
     values_.emplace(next, next->begin);
@@ -524,32 +521,17 @@ auto kizhin::Map< K, T, C >::RmlIterator< IsConst >::operator++() -> RmlIterator
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-class kizhin::Map< K, T, C >::BfsIterator
+class kizhin::Map< K, T, C >::BfsIterator: public HeavyIterator< IsConst >
 {
-private:
-  template < typename T1, typename T2 >
-  using conditional_t = std::conditional_t< IsConst, T1, T2 >;
-
 public:
-  using value_type = Map::value_type;
-  using difference_type = std::ptrdiff_t;
-  using pointer = conditional_t< Map::const_pointer, Map::pointer >;
-  using reference = conditional_t< Map::const_reference, Map::reference >;
-  using iterator_category = std::forward_iterator_tag;
+  using pointer = typename HeavyIterator< IsConst >::pointer;
 
   BfsIterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
   BfsIterator(const Iterator< RhsConst >& rhs):
-    nodes_(rhs.nodes_),
-    valuePtr_(rhs.valuePtr_)
+    HeavyIterator< IsConst >(rhs),
+    nodes_(rhs.nodes_)
   {}
-
-  pointer operator->() const noexcept { return std::addressof(**this); }
-  reference operator*() const noexcept
-  {
-    assert(valuePtr_ && "Dereferencing empty BfsIterator");
-    return *valuePtr_;
-  }
 
   BfsIterator& operator++();
   BfsIterator operator++(int)
@@ -559,29 +541,20 @@ public:
     return result;
   }
 
-  friend bool operator==(const BfsIterator& lhs, const BfsIterator& rhs) noexcept
-  {
-    return lhs.nodes_ == rhs.nodes_ && lhs.valuePtr_ == rhs.valuePtr_;
-  }
-
-  friend bool operator!=(const BfsIterator& lhs, const BfsIterator& rhs) noexcept
-  {
-    return !(lhs == rhs);
-  }
-
 private:
   friend class Map;
 
-  Queue< const Node* > nodes_{};
-  pointer valuePtr_ = nullptr;
-  pointer end_ = nullptr;
+  Queue< Node* > nodes_{};
+  using HeavyIterator< IsConst >::valuePtr_;
+  using HeavyIterator< IsConst >::node_;
 
   BfsIterator(Node*);
 };
 
 template < typename K, typename T, typename C >
 template < bool IsConst >
-kizhin::Map< K, T, C >::BfsIterator< IsConst >::BfsIterator(Node* root)
+kizhin::Map< K, T, C >::BfsIterator< IsConst >::BfsIterator(Node* root):
+  HeavyIterator< IsConst >()
 {
   if (root) {
     nodes_.push(root);
@@ -593,23 +566,23 @@ template < typename K, typename T, typename C >
 template < bool IsConst >
 auto kizhin::Map< K, T, C >::BfsIterator< IsConst >::operator++() -> BfsIterator&
 {
-  if (valuePtr_ && valuePtr_ + 1 != end_) {
+  if (valuePtr_ && valuePtr_ + 1 != node_->end) {
     ++valuePtr_;
     return *this;
   }
   if (nodes_.empty()) {
     valuePtr_ = nullptr;
-    end_ = nullptr;
+    node_ = nullptr;
     return *this;
   }
-  const Node* node = nodes_.front();
+  node_ = nodes_.front();
+  valuePtr_ = node_->begin;
   nodes_.pop();
-  for (const Node* child: node->children) {
-    if (child && !detail::isEmpty(child))
+  for (Node* child: node_->children) {
+    if (child && !detail::isEmpty(child)) {
       nodes_.push(child);
+    }
   }
-  valuePtr_ = node->begin;
-  end_ = node->end;
   return *this;
 }
 
