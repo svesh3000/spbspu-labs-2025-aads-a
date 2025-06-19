@@ -23,6 +23,7 @@ namespace demehin
     explicit HashTable(std::initializer_list< std::pair< Key, T > >);
 
     T& operator[](const Key&);
+    const T& operator[](const Key&) const;
 
     std::pair< Iter, bool > insert(const std::pair< Key, T >&);
     Iter insert(cIter, const Key&);
@@ -341,6 +342,12 @@ namespace demehin
   {
     auto res = insert(std::make_pair(key, T()));
     return res.first->second;
+  }
+
+  template< typename Key, typename T, typename Hash, typename Equal >
+  const T& HashTable< Key, T, Hash, Equal >::operator[](const Key& key) const
+  {
+    return at(key);
   }
 
   template< typename Key, typename T, typename Hash, typename Equal >

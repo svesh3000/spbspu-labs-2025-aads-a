@@ -109,6 +109,10 @@ void demehin::bind(std::istream& in, MapOfGraphs& graphs)
   std::string gr_name, from, to;
   unsigned int weight;
   in >> gr_name >> from >> to >> weight;
+  if (!in)
+  {
+    throw std::logic("incorrect input");
+  }
 
   graphs.at(gr_name).addEdge(from, to, weight);
 }
@@ -118,6 +122,10 @@ void demehin::cut(std::istream& in, MapOfGraphs& graphs)
   std::string gr_name, from, to;
   unsigned int weight;
   in >> gr_name >> from >> to >> weight;
+  if (!in)
+  {
+    throw std::logic_error("incorrect input");
+  }
 
   if (!(graphs.at(gr_name).deleteEdge(from, to, weight)))
   {
@@ -139,6 +147,11 @@ void demehin::create(std::istream& in, MapOfGraphs& graphs)
   Graph newGraph;
   size_t vrt_cnt = 0;
   in >> vrt_cnt;
+  if (!in)
+  {
+    throw std::logic_error("incorrect input");
+  }
+
   for (size_t i = 0; i < vrt_cnt; i++)
   {
     std::string vrt;
