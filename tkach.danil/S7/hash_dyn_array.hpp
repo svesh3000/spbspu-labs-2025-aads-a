@@ -29,21 +29,21 @@ namespace
 namespace tkach
 {
   template< typename T >
-  class HashDynAry
+  class HashDynArray
   {
   public:
-    HashDynAry();
-    HashDynAry(const HashDynAry& other);
-    HashDynAry(HashDynAry&& other) noexcept;
-    HashDynAry(size_t capacity);
-    ~HashDynAry();
-    HashDynAry< T >& operator=(HashDynAry< T >&&) noexcept;
-    HashDynAry< T >& operator=(const HashDynAry< T >&);
+    HashDynArray();
+    HashDynArray(const HashDynArray& other);
+    HashDynArray(HashDynArray&& other) noexcept;
+    HashDynArray(size_t capacity);
+    ~HashDynArray();
+    HashDynArray< T >& operator=(HashDynArray< T >&&) noexcept;
+    HashDynArray< T >& operator=(const HashDynArray< T >&);
     T& operator[](size_t index);
     const T& operator[](size_t index) const;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void swap(HashDynAry& other) noexcept;
+    void swap(HashDynArray& other) noexcept;
   private:
     size_t capacity_;
     T* data_;
@@ -51,31 +51,31 @@ namespace tkach
   };
 
   template< typename T >
-  HashDynAry< T >::HashDynAry():
+  HashDynArray< T >::HashDynArray():
     capacity_(5),
     data_(new T[5])
   {}
 
   template< typename T >
-  HashDynAry< T >::HashDynAry(size_t capacity):
+  HashDynArray< T >::HashDynArray(size_t capacity):
     capacity_(capacity),
     data_(new T[capacity])
   {}
 
   template< typename T >
-  T& HashDynAry< T >::operator[](size_t index)
+  T& HashDynArray< T >::operator[](size_t index)
   {
-    return const_cast< T& >(static_cast< const HashDynAry* >(this)->operator[](index));
+    return const_cast< T& >(static_cast< const HashDynArray* >(this)->operator[](index));
   }
 
   template< typename T >
-  const T& HashDynAry< T >::operator[](size_t index) const
+  const T& HashDynArray< T >::operator[](size_t index) const
   {
     return data_[index];
   }
 
   template< typename T >
-  void HashDynAry< T >::clear()
+  void HashDynArray< T >::clear()
   {
     if (data_ == nullptr)
     {
@@ -85,13 +85,13 @@ namespace tkach
   }
 
   template< typename T >
-  HashDynAry< T >::HashDynAry(const HashDynAry& other):
+  HashDynArray< T >::HashDynArray(const HashDynArray& other):
     capacity_(other.capacity_),
     data_(getDataFromOther(other.data_, other.capacity_))
   {}
 
   template< typename T >
-  HashDynAry< T >::HashDynAry(HashDynAry&& other) noexcept:
+  HashDynArray< T >::HashDynArray(HashDynArray&& other) noexcept:
     capacity_(other.capacity_),
     data_(other.data_)
   {
@@ -100,49 +100,49 @@ namespace tkach
   }
 
   template< typename T >
-  HashDynAry< T >::~HashDynAry()
+  HashDynArray< T >::~HashDynArray()
   {
     clear();
   }
 
   template< typename T >
-  HashDynAry< T >& HashDynAry< T >::operator=(HashDynAry< T >&& other) noexcept
+  HashDynArray< T >& HashDynArray< T >::operator=(HashDynArray< T >&& other) noexcept
   {
     if (this == std::addressof(other))
     {
       return *this;
     }
-    HashDynAry< T > temp(std::move(other));
+    HashDynArray< T > temp(std::move(other));
     swap(temp);
     return *this;
   }
 
   template< typename T >
-  HashDynAry< T >& HashDynAry< T >::operator=(const HashDynAry< T >& other)
+  HashDynArray< T >& HashDynArray< T >::operator=(const HashDynArray< T >& other)
   {
     if (this == std::addressof(other))
     {
       return *this;
     }
-    HashDynAry< T > temp(other);
+    HashDynArray< T > temp(other);
     swap(temp);
     return *this;
   }
 
   template< typename T >
-  bool HashDynAry< T >::empty() const noexcept
+  bool HashDynArray< T >::empty() const noexcept
   {
     return capacity_ == 0;
   }
 
   template< typename T >
-  size_t HashDynAry< T >::size() const noexcept
+  size_t HashDynArray< T >::size() const noexcept
   {
     return capacity_;
   }
 
   template< typename T >
-  void HashDynAry< T >::swap(HashDynAry< T >& other) noexcept
+  void HashDynArray< T >::swap(HashDynArray< T >& other) noexcept
   {
     std::swap(data_, other.data_);
     std::swap(capacity_, other.capacity_);
