@@ -16,19 +16,25 @@ int main(int argc, char* argv[])
   cmds["complement"] = std::bind(maslov::complementCommand, std::ref(std::cin), std::ref(dicts));
   cmds["intersect"] = std::bind(maslov::intersectCommand, std::ref(std::cin), std::ref(dicts));
   cmds["union"] = std::bind(maslov::unionCommand, std::ref(std::cin), std::ref(dicts));
-  try
+  inputFile(argv[1], dicts);
+  std::string command;
+  while (!(std::cin >> command).eof())
   {
-    inputFile(argv[1], dicts);
-    std::string command;
-    while (!(std::cin >> command).eof())
+    try
     {
       cmds.at(command)();
     }
-  }
-  catch (const std::exception &)
-  {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    std::cout << "<INVALID COMMAND>\n";
+    catch (const std::out_of_range &) 
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cout << "<INVALID COMMAND>\n";
+    }
+    catch (const std::exception & e)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cout << e.what() << '\n';
+    }
   }
 }
