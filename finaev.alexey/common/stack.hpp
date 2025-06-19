@@ -18,7 +18,7 @@ namespace finaev
     T& top();
     const T& top() const;
   private:
-    dynamicArr< T > arr_;
+    DynamicArr< T > arr_;
   };
 
   template< class T >

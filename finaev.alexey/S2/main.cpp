@@ -12,17 +12,12 @@ int main(int argc, char * argv[])
       return 1;
     }
     std::ifstream mainFile;
-    std::istream* input = std::addressof(std::cin);
-    if (argc == 2)
+    std::istream& input = (argc == 2) ? (mainFile.open(argv[1]), mainFile) : std::cin;
+    if (argc == 2 && !mainFile)
     {
-      mainFile.open(argv[1]);
-      if (!mainFile)
-      {
-        throw std::logic_error("error main file open\n");
-      }
-      input = &mainFile;
+      std::logic_error("erroe open file\n");
     }
-    finaev::countFinalResults(*input);
+    finaev::countFinalResults(input);
   }
   catch (const std::exception& e)
   {
