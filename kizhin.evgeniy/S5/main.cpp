@@ -1,5 +1,6 @@
 #include <cstring>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include "map-utils.hpp"
@@ -25,15 +26,13 @@ int main(int argc, char** argv)
       return 0;
     }
     ValueCollector result;
-    if (std::strcmp(argv[1], "ascending") == 0) {
-      result = map.traverseLmr(result);
-    } else if (std::strcmp(argv[1], "descending") == 0) {
-      result = map.traverseRml(result);
-    } else if (std::strcmp(argv[1], "breadth") == 0) {
-      result = map.traverseBreadth(result);
-    } else {
-      throw std::logic_error("Invalid traverse type given");
-    }
+    MapT* mapPtr = std::addressof(map);
+    const Map< std::string, std::function< ValueCollector() > > commands{
+      { "ascending", std::bind(&MapT::traverseLmr< ValueCollector >, mapPtr, result) },
+      { "descending", std::bind(&MapT::traverseRml< ValueCollector >, mapPtr, result) },
+      { "breadth", std::bind(&MapT::traverseBreadth< ValueCollector >, mapPtr, result) },
+    };
+    result = commands.at(argv[1])();
     std::cout << result.keys << ' ' << result.values << '\n';
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << '\n';
