@@ -22,6 +22,7 @@ namespace savintsev
     bool in_t1_ = true;
 
     FwdIterator(HashMap< Key, T, HS1, HS2, EQ > & map, size_t pos, bool in_t1);
+    FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it);
 
     void skip_empty();
     bool is_valid() const;
@@ -75,6 +76,14 @@ namespace savintsev
     {
       map_ = nullptr;
     }
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  FwdIterator< Key, T, HS1, HS2, EQ >::FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it):
+    map_(it.map_),
+    pos_(it.pos_),
+    in_t1_(it.in_t1_)
+  {
+    skip_empty();
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   bool FwdIterator< Key, T, HS1, HS2, EQ >::is_valid() const

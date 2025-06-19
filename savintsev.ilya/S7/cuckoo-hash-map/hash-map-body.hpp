@@ -14,7 +14,7 @@ namespace savintsev
   <
     typename Key,
     typename T,
-    typename HS1 = Hash< Key, boost::hash2::fnv1a_64 >,
+    typename HS1 = std::hash< Key >,
     typename HS2 = Hash< Key, boost::hash2::xxhash_64 >,
     typename EQ = std::equal_to<>
   >
@@ -37,9 +37,8 @@ namespace savintsev
     double max_load_factor_ = 0.75;
 
     T & insert_data(const Key & k);
-    void delete_data(const Key & k);
-    bool lookup_data(const Key & k);
-    std::pair< T &, bool > get_data(const Key & k);
+    bool lookup_data(const Key & k) const;
+    std::pair< T &, bool > get_data(const Key & k) const;
 
   public:
 
@@ -144,12 +143,10 @@ namespace savintsev
     {
       if (!t1_[i].second)
       {
-        t1_[i].first.~std::pair< Key, T >();
         t1_[i].second = true;
       }
       if (!t2_[i].second)
       {
-        t2_[i].first.~std::pair< Key, T >();
         t2_[i].second = true;
       }
     }
@@ -238,28 +235,47 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   size_t HashMap< Key, T, HS1, HS2, EQ >::erase(const Key & k)
   {
-    if (lookup_data(k))
+    Key current_key = k;
+
+    size_t h1 = HS1{}(current_key) % capacity_;
+    if (!t1_[h1].second)
     {
-      delete_data(k);
-      return 1ull;
+      Key old_key = t1_[h1].first.first;
+      if (EQ{}(current_key, old_key))
+      {
+        t1_[h1].second = true;
+        --size_;
+        return 1ull;
+      }
     }
+
+    size_t h2 = HS2{}(current_key) % capacity_;
+    if (!t2_[h2].second)
+    {
+      Key old_key = t2_[h2].first.first;
+      if (EQ{}(current_key, old_key))
+      {
+        t2_[h2].second = true;
+        --size_;
+        return 1ull;
+      }
+    }
+
     return 0ull;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::iterator HashMap< Key, T, HS1, HS2, EQ >::erase(const_iterator position)
   {
-    if (!position.is_valid)
+    if (!position.is_valid())
     {
       return iterator();
     }
     if (position.in_t1_)
     {
-      t1_[position.pos_].first.~std::pair< Key, T >();
       t1_[position.pos_].second = true;
       --size_;
       return iterator(*this, position);
     }
-    t2_[position.pos_].first.~std::pair< Key, T >();
     t2_[position.pos_].second = true;
     --size_;
     return iterator(*this, position, false);
@@ -267,7 +283,7 @@ namespace savintsev
   template< typename K, typename T, typename H, typename N, typename E >
   typename HashMap< K, T, H, N, E >::iterator HashMap< K, T, H, N, E >::erase(const_iterator fst, const_iterator last)
   {
-    if (!fst.is_valid)
+    if (!fst.is_valid())
     {
       return iterator();
     }
@@ -275,7 +291,7 @@ namespace savintsev
     {
       erase(it);
     }
-    return last;
+    return iterator(*this, last);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   template< class... Args >
@@ -298,12 +314,11 @@ namespace savintsev
     inserted = std::move(temp.second);
     return {find(temp.first), true};
   }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  template< class... Args >
-  typename HashMap< Key, T, HS1, HS2, EQ >::iterator HashMap< Key, T, HS1, HS2, EQ >::emplace_hint(const_iterator hint,
-      Args &&... args)
+  template< typename K, typename T, typename A, typename B, typename E >
+  template< class... X >
+  typename HashMap< K, T, A, B, E >::iterator HashMap< K, T, A, B, E >::emplace_hint(const_iterator hint, X &&... args)
   {
-    std::pair< Key, T > temp(std::forward< Args >(args)...);
+    std::pair< K, T > temp(std::forward< X >(args)...);
 
     auto it = find(temp.first);
     if (it != end())
@@ -496,45 +511,12 @@ namespace savintsev
     return *inserted_value;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  void HashMap< Key, T, HS1, HS2, EQ >::delete_data(const Key & k)
-  {
-    Key current_key = k;
-
-    size_t h1 = HS1{}(current_key) % capacity_;
-    if (!t1_[h1].second)
-    {
-      Key old_key = t1_[h1].first.first;
-      if (EQ{}(current_key, old_key))
-      {
-        using pair_type = decltype(t1_[h1].first);
-        t1_[h1].first.~pair_type();
-        t1_[h1].second = true;
-        --size_;
-        return;
-      }
-    }
-
-    size_t h2 = HS2{}(current_key) % capacity_;
-    if (!t2_[h2].second)
-    {
-      Key old_key = t2_[h2].first.first;
-      if (EQ{}(current_key, old_key))
-      {
-        using pair_type = decltype(t2_[h2].first);
-        t2_[h2].first.~pair_type();
-        t2_[h2].second = true;
-        --size_;
-        return;
-      }
-    }
-  }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  bool HashMap< Key, T, HS1, HS2, EQ >::lookup_data(const Key & k)
+  bool HashMap< Key, T, HS1, HS2, EQ >::lookup_data(const Key & k) const
   {
     return get_data(k).second;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k)
+  std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k) const
   {
     Key current_key = k;
 

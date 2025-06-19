@@ -16,7 +16,7 @@ namespace savintsev
   {
     friend class HashMap< Key, T, HS1, HS2, EQ >;
   private:
-    HashMap< Key, T, HS1, HS2, EQ > * map_ = nullptr;
+    const HashMap< Key, T, HS1, HS2, EQ > * map_ = nullptr;
     size_t pos_ = 0;
     bool in_t1_ = true;
 
