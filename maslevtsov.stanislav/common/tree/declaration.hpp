@@ -23,6 +23,7 @@ namespace maslevtsov {
     Tree& operator=(Tree&& rhs) noexcept;
 
     T& operator[](const Key& key);
+    const T& operator[](const Key& key) const;
     T& at(const Key& key);
     const T& at(const Key& key) const;
 
@@ -71,6 +72,7 @@ namespace maslevtsov {
 
     void split_nodes(Node* node, value_type& to_insert, Node* left_child = nullptr, Node* right_child = nullptr);
     void clear_subtree(Node* node) noexcept;
+    void assign_value(value_type& dist, const value_type& src);
 
     void erase_from_leaf(iterator pos) noexcept;
     void balance_parent_three(Node* deleted) noexcept;

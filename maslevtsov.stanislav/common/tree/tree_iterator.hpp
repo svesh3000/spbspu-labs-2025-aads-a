@@ -5,15 +5,15 @@
 #include <type_traits>
 #include "tree_node.hpp"
 
-namespace detail {
-  enum class TreeIteratorType
-  {
-    CONSTANT,
-    NONCONSTANT,
-  };
-}
-
 namespace maslevtsov {
+  namespace detail {
+    enum class TreeIteratorType
+    {
+      CONSTANT,
+      NONCONSTANT,
+    };
+  }
+
   template< class T, detail::TreeIteratorType it_type >
   class TreeIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
