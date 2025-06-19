@@ -11,7 +11,7 @@ namespace maslevtsov {
     TreeNode* right;
     bool is_two;
     T data1;
-    T data2 = T();
+    T data2;
   };
 }
 
