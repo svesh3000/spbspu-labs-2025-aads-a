@@ -13,11 +13,14 @@ namespace averenkov
     Array();
     Array(const Array &rhs);
     Array(Array &&rhs) noexcept;
-    Array &operator=(const Array &rhs);
+    Array &operator=(const Array &rhs) noexcept;
+    Array &operator=(Array &&rhs) noexcept;
     ~Array();
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void swap(Array& rhs) noexcept;
 
     const T& front() const noexcept;
     T& front() noexcept;
@@ -47,26 +50,22 @@ namespace averenkov
 
   template< class T >
   Array< T >::Array(const Array& rhs):
-    data_(nullptr),
-    last_(rhs.last_),
-    capacity_(rhs.capacity_),
-    first_(rhs.first_)
+    Array()
   {
-    T* temp = nullptr;
+    Array temp;
     try
     {
-      temp = new T[rhs.capacity_];
-      for (size_t i = 0; i < last_; ++i)
+      temp.data_ = new T[rhs.capacity_];
+      for (size_t i = 0; i < temp.last_; ++i)
       {
-        temp[i] = rhs.data_[i];
+        temp.data_[i] = rhs.data_[i];
       }
     }
     catch (...)
     {
-      delete[] temp;
-      temp = nullptr;
+      throw;
     }
-    std::swap(temp, data_);
+    swap(temp);
   }
 
 
@@ -84,16 +83,18 @@ namespace averenkov
   }
 
   template< class T >
-  Array< T >& Array< T >::operator=(const Array& rhs)
+  Array< T >& Array< T >::operator=(const Array& other) noexcept
   {
-    if (this != std::addressof(rhs))
-    {
-      Array< T > temp(rhs);
-      std::swap(data_, temp.data_);
-      last_ = rhs.last_;
-      capacity_ = rhs.capacity_;
-      first_ = rhs.first_;
-    }
+    Array< T > temp(other);
+    swap(temp);
+    return *this;
+  }
+
+  template< class T >
+  Array< T >& Array< T >::operator=(Array&& other) noexcept
+  {
+    Array< T > temp(std::move(other));
+    swap(temp);
     return *this;
   }
 
@@ -101,6 +102,15 @@ namespace averenkov
   Array< T >::~Array()
   {
     delete[] data_;
+  }
+
+  template< class T >
+  void Array< T >::swap(Array< T >& other) noexcept
+  {
+    std::swap(data_, other.data_);
+    std::swap(last_, other.last_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(first_, other.first_);
   }
 
   template< class T >
@@ -184,7 +194,7 @@ namespace averenkov
     catch (...)
     {
       delete[] new_data;
-      return;
+      throw;
     }
     delete[] data_;
     data_ = new_data;

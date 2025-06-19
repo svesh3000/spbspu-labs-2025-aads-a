@@ -1,5 +1,5 @@
 #include <iostream>
-#include <climits>
+#include <limits>
 #include <fstream>
 #include <string>
 #include <cctype>
@@ -9,6 +9,8 @@
 
 bool isOverflow(long long a, long long b)
 {
+  const long long int max = std::numeric_limits< long long int >::max();
+  const long long int min = std::numeric_limits< long long int >::min();
   if (a == 0 || b == 0)
   {
     return false;
@@ -17,22 +19,22 @@ bool isOverflow(long long a, long long b)
   {
     if (b > 0)
     {
-      return a > LLONG_MAX / b;
+      return a > max / b;
     }
     else
     {
-      return b < LLONG_MIN / a;
+      return b < min / a;
     }
   }
   else
   {
     if (b > 0)
     {
-      return a < LLONG_MIN / b;
+      return a < min / b;
     }
     else
     {
-      return a < LLONG_MAX / b;
+      return a < max / b;
     }
   }
 }
@@ -65,23 +67,37 @@ std::string readToken(const std::string& str, size_t& pos)
   {
     return std::string(1, str[pos++]);
   }
-  std::string num;
-  bool negative = false;
-  if (str[pos] == '-' && (pos == 0 || str[pos-1] == '('))
+  size_t start = pos;
+  while (pos < str.size() && !std::isspace(str[pos]))
   {
-    negative = true;
-    num += '-';
+    if (isOperator(str[pos]) || str[pos] == '(' || str[pos] == ')')
+    {
+      if (pos > start)
+      {
+        break;
+      }
+      return std::string(1, str[pos++]);
+    }
     pos++;
   }
-  while (pos < str.size() && std::isdigit(str[pos]))
+  std::string token = str.substr(start, pos - start);
+  if (token == "-" && (start == 0 || str[start - 1] == '('))
   {
-    num += str[pos++];
+    if (pos < str.size())
+    {
+      std::string nextToken = readToken(str, pos);
+      if (nextToken.empty())
+      {
+        throw std::runtime_error("Error");
+      }
+      return "-" + nextToken;
+    }
+    else
+    {
+      throw std::runtime_error("Error");
+    }
   }
-  if (num.empty() || (negative && num.size() == 1))
-  {
-    throw std::runtime_error("Error");
-  }
-  return num;
+  return token;
 }
 
 averenkov::Queue< std::string > infixToPostfix(const std::string& infix)
@@ -180,14 +196,14 @@ long long evaluatePostfix(averenkov::Queue< std::string >& postfixQueue)
       switch (token[0])
       {
         case '+':
-          if (a > 0 && b > 0 && a > LLONG_MAX - b)
+          if (a > 0 && b > 0 && a > std::numeric_limits< long long int >::max() - b)
           {
             throw std::runtime_error("Overflow error");
           }
           result = a + b;
           break;
         case '-':
-          if (b > 0 && a < LLONG_MIN + b)
+          if (b > 0 && a < std::numeric_limits< long long int >::min() + b)
           {
             throw std::runtime_error("Overflow error");
           }
