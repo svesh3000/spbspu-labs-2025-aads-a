@@ -2,6 +2,7 @@
 #include <string>
 #include <dynamic_array.hpp>
 #include <fstream>
+#include <hash_dyn_array.hpp>
 namespace
 {
   using tree_of_words = tkach::AvlTree< std::string, tkach::List< std::string > >;
@@ -158,16 +159,22 @@ namespace tkach
   {
     using tree_of_dict = AvlTree< std::string, AvlTree< std::string, List< std::string > > >;
     tree_of_dict temp(avltree);
-    std::string main_name_dict = "", file_name = "";
-    in >> file_name;
-    if (in.peek() != '\n')
+    std::string file_name = "";
+    int count_of_dict = 0;
+    HashDynAry< std::string > main_name_dict = (count_of_dict);
+    in >> file_name >> count_of_dict;
+    if (count_of_dict < 0)
     {
-      in >> main_name_dict;
+      throw std::logic_error("<INVALID IMPORT>");
+    }
+    for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
+    {
+      main_name_dict[i];
     }
     std::fstream in2(file_name);
     if (!in2.is_open())
     {
-      throw std::logic_error("<INVALID IMPORT2>");
+      throw std::logic_error("<INVALID IMPORT>");
     }
     std::string name_of_dict = "";
     while (in2 >> name_of_dict)
@@ -222,14 +229,17 @@ namespace tkach
     {
       throw std::logic_error("<INVALID IMPORT>");
     }
-    if (main_name_dict != "")
+    if (count_of_dict != 0)
     {
-      auto it = temp.find(main_name_dict);
-      if (it == temp.end())
+      for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
       {
-        return;
+        auto it = temp.find(main_name_dict[i]);
+        if (it == temp.end())
+        {
+          throw std::logic_error("<INVALID IMPORT>");
+        }
+        avltree[main_name_dict[i]] = temp[main_name_dict[i]];
       }
-      avltree[main_name_dict] = temp[main_name_dict];
     }
     else
     {
