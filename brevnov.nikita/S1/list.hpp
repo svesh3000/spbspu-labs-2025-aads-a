@@ -495,7 +495,7 @@ namespace brevnov
   template< typename T >
   void List< T >::splice(ConstIter pos, List< T >& list, ConstIter first, ConstIter last) noexcept
   {
-    if (first == last || &list == this || list.empty())
+    if (first == last || std::addressof(list) == this || list.empty())
     {
       return;
     }
