@@ -1,4 +1,6 @@
 #include <iostream>
+#include <functional>
+#include <limits>
 #include "commands.hpp"
 
 int main(int argc, char* argv[])
@@ -8,24 +10,25 @@ int main(int argc, char* argv[])
     std::cerr << "ERROR: wrong arguments\n";
     return 1;
   }
+  maslov::Dictionaries dicts;
+  maslov::BiTree< std::string, std::function< void() >, std::less< std::string > > cmds;
+  cmds["print"] = std::bind(maslov::printCommand, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["complement"] = std::bind(maslov::complementCommand, std::ref(std::cin), std::ref(dicts));
+  cmds["intersect"] = std::bind(maslov::intersectCommand, std::ref(std::cin), std::ref(dicts));
+  cmds["union"] = std::bind(maslov::unionCommand, std::ref(std::cin), std::ref(dicts));
   try
   {
-    maslov::Dictionaries dicts;
     inputFile(argv[1], dicts);
     std::string command;
-    while (!std::cin.eof())
+    while (!(std::cin >> command).eof())
     {
-      std::cin >> command;
-      if (std::cin.eof())
-      {
-        break;
-      }
-      processCommand(std::cin, command, dicts);
+      cmds.at(command)();
     }
   }
-  catch (const std::exception & e)
+  catch (const std::exception &)
   {
-    std::cerr << e.what() << '\n';
-    return 1;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    std::cout << "<INVALID COMMAND>\n";
   }
 }
