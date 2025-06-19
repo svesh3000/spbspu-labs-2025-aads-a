@@ -64,12 +64,12 @@ namespace tkach
       std::pair< Key, Value > pair;
       EntryState state = EntryState::Empty;
     };
-    HashDynAry< Slot > table_;
+    HashDynArray< Slot > table_;
     size_t count_;
     Hash hasher_;
     Equal key_equal_;
     float max_load_factor_ ;
-    size_t find_pos(const Key& key, const HashDynAry< Slot >& table) const;
+    size_t find_pos(const Key& key, const HashDynArray< Slot >& table) const;
     friend class HashIterator< Key, Value, Hash, Equal >;
     friend class CHashIterator< Key, Value, Hash, Equal >;
   };
@@ -227,7 +227,7 @@ namespace tkach
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  size_t HashTable< Key, Value, Hash, Equal >::find_pos(const Key& key, const HashDynAry< Slot >& table) const
+  size_t HashTable< Key, Value, Hash, Equal >::find_pos(const Key& key, const HashDynArray< Slot >& table) const
   {
     size_t initial_index = hasher_(key) % table.size();
     size_t first_deleted = table.size();
@@ -267,7 +267,7 @@ namespace tkach
     {
       new_size = 11;
     }
-    HashDynAry< Slot > new_table(new_size);
+    HashDynArray< Slot > new_table(new_size);
     for (size_t i = 0; i < table_.size(); ++i)
     {
       if (table_[i].state == EntryState::Occupied)
