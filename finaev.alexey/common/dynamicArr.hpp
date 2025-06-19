@@ -6,18 +6,18 @@
 namespace finaev
 {
   template< class T >
-  class dynamicArr
+  class DynamicArr
   {
   public:
-    dynamicArr();
-    ~dynamicArr();
-    dynamicArr(const dynamicArr< T >&);
-    dynamicArr(dynamicArr< T >&&) noexcept;
+    DynamicArr();
+    ~DynamicArr();
+    DynamicArr(const DynamicArr< T >&);
+    DynamicArr(DynamicArr< T >&&) noexcept;
 
-    void swap(dynamicArr< T >&) noexcept;
+    void swap(DynamicArr< T >&) noexcept;
 
-    dynamicArr& operator=(const dynamicArr< T >& other);
-    dynamicArr& operator=(dynamicArr< T >&& other) noexcept;
+    DynamicArr& operator=(const DynamicArr< T >& other);
+    DynamicArr& operator=(DynamicArr< T >&& other) noexcept;
 
     void push(const T&);
     void pop_back();
@@ -41,7 +41,7 @@ namespace finaev
   };
 
   template< class T >
-  dynamicArr< T >::dynamicArr():
+  DynamicArr< T >::DynamicArr():
     capacity_(1),
     size_(0),
     head_(0),
@@ -49,14 +49,13 @@ namespace finaev
   {}
 
   template< class T >
-  dynamicArr< T >::~dynamicArr()
+  DynamicArr< T >::~DynamicArr()
   {
     delete[] data_;
-    data_ = nullptr;
   }
 
   template< class T >
-  dynamicArr< T >::dynamicArr(const dynamicArr< T >& other):
+  DynamicArr< T >::DynamicArr(const DynamicArr< T >& other):
     capacity_(other.capacity_),
     size_(other.size_),
     head_(other.head_),
@@ -80,7 +79,7 @@ namespace finaev
   }
 
   template< class T >
-  dynamicArr< T >::dynamicArr(dynamicArr< T >&& other) noexcept:
+  DynamicArr< T >::DynamicArr(DynamicArr< T >&& other) noexcept:
     capacity_(other.capacity_),
     size_(other.size_),
     head_(other.head_),
@@ -92,7 +91,7 @@ namespace finaev
   }
 
   template< class T >
-  void dynamicArr< T >::swap(dynamicArr< T >& other) noexcept
+  void DynamicArr< T >::swap(DynamicArr< T >& other) noexcept
   {
     std::swap(capacity_, other.capacity_);
     std::swap(size_, other.size_);
@@ -101,29 +100,29 @@ namespace finaev
   }
 
   template< class T >
-  dynamicArr< T >& dynamicArr< T >::operator=(const dynamicArr< T >& other)
+  DynamicArr< T >& DynamicArr< T >::operator=(const DynamicArr< T >& other)
   {
     if (this != std::addressof(other))
     {
-      dynamicArr< T > temp(other);
+      DynamicArr< T > temp(other);
       swap(temp);
     }
     return *this;
   }
 
   template< class T >
-  dynamicArr< T >& dynamicArr< T >::operator=(dynamicArr< T >&& other) noexcept
+  DynamicArr< T >& DynamicArr< T >::operator=(DynamicArr< T >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
-      dynamicArr< T > temp(std::move(other));
+      DynamicArr< T > temp(std::move(other));
       swap(temp);
     }
     return *this;
   }
 
   template< class T >
-  void dynamicArr< T >::resize()
+  void DynamicArr< T >::resize()
   {
     size_t newCapacity = capacity_ * 2;
     T* newData = nullptr;
@@ -148,7 +147,7 @@ namespace finaev
   }
 
   template< class T >
-  void dynamicArr< T >::push(const T& value)
+  void DynamicArr< T >::push(const T& value)
   {
     if (size_ == capacity_)
     {
@@ -159,7 +158,7 @@ namespace finaev
   }
 
   template< class T >
-  void dynamicArr< T >::pop_back()
+  void DynamicArr< T >::pop_back()
   {
     if (empty())
     {
@@ -169,7 +168,7 @@ namespace finaev
   }
 
   template< class T >
-  void dynamicArr< T >::pop_front()
+  void DynamicArr< T >::pop_front()
   {
     if (empty())
     {
@@ -180,37 +179,37 @@ namespace finaev
   }
 
   template< class T >
-  bool dynamicArr< T >::empty() const noexcept
+  bool DynamicArr< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< class T >
-  size_t dynamicArr< T >::size() const noexcept
+  size_t DynamicArr< T >::size() const noexcept
   {
     return size_;
   }
 
   template< class T >
-  const T& dynamicArr< T >::front() const
+  const T& DynamicArr< T >::front() const
   {
     return data_[head_];
   }
 
   template< class T >
-  T& dynamicArr< T >::front()
+  T& DynamicArr< T >::front()
   {
     return data_[head_];
   }
 
   template< class T >
-  const T& dynamicArr< T >::back() const
+  const T& DynamicArr< T >::back() const
   {
     return data_[size_ + head_ - 1];
   }
 
   template< class T >
-  T& dynamicArr< T >::back()
+  T& DynamicArr< T >::back()
   {
     return data_[size_ + head_ - 1];
   }
