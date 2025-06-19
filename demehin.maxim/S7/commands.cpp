@@ -111,7 +111,7 @@ void demehin::bind(std::istream& in, MapOfGraphs& graphs)
   in >> gr_name >> from >> to >> weight;
   if (!in)
   {
-    throw std::logic("incorrect input");
+    throw std::logic_error("incorrect input");
   }
 
   graphs.at(gr_name).addEdge(from, to, weight);
