@@ -4,15 +4,15 @@
 #include <type_traits>
 #include <iterator>
 
-namespace detail {
-  enum class HashTableIteratorType
-  {
-    CONSTANT,
-    NONCONSTANT,
-  };
-}
-
 namespace maslevtsov {
+  namespace detail {
+    enum class HashTableIteratorType
+    {
+      CONSTANT,
+      NONCONSTANT,
+    };
+  }
+
   template< class Key, class T, class Hash, class KeyEqual >
   class HashTable;
 

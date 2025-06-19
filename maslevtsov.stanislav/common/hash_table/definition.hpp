@@ -6,14 +6,16 @@
 #include <vector/definition.hpp>
 #include "declaration.hpp"
 
-namespace detail {
-  template< class Key >
-  size_t get_odd_step(const Key& key, size_t capacity)
-  {
-    boost::hash2::siphash_64 siphasher;
-    siphasher.update(&key, sizeof(key));
-    size_t odd_step = 1 + 2 * (siphasher.result() % (capacity / 2));
-    return odd_step;
+namespace maslevtsov {
+  namespace detail {
+    template< class Key >
+    size_t get_odd_step(const Key& key, size_t capacity)
+    {
+      boost::hash2::siphash_64 siphasher;
+      siphasher.update(&key, sizeof(key));
+      size_t odd_step = 1 + 2 * (siphasher.result() % (capacity / 2));
+      return odd_step;
+    }
   }
 }
 
