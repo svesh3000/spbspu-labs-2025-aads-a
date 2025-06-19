@@ -12,21 +12,21 @@ namespace savintsev
   {
     void operator()(const std::pair< long long, std::string > val)
     {
-      if (val.first > 0 && result_ > std::numeric_limits< long long >::max() - val.first)
+      if (val.first > 0 && result > std::numeric_limits< long long >::max() - val.first)
       {
         throw std::overflow_error("Key sum overflow (positive)");
       }
-      else if (val.first < 0 && result_ < std::numeric_limits< long long >::min() - val.first)
+      else if (val.first < 0 && result < std::numeric_limits< long long >::min() - val.first)
       {
         throw std::overflow_error("Key sum overflow (negative)");
       }
 
-      result_ += val.first;
-      values_ += " " + val.second;
+      result += val.first;
+      values += " " + val.second;
     }
 
-    long long result_ = 0;
-    std::string values_;
+    long long result = 0;
+    std::string values;
   };
 }
 
@@ -67,34 +67,21 @@ int main(int argc, char * argv[])
     return 0;
   }
 
-  TwoThreeTree< std::string, std::function< void(KeyAdder) > > commands;
+  TwoThreeTree< std::string, std::function< void(KeyAdder &) > > commands;
 
   using namespace std::placeholders;
 
-  commands["ascending"] = std::bind(ascending< KeyAdder >, std::ref(tree), _1);
-  commands["descending"] = std::bind(descending< KeyAdder >, std::ref(tree), _1);
-  commands["breadth"] = std::bind(breadth< KeyAdder >, std::ref(tree), _1);
+  commands["ascending"] = std::bind(ascending< KeyAdder & >, std::ref(tree), _1);
+  commands["descending"] = std::bind(descending< KeyAdder & >, std::ref(tree), _1);
+  commands["breadth"] = std::bind(breadth< KeyAdder & >, std::ref(tree), _1);
 
   try
   {
     KeyAdder summator;
 
-    if (traverse_mode == "ascending")
-    {
-      summator = tree.traverse_lnr(summator);
-    }
-    else if (traverse_mode == "descending")
-    {
-      summator = tree.traverse_rnl(summator);
-    }
-    else if (traverse_mode == "breadth")
-    {
-      summator = tree.traverse_breadth(summator);
-    }
-
     commands.at(traverse_mode)(summator);
 
-    std::cout << summator.result_ << summator.values_ << "\n";
+    std::cout << summator.result << summator.values << "\n";
   }
   catch (const std::overflow_error & e)
   {

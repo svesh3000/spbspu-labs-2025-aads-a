@@ -9,17 +9,17 @@ namespace savintsev
   template< typename T >
   void ascending(DataTree & tree, T smth)
   {
-    tree.traverse_lnr(smth);
+    smth = tree.traverse_lnr(smth);
   }
   template< typename T >
   void descending(DataTree & tree, T smth)
   {
-    tree.traverse_rnl(smth);
+    smth = tree.traverse_rnl(smth);
   }
   template< typename T >
   void breadth(DataTree & tree, T smth)
   {
-    tree.traverse_breadth(smth);
+    smth = tree.traverse_breadth(smth);
   }
 }
 
