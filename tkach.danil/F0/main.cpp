@@ -25,6 +25,10 @@ int main(const int argc, const char* const* const argv)
   cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(data));
   cmds["substructdictionaries"] = std::bind(substructDicts, std::ref(std::cin), std::ref(data));
   cmds["mergewords"] = std::bind(mergeWords, std::ref(std::cin), std::ref(data));
+  cmds["copytranslations"] = std::bind(copyTranslations, std::ref(std::cin), std::ref(data));
+  cmds["printtranslations"] = std::bind(printTranslations, std::ref(std::cin),std::ref(std::cout), std::cref(data));
+  cmds["printengwordswithtraslation"] = std::bind(printEngWordsWithTraslation, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["commonpartdictionaries"] = std::bind(doCommonPartDicts, std::ref(std::cin), std::ref(data));
   cmds["mergedictionaries"] = std::bind(mergeNumberDicts, std::ref(std::cin), std::ref(data));
   cmds["printall"] = std::bind(printAll, std::ref(std::cout), std::cref(data));
   cmds["removeword"] = std::bind(removeWord, std::ref(std::cin), std::ref(data));

@@ -1,8 +1,10 @@
 #include "commands.hpp"
 #include <string>
-#include <dynamic_array.hpp>
 #include <fstream>
 #include <hash_dyn_array.hpp>
+#include <AVLtree.hpp>
+#include <dynamic_array.hpp>
+
 namespace
 {
   using tree_of_words = tkach::AvlTree< std::string, tkach::List< std::string > >;
@@ -27,23 +29,22 @@ namespace
 
   tkach::List< std::string > mergeTranslations(const tkach::List< std::string >& list1, const tkach::List< std::string >& list2)
   {
-    tkach::List< std::string > translations;
+    tkach::AvlTree< std::string, std::string > tree_translations;
     for (auto it = list1.cbegin(); it != list1.cend(); ++it)
     {
-      if (!findTranslation(translations, *it))
-      {
-        translations.pushBack(*it);
-      }
+      tree_translations.insert(*it, *it);
     }
     if (std::addressof(list1) != std::addressof(list2))
     {
       for (auto it = list2.cbegin(); it != list2.cend(); ++it)
       {
-        if (!findTranslation(translations, *it))
-        {
-          translations.pushBack(*it);
-        }
+        tree_translations.insert(*it, *it);
       }
+    }
+    tkach::List< std::string > translations;
+    for (auto it = tree_translations.cbegin(); it != tree_translations.cend(); ++it)
+    {
+      translations.pushBack(it->first);
     }
     return translations;
   }
@@ -414,6 +415,7 @@ namespace tkach
   {
     exportDictionaries(in, avltree, std::ios_base::app);
   }
+
   void printAll(std::ostream& out, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& data)
   {
     for (auto it = data.cbegin(); it != data.cend(); ++it)
@@ -659,5 +661,207 @@ namespace tkach
     tree_of_words result_dict = mergeDicts(source_dicts);
     avltree[new_dict_name] = result_dict;
   }
-}
 
+  void doCommonPartDicts(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+  {
+    std::string new_dict_name;
+    int number_of_dictionaries = 0;
+    if (!(in >> new_dict_name) || new_dict_name.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
+    {
+      throw std::logic_error("<INVALID NUMBER>");
+    }
+    HashDynArray< tree_of_words* > source_dicts;
+    for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
+    {
+      std::string current_dict_name;
+      if (!(in >> current_dict_name) || current_dict_name.empty())
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
+      auto it = avltree.find(current_dict_name);
+      if (it == avltree.end())
+      {
+        throw std::logic_error("<INVALID DICTIONARY>");
+      }
+      source_dicts[i] = &it->second;
+    }
+    tree_of_words result_dict(*source_dicts[0]);
+    for (size_t i = 1; i < static_cast< size_t >(number_of_dictionaries); ++i)
+    {
+      const tree_of_words* dict = source_dicts[i];
+      tree_of_words common;
+      for (auto it = result_dict.begin(); it != result_dict.end(); ++it)
+      {
+        auto it_find = dict->find(it->first);
+        if (it_find != dict->cend())
+        {
+          common[it->first] = mergeTranslations(it->second, it_find->second);
+        }
+        result_dict = common;
+      }
+    }
+    avltree[new_dict_name] = result_dict;
+  }
+
+  void copyTranslations(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+  {
+    std::string source_dict_name;
+    std::string eng_word;
+    int number_of_dictionaries = 0;
+    if (!(in >> source_dict_name) || source_dict_name.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!(in >> eng_word) || eng_word.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
+    {
+      throw std::logic_error("<INVALID NUMBER>");
+    }
+    auto source_it = avltree.find(source_dict_name);
+    if (source_it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
+    }
+    const tree_of_words& source_dict = source_it->second;
+    auto word_it = source_dict.find(eng_word);
+    if (word_it == source_dict.cend())
+    {
+      throw std::logic_error("<INVALID WORD>");
+    }
+    for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
+    {
+      std::string current_dict_name;
+      if (!(in >> current_dict_name) || current_dict_name.empty())
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
+      auto it = avltree.find(current_dict_name);
+      if (it == avltree.end())
+      {
+        throw std::logic_error("<INVALID DICTIONARY>");
+      }
+      tree_of_words& target = it->second;
+      auto target_it = target.find(eng_word);
+      if (target_it == target.end())
+      {
+        target[eng_word] = word_it->second;
+      }
+      else
+      {
+        target_it->second = mergeTranslations(target_it->second, word_it->second);
+      }
+    }
+  }
+
+  void printTranslations(std::istream& in, std::ostream& out, const tree_of_dict& avltree)
+  {
+    std::string eng_word;
+    int number_of_dictionaries = 0;
+    if (!(in >> eng_word) || eng_word.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
+    {
+      throw std::logic_error("<INVALID NUMBER>");
+    }
+    AvlTree< std::string, std::string > tree_translations;
+    bool word_found = false;
+    for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
+    {
+      std::string current_dict_name;
+      if (!(in >> current_dict_name) || current_dict_name.empty())
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
+      auto it = avltree.find(current_dict_name);
+      if (it == avltree.cend())
+      {
+        throw std::logic_error("<INVALID DICTIONARY>");
+      }
+      auto it2 = it->second.find(eng_word);
+      if (it2 != it->second.cend())
+      {
+        word_found = true;
+        for (auto it3 = it2->second.cbegin(); it3 != it2->second.cend(); ++it3)
+        {
+          tree_translations[*it3];
+        }
+      }
+    }
+    if (!word_found)
+    {
+      throw std::logic_error("<INVALID WORD>");
+    }
+    else if (tree_translations.empty())
+    {
+      out << "\n";
+    }
+    else
+    {
+      out << tree_translations.begin()->first;
+      for (auto it = ++tree_translations.begin(); it != tree_translations.end(); ++it)
+      {
+        out << " " << it->first;
+      }
+      out << "\n";
+    }
+  }
+
+  void printEngWordsWithTraslation(std::istream& in, std::ostream& out, const tree_of_dict& avltree)
+  {
+    std::string translation;
+    int number_of_dictionaries = 0;
+    if (!(in >> translation) || translation.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
+    {
+      throw std::logic_error("<INVALID NUMBER>");
+    }
+    AvlTree< std::string, std::string > tree_word;
+    bool translation_found = false;
+    for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
+    {
+      std::string current_dict_name;
+      if (!(in >> current_dict_name) || current_dict_name.empty())
+      {
+        throw std::logic_error("<INVALID ARGUMENTS>");
+      }
+      auto it = avltree.find(current_dict_name);
+      if (it == avltree.cend())
+      {
+        throw std::logic_error("<INVALID DICTIONARY>");
+      }
+      for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
+      {
+        if (findTranslation(it2->second, translation))
+        {
+          translation_found = true;
+          tree_word[it2->first];
+        }
+      }
+    }
+    if (!translation_found)
+    {
+      throw std::logic_error("<NO WORD WITH THIS TRASLATION>");
+    }
+    else
+    {
+      out << tree_word.begin()->first;
+      for (auto it = ++tree_word.begin(); it != tree_word.end(); ++it)
+      {
+        out << " " << it->first;
+      }
+      out << "\n";
+    }
+  }
+}
