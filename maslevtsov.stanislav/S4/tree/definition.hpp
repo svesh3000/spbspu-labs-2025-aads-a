@@ -6,7 +6,7 @@
 
 template< class Key, class T, class Compare >
 maslevtsov::Tree< Key, T, Compare >::Tree():
-  dummy_root_(new Node{nullptr, nullptr, nullptr, nullptr, true, value_type()}),
+  dummy_root_(new Node{nullptr, nullptr, nullptr, nullptr, true, value_type(), value_type()}),
   size_(0),
   compare_(Compare())
 {}
@@ -57,6 +57,12 @@ template< class Key, class T, class Compare >
 T& maslevtsov::Tree< Key, T, Compare >::operator[](const Key& key)
 {
   return insert(std::make_pair(key, T())).first->second;
+}
+
+template< class Key, class T, class Compare >
+const T& maslevtsov::Tree< Key, T, Compare >::operator[](const Key& key) const
+{
+  return at(key);
 }
 
 template< class Key, class T, class Compare >
@@ -158,7 +164,7 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   maslevtsov::Tree< Key, T, Compare >::insert(const value_type& value)
 {
   if (empty()) {
-    Node* new_node = new Node{dummy_root_, nullptr, nullptr, nullptr, true, value};
+    Node* new_node = new Node{dummy_root_, nullptr, nullptr, nullptr, true, value, value_type()};
     dummy_root_->left = new_node;
     ++size_;
     return {iterator(new_node, true), true};
@@ -187,13 +193,13 @@ std::pair< typename maslevtsov::Tree< Key, T, Compare >::iterator, bool >
   }
   if (current->is_two) {
     if (compare_(value.first, current->data1.first)) {
-      current->data2 = current->data1;
-      current->data1 = value;
+      assign_value(current->data2, current->data1);
+      assign_value(current->data1, value);
       current->is_two = false;
       ++size_;
       return {iterator(current, true), true};
     }
-    current->data2 = value;
+    assign_value(current->data2, value);
     current->is_two = false;
     ++size_;
     return {iterator(current, false), true};
@@ -334,11 +340,11 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   if (compare_(values_to_split[2].first, values_to_split[1].first)) {
     std::swap(values_to_split[2], values_to_split[1]);
   }
-  Node* left_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[0]};
+  Node* left_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[0], value_type()};
   Node* right_node = nullptr;
   try {
-    right_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[2]};
-  } catch (const std::bad_alloc&) {
+    right_node = new Node{nullptr, nullptr, nullptr, nullptr, true, values_to_split[2], value_type()};
+  } catch (...) {
     delete left_node;
     clear_subtree(left_child);
     clear_subtree(right_child);
@@ -378,8 +384,16 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
   }
   Node* parent = node->parent;
   if (parent == dummy_root_) {
-    node->data1 = values_to_split[1];
-    node->data2 = value_type();
+    try {
+      node->data1 = values_to_split[1];
+      node->data2 = value_type();
+    } catch (...) {
+      delete left_node;
+      delete right_node;
+      clear_subtree(left_child);
+      clear_subtree(right_child);
+      std::terminate();
+    }
     node->left = left_node;
     left_node->parent = node;
     node->right = right_node;
@@ -389,12 +403,28 @@ void maslevtsov::Tree< Key, T, Compare >::split_nodes(Node* node, value_type& to
     return;
   } else if (parent->is_two) {
     if (compare_(values_to_split[1].first, parent->data1.first)) {
-      parent->data2 = parent->data1;
-      parent->data1 = values_to_split[1];
+      try {
+        parent->data2 = parent->data1;
+        parent->data1 = values_to_split[1];
+      } catch (...) {
+        delete left_node;
+        delete right_node;
+        clear_subtree(left_child);
+        clear_subtree(right_child);
+        std::terminate();
+      }
       parent->left = left_node;
       parent->middle = right_node;
     } else {
-      parent->data2 = values_to_split[1];
+      try {
+        parent->data2 = values_to_split[1];
+      } catch (...) {
+        delete left_node;
+        delete right_node;
+        clear_subtree(left_child);
+        clear_subtree(right_child);
+        std::terminate();
+      }
       parent->middle = left_node;
       parent->right = right_node;
     }
@@ -421,6 +451,16 @@ void maslevtsov::Tree< Key, T, Compare >::clear_subtree(Node* node) noexcept
 }
 
 template< class Key, class T, class Compare >
+void maslevtsov::Tree< Key, T, Compare >::assign_value(value_type& dist, const value_type& src)
+{
+  try {
+    dist = src;
+  } catch (...) {
+    std::terminate();
+  }
+}
+
+template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::erase_from_leaf(iterator pos) noexcept
 {
   if (!pos.node_->is_two) {
@@ -428,10 +468,10 @@ void maslevtsov::Tree< Key, T, Compare >::erase_from_leaf(iterator pos) noexcept
       std::swap(pos.node_->data1, pos.node_->data2);
     }
     pos.node_->is_two = true;
-    pos.node_->data2 = value_type();
+    assign_value(pos.node_->data2, value_type());
   } else {
     Node* to_delete = pos.node_;
-    to_delete->data1 = value_type();
+    assign_value(to_delete->data1, value_type());
     if (!to_delete->parent->is_two) {
       balance_parent_three(to_delete);
     } else {
@@ -449,19 +489,19 @@ void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) no
       std::swap(deleted->data1, parent->data2);
       std::swap(parent->data2, parent->right->data1);
       std::swap(parent->right->data1, parent->right->data2);
-      parent->right->data2 = value_type();
+      assign_value(parent->right->data2, value_type());
       parent->right->is_two = true;
     } else if (!parent->left->is_two) {
       std::swap(deleted->data1, parent->data1);
       std::swap(parent->data1, parent->left->data2);
-      parent->left->data2 = value_type();
+      assign_value(parent->left->data2, value_type());
       parent->left->is_two = true;
     } else {
       std::swap(parent->data2, parent->right->data2);
       std::swap(parent->right->data1, parent->right->data2);
       parent->right->is_two = false;
       parent->is_two = true;
-      parent->middle->data1 = value_type();
+      assign_value(parent->middle->data1, value_type());
       delete parent->middle;
       parent->middle = nullptr;
     }
@@ -470,7 +510,7 @@ void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) no
       std::swap(deleted->data1, parent->data1);
       std::swap(parent->data1, parent->middle->data1);
       std::swap(parent->middle->data1, parent->middle->data2);
-      parent->middle->data2 = value_type();
+      assign_value(parent->middle->data2, value_type());
       parent->middle->is_two = true;
     } else {
       std::swap(parent->data1, parent->middle->data2);
@@ -478,7 +518,7 @@ void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) no
       std::swap(parent->middle->data1, parent->middle->data2);
       parent->middle->is_two = false;
       parent->is_two = true;
-      parent->left->data1 = value_type();
+      assign_value(parent->left->data1, value_type());
       delete parent->left;
       parent->left = parent->middle;
       parent->middle = nullptr;
@@ -487,13 +527,13 @@ void maslevtsov::Tree< Key, T, Compare >::balance_parent_three(Node* deleted) no
     if (!parent->middle->is_two) {
       std::swap(deleted->data1, parent->data2);
       std::swap(parent->data2, parent->middle->data2);
-      parent->middle->data2 = value_type();
+      assign_value(parent->middle->data2, value_type());
       parent->middle->is_two = true;
     } else {
       std::swap(parent->data2, parent->middle->data2);
       parent->middle->is_two = false;
       parent->is_two = true;
-      parent->right->data1 = value_type();
+      assign_value(parent->right->data1, value_type());
       delete parent->right;
       parent->right = parent->middle;
       parent->middle = nullptr;
@@ -509,12 +549,12 @@ void maslevtsov::Tree< Key, T, Compare >::balance_parent_two(Node* deleted) noex
     std::swap(parent->data1, parent->left->data1);
     std::swap(parent->data1, parent->right->data1);
     std::swap(parent->right->data1, parent->right->data2);
-    parent->right->data2 = value_type();
+    assign_value(parent->right->data2, value_type());
     parent->right->is_two = true;
   } else if (parent->right == deleted && !parent->left->is_two) {
     std::swap(parent->data1, parent->right->data1);
     std::swap(parent->data1, parent->left->data2);
-    parent->left->data2 = value_type();
+    assign_value(parent->left->data2, value_type());
     parent->left->is_two = true;
   } else {
     balance_parent_bro_two(deleted);
@@ -525,7 +565,7 @@ template< class Key, class T, class Compare >
 void maslevtsov::Tree< Key, T, Compare >::balance_parent_bro_two(Node* deleted) noexcept
 {
   Node* parent = deleted->parent;
-  deleted->data1 = value_type();
+  assign_value(deleted->data1, value_type());
   if (parent->left == deleted) {
     delete deleted;
     parent->left = nullptr;
