@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstring>
 #include <stdexcept>
 #include <map.hpp>
 #include <safe_math.hpp>
@@ -48,25 +47,21 @@ int main(int argc, char** argv)
     }
   };
   Accumulator acc;
+  rychkov::Map< std::string, Accumulator (decltype(map)::*)(Accumulator) const > call_map = {
+        {"ascending", &decltype(map)::traverse_lnr},
+        {"descending", &decltype(map)::traverse_rnl},
+        {"breadth", &decltype(map)::traverse_breadth}
+      };
+
+  decltype(call_map)::const_iterator call_p = call_map.find(argv[1]);
+  if (call_p == call_map.cend())
+  {
+    std::cerr << "wrong traverse name\n";
+    return 1;
+  }
   try
   {
-    if (std::strcmp(argv[1], "ascending") == 0)
-    {
-      acc = map.traverse_lnr(acc);
-    }
-    else if (std::strcmp(argv[1], "descending") == 0)
-    {
-      acc = map.traverse_rnl(acc);
-    }
-    else if (std::strcmp(argv[1], "breadth") == 0)
-    {
-      acc = map.traverse_breadth(acc);
-    }
-    else
-    {
-      std::cerr << "wrong traverse name\n";
-      return 1;
-    }
+    acc = (map.*(call_p->second))(acc);
   }
   catch (const std::invalid_argument&)
   {
