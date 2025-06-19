@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <functional>
+#include "cmds.hpp"
 #include <two-three-tree.h>
 
 namespace savintsev
@@ -36,12 +38,14 @@ int main(int argc, char * argv[])
     return 1;
   }
 
-  std::string treverse_mode(argv[1]);
+  std::string traverse_mode(argv[1]);
   std::string filename(argv[2]);
 
   using namespace savintsev;
 
-  TwoThreeTree< long long, std::string > tree;
+  using DataTree = TwoThreeTree< long long, std::string >;
+
+  DataTree tree;
 
   std::ifstream file(filename);
   if (!file)
@@ -63,33 +67,43 @@ int main(int argc, char * argv[])
     return 0;
   }
 
+  TwoThreeTree< std::string, std::function< void(KeyAdder) > > commands;
+
+  using namespace std::placeholders;
+
+  commands["ascending"] = std::bind(ascending< KeyAdder >, std::ref(tree), _1);
+  commands["descending"] = std::bind(descending< KeyAdder >, std::ref(tree), _1);
+  commands["breadth"] = std::bind(breadth< KeyAdder >, std::ref(tree), _1);
+
   try
   {
     KeyAdder summator;
 
-    if (treverse_mode == "ascending")
+    if (traverse_mode == "ascending")
     {
       summator = tree.traverse_lnr(summator);
     }
-    else if (treverse_mode == "descending")
+    else if (traverse_mode == "descending")
     {
       summator = tree.traverse_rnl(summator);
     }
-    else if (treverse_mode == "breadth")
+    else if (traverse_mode == "breadth")
     {
       summator = tree.traverse_breadth(summator);
     }
-    else
-    {
-      std::cerr << "ERROR: Traverse doesn't exist (Invalid argument)\n";
-      return 1;
-    }
+
+    commands.at(traverse_mode)(summator);
 
     std::cout << summator.result_ << summator.values_ << "\n";
   }
   catch (const std::overflow_error & e)
   {
     std::cerr << "ERROR: " << e.what() << "\n";
+    return 1;
+  }
+  catch (const std::out_of_range & e)
+  {
+    std::cerr << "ERROR: Traverse doesn't exist (Invalid argument)\n";
     return 1;
   }
   catch (const std::logic_error & e)
