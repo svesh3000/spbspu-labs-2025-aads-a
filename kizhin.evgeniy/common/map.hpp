@@ -82,6 +82,10 @@ namespace kizhin {
     void insert(InputIt, InputIt);
     void insert(std::initializer_list< value_type >);
 
+    iterator erase(const_iterator);
+    size_type erase(const key_type&);
+    iterator erase(const_iterator, const_iterator);
+
     void clear() noexcept;
     void swap(Map&) noexcept(is_nothrow_swappable);
 
@@ -116,23 +120,41 @@ namespace kizhin {
 
   private:
     using Node = detail::Node< value_type >;
+    class EndNodeGuard;
 
     Node* root_ = nullptr;
     size_type size_ = 0;
     Comparator comparator_;
 
     void deallocate() noexcept;
+    Node* getEndNode() const noexcept;
 
     template < typename... Args >
-    [[nodiscard]] Node* emplaceToNode(Node*, Args&&...);
+    Node* emplaceToNode(Node*, Args&&...);
+    template < typename... Args >
+    std::pair< iterator, bool > emplaceToEmpty(Args&&...);
+    Node* eraseFromNode(Node*, const_pointer);
+    void swapVals(Node* lhs, pointer lhsPtr, Node* rhs, pointer rhsPtr);
 
     Node* split(Node*);
-    std::tuple< Node*, Node* > splitInTwo(const Node*) const;
+    std::tuple< Node*, Node* > splitInTwo(const Node*);
     void splitChildren(const Node* src, Node* left, Node* right) const noexcept;
 
     pointer findKey(const Node*, const key_type&) const;
     Node* findTarget(Node*, const key_type&) const;
     Node* validateHint(Node*, const key_type&) const;
+
+    Node* fixUnderflow(Node*);
+    Node* fixRootUnderflow(Node*);
+
+    bool isMergeable(const Node*) const;
+    Node* merge(Node*);
+
+    Node* redistribute(Node*);
+    Node* giveToSibling(Node*);
+    Node* borrowFromSibling(Node*);
+    Node* borrowFromLeft(Node* target, Node* sibling);
+    Node* borrowFromRight(Node* target, Node* sibling);
   };
 
   template < typename K, typename T, typename C >
@@ -178,11 +200,7 @@ public:
   using difference_type = std::ptrdiff_t;
   using pointer = conditional_t< Map::const_pointer, Map::pointer >;
   using reference = conditional_t< Map::const_reference, Map::reference >;
-#if defined(BIDIR_MAP_ITERATORS)
   using iterator_category = std::bidirectional_iterator_tag;
-#else
-  using iterator_category = std::forward_iterator_tag;
-#endif
 
   Iterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
@@ -193,10 +211,8 @@ public:
 
   Iterator& operator++();
   Iterator operator++(int);
-#if defined(BIDIR_MAP_ITERATORS)
   Iterator& operator--();
   Iterator operator--(int);
-#endif
 
   friend bool operator==(const Iterator& lhs, const Iterator& rhs) noexcept
   {
@@ -247,7 +263,7 @@ template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator->() const noexcept -> pointer
 {
   assert(node_ && valuePtr_ && "Dereferencing empty iterator");
-  return valuePtr_;
+  return std::addressof(**this);
 }
 
 template < typename K, typename T, typename C >
@@ -263,7 +279,7 @@ template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator++() -> Iterator&
 {
   assert(node_ && valuePtr_ && "Incrementing empty iterator");
-  std::tie(node_, valuePtr_) = nextIter(node_, valuePtr_);
+  std::tie(node_, valuePtr_) = detail::nextIter(node_, valuePtr_);
   return *this;
 }
 
@@ -276,13 +292,12 @@ auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator++(int) -> Iterator
   return result;
 }
 
-#if defined(BIDIR_MAP_ITERATORS)
 template < typename K, typename T, typename C >
 template < bool IsConst >
 auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--() -> Iterator&
 {
   assert(node_ && valuePtr_ && "Decrementing empty iterator");
-  std::tie(node_, valuePtr_) = prevIter(node_, valuePtr_);
+  std::tie(node_, valuePtr_) = detail::prevIter(node_, valuePtr_);
   return *this;
 }
 
@@ -294,7 +309,6 @@ auto kizhin::Map< K, T, C >::Iterator< IsConst >::operator--(int) -> Iterator
   --(*this);
   return result;
 }
-#endif
 
 template < typename K, typename T, typename C >
 class kizhin::Map< K, T, C >::value_compare
@@ -382,7 +396,7 @@ typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::begin() noexce
 template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::end() noexcept
 {
-  return iterator{};
+  return iterator{ getEndNode() };
 }
 
 template < typename K, typename T, typename C >
@@ -399,7 +413,7 @@ template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::const_iterator kizhin::Map< K, T, C >::end()
     const noexcept
 {
-  return const_iterator{};
+  return const_iterator{ getEndNode() };
 }
 
 template < typename K, typename T, typename C >
@@ -493,6 +507,61 @@ void kizhin::Map< K, T, C >::insert(std::initializer_list< value_type > list)
 }
 
 template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::erase(
+    const_iterator position)
+{
+  assert(position != end() && "Position for erasing must not be end()");
+  const key_type erasingKey = position->first;
+  Node* node = position.node_;
+  pointer nodePtr = const_cast< pointer >(position.valuePtr_);
+  EndNodeGuard guard(this);
+  using std::exchange;
+  if (!detail::isLeaf(node) && nodePtr == node->begin) {
+    Node* left = detail::treeMax(node->children[0]);
+    pointer leftPtr = left->end - 1;
+    swapVals(left, leftPtr, exchange(node, left), exchange(nodePtr, leftPtr));
+  } else if (!detail::isLeaf(node)) {
+    Node* right = detail::treeMin(node->children[detail::size(node)]);
+    pointer rightPtr = right->begin;
+    swapVals(right, rightPtr, exchange(node, right), exchange(nodePtr, rightPtr));
+  }
+  node = eraseFromNode(node, nodePtr);
+  --size_;
+  while (node && detail::isEmpty(node)) {
+    node = fixUnderflow(node);
+  }
+  guard.join();
+  return upperBound(erasingKey);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::size_type kizhin::Map< K, T, C >::erase(
+    const key_type& key)
+{
+  const_iterator position = find(key);
+  if (position == end()) {
+    return 0;
+  }
+  erase(position);
+  return 1;
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::iterator kizhin::Map< K, T, C >::erase(
+    const_iterator first, const const_iterator last)
+{
+  if (first == begin() && last == end()) {
+    clear();
+    return end();
+  }
+  iterator firstI(first.node_, const_cast< pointer >(first.valuePtr_));
+  for (; firstI != last; ++first) {
+    firstI = erase(firstI);
+  }
+  return firstI;
+}
+
+template < typename K, typename T, typename C >
 void kizhin::Map< K, T, C >::clear() noexcept
 {
   if (!empty()) {
@@ -526,11 +595,9 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
     C >::emplaceHint(const_iterator hint, Args&&... args)
 {
   if (empty()) {
-    root_ = new Node;
-    detail::emplaceBack(root_, std::forward< Args >(args)...);
-    ++size_;
-    return std::make_pair(begin(), true);
+    return emplaceToEmpty(std::forward< Args >(args)...);
   }
+  EndNodeGuard guard(this);
   value_type value{ std::forward< Args >(args)... };
   Node* target = findTarget(hint.node_, value.first);
   pointer valuePtr = findKey(target, value.first);
@@ -543,6 +610,7 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   while (detail::size(target) > 2) {
     target = split(target);
   }
+  guard.join();
   return std::make_pair(find(key), true);
 }
 
@@ -713,9 +781,51 @@ F kizhin::Map< K, T, C >::traverseBreadth(F func) const
 }
 
 template < typename K, typename T, typename C >
+class kizhin::Map< K, T, C >::EndNodeGuard
+{
+public:
+  EndNodeGuard(const EndNodeGuard&) = delete;
+  EndNodeGuard(Map* owner) noexcept:
+    owner_(owner),
+    endNode_(owner->getEndNode())
+  {
+    endNode_->parent->children.fill(nullptr);
+  }
+  EndNodeGuard& operator=(const EndNodeGuard&) = delete;
+
+  ~EndNodeGuard()
+  {
+    if (!isJoined_) {
+      join();
+    }
+  }
+
+  void join() noexcept
+  {
+    assert(!isJoined_ && "EndNode has already joined");
+    isJoined_ = true;
+    if (owner_->empty()) {
+      delete endNode_;
+      return;
+    }
+    Node* max = detail::treeMax(owner_->root_);
+    endNode_->parent = max;
+    max->children.fill(endNode_);
+  }
+
+private:
+  Map* owner_ = nullptr;
+  Node* endNode_ = nullptr;
+  bool isJoined_ = false;
+};
+
+template < typename K, typename T, typename C >
 void kizhin::Map< K, T, C >::deallocate() noexcept
 {
   assert(!empty() && "Attempt to deallocate empty tree");
+  Node* endNode = getEndNode();
+  endNode->parent->children.fill(nullptr);
+  delete endNode;
   Node* left = root_;
   while (root_->children[0]) {
     left = detail::treeMin(left);
@@ -727,11 +837,25 @@ void kizhin::Map< K, T, C >::deallocate() noexcept
 }
 
 template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::getEndNode() const noexcept
+{
+  if (empty()) {
+    return nullptr;
+  }
+  Node* max = detail::treeMax(root_);
+  return detail::isEmpty(max) ? max : max->children[0];
+}
+
+template < typename K, typename T, typename C >
 template < typename... Args >
-[[nodiscard]] typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T,
-    C >::emplaceToNode(Node* node, Args&&... args)
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::emplaceToNode(Node* node,
+    Args&&... args)
 {
   assert(node && "emplaceToNode: nullptr given");
+  if (detail::isEmpty(node)) {
+    detail::emplaceBack(node, std::forward< Args >(args)...);
+    return node;
+  }
   std::unique_ptr< Node > result = std::make_unique< Node >();
   detail::emplace(node, result.get(), valueComp(), std::forward< Args >(args)...);
   detail::relink(node, result.get());
@@ -743,13 +867,61 @@ template < typename... Args >
 }
 
 template < typename K, typename T, typename C >
+template < typename... Args >
+std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
+    C >::emplaceToEmpty(Args&&... args)
+{
+  assert(empty() && "emplaceToEmpty called on non empty Map");
+  root_ = new Node;
+  detail::emplaceBack(root_, std::forward< Args >(args)...);
+  Node* endNode = new Node;
+  endNode->parent = root_;
+  root_->children.fill(endNode);
+  ++size_;
+  return std::make_pair(begin(), true);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::eraseFromNode(Node* node,
+    const_pointer valPtr)
+{
+  assert(node && valPtr && "eraseFromNode: nullptr given");
+  assert(valPtr >= node->begin && valPtr < node->end && "eraseFromNode: invalid valPtr");
+  if (valPtr == node->end - 1) {
+    detail::popBack(node);
+    return node;
+  }
+  std::unique_ptr< Node > result = std::make_unique< Node >();
+  detail::pop(node, result.get(), valPtr);
+  detail::relink(node, result.get());
+  if (node == root_) {
+    root_ = result.get();
+  }
+  delete node;
+  return result.release();
+}
+
+template < typename K, typename T, typename C >
+void kizhin::Map< K, T, C >::swapVals(Node* lhs, pointer lhsPtr, Node* rhs,
+    pointer rhsPtr)
+{
+  static_assert(is_nothrow_move_constructible_v< value_type >,
+      "swapVals requires value_type to have a noexcept move constructor");
+  assert(lhs && lhsPtr && rhs && rhsPtr && "SwapVals: nullptr node given");
+  value_type temp1(std::move(*lhsPtr));
+  value_type temp2(std::move(*rhsPtr));
+  lhsPtr->~value_type();
+  rhsPtr->~value_type();
+  new (lhsPtr) value_type(std::move(temp2));
+  new (rhsPtr) value_type(std::move(temp1));
+}
+
+template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
 {
-  /* TODO: Must be strong exception safety */
-  using detail::size;
   assert(node && "Attempt to split nullptr node");
   assert(detail::size(node) > 2 && "Cannot split node with size less than 3");
-  assert((!node->parent || size(node->parent) < 3) && "Split: filled parent");
+  assert((!node->parent || detail::size(node->parent) < 3) && "Split: filled parent");
 
   Node* left = nullptr;
   Node* right = nullptr;
@@ -761,62 +933,64 @@ typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::split(Node* node)
     root_ = parent;
   }
   parent = emplaceToNode(parent, *(node->begin + 1));
-  auto& parChildren = parent->children;
-  *std::remove(parChildren.begin(), parChildren.end(), node) = nullptr;
+  auto& children = parent->children;
+  *std::remove(children.begin(), children.end(), node) = nullptr;
   delete node;
-
-  auto it = std::remove(parChildren.begin(), parChildren.end(), nullptr);
+  auto it = std::find(children.begin(), children.end(), nullptr);
   *(it++) = detail::updateParent(left);
   *(it++) = detail::updateParent(right);
-  const auto pred = [this](const Node* lhs, const Node* rhs) -> bool
+  struct NodeComparator
   {
-    return valueComp()(*(lhs->begin), *(rhs->begin));
-  }; /* TODO: Remove lambdas */
-  std::sort(parChildren.begin(), it, pred);
+    bool operator()(const Node* lhs, const Node* rhs) const
+    {
+      return comp(*(lhs->begin), *(rhs->begin));
+    }
+    value_compare comp;
+  };
+  std::sort(children.begin(), it, NodeComparator{ valueComp() });
   return detail::updateParent(parent);
 }
 
 template < typename K, typename T, typename C >
 std::tuple< typename kizhin::Map< K, T, C >::Node*,
     typename kizhin::Map< K, T, C >::Node* >
-kizhin::Map< K, T, C >::splitInTwo(const Node* node) const
+kizhin::Map< K, T, C >::splitInTwo(const Node* node)
 {
   assert(node && "splitInTwo: nullptr node given");
   assert(detail::size(node) == 3 && "splitInTwo: node must be filled");
   std::unique_ptr< Node > left = std::make_unique< Node >();
   std::unique_ptr< Node > right = std::make_unique< Node >();
-
-  detail::emplaceBack(left.get(), *node->begin);
-  detail::emplaceBack(right.get(), *(node->end - 1));
+  emplaceToNode(left.get(), *node->begin);
+  emplaceToNode(right.get(), *(node->end - 1));
   splitChildren(node, left.get(), right.get());
-
-  const auto result = std::make_tuple(left.get(), right.get());
-  left.release();
-  right.release();
-  return result;
+  return std::make_tuple(left.release(), right.release());
 }
 
 template < typename K, typename T, typename C >
 void kizhin::Map< K, T, C >::splitChildren(const Node* src, Node* left,
     Node* right) const noexcept
 {
-  assert(src && left && right && "nullptr given to splitChildren");
-  left->children[0] = src->children[0];
-  left->children[1] = src->children[1];
-  right->children[0] = src->children[2];
-  right->children[1] = src->children[3];
+  assert(src && left && right && "SplitChildren: nullptr node given");
+  auto mid = src->children.begin() + (src->children.size() / 2);
+  std::copy(src->children.begin(), mid, left->children.begin());
+  std::copy(mid, src->children.end(), right->children.begin());
 }
 
 template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::pointer kizhin::Map< K, T, C >::findKey(const Node* node,
     const key_type& key) const
 {
-  assert(node && "Attempt to check is key in nullptr node");
-  const auto pred = [this, &key](const_reference val) -> bool
+  assert(node && "FindKey: nullptr node given");
+  struct KeyEqual
   {
-    return !keyComp()(val.first, key) && !keyComp()(key, val.first);
-  }; /* TODO: Remove lambdas */
-  return std::find_if(node->begin, node->end, pred);
+    bool operator()(const_reference val) const
+    {
+      return !comp(val.first, key) && !comp(key, val.first);
+    }
+    C comp;
+    const key_type& key;
+  };
+  return std::find_if(node->begin, node->end, KeyEqual{ keyComp(), key });
 }
 
 template < typename K, typename T, typename C >
@@ -842,25 +1016,193 @@ template < typename K, typename T, typename C >
 typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::validateHint(Node* hint,
     const key_type& key) const
 {
-  if (!hint || hint == root_) {
+  if (!hint || detail::isEmpty(hint) || hint == root_) {
     return root_;
   }
   bool isValid = true;
+  bool isMid = false;
   const Node* current = hint;
-  while (current->parent && isValid) {
+  while (current->parent && isValid && !isMid) {
     const key_type& parFirst = current->parent->begin->first;
     const key_type& parLast = (current->parent->end - 1)->first;
-    const bool isMid = detail::isMiddle(current);
-    if (isMid && (keyComp()(key, parFirst) || keyComp()(parLast, key))) {
-      isValid = false;
-    } else if (detail::isLeft(current) && keyComp()(parFirst, key)) {
-      isValid = false;
-    } else if (detail::isRight(current) && keyComp()(key, parLast)) {
-      isValid = false;
-    }
+    isMid = detail::isMiddle(current);
+    isValid = isMid && !(keyComp()(key, parFirst) || keyComp()(parLast, key));
+    isValid = isValid || (detail::isLeft(current) && !keyComp()(parFirst, key));
+    isValid = isValid || (detail::isRight(current) && !keyComp()(key, parLast));
     current = current->parent;
   }
   return isValid ? hint : root_;
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::fixUnderflow(Node* node)
+{
+  assert(node && "fixUnderflow called with nullptr");
+  assert(detail::isEmpty(node) && "fixUnderflow called on non-empty node");
+  if (node == root_) {
+    return fixRootUnderflow(node);
+  }
+  if (isMergeable(node)) {
+    return merge(node)->parent;
+  }
+  return redistribute(node)->parent;
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::fixRootUnderflow(
+    Node* root)
+{
+  assert(root && "fixRootUnderflow: nullptr node given");
+  assert(root == root_ && "fixRootUnderflow: non-root node given");
+  if (detail::isLeaf(root)) {
+    delete std::exchange(root_, nullptr);
+    return root_;
+  }
+  Node* newRoot = root_->children[0];
+  newRoot->parent = nullptr;
+  delete std::exchange(root_, newRoot);
+  return root_;
+}
+
+template < typename K, typename T, typename C >
+bool kizhin::Map< K, T, C >::isMergeable(const Node* node) const
+{
+  assert(node && "IsMergeable: nullptr node given");
+  assert(node->parent && "IsMergeable: root node given");
+  if (detail::isThree(node->parent)) {
+    return false;
+  }
+  const auto getRight = detail::getRightSibling< const Node* >;
+  const auto getLeft = detail::getLeftSibling< const Node* >;
+  return !detail::isThree(detail::isLeft(node) ? getRight(node) : getLeft(node));
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::merge(Node* node)
+{
+  assert(node && "Merge: nullptr node given");
+  assert(node->parent && detail::isEmpty(node) && "Merge: empty or root node given");
+  assert(!detail::isThree(node->parent) && "Merge: invalid node given");
+  Node* parent = node->parent;
+  using detail::getLeftSibling;
+  using detail::getRightSibling;
+  Node* sibling = detail::isLeft(node) ? getRightSibling(node) : getLeftSibling(node);
+  sibling = emplaceToNode(sibling, std::move_if_noexcept(*parent->begin));
+  if (detail::isRight(node)) {
+    sibling->children[2] = node->children[0];
+  } else {
+    sibling->children[2] = std::exchange(sibling->children[1], sibling->children[0]);
+    sibling->children[0] = node->children[0];
+  }
+  *std::remove(parent->children.begin(), parent->children.end(), node) = nullptr;
+  delete node;
+  detail::clear(parent);
+  return detail::updateParent(sibling);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::redistribute(Node* node)
+{
+  assert(node && "Redistribute: nullptr node given");
+  assert(!isMergeable(node) && "Redistribute: merge must be called");
+  assert(detail::isEmpty(node) && "Redistribute: non-empty node given");
+  assert(node->parent && "Redistribute: root node given");
+  const auto& children = node->parent->children;
+  const auto end = std::find(children.begin(), children.end(), nullptr);
+  if (std::any_of(children.begin(), end, detail::isThree< const Node* >)) {
+    return borrowFromSibling(node);
+  }
+  return giveToSibling(node);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::giveToSibling(Node* node)
+{
+  assert(node && "GiveToSibling: nullptr node given");
+  assert(node->parent && "GiveToSibling: root node given");
+  assert(detail::isThree(node->parent) && "GiveToSibling: invalid node given");
+  const auto getRight = detail::getRightSibling< Node* >;
+  const auto getLeft = detail::getLeftSibling< Node* >;
+  Node* parent = node->parent;
+  Node* sibling = detail::isLeft(node) ? getRight(node) : getLeft(node);
+  pointer parentPtr = detail::isRight(node) ? parent->end - 1 : parent->begin;
+  sibling = emplaceToNode(sibling, *parentPtr);
+  parent = eraseFromNode(parent, parentPtr);
+  if (detail::isLeft(node)) {
+    sibling->children[2] = sibling->children[1];
+    sibling->children[1] = sibling->children[0];
+    sibling->children[0] = node->children[0];
+  } else {
+    sibling->children[2] = node->children[0];
+  }
+  *std::remove(parent->children.begin(), parent->children.end(), node) = nullptr;
+  delete node;
+  return detail::updateParent(sibling);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::borrowFromSibling(
+    Node* node)
+{
+  assert(node && "BorrowFromSibling: nullptr node given");
+  assert(node->parent && "BorrowFromSibling: root node given");
+  Node* sibling = nullptr;
+  const bool isMid = detail::isMiddle(node);
+  const bool fromLeftMid = isMid && detail::isThree(detail::getRightSibling(node));
+  const bool fromLeft = detail::isLeft(node) || fromLeftMid;
+  if (fromLeft) {
+    sibling = detail::getRightSibling(node);
+    sibling = detail::isThree(sibling) ? sibling : borrowFromSibling(sibling);
+    node = borrowFromRight(node, sibling);
+    sibling = detail::getRightSibling(node);
+    node->children[detail::size(node)] = sibling->children[0];
+    sibling->children[0] = sibling->children[1];
+    sibling->children[1] = sibling->children[2];
+  } else {
+    sibling = detail::getLeftSibling(node);
+    sibling = detail::isThree(sibling) ? sibling : borrowFromSibling(sibling);
+    node = borrowFromLeft(node, sibling);
+    sibling = detail::getLeftSibling(node);
+    node->children[2] = node->children[1];
+    node->children[1] = node->children[0];
+    node->children[0] = sibling->children[2];
+  }
+  sibling->children[2] = nullptr;
+  return detail::updateParent(node);
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::borrowFromLeft(Node* node,
+    Node* sibling)
+{
+  assert(node && sibling && "BorrowFromLeft: nullptr given");
+  assert(node->parent == sibling->parent && "BorrowFromLeft: siblings expected");
+  assert(node != sibling && isThree(sibling) && "BorrowFromLeft: invalid sibling");
+  assert(!detail::isLeft(node) && "BorrowFromLeft: left node given");
+  Node* parent = node->parent;
+  pointer const parentPtr = detail::isRight(node) ? parent->end - 1 : parent->begin;
+  node = emplaceToNode(node, *parentPtr);
+  parent = eraseFromNode(parent, parentPtr);
+  parent = emplaceToNode(parent, *(sibling->end - 1));
+  sibling = eraseFromNode(sibling, sibling->end - 1);
+  return node;
+}
+
+template < typename K, typename T, typename C >
+typename kizhin::Map< K, T, C >::Node* kizhin::Map< K, T, C >::borrowFromRight(Node* node,
+    Node* sibling)
+{
+  assert(node && sibling && "BorrowFromRight: nullptr given");
+  assert(node->parent == sibling->parent && "BorrowFromRight: siblings expected");
+  assert(node != sibling && isThree(sibling) && "BorrowFromRight: invalid sibling");
+  assert(!detail::isRight(node) && "BorrowFromRight: left node given");
+  Node* parent = node->parent;
+  pointer const parentPtr = detail::isLeft(node) ? parent->begin : parent->end - 1;
+  node = emplaceToNode(node, *parentPtr);
+  parent = eraseFromNode(parent, parentPtr);
+  parent = emplaceToNode(parent, *sibling->begin);
+  sibling = eraseFromNode(sibling, sibling->begin);
+  return node;
 }
 
 template < typename K, typename T, typename C >
