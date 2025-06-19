@@ -80,6 +80,10 @@ void kiselev::input(std::istream& in, Graphs& graphs)
       std::string v2;
       unsigned int weight;
       in >> v1 >> v2 >> weight;
+      if (in.fail())
+      {
+        throw std::logic_error("Incorrect parameter");
+      }
       newGraph.addEdge(v1, v2, weight);
     }
     graphs[graph] = newGraph;
@@ -137,6 +141,10 @@ void kiselev::bind(std::istream& in, Graphs& graphs)
   std::string v2;
   unsigned int weight;
   in >> graph >> v1 >> v2 >> weight;
+  if (in.fail())
+  {
+    throw std::logic_error("Incorrect parameter");
+  }
   auto it = graphs.find(graph);
   if (it == graphs.end())
   {
@@ -152,6 +160,10 @@ void kiselev::cut(std::istream& in, Graphs& graphs)
   std::string v2;
   unsigned int weight;
   in >> graph >> v1 >> v2 >> weight;
+  if (in.fail())
+  {
+    throw std::logic_error("Incorrect parameter");
+  }
   auto graphIt = graphs.find(graph);
   if (graphIt == graphs.end() || !graphIt->second.removeEdge(v1, v2, weight))
   {
@@ -170,6 +182,10 @@ void kiselev::create(std::istream& in, Graphs& graphs)
   Graph newGraph;
   size_t count;
   in >> count;
+  if (in.fail())
+  {
+    throw std::logic_error("Incorrect parameter");
+  }
   for (size_t i = 0; i < count; ++i)
   {
     std::string vertex;
@@ -201,6 +217,10 @@ void kiselev::extract(std::istream& in, Graphs& graphs)
   std::string graph;
   size_t count;
   in >> newGraph >> graph >> count;
+  if (in.fail())
+  {
+    throw std::logic_error("Incorrect parameter");
+  }
   if (graphs.find(newGraph) != graphs.end() || graphs.find(graph) == graphs.end())
   {
     throw std::logic_error("<INVALID COMMAND>");

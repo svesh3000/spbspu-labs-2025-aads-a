@@ -98,7 +98,7 @@ namespace kiselev
     }
     Value& operator[](const Key& key)
     {
-      Iterator res = insert({ std::move(key), Value() }).first;
+      Iterator res = insert({ key, Value() }).first;
       return res->second;
     }
 
@@ -371,7 +371,7 @@ namespace kiselev
 
     void rehash(size_t count)
     {
-      size_t minSize = static_cast<size_t>(std::ceil(count_ / maxLoadFactor_));
+      size_t minSize = static_cast< size_t >(std::ceil(count_ / maxLoadFactor_));
       if (count < minSize)
       {
         count = minSize;

@@ -1,5 +1,7 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
+#include <boost/container_hash/hash.hpp>
+#include <boost/container_hash/hash_fwd.hpp>
 #include <cstddef>
 #include <unordered_map>
 #include <set>
@@ -10,15 +12,15 @@
 #include <utility>
 #include <vector>
 #include "hashTable.hpp"
-namespace kiselev
+namespace detail
 {
   struct PairHash1
   {
     size_t operator()(const std::pair< std::string, std::string >& pair) const
     {
-      size_t h1 = std::hash< std::string >()(pair.first);
-      size_t h2 = std::hash< std::string >()(pair.second);
-      return h1 * 7 + h2;
+      size_t h = std::hash< std::string >()(pair.first);
+      boost::hash_combine(h, pair.second);
+      return h;
     }
   };
 
@@ -26,17 +28,20 @@ namespace kiselev
   {
     size_t operator()(const std::pair< std::string, std::string >& pair) const
     {
-      size_t h1 = BoostHash< std::string >()(pair.first);
-      size_t h2 = BoostHash< std::string >()(pair.second);
-      return h1 * 7 + h2;
+      size_t h = kiselev::BoostHash< std::string >()(pair.first);
+      boost::hash_combine(h, pair.second);
+      return h;
     }
   };
+}
 
+namespace kiselev
+{
   class Graph
   {
   public:
     using Vertexes = std::pair< std::string, std::string >;
-    using Edge = HashTable< Vertexes, std::list< unsigned int >, PairHash1, PairHash2 >;
+    using Edge = HashTable< Vertexes, std::list< unsigned int >, detail::PairHash1, detail::PairHash2 >;
     using MapHash = std::map< std::string, HashTable< unsigned int, unsigned int, std::hash< unsigned int >, BoostHash< unsigned int > > >;
 
     void addEdge(const std::string& v1, const std::string& v2, unsigned int weight)

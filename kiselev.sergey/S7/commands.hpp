@@ -1,10 +1,10 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-#include "graph.hpp"
 #include <istream>
 #include <map>
-#include <string>
 #include <ostream>
+#include <string>
+#include "graph.hpp"
 namespace kiselev
 {
   using Graphs = std::map< std::string, Graph >;
