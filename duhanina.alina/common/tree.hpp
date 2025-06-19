@@ -23,11 +23,11 @@ namespace duhanina
     explicit Tree(std::initializer_list< std::pair< Key, Value > >);
 
     Tree(const Tree& other);
-    Tree(Tree&& other);
+    Tree(Tree&& other) noexcept;
     ~Tree();
 
     Tree& operator=(const Tree& other);
-    Tree& operator=(Tree&& other);
+    Tree& operator=(Tree&& other) noexcept;
 
     Iterator_t begin() const noexcept;
     ConstIterator_t cbegin() const noexcept;
@@ -120,8 +120,8 @@ namespace duhanina
   {}
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::Tree(Tree&& other):
-    fakeRoot_(std::exchange(other.fakeRoot_, nullptr)),
+  Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
+    fakeRoot_(std::exchange(other.fakeRoot_, new Node_t(Key(), Value(), nullptr))),
     size_(std::exchange(other.size_, 0))
   {}
 
@@ -144,7 +144,7 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other)
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
