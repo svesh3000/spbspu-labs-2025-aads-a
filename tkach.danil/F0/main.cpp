@@ -23,12 +23,15 @@ int main(const int argc, const char* const* const argv)
   cmds["exportend"] = std::bind(doExportInEnd, std::ref(std::cin), std::cref(data));
   cmds["exportoverwrite"] = std::bind(doExportOverwrite, std::ref(std::cin), std::cref(data));
   cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(data));
+  cmds["substructdictionaries"] = std::bind(substructDicts, std::ref(std::cin), std::ref(data));
+  cmds["mergewords"] = std::bind(mergeWords, std::ref(std::cin), std::ref(data));
+  cmds["mergedictionaries"] = std::bind(mergeNumberDicts, std::ref(std::cin), std::ref(data));
   cmds["printall"] = std::bind(printAll, std::ref(std::cout), std::cref(data));
   cmds["removeword"] = std::bind(removeWord, std::ref(std::cin), std::ref(data));
-  cmds["getcommontranslations"] = std::bind(printcommontranslations, std::ref(std::cin), std::ref(std::cout), std::cref(data));
+  cmds["getcommontranslations"] = std::bind(printCommonTranslations, std::ref(std::cin), std::ref(std::cout), std::cref(data));
   cmds["clear"] = std::bind(clear, std::ref(std::cin), std::ref(data));
-  cmds["removetranslation"] = std::bind(removetranslation, std::ref(std::cin), std::ref(data));
-  cmds["addtranslation"] = std::bind(addtranslation, std::ref(std::cin), std::ref(data));
+  cmds["removetranslation"] = std::bind(removeTranslation, std::ref(std::cin), std::ref(data));
+  cmds["addtranslation"] = std::bind(addTranslation, std::ref(std::cin), std::ref(data));
   std::string command;
   while (!(std::cin >> command).eof())
   {
