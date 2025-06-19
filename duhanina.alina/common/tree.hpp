@@ -36,7 +36,7 @@ namespace duhanina
 
     void push(const Key& k, const Value& v);
     Value& get(const Key& k) const;
-    Value& drop(const Key& k);
+    void drop(const Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -121,19 +121,9 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(Tree&& other):
-    fakeRoot_(other.fakeRoot_),
-    size_(other.size_)
-  {
-    try
-    {
-      other.size_ = 0;
-      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-    }
-    catch (...)
-    {
-      other.fakeRoot_ = nullptr;
-    }
-  }
+    fakeRoot_(std::exchange(other.fakeRoot_, nullptr)),
+    size_(std::exchange(other.size_, 0))
+  {}
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::~Tree()
@@ -145,8 +135,11 @@ namespace duhanina
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree< Key, Value, Compare >& other)
   {
-    Tree< Key, Value, Compare> temp(other);
-    swap(temp);
+    if (this != std::addressof(other))
+    {
+      Tree< Key, Value, Compare> temp(other);
+      swap(temp);
+    }
     return *this;
   }
 
@@ -230,12 +223,15 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::drop(const Key& k)
+  void Tree< Key, Value, Compare >::drop(const Key& k)
   {
-    auto* result = new Value(std::move(get(k)));
+    Node_t* node = find(getRoot(), k);
+    if (!node)
+    {
+      throw std::out_of_range("Key not found");
+    }
     setRoot(remove(getRoot(), k));
     size_--;
-    return *result;
   }
 
   template < typename Key, typename Value, typename Compare >
