@@ -1,8 +1,11 @@
 #include "commands.hpp"
 #include <algorithm>
+#include <string>
 
-void mozhegova::print(std::ostream & out, std::string name, const dictionaries & dicts)
+void mozhegova::print(std::istream & in, std::ostream & out, const dictionaries & dicts)
 {
+  std::string name;
+  in >> name;
   BiTree< int, std::string > dict = dicts.at(name);
   if (dict.empty())
   {
@@ -17,8 +20,10 @@ void mozhegova::print(std::ostream & out, std::string name, const dictionaries &
   out << '\n';
 }
 
-void mozhegova::complement(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
+void mozhegova::complement(std::istream & in, dictionaries & dicts)
 {
+  std::string dictName1, dictName2, newDictName;
+  in >> newDictName >> dictName1 >> dictName2;
   BiTree< int, std::string > dict1 = dicts.at(dictName1);
   BiTree< int, std::string > dict2 = dicts.at(dictName2);
   BiTree< int, std::string > newDict;
@@ -32,8 +37,10 @@ void mozhegova::complement(std::string newDictName, std::string dictName1, std::
   dicts[newDictName] = newDict;
 }
 
-void mozhegova::intersect(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
+void mozhegova::intersect(std::istream & in, dictionaries & dicts)
 {
+  std::string dictName1, dictName2, newDictName;
+  in >> newDictName >> dictName1 >> dictName2;
   BiTree< int, std::string > dict1 = dicts.at(dictName1);
   BiTree< int, std::string > dict2 = dicts.at(dictName2);
   BiTree< int, std::string > newDict;
@@ -47,8 +54,10 @@ void mozhegova::intersect(std::string newDictName, std::string dictName1, std::s
   dicts[newDictName] = newDict;
 }
 
-void mozhegova::unionCmd(std::string newDictName, std::string dictName1, std::string dictName2, dictionaries & dicts)
+void mozhegova::unionCmd(std::istream & in, dictionaries & dicts)
 {
+  std::string dictName1, dictName2, newDictName;
+  in >> newDictName >> dictName1 >> dictName2;
   BiTree< int, std::string > dict1 = dicts.at(dictName1);
   BiTree< int, std::string > dict2 = dicts.at(dictName2);
   BiTree< int, std::string > newDict = dict1;
