@@ -837,7 +837,7 @@ namespace tkach
     out << "import <file_name> <number_of_dictionaries> <dictionary_name1> ... - Импорт словарей из файла.\n";
     out << "addword <dictionary_name> <english_word> <number_of_translations> <translation1> ...";
     out << "- Добавление слова и его переводов в словарь.\n";
-    out << "mergewords <dictionary_name> <english_word1> <english_word2>"; 
+    out << "mergewords <dictionary_name> <english_word1> <english_word2>";
     out << "- Объединение переводов двух английских слов в одном словаре.\n";
     out << "printcommontranslations <dictionary_name> <number_of_words> <word1> ... ";
     out << "- Вывод общих переводов для нескольких слов в одном словаре.\n";
