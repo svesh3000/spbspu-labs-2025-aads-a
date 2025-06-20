@@ -1,8 +1,7 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include <cstddef>
-#include <stdexcept>
+#include "resize.hpp"
 
 namespace mozhegova
 {
@@ -12,11 +11,11 @@ namespace mozhegova
   public:
     Stack();
     Stack(const Stack< T > &);
-    Stack(Stack< T > &&);
+    Stack(Stack< T > &&) noexcept;
     ~Stack();
 
     Stack< T > & operator=(const Stack< T > &);
-    Stack< T > & operator=(Stack< T > &&);
+    Stack< T > & operator=(Stack< T > &&) noexcept;
 
     void push(const T & value);
     void pop();
@@ -25,18 +24,18 @@ namespace mozhegova
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void swap(Stack< T > &) noexcept;
   private:
     size_t size_;
     size_t capacity_;
     T * data_;
-
-    void resize();
   };
 
   template< typename T >
   Stack< T >::Stack():
     size_(0),
-    capacity_(50),
+    capacity_(1),
     data_(new T[capacity_])
   {}
 
@@ -46,14 +45,22 @@ namespace mozhegova
     capacity_(other.capacity_),
     data_(new T[capacity_])
   {
-    for (size_t i = 0; i < size_; i++)
+    try
     {
-      data_[i] = other.data_[i];
+      for (size_t i = 0; i < size_; i++)
+      {
+        data_[i] = other.data_[i];
+      }
+    }
+    catch(const std::exception &)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
   template< typename T >
-  Stack< T >::Stack(Stack< T > && other):
+  Stack< T >::Stack(Stack< T > && other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
     data_(other.data_)
@@ -72,26 +79,21 @@ namespace mozhegova
   template< typename T >
   Stack< T > & Stack< T >::operator=(const Stack< T > & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       Stack< T > copy(other);
-      std::swap(size_, copy.size_);
-      std::swap(capacity_, copy.capacity_);
-      std::swap(data_, copy.data_);
+      swap(copy);
     }
     return *this;
   }
 
   template< typename T >
-  Stack< T > & Stack< T >::operator=(Stack< T > && other)
+  Stack< T > & Stack< T >::operator=(Stack< T > && other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      delete[] data_;
-      std::swap(size_, other.size_);
-      std::swap(capacity_, other.capacity_);
-      data_ = other.data_;
-      other.data_ = nullptr;
+      Stack< T > copy(std::move(other));
+      swap(copy);
     }
     return *this;
   }
@@ -101,7 +103,7 @@ namespace mozhegova
   {
     if (size_ == capacity_)
     {
-      resize();
+      data_ = resize(data_, capacity_);
     }
     data_[size_++] = value;
   }
@@ -149,16 +151,11 @@ namespace mozhegova
   }
 
   template< typename T >
-  void Stack< T >::resize()
+  void Stack< T >::swap(Stack< T > & other) noexcept
   {
-    capacity_ *= 2;
-    T * temp = new T[capacity_];
-    for (size_t i = 0; i < size_; i++)
-    {
-      temp[i] = data_[i];
-    }
-    delete[] data_;
-    data_ = temp;
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(data_, other.data_);
   }
 }
 

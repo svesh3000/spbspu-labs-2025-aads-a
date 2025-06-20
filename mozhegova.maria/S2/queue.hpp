@@ -1,8 +1,7 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include <cstddef>
-#include <stdexcept>
+#include "resize.hpp"
 
 namespace mozhegova
 {
@@ -12,33 +11,33 @@ namespace mozhegova
   public:
     Queue();
     Queue(const Queue< T > &);
-    Queue(Queue< T > &&);
+    Queue(Queue< T > &&) noexcept;
     ~Queue();
 
     Queue< T > & operator=(const Queue< T > &);
-    Queue< T > & operator=(Queue< T > &&);
+    Queue< T > & operator=(Queue< T > &&) noexcept;
 
     void push(const T & value);
     void pop();
     T & front();
     const T & front() const;
-    T & back();
-    const T & back() const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    void swap(Queue< T > &) noexcept;
   private:
     size_t size_;
     size_t capacity_;
+    size_t first_;
     T * data_;
-
-    void resize();
   };
 
   template< typename T >
   Queue< T >::Queue():
     size_(0),
-    capacity_(50),
+    capacity_(1),
+    first_(0),
     data_(new T[capacity_])
   {}
 
@@ -46,22 +45,33 @@ namespace mozhegova
   Queue< T >::Queue(const Queue< T > & other):
     size_(other.size_),
     capacity_(other.capacity_),
+    first_(other.first_),
     data_(new T[capacity_])
   {
-    for (size_t i = 0; i < size_; i++)
+    try
     {
-      data_[i] = other.data_[i];
+      for (size_t i = 0; i < size_; i++)
+      {
+        data_[i] = other.data_[i];
+      }
+    }
+    catch (const std::exception &)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
   template< typename T >
-  Queue< T >::Queue(Queue< T > && other):
+  Queue< T >::Queue(Queue< T > && other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
+    first_(other.first_),
     data_(other.data_)
   {
     other.size_ = 0;
     other.capacity_ = 0;
+    other.first_ = 0;
     other.data_ = nullptr;
   }
 
@@ -74,26 +84,21 @@ namespace mozhegova
   template< typename T >
   Queue< T > & Queue< T >::operator=(const Queue< T > & other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       Queue< T > copy(other);
-      std::swap(size_, copy.size_);
-      std::swap(capacity_, copy.capacity_);
-      std::swap(data_, copy.data_);
+      swap(copy);
     }
     return *this;
   }
 
   template< typename T >
-  Queue< T > & Queue< T >::operator=(Queue< T > && other)
+  Queue< T > & Queue< T >::operator=(Queue< T > && other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      delete[] data_;
-      std::swap(size_, other.size_);
-      std::swap(capacity_, other.capacity_);
-      data_ = other.data_;
-      other.data_ = nullptr;
+      Queue< T > copy(std::move(other));
+      swap(copy);
     }
     return *this;
   }
@@ -103,7 +108,7 @@ namespace mozhegova
   {
     if (size_ == capacity_)
     {
-      resize();
+      data_ = resize(data_, capacity_);
     }
     data_[size_++] = value;
   }
@@ -115,10 +120,7 @@ namespace mozhegova
     {
       throw std::logic_error("empty queue");
     }
-    for (size_t i = 1; i < size_; i++)
-    {
-      data_[i - 1] = data_[i];
-    }
+    first_++;
     size_--;
   }
 
@@ -129,7 +131,7 @@ namespace mozhegova
     {
       throw std::logic_error("empty queue");
     }
-    return data_[0];
+    return data_[first_];
   }
 
   template< typename T >
@@ -139,27 +141,7 @@ namespace mozhegova
     {
       throw std::logic_error("empty queue");
     }
-    return data_[0];
-  }
-
-  template< typename T >
-  T & Queue< T >::back()
-  {
-    if (empty())
-    {
-      throw std::logic_error("empty queue");
-    }
-    return data_[size_ - 1];
-  }
-
-  template< typename T >
-  const T & Queue< T >::back() const
-  {
-    if (empty())
-    {
-      throw std::logic_error("empty queue");
-    }
-    return data_[size_ - 1];
+    return data_[first_];
   }
 
   template< typename T >
@@ -175,16 +157,12 @@ namespace mozhegova
   }
 
   template< typename T >
-  void Queue< T >::resize()
+  void Queue< T >::swap(Queue< T > & other) noexcept
   {
-    capacity_ *= 2;
-    T * temp = new T[capacity_];
-    for (size_t i = 0; i < size_; i++)
-    {
-      temp[i] = data_[i];
-    }
-    delete[] data_;
-    data_ = temp;
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
+    std::swap(first_, other.first_);
+    std::swap(data_, other.data_);
   }
 }
 

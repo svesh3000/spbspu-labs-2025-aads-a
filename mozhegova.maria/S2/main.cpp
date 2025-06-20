@@ -17,51 +17,20 @@ namespace
       {
         continue;
       }
-      std::string temp;
-      for (char c : line)
+      size_t start = 0;
+      size_t end = line.find(' ');
+      while (end != std::string::npos)
       {
-        if (std::isdigit(c))
-        {
-          temp += c;
-        }
-        else if (std::isspace(c))
-        {
-          if (!temp.empty())
-          {
-            infExpr.push(temp);
-            temp.clear();
-          }
-        }
-        else
-        {
-          temp += c;
-          infExpr.push(temp);
-          temp.clear();
-        }
+        infExpr.push(line.substr(start, end - start));
+        start = end + 1;
+        end = line.find(' ', start);
       }
-      if (!temp.empty())
-      {
-        infExpr.push(temp);
-        temp.clear();
-      }
+      infExpr.push(line.substr(start));
       if (!infExpr.empty())
       {
         queue.push(infExpr);
       }
     }
-  }
-
-  bool isOperand(std::string str)
-  {
-    bool flag = true;
-    for (char c : str)
-    {
-      if (!std::isdigit(c))
-      {
-        flag = false;
-      }
-    }
-    return flag;
   }
 
   bool isOperation(std::string op)
@@ -85,6 +54,11 @@ namespace
     }
   }
 
+  bool isHighPriority(const std::string & op1, const std::string & op2)
+  {
+    return getPriority(op1) >= getPriority(op2);
+  }
+
   mozhegova::Queue< mozhegova::Queue< std::string > > convertInfToPost(mozhegova::Queue< mozhegova::Queue< std::string > > & queue)
   {
     mozhegova::Queue< mozhegova::Queue< std::string > > newQueue;
@@ -98,49 +72,50 @@ namespace
       {
         std::string token = infExpr.front();
         infExpr.pop();
-        if (isOperand(token))
+        try
         {
-          postExpr.push(token);
-        }
-        else if (token == "(")
-        {
+          std::stoll(token);
           stack.push(token);
         }
-        else if (token == ")")
+        catch (const std::exception &)
         {
-          while (!stack.empty() && stack.top() != "(")
+          if (token == "(")
           {
-            postExpr.push(stack.top());
+            stack.push(token);
+          }
+          else if (token == ")")
+          {
+            while (!stack.empty() && stack.top() != "(")
+            {
+              postExpr.push(stack.top());
+              stack.pop();
+            }
+            if (stack.empty())
+            {
+              throw std::logic_error("invalid brackets");
+            }
             stack.pop();
           }
-          if (stack.top() == "(")
+          else if (isOperation(token))
           {
-            stack.pop();
+            while (!stack.empty() && stack.top() != "(" && isHighPriority(token, stack.top()))
+            {
+              postExpr.push(stack.top());
+              stack.pop();
+            }
+            stack.push(token);
           }
           else
           {
             throw std::logic_error("invalid expression");
           }
         }
-        else if (isOperation(token))
-        {
-          while (!stack.empty() && getPriority(token) <= getPriority(stack.top()))
-          {
-            postExpr.push(stack.top());
-            stack.pop();
-          }
-          stack.push(token);
-        }
-        else
-        {
-          throw std::logic_error("invalid expression");
-        }
       }
       while (!stack.empty())
       {
         if (stack.top() == "(")
         {
-          throw std::logic_error("invalid expression");
+          throw std::logic_error("invalid brackets");
         }
         postExpr.push(stack.top());
         stack.pop();
@@ -150,50 +125,78 @@ namespace
     return newQueue;
   }
 
-  long long calculateWithCheck(std::string op, long long a, long long b)
+  long long addWithCheck(long long a, long long b)
+  {
+    const long long max = std::numeric_limits< long long >::max();
+    if (a > max - b)
+    {
+      throw std::overflow_error("overflow");
+    }
+    return a + b;
+  }
+
+  long long subWithCheck(long long a, long long b)
+  {
+    const long long min = std::numeric_limits< long long >::min();
+    if (a < min + b)
+    {
+      throw std::overflow_error("overflow");
+    }
+    return a - b;
+  }
+
+  long long mulWithCheck(long long a, long long b)
   {
     const long long max = std::numeric_limits< long long >::max();
     const long long min = std::numeric_limits< long long >::min();
+    if ((a > max / b) || (a < min / b))
+    {
+      throw std::overflow_error("overflow");
+    }
+    return a * b;
+  }
+
+  long long divWithCheck(long long a, long long b)
+  {
+    const long long min = std::numeric_limits< long long >::min();
+    if (a == min && b == -1)
+    {
+      throw std::overflow_error("overflow");
+    }
+    return a / b;
+  }
+
+  long long divRemWithCheck(long long a, long long b)
+  {
+    long long res = a % b;
+    if (res < 0)
+    {
+      res += std::abs(b);
+    }
+    return res;
+  }
+
+  long long calculateWithCheck(std::string op, long long a, long long b)
+  {
     if (op == "+")
     {
-      if (a > max - b)
-      {
-        throw std::overflow_error("overflow");
-      }
-      return a + b;
+      return addWithCheck(a, b);
     }
     else if (op == "-")
     {
-      if (a < min + b)
-      {
-        throw std::overflow_error("overflow");
-      }
-      return a - b;
+      return subWithCheck(a, b);
     }
     else if (op == "*")
     {
-      if ((a > max / b) || (a < min / b))
-      {
-        throw std::overflow_error("overflow");
-      }
-      return a * b;
+      return mulWithCheck(a, b);
     }
     else if (op == "/")
     {
-      if (a == min && b == -1)
-      {
-        throw std::overflow_error("overflow");
-      }
-      return a / b;
+      return divWithCheck(a, b);
     }
     else
     {
-      long long res = a % b;
-      if (res < 0)
-      {
-        res += std::abs(b);
-      }
-      return res;
+      return divRemWithCheck(a, b);
     }
   }
 
@@ -209,11 +212,11 @@ namespace
       {
         std::string token = postExpr.front();
         postExpr.pop();
-        if (isOperand(token))
+        try
         {
           stack.push(std::stoll(token));
         }
-        else
+        catch (const std::exception &)
         {
           long long b = stack.top();
           stack.pop();
@@ -263,7 +266,7 @@ int main(int argc, char * argv[])
     postExprs = convertInfToPost(infExprs);
     results = calculateExprs(postExprs);
   }
-  catch(const std::exception & e)
+  catch (const std::exception & e)
   {
     std::cerr << e.what() << '\n';
     return 1;
