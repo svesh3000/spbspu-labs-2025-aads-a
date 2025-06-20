@@ -385,12 +385,17 @@ class kizhin::Map< K, T, C >::LmrIterator: public HeavyIterator< IsConst >
 {
 public:
   using pointer = typename HeavyIterator< IsConst >::pointer;
+  using reference = typename HeavyIterator< IsConst >::reference;
 
   LmrIterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
-  LmrIterator(const Iterator< RhsConst >& rhs):
+  LmrIterator(const LmrIterator< RhsConst >& rhs):
     HeavyIterator< IsConst >(rhs),
     values_(rhs.values_)
+  {}
+  template < bool RhsConst, std::enable_if_t< !IsConst || RhsConst, int > = 0 >
+  LmrIterator(Iterator< RhsConst > rhs):
+    LmrIterator(rhs.node_)
   {}
 
   LmrIterator& operator++();
@@ -416,6 +421,9 @@ template < bool IsConst >
 kizhin::Map< K, T, C >::LmrIterator< IsConst >::LmrIterator(Node* root):
   HeavyIterator< IsConst >()
 {
+  while (root && root->parent) {
+    root = root->parent;
+  }
   while (root && !detail::isEmpty(root)) {
     values_.emplace(root, root->begin);
     root = root->children[0];
@@ -455,12 +463,17 @@ class kizhin::Map< K, T, C >::RmlIterator: public HeavyIterator< IsConst >
 {
 public:
   using pointer = typename HeavyIterator< IsConst >::pointer;
+  using reference = typename HeavyIterator< IsConst >::reference;
 
   RmlIterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
-  RmlIterator(const Iterator< RhsConst >& rhs):
+  RmlIterator(const RmlIterator< RhsConst >& rhs):
     HeavyIterator< IsConst >(rhs),
     values_(rhs.values_)
+  {}
+  template < bool RhsConst, std::enable_if_t< !IsConst || RhsConst, int > = 0 >
+  RmlIterator(Iterator< RhsConst > rhs):
+    RmlIterator(rhs.node_)
   {}
 
   RmlIterator& operator++();
@@ -486,6 +499,9 @@ template < bool IsConst >
 kizhin::Map< K, T, C >::RmlIterator< IsConst >::RmlIterator(Node* root):
   HeavyIterator< IsConst >()
 {
+  while (root && root->parent) {
+    root = root->parent;
+  }
   while (root && !detail::isEmpty(root)) {
     values_.emplace(root, root->end - 1);
     root = root->children[detail::size(root)];
@@ -525,12 +541,17 @@ class kizhin::Map< K, T, C >::BfsIterator: public HeavyIterator< IsConst >
 {
 public:
   using pointer = typename HeavyIterator< IsConst >::pointer;
+  using reference = typename HeavyIterator< IsConst >::reference;
 
   BfsIterator() noexcept = default;
   template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
-  BfsIterator(const Iterator< RhsConst >& rhs):
+  BfsIterator(const BfsIterator< RhsConst >& rhs):
     HeavyIterator< IsConst >(rhs),
     nodes_(rhs.nodes_)
+  {}
+  template < bool RhsConst, std::enable_if_t< !IsConst || RhsConst, int > = 0 >
+  BfsIterator(Iterator< RhsConst > rhs):
+    BfsIterator(rhs.node_)
   {}
 
   BfsIterator& operator++();
@@ -556,6 +577,9 @@ template < bool IsConst >
 kizhin::Map< K, T, C >::BfsIterator< IsConst >::BfsIterator(Node* root):
   HeavyIterator< IsConst >()
 {
+  while (root && root->parent) {
+    root = root->parent;
+  }
   if (root) {
     nodes_.push(root);
     ++(*this);
