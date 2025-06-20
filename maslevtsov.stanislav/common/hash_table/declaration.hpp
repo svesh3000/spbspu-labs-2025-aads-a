@@ -22,6 +22,7 @@ namespace maslevtsov {
     HashTable(std::initializer_list< value_type > ilist);
 
     T& operator[](const Key& key);
+    const T& operator[](const Key& key) const;
     T& at(const Key& key);
     const T& at(const Key& key) const;
     iterator find(const Key& key) noexcept;

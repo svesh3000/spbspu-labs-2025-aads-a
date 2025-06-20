@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_SUITE(hash_policy_tests)
 BOOST_AUTO_TEST_CASE(load_factor_test)
 {
   maslevtsov::HashTable< int, int > table = {{0, 0}, {1, 1}, {2, 2}, {3, 3}};
-  BOOST_TEST(table.load_factor() == 0.125);
+  BOOST_TEST(table.load_factor() == 0.5);
 }
 
 BOOST_AUTO_TEST_CASE(max_load_factor_test)

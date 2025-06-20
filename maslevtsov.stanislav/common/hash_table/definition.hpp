@@ -21,7 +21,7 @@ namespace maslevtsov {
 
 template< class Key, class T, class Hash, class KeyEqual >
 maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable() noexcept:
-  slots_(32),
+  slots_(8),
   size_(0)
 {}
 
@@ -42,6 +42,12 @@ template< class Key, class T, class Hash, class KeyEqual >
 T& maslevtsov::HashTable< Key, T, Hash, KeyEqual >::operator[](const Key& key)
 {
   return insert(std::make_pair(key, T())).first->second;
+}
+
+template< class Key, class T, class Hash, class KeyEqual >
+const T& maslevtsov::HashTable< Key, T, Hash, KeyEqual >::operator[](const Key& key) const
+{
+  return at(key);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
