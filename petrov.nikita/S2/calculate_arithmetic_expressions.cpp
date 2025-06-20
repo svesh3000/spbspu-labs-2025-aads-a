@@ -1,33 +1,12 @@
 #include "calculate_arithmetic_expressions.hpp"
 #include <limits>
 #include <stdexcept>
-#include <iostream>
 
 namespace
 {
   bool isAnyOperation(std::string & token)
   {
-    if (token == "**")
-    {
-      return true;
-    }
-    else if (token == "/")
-    {
-      return true;
-    }
-    else if (token == "*")
-    {
-      return true;
-    }
-    else if (token == "%")
-    {
-      return true;
-    }
-    else if (token == "+")
-    {
-      return true;
-    }
-    else if (token == "-")
+    if (token == "**" || token == "/" || token == "*" || token == "%" || token == "+" || token == "-")
     {
       return true;
     }
