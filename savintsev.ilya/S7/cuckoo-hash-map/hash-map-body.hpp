@@ -2,17 +2,13 @@
 #define HASH_MAP_HPP
 #include <initializer_list>
 #include <iterator>
+#include <iostream>
 #include <dynamic-array.hpp>
 #include <boost/hash2/xxhash.hpp>
 #include "hash-wrapper.hpp"
-//#include "hash-map-iter.hpp"
-//#include "hash-map-citer.hpp"
 
 namespace savintsev
 {
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  class FwdIter;
-
   template
   <
     typename Key,
@@ -24,10 +20,112 @@ namespace savintsev
   class HashMap
   {
   public:
-    friend FwdConstIterator< Key, T, HS1, HS2, EQ >;
+    class FwdConstIter;
 
-    using iterator = FwdIter< Key, T, HS1, HS2, EQ >;
-    using const_iterator = FwdConstIterator< Key, T, HS1, HS2, EQ >;
+    class FwdIter
+    {
+    public:
+      using iterator_category = std::forward_iterator_tag;
+      using value_type = std::pair< Key, T >;
+      using difference_type = std::ptrdiff_t;
+      using pointer = value_type *;
+      using reference = value_type &;
+
+      friend class FwdConstIter;
+      friend class HashMap;
+
+      FwdIter() = default;
+      FwdIter(const FwdConstIter & other):
+        parent_(const_cast< HashMap * >(other.parent_)),
+        pos_(other.pos_),
+        first_(other.first_)
+      {
+        skip_empty();
+      }
+      FwdIter(HashMap * parent, size_t pos, bool in_table1):
+        parent_(parent),
+        pos_(pos),
+        first_(in_table1)
+      {
+        skip_empty();
+      }
+
+      reference operator*();
+      pointer operator->();
+      reference operator*() const;
+      pointer operator->() const;
+
+      FwdIter & operator++();
+      FwdIter operator++(int);
+
+      bool operator!=(const FwdIter & rhs) const;
+      bool operator==(const FwdIter & rhs) const;
+
+      friend std::ostream & operator<<(std::ostream & os, const FwdConstIter & iter)
+      {
+        return os << iter->first;
+      }
+    private:
+      HashMap * parent_ = nullptr;
+      size_t pos_ = 0;
+      bool first_ = true;
+      void skip_empty();
+    };
+
+    class FwdConstIter
+    {
+    public:
+      using iterator_category = std::forward_iterator_tag;
+      using value_type = std::pair< Key, T >;
+      using difference_type = std::ptrdiff_t;
+      using pointer = const value_type *;
+      using reference = const value_type &;
+
+      friend class FwdIter;
+      friend class HashMap;
+
+      FwdConstIter() = default;
+      FwdConstIter(const FwdIter & it):
+        parent_(it.parent_),
+        pos_(it.pos_),
+        first_(it.first_)
+      {
+        skip_empty();
+      }
+      FwdConstIter(const HashMap * parent, size_t pos, bool in_table1):
+        parent_(parent),
+        pos_(pos),
+        first_(in_table1)
+      {
+        skip_empty();
+      }
+
+      reference operator*() const;
+      pointer operator->() const;
+
+      FwdConstIter & operator++();
+      FwdConstIter operator++(int);
+
+      bool operator!=(const FwdConstIter & rhs) const;
+      bool operator==(const FwdConstIter & rhs) const;
+
+      friend std::ostream & operator<<(std::ostream & os, const FwdIter & iter)
+      {
+        return os << iter->first;
+      }
+    private:
+      const HashMap * parent_ = nullptr;
+      size_t pos_ = 0;
+      bool first_ = true;
+      void skip_empty();
+    };
+
+    friend class FwdIter;
+    friend class FwdConstIter;
+
+    using iterator = FwdIter;
+    using const_iterator = FwdConstIter;
+    using val_type = std::pair< Key, T >;
 
     HashMap();
     HashMap(size_t size);
@@ -65,8 +163,8 @@ namespace savintsev
     template< class... Args >
     iterator emplace_hint(const_iterator hint, Args &&... args);
 
-    std::pair< iterator, bool > insert(const std::pair< Key, T > & val);
-    iterator insert(const_iterator hint, const std::pair< Key, T > & val);
+    std::pair< iterator, bool > insert(const val_type & val);
+    iterator insert(const_iterator hint, const val_type & val);
     template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
 
@@ -79,38 +177,6 @@ namespace savintsev
 
     void rehash(size_t n);
 
-    class FwdIter
-    {
-    private:
-      size_t pos_ = 0;
-      bool first_ = true;
-
-      //FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it);
-
-      void skip_empty();
-      bool is_valid() const;
-
-    public:
-      using iterator_category = std::forward_iterator_tag;
-      using value_type = std::pair< Key, T >;
-      using difference_type = std::ptrdiff_t;
-      using pointer = value_type *;
-      using reference = value_type &;
-
-      FwdIterator() = default;
-
-      reference operator*();
-      pointer operator->();
-      reference operator*() const;
-      pointer operator->() const;
-
-      FwdIter & operator++();
-      FwdIter operator++(int);
-
-      bool operator!=(const FwdIter & rhs) const;
-      bool operator==(const FwdIter & rhs) const;
-    };
-
   private:
 
     Array< std::pair< std::pair< Key, T >, bool > > t1_;
@@ -120,12 +186,10 @@ namespace savintsev
     size_t size_ = 0;
 
     static constexpr size_t MAX_ITERATIONS = 100;
-    
+
     double max_load_factor_ = 0.75;
 
     T & insert_data(const Key & k);
-    bool lookup_data(const Key & k) const;
-    std::pair< T &, bool > get_data(const Key & k) const;
   };
 
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
@@ -140,8 +204,8 @@ namespace savintsev
   {
     for (size_t i = 0; i < capacity_; ++i)
     {
-      t1_[i].second = true;
-      t2_[i].second = true;
+      t1_[i].second = false;
+      t2_[i].second = false;
     }
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
@@ -175,13 +239,13 @@ namespace savintsev
   {
     for (size_t i = 0; i < capacity_; ++i)
     {
-      if (!t1_[i].second)
+      if (t1_[i].second)
       {
-        t1_[i].second = true;
+        t1_[i].second = false;
       }
-      if (!t2_[i].second)
+      if (t2_[i].second)
       {
-        t2_[i].second = true;
+        t2_[i].second = false;
       }
     }
 
@@ -199,72 +263,72 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::at(const Key & k)
   {
-    auto data = get_data(k);
-    if (data.second)
+    auto data = find(k);
+    if (data != end())
     {
-      return data.first;
+      return data->second;
     }
     throw std::out_of_range("hashmap: at failed: no such item");
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   const T & HashMap< Key, T, HS1, HS2, EQ >::at(const Key & k) const
   {
-    auto data = get_data(k);
-    if (data.second)
+    auto data = find(k);
+    if (data != end())
     {
-      return data.first;
+      return data->second;
     }
     throw std::out_of_range("hashmap: at failed: no such item");
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::operator[](const Key & k)
   {
-    auto data = get_data(k);
-    if (data.second)
+    auto data = find(k);
+    if (data != end())
     {
-      return data.first;
+      return data->second;
     }
     return insert_data(k);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::operator[](Key && k)
   {
-    auto data = get_data(k);
-    if (data.second)
+    auto data = find(k);
+    if (data != end())
     {
-      return data.first;
+      return data->second;
     }
     return insert_data(k);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::iterator HashMap< K, T, HS1, HS2, EQ >::begin() noexcept
   {
-    return iterator(*this, 0, true);
+    return iterator(this, 0, true);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::const_iterator HashMap< K, T, HS1, HS2, EQ >::begin() const noexcept
   {
-    return const_iterator(*this, 0, true);
+    return const_iterator(this, 0, true);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::const_iterator HashMap< K, T, HS1, HS2, EQ >::cbegin() const noexcept
   {
-    return const_iterator(*this, 0, true);
+    return const_iterator(this, 0, true);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::iterator HashMap< K, T, HS1, HS2, EQ >::end() noexcept
   {
-    return iterator{capacity_, false};
+    return iterator(this, capacity_, false);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::const_iterator HashMap< K, T, HS1, HS2, EQ >::end() const noexcept
   {
-    return const_iterator();
+    return const_iterator(this, capacity_, false);
   }
   template< typename K, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< K, T, HS1, HS2, EQ >::const_iterator HashMap< K, T, HS1, HS2, EQ >::cend() const noexcept
   {
-    return const_iterator();
+    return const_iterator(this, capacity_, false);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   size_t HashMap< Key, T, HS1, HS2, EQ >::erase(const Key & k)
@@ -272,24 +336,24 @@ namespace savintsev
     Key current_key = k;
 
     size_t h1 = HS1{}(current_key) % capacity_;
-    if (!t1_[h1].second)
+    if (t1_[h1].second)
     {
       Key old_key = t1_[h1].first.first;
       if (EQ{}(current_key, old_key))
       {
-        t1_[h1].second = true;
+        t1_[h1].second = false;
         --size_;
         return 1ull;
       }
     }
 
     size_t h2 = HS2{}(current_key) % capacity_;
-    if (!t2_[h2].second)
+    if (t2_[h2].second)
     {
       Key old_key = t2_[h2].first.first;
       if (EQ{}(current_key, old_key))
       {
-        t2_[h2].second = true;
+        t2_[h2].second = false;
         --size_;
         return 1ull;
       }
@@ -300,32 +364,33 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::iterator HashMap< Key, T, HS1, HS2, EQ >::erase(const_iterator position)
   {
-    if (!position.is_valid())
+    iterator it = find(position->first);
+    if (it != end())
     {
-      return iterator();
-    }
-    if (position.in_t1_)
-    {
-      t1_[position.pos_].second = true;
+      if (it.first_)
+      {
+        t1_[it.pos_].second = false;
+      }
+      else
+      {
+        t2_[it.pos_].second = false;
+      }
       --size_;
-      return iterator(*this, position);
     }
-    t2_[position.pos_].second = true;
-    --size_;
-    return iterator(*this, position, false);
+    return it;
   }
   template< typename K, typename T, typename H, typename N, typename E >
   typename HashMap< K, T, H, N, E >::iterator HashMap< K, T, H, N, E >::erase(const_iterator fst, const_iterator last)
   {
-    if (!fst.is_valid())
+    if (fst == cend())
     {
-      return iterator();
+      return iterator(this, capacity_, false);
     }
     for (auto it = fst; it != last; ++it)
     {
       erase(it);
     }
-    return iterator(*this, last);
+    return find(last->first);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   template< class... Args >
@@ -352,17 +417,7 @@ namespace savintsev
   template< class... X >
   typename HashMap< K, T, A, B, E >::iterator HashMap< K, T, A, B, E >::emplace_hint(const_iterator hint, X &&... args)
   {
-    std::pair< K, T > temp(std::forward< X >(args)...);
-
-    auto it = find(temp.first);
-    if (it != end())
-    {
-      return {it, false};
-    }
-
-    T & inserted = insert_data(temp.first);
-    inserted = std::move(temp.second);
-    return {find(temp.first), true};
+    return emplace(std::forward< X >(args)...).first;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   std::pair
@@ -370,7 +425,7 @@ namespace savintsev
     typename HashMap< Key, T, HS1, HS2, EQ >::iterator,
     bool
   >
-  HashMap< Key, T, HS1, HS2, EQ >::insert(const std::pair< Key, T > & val)
+  HashMap< Key, T, HS1, HS2, EQ >::insert(const val_type & val)
   {
     auto it = find(val.first);
     if (it != end())
@@ -381,11 +436,10 @@ namespace savintsev
     insert_data(val.first) = val.second;
     return {find(val.first), true};
   }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  typename HashMap< Key, T, HS1, HS2, EQ >::iterator HashMap< Key, T, HS1, HS2, EQ >::insert(const_iterator hint,
-      const std::pair< Key, T > & val)
+  template< typename K, typename T, typename A, typename B, typename E >
+  typename HashMap< K, T, A, B, E >::iterator HashMap< K, T, A, B, E >::insert(const_iterator hint, const val_type & v)
   {
-    return insert(val);
+    return insert(v).first;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   template< class InputIterator >
@@ -404,15 +458,15 @@ namespace savintsev
 
     if (t1_[h1].second && EQ{}(t1_[h1].first.first, k))
     {
-      return iterator(*this, h1, true);
+      return iterator(this, h1, true);
     }
 
     if (t2_[h2].second && EQ{}(t2_[h2].first.first, k))
     {
-      return iterator(*this, h2, false);
+      return iterator(this, h2, false);
     }
 
-    return end();
+    return iterator(this, capacity_, false);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::const_iterator HashMap< Key, T, HS1, HS2, EQ >::find(const Key & k) const
@@ -422,15 +476,15 @@ namespace savintsev
 
     if (t1_[h1].second && EQ{}(t1_[h1].first.first, k))
     {
-      return const_iterator(*this, h1, true);
+      return const_iterator(this, h1, true);
     }
 
     if (t2_[h2].second && EQ{}(t2_[h2].first.first, k))
     {
-      return const_iterator(*this, h2, false);
+      return const_iterator(this, h2, false);
     }
 
-    return cend();
+    return const_iterator(this, capacity_, false);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   float HashMap< Key, T, HS1, HS2, EQ >::load_factor() const noexcept
@@ -453,25 +507,42 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   void HashMap< Key, T, HS1, HS2, EQ >::rehash(size_t n)
   {
-    HashMap< Key, T, HS1, HS2, EQ > map(n);
+    Array< std::pair< std::pair< Key, T >, bool > > new_t1(n);
+    Array< std::pair< std::pair< Key, T >, bool > > new_t2(n);
 
-    map.max_load_factor_ = max_load_factor_;
+    auto old_t1 = t1_;
+    auto old_t2 = t2_;
 
-    for (size_t i = 0; i < capacity_; ++i)
+    t1_ = std::move(new_t1);
+    t2_ = std::move(new_t2);
+    
+    const size_t old_capacity = capacity_;
+    const size_t old_size = size_;
+    capacity_ = n;
+    size_ = 0;
+
+    try
     {
-      if (!t1_[i].second)
+      for (size_t i = 0; i < old_capacity; ++i)
       {
-        map.insert_data(t1_[i].first.first) = t1_[i].first.second;
-      }
-      if (!t2_[i].second)
-      {
-        map.insert_data(t2_[i].first.first) = t2_[i].first.second;
+        if (old_t1[i].second)
+        {
+          insert_data(old_t1[i].first.first) = old_t1[i].first.second;
+        }
+        if (old_t2[i].second)
+        {
+          insert_data(old_t2[i].first.first) = old_t2[i].first.second;
+        }
       }
     }
-    t1_ = std::move(map.t1_);
-    t2_ = std::move(map.t2_);
-    capacity_ = map.capacity_;
-    size_ = map.size_;
+    catch (...)
+    {
+      capacity_ = old_capacity;
+      size_ = old_size;
+      t1_ = std::move(old_t1);
+      t2_ = std::move(old_t2);
+      throw;
+    }
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   T & HashMap< Key, T, HS1, HS2, EQ >::insert_data(const Key & k)
@@ -486,9 +557,9 @@ namespace savintsev
     while (attempts < MAX_ITERATIONS)
     {
       size_t h1 = HS1{}(current_key) % capacity_;
-      if (t1_[h1].second)
+      if (!t1_[h1].second)
       {
-        t1_[h1] = {{current_key, current_value}, false};
+        t1_[h1] = {{current_key, current_value}, true};
         size_++;
         if (current_key == original_key)
         {
@@ -498,7 +569,7 @@ namespace savintsev
       }
 
       auto displaced = t1_[h1];
-      t1_[h1] = {{current_key, current_value}, false};
+      t1_[h1] = {{current_key, current_value}, true};
       if (current_key == original_key)
       {
         inserted_value = std::addressof(t1_[h1].first.second);
@@ -508,9 +579,9 @@ namespace savintsev
       attempts++;
 
       size_t h2 = HS2{}(current_key) % capacity_;
-      if (t2_[h2].second)
+      if (!t2_[h2].second)
       {
-        t2_[h2] = {{current_key, current_value}, false};
+        t2_[h2] = {{current_key, current_value}, true};
         size_++;
         if (current_key == original_key)
         {
@@ -520,7 +591,7 @@ namespace savintsev
       }
 
       displaced = t2_[h2];
-      t2_[h2] = {{current_key, current_value}, false};
+      t2_[h2] = {{current_key, current_value}, true};
       if (current_key == original_key)
       {
         inserted_value = std::addressof(t2_[h2].first.second);
@@ -539,66 +610,32 @@ namespace savintsev
     if (!inserted_value)
     {
       rehash(capacity_ * 2);
+      capacity_ = capacity_ * 2;
       return insert_data(original_key);
     }
 
     return *inserted_value;
   }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  bool HashMap< Key, T, HS1, HS2, EQ >::lookup_data(const Key & k) const
-  {
-    return get_data(k).second;
-  }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  std::pair< T &, bool > HashMap< Key, T, HS1, HS2, EQ >::get_data(const Key & k) const
-  {
-    Key current_key = k;
-
-    size_t h1 = HS1{}(current_key) % capacity_;
-    if (!t1_[h1].second)
-    {
-      Key old_key = t1_[h1].first.first;
-      if (EQ{}(current_key, old_key))
-      {
-        return {t1_[h1].first.second, true};
-      }
-    }
-
-    size_t h2 = HS2{}(current_key) % capacity_;
-    if (!t2_[h2].second)
-    {
-      Key old_key = t2_[h2].first.first;
-      if (EQ{}(current_key, old_key))
-      {
-        return {t2_[h2].first.second, true};
-      }
-    }
-    return {t1_[0].first.second, false};
-  }
 
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::reference HashMap< K, T, H1, H2, EQ >::FwdIter::operator*()
   {
-    assert(is_valid());
-    return first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
+    return first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first;
   }
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::pointer HashMap< K, T, H1, H2, EQ >::FwdIter::operator->()
   {
-    assert(is_valid());
-    return std::addressof(first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
+    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
   }
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::reference HashMap< K, T, H1, H2, EQ >::FwdIter::operator*() const
   {
-    assert(is_valid());
-    return first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
+    return first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first;
   }
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::pointer HashMap< K, T, H1, H2, EQ >::FwdIter::operator->() const
   {
-    assert(is_valid());
-    return std::addressof(first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
+    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::FwdIter & HashMap< Key, T, HS1, HS2, EQ >::FwdIter::operator++()
@@ -610,7 +647,7 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::FwdIter HashMap< Key, T, HS1, HS2, EQ >::FwdIter::operator++(int)
   {
-    FwdIter< Key, T, HS1, HS2, EQ > result(*this);
+    FwdIter result(*this);
     ++(*this);
     return result;
   }
@@ -622,27 +659,95 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   bool HashMap< Key, T, HS1, HS2, EQ >::FwdIter::operator==(const FwdIter & rhs) const
   {
-    if (map_ || rhs.map_)
+    if (parent_ != rhs.parent_)
     {
-      return map_ == rhs.map_ && pos_ == rhs.pos_ && first_ == rhs.first_;
+      return false;
     }
-    return true;
+    bool c1 = parent_ && pos_ >= parent_->capacity_ && !first_;
+    bool c2 = rhs.parent_ && rhs.pos_ >= rhs.parent_->capacity_ && !rhs.first_;
+    if (c1 && c2)
+    {
+      return true;
+    }
+    return pos_ == rhs.pos_ && first_ == rhs.first_;
   }
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   void HashMap< K, T, H1, H2, EQ >::FwdIter::skip_empty()
   {
-    while (first_ && (pos_ < capacity_) && t1_[pos_].second)
+    while (first_ && (pos_ < parent_->capacity_) && !parent_->t1_[pos_].second)
     {
       ++pos_;
     }
-    if ((pos_ >= capacity_) && first_)
+    if ((pos_ >= parent_->capacity_) && first_)
     {
       first_ = false;
       pos_ = 0;
-      while (pos_ < capacity_ && t2_[pos_].second)
-      {
-        ++pos_;
-      }
+    }
+    while (!first_ && (pos_ < parent_->capacity_) && (!parent_->t2_[pos_].second))
+    {
+      ++pos_;
+    }
+  }
+
+  template< typename K, typename T, typename A, typename B, typename E >
+  typename HashMap< K, T, A, B, E >::FwdConstIter::reference HashMap< K, T, A, B, E >::FwdConstIter::operator*() const
+  {
+    return first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first;
+  }
+  template< typename K, typename T, typename A, typename B, typename E >
+  typename HashMap< K, T, A, B, E >::FwdConstIter::pointer HashMap< K, T, A, B, E >::FwdConstIter::operator->() const
+  {
+    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  typename HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter & HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter::operator++()
+  {
+    ++pos_;
+    skip_empty();
+    return *this;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  typename HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter::operator++(int)
+  {
+    FwdIter result(*this);
+    ++(*this);
+    return result;
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  bool HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter::operator!=(const FwdConstIter & rhs) const
+  {
+    return !(*this == rhs);
+  }
+  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  bool HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter::operator==(const FwdConstIter & rhs) const
+  {
+    if (parent_ != rhs.parent_)
+    {
+      return false;
+    }
+    bool c1 = parent_ && pos_ >= parent_->capacity_ && !first_;
+    bool c2 = rhs.parent_ && rhs.pos_ >= rhs.parent_->capacity_ && !rhs.first_;
+    if (c1 && c2)
+    {
+      return true;
+    }
+    return pos_ == rhs.pos_ && first_ == rhs.first_;
+  }
+  template< typename K, typename T, typename H1, typename H2, typename EQ >
+  void HashMap< K, T, H1, H2, EQ >::FwdConstIter::skip_empty()
+  {
+    while (first_ && (pos_ < parent_->capacity_) && !parent_->t1_[pos_].second)
+    {
+      ++pos_;
+    }
+    if ((pos_ >= parent_->capacity_) && first_)
+    {
+      first_ = false;
+      pos_ = 0;
+    }
+    while (!first_ && (pos_ < parent_->capacity_) && (!parent_->t2_[pos_].second))
+    {
+      ++pos_;
     }
   }
 }
