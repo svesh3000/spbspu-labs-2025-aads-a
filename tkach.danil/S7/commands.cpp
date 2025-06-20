@@ -100,7 +100,10 @@ namespace tkach
   {
     std::string name_graph, name_vert1, name_vert2;
     size_t weight = 0;
-    in >> name_graph >> name_vert1 >> name_vert2 >> weight;
+    if (!(in >> name_graph >> name_vert1 >> name_vert2 >> weight))
+    {
+      throw std::invalid_argument("<INVALID INPUT>");
+    }
     tree_of_graphs.at(name_graph).addEdge(name_vert1, name_vert2, weight);
   }
 
@@ -108,7 +111,10 @@ namespace tkach
   {
     std::string name_graph, name_vert1, name_vert2;
     size_t weight = 0;
-    in >> name_graph >> name_vert1 >> name_vert2 >> weight;
+    if (!(in >> name_graph >> name_vert1 >> name_vert2 >> weight))
+    {
+      throw std::invalid_argument("<INVALID INPUT>");
+    }
     if (!tree_of_graphs.at(name_graph).removeEdge(name_vert1, name_vert2, weight))
     {
       throw std::logic_error("<INVALID COMMAND>");
@@ -124,7 +130,10 @@ namespace tkach
     {
       throw std::logic_error("<INVALID COMMAND>");
     }
-    in >> count;
+    if (!(in >> count))
+    {
+      throw std::invalid_argument("<INVALID INPUT>");
+    }
     Graph temp;
     for (size_t i = 0; i < count; ++ i)
     {
@@ -153,7 +162,10 @@ namespace tkach
   {
     std::string new_graph, name_graph1;
     size_t count = 0;
-    in >> new_graph >> name_graph1 >> count;
+    if (!(in >> new_graph >> name_graph1 >> count))
+    {
+      throw std::invalid_argument("<INVALID INPUT>");
+    }
     if (tree_of_graphs.find(new_graph) != tree_of_graphs.end())
     {
       throw std::logic_error("<INVALID COMMAND>");
