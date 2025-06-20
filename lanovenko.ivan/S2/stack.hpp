@@ -69,7 +69,6 @@ namespace lanovenko
   {
     data_.swap(rhs.data_);
   }
-
 }
 
 #endif
