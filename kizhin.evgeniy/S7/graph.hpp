@@ -1,9 +1,10 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S7_GRAPH_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S7_GRAPH_HPP
 
-#include <unordered_map>
+#include <map>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 namespace kizhin {
   using Vertex = std::string;
@@ -27,13 +28,15 @@ namespace kizhin {
   using WeightContiner = std::multiset< Weight >;
 
   bool operator==(const VertexPair&, const VertexPair&);
+  bool operator<(const VertexPair&, const VertexPair&);
 
   using Graph = std::unordered_map< VertexPair, WeightContiner >;
   using VertexContainer = std::set< Vertex >;
+  using SortedGraph = std::map< Graph::key_type, Graph::mapped_type >;
 
   VertexContainer getVertices(const Graph&);
-  Graph getOutbound(const Graph&, const Vertex&);
-  Graph getInbound(const Graph&, const Vertex&);
+  SortedGraph getOutbound(const Graph&, const Vertex&);
+  SortedGraph getInbound(const Graph&, const Vertex&);
 }
 
 #endif

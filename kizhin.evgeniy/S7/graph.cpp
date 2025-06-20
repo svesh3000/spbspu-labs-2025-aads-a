@@ -41,6 +41,13 @@ bool kizhin::operator==(const VertexPair& lhs, const VertexPair& rhs)
   return lhs.from == rhs.from && lhs.to == rhs.to;
 }
 
+bool kizhin::operator<(const VertexPair& lhs, const VertexPair& rhs)
+{
+  auto lhsTuple = std::tie(lhs.from, lhs.to);
+  auto rhsTuple = std::tie(rhs.from, rhs.to);
+  return lhsTuple < rhsTuple;
+}
+
 kizhin::VertexContainer kizhin::getVertices(const Graph& graph)
 {
   VertexContainer result;
@@ -52,17 +59,17 @@ kizhin::VertexContainer kizhin::getVertices(const Graph& graph)
   return result;
 }
 
-kizhin::Graph kizhin::getOutbound(const Graph& graph, const Vertex& vertex)
+kizhin::SortedGraph kizhin::getOutbound(const Graph& graph, const Vertex& vertex)
 {
-  Graph result;
+  SortedGraph result;
   auto out = std::inserter(result, result.end());
   std::copy_if(graph.begin(), graph.end(), out, VertexEdgeFrom{ vertex });
   return result;
 }
 
-kizhin::Graph kizhin::getInbound(const Graph& graph, const Vertex& vertex)
+kizhin::SortedGraph kizhin::getInbound(const Graph& graph, const Vertex& vertex)
 {
-  Graph result;
+  SortedGraph result;
   auto out = std::inserter(result, result.end());
   std::copy_if(graph.begin(), graph.end(), out, VertexEdgeTo{ vertex });
   return result;

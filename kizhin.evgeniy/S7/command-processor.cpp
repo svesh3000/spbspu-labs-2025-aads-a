@@ -83,7 +83,7 @@ void kizhin::outOutbound(const GraphContainer& graphs, std::ostream& out,
   if (graph.empty()) {
     throw std::logic_error("Empty graph");
   }
-  Graph outbounds = getOutbound(graph, vertex);
+  SortedGraph outbounds = getOutbound(graph, vertex);
   if (outbounds.empty()) {
     out << '\n';
   }
@@ -109,7 +109,7 @@ void kizhin::outInbound(const GraphContainer& graphs, std::ostream& out, std::is
   if (graph.empty()) {
     throw std::logic_error("Empty graph");
   }
-  Graph inbounds = getInbound(graph, vertex);
+  SortedGraph inbounds = getInbound(graph, vertex);
   if (inbounds.empty()) {
     out << '\n';
   }
