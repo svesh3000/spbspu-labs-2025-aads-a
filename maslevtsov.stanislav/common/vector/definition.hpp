@@ -7,9 +7,9 @@
 
 template< class T >
 maslevtsov::Vector< T >::Vector():
-  capacity_(8),
+  capacity_(16),
   size_(0),
-  data_(new T[8])
+  data_(new T[16])
 {}
 
 template< class T >

@@ -39,17 +39,6 @@ namespace maslevtsov {
       out_(&out)
     {}
 
-    IOFuncBinder& operator=(const IOFuncBinder& rhs)
-    {
-      iofunc_ = rhs.iofunc_;
-      ifunc_ = rhs.ifunc_;
-      ofunc_ = rhs.ofunc_;
-      arg_ = rhs.arg_;
-      in_ = rhs.in_;
-      out_ = rhs.out_;
-      return *this;
-    }
-
     void operator()() const
     {
       if (in_ && out_) {

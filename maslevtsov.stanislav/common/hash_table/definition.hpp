@@ -21,7 +21,7 @@ namespace maslevtsov {
 
 template< class Key, class T, class Hash, class KeyEqual >
 maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable() noexcept:
-  slots_(8),
+  slots_(16),
   size_(0)
 {}
 
