@@ -61,6 +61,11 @@ int main(int argc, char * argv[])
     cmds.at(argv[1])(result);
     std::cout << result.keySum << ' ' << result.values << '\n';
   }
+  catch (const std::out_of_range & e)
+  {
+    std::cerr << "<INVALID COMMAND>\n";
+    return 1;
+  }
   catch (const std::logic_error & e)
   {
     std::cout << e.what() << '\n';
