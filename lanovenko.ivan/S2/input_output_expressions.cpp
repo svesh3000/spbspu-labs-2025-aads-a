@@ -1,6 +1,6 @@
 #include "input_output_expressions.hpp"
 
-void lanovenko::inputExpression(std::istream& in, Queue<std::string>& infixExpressions)
+void lanovenko::inputExpression(std::istream& in, Queue< std::string >& infixExpressions)
 {
   while (!in.eof())
   {
@@ -13,7 +13,7 @@ void lanovenko::inputExpression(std::istream& in, Queue<std::string>& infixExpre
   }
 }
 
-void lanovenko::resultsOutput(Stack < long long > results, std::ostream& out)
+void lanovenko::resultsOutput(Stack< long long >& results, std::ostream& out)
 {
   if (!results.empty())
   {

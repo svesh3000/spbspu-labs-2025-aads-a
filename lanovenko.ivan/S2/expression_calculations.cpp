@@ -77,7 +77,7 @@ long long lanovenko::calculateBinary(long long a, long long b, const std::string
   return 0;
 }
 
-void lanovenko::pushCalculated(Stack < long long >& result, const std::string& operation)
+void lanovenko::pushCalculated(Stack< long long >& result, const std::string& operation)
 {
   if (result.empty())
   {
@@ -96,7 +96,7 @@ void lanovenko::pushCalculated(Stack < long long >& result, const std::string& o
 
 long long lanovenko::calcualtePostfix(Queue< std::string >& postfix)
 {
-  Stack < long long > result{};
+  Stack< long long > result{};
   while (!postfix.empty())
   {
     std::string current = postfix.front();
