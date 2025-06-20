@@ -105,7 +105,7 @@ namespace petrov
   template< typename T >
   T & DynamicArray< T >::operator[](const size_t & pos)
   {
-    return const_cast< T >(static_cast< const T >(this)->operator[](pos));
+    return const_cast< T & >(static_cast< const DynamicArray< T > * >(this)->operator[](pos));
   }
 
   template< typename T >
