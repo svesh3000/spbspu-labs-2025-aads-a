@@ -119,9 +119,17 @@ namespace brevnov
     tail_(nullptr),
     size_(0)
   {
-    for (ConstIter it = copy.cbegin(); it != copy.cend(); ++it)
+    try
     {
-      push_back(*it);
+      for (ConstIter it = copy.cbegin(); it != copy.cend(); ++it)
+      {
+        push_back(*it);
+      }
+    }
+    catch(...)
+    {
+      clear();
+      throw;
     }
   }
 
