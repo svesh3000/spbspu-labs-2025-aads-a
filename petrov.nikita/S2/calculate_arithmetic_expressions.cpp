@@ -6,14 +6,7 @@ namespace
 {
   bool isAnyOperation(std::string & token)
   {
-    if (token == "**" || token == "/" || token == "*" || token == "%" || token == "+" || token == "-")
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    return token == "**" || token == "/" || token == "*" || token == "%" || token == "+" || token == "-";
   }
 }
 
