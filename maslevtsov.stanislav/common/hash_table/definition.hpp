@@ -90,21 +90,21 @@ template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::begin() noexcept
 {
-  return slots_[0].second == SlotState::EMPTY ? ++iterator(this, 0) : iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++iterator(this, 0) : iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::const_iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::begin() const noexcept
 {
-  return slots_[0].second == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::const_iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::cbegin() const noexcept
 {
-  return slots_[0].second == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
+  return slots_[0].state == SlotState::EMPTY ? ++const_iterator(this, 0) : const_iterator(this, 0);
 }
 
 template< class Key, class T, class Hash, class KeyEqual >
@@ -145,7 +145,7 @@ template< class Key, class T, class Hash, class KeyEqual >
 void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::clear() noexcept
 {
   for (size_t i = 0; i != slots_.size(); ++i) {
-    slots_[i].second = SlotState::EMPTY;
+    slots_[i].state = SlotState::EMPTY;
   }
   size_ = 0;
 }
@@ -191,19 +191,19 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
   size_t odd_step = detail::get_odd_step(key, slots_.size());
   size_t first_deleted = slots_.size();
   for (size_t i = 0; i < slots_.size(); ++i) {
-    if (slots_[index].second == SlotState::EMPTY) {
+    if (slots_[index].state == SlotState::EMPTY) {
       if (first_deleted != slots_.size()) {
-        slots_[first_deleted].first = value;
-        slots_[first_deleted].second = SlotState::OCCUPIED;
+        slots_[first_deleted].data = value;
+        slots_[first_deleted].state = SlotState::OCCUPIED;
         ++size_;
         return {iterator(this, first_deleted), true};
       } else {
-        slots_[index].first = value;
-        slots_[index].second = SlotState::OCCUPIED;
+        slots_[index].data = value;
+        slots_[index].state = SlotState::OCCUPIED;
         ++size_;
         return {iterator(this, index), true};
       }
-    } else if (slots_[index].second == SlotState::DELETED) {
+    } else if (slots_[index].state == SlotState::DELETED) {
       if (first_deleted == slots_.size()) {
         first_deleted = index;
       }
@@ -211,8 +211,8 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
     index = (index + odd_step) % slots_.size();
   }
   if (first_deleted != slots_.size()) {
-    slots_[first_deleted].first = value;
-    slots_[first_deleted].second = SlotState::OCCUPIED;
+    slots_[first_deleted].data = value;
+    slots_[first_deleted].state = SlotState::OCCUPIED;
     ++size_;
     return {iterator(this, first_deleted), true};
   }
@@ -227,7 +227,7 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   value_type value(std::forward< Args >(args)...);
   const Key& key = value.first;
   if (hint != cend()) {
-    if (slots_[hint.index_].second == SlotState::OCCUPIED && key_equal_(slots_[hint.index_].first.first, key)) {
+    if (slots_[hint.index_].state == SlotState::OCCUPIED && key_equal_(slots_[hint.index_].data.first, key)) {
       return iterator(this, hint.index_);
     }
   }
@@ -238,7 +238,7 @@ template< class Key, class T, class Hash, class KeyEqual >
 typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::erase(iterator pos) noexcept
 {
-  slots_[pos.index_].second = SlotState::DELETED;
+  slots_[pos.index_].state = SlotState::DELETED;
   --size_;
   return ++pos;
 }
@@ -317,13 +317,13 @@ void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
     }
     count = new_count;
   }
-  Vector< std::pair< value_type, SlotState > > new_slots(count);
+  Vector< Slot > new_slots(count);
   for (auto it = slots_.begin(); it != slots_.end(); ++it) {
-    if (it->second == SlotState::OCCUPIED) {
-      const Key& key = it->first.first;
+    if (it->state == SlotState::OCCUPIED) {
+      const Key& key = it->data.first;
       size_t index = hasher_(key) % new_slots.size();
       size_t odd_step = detail::get_odd_step(key, new_slots.size());
-      while (new_slots[index].second == SlotState::OCCUPIED) {
+      while (new_slots[index].state == SlotState::OCCUPIED) {
         index = (index + odd_step) % new_slots.size();
       }
       new_slots[index] = *it;
@@ -339,10 +339,10 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::size_type
   size_t index = hasher_(key) % slots_.size();
   size_t odd_step = detail::get_odd_step(key, slots_.size());
   for (size_t i = 0; i < slots_.size(); ++i) {
-    if (slots_[index].second == SlotState::EMPTY) {
+    if (slots_[index].state == SlotState::EMPTY) {
       return slots_.size();
     }
-    if (slots_[index].second == SlotState::OCCUPIED && key_equal_(slots_[index].first.first, key)) {
+    if (slots_[index].state == SlotState::OCCUPIED && key_equal_(slots_[index].data.first, key)) {
       return index;
     }
     index = (index + odd_step) % slots_.size();

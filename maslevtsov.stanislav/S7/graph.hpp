@@ -4,6 +4,7 @@
 #include <string>
 #include <hash_table/declaration.hpp>
 #include <vector/declaration.hpp>
+#include <fwd_list/declaration.hpp>
 #include <tree/declaration.hpp>
 #include "pair_hash.hpp"
 
@@ -12,7 +13,7 @@ namespace maslevtsov {
   {
   public:
     using vertices_pair_t = std::pair< std::string, std::string >;
-    using edges_set_t = maslevtsov::HashTable< vertices_pair_t, Vector< unsigned >, PairKeyHash< std::string > >;
+    using edges_set_t = maslevtsov::HashTable< vertices_pair_t, FwdList< unsigned >, PairKeyHash< std::string > >;
 
     Graph();
     Graph(const Graph& src1, const Graph& src2);

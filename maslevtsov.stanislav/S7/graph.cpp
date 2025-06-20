@@ -2,6 +2,7 @@
 #include <hash_table/definition.hpp>
 #include <vector/definition.hpp>
 #include <tree/definition.hpp>
+#include <fwd_list/definition.hpp>
 
 namespace {
   void sort(maslevtsov::Vector< unsigned >& vector)
@@ -21,8 +22,8 @@ namespace {
   void add_edges(maslevtsov::Graph& dist, const maslevtsov::Graph::edges_set_t& src)
   {
     for (auto i = src.cbegin(); i != src.cend(); ++i) {
-      for (size_t j = 0; j != i->second.size(); ++j) {
-        dist.bind(i->first.first, i->first.second, i->second[j]);
+      for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
+        dist.bind(i->first.first, i->first.second, *j);
       }
     }
   }
@@ -62,8 +63,8 @@ maslevtsov::Graph::Graph(const Graph& src, Vector< std::string >& vertices):
 {
   for (auto i = src.edges_set_.cbegin(); i != src.edges_set_.cend(); ++i) {
     if (check_bind_existence(i->first.first, i->first.second, vertices)) {
-      for (size_t j = 0; j != i->second.size(); ++j) {
-        bind(i->first.first, i->first.second, i->second[j]);
+      for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
+        bind(i->first.first, i->first.second, *j);
       }
     }
   }
@@ -139,12 +140,19 @@ void maslevtsov::Graph::cut(const std::string& vertice1, const std::string& vert
     throw std::invalid_argument("non-existing edge given");
   }
   bool is_deleted = false;
-  for (auto it = to_cut_it->second.begin(); it != to_cut_it->second.end();) {
-    if (*it == weight) {
-      it = to_cut_it->second.erase(it);
+  auto cur = to_cut_it->second.cbegin();
+  auto next = ++to_cut_it->second.cbegin();
+  if (*cur == weight) {
+    to_cut_it->second.pop_front();
+    return;
+  }
+  while (next != to_cut_it->second.cend()) {
+    if (*next == weight) {
+      to_cut_it->second.erase_after(cur);
       is_deleted = true;
-    } else {
-      ++it;
+      ++cur;
+      next = cur;
+      ++next;
     }
   }
   if (!is_deleted) {

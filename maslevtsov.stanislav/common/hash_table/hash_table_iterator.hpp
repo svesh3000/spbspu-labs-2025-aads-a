@@ -63,7 +63,7 @@ namespace maslevtsov {
 
     ++index_;
     size_t slots_size = hash_table_->slots_.size();
-    while (index_ < slots_size && hash_table_->slots_[index_].second != hash_table_t::SlotState::OCCUPIED) {
+    while (index_ < slots_size && hash_table_->slots_[index_].state != hash_table_t::SlotState::OCCUPIED) {
       ++index_;
     }
     return *this;
@@ -82,14 +82,14 @@ namespace maslevtsov {
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::reference_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator*() const noexcept
   {
-    return hash_table_->slots_[index_].first;
+    return hash_table_->slots_[index_].data;
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::pointer_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator->() const noexcept
   {
-    return std::addressof(hash_table_->slots_[index_].first);
+    return std::addressof(hash_table_->slots_[index_].data);
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
