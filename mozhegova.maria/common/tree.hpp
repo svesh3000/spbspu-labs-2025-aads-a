@@ -648,21 +648,77 @@ namespace mozhegova
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseLnr(F f) const
   {
-    return const_cast< node * >(this)->traverseLnr(f);
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< const node * > stack;
+    const node * current = root_;
+    while (current != fakeLeaf_ || !stack.empty())
+    {
+      while (current != fakeLeaf_)
+      {
+        stack.push(current);
+        current = current->left;
+      }
+      current = stack.top();
+      stack.pop();
+      f(current->data);
+      current = current->right;
+    }
+    return f;
   }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseRnl(F f) const
   {
-    return const_cast< node * >(this)->traverseRnl(f);
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Stack< const node * > stack;
+    const node * current = root_;
+    while (current != fakeLeaf_ || !stack.empty())
+    {
+      while (current != fakeLeaf_)
+      {
+        stack.push(current);
+        current = current->right;
+      }
+      current = stack.top();
+      stack.pop();
+      f(current->data);
+      current = current->left;
+    }
+    return f;
   }
 
   template< typename Key, typename T, typename Cmp >
   template< typename F >
   F BiTree< Key, T, Cmp >::traverseBreadth(F f) const
   {
-    return const_cast< node * >(this)->raverseBreadth(f);
+    if (empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
+    Queue< const node * > queue;
+    queue.push(root_);
+    while (!queue.empty())
+    {
+      const node * current = queue.front();
+      queue.pop();
+      f(current->data);
+      if (current->left != fakeLeaf_)
+      {
+        queue.push(current->left);
+      }
+      if (current->right != fakeLeaf_)
+      {
+        queue.push(current->right);
+      }
+    }
+    return f;
   }
 
   template< typename Key, typename T, typename Cmp >
