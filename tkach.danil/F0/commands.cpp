@@ -12,7 +12,6 @@ namespace
 
   bool findTranslation(const tkach::List< std::string >& list, const std::string& translation)
   {
-
     if (list.empty())
     {
       return false;
