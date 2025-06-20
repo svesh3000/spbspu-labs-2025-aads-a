@@ -2,6 +2,7 @@
 #define HASH_MAP_ITER_HPP
 #include <iterator>
 #include <cassert>
+#include <dynamic-array.hpp>
 
 namespace savintsev
 {
@@ -11,18 +12,21 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   class FwdConstIterator;
 
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
+  template< typename Key, typename T >
   class FwdIterator
   {
     friend class HashMap< Key, T, HS1, HS2, EQ >;
     friend class FwdConstIterator< Key, T, HS1, HS2, EQ >;
   private:
-    HashMap< Key, T, HS1, HS2, EQ > * map_ = nullptr;
+    Array< std::pair< std::pair< Key, T >, bool > > * tab1_ = nullptr;
+    Array< std::pair< std::pair< Key, T >, bool > > * tab2_ = nullptr;
     size_t pos_ = 0;
-    bool in_t1_ = true;
+    size_t capacity_ = 0;
+    bool first_ = true;
 
-    FwdIterator(HashMap< Key, T, HS1, HS2, EQ > & map, size_t pos, bool in_t1);
-    FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it);
+    template< typename HS1, typename HS2, typename EQ >
+    FwdIterator(HashMap< Key, T, HS1, HS2, EQ > * map, size_t pos, bool in_first_table);
+    //FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it);
 
     void skip_empty();
     bool is_valid() const;
@@ -48,71 +52,77 @@ namespace savintsev
     bool operator==(const FwdIterator & rhs) const;
   };
 
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  FwdIterator< Key, T, HS1, HS2, EQ >::FwdIterator(HashMap< Key, T, HS1, HS2, EQ > & map, size_t pos, bool in_t):
-    map_(std::addressof(map)),
+  template< typename Key, typename T >
+  template< typename HS1, typename HS2, typename EQ >
+  FwdIterator< Key, T >::FwdIterator(HashMap< Key, T, HS1, HS2, EQ > * map, size_t pos, bool in_first_table):
+    tab1_(nullptr),
+    tab2_(nullptr),
     pos_(pos),
-    in_t1_(in_t)
+    capacity_(0),
+    first_(in_first_table)
   {
-    skip_empty();
+    if (map)
+    {
+      tab1_ = std::addressof(map->t1_);
+      tab2_ = std::addressof(map->t1_);
+      skip_empty();
+    }
   }
-  template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
-  void FwdIterator< Key, T, HS1, HS2, EQ >::skip_empty()
+  template< typename Key, typename T >
+  void FwdIterator< Key, T >::skip_empty()
   {
-    while (in_t1_ && (pos_ < map_->capacity_) && (!map_->t1_[pos_].second))
+    while (first_ && (pos_ < capacity_) && (tab1_->[]))
     {
       ++pos_;
     }
-    if ((pos_ >= map_->capacity_) && in_t1_)
+    if ((pos_ >= capacity_) && first_)
     {
-      in_t1_ = false;
+      first_ = false;
       pos_ = 0;
-      while ((pos_ < map_->capacity_) && !map_->t2_[pos_].second)
+      while (pos_ < capacity_ && tab2_[pos_].second)
       {
         ++pos_;
       }
     }
-    if (!is_valid())
-    {
-      map_ = nullptr;
-    }
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   FwdIterator< Key, T, HS1, HS2, EQ >::FwdIterator(const FwdConstIterator< Key, T, HS1, HS2, EQ > & it):
-    map_(it.map_),
-    pos_(it.pos_),
-    in_t1_(it.in_t1_)
+    tab1_(it.tab1_),
+    tab2_(map.t2_),
+    pos_(pos),
+    capacity_(map.capacity_),
+    first_(in_t1)
   {
     skip_empty();
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   bool FwdIterator< Key, T, HS1, HS2, EQ >::is_valid() const
   {
-    return map_ && pos_ < map_->capacity_ && (in_t1_ ? map_->t1_[pos_].second : map_->t2_[pos_].second);
+    return map_ && pos_ < map_->capacity_ && (first_ ? map_->t1_[pos_].second : map_->t2_[pos_].second);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename FwdIterator< Key, T, HS1, HS2, EQ >::reference FwdIterator< Key, T, HS1, HS2, EQ >::operator*()
   {
     assert(is_valid());
-    return in_t1_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
+    return first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename FwdIterator< Key, T, HS1, HS2, EQ >::pointer FwdIterator< Key, T, HS1, HS2, EQ >::operator->()
   {
     assert(is_valid());
-    return std::addressof(in_t1_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
+    return std::addressof(first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename FwdIterator< Key, T, HS1, HS2, EQ >::reference FwdIterator< Key, T, HS1, HS2, EQ >::operator*() const
   {
     assert(is_valid());
-    return in_t1_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
+    return first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename FwdIterator< Key, T, HS1, HS2, EQ >::pointer FwdIterator< Key, T, HS1, HS2, EQ >::operator->() const
   {
     assert(is_valid());
-    return std::addressof(in_t1_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
+    return std::addressof(first_ ? map_->t1_[pos_].first : map_->t2_[pos_].first);
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   FwdIterator< Key, T, HS1, HS2, EQ > & FwdIterator< Key, T, HS1, HS2, EQ >::operator++()
@@ -138,7 +148,7 @@ namespace savintsev
   {
     if (map_ || rhs.map_)
     {
-      return map_ == rhs.map_ && pos_ == rhs.pos_ && in_t1_ == rhs.in_t1_;
+      return map_ == rhs.map_ && pos_ == rhs.pos_ && first_ == rhs.first_;
     }
     return true;
   }
