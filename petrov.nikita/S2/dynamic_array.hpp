@@ -64,7 +64,7 @@ namespace petrov
     catch (...)
     {
       delete massive_;
-      throw std::exception();
+      throw;
     }
   }
 
@@ -154,7 +154,7 @@ namespace petrov
     catch (...)
     {
       delete[] temp;
-      throw std::exception();
+      throw;
     }
   }
 
