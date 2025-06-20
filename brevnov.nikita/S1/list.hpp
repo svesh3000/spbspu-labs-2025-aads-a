@@ -126,7 +126,7 @@ namespace brevnov
         push_back(*it);
       }
     }
-    catch(...)
+    catch (...)
     {
       clear();
       throw;
