@@ -3,6 +3,7 @@
 #include <limits>
 #include <hash_table/definition.hpp>
 #include "graph.hpp"
+#include "bind_functor.hpp"
 #include "commands.hpp"
 
 int main(int argc, char** argv)
@@ -34,16 +35,16 @@ int main(int argc, char** argv)
     graphs[graph_name] = graph;
   }
 
-  HashTable< std::string, std::function< void() > > commands;
-  commands["graphs"] = std::bind(print_graphs, std::cref(graphs), std::ref(std::cout));
-  commands["vertexes"] = std::bind(print_vertices, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["outbound"] = std::bind(print_outbound, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["inbound"] = std::bind(print_inbound, std::cref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["bind"] = std::bind(bind_vertices, std::ref(graphs), std::ref(std::cin));
-  commands["cut"] = std::bind(cut_vertices, std::ref(graphs), std::ref(std::cin));
-  commands["create"] = std::bind(create_graph, std::ref(graphs), std::ref(std::cin));
-  commands["merge"] = std::bind(merge_graphs, std::ref(graphs), std::ref(std::cin));
-  commands["extract"] = std::bind(extract_from_graph, std::ref(graphs), std::ref(std::cin));
+  HashTable< std::string, IOFuncBinder< graphs_map_t > > commands;
+  commands["graphs"] = IOFuncBinder< graphs_map_t >(print_graphs, graphs, std::cout);
+  commands["vertexes"] = IOFuncBinder< graphs_map_t >(print_vertices, graphs, std::cin, std::cout);
+  commands["outbound"] = IOFuncBinder< graphs_map_t >(print_outbound, graphs, std::cin, std::cout);
+  commands["inbound"] = IOFuncBinder< graphs_map_t >(print_inbound, graphs, std::cin, std::cout);
+  commands["bind"] = IOFuncBinder< graphs_map_t >(bind_vertices, graphs, std::cin);
+  commands["cut"] = IOFuncBinder< graphs_map_t >(cut_vertices, graphs, std::cin);
+  commands["create"] = IOFuncBinder< graphs_map_t >(create_graph, graphs, std::cin);
+  commands["merge"] = IOFuncBinder< graphs_map_t >(merge_graphs, graphs, std::cin);
+  commands["extract"] = IOFuncBinder< graphs_map_t >(extract_from_graph, graphs, std::cin);
 
   std::string command;
   while ((std::cin >> command) && !std::cin.eof()) {

@@ -69,18 +69,7 @@ namespace maslevtsov {
       DELETED,
     };
 
-    struct Slot
-    {
-      value_type data;
-      SlotState state = SlotState::EMPTY;
-
-      Slot():
-        data(),
-        state(SlotState::EMPTY)
-      {}
-    };
-
-    Vector< Slot > slots_;
+    Vector< std::pair< value_type, SlotState > > slots_;
     size_type size_;
     Hash hasher_;
     KeyEqual key_equal_;
