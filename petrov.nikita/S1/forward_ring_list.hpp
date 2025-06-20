@@ -100,10 +100,12 @@ namespace petrov
     const T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    template< typename U >
-    void push_front (U && val);
+    template< typename T1 >
+    void push_front (T1 && val);
     void pop_front();
     void remove(const T & val);
+    template< typename Cond >
+    void remove_if(Cond cond);
     void clear();
     void reverse();
     void swap(this_t & rhs) noexcept;
@@ -374,12 +376,12 @@ namespace petrov
   }
 
   template< typename T >
-  template< typename U >
-  void ForwardRingList< T >::push_front(U && val)
+  template< typename T1 >
+  void ForwardRingList< T >::push_front(T1 && val)
   {
     if (empty())
     {
-      head_ = new node_t{ val, head_ };
+      head_ = new node_t{ std::forward< T1 >(val), head_ };
       tail_ = head_;
       tail_->next = head_;
       size_++;
@@ -387,7 +389,7 @@ namespace petrov
     else
     {
       auto temp = tail_->next;
-      tail_->next = new node_t{ val, nullptr };
+      tail_->next = new node_t{ std::forward< T1 >(val), nullptr };
       head_ = tail_->next;
       head_->next = temp;
       size_++;
@@ -482,7 +484,13 @@ namespace petrov
         subhead = subhead->next;
       }
     }
-    return;
+  }
+
+  template< typename T >
+  template< typename Cond >
+  void ForwardRingList< T >::remove_if(Cond cond)
+  {
+    
   }
 
   template< typename T >
