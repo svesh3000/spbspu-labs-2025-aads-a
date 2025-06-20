@@ -1,131 +1,96 @@
 #include "commands.hpp"
 #include <fstream>
 #include <iostream>
-#include <limits>
 
-namespace
+void maslov::printCommand(std::istream & in, std::ostream & out, const Dictionaries & dicts)
 {
-  void printCommand(std::istream & in, const maslov::Dictionaries & dicts)
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.cend())
   {
-    std::string dictName;
-    in >> dictName;
-    auto it = dicts.find(dictName);
-    if (it == dicts.cend())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    auto dict = it->second;
-    if (dict.empty())
-    {
-      std::cout << "<EMPTY>\n";
-      return;
-    }
-    std::cout << dictName;
-    for (auto it = dict.cbegin(); it != dict.cend(); ++it)
-    {
-      std::cout << ' ' << it->first << ' ' << it->second;
-    }
-    std::cout << '\n';
+    throw std::logic_error("<INVALID COMMAND>");
   }
-
-  void complementCommand(std::istream & in, maslov::Dictionaries & dicts)
+  auto dict = it->second;
+  if (dict.empty())
   {
-    std::string resultName, dictName1, dictName2;
-    in >> resultName >> dictName1 >> dictName2;
-    auto it1 = dicts.find(dictName1);
-    auto it2 = dicts.find(dictName2);
-    if (it1 == dicts.end() || it2 == dicts.end())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    auto dict1 = it1->second;
-    auto dict2 = it2->second;
-    maslov::BiTree< int, std::string, std::less< int > > result;
-    for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
-    {
-      if (dict2.find(it->first) == dict2.end())
-      {
-        result.push(it->first, it->second);
-      }
-    }
-    dicts.push(resultName, result);
+    throw std::logic_error("<EMPTY>");
   }
-
-  void intersectCommand(std::istream & in, maslov::Dictionaries & dicts)
+  out << dictName;
+  for (auto it = dict.cbegin(); it != dict.cend(); ++it)
   {
-    std::string resultName, dictName1, dictName2;
-    in >> resultName >> dictName1 >> dictName2;
-    auto it1 = dicts.find(dictName1);
-    auto it2 = dicts.find(dictName2);
-    if (it1 == dicts.end() || it2 == dicts.end())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    auto dict1 = it1->second;
-    auto dict2 = it2->second;
-    maslov::BiTree< int, std::string, std::less< int > > result;
-    for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
-    {
-      if (dict2.find(it->first) != dict2.end())
-      {
-        result.push(it->first, it->second);
-      }
-    }
-    dicts.push(resultName, result);
+    out << ' ' << it->first << ' ' << it->second;
   }
-
-  void unionCommand(std::istream & in, maslov::Dictionaries & dicts)
-  {
-    std::string resultName, dictName1, dictName2;
-    in >> resultName >> dictName1 >> dictName2;
-    auto it1 = dicts.find(dictName1);
-    auto it2 = dicts.find(dictName2);
-    if (it1 == dicts.end() || it2 == dicts.end())
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      return;
-    }
-    auto dict1 = it1->second;
-    auto dict2 = it2->second;
-    maslov::BiTree< int, std::string, std::less< int > > result = dict1;
-    for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
-    {
-      if (result.find(it->first) == result.end())
-      {
-        result.push(it->first, it->second);
-      }
-    }
-    dicts.push(resultName, result);
-  }
+  out << '\n';
 }
 
-void maslov::processCommand(std::istream & in, const std::string & command, Dictionaries & dicts)
+void maslov::complementCommand(std::istream & in, Dictionaries & dicts)
 {
-  if (command == "print")
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
-    printCommand(in, dicts);
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  else if (command == "complement")
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
+  BiTree< int, std::string, std::less< int > > result;
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
-    complementCommand(in, dicts);
+    if (dict2.find(it->first) == dict2.end())
+    {
+      result.push(it->first, it->second);
+    }
   }
-  else if (command == "intersect")
+  dicts.push(resultName, result);
+}
+
+void maslov::intersectCommand(std::istream & in, Dictionaries & dicts)
+{
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
-    intersectCommand(in, dicts);
+    throw std::logic_error("<INVALID COMMAND>");
   }
-  else if (command == "union")
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
+  BiTree< int, std::string, std::less< int > > result;
+  for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
   {
-    unionCommand(in, dicts);
+    if (dict2.find(it->first) != dict2.end())
+    {
+      result.push(it->first, it->second);
+    }
   }
-  else
+  dicts.push(resultName, result);
+}
+
+void maslov::unionCommand(std::istream & in, Dictionaries & dicts)
+{
+  std::string resultName, dictName1, dictName2;
+  in >> resultName >> dictName1 >> dictName2;
+  auto it1 = dicts.find(dictName1);
+  auto it2 = dicts.find(dictName2);
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
-    std::cout << "<INVALID COMMAND>\n";
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    throw std::logic_error("<INVALID COMMAND>");
   }
+  auto dict1 = it1->second;
+  auto dict2 = it2->second;
+  BiTree< int, std::string, std::less< int > > result = dict1;
+  for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
+  {
+    if (result.find(it->first) == result.end())
+    {
+      result.push(it->first, it->second);
+    }
+  }
+  dicts.push(resultName, result);
 }
 
 void maslov::inputFile(const std::string & filename, Dictionaries & dicts)
