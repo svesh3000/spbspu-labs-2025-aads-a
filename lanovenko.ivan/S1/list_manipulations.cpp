@@ -1,6 +1,6 @@
 #include "list_manipulations.hpp"
 
-void lanovenko::printSequencesName(const list_of_pairs temporary, std::ostream& out)
+void lanovenko::printSequencesName(const list_of_pairs& temporary, std::ostream& out)
 {
   if (temporary.empty())
   {
@@ -17,10 +17,10 @@ void lanovenko::printSequencesName(const list_of_pairs temporary, std::ostream& 
 
 bool lanovenko::isSumLimit(size_t a, size_t b)
 {
-  return (b > std::numeric_limits<int>::max() - a);
+  return (b > std::numeric_limits< int >::max() - a);
 }
 
-void lanovenko::printSumList(const ForwardList<int>& sumList, bool sumLimit, std::ostream& out)
+void lanovenko::printSumList(const ForwardList< int >& sumList, bool sumLimit, std::ostream& out)
 {
   if (sumLimit)
   {
@@ -42,34 +42,48 @@ void lanovenko::printSumList(const ForwardList<int>& sumList, bool sumLimit, std
   out << '\n';
 }
 
-void lanovenko::printSequences(const list_of_pairs temporary, size_t maxSize, bool& sumLimit, std::ostream& out)
+void lanovenko::printRowsLists(const ForwardList< list_ull >& rowsLists, std::ostream& out)
 {
-  ForwardList<int> sumList{};
+  for (auto i = rowsLists.begin(); i != rowsLists.end(); i++)
+  {
+    auto j = (*i).begin();
+    out << (*j);
+    for (++j; j != (*i).end(); j++)
+    {
+      out << ' ' << (*j);
+    }
+    out << '\n';
+  }
+}
+
+void lanovenko::printSequences(const list_of_pairs& temporary, size_t maxSize, bool& sumLimit, std::ostream& out)
+{
+  ForwardList< int > sumList{};
+  ForwardList< list_ull > rowsList;
   for (size_t i = 0; i < maxSize; i++)
   {
     size_t res = 0;
-    bool isFirstElement = true;
-    for (const auto& pair : temporary)
+    list_ull current;
+    for (const auto& pair: temporary)
     {
       if (!pair.second.empty() && i < pair.second.size())
       {
         auto it = pair.second.begin();
         std::advance(it, i);
-        if (!isFirstElement)
-        {
-          out << " ";
-        }
-        out << (*it);
+        current.push_back(*it);
         if (isSumLimit(res, *it))
         {
           sumLimit = true;
         }
         res += *(it);
-        isFirstElement = false;
       }
     }
-    out << '\n';
     sumList.push_back(res);
+    if (!current.empty())
+    {
+      rowsList.push_back(current);
+    }
   }
+  printRowsLists(rowsList, out);
   printSumList(sumList, sumLimit, out);
 }
