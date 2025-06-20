@@ -1,9 +1,9 @@
-#include <iostream>
 #include <string>
-#include <fstream>
-#include <hashTable/hashTable.hpp>
-#include <functional>
 #include <limits>
+#include <fstream>
+#include <iostream>
+#include <functional>
+#include <hashTable/hashTable.hpp>
 #include "commands.hpp"
 
 int main(int argc, char * argv[])
@@ -35,6 +35,7 @@ int main(int argc, char * argv[])
   {
     std::cerr << e.what() << '\n';
   }
+
   HashTable< std::string, std::function< void() > > cmds;
   cmds["createdictionary"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
   cmds["showdictionary"] = std::bind(showDictionary, std::ref(std::cout), std::cref(dicts));
@@ -59,7 +60,7 @@ int main(int argc, char * argv[])
     }
     catch (const std::exception & e)
     {
-     std::cin.clear();
+      std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << e.what() << '\n';
     }

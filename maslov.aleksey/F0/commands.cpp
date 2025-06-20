@@ -4,10 +4,27 @@
 #include <iomanip>
 
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
-{}
+{
+  std::string dictName;
+  in >> dictName;
+  if (dicts.find(dictName) != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  dicts[dictName] = HashTable< std::string, int >{};
+}
 
 void maslov::showDictionary(std::ostream & out, const Dicts & dicts)
-{}
+{
+  if (dicts.empty())
+  {
+    out << '\n';
+  }
+  for (auto it = dicts.cbegin(); it != dicts.cend(); it++)
+  {
+    out << it->first << '\n';
+  }
+}
 
 void maslov::load(std::istream & in, Dicts & dicts)
 {
@@ -25,6 +42,9 @@ void maslov::load(std::istream & in, Dicts & dicts)
   }
   loadFromFile(file, dictName, dicts);
 }
+
+void maslov::loadFromFile(std::ifstream & file, const std::string & name, Dicts & dicts)
+{}
 
 void maslov::unionDictionary(std::istream & in, Dicts & dicts)
 {}
@@ -95,18 +115,15 @@ void maslov::printHelp(std::ostream & out)
   out << "cleandictionary <dict_name>" << "deleting all words from the dictionary\n";
 
   out << std::setw(numWidth) << "11." << std::setw(cmdWidth);
-  out << "top <dict_name> <number>" << "print of the most frequently used words\n";
+  out << "top <dict_name> <number>" << "print the most frequently used words\n";
 
   out << std::setw(numWidth) << "12." << std::setw(cmdWidth);
-  out << "rare <dict_name> <number>" << "print of the least frequently used words\n";
+  out << "rare <dict_name> <number>" << "print the least frequently used words\n";
 
   out << std::setw(numWidth) << "13." << std::setw(cmdWidth);
-  out << "frequency <dict_name> <word>" << "print of the word frequency\n";
+  out << "frequency <dict_name> <word>" << "print the word frequency\n";
 
   out << std::setw(numWidth) << "14." << std::setw(cmdWidth);
   out << "wordrange <result> <dict_name> <freq1> <freq2>";
   out << "creates a dictionary of words whose frequencies are in the range\n";
 }
-
-void maslov::loadFromFile(std::ifstream & file, const std::string & name, Dicts & dicts)
-{}

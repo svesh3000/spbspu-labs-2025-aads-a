@@ -10,6 +10,7 @@ namespace maslov
   void createDictionary(std::istream & in, Dicts & dicts);
   void showDictionary(std::ostream & out, const Dicts & dicts);
   void load(std::istream & in, Dicts & dicts);
+  void loadFromFile(std::ifstream & file, const std::string & name, Dicts & dicts);
   void unionDictionary(std::istream & in, Dicts & dicts);
   void intersectDictionary(std::istream & in, Dicts & dicts);
   void copyDictionary(std::istream & in, Dicts & dicts);
@@ -22,7 +23,6 @@ namespace maslov
   void printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts);
   void createWordRange(std::istream & in, Dicts & dicts);
   void printHelp(std::ostream & out);
-  void loadFromFile(std::ifstream & file, const std::string & name, Dicts & dicts);
 }
 
 #endif
