@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <set>
-#include "hashTable.hpp"
+#include <hashTable/hashTable.hpp>
 
 namespace maslov::detail
 {
