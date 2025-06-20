@@ -101,18 +101,18 @@ namespace demehin
   {
     if (pos == cend())
     {
-        return end();
+      return end();
     }
 
     size_t ind = pos - cbegin();
     if (ind >= size_)
     {
-        throw std::out_of_range("Iterator out of range");
+      throw std::out_of_range("Iterator out of range");
     }
 
     for (size_t i = begin_ + ind; i < begin_ + size_ - 1; i++)
     {
-        data_[i] = std::move(data_[i + 1]);
+      data_[i] = std::move(data_[i + 1]);
     }
 
     size_--;
