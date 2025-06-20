@@ -6,36 +6,41 @@
 #include <utility>
 #include <stdexcept>
 #include "forward_list_node.hpp"
-#include "forward_list_const_iterator.hpp"
 #include "forward_list_iterator.hpp"
+#include "forward_list_const_iterator.hpp"
 
 namespace lanovenko
 {
   template< typename T > class ForwardList
   {
   public:
-    friend class const_iterator;
-    friend class iterator;
     using const_iterator = ForwardListConstIterator< T >;
     using iterator = ForwardListIterator< T >;
-    ForwardList();
-    ~ForwardList();
-    ForwardList(const ForwardList&);
-    ForwardList(ForwardList&&) noexcept;
-    ForwardList< T >& operator=(ForwardList);
-    ForwardList< T >& operator=(ForwardList&&);
-    iterator begin() const noexcept;
-    iterator end() const noexcept;
+
+    ~ForwardList() noexcept;
+    ForwardList() noexcept;
+    ForwardList(const ForwardList& rhs);
+    ForwardList(ForwardList&& rhs) noexcept;
+    ForwardList< T >& operator=(const ForwardList& rhs);
+    ForwardList< T >& operator=(ForwardList&& rhs) noexcept;
+
+    iterator begin() noexcept;
+    iterator end() noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
-    T& front() const;
-    T& back() const;
+
+    T& front();
+    T& back();
+    const T& front() const;
+    const T& back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void push_front(const T& value);
     void push_front(T&& value);
-    void pop_front();
-    void swap(ForwardList& fwsdlst);
+    void pop_front() noexcept;
+    void swap(ForwardList& rhs) noexcept;
     void clear() noexcept;
     void push_back(const T& value);
     void push_back(T&& value);
@@ -43,228 +48,240 @@ namespace lanovenko
     ForwardListNode< T >* head_;
     ForwardListNode< T >* tail_;
     size_t size_;
-    void push_front_value(ForwardListNode< T >* node);
-    void push_back_value(ForwardListNode< T >* node);
+    void push_front_value(ForwardListNode< T >* node) noexcept;
+    void push_back_value(ForwardListNode< T >* node) noexcept;
   };
-}
 
-template < typename T >
-lanovenko::ForwardList< T >::ForwardList():
-  head_(nullptr),
-  tail_(nullptr),
-  size_(0)
-{}
-
-template < typename T >
-lanovenko::ForwardList<T>::ForwardList(const ForwardList& rhs):
-  head_(nullptr),
-  tail_(nullptr),
-  size_(0)
-{
-  ForwardList<T> temporary{};
-  for (iterator it = rhs.begin(); it != rhs.end(); it++)
-  {
-    temporary.push_front(*it);
-  }
-  for (iterator it = temporary.begin(); it != temporary.end(); it++)
-  {
-    push_front(*it);
-  }
-}
-
-template < typename T >
-lanovenko::ForwardList< T >::ForwardList(ForwardList&& rhs) noexcept:
-  head_(rhs.head_),
-  tail_(rhs.tail_),
-  size_(rhs.size_)
-{
-  rhs.head_ = rhs.tail_ = nullptr;
-  rhs.size_ = 0;
-}
-
-template < typename T >
-lanovenko::ForwardList< T >& lanovenko::ForwardList< T >::operator=(ForwardList rhs)
-{
-  swap(rhs);
-  return *this;
-}
-
-template <typename T>
-lanovenko::ForwardList< T >& lanovenko::ForwardList< T >::operator=(ForwardList&& rhs)
-{
-  if (this != &rhs)
+  template< typename T >
+  ForwardList< T >::~ForwardList() noexcept
   {
     clear();
-    head_ = rhs.head_;
-    tail_ = rhs.tail_;
-    size_ = rhs.size_;
-    rhs.tail_ = rhs.head_ = nullptr;
+  }
+
+  template< typename T >
+  ForwardList< T >::ForwardList() noexcept:
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {}
+
+  template< typename T >
+  ForwardList< T >::ForwardList(const ForwardList& rhs):
+    ForwardList()
+  {
+    for (const_iterator cit = rhs.begin(); cit != rhs.end(); cit++)
+    {
+      push_back(*cit);
+    }
+  }
+
+  template< typename T >
+  ForwardList< T >::ForwardList(ForwardList&& rhs) noexcept:
+    head_(rhs.head_),
+    tail_(rhs.tail_),
+    size_(rhs.size_)
+  {
+    rhs.head_ = rhs.tail_ = nullptr;
     rhs.size_ = 0;
   }
-  return *this;
-}
 
-template < typename T >
-lanovenko::ForwardList< T >::~ForwardList()
-{
-  clear();
-}
-
-template <typename T>
-typename lanovenko::ForwardList< T >::iterator lanovenko::ForwardList< T >::begin() const noexcept
-{
-  return iterator(head_);
-}
-
-template <typename T>
-typename lanovenko::ForwardList< T >::iterator lanovenko::ForwardList< T >::end() const noexcept
-{
-  if (size_ == 0)
+  template< typename T >
+  ForwardList< T >& ForwardList< T >::operator=(const ForwardList& rhs)
   {
-    return iterator(nullptr);
+    if (this != std::addressof(rhs))
+    {
+      ForwardList< T > temp(rhs);
+      swap(temp);
+    }
+    return *this;
   }
-  iterator it(tail_->next_);
-  it.firstIteration_ = false;
-  return it;
-}
 
-template<typename T>
-typename lanovenko::ForwardList< T >::const_iterator lanovenko::ForwardList< T >::cbegin() const noexcept
-{
-  return const_iterator(head_);
-}
-
-template<typename T>
-typename lanovenko::ForwardList< T >::const_iterator lanovenko::ForwardList< T >::cend() const noexcept
-{
-  if (size_ == 0)
+  template< typename T >
+  ForwardList< T >& ForwardList< T >::operator=(ForwardList&& rhs) noexcept
   {
-    return const_iterator(nullptr);
+    if (this != std::addressof(rhs))
+    {
+      ForwardList< T > temp(std::move(rhs));
+      swap(temp);
+    }
+    return *this;
   }
-  const_iterator it(tail_->next_);
-  it.firstIteration_ = false;
-  return it;
-}
 
-template < typename T >
-T& lanovenko::ForwardList< T >::front() const
-{
-  if (empty())
+  template< typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::begin() noexcept
   {
-    throw std::logic_error("Empty List");
+    return iterator(head_);
   }
-  return head_->data_;
-}
 
-template < typename T >
-T& lanovenko::ForwardList< T >::back() const
-{
-  if (empty())
+  template< typename T >
+  typename ForwardList< T >::iterator ForwardList< T >::end() noexcept
   {
-    throw std::logic_error("Empty List");
+    return size_ == 0 ? iterator() : iterator(tail_->next_, false);
   }
-  return tail_->data_;
-}
 
-template < typename T >
-bool lanovenko::ForwardList< T >::empty() const noexcept
-{
-  return size_ == 0;
-}
-
-template < typename T >
-size_t lanovenko::ForwardList< T >::size() const noexcept
-{
-  return size_;
-}
-
-template <typename T>
-void lanovenko::ForwardList< T >::push_front_value(ForwardListNode< T >* newNode)
-{
-  newNode->next_ = head_;
-  head_ = newNode;
-  if (empty())
+  template< typename T >
+  typename ForwardList< T >::const_iterator ForwardList< T >::begin() const noexcept
   {
-    tail_ = newNode;
+    return const_iterator(head_);
   }
-  tail_->next_ = head_;
-  size_++;
-}
 
-template <typename T>
-void lanovenko::ForwardList< T >::push_front(const T& value)
-{
-  push_front_value(new ForwardListNode<T>(value));
-}
-
-template < typename T >
-void lanovenko::ForwardList< T >::push_front(T&& value)
-{
-  push_front_value(new ForwardListNode< T >(std::move(value)));
-}
-
-template < typename T >
-void lanovenko::ForwardList< T >::pop_front()
-{
-  if (!empty())
+  template< typename T >
+  typename ForwardList< T >::const_iterator ForwardList< T >::end() const noexcept
   {
-    ForwardListNode< T >* toDelete = head_;
-    head_ = head_->next_;
-    tail_->next_ = head_;
-    delete toDelete;
-    size_--;
+    return size_ == 0 ? const_iterator() : const_iterator(tail_->next_, false);
   }
-  if (empty())
-  {
-    head_ = nullptr;
-    tail_ = nullptr;
-  }
-}
 
-template< typename T >
-void lanovenko::ForwardList< T >::push_back_value(ForwardListNode< T >* newNode)
-{
-  if (!empty())
+  template< typename T >
+  typename ForwardList< T >::const_iterator ForwardList< T >::cbegin() const noexcept
   {
-    tail_->next_ = newNode;
-    tail_ = newNode;
-    tail_->next_ = head_;
+    return const_iterator(head_);
   }
-  if (empty())
+
+  template< typename T >
+  typename ForwardList< T >::const_iterator ForwardList< T >::cend() const noexcept
   {
+    return size_ == 0 ? const_iterator() : const_iterator(tail_->next_, false);
+  }
+
+  template< typename T >
+  T& ForwardList< T >::front()
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty List");
+    }
+    return head_->data_;
+  }
+
+  template< typename T >
+  T& ForwardList< T >::back()
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty List");
+    }
+    return tail_->data_;
+  }
+
+  template< typename T >
+  const T& ForwardList< T >::front() const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty List");
+    }
+    return head_->data_;
+  }
+
+  template< typename T >
+  const T& ForwardList< T >::back() const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty List");
+    }
+    return tail_->data_;
+  }
+
+  template< typename T >
+  bool ForwardList< T >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< typename T >
+  size_t ForwardList< T >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< typename T >
+  void ForwardList< T >::push_front_value(ForwardListNode< T >* newNode) noexcept
+  {
+    newNode->next_ = head_;
     head_ = newNode;
-    tail_ = newNode;
-    tail_->next_ = newNode;
+    if (empty())
+    {
+      tail_ = newNode;
+    }
+    tail_->next_ = head_;
+    size_++;
   }
-  size_++;
-}
 
-template< typename T >
-void lanovenko::ForwardList< T >::push_back(const T& value)
-{
-  push_back_value(new ForwardListNode<T>(value));
-}
-
-template< typename T >
-void lanovenko::ForwardList< T >::push_back(T&& value)
-{
-  push_back_value(new ForwardListNode< T >(std::move(value)));
-}
-
-template < typename T >
-void lanovenko::ForwardList< T >::swap(ForwardList& fwdlst)
-{
-  std::swap(head_, fwdlst.head_);
-  std::swap(tail_, fwdlst.tail_);
-  std::swap(size_, fwdlst.size_);
-}
-
-template < typename T >
-void lanovenko::ForwardList< T >::clear() noexcept
-{
-  while (!empty())
+  template< typename T >
+  void ForwardList< T >::push_front(const T& value)
   {
-    pop_front();
+    push_front_value(new ForwardListNode< T >(value));
+  }
+
+  template< typename T >
+  void ForwardList< T >::push_front(T&& value)
+  {
+    push_front_value(new ForwardListNode< T >(std::move(value)));
+  }
+
+  template< typename T >
+  void ForwardList< T >::pop_front() noexcept
+  {
+    if (!empty())
+    {
+      ForwardListNode< T >* toDelete = head_;
+      head_ = head_->next_;
+      tail_->next_ = head_;
+      delete toDelete;
+      size_--;
+    }
+    if (empty())
+    {
+      head_ = tail_ = nullptr;
+    }
+  }
+
+  template< typename T >
+  void ForwardList< T >::push_back_value(ForwardListNode< T >* newNode) noexcept
+  {
+    if (!empty())
+    {
+      tail_->next_ = newNode;
+      tail_ = newNode;
+      tail_->next_ = head_;
+    }
+    if (empty())
+    {
+      head_ = newNode;
+      tail_ = newNode;
+      tail_->next_ = newNode;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  void ForwardList< T >::push_back(const T& value)
+  {
+    push_back_value(new ForwardListNode< T >(value));
+  }
+
+  template< typename T >
+  void ForwardList< T >::push_back(T&& value)
+  {
+    push_back_value(new ForwardListNode< T >(std::move(value)));
+  }
+
+  template< typename T >
+  void ForwardList< T >::swap(ForwardList& rhs) noexcept
+  {
+    std::swap(head_, rhs.head_);
+    std::swap(tail_, rhs.tail_);
+    std::swap(size_, rhs.size_);
+  }
+
+  template< typename T >
+  void ForwardList< T >::clear() noexcept
+  {
+    while (!empty())
+    {
+      pop_front();
+    }
   }
 }
 

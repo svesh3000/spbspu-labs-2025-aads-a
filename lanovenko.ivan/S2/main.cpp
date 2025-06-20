@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     }
     catch (const std::invalid_argument& e)
     {
-      std::cerr << e.what();
+      std::cerr << e.what() << "\n";
       return 1;
     }
     infixExpressions.pop();
@@ -48,14 +48,9 @@ int main(int argc, char** argv)
     {
       res = calcualtePostfix(postfixExpressions.front());
     }
-    catch (const std::invalid_argument& e)
+    catch (...)
     {
-      std::cerr << e.what();
-      return 1;
-    }
-    catch (const std::logic_error& e)
-    {
-      std::cerr << e.what();
+      std::cerr << "Error of calculation\n";
       return 1;
     }
     results.push(res);

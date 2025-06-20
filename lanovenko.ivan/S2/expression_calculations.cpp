@@ -1,8 +1,9 @@
 #include "expression_calculations.hpp"
+#include "conversion_to_postfix.hpp"
 
 bool lanovenko::additionOverflow(long long a, long long b)
 {
-  return (b > std::numeric_limits<long long>::max() - a);
+  return (b > std::numeric_limits< long long >::max() - a);
 }
 
 bool lanovenko::multiplicationOverflow(long long a, long long b)
@@ -19,7 +20,7 @@ bool lanovenko::multiplicationOverflow(long long a, long long b)
     }
     else
     {
-      return b < std::numeric_limits<long long >::min() / a;
+      return b < std::numeric_limits< long long >::min() / a;
     }
   }
   else
@@ -35,9 +36,9 @@ bool lanovenko::multiplicationOverflow(long long a, long long b)
   }
 }
 
-long long lanovenko::calculateBinary(long long a, long long b, char operation)
+long long lanovenko::calculateBinary(long long a, long long b, const std::string& operation)
 {
-  if (operation == '+')
+  if (operation == "+")
   {
     if (additionOverflow(a, b))
     {
@@ -45,11 +46,11 @@ long long lanovenko::calculateBinary(long long a, long long b, char operation)
     }
     return a + b;
   }
-  if (operation == '-')
+  if (operation == "-")
   {
     return a - b;
   }
-  if (operation == '*')
+  if (operation == "*")
   {
     if (multiplicationOverflow(a, b))
     {
@@ -57,7 +58,7 @@ long long lanovenko::calculateBinary(long long a, long long b, char operation)
     }
     return a * b;
   }
-  if (operation == '/')
+  if (operation == "/")
   {
     if (b == 0)
     {
@@ -65,7 +66,7 @@ long long lanovenko::calculateBinary(long long a, long long b, char operation)
     }
     return (a / b);
   }
-  if (operation == '%')
+  if (operation == "%")
   {
     if (b == 0)
     {
@@ -76,7 +77,7 @@ long long lanovenko::calculateBinary(long long a, long long b, char operation)
   return 0;
 }
 
-void lanovenko::pushCalculated(Stack < long long >& result, char operation)
+void lanovenko::pushCalculated(Stack < long long >& result, const std::string& operation)
 {
   if (result.empty())
   {
@@ -98,14 +99,14 @@ long long lanovenko::calcualtePostfix(Queue< std::string >& postfix)
   Stack < long long > result{};
   while (!postfix.empty())
   {
-    char current = postfix.front().front();
-    if (std::isdigit(current))
-    {
-      result.push(std::stoll(postfix.front()));
-    }
-    if (current == '+' || current == '-' || current == '*' || current == '/' || current == '%')
+    std::string current = postfix.front();
+    if (isOperator(current))
     {
       pushCalculated(result, current);
+    }
+    else
+    {
+      result.push(std::stoll(current));
     }
     postfix.pop();
   }

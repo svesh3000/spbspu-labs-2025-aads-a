@@ -8,10 +8,10 @@
 
 namespace lanovenko
 {
-  std::string parseDigit(const std::string& str, size_t& num);
-  size_t getPriority(char c);
-  void pushSign(Queue< std::string >& result, Stack< char >& operations, char sign);
-  Queue< std::string > toPostfix(const std::string& infix);
+  bool isOperator(const std::string& lhs);
+  bool comparePriorities(const std::string& lhs, const std::string& rhs);
+  void pushSign(Queue< std::string >& result, Stack< std::string >& operations, const std::string& sign);
+  Queue< std::string > toPostfix(std::string infix);
 }
 
 #endif
