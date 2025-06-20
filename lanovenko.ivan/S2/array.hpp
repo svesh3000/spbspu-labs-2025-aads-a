@@ -169,7 +169,6 @@ namespace lanovenko
     assert(size_ < max_size_);
     data_[size_++] = std::forward< U >(value);
   }
-
 }
 
 #endif
