@@ -157,7 +157,14 @@ namespace tkach
   ListIterator< T > List< T >::begin() noexcept
   {
     Node< T >* head = getHead();
-    return ListIterator< T >(head, head, false);
+    if (empty())
+    {
+      return ListIterator< T >(head, head, true);
+    }
+    else
+    {
+      return ListIterator< T >(head, head, false);
+    }
   }
 
   template< typename T >
@@ -171,7 +178,14 @@ namespace tkach
   CListIterator< T > List< T >::cbegin() const noexcept
   {
     Node< T >* head = getHead();
-    return CListIterator< T >(head, head, false);
+    if (empty())
+    {
+      return CListIterator< T >(head, head, true);
+    }
+    else
+    {
+      return CListIterator< T >(head, head, false);
+    }
   }
 
   template< typename T >

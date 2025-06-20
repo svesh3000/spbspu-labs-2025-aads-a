@@ -90,15 +90,7 @@ namespace
       {
         std::string word = it->first;
         tkach::List< std::string > translations = it->second;
-        auto it2 = temp_dict.find(word);
-        if (it2 != temp_dict.end())
-        {
-          it2->second = mergeTranslations(it2->second, translations);
-        }
-        else
-        {
-          temp_dict[word] = mergeTranslations(translations, translations);
-        }
+        temp_dict[word] = mergeTranslations(translations, temp_dict[word]);
       }
     }
     return temp_dict;
@@ -209,16 +201,7 @@ namespace tkach
             break;
           }
         }
-        auto it = temp_dict.find(eng_word);
-        if (it == temp_dict.end())
-        {
-          temp_dict[eng_word] = mergeTranslations(translations, translations);
-        }
-        else
-        {
-          List< std::string > unique = mergeTranslations(translations, temp_dict[eng_word]);
-          temp_dict[eng_word] = unique;
-        }
+        temp_dict[eng_word] = mergeTranslations(translations, temp_dict[eng_word]);
         if (in2.peek() == '\n')
         {
           in2.get();
@@ -296,14 +279,7 @@ namespace tkach
     {
       tree_of_words& current_dict = it->second;
       auto it2 = current_dict.find(eng_word);
-      if (it2 == current_dict.end())
-      {
-        current_dict[eng_word] = mergeTranslations(translations, translations);
-      }
-      else
-      {
-        it2->second = mergeTranslations(translations, it2->second);
-      }
+      current_dict[eng_word] = mergeTranslations(translations, current_dict[eng_word]);
     }
   }
 
@@ -764,15 +740,7 @@ namespace tkach
         throw std::logic_error("<INVALID DICTIONARY>");
       }
       tree_of_words& target = it->second;
-      auto target_it = target.find(eng_word);
-      if (target_it == target.end())
-      {
-        target[eng_word] = word_it->second;
-      }
-      else
-      {
-        target_it->second = mergeTranslations(target_it->second, word_it->second);
-      }
+      target[eng_word] = mergeTranslations(word_it->second, target[eng_word]);
     }
   }
 
