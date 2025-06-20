@@ -16,6 +16,7 @@ namespace tkach
   void printCommonTranslations(std::istream& in, std::ostream& out, const tree_of_dict& avltree);
   void removeWord(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void clear(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
+  void printCount(std::istream& in, std::ostream& out, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void mergeWords(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void mergeNumberDicts(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void doCommonPartDicts(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
@@ -26,6 +27,7 @@ namespace tkach
   void removeTranslation(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void substructDicts(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
   void printAll(std::ostream& out, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree);
+  void help(std::ostream& out);
 }
 
 #endif

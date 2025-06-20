@@ -259,7 +259,7 @@ namespace tkach
   {
     while (begin != end)
     {
-      insert((begin.node_)->data);
+      insert(*begin);
       begin++;
     }
   }

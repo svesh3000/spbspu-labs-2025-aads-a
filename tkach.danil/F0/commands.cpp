@@ -32,13 +32,13 @@ namespace
     tkach::AvlTree< std::string, std::string > tree_translations;
     for (auto it = list1.cbegin(); it != list1.cend(); ++it)
     {
-      tree_translations.insert(*it, *it);
+      tree_translations[*it];
     }
     if (std::addressof(list1) != std::addressof(list2))
     {
       for (auto it = list2.cbegin(); it != list2.cend(); ++it)
       {
-        tree_translations.insert(*it, *it);
+        tree_translations[*it];
       }
     }
     tkach::List< std::string > translations;
@@ -108,14 +108,14 @@ namespace
   void exportDictionaries(std::istream& in, const tree_of_dict& avltree, std::ios_base::openmode mode)
   {
     std::string filename;
-    size_t count_of_dicts = 0;
+    int count_of_dicts = 0;
     if (!(in >> filename) || filename.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
-    if (!(in >> count_of_dicts))
+    if (!(in >> count_of_dicts) || (count_of_dicts < 0))
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID NUMBER>");
     }
     std::ofstream outFile(filename, mode);
     if (!outFile.is_open())
@@ -141,11 +141,11 @@ namespace
     else
     {
       std::string current_dict_name;
-      for (size_t i = 0; i < count_of_dicts; ++i)
+      for (size_t i = 0; i < static_cast< size_t >(count_of_dicts); ++i)
       {
         if (!(in >> current_dict_name) || current_dict_name.empty())
         {
-          throw std::logic_error("<INVALID COMMAND>");
+          throw std::logic_error("<INVALID ARGUMENTS>");
         }
         auto it = avltree.find(current_dict_name);
         if (it == avltree.cend())
@@ -167,26 +167,26 @@ namespace tkach
     tree_of_dict temp(avltree);
     std::string file_name = "";
     int count_of_dict = 0;
-    if (!(in >> file_name >> count_of_dict))
+    if (!(in >> file_name))
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    std::fstream in2(file_name);
+    if (!in2.is_open())
     {
       throw std::logic_error("<INVALID IMPORT>");
     }
-    if (count_of_dict < 0)
+    if (!(in >> count_of_dict) || count_of_dict < 0)
     {
-      throw std::logic_error("<INVALID IMPORT>");
+      throw std::logic_error("<INVALID NUMBER>");
     }
     HashDynArray< std::string > main_name_dict(count_of_dict);
     for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
     {
       if (!(in >> main_name_dict[i]))
       {
-        throw std::logic_error("<INVALID IMPORT>");
+        throw std::logic_error("<INVALID ARGUMENTS>");
       }
-    }
-    std::fstream in2(file_name);
-    if (!in2.is_open())
-    {
-      throw std::logic_error("<INVALID IMPORT>");
     }
     std::string name_of_dict = "";
     while (in2 >> name_of_dict)
@@ -263,26 +263,22 @@ namespace tkach
   {
     std::string dict_name;
     std::string eng_word;
-    size_t num_translations = 0;
+    int num_translations = 0;
     if (!(in >> dict_name) || dict_name.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     if (!(in >> eng_word) || eng_word.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
-    if (!(in >> num_translations))
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (num_translations <= 0)
+    if (!(in >> num_translations) || (num_translations <= 0))
     {
       throw std::logic_error("<INVALID NUMBER>");
     }
     List< std::string > translations;
     std::string translation;
-    for (size_t i = 0; i < num_translations; ++i)
+    for (size_t i = 0; i < static_cast< size_t >(num_translations); ++i)
     {
       if (!(in >> translation))
       {
@@ -319,25 +315,25 @@ namespace tkach
     std::string eng_word2;
     if (!(in >> dict_name) || dict_name.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (!(in >> eng_word1) || eng_word1.empty())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (!(in >> eng_word2) || eng_word2.empty())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     auto it = avltree.find(dict_name);
     if (it == avltree.end())
     {
       throw std::logic_error("<INVALID DICTIONARY>");
     }
+    if (!(in >> eng_word1) || eng_word1.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
     auto it2 = it->second.find(eng_word1);
     if (it2 == it->second.end())
     {
       throw std::logic_error("<INVALID WORD>");
+    }
+    if (!(in >> eng_word2) || eng_word2.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     auto it3 = it->second.find(eng_word2);
     if (it3 == it->second.end())
@@ -348,34 +344,30 @@ namespace tkach
     it3->second = it2->second;
   }
 
-  void printCommonTranslations(std::istream& in, std::ostream& out, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+  void printCommonTranslations(std::istream& in, std::ostream& out, const tree_of_dict& avltree)
   {
     std::string dict_name;
-    size_t number_of_words = 0;
+    int number_of_words = 0;
     if (!(in >> dict_name) || dict_name.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (!(in >> number_of_words))
-    {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (number_of_words <= 0)
-    {
-      throw std::logic_error("<INVALID NUMBER>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     auto it = avltree.find(dict_name);
     if (it == avltree.cend())
     {
       throw std::logic_error("<INVALID DICTIONARY>");
     }
+    if (!(in >> number_of_words) || number_of_words <= 0)
+    {
+      throw std::logic_error("<INVALID NUMBER>");
+    }
     tkach::List< std::string > common_translations;
-    for (size_t i = 0; i < number_of_words; ++i)
+    for (size_t i = 0; i < static_cast< size_t >(number_of_words); ++i)
     {
       std::string word;
       if (!(in >> word) || word.empty())
       {
-        throw std::logic_error("<INVALID COMMAND>");
+        throw std::logic_error("<INVALID ARGUMENTS>");
       }
       auto word_it = it->second.find(word);
       if (word_it == it->second.cend())
@@ -418,17 +410,27 @@ namespace tkach
 
   void printAll(std::ostream& out, const AvlTree< std::string, AvlTree< std::string, List< std::string > > >& data)
   {
+    if (data.empty())
+    {
+      throw std::logic_error("<EMPTY>");
+    }
     for (auto it = data.cbegin(); it != data.cend(); ++it)
     {
       out << it->first << "\n";
-      for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
+      if (!(it->second.empty()))
       {
-        out << it2->first;
-        for (auto it3 = it2->second.cbegin(); it3 != it2->second.cend(); it3++)
+        for (auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2)
         {
-          out << " " << *it3;
+          out << it2->first;
+          if (!it2->second.empty())
+          {
+            for (auto it3 = it2->second.cbegin(); it3 != it2->second.cend(); it3++)
+            {
+              out << " " << *it3;
+            }
+          }
+          out << "\n";
         }
-        out << "\n";
       }
     }
   }
@@ -439,16 +441,16 @@ namespace tkach
     std::string eng_word;
     if (!(in >> dict_name) || dict_name.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
-    }
-    if (!(in >> eng_word) || eng_word.empty())
-    {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     auto it = avltree.find(dict_name);
     if (it == avltree.end())
     {
       throw std::logic_error("<INVALID DICTIONARY>");
+    }
+    if (!(in >> eng_word) || eng_word.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     bool removed = (it->second).erase(eng_word);
     if (!removed)
@@ -463,24 +465,24 @@ namespace tkach
     std::string eng_word;
     std::string translation;
     size_t dict_name_specified = 2;
-    if (!(in >> dict_name_specified) && dict_name_specified != 0 && dict_name_specified != 1)
+    if (!(in >> dict_name_specified) || (dict_name_specified != 0 && dict_name_specified != 1))
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID NUMBER>");
     }
     if (dict_name_specified)
     {
       if (!(in >> dict_name) || dict_name.empty())
       {
-        throw std::logic_error("<INVALID COMMAND>");
+        throw std::logic_error("<INVALID ARGUMENTS>");
       }
     }
     if (!(in >> eng_word) || eng_word.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     if (!(in >> translation) || translation.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     if (dict_name_specified)
     {
@@ -521,24 +523,24 @@ namespace tkach
     std::string eng_word;
     std::string translation;
     size_t dict_name_specified = 2;
-    if (!(in >> dict_name_specified) && dict_name_specified != 0 && dict_name_specified != 1)
+    if (!(in >> dict_name_specified) || (dict_name_specified != 0 && dict_name_specified != 1))
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID NUMBER>");
     }
     if (dict_name_specified)
     {
       if (!(in >> dict_name) || dict_name.empty())
       {
-        throw std::logic_error("<INVALID COMMAND>");
+        throw std::logic_error("<INVALID ARGUMENTS>");
       }
     }
     if (!(in >> eng_word) || eng_word.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     if (!(in >> translation) || translation.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     if (dict_name_specified)
     {
@@ -568,7 +570,7 @@ namespace tkach
         auto it2 = it->second.find(eng_word);
         if (it2 != it->second.end())
         {
-          if (!findTranslation(it2->second, translation))
+          if (findTranslation(it2->second, translation))
           {
             it2->second.remove(translation);
           }
@@ -582,7 +584,7 @@ namespace tkach
     std::string dict_name;
     if (!(in >> dict_name) || dict_name.empty())
     {
-      throw std::logic_error("<INVALID COMMAND>");
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     auto it = avltree.find(dict_name);
     if (it == avltree.end())
@@ -590,6 +592,21 @@ namespace tkach
       throw std::logic_error("<INVALID DICTIONARY>");
     }
     it->second.clear();
+  }
+
+  void printCount(std::istream& in, std::ostream& out, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+  {
+    std::string dict_name;
+    if (!(in >> dict_name) || dict_name.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    auto it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
+    }
+    out << it->second.size() << "\n";
   }
 
   void substructDicts(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
@@ -701,8 +718,8 @@ namespace tkach
         {
           common[it->first] = mergeTranslations(it->second, it_find->second);
         }
-        result_dict = common;
       }
+      result_dict = common;
     }
     avltree[new_dict_name] = result_dict;
   }
@@ -716,24 +733,24 @@ namespace tkach
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
     }
-    if (!(in >> eng_word) || eng_word.empty())
-    {
-      throw std::logic_error("<INVALID ARGUMENTS>");
-    }
-    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
-    {
-      throw std::logic_error("<INVALID NUMBER>");
-    }
     auto source_it = avltree.find(source_dict_name);
     if (source_it == avltree.end())
     {
       throw std::logic_error("<INVALID DICTIONARY>");
+    }
+    if (!(in >> eng_word) || eng_word.empty())
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
     }
     const tree_of_words& source_dict = source_it->second;
     auto word_it = source_dict.find(eng_word);
     if (word_it == source_dict.cend())
     {
       throw std::logic_error("<INVALID WORD>");
+    }
+    if (!(in >> number_of_dictionaries) || (number_of_dictionaries <= 0))
+    {
+      throw std::logic_error("<INVALID NUMBER>");
     }
     for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
     {
@@ -813,6 +830,36 @@ namespace tkach
       }
       out << "\n";
     }
+  }
+
+  void help(std::ostream& out)
+  {
+    out << "import <file_name> <number_of_dictionaries> <dictionary_name1> ... - Импорт словарей из файла.\n";
+    out << "addword <dictionary_name> <english_word> <number_of_translations> <translation1> ...";
+    out << "- Добавление слова и его переводов в словарь.\n";
+    out << "mergewords <dictionary_name> <english_word1> <english_word2> - Объединение переводов двух английских слов в одном словаре.\n";
+    out << "printcommontranslations <dictionary_name> <number_of_words> <word1> ...";
+    out << "- Вывод общих переводов для нескольких слов в одном словаре.\n";
+    out << "exportoverwrite <file_name> <number_of_dictionaries> <dictionary_name1> ... - Экспорт словарей в файл, перезаписывая его.\n";
+    out << "exportinend <file_name> <number_of_dictionaries> <dictionary_name1> ... - Экспорт словарей в файл, добавляя в конец.\n";
+    out << "printall - Вывод всех словарей и их содержимого.\n";
+    out << "removeword <dictionary_name> <english_word> - Удаление слова из словаря.\n";
+    out << "addtranslation <0_or_1> [dictionary_name] <english_word> <translation> - Добавление перевода к слову.\n";
+    out << "removetranslation <0_or_1> [dictionary_name] <english_word> <translation> - Удаление перевода слова.\n";
+    out << "clear <dictionary_name> - Очистка словаря от всех слов.\n";
+    out << "mergedictionaries <new_dictionary_name> <number_of_dictionaries> <dictionary_name1> ... ";
+    out << "- Объединение нескольких словарей в новый.\n";
+    out << "subtractedictionaries <new_dictionary_name> <number_of_dictionaries> <dictionary_name1> ... ";
+    out << "- Вычитание словарей из первого в новый.\n";
+    out << "commonpartdictionaries <new_dictionary_name> <number_of_dictionaries> <dictionary_name1> ... ";
+    out << "- Создание нового словаря из общих слов нескольких словарей.\n";
+    out << "copytranslations <source_dictionary_name> <english_word> <number_of_dictionaries> <target_dictionary_name1> ... ";
+    out << "- Копирование переводов слова из одного словаря в другие.\n";
+    out << "printtranslations <english_word> <number_of_dictionaries> <dictionary_name1> ... ";
+    out << "- Вывод переводов слова в указанных словарях.\n";
+    out << "printengwordswithtraslation <translation> <number_of_dictionaries> <dictionary_name1> ...  ";
+    out << "- Вывод английских слов, содержащих этот перевод.\n";
+    out << "count <dictionary_name> - Вывод количества слов в словаре.\n";
   }
 
   void printEngWordsWithTraslation(std::istream& in, std::ostream& out, const tree_of_dict& avltree)
