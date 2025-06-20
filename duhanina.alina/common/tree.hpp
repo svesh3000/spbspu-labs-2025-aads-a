@@ -35,7 +35,7 @@ namespace duhanina
     ConstIterator_t cend() const noexcept;
 
     void push(const Key& k, const Value& v);
-    Value& get(const Key& k) const;
+    const Value& get(const Key& k) const;
     void drop(const Key& k);
 
     size_t size() const noexcept;
@@ -212,9 +212,9 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::get(const Key& k) const
+  const Value& Tree< Key, Value, Compare >::get(const Key& k) const
   {
-    Node_t* node = find(getRoot(), k);
+    const Node_t* node = find(getRoot(), k);
     if (!node)
     {
       throw std::out_of_range("Key not found");
