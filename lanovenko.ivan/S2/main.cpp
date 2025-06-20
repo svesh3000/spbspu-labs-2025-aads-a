@@ -12,10 +12,10 @@ int main(int argc, char** argv)
   using namespace lanovenko;
   if (argc > 2)
   {
-    std::cerr << "to much parametrs!\n";
+    std::cerr << "To much parametrs!\n";
     return 1;
   }
-  Queue < std::string > infixExpressions{};
+  Queue< std::string > infixExpressions{};
   if (argc == 1)
   {
     inputExpression(std::cin, infixExpressions);
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     std::ifstream input(argv[1]);
     inputExpression(input, infixExpressions);
   }
-  Queue< Queue < std::string > > postfixExpressions{};
+  Queue< Queue< std::string > > postfixExpressions{};
   while (!infixExpressions.empty())
   {
     std::string expression = infixExpressions.front();
@@ -33,27 +33,27 @@ int main(int argc, char** argv)
     {
       postfixExpressions.push(toPostfix(expression));
     }
-    catch (const std::invalid_argument& e)
+    catch (...)
     {
-      std::cerr << e.what() << "\n";
+      std::cerr << "Conversion error\n";
       return 1;
     }
     infixExpressions.pop();
   }
-  Stack < long long > results{};
+  Stack< long long > results{};
   while (!postfixExpressions.empty())
   {
     long long res = 0;
     try
     {
       res = calcualtePostfix(postfixExpressions.front());
+      results.push(res);
     }
     catch (...)
     {
       std::cerr << "Error of calculation\n";
       return 1;
     }
-    results.push(res);
     postfixExpressions.pop();
   }
   resultsOutput(results, std::cout);
