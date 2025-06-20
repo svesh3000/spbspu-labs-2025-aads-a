@@ -14,8 +14,8 @@ namespace sveshnikov
     tree_node_t< Key, T > *parent_;
     size_t height_;
 
-    tree_node_t();
-    tree_node_t(const std::pair< Key, T > &val);
+    explicit tree_node_t();
+    explicit tree_node_t(const std::pair< Key, T > &val);
   };
 
   template< class Key, class T >

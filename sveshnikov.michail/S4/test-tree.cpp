@@ -74,14 +74,14 @@ BOOST_AUTO_TEST_CASE(swap_and_clear)
 BOOST_AUTO_TEST_CASE(insert)
 {
   sveshnikov::AvlTree< int, std::string > tree;
-  auto i = tree.insert({1, "a"}).first;
+  auto it = tree.insert({1, "a"}).first;
   int arr[5] = {2, 5, 4, 6, 3};
   for (size_t i = 0; i < 5; i++)
   {
     tree.insert({arr[i], "a"});
   }
   BOOST_TEST(tree.size() == 6);
-  bool is_equal = (i == tree.begin());
+  bool is_equal = (it == tree.begin());
   BOOST_TEST(is_equal);
   bool is_insert = tree.insert({3, "a"}).second;
   BOOST_TEST(!is_insert);
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE(insert)
 BOOST_AUTO_TEST_CASE(erase)
 {
   sveshnikov::AvlTree< int, std::string > tree;
-  int arr1[8] = {2, 6, 4, 5, 3, 1, 0};
-  for (size_t i = 0; i < 8; i++)
+  int arr1[7] = {2, 6, 4, 5, 3, 1, 0};
+  for (size_t i = 0; i < 7; i++)
   {
     tree.insert({arr1[i], "a"});
   }
@@ -99,21 +99,25 @@ BOOST_AUTO_TEST_CASE(erase)
 
   tree.erase(it);
   BOOST_TEST(tree.size() == 7);
-  BOOST_TEST(tree.erase(8) == 0);
+  int is_erase = tree.erase(8);
+  BOOST_TEST(is_erase == 0);
   int arr2[6] = {2, 4, 5, 0, 3, 1};
   size_t size = 7;
   for (size_t i = 0; i < 6; i++)
   {
     size--;
-    BOOST_TEST(tree.erase(arr2[i]) == 1);
+    is_erase = tree.erase(arr2[i]);
+    BOOST_TEST(is_erase == 1);
     BOOST_TEST((--tree.end())->first == 6);
     BOOST_TEST(tree.size() == size);
   }
 
   BOOST_TEST(tree.begin()->first == 6);
-  BOOST_TEST(tree.erase(6) == 1);
+  tree.erase(6);
+  BOOST_TEST(is_erase == 1);
   BOOST_TEST(tree.empty());
-  BOOST_TEST(tree.erase(11) == 0);
+  is_erase = tree.erase(11);
+  BOOST_TEST(is_erase == 0);
 }
 
 BOOST_AUTO_TEST_CASE(operations)

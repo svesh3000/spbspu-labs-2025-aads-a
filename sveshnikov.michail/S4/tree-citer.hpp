@@ -63,7 +63,7 @@ namespace sveshnikov
     }
     else
     {
-      while (node_->parent_ && node_ == node_->parent_->left_)
+      while (node_->parent_ && node_ != node_->parent_->left_)
       {
         node_ = node_->parent_;
       }
