@@ -15,7 +15,7 @@ int main(int argc, char * argv[])
     std::istream& input = (argc == 2) ? (mainFile.open(argv[1]), mainFile) : std::cin;
     if (argc == 2 && !mainFile)
     {
-      std::logic_error("erroe open file\n");
+      throw std::logic_error("error open file\n");
     }
     finaev::countFinalResults(input);
   }
