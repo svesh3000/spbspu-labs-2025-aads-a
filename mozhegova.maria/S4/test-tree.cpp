@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "tree.hpp"
+#include <tree.hpp>
 
 namespace
 {

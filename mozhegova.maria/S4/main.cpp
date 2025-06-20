@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include "tree.hpp"
+#include <tree.hpp>
 #include "commands.hpp"
 
 namespace

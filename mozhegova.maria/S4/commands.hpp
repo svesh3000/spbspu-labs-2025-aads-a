@@ -3,7 +3,7 @@
 
 #include <string>
 #include <ostream>
-#include "tree.hpp"
+#include <tree.hpp>
 
 namespace mozhegova
 {
