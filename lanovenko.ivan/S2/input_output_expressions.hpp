@@ -9,8 +9,8 @@
 
 namespace lanovenko
 {
-  void inputExpression(std::istream& in, Queue < std::string >& infixExpressions);
-  void resultsOutput(Stack < long long > results, std::ostream& out);
+  void inputExpression(std::istream& in, Queue< std::string >& infixExpressions);
+  void resultsOutput(Stack< long long >& results, std::ostream& out);
 }
 
 #endif
