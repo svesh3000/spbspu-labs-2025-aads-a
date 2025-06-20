@@ -1,20 +1,8 @@
 #include "graph.hpp"
 #include <algorithm>
 #include <tuple>
-
-#if 0
-#  include <boost/hash2/fnv1a.hpp>
-#  include <boost/hash2/hash_append.hpp>
-
-std::size_t std::hash< std::pair< std::string, std::string > >::operator()(
-    const pair< string, string >& value) const
-{
-  namespace hash2 = boost::hash2;
-  hash2::fnv1a_64 hasher;
-  hash2::hash_append(hasher, {}, value);
-  return hash2::get_integral_result< size_t >(hasher);
-}
-#endif
+#include <boost/hash2/fnv1a.hpp>
+#include <boost/hash2/hash_append.hpp>
 
 namespace kizhin {
   struct VertexEdgeFrom
@@ -38,18 +26,19 @@ namespace kizhin {
   };
 }
 
-#if 0
-bool kizhin::operator==(const Edge& lhs, const Edge& rhs)
+std::size_t std::hash< kizhin::VertexPair >::operator()(
+    const kizhin::VertexPair& value) const
 {
-  return lhs.from == rhs.from && lhs.to == rhs.to && lhs.weight == rhs.weight;
+  namespace hash2 = boost::hash2;
+  hash2::fnv1a_64 hasher;
+  hash2::hash_append(hasher, {}, value.from);
+  hash2::hash_append(hasher, {}, value.to);
+  return hash2::get_integral_result< size_t >(hasher);
 }
-#endif
 
-bool kizhin::operator<(const VertexPair& lhs, const VertexPair& rhs)
+bool kizhin::operator==(const VertexPair& lhs, const VertexPair& rhs)
 {
-  const auto lhsTuple = std::tie(lhs.from, lhs.to);
-  const auto rhsTuple = std::tie(rhs.from, rhs.to);
-  return lhsTuple < rhsTuple;
+  return lhs.from == rhs.from && lhs.to == rhs.to;
 }
 
 kizhin::VertexContainer kizhin::getVertices(const Graph& graph)

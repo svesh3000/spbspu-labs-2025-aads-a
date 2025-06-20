@@ -1,20 +1,9 @@
 #ifndef SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S7_GRAPH_HPP
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S7_GRAPH_HPP
 
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <string>
-#include <vector>
-
-#if 0
-namespace std {
-  template <>
-  struct hash< pair< string, string > >
-  {
-    size_t operator()(const pair< string, string >&) const;
-  };
-}
-#endif
 
 namespace kizhin {
   using Vertex = std::string;
@@ -23,13 +12,23 @@ namespace kizhin {
     Vertex from{};
     Vertex to{};
   };
+}
+
+namespace std {
+  template <>
+  struct hash< kizhin::VertexPair >
+  {
+    size_t operator()(const kizhin::VertexPair&) const;
+  };
+}
+
+namespace kizhin {
   using Weight = std::size_t;
   using WeightContiner = std::multiset< Weight >;
 
-  // bool operator==(const Edge&, const Edge&);
-  bool operator<(const VertexPair&, const VertexPair&);
+  bool operator==(const VertexPair&, const VertexPair&);
 
-  using Graph = std::map< VertexPair, WeightContiner >;
+  using Graph = std::unordered_map< VertexPair, WeightContiner >;
   using VertexContainer = std::set< Vertex >;
 
   VertexContainer getVertices(const Graph&);

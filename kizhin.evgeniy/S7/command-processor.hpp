@@ -2,6 +2,7 @@
 #define SPBSPU_LABS_2025_AADS_A_KIZHIN_EVGENIY_S7_COMMAND_PROCESSOR_HPP
 
 #include <iosfwd>
+#include <map>
 #include "graph.hpp"
 
 namespace kizhin {
