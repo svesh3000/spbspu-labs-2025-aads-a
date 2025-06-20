@@ -1,10 +1,31 @@
 #include <fstream>
 #include <iostream>
 #include <tree.hpp>
+#include <functional>
 #include "accumulator.hpp"
+
+namespace
+{
+  using Tree = maslov::BiTree< int, std::string, std::less< int > >;
+  void callAscending(const Tree & tree, maslov::KeyValueAccumulator & result)
+  {
+    result = tree.traverseLnr(result);
+  }
+
+  void callDescending(const Tree & tree, maslov::KeyValueAccumulator & result)
+  {
+    result = tree.traverseRnl(result);
+  }
+
+  void callBreadth(const Tree & tree, maslov::KeyValueAccumulator & result)
+  {
+    result = tree.traverseBreadth(result);
+  }
+}
 
 int main(int argc, char * argv[])
 {
+  using namespace maslov;
   if (argc != 3)
   {
     std::cerr << "ERROR: wrong arguments\n";
@@ -18,7 +39,7 @@ int main(int argc, char * argv[])
   }
   int key = 0;
   std::string value;
-  maslov::BiTree< int, std::string, std::less< int > > biTree;
+  BiTree< int, std::string, std::less< int > > biTree;
   while ((fileInput >> key >> value) && !fileInput.eof())
   {
     biTree.push(key, value);
@@ -28,27 +49,16 @@ int main(int argc, char * argv[])
     std::cerr << "ERROR: wrong input\n";
     return 1;
   }
+  using func = std::function< void(KeyValueAccumulator &) >;
+  BiTree< std::string, func, std::less< std::string > > cmds;
+  using namespace std::placeholders;
+  cmds["ascending"] = std::bind(callAscending, std::cref(biTree), _1);
+  cmds["descending"] = std::bind(callDescending, std::cref(biTree), _1);
+  cmds["breadth"] = std::bind(callBreadth, std::cref(biTree), _1);
   try
   {
-    std::string cmd(argv[1]);
-    maslov::KeyValueAccumulator result;
-    if (cmd == "ascending")
-    {
-      result = biTree.traverseLnr(result);
-    }
-    else if (cmd == "descending")
-    {
-      result = biTree.traverseRnl(result);
-    }
-    else if (cmd == "breadth")
-    {
-      result = biTree.traverseBreadth(result);
-    }
-    else
-    {
-      std::cerr << "<INVALID COMMAND>\n";
-      return 1;
-    }
+    KeyValueAccumulator result;
+    cmds.at(argv[1])(result);
     std::cout << result.keySum << ' ' << result.values << '\n';
   }
   catch (const std::logic_error & e)
