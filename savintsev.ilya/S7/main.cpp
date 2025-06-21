@@ -13,11 +13,11 @@
 
 struct Graph
 {
-  savintsev::HashMap< std::string, savintsev::HashMap< std::string, std::vector< int > > > edges;
+  std::unordered_map< std::string, std::unordered_map< std::string, std::vector< int > > > edges;
   std::set< std::string > vertexes;
 };
 
-savintsev::HashMap< std::string, Graph > graphs;
+std::unordered_map< std::string, Graph > graphs;
 
 std::vector< std::string > split(const std::string & line)
 {
@@ -397,7 +397,7 @@ int main(int argc, char* argv[])
 
   using namespace std::placeholders;
 
-  savintsev::HashMap< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
+  std::unordered_map< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
   cmd_map["graphs"] = std::bind(cmd_graphs);
   cmd_map["vertexes"] = std::bind(cmd_vertexes, _1);
   cmd_map["outbound"] = std::bind(cmd_outbound, _1);
