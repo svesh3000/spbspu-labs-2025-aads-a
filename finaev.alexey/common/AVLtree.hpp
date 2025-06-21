@@ -18,7 +18,7 @@ namespace finaev
 
     AVLtree();
     AVLtree(const AVLtree& other);
-    AVLtree(AVLtree&& other) noexcept;
+    AVLtree(AVLtree&& other);
     AVLtree< Key, Value, Cmp >& operator=(const AVLtree& other);
     AVLtree< Key, Value, Cmp>& operator=(AVLtree&& other) noexcept;
 
@@ -46,20 +46,20 @@ namespace finaev
     size_t size_;
 
     node_t* copyTree(node_t* root);
-    void clear(node_t* root);
-    void updateHeight(node_t* root);
-    node_t* rotateRight(node_t* root);
-    node_t* rotateLeft(node_t* root);
-    node_t* rotateRightLeft(node_t* root);
-    node_t* rotateLeftRight(node_t* root);
-    int getBalance(node_t* root);
-    node_t* balance(node_t* root);
+    void clear(node_t* root) noexcept;
+    void updateHeight(node_t* root) noexcept;
+    node_t* rotateRight(node_t* root) noexcept;
+    node_t* rotateLeft(node_t* root) noexcept;
+    node_t* rotateRightLeft(node_t* root) noexcept;
+    node_t* rotateLeftRight(node_t* root) noexcept;
+    int getBalance(node_t* root) noexcept;
+    node_t* balance(node_t* root) noexcept;
     std::pair< iter, bool > treeInsert(const Key&, const Value&);
   };
 
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >::AVLtree():
-    fakeroot_(new TreeNode< Key, Value >(Key(), Value(), nullptr)),
+    fakeroot_(new node_t(Key(), Value(), nullptr)),
     root_(nullptr),
     cmp_(),
     size_(0)
@@ -69,10 +69,10 @@ namespace finaev
 
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >::AVLtree(const AVLtree& other):
+    fakeroot_(new node_t(Key(), Value(), nullptr)),
     cmp_(other.cmp_),
     size_(other.size_)
   {
-    fakeroot_ = new TreeNode< Key, Value >(Key(), Value(), nullptr);
     fakeroot_->left = copyTree(other.fakeroot_->left);
     root_ = fakeroot_->left;
     if (root_)
@@ -82,7 +82,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  AVLtree< Key, Value, Cmp >::AVLtree(AVLtree&& other) noexcept:
+  AVLtree< Key, Value, Cmp >::AVLtree(AVLtree&& other):
     fakeroot_(other.fakeroot_),
     root_(other.root_),
     cmp_(other.cmp_),
@@ -97,7 +97,7 @@ namespace finaev
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >& AVLtree< Key, Value, Cmp >::operator=(AVLtree&& other) noexcept
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -225,23 +225,36 @@ namespace finaev
     {
       return nullptr;
     }
-    node_t* newNode = new node_t(root->data.first, root->data.second, nullptr);
-    newNode->left = copyTree(root->left);
-    if (newNode->left)
+    node_t* leftPart = nullptr;
+    node_t* rightPart = nullptr;
+    try
     {
-      newNode->left->parent = newNode;
+      leftPart = copyTree(root->left);
+      rightPart = copyTree(root->right);
+      node_t* newNode = new node_t(root->data.first, root->data.second, nullptr);
+      newNode->left = leftPart;
+      newNode->right = rightPart;
+      newNode->height = root->height;
+      if (leftPart)
+      {
+        leftPart->parent = newNode;
+      }
+      if (rightPart)
+      {
+        rightPart->parent = newNode;
+      }
+      return newNode;
     }
-    newNode->right = copyTree(root->right);
-    if (newNode->right)
+    catch (...)
     {
-      newNode->right->parent = newNode;
+      clear(leftPart);
+      clear(rightPart);
+      throw;
     }
-    newNode->height = root->height;
-    return newNode;
   }
 
   template< class Key, class Value, class Cmp >
-  void AVLtree< Key, Value, Cmp >::updateHeight(node_t* root)
+  void AVLtree< Key, Value, Cmp >::updateHeight(node_t* root) noexcept
   {
     if (!root)
     {
@@ -253,7 +266,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateRight(node_t* root)
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateRight(node_t* root) noexcept
   {
     if (!root || !root->left)
     {
@@ -290,7 +303,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateLeft(node_t* root)
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateLeft(node_t* root) noexcept
   {
     if (!root || !root->right)
     {
@@ -327,7 +340,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateRightLeft(node_t* root)
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateRightLeft(node_t* root) noexcept
   {
     if (!root || !root->right)
     {
@@ -342,7 +355,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateLeftRight(node_t* root)
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::rotateLeftRight(node_t* root) noexcept
   {
     if (!root || !root->left)
     {
@@ -357,7 +370,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  int AVLtree< Key, Value, Cmp >::getBalance(node_t* root)
+  int AVLtree< Key, Value, Cmp >::getBalance(node_t* root) noexcept
   {
     if (!root)
     {
@@ -369,7 +382,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp>::node_t* AVLtree< Key, Value, Cmp >::balance(node_t* root)
+  typename AVLtree< Key, Value, Cmp>::node_t* AVLtree< Key, Value, Cmp >::balance(node_t* root) noexcept
   {
     while (root != fakeroot_)
     {
@@ -505,7 +518,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  void AVLtree< Key, Value, Cmp >::clear(node_t* root)
+  void AVLtree< Key, Value, Cmp >::clear(node_t* root) noexcept
   {
     if (root)
     {
