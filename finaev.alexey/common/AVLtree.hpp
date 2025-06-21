@@ -1,5 +1,5 @@
-#ifndef AVLTREE_H
-#define AVLTREE_H
+#ifndef AVLTREE_HPP
+#define AVLTREE_HPP
 #include <utility>
 #include <functional>
 #include "treeNode.hpp"

@@ -2,7 +2,6 @@
 #include <string>
 #include <fstream>
 #include <limits>
-#include <AVLtree.hpp>
 #include <algorithm>
 #include "inputDict.hpp"
 #include "commands.hpp"

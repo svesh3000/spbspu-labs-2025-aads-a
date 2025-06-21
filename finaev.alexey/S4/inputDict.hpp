@@ -4,7 +4,6 @@
 #include <string>
 #include <AVLtree.hpp>
 
-
 namespace finaev
 {
   using mainDict = finaev::AVLtree< std::string, finaev::AVLtree< int, std::string > >;
