@@ -29,6 +29,9 @@ void dribas::vertexes(const RobinHoodHashTable< std::string, Graph >& graphs, st
   for (const auto& vertex: vertexes) {
     out << vertex << '\n';
   }
+  if (vertexes.empty()) {
+    out << '\n';
+  }
 }
 
 void dribas::outbound(const RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in, std::ostream& out)
