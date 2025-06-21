@@ -41,9 +41,9 @@ int main(int argc, char * argv[])
   cmds["createdict"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
   cmds["showdicts"] = std::bind(showDictionary, std::ref(std::cout), std::cref(dicts));
   cmds["load"] = std::bind(load, std::ref(std::cin), std::ref(dicts));
-  //cmds["union"] = std::bind(unionDictionary, std::ref(std::cin), std::ref(dicts));
-  //cmds["intersect"] = std::bind(intersectDictionary, std::ref(std::cin), std::ref(dicts));
-  //cmds["copy"] = std::bind(copyDictionary, std::ref(std::cin), std::ref(dicts));
+  cmds["union"] = std::bind(unionDictionary, std::ref(std::cin), std::ref(dicts));
+  cmds["intersect"] = std::bind(intersectDictionary, std::ref(std::cin), std::ref(dicts));
+  cmds["copy"] = std::bind(copyDictionary, std::ref(std::cin), std::ref(dicts));
   cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(dicts));
   cmds["size"] = std::bind(printSize, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["cleanword"] = std::bind(cleanWord, std::ref(std::cin), std::ref(dicts));

@@ -11,9 +11,9 @@ namespace maslov
   void showDictionary(std::ostream & out, const Dicts & dicts);
   void load(std::istream & in, Dicts & dicts);
   void loadFromFile(std::ifstream & file,  HashTable< std::string, int > & dict);
-  /*void unionDictionary(std::istream & in, Dicts & dicts);
+  void unionDictionary(std::istream & in, Dicts & dicts);
   void intersectDictionary(std::istream & in, Dicts & dicts);
-  void copyDictionary(std::istream & in, Dicts & dicts);*/
+  void copyDictionary(std::istream & in, Dicts & dicts);
   void addWord(std::istream & in, Dicts & dicts);
   void printSize(std::istream & in, std::ostream & out, const Dicts & dicts);
   void cleanWord(std::istream & in, Dicts & dicts);

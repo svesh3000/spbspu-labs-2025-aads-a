@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include  <algorithm>
 
 namespace
 {
@@ -80,14 +81,64 @@ void maslov::loadFromFile(std::ifstream & file, HashTable< std::string, int > & 
   }
 }
 
-/*void maslov::unionDictionary(std::istream & in, Dicts & dicts)
-{}
+void maslov::unionDictionary(std::istream & in, Dicts & dicts)
+{
+  std::string dict1, dict2, resultName;
+  in >> resultName >> dict1 >> dict2;
+  auto it1 = dicts.find(dict1);
+  auto it2 = dicts.find(dict2);
+  if (it1 == dicts.end() || it2 == dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (dicts.find(resultName) != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto & resultDict = dicts[resultName];
+  resultDict = it1->second;
+  for (auto it = it2->second.begin(); it != it2->second.end(); it++)
+  {
+    resultDict[it->first] += it->second;
+  }
+}
 
 void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
-{}
+{
+  std::string dict1, dict2, resultName;
+  in >> resultName >> dict1 >> dict2;
+  auto it1 = dicts.find(dict1);
+  auto it2 = dicts.find(dict2);
+  if (it1 == dicts.end() || it2 == dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (dicts.find(resultName) != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto & resultDict = dicts[resultName];
+  for (auto it = it1->second.begin(); it != it1->second.end(); it++)
+  {
+    auto wordIt = it2->second.find(it->first);
+    if (wordIt != it2->second.end())
+    {
+      resultDict[it->first] = std::min(it->second, wordIt->second);
+    }
+  }
+}
 
 void maslov::copyDictionary(std::istream & in, Dicts & dicts)
-{}*/
+{
+  std::string resultName, dictName;
+  in >> resultName >> dictName;
+  auto it = dicts.find(dictName);
+  if (it == dicts.end() || dicts.find(resultName) != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  dicts[resultName] = it->second;
+}
 
 void maslov::addWord(std::istream & in, Dicts & dicts)
 {
