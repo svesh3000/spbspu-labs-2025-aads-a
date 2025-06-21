@@ -1,6 +1,7 @@
-#ifndef AVLTREE_H
-#define AVLTREE_H
+#ifndef AVLTREE_HPP
+#define AVLTREE_HPP
 #include <utility>
+#include <functional>
 #include "treeNode.hpp"
 #include "iterator.hpp"
 #include "constIterator.hpp"
@@ -9,13 +10,13 @@
 
 namespace finaev
 {
-  template < class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp = std::less< Key > >
   class AVLtree
   {
   public:
-    using node_t = treeNode< Key, Value >;
-    using iter = treeIterator< Key, Value, Cmp >;
-    using cIter = constTreeIterator< Key, Value, Cmp >;
+    using node_t = TreeNode< Key, Value >;
+    using iter = TreeIterator< Key, Value, Cmp >;
+    using cIter = ConstTreeIterator< Key, Value, Cmp >;
 
     AVLtree();
     AVLtree(const AVLtree& other);
