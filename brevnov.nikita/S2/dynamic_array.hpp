@@ -91,7 +91,6 @@ namespace brevnov
   {
     clear();
     delete[] data_;
-    capacity_ = 0;
   }
 
   template< typename T >
@@ -194,8 +193,6 @@ namespace brevnov
     {
       popFront();
     }
-    size_ = 0;
-    begin_ = 0;
   }
 
   template< typename T >

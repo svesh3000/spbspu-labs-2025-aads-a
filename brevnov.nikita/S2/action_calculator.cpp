@@ -179,12 +179,12 @@ brevnov::stack_number brevnov::calculation_expression(queue& postfix_expressions
       {
         try
         {
-          long long int number = stoll(part);
+          long long int number = std::stoll(part);
           numbers.push(number);
         }
         catch (...)
         {
-          throw std::logic_error("Invalid number");
+          throw std::exception("Invalid number");
         }
       }
     }
