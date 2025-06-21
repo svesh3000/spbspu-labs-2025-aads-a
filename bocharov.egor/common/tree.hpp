@@ -206,12 +206,10 @@ namespace bocharov
   template< typename InputIt >
   void Tree< Key, T, Cmp >::insert(InputIt first, InputIt last)
   {
-    Tree< Key, T, Cmp > temp(*this);
     for (; first != last; first++)
     {
-      temp.insert(*first);
+      insert(*first);
     }
-    swap(temp);
   }
 
   template< typename Key, typename T, typename Cmp >
