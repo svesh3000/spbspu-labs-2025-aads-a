@@ -32,6 +32,8 @@ namespace finaev
     void swap(AVLtree< Key, Value, Cmp >&) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
+    iter erase(iter it) noexcept;
+    size_t erase(const Key& key) noexcept;
 
     Value& at(const Key &);
     const Value& at(const Key &) const;
@@ -55,6 +57,9 @@ namespace finaev
     int getBalance(node_t* root) noexcept;
     node_t* balance(node_t* root) noexcept;
     std::pair< iter, bool > treeInsert(const Key&, const Value&);
+    node_t* findMin(node_t* node) noexcept;
+    node_t* findSuccessor(node_t* node) noexcept;
+    node_t* deleteNode(node_t* node, const Key&) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
@@ -416,6 +421,89 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findMin(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    while(node->left)
+    {
+      node = node->left;
+    }
+    return node;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findSuccessor(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    if (node->right)
+    {
+      findMin(node->right);
+    }
+    while (node->parent)
+    {
+      if (node == node->parent->left)
+      {
+        return node->parent;
+      }
+      node = node->parent;
+    }
+    return nullptr;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::deleteNode(node_t* node, const Key& key) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    if (cmp_(key, node->data.first))
+    {
+      node->left = deleteNode(node->left, key);
+    }
+    else if (cmp_(node->data.first, key))
+    {
+      node->right = deleteNode(node->right, key);
+    }
+    else
+    {
+      if (!node->left || !node->right)
+      {
+        node_t* temp = node->left ? node->left : node->right;
+        if (!temp)
+        {
+          temp = node;
+          node = nullptr;
+        }
+        else
+        {
+          *node = *temp;
+        }
+        delete temp;
+        --size_;
+      }
+      else
+      {
+        node_t* temp = findMin(node->right);
+        node->data = temp->data;
+        node->right = deleteNode(node->right, temp->data.first);
+      }
+    }
+    if (!node)
+    {
+      return nullptr;
+    }
+    updateHeight(node);
+    return balance(node);
+  }
+
+  template< class Key, class Value, class Cmp >
   std::pair< typename AVLtree< Key, Value, Cmp >::iter, bool > AVLtree< Key, Value, Cmp >::treeInsert(const Key& k, const Value& v)
   {
     if (empty())
@@ -515,6 +603,33 @@ namespace finaev
   size_t AVLtree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::iter AVLtree< Key, Value, Cmp >::erase(iter it) noexcept
+  {
+    if (it == end())
+    {
+      return end();
+    }
+    node_t* node = it.node_;
+    node_t* next = findSuccessor(node);
+    root_ = deleteNode(node, node->data.first);
+    delete node;
+    --size_;
+    return iter(next);
+  }
+
+  template< class Key, class Value, class Cmp >
+  size_t AVLtree< Key, Value, Cmp >::erase(const Key& key) noexcept
+  {
+    iter it = find(key);
+    if (it != end())
+    {
+      erase(it);
+      return 1;
+    }
+    return 0;
   }
 
   template< class Key, class Value, class Cmp >

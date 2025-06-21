@@ -109,3 +109,29 @@ BOOST_AUTO_TEST_CASE(tree_find)
   bool f = (tree.find(4) == tree.end());
   BOOST_TEST(f);
 }
+
+BOOST_AUTO_TEST_CASE(erase_by_position)
+{
+  finaev::AVLtree< int, std::string > tree;
+  tree.insert({1, "1"});
+  tree.insert({2, "2"});
+  tree.insert({3, "3"});
+  auto it = tree.find(2);
+  it = tree.erase(it);
+  BOOST_TEST(it->first == 3);
+  BOOST_TEST(tree.size() == 2);
+  std::ostringstream out;
+  printTree(out, tree);
+  BOOST_TEST(out.str() == "13");
+}
+
+BOOST_AUTO_TEST_CASE(erase_by_key)
+{
+  finaev::AVLtree< int, std::string > tree;
+  tree.insert({1, "1"});
+  tree.insert({2, "2"});
+  tree.insert({3, "3"});
+  size_t erased = tree.erase(2);
+  BOOST_TEST(erased == 1);
+  BOOST_TEST(tree.size() == 2);
+}
