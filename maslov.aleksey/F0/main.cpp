@@ -4,6 +4,7 @@
 #include <iostream>
 #include <functional>
 #include <hashTable/hashTable.hpp>
+#include <tree/tree.hpp>
 #include "commands.hpp"
 
 int main(int argc, char * argv[])
@@ -29,28 +30,28 @@ int main(int argc, char * argv[])
   try
   {
     dicts[argv[2]] = HashTable< std::string, int >{};
-    loadFromFile(file, argv[2], dicts);
+    loadFromFile(file, dicts.find(argv[2])->second);
   }
   catch (const std::exception & e)
   {
     std::cerr << e.what() << '\n';
   }
 
-  HashTable< std::string, std::function< void() > > cmds;
-  cmds["createdictionary"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
-  cmds["showdictionary"] = std::bind(showDictionary, std::ref(std::cout), std::cref(dicts));
+  BiTree< std::string, std::function< void() >, std::less< std::string > > cmds;
+  cmds["createdict"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
+  cmds["showdicts"] = std::bind(showDictionary, std::ref(std::cout), std::cref(dicts));
   cmds["load"] = std::bind(load, std::ref(std::cin), std::ref(dicts));
-  cmds["union"] = std::bind(unionDictionary, std::ref(std::cin), std::ref(dicts));
-  cmds["intersect"] = std::bind(intersectDictionary, std::ref(std::cin), std::ref(dicts));
-  cmds["copy"] = std::bind(copyDictionary, std::ref(std::cin), std::ref(dicts));
+  //cmds["union"] = std::bind(unionDictionary, std::ref(std::cin), std::ref(dicts));
+  //cmds["intersect"] = std::bind(intersectDictionary, std::ref(std::cin), std::ref(dicts));
+  //cmds["copy"] = std::bind(copyDictionary, std::ref(std::cin), std::ref(dicts));
   cmds["addword"] = std::bind(addWord, std::ref(std::cin), std::ref(dicts));
   cmds["size"] = std::bind(printSize, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["cleanword"] = std::bind(cleanWord, std::ref(std::cin), std::ref(dicts));
-  cmds["cleandictionary"] = std::bind(cleanDictionary, std::ref(std::cin), std::ref(dicts));
-  cmds["top"] = std::bind(printTop, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
-  cmds["rare"] = std::bind(printRare, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["cleandict"] = std::bind(cleanDictionary, std::ref(std::cin), std::ref(dicts));
+  //cmds["top"] = std::bind(printTop, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  //cmds["rare"] = std::bind(printRare, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
   cmds["frequency"] = std::bind(printFrequency, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
-  cmds["wordRange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
+  //cmds["wordrange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
   std::string command;
   while (!(std::cin >> command).eof())
   {

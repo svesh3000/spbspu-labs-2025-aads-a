@@ -80,21 +80,21 @@ void maslov::loadFromFile(std::ifstream & file, HashTable< std::string, int > & 
   }
 }
 
-void maslov::unionDictionary(std::istream & in, Dicts & dicts)
+/*void maslov::unionDictionary(std::istream & in, Dicts & dicts)
 {}
 
 void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
 {}
 
 void maslov::copyDictionary(std::istream & in, Dicts & dicts)
-{}
+{}*/
 
 void maslov::addWord(std::istream & in, Dicts & dicts)
 {
   std::string dictName, wordName, frequency;
   in >> dictName >> wordName >> frequency;
   auto it = dicts.find(dictName);
-  if (it != dicts.end() && it->second.find(wordName) != it->second.end())
+  if (it == dicts.end() || it->second.find(wordName) != it->second.end())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
@@ -111,7 +111,7 @@ void maslov::printSize(std::istream & in, std::ostream & out, const Dicts & dict
   std::string dictName;
   in >> dictName;
   auto it = dicts.find(dictName);
-  if (it != dicts.cend())
+  if (it == dicts.cend())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
@@ -123,7 +123,7 @@ void maslov::cleanWord(std::istream & in, Dicts & dicts)
   std::string dictName, wordName;
   in >> dictName >> wordName;
   auto it = dicts.find(dictName);
-  if (it != dicts.end() && it->second.find(wordName) != it->second.end())
+  if (it == dicts.end() || it->second.find(wordName) == it->second.end())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
@@ -135,33 +135,33 @@ void maslov::cleanDictionary(std::istream & in, Dicts & dicts)
   std::string dictName;
   in >> dictName;
   auto it = dicts.find(dictName);
-  if (it != dicts.end())
+  if (it == dicts.end())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
   dicts.erase(dictName);
 }
 
-void maslov::printTop(std::istream & in, std::ostream & out, const Dicts & dicts)
+/*void maslov::printTop(std::istream & in, std::ostream & out, const Dicts & dicts)
 {}
 
 void maslov::printRare(std::istream & in, std::ostream & out, const Dicts & dicts)
-{}
+{}*/
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
 {
   std::string dictName, wordName;
   in >> dictName >> wordName;
   auto it = dicts.find(dictName);
-  if (it != dicts.cend())
+  if (it == dicts.cend())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
   out << it->second.at(wordName) << '\n';
 }
 
-void maslov::createWordRange(std::istream & in, Dicts & dicts)
-{}
+//void maslov::createWordRange(std::istream & in, Dicts & dicts)
+//{}
 
 void maslov::printHelp(std::ostream & out)
 {
@@ -169,10 +169,10 @@ void maslov::printHelp(std::ostream & out)
   constexpr size_t cmdWidth = 50;
   constexpr size_t numWidth = 4;
   out << std::setw(numWidth) << "1." << std::setw(cmdWidth);
-  out << "createdictionary <dict_name>" << "create a new dictionary\n";
+  out << "createdict <dict_name>" << "create a new dictionary\n";
 
   out << std::setw(numWidth) << "2." << std::setw(cmdWidth);
-  out << "showdictionary" << "shows all dictionary names\n";
+  out << "showdicts" << "shows all dictionary names\n";
 
   out << std::setw(numWidth) << "3." << std::setw(cmdWidth);
   out << "load <dict_name> <file>" << "upload text from a file to the dictionary\n";
@@ -196,7 +196,7 @@ void maslov::printHelp(std::ostream & out)
   out << "cleanword <dict_name> <word>" << "deleting a word from the dictionary\n";
 
   out << std::setw(numWidth) << "10." << std::setw(cmdWidth);
-  out << "cleandictionary <dict_name>" << "deleting all words from the dictionary\n";
+  out << "cleandict <dict_name>" << "deleting all words from the dictionary\n";
 
   out << std::setw(numWidth) << "11." << std::setw(cmdWidth);
   out << "top <dict_name> <number>" << "print the most frequently used words\n";
