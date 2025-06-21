@@ -1,7 +1,7 @@
 #ifndef DYNAMIC_ARRAY_HPP
 #define DYNAMIC_ARRAY_HPP
 #include <cstddef>
-#include "lrgcpy.hpp"
+#include <lrgcpy.hpp>
 
 namespace savintsev
 {
@@ -30,7 +30,7 @@ namespace savintsev
 
     template< typename U >
     void push_back(U && rhs);
-    void pop_front();
+    void pop_front() noexcept;
     void pop_back() noexcept;
 
     void swap(Array & x) noexcept;
@@ -64,20 +64,7 @@ namespace savintsev
     size_(rhs.size_),
     start_(0),
     capacity_(rhs.capacity_)
-  {
-    try
-    {
-      for (size_t i = 0; i < rhs.size_; ++i)
-      {
-        data_[i] = rhs.data_[rhs.start_ + i];
-      }
-    }
-    catch (...)
-    {
-      delete[] data_;
-      throw;
-    }
-  }
+  {}
 
   template< typename T >
   Array< T >::Array(Array && rhs) noexcept:
@@ -199,7 +186,7 @@ namespace savintsev
   }
 
   template< typename T >
-  void Array< T >::pop_front()
+  void Array< T >::pop_front() noexcept
   {
     ++start_;
     --size_;
