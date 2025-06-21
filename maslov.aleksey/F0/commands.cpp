@@ -56,16 +56,57 @@ void maslov::copyDictionary(std::istream & in, Dicts & dicts)
 {}
 
 void maslov::addWord(std::istream & in, Dicts & dicts)
-{}
+{
+  std::string dictName, wordName, frequency;
+  in >> dictName >> wordName >> frequency;
+  auto it = dicts.find(dictName);
+  if (it != dicts.end() && it->second.find(wordName) != it->second.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  int num = std::stoi(frequency);
+  if (num <= 0)
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  it->second[wordName] = num;
+}
 
 void maslov::printSize(std::istream & in, std::ostream & out, const Dicts & dicts)
-{}
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it != dicts.cend())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  out << it->second.size() << '\n';
+}
 
 void maslov::cleanWord(std::istream & in, Dicts & dicts)
-{}
+{
+  std::string dictName, wordName;
+  in >> dictName >> wordName;
+  auto it = dicts.find(dictName);
+  if (it != dicts.end() && it->second.find(wordName) != it->second.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  it->second.erase(wordName);
+}
 
 void maslov::cleanDictionary(std::istream & in, Dicts & dicts)
-{}
+{
+  std::string dictName;
+  in >> dictName;
+  auto it = dicts.find(dictName);
+  if (it != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  dicts.erase(dictName);
+}
 
 void maslov::printTop(std::istream & in, std::ostream & out, const Dicts & dicts)
 {}
@@ -74,7 +115,16 @@ void maslov::printRare(std::istream & in, std::ostream & out, const Dicts & dict
 {}
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
-{}
+{
+  std::string dictName, wordName;
+  in >> dictName >> wordName;
+  auto it = dicts.find(dictName);
+  if (it != dicts.cend())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  out << it->second.at(wordName) << '\n';
+}
 
 void maslov::createWordRange(std::istream & in, Dicts & dicts)
 {}
