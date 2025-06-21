@@ -16,7 +16,7 @@ namespace gavrilova {
 
 namespace gavrilova {
 
-  template < typename Key, typename Value, typename Hash = std::hash, typename KeyEqual >
+  template < typename Key, typename Value, typename Hash, typename KeyEqual >
   struct IteratorHashTable: public std::iterator< std::forward_iterator_tag, std::pair< const Key, Value > > {
     using iterator_category = std::forward_iterator_tag;
     using value_type = std::pair< const Key, Value >;
