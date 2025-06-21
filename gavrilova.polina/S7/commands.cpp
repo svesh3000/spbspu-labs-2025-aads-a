@@ -33,7 +33,6 @@ namespace {
       }
     }
   }
-
 }
 
 void gavrilova::graphs(std::ostream& out, const GraphsCollection& graphs)
