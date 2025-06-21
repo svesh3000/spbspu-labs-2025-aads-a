@@ -19,7 +19,7 @@ namespace finaev
 
     AVLtree();
     AVLtree(const AVLtree& other);
-    AVLtree(AVLtree&& other) noexcept;
+    AVLtree(AVLtree&& other);
     AVLtree< Key, Value, Cmp >& operator=(const AVLtree& other);
     AVLtree< Key, Value, Cmp>& operator=(AVLtree&& other) noexcept;
 
@@ -33,6 +33,9 @@ namespace finaev
     void swap(AVLtree< Key, Value, Cmp >&) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
+    iter erase(iter) noexcept;
+    size_t erase(const Key&) noexcept;
+    size_t count(const Key&) const noexcept;
 
     Value& at(const Key &);
     const Value& at(const Key &) const;
@@ -63,11 +66,15 @@ namespace finaev
     int getBalance(node_t* root);
     node_t* balance(node_t* root);
     std::pair< iter, bool > treeInsert(const Key&, const Value&);
+    node_t* findMin(node_t* node) noexcept;
+    node_t* findMax(node_t* node) noexcept;
+    node_t* findSuccessor(node_t* node) noexcept;
+    node_t* deleteNode(node_t* node, const Key&) noexcept;
   };
 
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >::AVLtree():
-    fakeroot_(new treeNode< Key, Value >(Key(), Value(), nullptr)),
+    fakeroot_(new node_t(Key(), Value(), nullptr)),
     root_(nullptr),
     cmp_(),
     size_(0)
@@ -77,10 +84,10 @@ namespace finaev
 
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >::AVLtree(const AVLtree& other):
+    fakeroot_(new node_t(Key(), Value(), nullptr)),
     cmp_(other.cmp_),
     size_(other.size_)
   {
-    fakeroot_ = new treeNode< Key, Value >(Key(), Value(), nullptr);
     fakeroot_->left = copyTree(other.fakeroot_->left);
     root_ = fakeroot_->left;
     if (root_)
@@ -90,7 +97,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  AVLtree< Key, Value, Cmp >::AVLtree(AVLtree&& other) noexcept:
+  AVLtree< Key, Value, Cmp >::AVLtree(AVLtree&& other):
     fakeroot_(other.fakeroot_),
     root_(other.root_),
     cmp_(other.cmp_),
@@ -105,7 +112,7 @@ namespace finaev
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >& AVLtree< Key, Value, Cmp >::operator=(AVLtree&& other) noexcept
   {
-    if (this == &other)
+    if (this == std::addressof(other))
     {
       return *this;
     }
@@ -233,19 +240,32 @@ namespace finaev
     {
       return nullptr;
     }
-    node_t* newNode = new node_t(root->data.first, root->data.second, nullptr);
-    newNode->left = copyTree(root->left);
-    if (newNode->left)
+    node_t* leftPart = nullptr;
+    node_t* rightPart = nullptr;
+    try
     {
-      newNode->left->parent = newNode;
+      leftPart = copyTree(root->left);
+      rightPart = copyTree(root->right);
+      node_t* newNode = new node_t(root->data.first, root->data.second, nullptr);
+      newNode->left = leftPart;
+      newNode->right = rightPart;
+      newNode->height = root->height;
+      if (leftPart)
+      {
+        leftPart->parent = newNode;
+      }
+      if (rightPart)
+      {
+        rightPart->parent = newNode;
+      }
+      return newNode;
     }
-    newNode->right = copyTree(root->right);
-    if (newNode->right)
+    catch (...)
     {
-      newNode->right->parent = newNode;
+      clear(leftPart);
+      clear(rightPart);
+      throw;
     }
-    newNode->height = root->height;
-    return newNode;
   }
 
   template< class Key, class Value, class Cmp >
@@ -377,37 +397,135 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  typename AVLtree< Key, Value, Cmp>::node_t* AVLtree< Key, Value, Cmp >::balance(node_t* root)
+  typename AVLtree< Key, Value, Cmp>::node_t* AVLtree< Key, Value, Cmp >::balance(node_t* root) noexcept
   {
-    while (root != fakeroot_)
+    if (!root || root == fakeroot_)
     {
-      updateHeight(root);
-      int balance = getBalance(root);
-      if (balance > 1)
+      return root;
+    }
+    root->left = balance(root->left);
+    root->right = balance(root->right);
+    updateHeight(root);
+    int balance = getBalance(root);
+
+    if (balance > 1)
+    {
+      if (root->left && getBalance(root->left) >= 0)
       {
-        if (getBalance(root->left) >= 0)
-        {
-          root = rotateRight(root);
-        }
-        else
-        {
-          root = rotateLeftRight(root);
-        }
+        return rotateRight(root);
       }
-      else if (balance < -1)
+      else if (root->left)
       {
-        if (getBalance(root->right) <= 0)
-        {
-          root = rotateLeft(root);
-        }
-        else
-        {
-          root = rotateRightLeft(root);
-        }
+        return rotateLeftRight(root);
       }
-      root = root->parent;
+    }
+    else if (balance < -1)
+    {
+      if (root->right && getBalance(root->right) <= 0)
+      {
+        return rotateLeft(root);
+      }
+      else if (root->right)
+      {
+        return rotateRightLeft(root);
+      }
     }
     return root;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findMin(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    while(node->left)
+    {
+      node = node->left;
+    }
+    return node;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findMax(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    while(node->right)
+    {
+      node = node->right;
+    }
+    return node;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findSuccessor(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    if (node->right)
+    {
+      return findMin(node->right);
+    }
+    while (node->parent)
+    {
+      if (node == node->parent->left)
+      {
+        return node->parent;
+      }
+      node = node->parent;
+    }
+    return nullptr;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::deleteNode(node_t* node, const Key& key) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    if (cmp_(key, node->data.first))
+    {
+      node->left = deleteNode(node->left, key);
+    }
+    else if (cmp_(node->data.first, key))
+    {
+      node->right = deleteNode(node->right, key);
+    }
+    else
+    {
+      if (!node->left || !node->right)
+      {
+        node_t* temp = node->left ? node->left : node->right;
+        if (!temp)
+        {
+          temp = node;
+          node = nullptr;
+        }
+        else
+        {
+          *node = *temp;
+        }
+        delete temp;
+      }
+      else
+      {
+        node_t* temp = findMin(node->right);
+        node->data = temp->data;
+        node->right = deleteNode(node->right, temp->data.first);
+      }
+    }
+    if (!node)
+    {
+      return nullptr;
+    }
+    return balance(node);
   }
 
   template< class Key, class Value, class Cmp >
@@ -417,6 +535,7 @@ namespace finaev
     {
       fakeroot_->left = new node_t{ k, v, fakeroot_ };
       root_ = fakeroot_->left;
+      ++size_;
       return { iter(root_), true };
     }
     node_t* current = fakeroot_->left;
@@ -447,6 +566,7 @@ namespace finaev
     {
       parent->right = newNode;
     }
+    ++size_;
     balance(fakeroot_->left);
     return { iter(newNode), true };
   }
@@ -510,6 +630,49 @@ namespace finaev
   size_t AVLtree< Key, Value, Cmp >::size() const noexcept
   {
     return size_;
+  }
+
+  template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::iter AVLtree< Key, Value, Cmp >::erase(iter it) noexcept
+  {
+    if (it == end())
+    {
+      return end();
+    }
+    node_t* node = it.node_;
+    node_t* next = findSuccessor(node);
+    fakeroot_->left = deleteNode(root_, node->data.first);
+    if (fakeroot_->left)
+    {
+      fakeroot_->left->parent = fakeroot_;
+    }
+    --size_;
+    if (next != nullptr)
+    {
+      return iter(next);
+    }
+    else
+    {
+      return end();
+    }
+  }
+
+  template< class Key, class Value, class Cmp >
+  size_t AVLtree< Key, Value, Cmp >::erase(const Key& key) noexcept
+  {
+    iter it = find(key);
+    if (it != end())
+    {
+      erase(it);
+      return 1;
+    }
+    return 0;
+  }
+
+  template<class Key, class Value, class Cmp>
+  size_t AVLtree<Key, Value, Cmp>::count(const Key& key) const noexcept
+  {
+    return find(key) != cEnd() ? 1 : 0;
   }
 
   template< class Key, class Value, class Cmp >
