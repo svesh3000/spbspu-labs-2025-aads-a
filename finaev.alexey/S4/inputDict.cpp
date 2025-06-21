@@ -14,7 +14,7 @@ void finaev::inDictionaries(std::istream& in, mainDict& dict)
       in >> key >> data;
       temp.insert({ key, data });
     }
-    dict.insert( { name, temp } );
+    dict.insert({ name, temp });
   }
   in.clear();
 }
