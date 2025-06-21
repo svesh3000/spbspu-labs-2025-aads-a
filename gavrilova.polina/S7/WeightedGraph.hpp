@@ -19,16 +19,14 @@ namespace gavrilova {
 
     void add_vertex(const Vertex& v);
     void add_edge(const Vertex& from, const Vertex& to, Weight weight);
-    void remove_edge(const Vertex& from, const Vertex& to, Weight weight);
+    bool remove_edge(const Vertex& from, const Vertex& to, Weight weight);
 
     bool has_vertex(const Vertex& v) const;
     bool has_edge(const Vertex& from, const Vertex& to, Weight weight) const;
 
     std::vector< Vertex > get_vertices() const;
     adjacency_list get_outbound_edges(const Vertex& v) const;
-    adjacency_list get_sorted_outbound_edges(const Vertex& v) const;
     adjacency_list get_inbound_edges(const Vertex& v) const;
-    adjacency_list get_sorted_inbound_edges(const Vertex& v) const;
     size_t vertex_count() const;
     size_t edge_count() const;
 
@@ -55,7 +53,7 @@ namespace gavrilova {
   template < typename Vertex, typename Weight >
   void WeightedGraph< Vertex, Weight >::add_vertex(const Vertex& v)
   {
-    if (!outbound_edges_.contains(v)) {
+    if (outbound_edges_.find(v) == outbound_edges_.end()) {
       outbound_edges_.insert({v, adjacency_list()});
       inbound_edges_.insert({v, adjacency_list()});
     }
@@ -72,18 +70,20 @@ namespace gavrilova {
   }
 
   template < typename Vertex, typename Weight >
-  void WeightedGraph< Vertex, Weight >::remove_edge(const Vertex& from, const Vertex& to, Weight weight)
+  bool WeightedGraph< Vertex, Weight >::remove_edge(const Vertex& from, const Vertex& to, Weight weight)
   {
     if (remove_edge_from_list(outbound_edges_[from], to, weight)) {
       remove_edge_from_list(inbound_edges_[to], from, weight);
       edges_count_--;
+      return true;
     }
+    return false;
   }
 
   template < typename Vertex, typename Weight >
   bool WeightedGraph< Vertex, Weight >::has_vertex(const Vertex& v) const
   {
-    return outbound_edges_.contains(v);
+    return outbound_edges_.find(v) != outbound_edges_.end();
   }
 
   template < typename Vertex, typename Weight >
@@ -105,12 +105,11 @@ namespace gavrilova {
   {
     std::vector< Vertex > vertices;
 
-    const auto& outbound_edges = outbound_edges_;
-    for (const auto& edge: outbound_edges) {
+    for (const auto& edge: outbound_edges_) {
       const auto& vertex = edge.first;
       vertices.push_back(vertex);
     }
-    
+
     sort_vertices(vertices);
     return vertices;
   }
@@ -123,14 +122,14 @@ namespace gavrilova {
     return outbound_edges_.at(v);
   }
 
-  template < typename Vertex, typename Weight >
-  typename WeightedGraph< Vertex, Weight >::adjacency_list
-  WeightedGraph< Vertex, Weight >::get_sorted_outbound_edges(const Vertex& v) const
-  {
-    auto edges = get_outbound_edges(v);
-    sort_edges(edges);
-    return edges;
-  }
+  // template < typename Vertex, typename Weight >
+  // typename WeightedGraph< Vertex, Weight >::adjacency_list
+  // WeightedGraph< Vertex, Weight >::get_sorted_outbound_edges(const Vertex& v) const
+  // {
+  //   auto edges = get_outbound_edges(v);
+  //   sort_edges(edges);
+  //   return edges;
+  // }
 
   template < typename Vertex, typename Weight >
   typename WeightedGraph< Vertex, Weight >::adjacency_list
@@ -140,14 +139,14 @@ namespace gavrilova {
     return inbound_edges_.at(v);
   }
 
-  template < typename Vertex, typename Weight >
-  typename WeightedGraph< Vertex, Weight >::adjacency_list
-  WeightedGraph< Vertex, Weight >::get_sorted_inbound_edges(const Vertex& v) const
-  {
-    auto edges = get_inbound_edges(v);
-    sort_edges(edges);
-    return edges;
-  }
+  // template < typename Vertex, typename Weight >
+  // typename WeightedGraph< Vertex, Weight >::adjacency_list
+  // WeightedGraph< Vertex, Weight >::get_sorted_inbound_edges(const Vertex& v) const
+  // {
+  //   auto edges = get_inbound_edges(v);
+  //   sort_edges(edges);
+  //   return edges;
+  // }
 
   template < typename Vertex, typename Weight >
   size_t WeightedGraph< Vertex, Weight >::vertex_count() const

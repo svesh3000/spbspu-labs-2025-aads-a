@@ -1,14 +1,15 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 
+#include <algorithm>
 #include <functional>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 #include <vector>
-
-// #include "ConstIteratorHashTable.hpp"
-// #include "IteratorHashTable.hpp"
+#include "ConstIteratorHashTable.hpp"
+#include "IteratorHashTable.hpp"
 
 namespace {
   bool is_prime(size_t n)
@@ -47,15 +48,7 @@ namespace {
   }
 }
 
-
 namespace gavrilova {
-
-  template < typename Key, typename Value, typename Hash = std::hash< Key >, typename KeyEqual = std::equal_to< Key > >
-  struct IteratorHashTable;
-
-  template < typename Key, typename Value, typename Hash = std::hash< Key >, typename KeyEqual = std::equal_to< Key > >
-  struct ConstIteratorHashTable;
-
   template < typename Key, typename Value, typename Hash = std::hash< Key >, typename KeyEqual = std::equal_to< Key > >
   class HashTable {
   public:
@@ -77,6 +70,13 @@ namespace gavrilova {
     HashTable(std::initializer_list< value_type > init_list);
     template < typename InputIt >
     HashTable(InputIt first, InputIt last);
+
+    HashTable(const HashTable& other);
+    HashTable& operator=(const HashTable& other);
+
+    HashTable(HashTable&& other) noexcept;
+    HashTable& operator=(HashTable&& other) noexcept;
+
     ~HashTable();
 
     std::pair< iterator, bool > insert(const value_type& value);
@@ -128,14 +128,67 @@ namespace gavrilova {
     };
 
     struct Slot {
-      union {
-        value_type value_;
-      };
+      typename std::aligned_storage< sizeof(value_type), alignof(value_type) >::type value_buffer_;
       SlotState state_ = SlotState::EMPTY;
 
-      Slot();
-      ~Slot();
-      void destroy();
+      value_type* get_value_ptr()
+      {
+        return reinterpret_cast< value_type* >(&value_buffer_);
+      }
+      const value_type* get_value_ptr() const
+      {
+        return reinterpret_cast< const value_type* >(&value_buffer_);
+      }
+
+      Slot() = default;
+
+      ~Slot()
+      {
+        destroy();
+      }
+
+      Slot(const Slot& other):
+        state_(other.state_)
+      {
+        if (state_ == SlotState::OCCUPIED) {
+          new (&value_buffer_) value_type(*other.get_value_ptr());
+        }
+      }
+
+      Slot(Slot&& other) noexcept:
+        state_(other.state_)
+      {
+        if (state_ == SlotState::OCCUPIED) {
+          new (&value_buffer_) value_type(std::move(*other.get_value_ptr()));
+          other.destroy();
+          other.state_ = SlotState::EMPTY;
+        }
+      }
+
+      Slot& operator=(const Slot& other) = delete;
+
+      Slot& operator=(Slot&& other) noexcept
+      {
+        if (this != &other) {
+          destroy();
+
+          state_ = other.state_;
+
+          if (state_ == SlotState::OCCUPIED) {
+            new (&value_buffer_) value_type(std::move(*other.get_value_ptr()));
+            other.destroy();
+            other.state_ = SlotState::EMPTY;
+          }
+        }
+        return *this;
+      }
+
+      void destroy()
+      {
+        if (state_ == SlotState::OCCUPIED) {
+          get_value_ptr()->~value_type();
+        }
+      }
     };
 
     std::vector< Slot > buckets_;
@@ -144,28 +197,13 @@ namespace gavrilova {
     Hash hasher_;
     KeyEqual key_equal_;
 
+    friend class IteratorHashTable< Key, Value, Hash, KeyEqual >;
+    friend class ConstIteratorHashTable< Key, Value, Hash, KeyEqual >;
+
     std::pair< size_type, bool > find_slot_for_insert(const Key& key) const;
     std::pair< size_type, bool > find_slot_for_read(const Key& key) const;
     size_type find_next_occupied(size_type start_index) const;
   };
-
-
-
-  template < typename Key, typename Value, typename Hash, typename KeyEqual >
-  HashTable< Key, Value, Hash, KeyEqual >::Slot::Slot()
-  {}
-
-  template < typename Key, typename Value, typename Hash, typename KeyEqual >
-  HashTable< Key, Value, Hash, KeyEqual >::Slot::~Slot()
-  {}
-
-  template < typename Key, typename Value, typename Hash, typename KeyEqual >
-  void HashTable< Key, Value, Hash, KeyEqual >::Slot::destroy()
-  {
-    if (state_ == SlotState::OCCUPIED) {
-      value_.~value_type();
-    }
-  }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(size_type initial_buckets):
@@ -178,7 +216,7 @@ namespace gavrilova {
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(std::initializer_list< value_type > init_list):
-    HashTable(init_list.size() * 2)
+    HashTable(::find_next_prime(init_list.size() / 0.75f + 1))
   {
     insert(init_list.begin(), init_list.end());
   }
@@ -186,9 +224,62 @@ namespace gavrilova {
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   template < typename InputIt >
   HashTable< Key, Value, Hash, KeyEqual >::HashTable(InputIt first, InputIt last):
-    HashTable(std::distance(first, last) * 2)
+    HashTable(::find_next_prime(std::distance(first, last) / 0.75f + 1))
   {
     insert(first, last);
+  }
+
+  template < typename Key, typename Value, typename Hash, typename KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(const HashTable& other):
+    buckets_(other.buckets_.size()),
+    element_count_(0),
+    max_load_factor_(other.max_load_factor_),
+    hasher_(other.hasher_),
+    key_equal_(other.key_equal_)
+  {
+    for (size_type i = 0; i < other.buckets_.size(); ++i) {
+      if (other.buckets_[i].state_ == SlotState::OCCUPIED) {
+        emplace(*other.buckets_[i].get_value_ptr());
+      }
+    }
+  }
+
+  template < typename Key, typename Value, typename Hash, typename KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >& HashTable< Key, Value, Hash, KeyEqual >::operator=(const HashTable& other)
+  {
+    if (this != &other) {
+      HashTable temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template < typename Key, typename Value, typename Hash, typename KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >::HashTable(HashTable&& other) noexcept:
+    buckets_(std::move(other.buckets_)),
+    element_count_(other.element_count_),
+    max_load_factor_(other.max_load_factor_),
+    hasher_(std::move(other.hasher_)),
+    key_equal_(std::move(other.key_equal_))
+  {
+    other.element_count_ = 0;
+  }
+
+  template < typename Key, typename Value, typename Hash, typename KeyEqual >
+  HashTable< Key, Value, Hash, KeyEqual >& HashTable< Key, Value, Hash, KeyEqual >::operator=(HashTable&& other) noexcept
+  {
+    if (this != &other) {
+      clear();
+
+      buckets_ = std::move(other.buckets_);
+      element_count_ = other.element_count_;
+      max_load_factor_ = other.max_load_factor_;
+      hasher_ = std::move(other.hasher_);
+      key_equal_ = std::move(other.key_equal_);
+
+      other.element_count_ = 0;
+    }
+    return *this;
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
@@ -228,19 +319,26 @@ namespace gavrilova {
     value_type temp_pair(std::forward< Args >(args)...);
     const Key& key = temp_pair.first;
 
-    if (load_factor() >= max_load_factor_) {
-      rehash(buckets_.size() * 2);
-    }
+    auto pair_result = find_slot_for_insert(key);
+    size_type index = pair_result.first;
+    bool found_existing = pair_result.second;
 
-    auto pair = find_slot_for_read(key);
-    size_type index = pair.first;
-    bool found = pair.second;
-
-    if (found) {
+    if (found_existing) {
       return {iterator(this, index), false};
     }
 
-    new (&buckets_[index].value_) value_type(std::forward< Args >(args)...);
+    if ((static_cast< float >(element_count_ + 1) / buckets_.size()) >= max_load_factor_) {
+      size_type new_size = static_cast< size_type >((element_count_ + 1) / max_load_factor_ + 1);
+      rehash(std::max(buckets_.size() * 2, new_size));
+      pair_result = find_slot_for_insert(key);
+      index = pair_result.first;
+    }
+
+    if (buckets_[index].state_ == SlotState::DELETED) {
+      buckets_[index].destroy();
+    }
+
+    new (buckets_[index].get_value_ptr()) value_type(std::move(temp_pair));
     buckets_[index].state_ = SlotState::OCCUPIED;
     element_count_++;
 
@@ -263,7 +361,7 @@ namespace gavrilova {
   typename HashTable< Key, Value, Hash, KeyEqual >::iterator
   HashTable< Key, Value, Hash, KeyEqual >::erase(const_iterator pos)
   {
-    if (pos == cend() || buckets_[pos.index_].state_ != SlotState::OCCUPIED) {
+    if (pos == cend() || pos.table_ != this || buckets_[pos.index_].state_ != SlotState::OCCUPIED) {
       return end();
     }
 
@@ -303,7 +401,7 @@ namespace gavrilova {
     if (it == end()) {
       throw std::out_of_range("HashTable::at: key not found");
     }
-    return it->second;
+    return const_cast< Value& >(it->second);
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
@@ -319,22 +417,67 @@ namespace gavrilova {
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   Value& HashTable< Key, Value, Hash, KeyEqual >::operator[](const Key& key)
   {
-    return emplace(key, Value{}).first->second;
+    auto pair_result = find_slot_for_insert(key);
+    size_type index = pair_result.first;
+    bool found_existing = pair_result.second;
+
+    if (found_existing) {
+      return const_cast< Value& >(buckets_[index].get_value_ptr()->second);
+    } else {
+      if ((static_cast< float >(element_count_ + 1) / buckets_.size()) >= max_load_factor_) {
+        size_type new_size = static_cast< size_type >((element_count_ + 1) / max_load_factor_ + 1);
+        rehash(std::max(buckets_.size() * 2, new_size));
+
+        pair_result = find_slot_for_insert(key);
+        index = pair_result.first;
+      }
+
+      if (buckets_[index].state_ == SlotState::DELETED) {
+        buckets_[index].destroy();
+      }
+
+      new (buckets_[index].get_value_ptr()) value_type(key, Value{});
+      buckets_[index].state_ = SlotState::OCCUPIED;
+      element_count_++;
+      return const_cast< Value& >(buckets_[index].get_value_ptr()->second);
+    }
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   Value& HashTable< Key, Value, Hash, KeyEqual >::operator[](Key&& key)
   {
-    return emplace(std::move(key), Value{}).first->second;
+    auto pair_result = find_slot_for_insert(key);
+    size_type index = pair_result.first;
+    bool found_existing = pair_result.second;
+
+    if (found_existing) {
+      return const_cast< Value& >(buckets_[index].get_value_ptr()->second);
+    } else {
+      if ((static_cast< float >(element_count_ + 1) / buckets_.size()) >= max_load_factor_) {
+        size_type new_size = static_cast< size_type >((element_count_ + 1) / max_load_factor_ + 1);
+        rehash(std::max(buckets_.size() * 2, new_size));
+        pair_result = find_slot_for_insert(key);
+        index = pair_result.first;
+      }
+
+      if (buckets_[index].state_ == SlotState::DELETED) {
+        buckets_[index].destroy();
+      }
+
+      new (buckets_[index].get_value_ptr()) value_type(std::move(key), Value{});
+      buckets_[index].state_ = SlotState::OCCUPIED;
+      element_count_++;
+      return const_cast< Value& >(buckets_[index].get_value_ptr()->second);
+    }
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   typename HashTable< Key, Value, Hash, KeyEqual >::iterator
   HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key)
   {
-    auto pair = find_slot_for_read(key);
-    size_type index = pair.first;
-    bool found = pair.second;
+    auto pair_result = find_slot_for_read(key);
+    size_type index = pair_result.first;
+    bool found = pair_result.second;
     return found ? iterator(this, index) : end();
   }
 
@@ -342,9 +485,9 @@ namespace gavrilova {
   typename HashTable< Key, Value, Hash, KeyEqual >::const_iterator
   HashTable< Key, Value, Hash, KeyEqual >::find(const Key& key) const
   {
-    auto pair = find_slot_for_read(key);
-    size_type index = pair.first;
-    bool found = pair.second;
+    auto pair_result = find_slot_for_read(key);
+    size_type index = pair_result.first;
+    bool found = pair_result.second;
     return found ? const_iterator(this, index) : cend();
   }
 
@@ -425,36 +568,47 @@ namespace gavrilova {
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::max_load_factor(float ml)
   {
+    if (ml <= 0.0f) {
+      throw std::out_of_range("Max load factor must be positive.");
+    }
     max_load_factor_ = ml;
-    if (load_factor() >= max_load_factor_) {
-      rehash(buckets_.size());
+
+    if (load_factor() >= max_load_factor_ && element_count_ > 0) {
+      rehash(static_cast< size_type >(element_count_ / max_load_factor_) + 1);
     }
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   void HashTable< Key, Value, Hash, KeyEqual >::rehash(size_type count)
   {
-    size_type new_size = ::find_next_prime(std::max(count,
-        static_cast< size_type >(element_count_ / max_load_factor_)));
-    if (new_size <= buckets_.size()) {
+    size_type new_num_buckets = ::find_next_prime(std::max(count,
+        static_cast< size_type >(element_count_ / max_load_factor_ + 1)));
+
+    if (new_num_buckets <= buckets_.size() && new_num_buckets != 0) {
       return;
     }
 
-    std::vector< Slot > new_buckets(new_size);
-    HashTable temp_table;
-    temp_table.buckets_.swap(new_buckets);
+    HashTable temp_table(new_num_buckets);
 
-    for (auto it = begin(); it != end(); ++it) {
-      temp_table.emplace(std::move(it->first), std::move(it->second));
+    for (size_type i = 0; i < buckets_.size(); ++i) {
+      if (buckets_[i].state_ == SlotState::OCCUPIED) {
+        temp_table.emplace(std::move(*buckets_[i].get_value_ptr()));
+        buckets_[i].destroy();
+        buckets_[i].state_ = SlotState::EMPTY;
+      }
     }
 
-    buckets_.swap(temp_table.buckets_);
+    swap(temp_table);
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   std::pair< typename HashTable< Key, Value, Hash, KeyEqual >::size_type, bool >
   HashTable< Key, Value, Hash, KeyEqual >::find_slot_for_insert(const Key& key) const
   {
+    if (buckets_.empty()) {
+      return {0, false};
+    }
+
     size_t hash = hasher_(key);
     size_t index = hash % buckets_.size();
     size_t first_deleted = buckets_.size();
@@ -467,7 +621,7 @@ namespace gavrilova {
       }
 
       if (buckets_[current].state_ == SlotState::OCCUPIED &&
-          key_equal_(buckets_[current].value_.first, key)) {
+          key_equal_(buckets_[current].get_value_ptr()->first, key)) {
         return {current, true};
       }
 
@@ -476,13 +630,17 @@ namespace gavrilova {
       }
     }
 
-    return {first_deleted != buckets_.size() ? first_deleted : 0, false};
+    return {first_deleted != buckets_.size() ? first_deleted : buckets_.size(), false};
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   std::pair< typename HashTable< Key, Value, Hash, KeyEqual >::size_type, bool >
   HashTable< Key, Value, Hash, KeyEqual >::find_slot_for_read(const Key& key) const
   {
+    if (buckets_.empty()) {
+      return {buckets_.size(), false};
+    }
+
     size_t hash = hasher_(key);
     size_t index = hash % buckets_.size();
 
@@ -490,16 +648,15 @@ namespace gavrilova {
       size_t current = (index + i) % buckets_.size();
 
       if (buckets_[current].state_ == SlotState::EMPTY) {
-        return {0, false};
+        return {buckets_.size(), false};
       }
 
       if (buckets_[current].state_ == SlotState::OCCUPIED &&
-          key_equal_(buckets_[current].value_.first, key)) {
+          key_equal_(buckets_[current].get_value_ptr()->first, key)) {
         return {current, true};
       }
     }
-
-    return {0, false};
+    return {buckets_.size(), false};
   }
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
