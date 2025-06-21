@@ -44,7 +44,7 @@ void cmd_graphs()
     return;
   }
 
-  savintsev::TwoThreeTree< std::string, Graph * > sorted;
+  std::map< std::string, Graph * > sorted;
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
     sorted[it->first] = std::addressof(it->second);
@@ -101,7 +101,7 @@ void cmd_outbound(const std::vector< std::string > & args)
     return;
   }
 
-  savintsev::TwoThreeTree< std::string, std::vector< int > > out;
+  std::map< std::string, std::vector< int > > out;
   auto targets = graphs[g].edges.find(v);
   if (targets != graphs[g].edges.end())
   {
@@ -146,7 +146,7 @@ void cmd_inbound(const std::vector< std::string > & args)
     return;
   }
 
-  savintsev::TwoThreeTree< std::string, std::vector< int > > in;
+  std::map< std::string, std::vector< int > > in;
   for (auto it = graphs[g].edges.begin(); it != graphs[g].edges.end(); ++it)
   {
     auto jt = it->second.find(v);
