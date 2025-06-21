@@ -23,7 +23,7 @@ void dribas::vertexes(const RobinHoodHashTable< std::string, Graph >& graphs, st
   in >> name;
   auto i = graphs.find(name);
   if (i == graphs.end()) {
-    return;
+    throw std::invalid_argument("");
   }
   auto vertexes = (*i).second.getUniqueVertexes();
   for (const auto& vertex: vertexes) {
@@ -38,10 +38,10 @@ void dribas::outbound(const RobinHoodHashTable< std::string, Graph >& graphs, st
   in >> name >> vertex;
   auto i = graphs.find(name);
   if (i == graphs.end()) {
-    return;
+    throw std::invalid_argument("");
   }
   if (!(*i).second.hasVertex(vertex)) {
-    return;
+    throw std::invalid_argument("");
   }
   auto vertexes = (*i).second.getOutboundEdges(vertex);
   for (const auto& faces: vertexes) {
@@ -60,10 +60,10 @@ void dribas::inbound(const RobinHoodHashTable< std::string, Graph >& graphs, std
   in >> name >> vertex;
   auto i = graphs.find(name);
   if (i == graphs.end()) {
-    return;
+    throw std::invalid_argument("");
   }
   if (!(*i).second.hasVertex(vertex)) {
-    return;
+    throw std::invalid_argument("");
   }
   auto vertexes = (*i).second.getInboundEdges(vertex);
   for (const auto& faces: vertexes) {
@@ -121,7 +121,7 @@ void dribas::create(RobinHoodHashTable< std::string, Graph >& graphs, std::istre
   size_t vertexCount;
   if (!(in >> vertexCount)) {
     in.clear();
-    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     graphs.insert(name, Graph());
     return;
   }
