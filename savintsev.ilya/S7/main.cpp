@@ -68,6 +68,12 @@ void cmd_vertexes(const vector<string> & args)
     return;
   }
 
+  if (graphs[name].vertexes.empty())
+  {
+    cout << "\n";
+    return;
+  }
+
   const set<string> & vertices = graphs[name].vertexes;
   for (set<string>::const_iterator it = vertices.begin(); it != vertices.end(); ++it)
   {
@@ -295,7 +301,7 @@ void cmd_merge(const vector<string> & args)
   graphs[newg] = g;
 }
 
-void cmd_extract(const vector<string> & args)
+void cmd_extract(const vector< string > & args)
 {
   if (args.size() < 5)
   {
@@ -387,7 +393,7 @@ int main(int argc, char* argv[])
     graphs[name] = g;
   }
 
-  unordered_map<string, function<void(const vector<string>&)>> cmd_map;
+  unordered_map< string, function< void(const vector< string > &) > > cmd_map;
   cmd_map["graphs"] = bind(cmd_graphs);
   cmd_map["vertexes"] = bind(cmd_vertexes, placeholders::_1);
   cmd_map["outbound"] = bind(cmd_outbound, placeholders::_1);
@@ -409,7 +415,7 @@ int main(int argc, char* argv[])
     {
       cmd_map.at(args[0])(args);
     }
-    catch (const out_of_range&)
+    catch (const out_of_range &)
     {
       cout << "<INVALID COMMAND>\n";
     }
