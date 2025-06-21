@@ -9,24 +9,22 @@
 #include <algorithm>
 #include <cstdlib>
 
-using namespace std;
-
 struct Graph
 {
-  unordered_map< string, unordered_map< string, vector< int > > > edges;
-  set< string > vertexes;
+  std::unordered_map< std::string, std::unordered_map< std::string, std::vector< int > > > edges;
+  std::set< std::string > vertexes;
 };
 
-unordered_map< string, Graph > graphs;
+std::unordered_map< std::string, Graph > graphs;
 
-vector< string > split(const string & line)
+std::vector< std::string > split(const std::string & line)
 {
-  vector<string> result;
+  std::vector< std::string > result;
   size_t start = 0;
   while (start < line.length())
   {
     size_t space = line.find(' ', start);
-    if (space == string::npos) space = line.length();
+    if (space == std::string::npos) space = line.length();
     result.push_back(line.substr(start, space - start));
     start = space + 1;
   }
@@ -37,74 +35,72 @@ void cmd_graphs()
 {
   if (graphs.empty())
   {
-    cout << "\n";
+    std::cout << "\n";
     return;
   }
 
-  map< string, Graph * > sorted;
-  for (unordered_map< string, Graph >::iterator it = graphs.begin(); it != graphs.end(); ++it)
+  std::map< std::string, Graph * > sorted;
+  for (std::unordered_map< std::string, Graph >::iterator it = graphs.begin(); it != graphs.end(); ++it)
   {
     sorted[it->first] = &it->second;
   }
 
-  for (map< string, Graph * >::iterator it = sorted.begin(); it != sorted.end(); ++it)
+  for (std::map< std::string, Graph * >::iterator it = sorted.begin(); it != sorted.end(); ++it)
   {
-    cout << it->first << '\n';
+    std::cout << it->first << '\n';
   }
 }
 
-void cmd_vertexes(const vector<string> & args)
+void cmd_vertexes(const std::vector< std::string > & args)
 {
   if (args.size() < 2)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & name = args[1];
+  const std::string & name = args[1];
   if (graphs.find(name) == graphs.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
   if (graphs[name].vertexes.empty())
   {
-    cout << "\n";
+    std::cout << "\n";
     return;
   }
 
-  const set<string> & vertices = graphs[name].vertexes;
-  for (set<string>::const_iterator it = vertices.begin(); it != vertices.end(); ++it)
+  const std::set< std::string > & vertices = graphs[name].vertexes;
+  for (std::set< std::string >::const_iterator it = vertices.begin(); it != vertices.end(); ++it)
   {
-    cout << *it << '\n';
+    std::cout << *it << '\n';
   }
 }
 
-void cmd_outbound(const vector<string> & args)
+void cmd_outbound(const std::vector< std::string > & args)
 {
   if (args.size() < 3)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & g = args[1];
-  const string & v = args[2];
+  const std::string & g = args[1];
+  const std::string & v = args[2];
 
-  if (graphs.find(g) == graphs.end() ||
-      graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
+  if (graphs.find(g) == graphs.end() || graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  map<string, vector<int>> out;
-  unordered_map<string, unordered_map<string, vector<int>>>::iterator targets = graphs[g].edges.find(v);
+  std::map< std::string, std::vector< int > > out;
+  auto targets = graphs[g].edges.find(v);
   if (targets != graphs[g].edges.end())
   {
-    for (unordered_map<string, vector<int>>::iterator jt = targets->second.begin();
-         jt != targets->second.end(); ++jt)
+    for (auto jt = targets->second.begin(); jt != targets->second.end(); ++jt)
     {
       out[jt->first] = jt->second;
       sort(out[jt->first].begin(), out[jt->first].end());
@@ -113,44 +109,42 @@ void cmd_outbound(const vector<string> & args)
 
   if (out.empty())
   {
-    cout << "\n";
+    std::cout << "\n";
     return;
   }
 
-  for (map< string, vector< int > >::iterator it = out.begin(); it != out.end(); ++it)
+  for (std::map< std::string, std::vector< int > >::iterator it = out.begin(); it != out.end(); ++it)
   {
-    cout << it->first;
-    for (vector<int>::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
+    std::cout << it->first;
+    for (std::vector< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
     {
-      cout << ' ' << *wt;
+      std::cout << ' ' << *wt;
     }
-    cout << '\n';
+    std::cout << '\n';
   }
 }
 
-void cmd_inbound(const vector< string > & args)
+void cmd_inbound(const std::vector< std::string > & args)
 {
   if (args.size() < 3)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & g = args[1];
-  const string & v = args[2];
+  const std::string & g = args[1];
+  const std::string & v = args[2];
 
-  if (graphs.find(g) == graphs.end() ||
-      graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
+  if (graphs.find(g) == graphs.end() || graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  map< string, vector< int > > in;
-  for (unordered_map< string, unordered_map< string, vector<int>>>::iterator it = graphs[g].edges.begin();
-       it != graphs[g].edges.end(); ++it)
+  std::map< std::string, std::vector< int > > in;
+  for (auto it = graphs[g].edges.begin(); it != graphs[g].edges.end(); ++it)
   {
-    unordered_map<string, vector<int>>::iterator jt = it->second.find(v);
+    auto jt = it->second.find(v);
     if (jt != it->second.end())
     {
       in[it->first] = jt->second;
@@ -158,34 +152,34 @@ void cmd_inbound(const vector< string > & args)
     }
   }
 
-  for (map<string, vector<int>>::iterator it = in.begin(); it != in.end(); ++it)
+  for (auto it = in.begin(); it != in.end(); ++it)
   {
-    cout << it->first;
-    for (vector<int>::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
+    std::cout << it->first;
+    for (std::vector< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
     {
-      cout << ' ' << *wt;
+      std::cout << ' ' << *wt;
     }
-    cout << '\n';
+    std::cout << '\n';
   }
 }
 
-void cmd_bind(const vector<string> & args)
+void cmd_bind(const std::vector< std::string > & args)
 {
   if (args.size() < 5)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & g = args[1];
+  const std::string & g = args[1];
   if (graphs.find(g) == graphs.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & a = args[2];
-  const string & b = args[3];
+  const std::string & a = args[2];
+  const std::string & b = args[3];
   int w = atoi(args[4].c_str());
 
   graphs[g].vertexes.insert(a);
@@ -193,32 +187,32 @@ void cmd_bind(const vector<string> & args)
   graphs[g].edges[a][b].push_back(w);
 }
 
-void cmd_cut(const vector<string> & args)
+void cmd_cut(const std::vector< std::string > & args)
 {
   if (args.size() < 5)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & g = args[1];
-  const string & a = args[2];
-  const string & b = args[3];
+  const std::string & g = args[1];
+  const std::string & a = args[2];
+  const std::string & b = args[3];
   int w = atoi(args[4].c_str());
 
-  if (graphs.find(g) == graphs.end() ||
-      graphs[g].edges.find(a) == graphs[g].edges.end() ||
-      graphs[g].edges[a].find(b) == graphs[g].edges[a].end())
+  bool c1 = graphs.find(g) == graphs.end();
+  bool c2 = graphs[g].edges.find(a) == graphs[g].edges.end();
+  if (c1 || c2 || graphs[g].edges[a].find(b) == graphs[g].edges[a].end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  vector<int> & weights = graphs[g].edges[a][b];
-  vector<int>::iterator it = find(weights.begin(), weights.end(), w);
+  std::vector< int > & weights = graphs[g].edges[a][b];
+  std::vector< int >::iterator it = find(weights.begin(), weights.end(), w);
   if (it == weights.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
@@ -229,18 +223,18 @@ void cmd_cut(const vector<string> & args)
   }
 }
 
-void cmd_create(const vector<string> & args)
+void cmd_create(const std::vector< std::string > & args)
 {
   if (args.size() < 2)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & g = args[1];
+  const std::string & g = args[1];
   if (graphs.find(g) != graphs.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
@@ -253,47 +247,40 @@ void cmd_create(const vector<string> & args)
 }
 
 
-void cmd_merge(const vector<string> & args)
+void cmd_merge(const std::vector< std::string > & args)
 {
   if (args.size() < 4)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & newg = args[1];
-  const string & g1 = args[2];
-  const string & g2 = args[3];
+  const std::string & newg = args[1];
+  const std::string & g1 = args[2];
+  const std::string & g2 = args[3];
 
-  if (graphs.find(newg) != graphs.end() ||
-      graphs.find(g1) == graphs.end() ||
-      graphs.find(g2) == graphs.end())
+  if (graphs.find(newg) != graphs.end() || graphs.find(g1) == graphs.end() || graphs.find(g2) == graphs.end())
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
   Graph g;
-  const string gs[2] = {g1, g2};
+  const std::string gs[2] = {g1, g2};
   for (size_t i = 0; i < 2; ++i)
   {
-    for (set<string>::const_iterator it = graphs[gs[i]].vertexes.begin();
-         it != graphs[gs[i]].vertexes.end(); ++it)
+    for (auto it = graphs[gs[i]].vertexes.begin(); it != graphs[gs[i]].vertexes.end(); ++it)
     {
       g.vertexes.insert(*it);
     }
 
-    for (unordered_map<string, unordered_map<string, vector<int>>>::const_iterator et = graphs[gs[i]].edges.begin();
-         et != graphs[gs[i]].edges.end(); ++et)
+    for (auto et = graphs[gs[i]].edges.begin(); et != graphs[gs[i]].edges.end(); ++et)
     {
-      for (unordered_map<string, vector<int>>::const_iterator jt = et->second.begin();
-           jt != et->second.end(); ++jt)
+      for (auto jt = et->second.begin(); jt != et->second.end(); ++jt)
       {
-        g.edges[et->first][jt->first].insert(
-          g.edges[et->first][jt->first].end(),
-          jt->second.begin(),
-          jt->second.end()
-        );
+        auto t1 = et->first;
+        auto t2 = jt->first;
+        g.edges[t1][t2].insert(g.edges[t1][t2].end(), jt->second.begin(), jt->second.end());
       }
     }
   }
@@ -301,33 +288,31 @@ void cmd_merge(const vector<string> & args)
   graphs[newg] = g;
 }
 
-void cmd_extract(const vector< string > & args)
+void cmd_extract(const std::vector< std::string > & args)
 {
   if (args.size() < 5)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
-  const string & newg = args[1];
-  const string & oldg = args[2];
+  const std::string & newg = args[1];
+  const std::string & oldg = args[2];
   size_t count = atoi(args[3].c_str());
 
-  if (graphs.find(newg) != graphs.end() ||
-      graphs.find(oldg) == graphs.end() ||
-      args.size() < 4 + count)
+  if (graphs.find(newg) != graphs.end() || graphs.find(oldg) == graphs.end() || args.size() < 4 + count)
   {
-    cout << "<INVALID COMMAND>\n";
+    std::cout << "<INVALID COMMAND>\n";
     return;
   }
 
   Graph g;
   for (size_t i = 0; i < count; ++i)
   {
-    const string & vertex = args[4 + i];
+    const std::string & vertex = args[4 + i];
     if (graphs[oldg].vertexes.find(vertex) == graphs[oldg].vertexes.end())
     {
-      cout << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
       return;
     }
     g.vertexes.insert(vertex);
@@ -335,12 +320,12 @@ void cmd_extract(const vector< string > & args)
 
   for (size_t i = 0; i < count; ++i)
   {
-    const string & src = args[4 + i];
+    const std::string & src = args[4 + i];
     for (size_t j = 0; j < count; ++j)
     {
-      const string & dst = args[4 + j];
-      if (graphs[oldg].edges.find(src) != graphs[oldg].edges.end() &&
-          graphs[oldg].edges[src].find(dst) != graphs[oldg].edges[src].end())
+      const std::string & dst = args[4 + j];
+      bool c1 = graphs[oldg].edges.find(src) != graphs[oldg].edges.end();
+      if (c1 && graphs[oldg].edges[src].find(dst) != graphs[oldg].edges[src].end())
       {
         g.edges[src][dst] = graphs[oldg].edges[src][dst];
       }
@@ -354,36 +339,48 @@ int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
-    cerr << "Missing input file\n";
+    std::cerr << "Missing input file\n";
     return 1;
   }
 
-  ifstream file(argv[1]);
+  std::ifstream file(argv[1]);
   if (!file)
   {
-    cerr << "Cannot open file\n";
+    std::cerr << "Cannot open file\n";
     return 1;
   }
 
-  string line;
+  std::string line;
   while (getline(file, line))
   {
-    if (line.empty()) continue;
-    vector< string > header = split(line);
-    if (header.size() != 2) continue;
+    if (line.empty())
+    {
+      continue;
+    }
+    std::vector< std::string > header = split(line);
+    if (header.size() != 2)
+    {
+      continue;
+    }
 
-    string name = header[0];
+    std::string name = header[0];
     int count = atoi(header[1].c_str());
     Graph g;
 
     for (int i = 0; i < count; ++i)
     {
       getline(file, line);
-      if (line.empty()) continue;
-      vector<string> e = split(line);
-      if (e.size() != 3) continue;
+      if (line.empty())
+      {
+        continue;
+      }
+      std::vector< std::string > e = split(line);
+      if (e.size() != 3)
+      {
+        continue;
+      }
 
-      string a = e[0], b = e[1];
+      std::string a = e[0], b = e[1];
       int w = atoi(e[2].c_str());
       g.vertexes.insert(a);
       g.vertexes.insert(b);
@@ -393,35 +390,43 @@ int main(int argc, char* argv[])
     graphs[name] = g;
   }
 
-  unordered_map< string, function< void(const vector< string > &) > > cmd_map;
-  cmd_map["graphs"] = bind(cmd_graphs);
-  cmd_map["vertexes"] = bind(cmd_vertexes, placeholders::_1);
-  cmd_map["outbound"] = bind(cmd_outbound, placeholders::_1);
-  cmd_map["inbound"] = bind(cmd_inbound, placeholders::_1);
-  cmd_map["bind"] = bind(cmd_bind, placeholders::_1);
-  cmd_map["cut"] = bind(cmd_cut, placeholders::_1);
-  cmd_map["create"] = bind(cmd_create, placeholders::_1);
-  cmd_map["merge"] = bind(cmd_merge, placeholders::_1);
-  cmd_map["extract"] = bind(cmd_extract, placeholders::_1);
+  using namespace std::placeholders;
 
-  string input;
-  while (getline(cin, input))
+  std::unordered_map< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
+  cmd_map["graphs"] = std::bind(cmd_graphs);
+  cmd_map["vertexes"] = std::bind(cmd_vertexes, _1);
+  cmd_map["outbound"] = std::bind(cmd_outbound, _1);
+  cmd_map["inbound"] = std::bind(cmd_inbound, _1);
+  cmd_map["bind"] = std::bind(cmd_bind, _1);
+  cmd_map["cut"] = std::bind(cmd_cut, _1);
+  cmd_map["create"] = std::bind(cmd_create, _1);
+  cmd_map["merge"] = std::bind(cmd_merge, _1);
+  cmd_map["extract"] = std::bind(cmd_extract, _1);
+
+  std::string input;
+  while (getline(std::cin, input))
   {
-    if (input.empty()) continue;
-    vector<string> args = split(input);
-    if (args.empty()) continue;
+    if (input.empty())
+    {
+      continue;
+    }
+    std::vector< std::string > args = split(input);
+    if (args.empty())
+    {
+      continue;
+    }
 
     try
     {
       cmd_map.at(args[0])(args);
     }
-    catch (const out_of_range &)
+    catch (const std::out_of_range &)
     {
-      cout << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
     catch (...)
     {
-      cout << "<INVALID COMMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 
