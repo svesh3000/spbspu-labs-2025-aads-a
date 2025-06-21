@@ -10,60 +10,63 @@
 #include "graph.hpp"
 #include "robinHashTable.hpp"
 
-void loadGraphsFromFile(const std::string& filename, dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs)
+namespace
 {
-  std::ifstream file(filename);
-  if (!file) {
-    throw std::runtime_error("Cannot open");
-  }
-  std::string graphName;
-  while (file >> graphName) {
-    size_t edgeCount;
-    if (!(file >> edgeCount)) {
-      throw std::runtime_error("Invalid graph");
+  void loadGraphsFromFile(const std::string& filename, dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs)
+  {
+    std::ifstream file(filename);
+    if (!file) {
+      throw std::runtime_error("Cannot open");
     }
-    dribas::Graph graph;
-    for (size_t i = 0; i < edgeCount; ++i) {
-      std::string from, to;
-      int weight;
-      if (!(file >> from >> to >> weight)) {
-        throw std::runtime_error("Invalid edge");
+    std::string graphName;
+    while (file >> graphName) {
+      size_t edgeCount;
+      if (!(file >> edgeCount)) {
+        throw std::runtime_error("Invalid graph");
       }
-      graph.addEdge(from, to, weight);
+      dribas::Graph graph;
+      for (size_t i = 0; i < edgeCount; ++i) {
+        std::string from, to;
+        int weight;
+        if (!(file >> from >> to >> weight)) {
+          throw std::runtime_error("Invalid edge");
+        }
+        graph.addEdge(from, to, weight);
+      }
+      graphs.insert(graphName, graph);
+      file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
-    graphs.insert(graphName, graph);
-    file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    if (file.bad()) {
+      throw std::runtime_error("error reading file");
+    }
   }
-  if (file.bad()) {
-    throw std::runtime_error("error reading file");
-  }
-}
 
-void processCommands(dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs) {
-  using namespace std::placeholders;
-  std::map< std::string, std::function< void() > > commands;
-  commands["graphs"] = std::bind(dribas::graph, std::ref(graphs), std::ref(std::cout));
-  commands["vertexes"] = std::bind(dribas::vertexes, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["outbound"] = std::bind(dribas::outbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["inbound"] = std::bind(dribas::inbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["bind"] = std::bind(dribas::bind, std::ref(graphs), std::ref(std::cin));
-  commands["cut"] = std::bind(dribas::cut, std::ref(graphs), std::ref(std::cin));
-  commands["create"] = std::bind(dribas::create, std::ref(graphs), std::ref(std::cin));
-  commands["merge"] = std::bind(dribas::merge, std::ref(graphs), std::ref(std::cin));
-  commands["extract"] = std::bind(dribas::extract, std::ref(graphs), std::ref(std::cin));
+  void processCommands(dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs) {
+    using namespace std::placeholders;
+    std::map< std::string, std::function< void() > > commands;
+    commands["graphs"] = std::bind(dribas::graph, std::ref(graphs), std::ref(std::cout));
+    commands["vertexes"] = std::bind(dribas::vertexes, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
+    commands["outbound"] = std::bind(dribas::outbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
+    commands["inbound"] = std::bind(dribas::inbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
+    commands["bind"] = std::bind(dribas::bind, std::ref(graphs), std::ref(std::cin));
+    commands["cut"] = std::bind(dribas::cut, std::ref(graphs), std::ref(std::cin));
+    commands["create"] = std::bind(dribas::create, std::ref(graphs), std::ref(std::cin));
+    commands["merge"] = std::bind(dribas::merge, std::ref(graphs), std::ref(std::cin));
+    commands["extract"] = std::bind(dribas::extract, std::ref(graphs), std::ref(std::cin));
 
-  std::string command;
-  while (std::cin >> command) {
-    try {
-      auto it = commands.find(command);
-      if (it != commands.end()) {
-        it->second();
-      } else {
-        throw std::invalid_argument("");
+    std::string command;
+    while (std::cin >> command) {
+      try {
+        auto it = commands.find(command);
+        if (it != commands.end()) {
+          it->second();
+        } else {
+          throw std::invalid_argument("");
+        }
+      } catch (const std::invalid_argument&) {
+        std::cout << "<INVALID COMMAND>\n";
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
-    } catch (const std::invalid_argument&) {
-      std::cout << "<INVALID COMMAND>\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 }
