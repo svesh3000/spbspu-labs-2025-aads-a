@@ -68,7 +68,7 @@ namespace lanovenko
   }
 
   template< typename Key, typename Value, typename Comparator >
-  TreeConstIterator< Key, Value, Comparator > TreeConstIterator< Key, Value, Comparator >::operator--(int) noexcept
+  TreeConstIterator< Key, Value, Comparator >& TreeConstIterator< Key, Value, Comparator >::operator--() noexcept
   {
     if (node_->left)
     {

@@ -136,7 +136,7 @@ namespace lanovenko
   {
     if (this != std::addressof(r))
     {
-      Tree< Key, Value, Comparator > temp(std::move(rhs));
+      Tree< Key, Value, Comparator > temp(std::move(r));
       swap(temp);
     }
     return *this;
