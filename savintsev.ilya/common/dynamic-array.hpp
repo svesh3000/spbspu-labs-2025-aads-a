@@ -10,6 +10,7 @@ namespace savintsev
   {
   public:
     ~Array();
+    Array();
     Array(size_t n);
     Array(const Array & rhs);
     Array(Array && rhs) noexcept;
@@ -49,6 +50,11 @@ namespace savintsev
     std::swap(start_, x.start_);
     std::swap(capacity_, x.capacity_);
   }
+
+  template< typename T >
+  Array< T >::Array():
+    Array(10)
+  {}
 
   template< typename T >
   Array< T >::Array(size_t n):

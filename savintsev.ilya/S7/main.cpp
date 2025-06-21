@@ -1,7 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <unordered_map>
-#include <map>
 #include <set>
 #include <vector>
 #include <string>
@@ -44,7 +42,7 @@ void cmd_graphs()
     return;
   }
 
-  std::map< std::string, Graph * > sorted;
+  savintsev::TwoThreeTree< std::string, Graph * > sorted;
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
     sorted[it->first] = std::addressof(it->second);
@@ -101,14 +99,14 @@ void cmd_outbound(const std::vector< std::string > & args)
     return;
   }
 
-  std::map< std::string, std::vector< int > > out;
+  savintsev::TwoThreeTree< std::string, std::vector< int > > out;
   auto targets = graphs[g].edges.find(v);
   if (targets != graphs[g].edges.end())
   {
     for (auto jt = targets->second.begin(); jt != targets->second.end(); ++jt)
     {
       out[jt->first] = jt->second;
-      sort(out[jt->first].begin(), out[jt->first].end());
+      std::sort(out[jt->first].begin(), out[jt->first].end());
     }
   }
 
@@ -146,14 +144,14 @@ void cmd_inbound(const std::vector< std::string > & args)
     return;
   }
 
-  std::map< std::string, std::vector< int > > in;
+  savintsev::TwoThreeTree< std::string, std::vector< int > > in;
   for (auto it = graphs[g].edges.begin(); it != graphs[g].edges.end(); ++it)
   {
     auto jt = it->second.find(v);
     if (jt != it->second.end())
     {
       in[it->first] = jt->second;
-      sort(in[it->first].begin(), in[it->first].end());
+      std::sort(in[it->first].begin(), in[it->first].end());
     }
   }
 

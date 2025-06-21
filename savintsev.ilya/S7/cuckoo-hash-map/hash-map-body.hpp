@@ -4,7 +4,6 @@
 #include <iterator>
 #include <iostream>
 #include <vector>
-#include <dynamic-array.hpp>
 #include <boost/hash2/xxhash.hpp>
 #include "hash-wrapper.hpp"
 
