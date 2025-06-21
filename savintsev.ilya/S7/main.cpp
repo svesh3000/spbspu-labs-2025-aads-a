@@ -62,7 +62,7 @@ void cmd_vertexes(const vector<string> & args)
     return;
   }
 
-  for (set<string>::const_iterator it = graphs[name].vertexes.begin(); 
+  for (set<string>::const_iterator it = graphs[name].vertexes.begin();
        it != graphs[name].vertexes.end(); ++it)
   {
     cout << *it << '\n';
@@ -79,8 +79,8 @@ void cmd_outbound(const vector<string> & args)
 
   const string & g = args[1];
   const string & v = args[2];
-  
-  if (graphs.find(g) == graphs.end() || 
+
+  if (graphs.find(g) == graphs.end() ||
       graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
   {
     cout << "<INVALID COMMAND>\n";
@@ -120,8 +120,8 @@ void cmd_inbound(const vector<string> & args)
 
   const string & g = args[1];
   const string & v = args[2];
-  
-  if (graphs.find(g) == graphs.end() || 
+
+  if (graphs.find(g) == graphs.end() ||
       graphs[g].vertexes.find(v) == graphs[g].vertexes.end())
   {
     cout << "<INVALID COMMAND>\n";
@@ -188,8 +188,8 @@ void cmd_cut(const vector<string> & args)
   const string & b = args[3];
   int w = atoi(args[4].c_str());
 
-  if (graphs.find(g) == graphs.end() || 
-      graphs[g].edges.find(a) == graphs[g].edges.end() || 
+  if (graphs.find(g) == graphs.end() ||
+      graphs[g].edges.find(a) == graphs[g].edges.end() ||
       graphs[g].edges[a].find(b) == graphs[g].edges[a].end())
   {
     cout << "<INVALID COMMAND>\n";
@@ -246,8 +246,8 @@ void cmd_merge(const vector<string> & args)
   const string & g1 = args[2];
   const string & g2 = args[3];
 
-  if (graphs.find(newg) != graphs.end() || 
-      graphs.find(g1) == graphs.end() || 
+  if (graphs.find(newg) != graphs.end() ||
+      graphs.find(g1) == graphs.end() ||
       graphs.find(g2) == graphs.end())
   {
     cout << "<INVALID COMMAND>\n";
@@ -294,8 +294,8 @@ void cmd_extract(const vector<string> & args)
   const string & oldg = args[2];
   size_t count = atoi(args[3].c_str());
 
-  if (graphs.find(newg) != graphs.end() || 
-      graphs.find(oldg) == graphs.end() || 
+  if (graphs.find(newg) != graphs.end() ||
+      graphs.find(oldg) == graphs.end() ||
       args.size() < 4 + count)
   {
     cout << "<INVALID COMMAND>\n";
@@ -320,7 +320,7 @@ void cmd_extract(const vector<string> & args)
     for (size_t j = 0; j < count; ++j)
     {
       const string & dst = args[4 + j];
-      if (graphs[oldg].edges.find(src) != graphs[oldg].edges.end() && 
+      if (graphs[oldg].edges.find(src) != graphs[oldg].edges.end() &&
           graphs[oldg].edges[src].find(dst) != graphs[oldg].edges[src].end())
       {
         g.edges[src][dst] = graphs[oldg].edges[src][dst];
