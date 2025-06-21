@@ -54,6 +54,9 @@ void dribas::outbound(const RobinHoodHashTable< std::string, Graph >& graphs, st
     }
     out << '\n';
   }
+  if (vertexes.empty()) {
+    out << '\n';
+  }
 }
 
 void dribas::inbound(const RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in, std::ostream& out)
@@ -74,6 +77,9 @@ void dribas::inbound(const RobinHoodHashTable< std::string, Graph >& graphs, std
     for (const auto weights: faces.second) {
       out << ' ' << weights;
     }
+    out << '\n';
+  }
+  if (vertexes.empty()) {
     out << '\n';
   }
 }
