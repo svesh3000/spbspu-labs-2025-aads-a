@@ -169,7 +169,7 @@ namespace savintsev
       size_t new_capacity = capacity_ ? capacity_ * 2 : 1;
       T * new_data = new T[new_capacity];
 
-      for (size_t i = 0; i < size_; ++i) 
+      for (size_t i = 0; i < size_; ++i)
       {
         new_data[i] = std::move(data_[start_ + i]);
       }

@@ -58,14 +58,14 @@ BOOST_AUTO_TEST_CASE(array_basic_operations)
   Array< int > arr(2);
   arr.push_back(1);
   arr.push_back(2);
-  
+
   BOOST_TEST(arr.size() == 2);
   BOOST_TEST(arr[0] == 1);
-  
+
   arr.pop_front();
   BOOST_TEST(arr.size() == 1);
   BOOST_TEST(arr[0] == 2);
-  
+
   arr.push_back(3);
   BOOST_TEST(arr.size() == 2);
   BOOST_TEST(arr[1] == 3);
