@@ -378,6 +378,7 @@ namespace savintsev
         t2_[it.pos_].second = false;
       }
       --size_;
+      ++it;
     }
     return it;
   }
@@ -388,9 +389,9 @@ namespace savintsev
     {
       return iterator(this, capacity_, false);
     }
-    for (auto it = fst; it != last; ++it)
+    for (auto it = fst; it != last;)
     {
-      erase(it);
+      it = erase(it);
     }
     return find(last->first);
   }
