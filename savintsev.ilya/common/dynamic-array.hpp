@@ -85,7 +85,9 @@ namespace savintsev
     size_(rhs.size_),
     start_(rhs.start_),
     capacity_(rhs.capacity_)
-  {}
+  {
+    rhs.data_ = nullptr;
+  }
 
   template< typename T >
   Array< T > & Array< T >::operator=(const Array & rhs)

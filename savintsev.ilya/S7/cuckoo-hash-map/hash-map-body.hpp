@@ -510,14 +510,12 @@ namespace savintsev
     Array< std::pair< std::pair< Key, T >, bool > > new_t1(n);
     Array< std::pair< std::pair< Key, T >, bool > > new_t2(n);
 
-    auto old_t1 = t1_;
-    auto old_t2 = t2_;
-
-    t1_ = std::move(new_t1);
-    t2_ = std::move(new_t2);
-    
     const size_t old_capacity = capacity_;
     const size_t old_size = size_;
+
+    std::swap(t1_, new_t1);
+    std::swap(t2_, new_t2);
+
     capacity_ = n;
     size_ = 0;
 
@@ -525,22 +523,22 @@ namespace savintsev
     {
       for (size_t i = 0; i < old_capacity; ++i)
       {
-        if (old_t1[i].second)
+        if (new_t1[i].second)
         {
-          insert_data(old_t1[i].first.first) = old_t1[i].first.second;
+          insert_data(new_t1[i].first.first) = new_t1[i].first.second;
         }
-        if (old_t2[i].second)
+        if (new_t2[i].second)
         {
-          insert_data(old_t2[i].first.first) = old_t2[i].first.second;
+          insert_data(new_t2[i].first.first) = new_t2[i].first.second;
         }
       }
     }
     catch (...)
     {
+      std::swap(t1_, new_t1);
+      std::swap(t2_, new_t2);
       capacity_ = old_capacity;
       size_ = old_size;
-      t1_ = std::move(old_t1);
-      t2_ = std::move(old_t2);
       throw;
     }
   }
@@ -548,11 +546,16 @@ namespace savintsev
   T & HashMap< Key, T, HS1, HS2, EQ >::insert_data(const Key & k)
   {
     Key original_key = k;
-    T * inserted_value = nullptr;
 
     Key current_key = k;
     T current_value = T{};
     size_t attempts = 0;
+    bool is_inserted = false;
+
+    if (load_factor() > max_load_factor_)
+    {
+      rehash(capacity_ * 2);
+    }
 
     while (attempts < MAX_ITERATIONS)
     {
@@ -561,19 +564,12 @@ namespace savintsev
       {
         t1_[h1] = {{current_key, current_value}, true};
         size_++;
-        if (current_key == original_key)
-        {
-          inserted_value = std::addressof(t1_[h1].first.second);
-        }
+        is_inserted = true;
         break;
       }
 
       auto displaced = t1_[h1];
       t1_[h1] = {{current_key, current_value}, true};
-      if (current_key == original_key)
-      {
-        inserted_value = std::addressof(t1_[h1].first.second);
-      }
       current_key = displaced.first.first;
       current_value = displaced.first.second;
       attempts++;
@@ -583,38 +579,24 @@ namespace savintsev
       {
         t2_[h2] = {{current_key, current_value}, true};
         size_++;
-        if (current_key == original_key)
-        {
-          inserted_value = std::addressof(t2_[h2].first.second);
-        }
+        is_inserted = true;
         break;
       }
 
       displaced = t2_[h2];
       t2_[h2] = {{current_key, current_value}, true};
-      if (current_key == original_key)
-      {
-        inserted_value = std::addressof(t2_[h2].first.second);
-      }
       current_key = displaced.first.first;
       current_value = displaced.first.second;
       attempts++;
-
-      if (load_factor() > max_load_factor_)
-      {
-        rehash(capacity_ * 2);
-        return insert_data(original_key);
-      }
     }
 
-    if (!inserted_value)
+    if (!is_inserted)
     {
       rehash(capacity_ * 2);
-      capacity_ = capacity_ * 2;
-      return insert_data(original_key);
+      insert_data(current_key) = current_value;
     }
 
-    return *inserted_value;
+    return find(original_key)->second;
   }
 
   template< typename K, typename T, typename H1, typename H2, typename EQ >

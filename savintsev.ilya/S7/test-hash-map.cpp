@@ -78,6 +78,7 @@ BOOST_AUTO_TEST_CASE(hm_access_to_data)
   {
     BOOST_TEST(lol[i] = i);
   }
+
 }
 
 BOOST_AUTO_TEST_CASE(hm_default_constructor)
@@ -275,7 +276,7 @@ BOOST_AUTO_TEST_CASE(hm_find_tests)
   BOOST_TEST(cit != hm.cend());
   BOOST_TEST(cit->second == "two");
 }
-/*
+
 BOOST_AUTO_TEST_CASE(hm_load_factor_tests)
 {
   HashMap< int, int > hm(10);
@@ -293,7 +294,7 @@ BOOST_AUTO_TEST_CASE(hm_load_factor_tests)
   
   hm.rehash(100);
   BOOST_TEST(hm.capacity() >= 100);
-  //BOOST_TEST(hm.size() == 5);
+  BOOST_TEST(hm.size() == 5);
 }
 
 BOOST_AUTO_TEST_CASE(hm_overload)
@@ -311,4 +312,3 @@ BOOST_AUTO_TEST_CASE(hm_overload)
 
   BOOST_TEST(book.capacity() > 2);
 }
-*/
