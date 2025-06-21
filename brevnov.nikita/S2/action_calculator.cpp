@@ -184,7 +184,7 @@ brevnov::stack_number brevnov::calculation_expression(queue& postfix_expressions
         }
         catch (...)
         {
-          throw std::exception;
+          throw;
         }
       }
     }
