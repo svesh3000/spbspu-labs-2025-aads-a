@@ -295,6 +295,7 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
 void maslov::printHelp(std::ostream & out)
 {
   out << std::left;
+  out << "Available commands:\n" << '\n';
   constexpr size_t cmdWidth = 50;
   constexpr size_t numWidth = 4;
   out << std::setw(numWidth) << "1." << std::setw(cmdWidth);

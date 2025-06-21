@@ -10,7 +10,7 @@
 int main(int argc, char * argv[])
 {
   using namespace maslov;
-  if (std::string(argv[1]) == "--help")
+  if (argc == 2 && std::string(argv[1]) == "--help")
   {
     printHelp(std::cout);
     return 0;
@@ -27,15 +27,8 @@ int main(int argc, char * argv[])
     return 1;
   }
   HashTable< std::string, HashTable< std::string, int > > dicts;
-  try
-  {
-    dicts[argv[2]] = HashTable< std::string, int >{};
-    loadFromFile(file, dicts.find(argv[2])->second);
-  }
-  catch (const std::exception & e)
-  {
-    std::cerr << e.what() << '\n';
-  }
+  dicts[argv[2]] = HashTable< std::string, int >{};
+  loadFromFile(file, dicts.find(argv[2])->second);
 
   BiTree< std::string, std::function< void() >, std::less< std::string > > cmds;
   cmds["createdict"] = std::bind(createDictionary, std::ref(std::cin), std::ref(dicts));
