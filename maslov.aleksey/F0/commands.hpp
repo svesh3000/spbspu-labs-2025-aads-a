@@ -20,7 +20,7 @@ namespace maslov
   void cleanDictionary(std::istream & in, Dicts & dicts);
   void printTopRare(std::istream & in, std::ostream & out, const Dicts & dicts, const std::string & order);
   void printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts);
-  //void createWordRange(std::istream & in, Dicts & dicts);
+  void createWordRange(std::istream & in, Dicts & dicts);
   void printHelp(std::ostream & out);
 }
 

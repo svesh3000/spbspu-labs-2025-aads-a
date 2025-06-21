@@ -51,13 +51,19 @@ int main(int argc, char * argv[])
   cmds["top"] = std::bind(printTopRare, std::ref(std::cin), std::ref(std::cout), std::cref(dicts), "descending");
   cmds["rare"] = std::bind(printTopRare, std::ref(std::cin), std::ref(std::cout), std::cref(dicts), "ascending");
   cmds["frequency"] = std::bind(printFrequency, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
-  //cmds["wordrange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
+  cmds["wordrange"] = std::bind(createWordRange, std::ref(std::cin), std::ref(dicts));
   std::string command;
   while (!(std::cin >> command).eof())
   {
     try
     {
       cmds.at(command)();
+    }
+    catch (const std::out_of_range &)
+    {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>" << '\n';
     }
     catch (const std::exception & e)
     {

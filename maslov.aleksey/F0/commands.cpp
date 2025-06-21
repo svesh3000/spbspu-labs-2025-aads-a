@@ -254,16 +254,43 @@ void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts &
 {
   std::string dictName, wordName;
   in >> dictName >> wordName;
-  auto it = dicts.find(dictName);
-  if (it == dicts.cend())
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend() || dictIt->second.find(wordName) != dictIt->second.cend())
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  out << it->second.at(wordName) << '\n';
+  out << dictIt->second.at(wordName) << '\n';
 }
 
-//void maslov::createWordRange(std::istream & in, Dicts & dicts)
-//{}
+void maslov::createWordRange(std::istream & in, Dicts & dicts)
+{
+  std::string resultName, dictName;
+  int freq1, freq2;
+  in >> resultName >> dictName >> freq1 >> freq2;
+  if (freq2 < freq1)
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto resultIt = dicts.find(resultName);
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.end() || resultIt != dicts.end())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  auto & resultDict = dicts[resultName];
+  for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
+  {
+    if (it->second >= freq1 && it->second <= freq2)
+    {
+      resultDict[it->first] = it->second;
+    }
+  }
+  if (resultDict.empty())
+  {
+    dicts.erase(resultName);
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+}
 
 void maslov::printHelp(std::ostream & out)
 {
