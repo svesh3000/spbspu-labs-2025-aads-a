@@ -35,6 +35,12 @@ vector<string> split(const string & line)
 
 void cmd_graphs()
 {
+  if (graphs.empty())
+  {
+    cout << "\n";
+    return;
+  }
+
   map<string, Graph *> sorted;
   for (unordered_map<string, Graph>::iterator it = graphs.begin(); it != graphs.end(); ++it)
   {
@@ -97,6 +103,12 @@ void cmd_outbound(const vector<string> & args)
       out[jt->first] = jt->second;
       sort(out[jt->first].begin(), out[jt->first].end());
     }
+  }
+
+  if (out.empty())
+  {
+    cout << "\n";
+    return;
   }
 
   for (map<string, vector<int>>::iterator it = out.begin(); it != out.end(); ++it)
@@ -213,7 +225,7 @@ void cmd_cut(const vector<string> & args)
 
 void cmd_create(const vector<string> & args)
 {
-  if (args.size() < 3)
+  if (args.size() < 2)
   {
     cout << "<INVALID COMMAND>\n";
     return;
@@ -227,9 +239,12 @@ void cmd_create(const vector<string> & args)
   }
 
   Graph newg;
-  for (vector<string>::const_iterator it = args.begin() + 2; it != args.end(); ++it)
+  if (args.size() > 2)
   {
-    newg.vertexes.insert(*it);
+    for (size_t i = 2; i < args.size(); ++i)
+    {
+      newg.vertexes.insert(args[i]);
+    }
   }
   graphs[g] = newg;
 }
