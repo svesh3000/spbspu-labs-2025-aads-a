@@ -122,15 +122,6 @@ namespace gavrilova {
     return outbound_edges_.at(v);
   }
 
-  // template < typename Vertex, typename Weight >
-  // typename WeightedGraph< Vertex, Weight >::adjacency_list
-  // WeightedGraph< Vertex, Weight >::get_sorted_outbound_edges(const Vertex& v) const
-  // {
-  //   auto edges = get_outbound_edges(v);
-  //   sort_edges(edges);
-  //   return edges;
-  // }
-
   template < typename Vertex, typename Weight >
   typename WeightedGraph< Vertex, Weight >::adjacency_list
   WeightedGraph< Vertex, Weight >::get_inbound_edges(const Vertex& v) const
@@ -138,15 +129,6 @@ namespace gavrilova {
     if (!has_vertex(v)) throw std::out_of_range("Vertex not found");
     return inbound_edges_.at(v);
   }
-
-  // template < typename Vertex, typename Weight >
-  // typename WeightedGraph< Vertex, Weight >::adjacency_list
-  // WeightedGraph< Vertex, Weight >::get_sorted_inbound_edges(const Vertex& v) const
-  // {
-  //   auto edges = get_inbound_edges(v);
-  //   sort_edges(edges);
-  //   return edges;
-  // }
 
   template < typename Vertex, typename Weight >
   size_t WeightedGraph< Vertex, Weight >::vertex_count() const

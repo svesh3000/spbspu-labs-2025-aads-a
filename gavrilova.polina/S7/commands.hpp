@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include "HashTableFwd.hpp"
+#include "HashTable.hpp"
 #include "WeightedGraph.hpp"
 
 namespace gavrilova {

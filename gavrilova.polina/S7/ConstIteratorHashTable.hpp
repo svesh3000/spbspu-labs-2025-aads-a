@@ -1,12 +1,11 @@
-// --- ConstIteratorHashTable.hpp ---
+
 #ifndef CONST_ITERATOR_HASH_TABLE_HPP
 #define CONST_ITERATOR_HASH_TABLE_HPP
 
 #include <cassert>
-#include <iterator>  // Required for std::forward_iterator_tag if you keep the base class
-#include <utility>   // Required for std::pair and std::addressof
+#include <iterator>
+#include <utility>
 
-// Forward declarations for HashTable and IteratorHashTable
 namespace gavrilova {
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   class HashTable;
@@ -18,39 +17,32 @@ namespace gavrilova {
 namespace gavrilova {
 
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
-  struct ConstIteratorHashTable /* : public std::iterator< std::forward_iterator_tag, const std::pair< Key, Value > > */ {
-    // Standard iterator typedefs (replacing std::iterator base class)
+  struct ConstIteratorHashTable {
     using iterator_category = std::forward_iterator_tag;
-    using value_type = const std::pair< const Key, Value >;  // Already correct
+    using value_type = const std::pair< const Key, Value >;
     using difference_type = std::ptrdiff_t;
     using pointer = const value_type*;
     using reference = const value_type&;
 
-    // Friend declarations for access to private members of HashTable and IteratorHashTable
     friend class HashTable< Key, Value, Hash, KeyEqual >;
     friend struct IteratorHashTable< Key, Value, Hash, KeyEqual >;
 
     using this_t = ConstIteratorHashTable< Key, Value, Hash, KeyEqual >;
     using Table = gavrilova::HashTable< Key, Value, Hash, KeyEqual >;
 
-    // Constructors/Destructors/Assignment Operators
     ConstIteratorHashTable();
     ~ConstIteratorHashTable() = default;
     ConstIteratorHashTable(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
 
-    // Conversion constructor from non-const iterator
     ConstIteratorHashTable(const IteratorHashTable< Key, Value, Hash, KeyEqual >& other);
 
-    // Increment operators
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
 
-    // Dereference operators (KEY CHANGES HERE)
     reference operator*() const;
     pointer operator->() const;
 
-    // Comparison operators
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
 
@@ -58,10 +50,9 @@ namespace gavrilova {
     bool operator!=(const IteratorHashTable< Key, Value, Hash, KeyEqual >& other) const;
 
   private:
-    const Table* table_;  // Pointer to const Table
+    const Table* table_;
     size_t index_;
 
-    // Private constructor for HashTable to create const iterators
     explicit ConstIteratorHashTable(const Table* table, size_t index);
   };
 
@@ -80,7 +71,7 @@ namespace gavrilova {
   template < typename Key, typename Value, typename Hash, typename KeyEqual >
   ConstIteratorHashTable< Key, Value, Hash, KeyEqual >::ConstIteratorHashTable(
       const IteratorHashTable< Key, Value, Hash, KeyEqual >& other):
-    table_(other.table_),  // Copy the pointer
+    table_(other.table_),
     index_(other.index_)
   {}
 
@@ -89,7 +80,7 @@ namespace gavrilova {
   ConstIteratorHashTable< Key, Value, Hash, KeyEqual >::operator++() noexcept
   {
     assert(table_ != nullptr);
-    // Use table_->find_next_occupied to skip EMPTY and DELETED slots
+
     index_ = table_->find_next_occupied(index_ + 1);
     return *this;
   }
@@ -109,7 +100,7 @@ namespace gavrilova {
   {
     assert(table_ != nullptr);
     assert(index_ < table_->buckets_.size() && table_->buckets_[index_].state_ == Table::SlotState::OCCUPIED);
-    // --- KEY CHANGE: Use get_value_ptr() ---
+
     return *table_->buckets_[index_].get_value_ptr();
   }
 
@@ -119,7 +110,7 @@ namespace gavrilova {
   {
     assert(table_ != nullptr);
     assert(index_ < table_->buckets_.size() && table_->buckets_[index_].state_ == Table::SlotState::OCCUPIED);
-    // --- KEY CHANGE: Use get_value_ptr() ---
+
     return table_->buckets_[index_].get_value_ptr();
   }
 
@@ -150,4 +141,4 @@ namespace gavrilova {
   }
 }
 
-#endif  // CONST_ITERATOR_HASH_TABLE_HPP
+#endif
