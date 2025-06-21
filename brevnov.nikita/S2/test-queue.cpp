@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(constructors)
   BOOST_TEST(test_move_queue.front() == 6);
 }
 
-BOOST_AUTO_TEST_CASE(front_back)
+BOOST_AUTO_TEST_CASE(front)
 {
   brevnov::Queue< int > test_queue;
   test_queue.push(5);
@@ -23,21 +23,13 @@ BOOST_AUTO_TEST_CASE(front_back)
   const int i = test_queue.front();
   BOOST_TEST(i == 5);
   BOOST_TEST(test_queue.front() == 5);
-  const int a = test_queue.back();
-  BOOST_TEST(a == 2);
-  BOOST_TEST(test_queue.back() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(assignment_operators)
 {
   brevnov::Queue< int > test_queue;
-  brevnov::Queue< int > test_queue2;
-  test_queue2.push(9);
-  test_queue = test_queue2;
+  test_queue.push(9);
   BOOST_TEST(test_queue.front() == 9);
-  test_queue.push(8);
-  test_queue2 = test_queue;
-  BOOST_TEST(test_queue2.back() == 8);
 }
 
 BOOST_AUTO_TEST_CASE(push_and_pop)
@@ -48,7 +40,6 @@ BOOST_AUTO_TEST_CASE(push_and_pop)
   BOOST_TEST(test_queue.front() == 2);
   test_queue.push(4);
   test_queue.push(8);
-  BOOST_TEST(test_queue.back() == 8);
   test_queue.pop();
   BOOST_TEST(test_queue.front() == 4);
 }

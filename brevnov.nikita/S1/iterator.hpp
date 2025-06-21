@@ -1,8 +1,8 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
-#include "node.hpp"
 #include <cassert>
 #include <iterator>
+#include "node.hpp"
 namespace brevnov
 {
   template< typename T >
