@@ -134,3 +134,14 @@ BOOST_AUTO_TEST_CASE(erase_by_key)
   BOOST_TEST(erased == 1);
   BOOST_TEST(tree.size() == 2);
 }
+
+BOOST_AUTO_TEST_CASE(count)
+{
+  finaev::AVLtree< int, std::string > tree;
+  tree.insert({1, "1"});
+  tree.insert({2, "2"});
+  size_t a = tree.count(2);
+  size_t b = tree.count(3);
+  BOOST_TEST(a == 1);
+  BOOST_TEST(b == 0);
+}

@@ -32,8 +32,9 @@ namespace finaev
     void swap(AVLtree< Key, Value, Cmp >&) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    iter erase(iter it) noexcept;
-    size_t erase(const Key& key) noexcept;
+    iter erase(iter) noexcept;
+    size_t erase(const Key&) noexcept;
+    size_t count(const Key&) const noexcept;
 
     Value& at(const Key &);
     const Value& at(const Key &) const;
@@ -658,6 +659,12 @@ namespace finaev
       return 1;
     }
     return 0;
+  }
+
+  template<class Key, class Value, class Cmp>
+  size_t AVLtree<Key, Value, Cmp>::count(const Key& key) const noexcept
+  {
+    return find(key) != cEnd() ? 1 : 0;
   }
 
   template< class Key, class Value, class Cmp >
