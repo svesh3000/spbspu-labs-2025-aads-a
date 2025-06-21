@@ -5,18 +5,18 @@
 namespace finaev
 {
   template < class Key, class Value >
-  struct treeNode
+  struct TreeNode
   {
     std::pair< Key, Value > data;
-    treeNode< Key, Value >* left;
-    treeNode< Key, Value >* right;
-    treeNode< Key, Value >* parent;
+    TreeNode< Key, Value >* left;
+    TreeNode< Key, Value >* right;
+    TreeNode< Key, Value >* parent;
     int height;
-    treeNode(const Key& k, const Value& val, treeNode< Key, Value >* p);
+    TreeNode(const Key& k, const Value& val, TreeNode< Key, Value >* p);
   };
 
   template < class Key, class Value >
-  treeNode< Key, Value >::treeNode(const Key& k, const Value& val, treeNode< Key, Value >* p):
+  TreeNode< Key, Value >::TreeNode(const Key& k, const Value& val, TreeNode< Key, Value >* p):
     data(std::pair< Key, Value >(k, val)),
     left(nullptr),
     right(nullptr),

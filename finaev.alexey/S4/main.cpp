@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <limits>
+#include <AVLtree.hpp>
+#include <algorithm>
 #include "inputDict.hpp"
 #include "commands.hpp"
 
@@ -20,41 +22,36 @@ int main(int argc, char* argv[])
     return 1;
   }
   finaev::AVLtree< std::string, finaev::AVLtree < int, std::string > > mainDict;
-  finaev::inDictionaries(inputFile, mainDict);
-  inputFile.close();
-  while (true)
+  try
   {
-    std::string command = "";
-    std::cin >> command;
+    finaev::inDictionaries(inputFile, mainDict);
+  }
+  catch (...)
+  {
+    std::cout << "error input!\n";
+    return 1;
+  }
+  finaev::AVLtree< std::string, std::function< void() > > commands;
+  commands["print"] = std::bind(finaev::printCMD, std::ref(std::cout), std::cref(mainDict));
+  commands["complement"] = std::bind(finaev::complementCMD, std::ref(mainDict));
+  commands["intersect"] = std::bind(finaev::intersectCMD, std::ref(mainDict));
+  commands["union"] = std::bind(finaev::unionCMD, std::ref(mainDict));
+  std::string command = "";
+  while (std::cin >> command)
+  {
     try
     {
-      if (std::cin.eof())
+      auto func = commands.find(command);
+      if (func != commands.end())
       {
-        break;
-      }
-      else if (command == "print")
-      {
-        finaev::printCMD(std::cout, mainDict);
-      }
-      else if (command == "complement")
-      {
-        finaev::complementCMD(mainDict);
-      }
-      else if (command == "intersect")
-      {
-        finaev::intersectCMD(mainDict);
-      }
-      else if (command == "union")
-      {
-        finaev::unionCMD(mainDict);
+        func->second();
       }
       else
       {
-        std::cout << "<INVALID COMMAND>\n";
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        throw std::invalid_argument("<INVALID COMMAND>");
       }
     }
-    catch(...)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');

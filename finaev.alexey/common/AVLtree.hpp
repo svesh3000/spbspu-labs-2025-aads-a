@@ -1,19 +1,20 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 #include <utility>
+#include <functional>
 #include "treeNode.hpp"
 #include "iterator.hpp"
 #include "constIterator.hpp"
 
 namespace finaev
 {
-  template < class Key, class Value, class Cmp = std::less< Key > >
+  template< class Key, class Value, class Cmp = std::less< Key > >
   class AVLtree
   {
   public:
-    using node_t = treeNode< Key, Value >;
-    using iter = treeIterator< Key, Value, Cmp >;
-    using cIter = constTreeIterator< Key, Value, Cmp >;
+    using node_t = TreeNode< Key, Value >;
+    using iter = TreeIterator< Key, Value, Cmp >;
+    using cIter = ConstTreeIterator< Key, Value, Cmp >;
 
     AVLtree();
     AVLtree(const AVLtree& other);
@@ -58,7 +59,7 @@ namespace finaev
 
   template< class Key, class Value, class Cmp >
   AVLtree< Key, Value, Cmp >::AVLtree():
-    fakeroot_(new treeNode< Key, Value >(Key(), Value(), nullptr)),
+    fakeroot_(new TreeNode< Key, Value >(Key(), Value(), nullptr)),
     root_(nullptr),
     cmp_(),
     size_(0)
@@ -71,7 +72,7 @@ namespace finaev
     cmp_(other.cmp_),
     size_(other.size_)
   {
-    fakeroot_ = new treeNode< Key, Value >(Key(), Value(), nullptr);
+    fakeroot_ = new TreeNode< Key, Value >(Key(), Value(), nullptr);
     fakeroot_->left = copyTree(other.fakeroot_->left);
     root_ = fakeroot_->left;
     if (root_)
