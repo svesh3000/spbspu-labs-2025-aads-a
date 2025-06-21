@@ -18,8 +18,7 @@ namespace maslov
   void printSize(std::istream & in, std::ostream & out, const Dicts & dicts);
   void cleanWord(std::istream & in, Dicts & dicts);
   void cleanDictionary(std::istream & in, Dicts & dicts);
-  //void printTop(std::istream & in, std::ostream & out, const Dicts & dicts);
-  //void printRare(std::istream & in, std::ostream & out, const Dicts & dicts);
+  void printTopRare(std::istream & in, std::ostream & out, const Dicts & dicts, const std::string & order);
   void printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts);
   //void createWordRange(std::istream & in, Dicts & dicts);
   void printHelp(std::ostream & out);

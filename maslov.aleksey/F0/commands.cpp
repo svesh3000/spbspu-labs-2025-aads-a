@@ -2,7 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include  <algorithm>
+#include <algorithm>
+#include <list/list.hpp>
 
 namespace
 {
@@ -18,6 +19,35 @@ namespace
       return c + ('a' - 'A');
     }
     return c;
+  }
+
+  void selectionSort(maslov::FwdList< std::pair< std::string, int > > & list, const std::string & order)
+  {
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+      auto targetIt = it;
+      for (auto curr = it; curr != list.end(); ++curr)
+      {
+        if (order == "descending")
+        {
+          if (curr->second > targetIt->second)
+          {
+            targetIt = curr;
+          }
+        }
+        else if (order == "ascending")
+        {
+          if (curr->second < targetIt->second)
+          {
+            targetIt = curr;
+          }
+        }
+      }
+      if (targetIt != it)
+      {
+        std::swap(*it, *targetIt);
+      }
+    }
   }
 }
 
@@ -193,11 +223,32 @@ void maslov::cleanDictionary(std::istream & in, Dicts & dicts)
   dicts.erase(dictName);
 }
 
-/*void maslov::printTop(std::istream & in, std::ostream & out, const Dicts & dicts)
-{}
-
-void maslov::printRare(std::istream & in, std::ostream & out, const Dicts & dicts)
-{}*/
+void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & dicts, const std::string & order)
+{
+  std::string dictName;
+  size_t number;
+  in >> dictName >> number;
+  auto dictIt = dicts.find(dictName);
+  if (dictIt == dicts.cend())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  if (number == 0 || number > dictIt->second.size())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  maslov::FwdList< std::pair< std::string, int > > words;
+  for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
+  {
+    words.pushFront({it->first, it->second});
+  }
+  selectionSort(words, order);
+  auto it = words.begin();
+  for (size_t i = 0; i < number && it != words.end(); i++, it++)
+  {
+    out << it->first << ' ' << it->second << '\n';
+  }
+}
 
 void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts & dicts)
 {
