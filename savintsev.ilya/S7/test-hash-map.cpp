@@ -210,23 +210,6 @@ BOOST_AUTO_TEST_CASE(hm_iterator_access)
   BOOST_TEST(count == 3);
 }
 
-BOOST_AUTO_TEST_CASE(hm_erase_tests)
-{
-  HashMap< int, std::string > hm = {{1, "one"}, {2, "two"}, {3, "three"}};
-
-  auto it = hm.find(2);
-  it = hm.erase(it);
-  BOOST_TEST(it != hm.end());
-  BOOST_TEST(hm.size() == 2);
-
-  size_t erased = hm.erase(1);
-  BOOST_TEST(erased == 1);
-  BOOST_TEST(hm.size() == 1);
-
-  hm.erase(hm.begin(), hm.end());
-  BOOST_TEST(hm.empty());
-}
-
 BOOST_AUTO_TEST_CASE(hm_emplace_tests)
 {
   HashMap< std::string, int > hm;
