@@ -6,18 +6,6 @@
 #include <map.hpp>
 #include "processor.hpp"
 
-rychkov::Parser::map_type< rychkov::S7ParseProcessor > rychkov::S7ParseProcessor::call_map = {
-      {"graphs", &rychkov::S7ParseProcessor::graphs},
-      {"vertexes", &rychkov::S7ParseProcessor::vertexes},
-      {"outbound", &rychkov::S7ParseProcessor::outbound},
-      {"inbound", &rychkov::S7ParseProcessor::inbound},
-      {"bind", &rychkov::S7ParseProcessor::bind},
-      {"cut", &rychkov::S7ParseProcessor::cut},
-      {"create", &rychkov::S7ParseProcessor::create},
-      {"merge", &rychkov::S7ParseProcessor::merge},
-      {"extract", &rychkov::S7ParseProcessor::extract}
-    };
-
 rychkov::S7ParseProcessor::S7ParseProcessor(int argc, char** argv)
 {
   if (argc != 2)

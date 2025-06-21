@@ -4,13 +4,6 @@
 #include <fstream>
 #include <stdexcept>
 
-rychkov::Parser::map_type< rychkov::S4ParseProcessor > rychkov::S4ParseProcessor::call_map = {
-      {"print", &rychkov::S4ParseProcessor::print},
-      {"complement", &rychkov::S4ParseProcessor::make_complement},
-      {"intersect", &rychkov::S4ParseProcessor::make_intersect},
-      {"union", &rychkov::S4ParseProcessor::make_union}
-    };
-
 rychkov::S4ParseProcessor::S4ParseProcessor(int argc, char** argv)
 {
   if (argc != 2)
