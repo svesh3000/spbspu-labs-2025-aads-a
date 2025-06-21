@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(copy_constructor)
   printTree(out2, treeCopy);
   BOOST_TEST(out2.str() == "12345");
 }
-  
+
 BOOST_AUTO_TEST_CASE(move_constructor)
 {
   finaev::AVLtree< int, std::string > tree;
@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(move_constructor)
   BOOST_TEST(tree.empty());
 }
 
-  
 BOOST_AUTO_TEST_CASE(copy_operator)
 {
   finaev::AVLtree< int, std::string > tree;
