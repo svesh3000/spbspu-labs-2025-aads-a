@@ -1,7 +1,7 @@
 #ifndef DYNAMIC_ARRAY_HPP
 #define DYNAMIC_ARRAY_HPP
 #include <cstddef>
-#include <lrgcpy.hpp>
+#include <utility>
 
 namespace savintsev
 {
@@ -60,11 +60,16 @@ namespace savintsev
 
   template< typename T >
   Array< T >::Array(const Array & rhs):
-    data_(createExpandCopy(rhs.data_ + rhs.start_, rhs.size_, rhs.capacity_)),
+    data_(new T[rhs.capacity_]),
     size_(rhs.size_),
-    start_(0),
+    start_(rhs.start_),
     capacity_(rhs.capacity_)
-  {}
+  {
+    for (size_t i = 0; i < size_; ++i)
+    {
+      data_[start_ + i] = rhs.data_[rhs.start_ + i];
+    }
+  }
 
   template< typename T >
   Array< T >::Array(Array && rhs) noexcept:
@@ -74,6 +79,9 @@ namespace savintsev
     capacity_(rhs.capacity_)
   {
     rhs.data_ = nullptr;
+    rhs.size_ = 0;
+    rhs.start_ = 0;
+    rhs.capacity_ = 0;
   }
 
   template< typename T >
@@ -119,7 +127,7 @@ namespace savintsev
   template< typename T >
   bool Array< T >::empty() const noexcept
   {
-    return !size_;
+    return size_ == 0;
   }
 
   template< typename T >
@@ -156,40 +164,43 @@ namespace savintsev
   template< typename U >
   void Array< T >::push_back(U && rhs)
   {
-    if (size_ + start_ < capacity_)
+    if (size_ + 1 >= capacity_)
     {
-      data_[size_ + start_] = std::forward< U >(rhs);
-      size_++;
-      return;
+      size_t new_capacity = capacity_ ? capacity_ * 2 : 1;
+      T * new_data = new T[new_capacity];
+
+      for (size_t i = 0; i < size_; ++i) 
+      {
+        new_data[i] = std::move(data_[start_ + i]);
+      }
+
+      delete[] data_;
+      data_ = new_data;
+      capacity_ = new_capacity;
+      start_ = 0;
     }
-    T * arr = createExpandCopy(data_ + start_, size_, capacity_ + capacity_);
-    try
-    {
-      arr[size_] = std::forward< U >(rhs);
-    }
-    catch (...)
-    {
-      delete[] arr;
-      throw;
-    }
-    delete[] data_;
-    data_ = arr;
-    capacity_ += capacity_;
-    start_ = 0;
-    size_++;
+
+    data_[start_ + size_] = std::forward< U >(rhs);
+    ++size_;
   }
 
   template< typename T >
   void Array< T >::pop_back() noexcept
   {
-    size_--;
+    if (size_ > 0)
+    {
+      --size_;
+    }
   }
 
   template< typename T >
   void Array< T >::pop_front() noexcept
   {
-    ++start_;
-    --size_;
+    if (size_ > 0)
+    {
+      ++start_;
+      --size_;
+    }
   }
 }
 

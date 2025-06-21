@@ -52,3 +52,51 @@ BOOST_AUTO_TEST_CASE(da_test_operator_sq)
   BOOST_TEST(m[0] == 30);
   BOOST_TEST(m[1] == 40);
 }
+
+BOOST_AUTO_TEST_CASE(array_basic_operations)
+{
+  Array< int > arr(2);
+  arr.push_back(1);
+  arr.push_back(2);
+  
+  BOOST_TEST(arr.size() == 2);
+  BOOST_TEST(arr[0] == 1);
+  
+  arr.pop_front();
+  BOOST_TEST(arr.size() == 1);
+  BOOST_TEST(arr[0] == 2);
+  
+  arr.push_back(3);
+  BOOST_TEST(arr.size() == 2);
+  BOOST_TEST(arr[1] == 3);
+}
+
+BOOST_AUTO_TEST_CASE(array_copy_move)
+{
+  Array< int > arr1(3);
+  arr1.push_back(1);
+  arr1.push_back(2);
+
+  Array< int > arr2(arr1);
+  BOOST_TEST(arr2.size() == 2);
+  BOOST_TEST(arr2[1] == 2);
+
+  Array< int > arr3(std::move(arr1));
+  BOOST_TEST(arr3.size() == 2);
+  BOOST_TEST(arr1.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(stress_test)
+{
+  Array< int > arr1(2);
+
+  for (int i = 1; i < 1001; ++i)
+  {
+    arr1.push_back(i);
+  }
+
+  for (int i = 0; i < 1000; ++i)
+  {
+    BOOST_TEST(arr1[i] == i + 1);
+  }
+}
