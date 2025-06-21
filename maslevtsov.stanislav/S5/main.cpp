@@ -30,12 +30,12 @@ int main(int argc, char** argv)
   }
   std::string result = "";
   KeysValuesPlus plus;
-  maslevtsov::Tree< std::string, std::function< KeysValuesPlus&() > > commands;
-  commands["ascending"] = std::bind(traverse_ascend< KeysValuesPlus& >, std::ref(data), std::ref(plus));
-  commands["descending"] = std::bind(traverse_descend< KeysValuesPlus& >, std::ref(data), std::ref(plus));
-  commands["breadth"] = std::bind(traverse_breadth< KeysValuesPlus& >, std::ref(data), std::ref(plus));
+  maslevtsov::Tree< std::string, std::function< void() > > commands;
+  commands["ascending"] = std::bind(traverse_ascend< KeysValuesPlus& >, std::ref(data), plus);
+  commands["descending"] = std::bind(traverse_descend< KeysValuesPlus& >, std::ref(data), plus);
+  commands["breadth"] = std::bind(traverse_breadth< KeysValuesPlus& >, std::ref(data), plus);
   try {
-    plus = commands.at(std::string(argv[1]))();
+    commands.at(std::string(argv[1]))();
   } catch (const std::out_of_range&) {
     std::cerr << "<INVALID COMMAND>\n";
     return 1;

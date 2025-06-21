@@ -5,21 +5,21 @@
 
 namespace maslevtsov {
   template< class F >
-  F traverse_ascend(Tree< int, std::string >& tree, F pred)
+  void traverse_ascend(Tree< int, std::string >& tree, F pred)
   {
-    return tree.traverse_lnr(pred);
+    pred = tree.traverse_lnr(pred);
   }
 
   template< class F >
-  F traverse_descend(Tree< int, std::string >& tree, F pred)
+  void traverse_descend(Tree< int, std::string >& tree, F pred)
   {
-    return tree.traverse_rnl(pred);
+    pred = tree.traverse_rnl(pred);
   }
 
   template< class F >
-  F traverse_breadth(Tree< int, std::string >& tree, F pred)
+  void traverse_breadth(Tree< int, std::string >& tree, F pred)
   {
-    return tree.traverse_breadth(pred);
+    pred = tree.traverse_breadth(pred);
   }
 }
 
