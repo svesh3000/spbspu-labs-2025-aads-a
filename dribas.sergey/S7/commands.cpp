@@ -2,9 +2,14 @@
 
 void dribas::graph(const RobinHoodHashTable< std::string, Graph >& graphs, std::ostream& out)
 {
-  for (const auto& pair: graphs) {
-    out << pair.first << '\n';
-  }
+    std::vector< std::string > graphNames;
+    for (const auto& pair: graphs) {
+      graphNames.push_back(pair.first);
+    }
+    std::sort(graphNames.begin(), graphNames.end());
+    for (const auto& name: graphNames) {
+      out << name << '\n';
+    }
 }
 
 void dribas::vertexes(const RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in, std::ostream& out)
@@ -27,6 +32,9 @@ void dribas::outbound(const RobinHoodHashTable< std::string, Graph >& graphs, st
   in >> name >> vertex;
   auto i = graphs.find(name);
   if (i == graphs.end()) {
+    throw std::invalid_argument("");
+  }
+  if (!(*i).second.hasVertex(vertex)) {
     throw std::invalid_argument("");
   }
   auto vertexes = (*i).second.getOutboundEdges(vertex);
@@ -89,7 +97,9 @@ void dribas::cut(RobinHoodHashTable< std::string, Graph >& graphs, std::istream&
   if (it == graphs.end()) {
     throw std::invalid_argument("");
   }
-  (*it).second.removeEdge(from, to, weight);
+  if (!(*it).second.removeEdge(from, to, weight)) {
+    throw std::invalid_argument("");
+  }
 }
 
 void dribas::create(RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in)
@@ -99,29 +109,43 @@ void dribas::create(RobinHoodHashTable< std::string, Graph >& graphs, std::istre
   if (graphs.find(name) != graphs.end()) {
     throw std::invalid_argument("");
   }
-  Graph newGraph;
-  while (in.peek() != '\n') {
-    in >> newGraph;
+  size_t edgeCount;
+  if (!(in >> edgeCount)) {
+    throw std::invalid_argument("");
+  }
+
+  dribas::Graph newGraph;
+  for (size_t i = 0; i < edgeCount; ++i) {
+    std::string from, to;
+    int weight;
+    if (!(in >> from >> to >> weight)) {
+      throw std::invalid_argument("");
+    }
+    newGraph.addEdge(from, to, weight);
+  }
+  if (in.peek() != '\n' && in.peek() != EOF) {
+    throw std::invalid_argument("");
   }
   graphs.insert(name, newGraph);
 }
 
 void dribas::merge(RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in)
 {
-  std::string newName;
-  std::string name1;
-  std::string name2;
-  in >> newName >> name1 >> name2;
+    std::string newName;
+    std::string name1;
+    std::string name2;
+    in >> newName >> name1 >> name2;
 
-  auto it1 = graphs.find(name1);
-  auto it2 = graphs.find(name2);
-  auto it3 = graphs.find(newName);
-
-  if (it1 == graphs.end() || it2 == graphs.end() || it3 != graphs.end()) {
-    throw std::invalid_argument("");
-  }
-  Graph newGraph((*it1).second, (*it2).second);
-  graphs.insert(newName, newGraph);
+    auto it1 = graphs.find(name1);
+    auto it2 = graphs.find(name2);
+    if (it1 == graphs.end() || it2 == graphs.end()) {
+      throw std::invalid_argument("");
+    }
+    if (graphs.find(newName) != graphs.end()) {
+      graphs.erase(newName);
+    }
+    Graph newGraph((*it1).second, (*it2).second);
+    graphs.insert(newName, newGraph);
 }
 
 void dribas::extract(RobinHoodHashTable< std::string, Graph >& graphs, std::istream& in)
