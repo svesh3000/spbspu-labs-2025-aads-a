@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
   {
     printHelp(std::cout);
     return 0;
-  } 
+  }
   if (argc != 3)
   {
     std::cerr << "ERROR: wrong arguments\n";
