@@ -10,7 +10,7 @@
 #include "graph.hpp"
 #include "robinHashTable.hpp"
 
-void loadGraphsFromFile(const std::string& filename, dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs) 
+void loadGraphsFromFile(const std::string& filename, dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs)
 {
   std::ifstream file(filename);
   if (!file) {
@@ -41,7 +41,7 @@ void loadGraphsFromFile(const std::string& filename, dribas::RobinHoodHashTable<
 
 void processCommands(dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs) {
   using namespace std::placeholders;
-  std::map< std::string, std::function<void()> > commands;
+  std::map< std::string, std::function< void() > > commands;
   commands["graphs"] = std::bind(dribas::graph, std::ref(graphs), std::ref(std::cout));
   commands["vertexes"] = std::bind(dribas::vertexes, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
   commands["outbound"] = std::bind(dribas::outbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
