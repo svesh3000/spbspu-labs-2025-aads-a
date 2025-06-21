@@ -45,7 +45,7 @@ void processCommands(dribas::RobinHoodHashTable< std::string, dribas::Graph >& g
   commands["graphs"] = std::bind(dribas::graph, std::ref(graphs), std::ref(std::cout));
   commands["vertexes"] = std::bind(dribas::vertexes, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
   commands["outbound"] = std::bind(dribas::outbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
-  commands["inbounds"] = std::bind(dribas::inbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
+  commands["inbound"] = std::bind(dribas::inbound, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
   commands["bind"] = std::bind(dribas::bind, std::ref(graphs), std::ref(std::cin));
   commands["cut"] = std::bind(dribas::cut, std::ref(graphs), std::ref(std::cin));
   commands["create"] = std::bind(dribas::create, std::ref(graphs), std::ref(std::cin));
