@@ -25,7 +25,6 @@ namespace lanovenko
     using iter = TreeIterator< Key, Value, Comparator >;
     using pairIt = std::pair< iter, iter >;
     using pairCit = std::pair< cIter, cIter >;
-    using node = TreeNode< Key, Value >;
 
     ~Tree() noexcept;
     Tree();
@@ -55,7 +54,7 @@ namespace lanovenko
     const Value& at(const Key& key) const;
     size_t count(const Key& k) const;
     Value& operator[](const Key& key);
-
+    const Value& operator[](const Key& key) const;
     template< typename F >
     F traverseLnr(F f);
     template< typename F >
@@ -69,6 +68,7 @@ namespace lanovenko
     template< typename F >
     F traverseBreadth(F f) const;
   private:
+    using node = TreeNode< Key, Value >;
     node* root_;
     node* fakeLeaf_;
     size_t size_;
@@ -121,8 +121,7 @@ namespace lanovenko
   }
 
   template< typename Key, typename Value, typename Comparator >
-  Tree< Key, Value, Comparator >& Tree< Key, Value, Comparator >::operator=(
-    const Tree< Key, Value, Comparator >& rhs)
+  Tree< Key, Value, Comparator >& Tree< Key, Value, Comparator >::operator=(const Tree< Key, Value, Comparator >& rhs)
   {
     if (this != std::addressof(rhs))
     {
@@ -133,10 +132,9 @@ namespace lanovenko
   }
 
   template< typename Key, typename Value, typename Comparator >
-  Tree< Key, Value, Comparator >& Tree< Key, Value, Comparator >::operator=(
-    Tree< Key, Value, Comparator >&& rhs) noexcept
+  Tree< Key, Value, Comparator >& Tree< Key, Value, Comparator >::operator=(Tree< Key, Value, Comparator >&& r) noexcept
   {
-    if (this != std::addressof(rhs))
+    if (this != std::addressof(r))
     {
       Tree< Key, Value, Comparator > temp(std::move(rhs));
       swap(temp);
@@ -336,10 +334,13 @@ namespace lanovenko
   Value& Tree< Key, Value, Comparator >::operator[](const Key& key)
   {
     iter node = find(key);
-    if (node == end())
-    {
-      node = insert({ key, Value{} });
-    }
+    return node->second;
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  const Value& Tree< Key, Value, Comparator >::operator[](const Key& key) const
+  {
+    cIter node = find(key);
     return node->second;
   }
 
@@ -562,8 +563,8 @@ namespace lanovenko
     size_--;
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseLnr(F f)
   {
     if (empty())
@@ -592,15 +593,15 @@ namespace lanovenko
     return f;
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseLnr(F f) const
   {
     return const_cast< Tree < Key, Value, Comparator > * >(this)->traverseLnr(f);
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseRnl(F f)
   {
     if (empty())
@@ -629,15 +630,15 @@ namespace lanovenko
     return f;
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseRnl(F f) const
   {
     return const_cast< Tree < Key, Value, Comparator > * >(this)->traverseRnl(f);
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseBreadth(F f)
   {
     if (empty())
@@ -663,13 +664,12 @@ namespace lanovenko
     return f;
   }
 
-  template < typename Key, typename Value, typename Comparator >
-  template < typename F >
+  template< typename Key, typename Value, typename Comparator >
+  template< typename F >
   inline F Tree< Key, Value, Comparator >::traverseBreadth(F f) const
   {
     return const_cast< Tree< Key, Value, Comparator > * >(this)->traverseBreadth(f);
   }
-
 }
 
 #endif
