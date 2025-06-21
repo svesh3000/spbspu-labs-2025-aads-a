@@ -13,13 +13,13 @@ using namespace std;
 
 struct Graph
 {
-  unordered_map<string, unordered_map<string, vector<int>>> edges;
-  set<string> vertexes;
+  unordered_map< string, unordered_map< string, vector< int > > > edges;
+  set< string > vertexes;
 };
 
-unordered_map<string, Graph> graphs;
+unordered_map< string, Graph > graphs;
 
-vector<string> split(const string & line)
+vector< string > split(const string & line)
 {
   vector<string> result;
   size_t start = 0;
@@ -41,13 +41,13 @@ void cmd_graphs()
     return;
   }
 
-  map<string, Graph *> sorted;
-  for (unordered_map<string, Graph>::iterator it = graphs.begin(); it != graphs.end(); ++it)
+  map< string, Graph * > sorted;
+  for (unordered_map< string, Graph >::iterator it = graphs.begin(); it != graphs.end(); ++it)
   {
     sorted[it->first] = &it->second;
   }
 
-  for (map<string, Graph *>::iterator it = sorted.begin(); it != sorted.end(); ++it)
+  for (map< string, Graph * >::iterator it = sorted.begin(); it != sorted.end(); ++it)
   {
     cout << it->first << '\n';
   }
@@ -68,8 +68,8 @@ void cmd_vertexes(const vector<string> & args)
     return;
   }
 
-  for (set<string>::const_iterator it = graphs[name].vertexes.begin();
-       it != graphs[name].vertexes.end(); ++it)
+  const set<string> & vertices = graphs[name].vertexes;
+  for (set<string>::const_iterator it = vertices.begin(); it != vertices.end(); ++it)
   {
     cout << *it << '\n';
   }
@@ -111,7 +111,7 @@ void cmd_outbound(const vector<string> & args)
     return;
   }
 
-  for (map<string, vector<int>>::iterator it = out.begin(); it != out.end(); ++it)
+  for (map< string, vector< int > >::iterator it = out.begin(); it != out.end(); ++it)
   {
     cout << it->first;
     for (vector<int>::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
@@ -122,7 +122,7 @@ void cmd_outbound(const vector<string> & args)
   }
 }
 
-void cmd_inbound(const vector<string> & args)
+void cmd_inbound(const vector< string > & args)
 {
   if (args.size() < 3)
   {
@@ -140,8 +140,8 @@ void cmd_inbound(const vector<string> & args)
     return;
   }
 
-  map<string, vector<int>> in;
-  for (unordered_map<string, unordered_map<string, vector<int>>>::iterator it = graphs[g].edges.begin();
+  map< string, vector< int > > in;
+  for (unordered_map< string, unordered_map< string, vector<int>>>::iterator it = graphs[g].edges.begin();
        it != graphs[g].edges.end(); ++it)
   {
     unordered_map<string, vector<int>>::iterator jt = it->second.find(v);
@@ -239,15 +239,13 @@ void cmd_create(const vector<string> & args)
   }
 
   Graph newg;
-  if (args.size() > 2)
+  for (size_t i = 3; i < args.size(); ++i)
   {
-    for (size_t i = 2; i < args.size(); ++i)
-    {
-      newg.vertexes.insert(args[i]);
-    }
+    newg.vertexes.insert(args[i]);
   }
   graphs[g] = newg;
 }
+
 
 void cmd_merge(const vector<string> & args)
 {
@@ -365,7 +363,7 @@ int main(int argc, char* argv[])
   while (getline(file, line))
   {
     if (line.empty()) continue;
-    vector<string> header = split(line);
+    vector< string > header = split(line);
     if (header.size() != 2) continue;
 
     string name = header[0];
