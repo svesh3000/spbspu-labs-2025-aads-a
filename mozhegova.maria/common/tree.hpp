@@ -85,25 +85,34 @@ namespace mozhegova
     size_t size_;
     Cmp cmp_;
 
-    void clearTree(node *);
+    void clearTree(node *) noexcept;
     node * insertTree(node *, const std::pair< Key, T > &);
-    node * eraseTree(node *, const Key &);
-    node * rotateRight(node *);
-    node * rotateLeft(node *);
-    node * balance(node *);
-    node * findMax(node *) const;
-    node * findMin(node *) const;
-    int getBalanceFactor(node *);
-    void updateHeight(node *);
+    node * eraseTree(node *, const Key &) noexcept;
+    node * rotateRight(node *) noexcept;
+    node * rotateLeft(node *) noexcept;
+    node * balance(node *) noexcept;
+    node * findMax(node *) const noexcept;
+    node * findMin(node *) const noexcept;
+    int getBalanceFactor(node *) noexcept;
+    void updateHeight(node *) noexcept;
   };
 
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp >::BiTree():
     root_(nullptr),
-    fakeLeaf_(new node()),
-    size_(0),
-    cmp_(Cmp())
-  {}
+    fakeLeaf_(new node{}),
+    size_(0)
+  {
+    try
+    {
+      cmp_ = Cmp{};
+    }
+    catch (...)
+    {
+      delete fakeLeaf_;
+      throw;
+    }
+  }
 
   template< typename Key, typename T, typename Cmp >
   BiTree< Key, T, Cmp >::BiTree(const BiTree< Key, T, Cmp > & other):
@@ -258,7 +267,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  void BiTree< Key, T, Cmp >::clearTree(node * root)
+  void BiTree< Key, T, Cmp >::clearTree(node * root) noexcept
   {
     if (!root || root == fakeLeaf_)
     {
@@ -394,10 +403,16 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::eraseTree(node * root, const Key & key)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::eraseTree(node * root, const Key & key) noexcept
   {
-    if (!root) return nullptr;
-    if (root == fakeLeaf_) return fakeLeaf_;
+    if (!root)
+    {
+      return nullptr;
+    }
+    if (root == fakeLeaf_)
+    {
+      return fakeLeaf_;
+    }
     if (cmp_(root->data.first, key))
     {
       root->right = eraseTree(root->right, key);
@@ -513,13 +528,57 @@ namespace mozhegova
   template< typename Key, typename T, typename Cmp >
   typename BiTree< Key, T, Cmp >::cIterPair BiTree< Key, T, Cmp >::equal_range(const Key & key) const noexcept
   {
-    return {lower_bound(key), upper_bound(key)};
+    node * temp = root_;
+    node * lowBound = fakeLeaf_;
+    node * uppBound = fakeLeaf_;
+    while (temp && temp != fakeLeaf_)
+    {
+      if (cmp_(key, temp->data.first))
+      {
+        uppBound = temp;
+        temp = temp->left;
+      }
+      else if (cmp_(temp->data.first, key))
+      {
+        lowBound = temp;
+        temp = temp->right;
+      }
+      else
+      {
+        lowBound = temp;
+        uppBound = temp->right;
+        break;
+      }
+    }
+    return {cIter(lowBound), cIter(uppBound)};
   }
 
   template< typename Key, typename T, typename Cmp >
   typename BiTree< Key, T, Cmp >::iterPair BiTree< Key, T, Cmp >::equal_range(const Key & key) noexcept
   {
-    return {lower_bound(key), upper_bound(key)};
+    node * temp = root_;
+    node * lowBound = fakeLeaf_;
+    node * uppBound = fakeLeaf_;
+    while (temp && temp != fakeLeaf_)
+    {
+      if (cmp_(key, temp->data.first))
+      {
+        uppBound = temp;
+        temp = temp->left;
+      }
+      else if (cmp_(temp->data.first, key))
+      {
+        lowBound = temp;
+        temp = temp->right;
+      }
+      else
+      {
+        lowBound = temp;
+        uppBound = temp->right;
+        break;
+      }
+    }
+    return {iter(lowBound), iter(uppBound)};
   }
 
   template< typename Key, typename T, typename Cmp >
@@ -534,7 +593,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMax(node * root) const
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMax(node * root) const noexcept
   {
     while (root && root->right != fakeLeaf_)
     {
@@ -544,7 +603,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMin(node * root) const
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::findMin(node * root) const noexcept
   {
     while (root && root->left != fakeLeaf_)
     {
@@ -554,7 +613,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::rotateRight(node * root)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::rotateRight(node * root) noexcept
   {
     if (!root || root->left == fakeLeaf_)
     {
@@ -582,7 +641,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::rotateLeft(node * root)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::rotateLeft(node * root) noexcept
   {
     if (!root || root->right == fakeLeaf_)
     {
@@ -610,13 +669,13 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  int BiTree< Key, T, Cmp >::getBalanceFactor(node * root)
+  int BiTree< Key, T, Cmp >::getBalanceFactor(node * root) noexcept
   {
     return root->left->h - root->right->h;
   }
 
   template< typename Key, typename T, typename Cmp >
-  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::balance(node * root)
+  typename BiTree< Key, T, Cmp >::node * BiTree< Key, T, Cmp >::balance(node * root) noexcept
   {
     int k = getBalanceFactor(root);
     if (k > 1)
@@ -639,7 +698,7 @@ namespace mozhegova
   }
 
   template< typename Key, typename T, typename Cmp >
-  void BiTree< Key, T, Cmp >::updateHeight(node * root)
+  void BiTree< Key, T, Cmp >::updateHeight(node * root) noexcept
   {
     root->h = 1 + std::max(root->left->h, root->right->h);
   }
