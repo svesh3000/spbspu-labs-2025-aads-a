@@ -16,20 +16,25 @@ namespace
   {
     std::ifstream file(filename);
     if (!file) {
-      throw std::runtime_error("Cannot open");
+      throw std::runtime_error("file");
     }
     std::string graphName;
     while (file >> graphName) {
       size_t edgeCount;
       if (!(file >> edgeCount)) {
-        throw std::runtime_error("Invalid graph");
+        if (file.eof() || file.peek() == '\n') {
+          graphs.insert(graphName, dribas::Graph());
+          file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+          continue;
+        }
+        throw std::runtime_error("");
       }
       dribas::Graph graph;
       for (size_t i = 0; i < edgeCount; ++i) {
         std::string from, to;
         int weight;
         if (!(file >> from >> to >> weight)) {
-          throw std::runtime_error("Invalid edge");
+          throw std::runtime_error("graph");
         }
         graph.addEdge(from, to, weight);
       }
@@ -37,11 +42,12 @@ namespace
       file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     if (file.bad()) {
-      throw std::runtime_error("error reading file");
+      throw std::runtime_error("file: " + filename);
     }
   }
 
-  void processCommands(dribas::RobinHoodHashTable< std::string, dribas::Graph >& graphs) {
+  void processCommands(dribas::RobinHoodHashTable<std::string, dribas::Graph>& graphs)
+  {
     using namespace std::placeholders;
     std::map< std::string, std::function< void() > > commands;
     commands["graphs"] = std::bind(dribas::graph, std::ref(graphs), std::ref(std::cout));
@@ -61,19 +67,20 @@ namespace
         if (it != commands.end()) {
           it->second();
         } else {
-          throw std::invalid_argument("");
+          throw std::invalid_argument("Unknown command");
         }
-      } catch (const std::invalid_argument&) {
+      } catch (const std::invalid_argument& e) {
         std::cout << "<INVALID COMMAND>\n";
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
     }
   }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
   if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    std::cerr << argv[0] << "\n";
     return 1;
   }
   dribas::RobinHoodHashTable< std::string, dribas::Graph > graphs;

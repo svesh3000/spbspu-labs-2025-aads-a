@@ -1,5 +1,6 @@
 #include "graph.hpp"
 #include <algorithm>
+#include <set>
 
 dribas::Graph::Graph(const Graph& source, const RobinHoodHashTable< std::string, bool >& vertices)
 {
@@ -11,28 +12,41 @@ dribas::Graph::Graph(const Graph& source, const RobinHoodHashTable< std::string,
       }
     }
   }
+  for (const auto& pair: vertices) {
+    if (pair.second) {
+      vertices_.insert(pair.first);
+    }
+  }
 }
 
 dribas::Graph::Graph(const Graph& first, const Graph& second)
 {
-  auto copyEdges = [this](const Graph& src)
-  {
-    for (const auto& entry : src.faces_)
-    {
+  auto copyGraphData = [this](const Graph& src) {
+    for (const auto& entry: src.faces_) {
       const auto& edge = entry.first;
       for (int weight: entry.second) {
         faces_[edge].push_back(weight);
       }
     }
+    for (const auto& vertex: src.vertices_) {
+      vertices_.insert(vertex);
+    }
   };
-  copyEdges(first);
-  copyEdges(second);
+  copyGraphData(first);
+  copyGraphData(second);
+}
+
+void dribas::Graph::addVertex(const std::string& vertex)
+{
+  vertices_.insert(vertex);
 }
 
 bool dribas::Graph::addEdge(const std::string& from, const std::string& to, int weight)
 {
   auto edge = std::make_pair(from, to);
   faces_[edge].push_back(weight);
+  vertices_.insert(from);
+  vertices_.insert(to);
   return true;
 }
 
@@ -58,17 +72,12 @@ bool dribas::Graph::removeEdge(const std::string& from, const std::string& to, i
 
 bool dribas::Graph::hasVertex(const std::string& vertex) const
 {
-  for (const auto& entry: faces_) {
-    if (entry.first.first == vertex || entry.first.second == vertex) {
-      return true;
-    }
-  }
-  return false;
+  return vertices_.count(vertex);
 }
 
 namespace
 {
-  bool compareEdges(const std::pair< std::string, std::vector< int > >& a, const std::pair< std::string, std::vector< int>  >& b)
+  bool compareEdges(const std::pair<std::string, std::vector< int >>& a, const std::pair<std::string, std::vector< int >>& b)
   {
     return a.first < b.first;
   }
@@ -76,7 +85,7 @@ namespace
 
 std::vector< std::pair< std::string, std::vector< int > > > dribas::Graph::getOutboundEdges(const std::string& vertex) const
 {
-  dribas::RobinHoodHashTable< std::string, std::vector< int > > edges_table;
+  dribas::RobinHoodHashTable<std::string, std::vector< int >> edges_table;
   for (const auto& entry: faces_) {
     if (entry.first.first == vertex) {
       for (int weight: entry.second) {
@@ -98,7 +107,7 @@ std::vector< std::pair< std::string, std::vector< int > > > dribas::Graph::getOu
 
 std::vector< std::pair< std::string, std::vector< int > > > dribas::Graph::getInboundEdges(const std::string& vertex) const
 {
-  dribas::RobinHoodHashTable< std::string, std::vector< int > > edges_table;
+  dribas::RobinHoodHashTable<std::string, std::vector< int >> edges_table;
   for (const auto& entry: faces_) {
     if (entry.first.second == vertex) {
       for (int weight: entry.second) {
@@ -117,14 +126,10 @@ std::vector< std::pair< std::string, std::vector< int > > > dribas::Graph::getIn
   return result;
 }
 
-std::vector< std::string > dribas::Graph::getVertexes() const
+std::vector< std::string > dribas::Graph::getUniqueVertexes() const
 {
-  std::set< std::string > vertices_set;
-  for (const auto& pair_entry: faces_) {
-    vertices_set.insert(pair_entry.first.first);
-    vertices_set.insert(pair_entry.first.second);
-  }
-  return std::vector< std::string >(vertices_set.begin(), vertices_set.end());
+  std::vector< std::string > sorted_vertices(vertices_.begin(), vertices_.end());
+  return sorted_vertices;
 }
 
 std::istream& dribas::operator>>(std::istream& in, Graph& graph)
@@ -139,11 +144,12 @@ std::istream& dribas::operator>>(std::istream& in, Graph& graph)
   }
   return in;
 }
+
 std::ostream& dribas::operator<<(std::ostream& out, const Graph& graph)
 {
   for (const auto& edge_entry: graph.faces_) {
     const auto& edge = edge_entry.first;
-    for (int weight : edge_entry.second) {
+    for (int weight: edge_entry.second) {
       out << edge.first << " " << edge.second << " " << weight << "\n";
     }
   }
