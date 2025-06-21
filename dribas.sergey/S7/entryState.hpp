@@ -9,7 +9,6 @@ namespace dribas
     OCCUPIED,
     DELETED
   };
-
 }
 
 #endif

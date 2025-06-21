@@ -15,21 +15,29 @@
 
 namespace dribas
 {
-  struct fnv1a{
-    template< class Key >
-    size_t operator()(const Key& key) const noexcept {
-      const char* data = reinterpret_cast< const char* >(&key);
-      size_t hash = 14695981039346656037ULL;
-      for (size_t i = 0; i < sizeof(Key); ++i) {
-        hash ^= static_cast< size_t >(data[i]);
-        hash *= 1099511628211ULL;
-      }
-      return hash;
+  struct fnv1a
+  {
+    template < class Key >
+    size_t operator()(const Key& key) const noexcept
+    {
+      return boost::hash_value(key);
+    }
+    size_t operator()(const std::string& key) const noexcept
+    {
+      return boost::hash_value(key);
+    }
+    size_t operator()(const std::pair<std::string, std::string>& key) const noexcept
+    {
+      size_t seed = 0;
+      boost::hash_combine(seed, key.first);
+      boost::hash_combine(seed, key.second);
+      return seed;
     }
   };
 
   template< class Key, class T >
-  struct Entry{
+  struct Entry
+  {
     std::pair< Key, T > data;
     size_t probe_distance;
     EntryState state;
@@ -53,7 +61,8 @@ namespace dribas
 
 
   template< class Key, class T, class Hash = fnv1a >
-  class RobinHoodHashTable{
+  class RobinHoodHashTable
+  {
   public:
     using value_type = std::pair< const Key, T >;
     using const_iterator = ConstIterator< Key, T, Hash >;
@@ -533,6 +542,6 @@ namespace dribas
     lhs.swap(rhs);
   }
 
-  }
+}
 
 #endif
