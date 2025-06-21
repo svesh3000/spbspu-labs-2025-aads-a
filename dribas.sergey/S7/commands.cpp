@@ -24,7 +24,7 @@ void dribas::vertexes(const RobinHoodHashTable< std::string, Graph >& graphs, st
     throw std::invalid_argument("");
   }
   for (auto vertex: (*i).second.getVertexes()) {
-    out << vertex << '\n'; 
+    out << vertex << '\n';
   }
 }
 
