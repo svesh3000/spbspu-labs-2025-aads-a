@@ -312,3 +312,310 @@ BOOST_AUTO_TEST_CASE(hm_overload)
 
   BOOST_TEST(book.capacity() > 2);
 }
+
+BOOST_AUTO_TEST_CASE(hm_basic_operations)
+{
+  savintsev::HashMap<std::string, int> hm;
+
+  BOOST_TEST(hm.empty());
+  BOOST_TEST(hm.size() == 0);
+
+  hm["key1"] = 42;
+  BOOST_TEST(!hm.empty());
+  BOOST_TEST(hm.size() == 1);
+  BOOST_TEST(hm["key1"] == 42);
+
+  hm["key1"] = 100;
+  BOOST_TEST(hm["key1"] == 100);
+  BOOST_TEST(hm.size() == 1);
+
+  hm["key2"] = 200;
+  BOOST_TEST(hm.size() == 2);
+  BOOST_TEST(hm["key2"] == 200);
+
+  auto it = hm.find("key1");
+  BOOST_TEST(it != hm.end());
+  BOOST_TEST(it->second == 100);
+
+  hm.erase("key1");
+  BOOST_TEST(hm.size() == 1);
+  BOOST_TEST(hm.find("key1") == hm.end());
+
+  hm.clear();
+  BOOST_TEST(hm.empty());
+  BOOST_TEST(hm.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(hm_collision_handling)
+{
+  savintsev::HashMap<std::string, int> hm(4);
+
+  hm["key1"] = 1;
+  hm["key2"] = 2;
+  hm["key3"] = 3;
+  hm["key4"] = 4;
+  hm["key5"] = 5;
+
+  BOOST_TEST(hm.size() == 5);
+
+  BOOST_TEST(hm["key1"] == 1);
+  BOOST_TEST(hm["key2"] == 2);
+  BOOST_TEST(hm["key3"] == 3);
+  BOOST_TEST(hm["key4"] == 4);
+  BOOST_TEST(hm["key5"] == 5);
+
+  hm.erase("key3");
+  BOOST_TEST(hm.size() == 4);
+  BOOST_TEST(hm.find("key3") == hm.end());
+  BOOST_TEST(hm["key1"] == 1);
+}
+
+BOOST_AUTO_TEST_CASE(hm_iterator_test)
+{
+  savintsev::HashMap< std::string, int > hm;
+  hm["a"] = 1;
+  hm["b"] = 2;
+  hm["c"] = 3;
+
+  size_t count = 0;
+  for (auto it = hm.begin(); it != hm.end(); ++it)
+  {
+    count++;
+  }
+  BOOST_TEST(count == 3);
+
+  auto it = hm.find("b");
+  BOOST_TEST(it != hm.end());
+  BOOST_TEST(it->first == "b");
+  BOOST_TEST(it->second == 2);
+
+  BOOST_TEST(hm.find("x") == hm.end());
+}
+
+BOOST_AUTO_TEST_CASE(hm_erase_test)
+{
+  savintsev::HashMap<std::string, int> hm;
+  hm["a"] = 1;
+  hm["b"] = 2;
+  hm["c"] = 3;
+
+  BOOST_TEST(hm.erase("b") == 1);
+  BOOST_TEST(hm.size() == 2);
+  BOOST_TEST(hm.find("b") == hm.end());
+
+  BOOST_TEST(hm.erase("x") == 0);
+  BOOST_TEST(hm.size() == 2);
+
+  auto it = hm.find("a");
+  hm.erase(it);
+  BOOST_TEST(hm.size() == 1);
+  BOOST_TEST(hm.find("a") == hm.end());
+  BOOST_TEST(hm["c"] == 3);
+}
+
+BOOST_AUTO_TEST_CASE(hm_emplace_insert_test)
+{
+  savintsev::HashMap< std::string, int > hm;
+  auto res1 = hm.emplace("a", 1);
+  BOOST_TEST(res1.second);
+  BOOST_TEST(res1.first->second == 1);
+
+  auto res2 = hm.emplace("a", 2);
+  BOOST_TEST(!res2.second);
+  BOOST_TEST(res2.first->second == 1);
+
+  auto res3 = hm.insert({"b", 2});
+  BOOST_TEST(res3.second);
+  BOOST_TEST(hm["b"] == 2);
+}
+
+BOOST_AUTO_TEST_CASE(hm_rehash_test)
+{
+  savintsev::HashMap<std::string, int> hm(4);
+  hm.max_load_factor(0.75);
+
+  BOOST_TEST(hm.capacity() == 4);
+
+  hm["a"] = 1;
+  hm["b"] = 2;
+  hm["c"] = 3;
+  BOOST_TEST(hm.capacity() == 4);
+
+  hm["d"] = 4;
+
+  hm["e"] = 5;
+  hm["f"] = 6;
+  hm["g"] = 7;
+  BOOST_TEST(hm.capacity() == 8);
+
+  hm["h"] = 8;
+  BOOST_TEST(hm.capacity() == 16);
+}
+
+BOOST_AUTO_TEST_CASE(hm_multiple_weights)
+{
+  savintsev::HashMap< std::string, std::vector< int > > hm;
+
+  hm["a->b"].push_back(10);
+  hm["a->b"].push_back(20);
+
+  BOOST_TEST(hm["a->b"].size() == 2);
+  BOOST_TEST(hm["a->b"][0] == 10);
+  BOOST_TEST(hm["a->b"][1] == 20);
+
+  auto it = hm.find("a->b");
+  BOOST_TEST(it != hm.end());
+  BOOST_TEST(it->second.size() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_iterators_after_copy)
+{
+  HashMap< int, std::string > map;
+  map.emplace(1, "one");
+  map.emplace(2, "two");
+
+  HashMap< int, std::string > copy(map);
+  BOOST_TEST(copy.size() == 2);
+
+  auto it = copy.begin();
+  BOOST_TEST(it->first == 1 || it->first == 2);
+  ++it;
+  BOOST_TEST(it->first == 1 || it->first == 2);
+  BOOST_TEST(it != copy.begin());
+
+  BOOST_TEST(map.at(1) == "one");
+  BOOST_TEST(copy.at(2) == "two");
+}
+
+BOOST_AUTO_TEST_CASE(test_constructors_operators)
+{
+  using Map = HashMap< int, std::string >;
+
+  Map table1;
+  BOOST_TEST(table1.empty());
+
+  Map table2(table1);
+  BOOST_TEST(table2.empty());
+
+  table1.emplace(1, "cat");
+  BOOST_TEST(table1.size() == 1);
+  Map table3(table1);
+  BOOST_TEST(table3.size() == 1);
+  BOOST_TEST(table3.begin()->first == 1);
+
+  Map table4(std::move(table3));
+  BOOST_TEST(table4.size() == 1);
+  BOOST_TEST(table4.begin()->second == "cat");
+
+  Map table5(table4.begin(), table4.end());
+  BOOST_TEST(table5.size() == 1);
+  BOOST_TEST(table5.begin()->second == "cat");
+
+  Map table6({{2, "d"}, {3, "p"}});
+  BOOST_TEST(table6.size() == 2);
+  BOOST_TEST(table6.begin()->second == "d");
+
+  table1 = table6;
+  BOOST_TEST(table1.size() == 2);
+  BOOST_TEST(table1.begin()->second == "d");
+
+  table1 = Map({{1, "ccc"}, {2, "ddd"}, {3, "ppp"}});
+  BOOST_TEST(table1.size() == 3);
+  BOOST_TEST(table1.begin()->second == "ccc");
+}
+
+BOOST_AUTO_TEST_CASE(test_clear_swap)
+{
+  using Map = HashMap< int, std::string >;
+
+  Map table1;
+  Map table2({{1, "aaa"}, {2, "bbb"}, {3, "ccc"}});
+  table1.swap(table2);
+  BOOST_TEST(table1.size() == 3);
+  BOOST_TEST(table1.begin()->first == 1);
+  BOOST_TEST(table2.empty());
+
+  table1.clear();
+  BOOST_TEST(table1.empty());
+  BOOST_TEST((table1.begin() == table1.end()));
+}
+
+BOOST_AUTO_TEST_CASE(test_iterators_size)
+{
+  using Map = HashMap< int, std::string >;
+
+  Map table1;
+  BOOST_TEST((table1.begin() == table1.end()));
+  BOOST_TEST(table1.empty());
+  BOOST_TEST(table1.size() == 0);
+
+  std::pair< int, std::string >p(1, "a");
+  table1.insert(p);
+  auto it = table1.begin();
+  BOOST_TEST((*it == p));
+  BOOST_TEST(it->first == 1);
+  BOOST_TEST(!table1.empty());
+  BOOST_TEST(table1.size() == 1);
+
+  ++it;
+  BOOST_TEST((it == table1.end()));
+
+  const Map table2;
+  BOOST_TEST((table2.begin() == table2.end()));
+  BOOST_TEST((table2.begin() == table2.cbegin()));
+}
+
+BOOST_AUTO_TEST_CASE(test_load_factor_rehash)
+{
+  using Map = HashMap< int, std::string >;
+
+  Map table1;
+  BOOST_TEST(table1.load_factor() == 0.0f);
+  BOOST_TEST(table1.max_load_factor() == 0.75f);
+
+  for (size_t i = 0; i < 6; i++)
+  {
+    table1.emplace(i, "aaa");
+  }
+  BOOST_TEST(table1.load_factor() > 0.5f);
+
+  table1.max_load_factor(0.8f);
+  BOOST_TEST(table1.max_load_factor() == 0.8f);
+
+  table1.max_load_factor(0.5f);
+  BOOST_TEST(table1.max_load_factor() == 0.5f);
+  BOOST_TEST(table1.size() == 6);
+
+  Map table2;
+  table2.rehash(34);
+  BOOST_TEST(table2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_find)
+{
+  using Map = HashMap< int, std::string >;
+
+  Map table1;
+  BOOST_TEST((table1.find(1) == table1.end()));
+
+  table1.emplace(1, "aaa");
+  BOOST_TEST(table1.find(1)->first == 1);
+
+  BOOST_TEST((table1.find(12) == table1.end()));
+
+  table1.emplace(2, "bbb");
+  BOOST_TEST((table1.find(12) == table1.end()));
+
+  table1.emplace(12, "rrr");
+  BOOST_TEST(table1.find(12)->first == 12);
+
+  BOOST_TEST(table1.at(12) == "rrr");
+  try
+  {
+    std::string value = table1.at(300);
+  }
+  catch (const std::out_of_range & e)
+  {
+    BOOST_TEST((table1.find(300) == table1.end()));
+  }
+}

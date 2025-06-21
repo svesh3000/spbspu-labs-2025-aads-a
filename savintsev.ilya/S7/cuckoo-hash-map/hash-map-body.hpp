@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <iostream>
+#include <vector>
 #include <dynamic-array.hpp>
 #include <boost/hash2/xxhash.hpp>
 #include "hash-wrapper.hpp"
@@ -179,11 +180,11 @@ namespace savintsev
 
   private:
 
-    Array< std::pair< std::pair< Key, T >, bool > > t1_;
-    Array< std::pair< std::pair< Key, T >, bool > > t2_;
+    std::vector< std::pair< std::pair< Key, T >, bool > > t1_;
+    std::vector< std::pair< std::pair< Key, T >, bool > > t2_;
 
     size_t capacity_;
-    size_t size_ = 0;
+    size_t size_;
 
     static constexpr size_t MAX_ITERATIONS = 100;
 
@@ -200,7 +201,8 @@ namespace savintsev
   HashMap< Key, T, HS1, HS2, EQ >::HashMap(size_t size):
     t1_(size),
     t2_(size),
-    capacity_(size)
+    capacity_(size),
+    size_(0)
   {
     for (size_t i = 0; i < capacity_; ++i)
     {
@@ -227,7 +229,7 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   size_t HashMap< Key, T, HS1, HS2, EQ >::capacity() const
   {
-    return (capacity_ * 2);
+    return capacity_;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   bool HashMap< Key, T, HS1, HS2, EQ >::empty() const noexcept
@@ -489,7 +491,7 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   float HashMap< Key, T, HS1, HS2, EQ >::load_factor() const noexcept
   {
-    return static_cast< double >(size_) / (capacity_ * 2);
+    return static_cast< double >(size_) / capacity_;
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   float HashMap< Key, T, HS1, HS2, EQ >::max_load_factor() const noexcept
@@ -507,8 +509,8 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   void HashMap< Key, T, HS1, HS2, EQ >::rehash(size_t n)
   {
-    Array< std::pair< std::pair< Key, T >, bool > > new_t1(n);
-    Array< std::pair< std::pair< Key, T >, bool > > new_t2(n);
+    std::vector< std::pair< std::pair< Key, T >, bool > > new_t1(n);
+    std::vector< std::pair< std::pair< Key, T >, bool > > new_t2(n);
 
     const size_t old_capacity = capacity_;
     const size_t old_size = size_;
@@ -607,7 +609,7 @@ namespace savintsev
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::pointer HashMap< K, T, H1, H2, EQ >::FwdIter::operator->()
   {
-    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
+    return std::addressof(operator*());
   }
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::reference HashMap< K, T, H1, H2, EQ >::FwdIter::operator*() const
@@ -617,7 +619,7 @@ namespace savintsev
   template< typename K, typename T, typename H1, typename H2, typename EQ >
   typename HashMap< K, T, H1, H2, EQ >::FwdIter::pointer HashMap< K, T, H1, H2, EQ >::FwdIter::operator->() const
   {
-    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
+    return std::addressof(operator*());
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::FwdIter & HashMap< Key, T, HS1, HS2, EQ >::FwdIter::operator++()
@@ -679,7 +681,7 @@ namespace savintsev
   template< typename K, typename T, typename A, typename B, typename E >
   typename HashMap< K, T, A, B, E >::FwdConstIter::pointer HashMap< K, T, A, B, E >::FwdConstIter::operator->() const
   {
-    return std::addressof(first_ ? parent_->t1_[pos_].first : parent_->t2_[pos_].first);
+    return std::addressof(operator*());
   }
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   typename HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter & HashMap< Key, T, HS1, HS2, EQ >::FwdConstIter::operator++()
