@@ -333,14 +333,14 @@ namespace lanovenko
   template< typename Key, typename Value, typename Comparator >
   Value& Tree< Key, Value, Comparator >::operator[](const Key& key)
   {
-    iter node = find(key);
+    iter node = insert({key, Value{}});
     return node->second;
   }
 
   template< typename Key, typename Value, typename Comparator >
   const Value& Tree< Key, Value, Comparator >::operator[](const Key& key) const
   {
-    cIter node = find(key);
+    iter node = insert({key, Value{}});
     return node->second;
   }
 
@@ -479,11 +479,6 @@ namespace lanovenko
     {
       node->right_ = insert(node->right_, value, cmp);
       node->right_->parent_ = node;
-    }
-    else
-    {
-      node->data_.second = value.second;
-      return node;
     }
     fixHeight(node);
     return balance(node);
