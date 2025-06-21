@@ -8,14 +8,16 @@
 #include <functional>
 #include <algorithm>
 #include <cstdlib>
+#include "cuckoo-hash-map.h"
+#include <two-three-tree.h>
 
 struct Graph
 {
-  std::unordered_map< std::string, std::unordered_map< std::string, std::vector< int > > > edges;
+  savintsev::HashMap< std::string, savintsev::HashMap< std::string, std::vector< int > > > edges;
   std::set< std::string > vertexes;
 };
 
-std::unordered_map< std::string, Graph > graphs;
+savintsev::HashMap< std::string, Graph > graphs;
 
 std::vector< std::string > split(const std::string & line)
 {
@@ -24,7 +26,10 @@ std::vector< std::string > split(const std::string & line)
   while (start < line.length())
   {
     size_t space = line.find(' ', start);
-    if (space == std::string::npos) space = line.length();
+    if (space == std::string::npos)
+    {
+      space = line.length();
+    }
     result.push_back(line.substr(start, space - start));
     start = space + 1;
   }
@@ -39,13 +44,13 @@ void cmd_graphs()
     return;
   }
 
-  std::map< std::string, Graph * > sorted;
-  for (std::unordered_map< std::string, Graph >::iterator it = graphs.begin(); it != graphs.end(); ++it)
+  savintsev::TwoThreeTree< std::string, Graph * > sorted;
+  for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
-    sorted[it->first] = &it->second;
+    sorted[it->first] = std::addressof(it->second);
   }
 
-  for (std::map< std::string, Graph * >::iterator it = sorted.begin(); it != sorted.end(); ++it)
+  for (auto it = sorted.begin(); it != sorted.end(); ++it)
   {
     std::cout << it->first << '\n';
   }
@@ -73,7 +78,7 @@ void cmd_vertexes(const std::vector< std::string > & args)
   }
 
   const std::set< std::string > & vertices = graphs[name].vertexes;
-  for (std::set< std::string >::const_iterator it = vertices.begin(); it != vertices.end(); ++it)
+  for (auto it = vertices.begin(); it != vertices.end(); ++it)
   {
     std::cout << *it << '\n';
   }
@@ -96,7 +101,7 @@ void cmd_outbound(const std::vector< std::string > & args)
     return;
   }
 
-  std::map< std::string, std::vector< int > > out;
+  savintsev::TwoThreeTree< std::string, std::vector< int > > out;
   auto targets = graphs[g].edges.find(v);
   if (targets != graphs[g].edges.end())
   {
@@ -113,7 +118,7 @@ void cmd_outbound(const std::vector< std::string > & args)
     return;
   }
 
-  for (std::map< std::string, std::vector< int > >::iterator it = out.begin(); it != out.end(); ++it)
+  for (auto it = out.begin(); it != out.end(); ++it)
   {
     std::cout << it->first;
     for (std::vector< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
@@ -141,7 +146,7 @@ void cmd_inbound(const std::vector< std::string > & args)
     return;
   }
 
-  std::map< std::string, std::vector< int > > in;
+  savintsev::TwoThreeTree< std::string, std::vector< int > > in;
   for (auto it = graphs[g].edges.begin(); it != graphs[g].edges.end(); ++it)
   {
     auto jt = it->second.find(v);
@@ -392,7 +397,7 @@ int main(int argc, char* argv[])
 
   using namespace std::placeholders;
 
-  std::unordered_map< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
+  savintsev::HashMap< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
   cmd_map["graphs"] = std::bind(cmd_graphs);
   cmd_map["vertexes"] = std::bind(cmd_vertexes, _1);
   cmd_map["outbound"] = std::bind(cmd_outbound, _1);
