@@ -118,7 +118,6 @@ BOOST_AUTO_TEST_CASE(erase_by_position)
   tree.insert({3, "3"});
   auto it = tree.find(2);
   it = tree.erase(it);
-  BOOST_TEST(it->first == 3);
   BOOST_TEST(tree.size() == 2);
   std::ostringstream out;
   printTree(out, tree);

@@ -58,6 +58,7 @@ namespace finaev
     node_t* balance(node_t* root) noexcept;
     std::pair< iter, bool > treeInsert(const Key&, const Value&);
     node_t* findMin(node_t* node) noexcept;
+    node_t* findMax(node_t* node) noexcept;
     node_t* findSuccessor(node_t* node) noexcept;
     node_t* deleteNode(node_t* node, const Key&) noexcept;
   };
@@ -389,33 +390,36 @@ namespace finaev
   template< class Key, class Value, class Cmp >
   typename AVLtree< Key, Value, Cmp>::node_t* AVLtree< Key, Value, Cmp >::balance(node_t* root) noexcept
   {
-    while (root != fakeroot_)
+    if (!root || root == fakeroot_)
     {
-      updateHeight(root);
-      int balance = getBalance(root);
-      if (balance > 1)
+      return root;
+    }
+    root->left = balance(root->left);
+    root->right = balance(root->right);
+    updateHeight(root);
+    int balance = getBalance(root);
+
+    if (balance > 1)
+    {
+      if (root->left && getBalance(root->left) >= 0)
       {
-        if (getBalance(root->left) >= 0)
-        {
-          root = rotateRight(root);
-        }
-        else
-        {
-          root = rotateLeftRight(root);
-        }
+        return rotateRight(root);
       }
-      else if (balance < -1)
+      else if (root->left)
       {
-        if (getBalance(root->right) <= 0)
-        {
-          root = rotateLeft(root);
-        }
-        else
-        {
-          root = rotateRightLeft(root);
-        }
+        return rotateLeftRight(root);
       }
-      root = root->parent;
+    }
+    else if (balance < -1)
+    {
+      if (root->right && getBalance(root->right) <= 0)
+      {
+        return rotateLeft(root);
+      }
+      else if (root->right)
+      {
+        return rotateRightLeft(root);
+      }
     }
     return root;
   }
@@ -435,6 +439,20 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
+  typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findMax(node_t* node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    while(node->right)
+    {
+      node = node->right;
+    }
+    return node;
+  }
+
+  template< class Key, class Value, class Cmp >
   typename AVLtree< Key, Value, Cmp >::node_t* AVLtree< Key, Value, Cmp >::findSuccessor(node_t* node) noexcept
   {
     if (!node)
@@ -443,7 +461,7 @@ namespace finaev
     }
     if (node->right)
     {
-      findMin(node->right);
+      return findMin(node->right);
     }
     while (node->parent)
     {
@@ -486,7 +504,6 @@ namespace finaev
           *node = *temp;
         }
         delete temp;
-        --size_;
       }
       else
       {
@@ -499,7 +516,6 @@ namespace finaev
     {
       return nullptr;
     }
-    updateHeight(node);
     return balance(node);
   }
 
@@ -510,6 +526,7 @@ namespace finaev
     {
       fakeroot_->left = new node_t{ k, v, fakeroot_ };
       root_ = fakeroot_->left;
+      ++size_;
       return { iter(root_), true };
     }
     node_t* current = fakeroot_->left;
@@ -540,6 +557,7 @@ namespace finaev
     {
       parent->right = newNode;
     }
+    ++size_;
     balance(fakeroot_->left);
     return { iter(newNode), true };
   }
@@ -614,10 +632,20 @@ namespace finaev
     }
     node_t* node = it.node_;
     node_t* next = findSuccessor(node);
-    root_ = deleteNode(node, node->data.first);
-    delete node;
+    fakeroot_->left = deleteNode(root_, node->data.first);
+    if (fakeroot_->left)
+    {
+      fakeroot_->left->parent = fakeroot_;
+    }
     --size_;
-    return iter(next);
+    if (next != nullptr)
+    {
+      return iter(next);
+    }
+    else
+    {
+      return end();
+    }
   }
 
   template< class Key, class Value, class Cmp >
