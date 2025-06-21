@@ -3,6 +3,23 @@
 #include <fstream>
 #include <iomanip>
 
+namespace
+{
+  bool isAlpha(char c)
+  {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+  }
+
+  char toLowercase(char c)
+  {
+    if (c >= 'A' && c <= 'Z')
+    {
+      return c + ('a' - 'A');
+    }
+    return c;
+  }
+}
+
 void maslov::createDictionary(std::istream & in, Dicts & dicts)
 {
   std::string dictName;
@@ -40,11 +57,28 @@ void maslov::load(std::istream & in, Dicts & dicts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  loadFromFile(file, dictName, dicts);
+  loadFromFile(file, it->second);
 }
 
-void maslov::loadFromFile(std::ifstream & file, const std::string & name, Dicts & dicts)
-{}
+void maslov::loadFromFile(std::ifstream & file, HashTable< std::string, int > & dict)
+{
+  std::string word;
+  while (file >> word)
+  {
+    std::string realWord;
+    for (char c: word)
+    {
+      if (isAlpha(c))
+      {
+        realWord += toLowercase(c);
+      }
+    }
+    if (!realWord.empty())
+    {
+      dict[realWord] += 1;
+    }
+  }
+}
 
 void maslov::unionDictionary(std::istream & in, Dicts & dicts)
 {}
