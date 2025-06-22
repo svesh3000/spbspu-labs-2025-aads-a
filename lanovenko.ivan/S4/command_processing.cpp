@@ -11,7 +11,7 @@ void lanovenko::merge(map_t& dictionaries)
   {
     dataset_union.insert(pair);
   }
-  for (const auto& pair: lhs)
+  for (const auto& pair : lhs)
   {
     dataset_union.insert(pair);
   }
