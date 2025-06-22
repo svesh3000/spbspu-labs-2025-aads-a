@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     }
     input = &file;
   }
-  
+
   TranslateSet tr1{"yabloko"};
   TranslateSet tr2{"banan", "bananovyj"};
   Dictionary dict{{"apple", tr1}, {"banana", tr2}};
