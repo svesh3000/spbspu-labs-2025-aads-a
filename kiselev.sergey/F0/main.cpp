@@ -2,9 +2,9 @@
 #include <functional>
 #include <iostream>
 #include <istream>
+#include <limits>
 #include <string>
 #include <utility>
-#include <limits>
 #include "commands.hpp"
 #include "tree.hpp"
 namespace

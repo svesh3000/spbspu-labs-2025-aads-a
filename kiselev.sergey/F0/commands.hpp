@@ -3,8 +3,8 @@
 #include <istream>
 #include <ostream>
 #include <string>
-#include "tree.hpp"
 #include "list.hpp"
+#include "tree.hpp"
 namespace kiselev
 {
   using Dict = RBTree< std::string, List< std::string > >;

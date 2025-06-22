@@ -1,9 +1,8 @@
 #include "commands.hpp"
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <string>
-#include <iostream>
-#include "list.hpp"
 
 namespace
 {
