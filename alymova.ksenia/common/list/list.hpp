@@ -14,6 +14,9 @@ namespace alymova
   class List
   {
   public:
+    using ListIterator = Iterator< T >;
+    using ListConstIterator = ConstIterator< T >;
+
     List();
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
@@ -59,6 +62,7 @@ namespace alymova
     Iterator< T > insert(Iterator< T > position, InputIterator first, InputIterator last);
     Iterator< T > insert(Iterator< T > position, std::initializer_list< T > il);
     Iterator< T > erase(Iterator< T > position);
+    Iterator< T > erase(ConstIterator< T > position);
     Iterator< T > erase(Iterator< T > first, Iterator< T > last);
     template< typename... Args >
     Iterator< T > emplace_front(Args&&... args);
@@ -450,12 +454,18 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::erase(Iterator< T > position)
   {
+    return static_cast< const List< T >& >(*this).erase(position);
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > position)
+  {
     auto return_it = Iterator< T >(position.node_->next);
-    if (position == begin())
+    if (position == cbegin())
     {
       pop_front();
     }
-    else if (position == --end())
+    else if (position == --cend())
     {
       pop_back();
     }
