@@ -115,6 +115,7 @@ namespace abramov
     size_(tree.size_)
   {
     tree.root_ = nullptr;
+    tree.fake_ = nullptr;
     tree.size_ = 0;
   }
 
@@ -130,6 +131,7 @@ namespace abramov
       fake_ = tree.fake_;
       cmp_ = std::move(tree.cmp_);
       size_ = tree.size_;
+      tree.root_ = nullptr;
       tree.root_ = nullptr;
       tree.size_ = 0;
     }
@@ -388,7 +390,7 @@ namespace abramov
     node_t *new_node = nullptr;
     try
     {
-      new_node = new Node< Key, Value >(node->data_, parent, nullptr, nullptr);
+      new_node = new Node< Key, Value >(node->data_, parent, fake, fake);
       new_node->left_ = copyTree(node->left_, new_node, old_fake, fake);
       new_node->right_ = copyTree(node->right_, new_node, old_fake, fake);
     }
@@ -403,6 +405,10 @@ namespace abramov
   template< class Key, class Value, class Cmp >
   const Node< Key, Value > *BinarySearchTree< Key, Value, Cmp >::cgetMin(const Node< Key, Value > *root) const noexcept
   {
+    if (empty())
+    {
+      return fake_;
+    }
     while (root->left_ != fake_)
     {
       root = root->left_;

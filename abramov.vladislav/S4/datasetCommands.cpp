@@ -42,7 +42,7 @@ void abramov::printDataSet(const std::string &name, const collections &dicts)
   std::cout << (--dict.cend())->first << " " << (--dict.cend())->second << "\n";
 }
 
-abramov::tree abramov::complementDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
+void abramov::complementDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts)
 {
   if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
@@ -58,10 +58,10 @@ abramov::tree abramov::complementDataSets(const std::string &s1, const std::stri
       res[it->first] = it->second;
     }
   }
-  return res;
+  dicts[s] = res;
 }
 
-abramov::tree abramov::intersectDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
+void abramov::intersectDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts)
 {
   if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
@@ -77,10 +77,10 @@ abramov::tree abramov::intersectDataSets(const std::string &s1, const std::strin
       res[it->first] = it->second;
     }
   }
-  return res;
+  dicts[s] = res;
 }
 
-abramov::tree abramov::unionDataSets(const std::string &s1, const std::string &s2, const collections &dicts)
+void abramov::unionDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts)
 {
   if (dicts.cfind(s1) == dicts.cend() || dicts.cfind(s2) == dicts.cend())
   {
@@ -100,7 +100,7 @@ abramov::tree abramov::unionDataSets(const std::string &s1, const std::string &s
       res[it->first] = it->second;
     }
   }
-  return res;
+  dicts[s] = res;
 }
 
 void abramov::doCommand(const std::string &s, std::istream &in, collections &dicts)
@@ -116,17 +116,17 @@ void abramov::doCommand(const std::string &s, std::istream &in, collections &dic
   else if (s == "complement")
   {
     in >> name >> s1 >> s2;
-    dicts[name] = complementDataSets(s1, s2, dicts);
+    complementDataSets(name, s1, s2, dicts);
   }
   else if (s == "intersect")
   {
     in >> name >> s1 >> s2;
-    dicts[name] = intersectDataSets(s1, s2, dicts);
+    intersectDataSets(name, s1, s2, dicts);
   }
   else if (s == "union")
   {
     in >> name >> s1 >> s2;
-    dicts[name] = unionDataSets(s1, s2, dicts);
+    unionDataSets(name, s1, s2, dicts);
   }
   else
   {

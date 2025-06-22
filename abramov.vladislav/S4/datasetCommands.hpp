@@ -11,9 +11,9 @@ namespace abramov
   using collections = BinarySearchTree< std::string, tree >;
   collections getDataSets(std::ifstream &in);
   void printDataSet(const std::string &s, const collections &dicts);
-  tree complementDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
-  tree intersectDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
-  tree unionDataSets(const std::string &s1, const std::string &s2, const collections &dicts);
+  void complementDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts);
+  void intersectDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts);
+  void unionDataSets(const std::string &s, const std::string &s1, const std::string &s2, collections &dicts);
   void doCommand(const std::string &s, std::istream &in, collections &dicts);
 }
 #endif
