@@ -38,6 +38,7 @@ namespace {
 void gavrilova::graphs(std::ostream& out, const GraphsCollection& graphs)
 {
   if (graphs.empty()) {
+    out << "\n";
     return;
   }
   std::vector< std::string > names;
