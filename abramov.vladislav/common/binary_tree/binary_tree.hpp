@@ -48,6 +48,14 @@ namespace abramov
     bool empty() const noexcept;
     void swap(BinarySearchTree &rhs) noexcept;
     void clear() noexcept;
+    template< class F >
+    F traverse_lnr(F f) const;
+    template< class F >
+    F traverse_lnr(F f);
+    template< class F >
+    F traverse_rnl(F f) const;
+    template< class F >
+    F traverse_rnl(F f);
   private:
     Node< Key, Value > *root_;
     Node< Key, Value > *fake_;
@@ -450,6 +458,50 @@ namespace abramov
   {
     using Tree = BinarySearchTree< Key, Value, Cmp >;
     return const_cast< Node< Key, Value >* >(const_cast< Tree* >(this)->cfindNode(k));
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_lnr(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty tree\n");
+    }
+    for (auto it = cbegin(); it != cend(); ++it)
+    {
+      f(*it);
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_lnr(F f)
+  {
+    return const_cast< const BinarySearchTree* >(this)->traverse_lnr(f);
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_rnl(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty tree\n");
+    }
+    for (auto it = cend(); it != cbegin(); --it)
+    {
+      f(*it);
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_rnl(F f)
+  {
+    return const_cast< const BinarySearchTree* >(this)->traverse_rnl(f);
   }
 }
 #endif
