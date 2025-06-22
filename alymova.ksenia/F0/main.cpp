@@ -31,12 +31,19 @@ int main(int argc, char** argv)
     input = &file;
   }
 
-  TranslateSet tr1{"yabloko"};
-  TranslateSet tr2{"banan", "bananovyj"};
-  Dictionary dict{{"apple", tr1}, {"banana", tr2}};
-  Dictionary dict1(dict);
-  DictSet set{{"first", dict}};
-  create(*input, std::cout, set);
+  try
+  {
+    TranslateSet tr1{"yabloko"};
+    TranslateSet tr2{"banan", "bananovyj"};
+    Dictionary dict{{"apple", tr1}, {"banana", tr2}};
+    Dictionary dict1(dict);
+    DictSet set{{"first", dict}, {"second", dict}};
+    translate(*input, std::cout, set);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
   /*printContent(std::cin, std::cout, set);
   std::cout << '\n';
   for (auto it0 = set.begin(); it0 != set.end(); it0++)

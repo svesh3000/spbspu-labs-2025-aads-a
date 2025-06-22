@@ -24,7 +24,7 @@ void alymova::create(std::istream& in, std::ostream& out, DictSet& set)
 {
   std::string name;
   in >> name;
-  if (!in || set.count(name) != 0)
+  if (!in)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
@@ -236,6 +236,10 @@ void alymova::findEnglishEquivalent(std::istream& in, std::ostream& out, const D
 
   List< std::string > translates, equivalents;
   in >> translates;
+  if (!in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   const Dictionary& dict = it_dict->second;
   for (auto it = dict.begin(); it != dict.end(); it++)
   {
@@ -285,6 +289,7 @@ void alymova::removeTranslate(std::istream& in, std::ostream& out, DictSet& set)
     return;
   }
   it_word->second.erase(it_translate);
+  out << "<SUCCESSFULLY REMOVED>";
 }
 
 void alymova::printContent(std::istream& in, std::ostream& out, const DictSet& set)
@@ -321,4 +326,43 @@ void alymova::printContent(std::istream& in, std::ostream& out, const DictSet& s
       out << '\n' << c << ' ' << it->first;
     }
   }
+}
+
+void alymova::translate(std::istream& in, std::ostream& out, DictSet& set)
+{
+  List< std::string > names;
+  std::string word;
+  in >> names >> word;
+  if (!in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+
+  List< Dictionary > dicts;
+  for (auto it = names.begin(); it != names.end(); it++)
+  {
+    auto it_dict = set.find(*it);
+    if (it_dict == set.end())
+    {
+      out << "<NOT FOUND>";
+      return;
+    }
+    dicts.push_back(it_dict->second);
+  }
+  List< std::string > translates;
+  for (auto it = dicts.begin(); it != dicts.end(); it++)
+  {
+    auto it_word = it->find(word);
+    if (it_word != it->end())
+    {
+      translates.insert(translates.end(), it_word->second.begin(), it_word->second.end());
+    }
+  }
+  if (translates.empty())
+  {
+    out << "<NOT FOUND>";
+    return;
+  }
+  translates.unique();
+  out << translates;
 }

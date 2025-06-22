@@ -18,7 +18,7 @@ std::istream& alymova::operator>>(std::istream& in, List< std::string >& list)
   }
   if (!in)
   {
-    throw std::logic_error("<INVALID COMMAND>");
+    return in;
   }
   list = tested;
   return in;

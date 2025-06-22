@@ -454,18 +454,12 @@ namespace alymova
   template< typename T >
   Iterator< T > List< T >::erase(Iterator< T > position)
   {
-    return static_cast< const List< T >& >(*this).erase(position);
-  }
-
-  template< typename T >
-  Iterator< T > List< T >::erase(ConstIterator< T > position)
-  {
     auto return_it = Iterator< T >(position.node_->next);
-    if (position == cbegin())
+    if (position == begin())
     {
       pop_front();
     }
-    else if (position == --cend())
+    else if (position == --end())
     {
       pop_back();
     }
@@ -477,6 +471,13 @@ namespace alymova
       delete node;
     }
     return return_it;
+  }
+
+  template< typename T >
+  Iterator< T > List< T >::erase(ConstIterator< T > position)
+  {
+    Iterator< T > it(position);
+    return erase(it);
   }
 
   template< typename T >
