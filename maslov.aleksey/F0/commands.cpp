@@ -74,11 +74,11 @@ void maslov::showDictionary(std::ostream & out, const Dicts & dicts)
   }
 }
 
-void maslov::load(std::istream & in, Dicts & dicts)
+void maslov::loadText(std::istream & in, Dicts & dicts)
 {
-  std::string fileName, dictName;
-  in >> fileName >> dictName;
-  std::ifstream file(fileName);
+  std::string filename, dictName;
+  in >> dictName >> filename;
+  std::ifstream file(filename);
   if (!file.is_open())
   {
     throw std::runtime_error("<INVALID COMMAND>");
@@ -88,11 +88,6 @@ void maslov::load(std::istream & in, Dicts & dicts)
   {
     throw std::runtime_error("<INVALID COMMAND>");
   }
-  loadFromFile(file, it->second);
-}
-
-void maslov::loadFromFile(std::ifstream & file, HashTable< std::string, int > & dict)
-{
   std::string word;
   while (file >> word)
   {
@@ -106,7 +101,7 @@ void maslov::loadFromFile(std::ifstream & file, HashTable< std::string, int > & 
     }
     if (!realWord.empty())
     {
-      dict[realWord] += 1;
+      it->second[realWord] += 1;
     }
   }
 }
@@ -292,6 +287,63 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   }
 }
 
+void maslov::saveDictionaries(std::istream & in, const Dicts & dicts)
+{
+  std::string fileName;
+  in >> fileName;
+  std::ofstream file(fileName);
+  if (!file.is_open())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  file << dicts.size() << '\n';
+  for (auto dictIt = dicts.cbegin(); dictIt != dicts.cend(); dictIt++)
+  {
+    file << dictIt->first << ' ' << dictIt->second.size() << '\n';
+    for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
+    {
+      file << it->first << ' ' << it->second << '\n';
+    }
+  }
+}
+
+void maslov::loadFileCommand(std::istream & in, Dicts & dicts)
+{
+  std::string filename;
+  in >> filename;
+  loadFile(filename, dicts);
+}
+
+void maslov::loadFile(const std::string & filename, Dicts & dicts)
+{
+  std::ifstream file(filename);
+  if (!file.is_open())
+  {
+    throw std::runtime_error("<INVALID COMMAND>");
+  }
+  size_t dictCount;
+  file >> dictCount;
+  for (size_t i = 0; i < dictCount; ++i)
+  {
+    std::string dictName;
+    size_t wordCount;
+    file >> dictName >> wordCount;
+    if (dicts.find(dictName) != dicts.end())
+    {
+      throw std::runtime_error("<INVALID COMMAND>");
+    }
+    Dict newDict;
+    std::string word;
+    int freq;
+    for (size_t j = 0; j < wordCount; ++j)
+    {
+      file >> word >> freq;
+      newDict[word] = freq;
+    }
+    dicts[dictName] = newDict;
+  }
+}
+
 void maslov::printHelp(std::ostream & out)
 {
   out << std::left;
@@ -305,7 +357,7 @@ void maslov::printHelp(std::ostream & out)
   out << "showdicts" << "shows all dictionary names\n";
 
   out << std::setw(numWidth) << "3." << std::setw(cmdWidth);
-  out << "load <dict_name> <file>" << "upload text from a file to the dictionary\n";
+  out << "loadtext <dict_name> <file>" << "upload text from a file to the dictionary\n";
 
   out << std::setw(numWidth) << "4." << std::setw(cmdWidth);
   out << "union <result> <dict1> <dict2>" << "creates a new dictionary that combines the other two\n";
@@ -340,4 +392,10 @@ void maslov::printHelp(std::ostream & out)
   out << std::setw(numWidth) << "14." << std::setw(cmdWidth);
   out << "wordrange <result> <dict_name> <freq1> <freq2>";
   out << "creates a dictionary of words whose frequencies are in the range\n";
+
+  out << std::setw(numWidth) << "15." << std::setw(cmdWidth);
+  out << "loadfile <file>" << "loads all dictionaries\n";
+
+  out << std::setw(numWidth) << "16." << std::setw(cmdWidth);
+  out << "save <file>" << "saves all dictionaries to a file\n";
 }
