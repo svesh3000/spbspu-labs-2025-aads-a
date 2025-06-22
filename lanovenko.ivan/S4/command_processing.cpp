@@ -7,11 +7,11 @@ void lanovenko::merge(map_t& dictionaries)
   const Tree< int, std::string, std::less< int > > lhs = dictionaries.at(dataset_1);
   const Tree< int, std::string, std::less< int > > rhs = dictionaries.at(dataset_2);
   Tree< int, std::string, std::less< int > > dataset_union{};
-  for (const auto& pair: rhs)
+  for (const auto& pair: lhs)
   {
     dataset_union.insert(pair);
   }
-  for (const auto& pair : lhs)
+  for (const auto& pair: rhs)
   {
     dataset_union.insert(pair);
   }
