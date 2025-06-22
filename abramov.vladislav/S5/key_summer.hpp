@@ -1,15 +1,16 @@
 #ifndef KEY_SUMMER_HPP
 #define KEY_SUMMER_HPP
-#include <pair>
+#include <string>
+#include <utility>
 
 namespace abramov
 {
   struct KeySummer
   {
-    long long int res = 0;
+    long long int res;
     std::string val;
 
-    void operator()(const std::pair< long long int, std::string > p);
-  }
+    void operator()(std::pair< long long int, std::string > p);
+  };
 }
 #endif

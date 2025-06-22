@@ -495,8 +495,9 @@ namespace abramov
     {
       throw std::logic_error("Empty tree\n");
     }
-    for (auto it = cend(); it != cbegin(); --it)
+    for (auto it = cend(); it != cbegin();)
     {
+      --it;
       f(*it);
     }
     return f;
