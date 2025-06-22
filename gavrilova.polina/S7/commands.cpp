@@ -38,7 +38,6 @@ namespace {
 void gavrilova::graphs(std::ostream& out, const GraphsCollection& graphs)
 {
   if (graphs.empty()) {
-    out << "";
     return;
   }
   std::vector< std::string > names;
@@ -79,7 +78,7 @@ void gavrilova::outbound(std::ostream& out, std::istream& in, const GraphsCollec
   }
   auto edges = it->second.get_outbound_edges(vertex_name);
   if (edges.empty()) {
-    out << "";
+    out << "\n";
     return;
   }
   sort(edges);
@@ -106,7 +105,7 @@ void gavrilova::inbound(std::ostream& out, std::istream& in, const GraphsCollect
   }
   auto edges = it->second.get_inbound_edges(vertex_name);
   if (edges.empty()) {
-    out << "";
+    out << "\n";
     return;
   }
   sort(edges);
