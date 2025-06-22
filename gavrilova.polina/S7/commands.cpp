@@ -78,7 +78,11 @@ void gavrilova::outbound(std::ostream& out, std::istream& in, const GraphsCollec
     throw std::invalid_argument("Graph or vertex not found");
   }
   auto edges = it->second.get_outbound_edges(vertex_name);
+  if (edges.empty()) {
+    return;
+  }
   sort(edges);
+  out << edges[0].first << " " << edges[0].second;
   for (size_t i = 1; i < edges.size(); ++i) {
     if (edges[i].first == edges[i - 1].first) {
       out << " " << edges[i].second;
@@ -100,6 +104,9 @@ void gavrilova::inbound(std::ostream& out, std::istream& in, const GraphsCollect
     throw std::invalid_argument("Graph or vertex not found");
   }
   auto edges = it->second.get_inbound_edges(vertex_name);
+  if (edges.empty()) {
+    return;
+  }
   sort(edges);
   out << edges[0].first << " " << edges[0].second;
   for (size_t i = 1; i < edges.size(); ++i) {
@@ -115,8 +122,10 @@ void gavrilova::inbound(std::ostream& out, std::istream& in, const GraphsCollect
 void gavrilova::bind(std::istream& in, GraphsCollection& graphs)
 {
   std::string graph_name, v_from, v_to;
-  unsigned int weight;
-  in >> graph_name >> v_from >> v_to >> weight;
+  unsigned int weight = 0;
+  if (!(in >> graph_name >> v_from >> v_to >> weight)) {
+    throw std::invalid_argument("Invalid input in bind");
+  }
   auto it = graphs.find(graph_name);
   if (it == graphs.end()) {
     throw std::invalid_argument("Graph not found");
@@ -128,7 +137,9 @@ void gavrilova::cut(std::istream& in, GraphsCollection& graphs)
 {
   std::string graph_name, v_from, v_to;
   unsigned int weight;
-  in >> graph_name >> v_from >> v_to >> weight;
+  if (!(in >> graph_name >> v_from >> v_to >> weight)) {
+    throw std::invalid_argument("Invalid input in bind");
+  }
   auto it = graphs.find(graph_name);
   if (it == graphs.end() || !it->second.remove_edge(v_from, v_to, weight)) {
     throw std::invalid_argument("Graph not found or edge doesn't exist");
@@ -160,7 +171,9 @@ void gavrilova::create(std::istream& in, GraphsCollection& graphs)
 void gavrilova::merge(std::istream& in, GraphsCollection& graphs)
 {
   std::string new_graph_name, g1_name, g2_name;
-  in >> new_graph_name >> g1_name >> g2_name;
+  if (!(in >> new_graph_name >> g1_name >> g2_name)) {
+    throw std::invalid_argument("Invalid input in merge");
+  }
 
   if (graphs.find(new_graph_name) != graphs.cend()) {
     throw std::invalid_argument("New graph already exists");
@@ -177,8 +190,10 @@ void gavrilova::merge(std::istream& in, GraphsCollection& graphs)
 void gavrilova::extract(std::istream& in, GraphsCollection& graphs)
 {
   std::string new_graph_name, old_graph_name;
-  size_t count;
-  in >> new_graph_name >> old_graph_name >> count;
+  size_t count = 0;
+  if (!(in >> new_graph_name >> old_graph_name >> count)) {
+    throw std::invalid_argument("Invalid input in extract");
+  }
 
   if (graphs.find(new_graph_name) != graphs.cend()) {
     throw std::invalid_argument("New graph already exists");
