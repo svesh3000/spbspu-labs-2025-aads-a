@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
     std::ifstream file(argv[1]);
     while (file)
     {
-      getline(file, reader);
+      std::getline(file, reader);
       if (!reader.empty())
       {
         try
@@ -64,12 +64,7 @@ int main(int argc, char ** argv)
   {
     std::cout << stack_qs.top()();
   }
-  catch (const std::invalid_argument & e)
-  {
-    std::cerr << e.what() << '\n';
-    return 1;
-  }
-  catch (const std::overflow_error & e)
+  catch (const std::exception & e)
   {
     std::cerr << e.what() << '\n';
     return 1;
@@ -82,12 +77,7 @@ int main(int argc, char ** argv)
     {
       std::cout << ' ' << stack_qs.top()();
     }
-    catch (const std::invalid_argument & e)
-    {
-      std::cerr << e.what() << '\n';
-      return 1;
-    }
-    catch (const std::overflow_error & e)
+    catch (const std::exception & e)
     {
       std::cerr << e.what() << '\n';
       return 1;

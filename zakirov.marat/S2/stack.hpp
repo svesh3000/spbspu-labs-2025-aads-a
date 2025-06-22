@@ -20,8 +20,8 @@ namespace zakirov
     size_t size() const noexcept;
     T & top() noexcept;
     const T & top() const noexcept;
-    void push (const T & value);
-    void push (T && value);
+    void push(const T & value);
+    void push(T && value);
     void pop() noexcept;
     void swap(Stack< T > & other) noexcept;
   private:
@@ -157,9 +157,17 @@ namespace zakirov
   {
     size_t new_capacity = capacity_ * 2 + 1;
     T * new_data = new T[new_capacity];
-    for (size_t i = 0; i < top_; ++i)
+    try 
     {
-      new_data[i] = std::move(data_[i]);
+      for (size_t i = 0; i < top_; ++i)
+      {
+        new_data[i] = std::move(data_[i]);
+      }
+    }
+    catch (...)
+    {
+      delete[] new_data;
+      throw;
     }
 
     delete[] data_;

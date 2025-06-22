@@ -51,9 +51,17 @@ namespace zakirov
     size_(other.size_),
     capacity_(other.capacity_)
   {
-    for (size_t i = first_; i < first_ + size_; ++i)
+    try
     {
-      data_[i] = other.data_[i];
+      for (size_t i = first_; i < first_ + size_; ++i)
+      {
+        data_[i] = other.data_[i];
+      }
+    }
+    catch (...)
+    {
+      delete[] data_;
+      throw;
     }
   }
 
@@ -137,19 +145,7 @@ namespace zakirov
   {
     if (first_ + size_ >= capacity_)
     {
-      if (first_ != 0)
-      {
-        for (size_t i = 0, j = first_; j < first_ + size_; ++i, ++j)
-        {
-          data_[i] = std::move(data_[j]);
-        }
-
-        first_ = 0;
-      }
-      else
-      {
-        add_capacity();
-      }
+      add_capacity();
     }
 
     data_[first_ + size_] = std::forward< U >(value);
@@ -189,9 +185,17 @@ namespace zakirov
   {
     size_t new_capacity = capacity_ * 2 + 1;
     T * new_data = new T[new_capacity];
-    for (size_t i = 0, j = first_; j < first_ + size_; ++i, ++j)
+    try
     {
-      new_data[i] = std::move(data_[j]);
+      for (size_t i = 0, j = first_; j < first_ + size_; ++i, ++j)
+      {
+        new_data[i] = data_[j];
+      }
+    }
+    catch (...)
+    {
+      delete[] new_data;
+      throw;
     }
 
     delete[] data_;
