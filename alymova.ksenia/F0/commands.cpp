@@ -18,22 +18,6 @@ namespace
     }
     return it;
   }
-
-  void printList(std::ostream& out, const alymova::List< std::string >& list)
-  {
-    if (list.empty())
-    {
-      out << '\n';
-    }
-    auto it = list.begin();
-    out << *(it++);
-    for (; it != list.end(); it++)
-    {
-      out << ' ' << *it;
-    }
-  }
-
-
 }
 
 void alymova::create(std::istream& in, std::ostream& out, DictSet& set)
@@ -301,4 +285,40 @@ void alymova::removeTranslate(std::istream& in, std::ostream& out, DictSet& set)
     return;
   }
   it_word->second.erase(it_translate);
+}
+
+void alymova::printContent(std::istream& in, std::ostream& out, const DictSet& set)
+{
+  std::string name;
+  in >> name;
+  if (!in)
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
+  auto it_dict = set.find(name);
+  if (it_dict == set.end())
+  {
+    out << "<NOT FOUND>";
+    return;
+  }
+  const Dictionary& dict = it_dict->second;
+  if (dict.empty())
+  {
+    out << '\n';
+    return;
+  }
+  char c = dict.begin()->first[0];
+  out << c;
+  for (auto it = dict.begin(); it != dict.end(); it++)
+  {
+    if (it->first[0] == c)
+    {
+      out << ' ' << it->first;
+    }
+    else
+    {
+      c = it->first[0];
+      out << '\n' << c << ' ' << it->first;
+    }
+  }
 }

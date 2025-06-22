@@ -31,10 +31,11 @@ std::ostream& alymova::operator<<(std::ostream& out, const List< std::string >& 
   {
     return out;
   }
-  list.sort();
-  auto it = list.begin();
+  List< std::string > copy(list);
+  copy.sort();
+  auto it = copy.begin();
   out << *(it++);
-  for (; it != list.end(); it++)
+  for (; it != copy.end(); it++)
   {
     out << ' ' << *it;
   }

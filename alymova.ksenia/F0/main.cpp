@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <clocale>
+#include <cstring>
 #include "commands.hpp"
 
 int main(int argc, char** argv)
@@ -17,7 +18,7 @@ int main(int argc, char** argv)
   std::ifstream file;
   if (argc == 2)
   {
-    if (argv[1] == "--help")
+    if (std::strcmp(argv[1], "--help") == 0)
     {
       return 0;
     }
@@ -29,12 +30,14 @@ int main(int argc, char** argv)
     }
     input = &file;
   }
-  /*TranslateSet tr1{"yabloko"};
+  
+  TranslateSet tr1{"yabloko"};
   TranslateSet tr2{"banan", "bananovyj"};
   Dictionary dict{{"apple", tr1}, {"banana", tr2}};
   Dictionary dict1(dict);
   DictSet set{{"first", dict}};
-  removeTranslate(std::cin, std::cout, set);
+  create(*input, std::cout, set);
+  /*printContent(std::cin, std::cout, set);
   std::cout << '\n';
   for (auto it0 = set.begin(); it0 != set.end(); it0++)
   {
@@ -47,6 +50,6 @@ int main(int argc, char** argv)
         std::cout << ' ' << *it1;
       }
       std::cout << '\n';
-    }*/
-  }
+    }
+  }*/
 }

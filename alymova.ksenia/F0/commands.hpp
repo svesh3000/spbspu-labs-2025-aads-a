@@ -25,7 +25,7 @@ namespace alymova
   void addTranslate(std::istream& in, std::ostream& out, DictSet& set);
   void findEnglishEquivalent(std::istream& in, std::ostream& out, const DictSet& set);
   void removeTranslate(std::istream& in, std::ostream& out, DictSet& set);
-  void printContent(std::istream& in, std::ostream& out, DictSet& set);
+  void printContent(std::istream& in, std::ostream& out, const DictSet& set);
   void translate(std::istream& in, std::ostream& out, DictSet& set);
   void unionDicts(std::istream& in, std::ostream& out, DictSet& set);
   void intersectDicts(std::istream& in, std::ostream& out, DictSet& set);
