@@ -18,7 +18,7 @@ std::istream& alymova::operator>>(std::istream& in, List< std::string >& list)
   }
   if (!in)
   {
-    throw std::logic_error("<INVALID COMMAND>"); 
+    throw std::logic_error("<INVALID COMMAND>");
   }
   list = tested;
   return in;
@@ -31,6 +31,7 @@ std::ostream& alymova::operator<<(std::ostream& out, const List< std::string >& 
   {
     return out;
   }
+  list.sort();
   auto it = list.begin();
   out << *(it++);
   for (; it != list.end(); it++)
