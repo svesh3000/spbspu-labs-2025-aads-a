@@ -1,5 +1,6 @@
 #ifndef BINARY_TREE_HPP
 #define BINARY_TREE_HPP
+#include <queue>
 #include <cstddef>
 #include <algorithm>
 #include <functional>
@@ -56,6 +57,10 @@ namespace abramov
     F traverse_rnl(F f) const;
     template< class F >
     F traverse_rnl(F f);
+    template< class F >
+    F traverse_breadth(F f) const;
+    template< class F >
+    F traverse_breadth(F f);
   private:
     Node< Key, Value > *root_;
     Node< Key, Value > *fake_;
@@ -479,7 +484,7 @@ namespace abramov
   template< class F >
   F BinarySearchTree< Key, Value, Cmp >::traverse_lnr(F f)
   {
-    return const_cast< const BinarySearchTree* >(this)->traverse_lnr(f);
+    return const_cast< const BinarySearchTree< Key, Value, Cmp >* >(this)->traverse_lnr(f);
   }
 
   template< class Key, class Value, class Cmp >
@@ -501,7 +506,44 @@ namespace abramov
   template< class F >
   F BinarySearchTree< Key, Value, Cmp >::traverse_rnl(F f)
   {
-    return const_cast< const BinarySearchTree* >(this)->traverse_rnl(f);
+    return const_cast< const BinarySearchTree< Key, Value, Cmp >* >(this)->traverse_rnl(f);
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_breadth(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Empty tree\n");
+    }
+    std::queue< const Node< Key, Value >* > q;
+    q.push(root_);
+    while (!q.empty())
+    {
+      const Node< Key, Value > *curr = q.front();
+      q.pop();
+      if (curr != fake_)
+      {
+        f(curr->data_);
+        if (curr->left_ != fake_)
+        {
+          q.push(curr->left_);
+        }
+        if (curr->right_ != fake_)
+        {
+          q.push(curr->right_);
+        }
+      }
+    }
+    return f;
+  }
+
+  template< class Key, class Value, class Cmp >
+  template< class F >
+  F BinarySearchTree< Key, Value, Cmp >::traverse_breadth(F f)
+  {
+    return const_cast< const BinarySearchTree< Key, Value, Cmp >* >(this)->traverse_breadth(f);
   }
 }
 #endif
