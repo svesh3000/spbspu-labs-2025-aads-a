@@ -11,6 +11,7 @@ int main(int argc, char **argv)
   if (argc != 3)
   {
     std::cerr << "Not enough arguments\n";
+    return 1;
   }
   std::string mode(argv[1]);
   std::string file_name(argv[2]);
