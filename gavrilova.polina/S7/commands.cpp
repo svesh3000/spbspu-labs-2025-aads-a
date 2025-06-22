@@ -38,6 +38,7 @@ namespace {
 void gavrilova::graphs(std::ostream& out, const GraphsCollection& graphs)
 {
   if (graphs.empty()) {
+    out << "\n";
     return;
   }
   std::vector< std::string > names;
@@ -62,39 +63,53 @@ void gavrilova::vertexes(std::ostream& out, std::istream& in, const GraphsCollec
   std::vector< std::string > v_names = it->second.get_vertices();
   sort(v_names);
   for (size_t i = 0; i < v_names.size(); ++i) {
-    out << v_names[i] << (i == v_names.size() - 1 ? "" : " ");
+    out << v_names[i] << "\n";
   }
-  out << "\n";
 }
 
 void gavrilova::outbound(std::ostream& out, std::istream& in, const GraphsCollection& graphs)
 {
   std::string graph_name, vertex_name;
-  in >> graph_name >> vertex_name;
+  if (!(in >> graph_name >> vertex_name)) {
+    throw std::invalid_argument("Invalid  input");
+  }
   auto it = graphs.find(graph_name);
   if (it == graphs.cend() || !it->second.has_vertex(vertex_name)) {
     throw std::invalid_argument("Graph or vertex not found");
   }
   auto edges = it->second.get_outbound_edges(vertex_name);
   sort(edges);
-  for (size_t i = 0; i < edges.size(); ++i) {
-    out << edges[i].first << " " << edges[i].second << "\n";
+  for (size_t i = 1; i < edges.size(); ++i) {
+    if (edges[i].first == edges[i - 1].first) {
+      out << " " << edges[i].second;
+    } else {
+      out << "\n" << edges[i].first << " " << edges[i].second;
+    }
   }
+  out << "\n";
 }
 
 void gavrilova::inbound(std::ostream& out, std::istream& in, const GraphsCollection& graphs)
 {
   std::string graph_name, vertex_name;
-  in >> graph_name >> vertex_name;
+  if (!(in >> graph_name >> vertex_name)) {
+    throw std::invalid_argument("Invalid  input");
+  }
   auto it = graphs.find(graph_name);
   if (it == graphs.cend() || !it->second.has_vertex(vertex_name)) {
     throw std::invalid_argument("Graph or vertex not found");
   }
   auto edges = it->second.get_inbound_edges(vertex_name);
   sort(edges);
-  for (size_t i = 0; i < edges.size(); ++i) {
-    out << edges[i].first << " " << edges[i].second << "\n";
+  out << edges[0].first << " " << edges[0].second;
+  for (size_t i = 1; i < edges.size(); ++i) {
+    if (edges[i].first == edges[i - 1].first) {
+      out << " " << edges[i].second;
+    } else {
+      out << "\n" << edges[i].first << " " << edges[i].second;
+    }
   }
+  out << "\n";
 }
 
 void gavrilova::bind(std::istream& in, GraphsCollection& graphs)
@@ -123,10 +138,13 @@ void gavrilova::cut(std::istream& in, GraphsCollection& graphs)
 void gavrilova::create(std::istream& in, GraphsCollection& graphs)
 {
   std::string graph_name;
-  size_t count = 0;
-  in >> graph_name >> count;
+  in >> graph_name;
   if (graphs.find(graph_name) != graphs.cend()) {
     throw std::invalid_argument("Graph already exists");
+  }
+  size_t count = 0;
+  if (!(in >> count)) {
+    throw std::invalid_argument("Invavlid input count");
   }
   Graph new_graph;
   for (size_t i = 0; i < count; ++i) {
