@@ -57,9 +57,9 @@ void maslov::createDictionary(std::istream & in, Dicts & dicts)
   in >> dictName;
   if (dicts.find(dictName) != dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
-  dicts[dictName] = HashTable< std::string, int >{};
+  dicts[dictName] = Dict{};
 }
 
 void maslov::showDictionary(std::ostream & out, const Dicts & dicts)
@@ -81,12 +81,12 @@ void maslov::loadText(std::istream & in, Dicts & dicts)
   std::ifstream file(filename);
   if (!file.is_open())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID FILE>");
   }
   auto it = dicts.find(dictName);
   if (it == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   std::string word;
   while (file >> word)
@@ -114,11 +114,11 @@ void maslov::unionDictionary(std::istream & in, Dicts & dicts)
   auto it2 = dicts.find(dict2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   if (dicts.find(resultName) != dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & resultDict = dicts[resultName];
   resultDict = it1->second;
@@ -136,11 +136,11 @@ void maslov::intersectDictionary(std::istream & in, Dicts & dicts)
   auto it2 = dicts.find(dict2);
   if (it1 == dicts.end() || it2 == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   if (dicts.find(resultName) != dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & resultDict = dicts[resultName];
   for (auto it = it1->second.begin(); it != it1->second.end(); it++)
@@ -160,7 +160,7 @@ void maslov::copyDictionary(std::istream & in, Dicts & dicts)
   auto it = dicts.find(dictName);
   if (it == dicts.end() || dicts.find(resultName) != dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   dicts[resultName] = it->second;
 }
@@ -170,14 +170,18 @@ void maslov::addWord(std::istream & in, Dicts & dicts)
   std::string dictName, wordName, frequency;
   in >> dictName >> wordName >> frequency;
   auto it = dicts.find(dictName);
-  if (it == dicts.end() || it->second.find(wordName) != it->second.end())
+  if (it == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
+  }
+  if (it->second.find(wordName) != it->second.end())
+  {
+    throw std::runtime_error("<INVALID WORD>");
   }
   int num = std::stoi(frequency);
   if (num <= 0)
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID NUMBER>");
   }
   it->second[wordName] = num;
 }
@@ -189,7 +193,7 @@ void maslov::printSize(std::istream & in, std::ostream & out, const Dicts & dict
   auto it = dicts.find(dictName);
   if (it == dicts.cend())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   out << it->second.size() << '\n';
 }
@@ -199,9 +203,13 @@ void maslov::cleanWord(std::istream & in, Dicts & dicts)
   std::string dictName, wordName;
   in >> dictName >> wordName;
   auto it = dicts.find(dictName);
-  if (it == dicts.end() || it->second.find(wordName) == it->second.end())
+  if (it == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
+  }
+  if (it->second.find(wordName) == it->second.end())
+  {
+    throw std::runtime_error("<INVALID WORD>");
   }
   it->second.erase(wordName);
 }
@@ -213,7 +221,7 @@ void maslov::cleanDictionary(std::istream & in, Dicts & dicts)
   auto it = dicts.find(dictName);
   if (it == dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   dicts.erase(dictName);
 }
@@ -226,11 +234,11 @@ void maslov::printTopRare(std::istream & in, std::ostream & out, const Dicts & d
   auto dictIt = dicts.find(dictName);
   if (dictIt == dicts.cend())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   if (number == 0 || number > dictIt->second.size())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID NUMBER>");
   }
   maslov::FwdList< std::pair< std::string, int > > words;
   for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
@@ -250,9 +258,13 @@ void maslov::printFrequency(std::istream & in, std::ostream & out, const Dicts &
   std::string dictName, wordName;
   in >> dictName >> wordName;
   auto dictIt = dicts.find(dictName);
-  if (dictIt == dicts.cend() || dictIt->second.find(wordName) != dictIt->second.cend())
+  if (dictIt == dicts.cend())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
+  }
+  if (dictIt->second.find(wordName) == dictIt->second.cend())
+  {
+    throw std::runtime_error("<INVALID WORD>");
   }
   out << dictIt->second.at(wordName) << '\n';
 }
@@ -264,13 +276,13 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   in >> resultName >> dictName >> freq1 >> freq2;
   if (freq2 < freq1)
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID INTERVAL>");
   }
   auto resultIt = dicts.find(resultName);
   auto dictIt = dicts.find(dictName);
   if (dictIt == dicts.end() || resultIt != dicts.end())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID DICTIONARY>");
   }
   auto & resultDict = dicts[resultName];
   for (auto it = dictIt->second.cbegin(); it != dictIt->second.cend(); it++)
@@ -283,7 +295,7 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   if (resultDict.empty())
   {
     dicts.erase(resultName);
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<EMPTY DICTIONARY>");
   }
 }
 
@@ -294,7 +306,7 @@ void maslov::saveDictionaries(std::istream & in, const Dicts & dicts)
   std::ofstream file(fileName);
   if (!file.is_open())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID FILE>");
   }
   file << dicts.size() << '\n';
   for (auto dictIt = dicts.cbegin(); dictIt != dicts.cend(); dictIt++)
@@ -319,7 +331,7 @@ void maslov::loadFile(const std::string & filename, Dicts & dicts)
   std::ifstream file(filename);
   if (!file.is_open())
   {
-    throw std::runtime_error("<INVALID COMMAND>");
+    throw std::runtime_error("<INVALID FILE>");
   }
   size_t dictCount;
   file >> dictCount;
@@ -328,19 +340,21 @@ void maslov::loadFile(const std::string & filename, Dicts & dicts)
     std::string dictName;
     size_t wordCount;
     file >> dictName >> wordCount;
-    if (dicts.find(dictName) != dicts.end())
-    {
-      throw std::runtime_error("<INVALID COMMAND>");
-    }
-    Dict newDict;
+    Dict & currDict = dicts[dictName];
     std::string word;
     int freq;
     for (size_t j = 0; j < wordCount; ++j)
     {
       file >> word >> freq;
-      newDict[word] = freq;
+      if (currDict.find(word) != currDict.end())
+      {
+        currDict[word] += freq;
+      }
+      else
+      {
+        currDict[word] = freq;
+      }
     }
-    dicts[dictName] = newDict;
   }
 }
 
