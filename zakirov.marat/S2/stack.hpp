@@ -157,7 +157,7 @@ namespace zakirov
   {
     size_t new_capacity = capacity_ * 2 + 1;
     T * new_data = new T[new_capacity];
-    try 
+    try
     {
       for (size_t i = 0; i < top_; ++i)
       {
