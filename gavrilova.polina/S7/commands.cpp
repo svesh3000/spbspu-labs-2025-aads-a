@@ -61,6 +61,10 @@ void gavrilova::vertexes(std::ostream& out, std::istream& in, const GraphsCollec
     throw std::invalid_argument("Graph not found");
   }
   std::vector< std::string > v_names = it->second.get_vertices();
+  if (v_names.empty) {
+    out << "\n";
+    return;
+  }
   sort(v_names);
   for (size_t i = 0; i < v_names.size(); ++i) {
     out << v_names[i] << "\n";
