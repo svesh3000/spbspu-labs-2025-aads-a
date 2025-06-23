@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   }
 
   try {
-    zholobov::KeySum keySum;
+    zholobov::KeySum< TreeMap::key_type > keySum;
     if (traversal == "ascending") {
       keySum = map.traverse_lnr(keySum);
     } else if (traversal == "descending") {
