@@ -15,7 +15,6 @@ namespace {
     TreeMap::key_type key{};
     TreeMap::mapped_type value{};
     while (input >> key >> value) {
-      std::cout << "Adding: key=" << key << ", value=" << value << "\n";
       result.emplace(key, value);
     }
     return result;
@@ -36,6 +35,10 @@ int main(int argc, char* argv[])
     return 1;
   }
   const TreeMap map = readTree(inputFile);
+  if (!inputFile.eof()) {
+    std::cerr << "Bad file content\n";
+    return 1;
+  }
   if (map.empty()) {
     std::cout << "<EMPTY>\n";
     return 0;
