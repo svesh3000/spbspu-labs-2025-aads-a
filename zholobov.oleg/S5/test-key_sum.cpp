@@ -20,8 +20,9 @@ BOOST_AUTO_TEST_CASE(overflow_1)
   zholobov::KeySum< int > key_sum;
   try {
     key_sum({1, "one"});
-    key_sum({5, "five"});
+    key_sum({4, "four"});
     key_sum({std::numeric_limits< int >::max() - 4, "very_big"});
+    BOOST_TEST_ERROR("Should have thrown overflow");
   } catch (const std::overflow_error& e) {
     BOOST_TEST(e.what() == "Numeric overflow");
   }
@@ -32,8 +33,9 @@ BOOST_AUTO_TEST_CASE(overflow_2)
   zholobov::KeySum< int > key_sum;
   try {
     key_sum({-1, "one"});
-    key_sum({-5, "five"});
+    key_sum({-4, "four"});
     key_sum({std::numeric_limits< int >::min() + 4, "very_big_negative"});
+    BOOST_TEST_ERROR("Should have thrown overflow");
   } catch (const std::overflow_error& e) {
     BOOST_TEST(e.what() == "Numeric overflow");
   }
