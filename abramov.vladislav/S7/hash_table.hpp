@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include "node.hpp"
+#include "iterator.hpp"
 #include "cIterator.hpp"
 
 namespace abramov
@@ -11,6 +12,7 @@ namespace abramov
   template< class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   struct HashTable
   {
+    using Iter = Iterator< Key, Value, Hash, Equal >;
     using cIter = ConstIterator< Key, Value, Hash, Equal >;
 
     HashTable();
@@ -18,9 +20,12 @@ namespace abramov
     double loadFactor() const noexcept;
     void rehash(size_t k);
     size_t erase(const Key &k);
-    ConstIterator< Key, Value, Hash, Equal > cbegin() const noexcept;
-    ConstIterator< Key, Value, Hash, Equal > cend() const noexcept;
-    ConstIterator< Key, Value, Hash, Equal > cfind(const Key &k) const noexcept;
+    Iterator< Key, Value, Hash, Equal > begin();
+    Iterator< Key, Value, Hash, Equal > end();
+    Iterator< Key, Value, Hash, Equal > find(const Key &k);
+    ConstIterator< Key, Value, Hash, Equal > cbegin() const;
+    ConstIterator< Key, Value, Hash, Equal > cend() const;
+    ConstIterator< Key, Value, Hash, Equal > cfind(const Key &k) const;
     size_t size() const noexcept;
     bool empty() const noexcept;
 
@@ -30,6 +35,7 @@ namespace abramov
     size_t size_;
     Hash hash_;
     Equal equal_;
+    friend struct Iterator< Key, Value, Hash, Equal >;
     friend struct ConstIterator< Key, Value, Hash, Equal >;
 
     void initTable();
@@ -168,15 +174,65 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+typename abramov::HashTable< Key, Value, Hash, Equal >::Iter
+abramov::HashTable< Key, Value, Hash, Equal >::end()
+{
+  return Iterator< Key, Value, Hash, Equal >(this, capacity_, nullptr);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename abramov::HashTable< Key, Value, Hash, Equal >::Iter
+abramov::HashTable< Key, Value, Hash, Equal >::begin()
+{
+  for (size_t i = 0; i < capacity_; ++i)
+  {
+    if (table_[i])
+    {
+      return Iterator< Key, Value, Hash, Equal >(this, i, table_[i]);
+    }
+  }
+  return end();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename abramov::HashTable< Key, Value, Hash, Equal >::Iter
+abramov::HashTable< Key, Value, Hash, Equal >::find(const Key & k)
+{
+  if (empty())
+  {
+    return end();
+  }
+  size_t pos = hash_(k) % capacity_;
+  size_t att = 0;
+  size_t orig_pos = pos;
+  do
+  {
+    Node< Key, Value > *curr = table_[pos];
+    while (curr)
+    {
+      if (equal_(curr->data_.first, k))
+      {
+        return Iterator< Key, Value, Hash, Equal >(this, pos, curr);
+      }
+      curr = curr->next_;
+    }
+    ++att;
+    pos = (orig_pos + att * att) % capacity_;
+  } while (pos != orig_pos);
+  return end();
+}
+
+
+template< class Key, class Value, class Hash, class Equal >
 typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
-abramov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
+abramov::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return ConstIterator< Key, Value, Hash, Equal >(this, capacity_, nullptr);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
-abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
+abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   for (size_t i = 0; i < capacity_; ++i)
   {
@@ -190,7 +246,7 @@ abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
 
 template< class Key, class Value, class Hash, class Equal >
 typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
-abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const noexcept
+abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const
 {
   if (empty())
   {
