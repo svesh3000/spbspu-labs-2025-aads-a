@@ -2,8 +2,6 @@
 #define COMMANDS_HPP
 #include <iostream>
 #include <functional>
-#include <list>
-#include <map>
 #include <tree/tree-2-3.hpp>
 #include <list/list.hpp>
 
