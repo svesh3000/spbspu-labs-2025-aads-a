@@ -11,6 +11,8 @@ namespace abramov
   template< class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   struct HashTable
   {
+    using cIter = ConstIterator< Key, Value, Hash, Equal >;
+
     HashTable();
     void insert(const Key &k, const Value &v);
     double loadFactor() const noexcept;
@@ -166,13 +168,15 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
 }
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
+typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
+abramov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
 {
   return ConstIterator< Key, Value, Hash, Equal >(this, capacity_, nullptr);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
+typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
+abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
 {
   for (size_t i = 0; i < capacity_; ++i)
   {
@@ -185,7 +189,8 @@ abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value
 }
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const noexcept
+typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
+abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const noexcept
 {
   if (empty())
   {
