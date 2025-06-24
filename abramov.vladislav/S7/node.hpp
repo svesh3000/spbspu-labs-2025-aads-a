@@ -1,5 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
+#include <utility>
 
 namespace abramov
 {
@@ -13,6 +14,7 @@ namespace abramov
   };
 }
 
+template< class Key, class Value >
 abramov::Node< Key, Value >::Node(const Key &k, const Value &v):
   data_(std::make_pair< Key, Value >(k, v)),
   active_(true)
