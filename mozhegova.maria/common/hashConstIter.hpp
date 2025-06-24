@@ -8,10 +8,14 @@ namespace mozhegova
   template< class Key, class Value, class Hash, class Equal >
   class HashTable;
 
+  template< class Key, class Value, class Hash, class Equal >
+  class HashIter;
+
   template< class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   class HashConstIter: public std::iterator< std::bidirectional_iterator_tag, Value >
   {
     friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashIter< Key, Value, Hash, Equal >;
   public:
     using this_t = HashConstIter< Key, Value, Hash, Equal >;
     using table =  HashTable< Key, Value, Hash, Equal >;
@@ -46,7 +50,7 @@ namespace mozhegova
 
   template< class Key, class Value, class Hash, class Equal >
   HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const table * table, size_t index):
-    table_(table),
+    table_(const_cast< HashTable< Key, Value, Hash, Equal > * >(table)),
     index_(index)
   {
     skipEmpty();

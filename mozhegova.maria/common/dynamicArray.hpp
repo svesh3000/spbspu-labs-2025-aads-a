@@ -44,8 +44,8 @@ namespace mozhegova
 
   template< typename T >
   DynamicArray< T >::DynamicArray(const DynamicArray & other):
+    capacity_(other.capacity_),  
     size_(other.size_),
-    capacity_(other.capacity_),
     data_(new T[capacity_])
   {
     try
@@ -64,8 +64,8 @@ namespace mozhegova
 
   template< typename T >
   DynamicArray< T >::DynamicArray(DynamicArray && other) noexcept:
+    capacity_(other.capacity_),  
     size_(other.size_),
-    capacity_(other.capacity_),
     data_(other.data_)
   {
     other.size_ = 0;
@@ -140,7 +140,7 @@ namespace mozhegova
     {
       data_ = resize(data_, capacity_);
     }
-    data[size++] = value;
+    data_[size++] = value;
   }
 }
 

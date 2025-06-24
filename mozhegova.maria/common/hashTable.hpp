@@ -12,6 +12,8 @@ namespace mozhegova
   template< class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   class HashTable
   {
+    friend class HashIter< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
   public:
     using Iter = HashIter< Key, Value, Hash, Equal >;
     using cIter = HashConstIter< Key, Value, Hash, Equal >;
@@ -66,7 +68,8 @@ namespace mozhegova
     Equal equal_;
     float max_load_factor_ = 0.7;
 
-    size_t findIndex(const Key & k, const DynamicArray< Slot< Key, Value > > & table) const;
+    size_t findIndex(const Key & k) const;
+    size_t findIndexIn(const Key & k, const DynamicArray< Slot< Key, Value > > & table) const;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -182,37 +185,37 @@ namespace mozhegova
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  size_t HashTable< Key, Value, Hash, Equal >::findIndex(const Key & k, const DynamicArray< Slot< Key, Value > > & table) const
+  size_t HashTable< Key, Value, Hash, Equal >::findIndex(const Key & k) const
   {
-    size_t homeSlot = hasher_(k) % table.size();
+    size_t homeSlot = hasher_(k) % table_.size();
     size_t currSlot = homeSlot;
     size_t i = 1;
-    while (table[currSlot].occupied || table[currSlot].deleted)
+    while (table_[currSlot].occupied || table_[currSlot].deleted)
     {
-      if (table[currSlot].occupied && equal_(table[currSlot].data.first, k))
+      if (table_[currSlot].occupied && equal_(table_[currSlot].data.first, k))
       {
         return currSlot;
       }
-      currSlot = (homeSlot + i * i) % table.size();
+      currSlot = (homeSlot + i * i) % table_.size();
       ++i;
-      if (i >= table.size())
+      if (i >= table_.size())
       {
         break;
       }
     }
-    return table.size();
+    return table_.size();
   }
 
   template< class Key, class Value, class Hash, class Equal >
   HashIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::find(const Key & k)
   {
-    return Iter{this, findIndex(k, table_)};
+    return Iter{this, findIndex(k)};
   }
 
   template< class Key, class Value, class Hash, class Equal >
   HashConstIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::find(const Key & k) const
   {
-    return cIter{this, findIndex(k, table_)};
+    return cIter{this, findIndex(k)};
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -246,6 +249,20 @@ namespace mozhegova
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  size_t HashTable< Key, Value, Hash, Equal >::findIndexIn(const Key & k, const DynamicArray< Slot< Key, Value > > & table) const
+  {
+    size_t homeSlot = hasher_(k) % table.size();
+    size_t currSlot = homeSlot;
+    size_t i = 1;
+    while (table[currSlot].occupied)
+    {
+      currSlot = (homeSlot + i * i) % table.size();
+      ++i;
+    }
+    return currSlot;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t n)
   {
     if (n < table_.size())
@@ -257,10 +274,10 @@ namespace mozhegova
     {
       if (table_[i].occupied)
       {
-        size_t newId = findIndex(table_[i].data.first, temp);
-        temp[i].data = table_[i].data;
-        temp[i].occupied = true;
-        temp[i].deleted = false;
+        size_t newId = findIndexIn(table_[i].data.first, temp);
+        temp[newId].data = table_[i].data;
+        temp[newId].occupied = true;
+        temp[newId].deleted = false;
       }
     }
     table_.swap(temp);
@@ -269,8 +286,9 @@ namespace mozhegova
   template< class Key, class Value, class Hash, class Equal >
   size_t HashTable< Key, Value, Hash, Equal >::erase(const Key & k) noexcept
   {
-    auto it = find(k);
-    if (it == end())
+    const HashTable & constThis = *this;
+    cIter it = constThis.find(k);
+    if (it == cend())
     {
       return 0;
     }
@@ -340,7 +358,7 @@ namespace mozhegova
       {
         return {Iter{this, currSlot}, false};
       }
-      if (table_[currSlot].deleted && firstDeleted == bucketable_ts_.size())
+      if (table_[currSlot].deleted && firstDeleted == table_.size())
       {
         firstDeleted = currSlot;
       }
