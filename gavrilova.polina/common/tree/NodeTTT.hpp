@@ -17,7 +17,8 @@ namespace gavrilova {
     bool is_fake;
 
     NodeTwoThreeTree();
-    NodeTwoThreeTree(const value_type& d1, const value_type& d2, bool is_3, this_t* p, this_t* c1, this_t* c2, this_t* c3);
+    NodeTwoThreeTree(const value_type& d1, const value_type& d2, bool is_3,
+    this_t* p, this_t* c1, this_t* c2, this_t* c3);
     bool is_leaf() const;
   };
 
@@ -32,7 +33,8 @@ namespace gavrilova {
   }
 
   template < class Key, class Value >
-  NodeTwoThreeTree< Key, Value >::NodeTwoThreeTree(const value_type& d1, const value_type& d2, bool is_3, this_t* p, this_t* c0, this_t* c1, this_t* c2):
+  NodeTwoThreeTree< Key, Value >::NodeTwoThreeTree(const value_type& d1, const value_type& d2, 
+  bool is_3, this_t* p, this_t* c0, this_t* c1, this_t* c2):
     data(), children(), parent(p), is_3_node(is_3), is_fake(false)
   {
     data[0] = d1;
