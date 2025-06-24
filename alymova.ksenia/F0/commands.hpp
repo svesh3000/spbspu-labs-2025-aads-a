@@ -14,6 +14,7 @@ namespace alymova
   using DictSet = TwoThreeTree< std::string, Dictionary, std::less< std::string > >;
 
   void create(std::istream& in, std::ostream& out, DictSet& set);
+  void dicts(std::ostream& out, const DictSet& set);
   void size(std::istream& in, std::ostream& out, const DictSet& set);
   void removeDict(std::istream& in, std::ostream& out, DictSet& set);
   void addWord(std::istream& in, std::ostream& out, DictSet& set);

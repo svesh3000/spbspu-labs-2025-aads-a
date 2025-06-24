@@ -65,6 +65,20 @@ void alymova::create(std::istream& in, std::ostream& out, DictSet& set)
   out << "<SUCCESSFULLY CREATED>";
 }
 
+void alymova::dicts(std::ostream& out, const DictSet& set)
+{
+  if (set.empty())
+  {
+    return;
+  }
+  auto it = set.begin();
+  for (; it != --set.end(); it++)
+  {
+    out << it->first << '\n';
+  }
+  out << it->first;
+}
+
 void alymova::size(std::istream& in, std::ostream& out, const DictSet& set)
 {
   std::string name;
@@ -198,7 +212,8 @@ void alymova::addTranslate(std::istream& in, std::ostream& out, DictSet& set)
   List< std::string >& translates = dict.at(word);
   if (findTranslate(translates, translate) != translates.cend())
   {
-    throw std::logic_error("Such translate already added");
+    out << "<TRANSLATE ALREADY ADDED>";
+    return;
   }
   translates.push_back(translate);
   out << "<SUCCESSFULL ADDED>";
@@ -431,8 +446,8 @@ void alymova::saveDictionaryFile(std::ostream& out, const DictSet& set)
 
 void alymova::printHelp(std::ostream& out)
 {
-  out << "You can use some commands\n";
   out << std::setw(60) << std::left << "create <dict> " << "create new empty dictionary\n";
+  out << std::setw(60) << std::left << "dictionary_list" << "print list of current dictionaries\n";
   out << std::setw(60) << std::left << "size <name> " << "print dictionary size\n";
   out << std::setw(60) << std::left << "remove_dictionary <name> " << "remove existing dictionary\n";
   out << std::setw(60) << std::left << "add_word <dict> <word> <translate> ";

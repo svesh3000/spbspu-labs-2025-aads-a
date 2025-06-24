@@ -45,6 +45,7 @@ int main(int argc, char** argv)
     }
     CommandSet commands;
     commands["create"] = std::bind(create, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
+    commands["dictionary_list"] = std::bind(dicts, std::ref(std::cout), std::cref(dataset));
     commands["size"] = std::bind(size, std::ref(std::cin), std::ref(std::cout), std::cref(dataset));
     commands["remove_dictionary"] = std::bind(removeDict, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
     commands["add_word"] = std::bind(addWord, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
@@ -65,6 +66,7 @@ int main(int argc, char** argv)
     commands["union"] = std::bind(unionDicts, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
     commands["intersect"] = std::bind(intersectDicts, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
     commands["day_word"] = std::bind(printDayWord, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
+
     std::string command;
     while (!(std::cin >> command).eof())
     {
