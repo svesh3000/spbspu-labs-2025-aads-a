@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
-#include "TwoThreeTree.hpp"
+#include <tree/TwoThreeTree.hpp>
 #include "commands.hpp"
 
 namespace {

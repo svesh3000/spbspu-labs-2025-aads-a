@@ -48,28 +48,24 @@ namespace gavrilova {
   void intersectDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
       const std::string& secondDatasetName, Dataset& datasets)
   {
-    void intersectDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
-        const std::string& secondDatasetName, Dataset& datasets)
-    {
-      auto firstIt = datasets.find(firstDatasetName);
-      auto secondIt = datasets.find(secondDatasetName);
+    auto firstIt = datasets.find(firstDatasetName);
+    auto secondIt = datasets.find(secondDatasetName);
 
-      if (firstIt == datasets.end() || secondIt == datasets.end()) {
-        throw std::invalid_argument("One or both datasets not found");
-      }
-
-      KeyMap newDataset;
-      const auto& firstDataset = firstIt->second;
-      const auto& secondDataset = secondIt->second;
-
-      for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); ++it) {
-        if (secondDataset.find(it->first) != secondDataset.end()) {
-          newDataset.insert(*it);
-        }
-      }
-
-      datasets[newDatasetName] = std::move(newDataset);
+    if (firstIt == datasets.end() || secondIt == datasets.end()) {
+      throw std::invalid_argument("One or both datasets not found");
     }
+
+    KeyMap newDataset;
+    const auto& firstDataset = firstIt->second;
+    const auto& secondDataset = secondIt->second;
+
+    for (auto it = firstDataset.cbegin(); it != firstDataset.cend(); ++it) {
+      if (secondDataset.find(it->first) != secondDataset.end()) {
+        newDataset.insert(*it);
+      }
+    }
+
+    datasets[newDatasetName] = std::move(newDataset);
   }
 
   void unionDatasets(const std::string& newDatasetName, const std::string& firstDatasetName,
