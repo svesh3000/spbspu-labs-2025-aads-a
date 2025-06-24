@@ -8,6 +8,7 @@ namespace abramov
   struct Node
   {
     std::pair< Key, Value > data_;
+    Node< Key, Value > *next_;
     bool active_;
 
     Node(const Key &k, const Value &v);
@@ -17,6 +18,7 @@ namespace abramov
 template< class Key, class Value >
 abramov::Node< Key, Value >::Node(const Key &k, const Value &v):
   data_(std::make_pair< Key, Value >(k, v)),
+  next_(nullptr),
   active_(true)
 {}
 #endif
