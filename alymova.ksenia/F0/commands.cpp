@@ -123,17 +123,17 @@ void alymova::addWord(std::istream& in, std::ostream& out, DictSet& set)
   {
     List< std::string > translates{translate};
     dict.emplace(word, translates);
-    out << "<ADDED WORD AND TRANSLATE>";
+    out << "<WORD AND TRANSLATE WERE ADDED>";
     return;
   }
   List< std::string >& translates = it_word->second;
   if (findTranslate(translates, translate) == translates.cend())
   {
     translates.push_back(translate);
-    out << "<ADDED TRANSLATE>";
+    out << "<TRANSLATE WAS ADDED>";
     return;
   }
-  out << "<WORD AND TRANSLATE ALREADY ADDED>";
+  out << "<WORD AND TRANSLATE ALREADY WERE ADDED>";
 }
 
 void alymova::fixWord(std::istream& in, std::ostream& out, DictSet& set)
@@ -212,11 +212,11 @@ void alymova::addTranslate(std::istream& in, std::ostream& out, DictSet& set)
   List< std::string >& translates = dict.at(word);
   if (findTranslate(translates, translate) != translates.cend())
   {
-    out << "<TRANSLATE ALREADY ADDED>";
+    out << "<TRANSLATE WAS ALREADY ADDED>";
     return;
   }
   translates.push_back(translate);
-  out << "<SUCCESSFULL ADDED>";
+  out << "<TRANSLATE WAS ADDED>";
 }
 
 void alymova::findEnglishEquivalent(std::istream& in, std::ostream& out, const DictSet& set)
@@ -392,11 +392,17 @@ void alymova::printDayWord(std::istream& in, std::ostream& out, const DictSet& s
     throw std::logic_error("<INVALID COMMAND>");
   }
   const Dictionary& dict = set.at(name);
+  if (dict.empty())
+  {
+    out << "Sorry, today is a bad day";
+    return;
+  }
   std::srand(std::time(nullptr));
   int random_num = std::rand() % dict.size();
   auto it_word = dict.begin();
   for (int i = 0; i < random_num; i++, it_word++);
-  out << "Have a good day with word: " << it_word->first;
+  out << "Have a good day with word:\n";
+  out << it_word->first << ' ' << it_word->second;
 }
 
 alymova::DictSet alymova::readDictionaryFile(std::istream& in)
