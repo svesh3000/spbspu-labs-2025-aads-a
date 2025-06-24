@@ -33,7 +33,7 @@ namespace gavrilova {
   }
 
   template < class Key, class Value >
-  NodeTwoThreeTree< Key, Value >::NodeTwoThreeTree(const value_type& d1, const value_type& d2, 
+  NodeTwoThreeTree< Key, Value >::NodeTwoThreeTree(const value_type& d1, const value_type& d2,
   bool is_3, this_t* p, this_t* c0, this_t* c1, this_t* c2):
     data(), children(), parent(p), is_3_node(is_3), is_fake(false)
   {
