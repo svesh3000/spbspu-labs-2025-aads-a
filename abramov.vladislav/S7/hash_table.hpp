@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include "node.hpp"
+#include "cIterator.hpp"
 
 namespace abramov
 {
@@ -15,6 +16,9 @@ namespace abramov
     double loadFactor() const noexcept;
     void rehash(size_t k);
     size_t erase(const Key &k);
+    ConstIterator< Key, Value, Hash, Equal > cbegin() const noexcept;
+    ConstIterator< Key, Value, Hash, Equal > cend() const noexcept;
+    ConstIterator< Key, Value, Hash, Equal > cfind(const Key &k) const noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
 
@@ -24,6 +28,7 @@ namespace abramov
     size_t size_;
     Hash hash_;
     Equal equal_;
+    friend struct ConstIterator< Key, Value, Hash, Equal >;
 
     void initTable();
     void resizeIfNeed();
@@ -158,6 +163,52 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
     pos = (orig_pos + att * att) & capacity_;
   } while (pos != orig_pos);
   return removed;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cend() const noexcept
+{
+  return ConstIterator< Key, Value, Hash, Equal >(this, capacity_, nullptr);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
+{
+  for (size_t i = 0; i < capacity_; ++i)
+  {
+    if (table_[i])
+    {
+      return ConstIterator< Key, Value, Hash, Equal >(this, i, table_[i]);
+    }
+  }
+  return cend();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+abramov::ConstIterator< Key, Value, Hash, Equal > abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const noexcept
+{
+  if (empty())
+  {
+    return cend();
+  }
+  size_t pos = hash_(k) % capacity_;
+  size_t att = 0;
+  size_t orig_pos = pos;
+  do
+  {
+    Node< Key, Value > *curr = table_[pos];
+    while (curr)
+    {
+      if (equal_(curr->data_.first, k))
+      {
+        return ConstIterator< Key, Value, Hash, Equal >(this, pos, curr);
+      }
+      curr = curr->next_;
+    }
+    ++att;
+    pos = (orig_pos + att * att) % capacity_;
+  } while (pos != orig_pos);
+  return cend();
 }
 
 template< class Key, class Value, class Hash, class Equal >
