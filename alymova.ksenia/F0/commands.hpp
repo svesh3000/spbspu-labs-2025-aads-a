@@ -31,7 +31,7 @@ namespace alymova
   void printDayWord(std::istream& in, std::ostream& out, const DictSet& set);
 
   DictSet readDictionaryFile(std::istream& in);
-  void saveDictionaryFile(std::ostream& out);
+  void saveDictionaryFile(std::ostream& out, const DictSet& set);
 
   void printHelp(std::ostream& out);
 }

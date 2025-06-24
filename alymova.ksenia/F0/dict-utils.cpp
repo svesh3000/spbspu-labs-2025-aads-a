@@ -41,3 +41,20 @@ std::ostream& alymova::operator<<(std::ostream& out, const List< std::string >& 
   }
   return out;
 }
+std::ostream& alymova::operator<<(std::ostream& out, const Dictionary& dict)
+{
+  std::ostream::sentry s(out);
+  if (!s)
+  {
+    return out;
+  }
+  for (auto it = dict.begin(); it != dict.end(); it++)
+  {
+    out << '\n' << it->first << ' ' << it->second.size();
+    if (!it->second.empty())
+    {
+      out << ' ' << it->second;
+    }
+  }
+  return out;
+}

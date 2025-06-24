@@ -8,7 +8,6 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using namespace std::placeholders;
   using TranslateSet = List< std::string >;
   using Dictionary = TwoThreeTree< std::string, TranslateSet, std::less< std::string > >;
   using DictSet = TwoThreeTree< std::string, Dictionary, std::less< std::string > >;
@@ -20,13 +19,13 @@ int main(int argc, char** argv)
     std::cerr << "<INCORRECT ARGUMENTS>\n";
     return 1;
   }
-  std::istream* input = &std::cin;
   std::ifstream file;
   if (argc == 2)
   {
     if (std::strcmp(argv[1], "--help") == 0)
     {
       printHelp(std::cout);
+      std::cout << '\n';
       return 0;
     }
     file.open(argv[1]);
@@ -35,13 +34,15 @@ int main(int argc, char** argv)
       std::cerr << "<INCORRECT FILE>\n";
       return 1;
     }
-    input = &file;
   }
 
   try
   {
-    //DictSet dataset = readDictionaryFile(*input);
     DictSet dataset;
+    if (argc == 2)
+    {
+      dataset = readDictionaryFile(file);
+    }
     CommandSet commands;
     commands["create"] = std::bind(create, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
     commands["size"] = std::bind(size, std::ref(std::cin), std::ref(std::cout), std::cref(dataset));
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
     commands["find_english_equivalent"] = short_name1;
 
     auto short_name2 = std::bind(removeTranslate, std::ref(std::cin), std::ref(std::cout), std::ref(dataset));
-    commands["remove_translate"] = short_name1;
+    commands["remove_translate"] = short_name2;
 
     commands["print_content"] = std::bind(printContent, std::ref(std::cin), std::ref(std::cout), std::cref(dataset));
     commands["translate"] = std::bind(translate, std::ref(std::cin), std::ref(std::cout), std::cref(dataset));
@@ -82,6 +83,17 @@ int main(int argc, char** argv)
         std::cout << "<INVALID COMMAND>\n";
       }
     }
+    std::ofstream file;
+    if (argc == 2)
+    {
+      file.open(argv[1]);
+    }
+    else
+    {
+      file.open("dictionaries.txt");
+    }
+    saveDictionaryFile(file, dataset);
+    file << '\n';
   }
   catch (const std::exception& e)
   {

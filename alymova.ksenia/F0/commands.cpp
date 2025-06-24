@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <exception>
 #include <cstdlib>
@@ -379,8 +380,53 @@ void alymova::printDayWord(std::istream& in, std::ostream& out, const DictSet& s
   std::srand(std::time(nullptr));
   int random_num = std::rand() % dict.size();
   auto it_word = dict.begin();
-  for (size_t i = 0; i < random_num; i++, it_word++);
+  for (int i = 0; i < random_num; i++, it_word++);
   out << "Have a good day with word: " << it_word->first;
+}
+
+alymova::DictSet alymova::readDictionaryFile(std::istream& in)
+{
+  DictSet dataset;
+  std::string name;
+  size_t size;
+  while (in >> name >> size)
+  {
+    Dictionary dict;
+    std::string key;
+    List< std::string > value;
+    for (size_t i = 0; i < size && in; i++)
+    {
+      in >> key >> value;
+      dict[key] = value;
+    }
+    if (in)
+    {
+      dataset[name] = dict;
+    }
+  }
+  if ((in).fail() && !(in).eof())
+  {
+    throw std::logic_error("<INVALID DICTIONARIES DESCRIPTION>");
+  }
+  return dataset;
+}
+
+void alymova::saveDictionaryFile(std::ostream& out, const DictSet& set)
+{
+  if (set.empty())
+  {
+    return;
+  }
+  auto it = set.begin();
+  for (; it != --set.end(); it++)
+  {
+    const Dictionary& dict = it->second;
+    out << it->first << ' ' << dict.size();
+    out << dict << '\n';
+  }
+  const Dictionary& dict = it->second;
+  out << it->first << ' ' << dict.size();
+  out << dict;
 }
 
 void alymova::printHelp(std::ostream& out)
@@ -415,6 +461,6 @@ void alymova::printHelp(std::ostream& out)
   out << "create new dictionary as intersection of dictionary1, dictionary2\n";
   out << std::setw(60) << std::left << "day_word <dict> ";
   out << "print word of day:)\n";
-  out << std::setw(60) << std::left << "save <file> " << "save all dictionaries in file\n";
-  out << "Result of programm work will be saved in file <dictionaries.txt> as default\n";
+  out << "\nIf dictionaries were load from file, result of programm will be saved in this file.\n";
+  out << "In the opposite case result of programm will be saved in file \"dictionaries\".";
 }
