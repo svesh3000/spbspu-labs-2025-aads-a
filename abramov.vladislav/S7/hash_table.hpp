@@ -1,5 +1,6 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include "node.hpp"
@@ -11,6 +12,9 @@ namespace abramov
   {
     HashTable();
     void insert(const Key &k, const Value &v);
+    double loadFactor() const noexcept;
+    void rehash(size_t k);
+    size_t erase(const Key &k);
     size_t size() const noexcept;
     bool empty() const noexcept;
 
@@ -23,15 +27,16 @@ namespace abramov
 
     void initTable();
     void resizeIfNeed();
-    double loadFactor() const noexcept;
-    void rehash(size_t k);
+    size_t findInsertPosition(const Key &k) const;
+    bool isPrime(size_t k) const noexcept;
+    size_t getLargerPrimeCapacity(size_t k) const noexcept;
   };
 }
 
 template< class Key, class Value, class Hash, class Equal >
 abramov::HashTable< Key, Value, Hash, Equal >::HashTable():
   table_(nullptr),
-  capacity_(20),
+  capacity_(17),
   size_(0),
   hash_(std::hash< Key >()),
   equal_(std::equal_to< Key >())
@@ -77,11 +82,11 @@ void abramov::HashTable< Key, Value, Hash, Equal >::resizeIfNeed()
   }
 }
 
-  template< class Key, class Value, class Hash, class Equal >
-  double abramov::HashTable< Key, Value, Hash, Equal >::loadFactor() const noexcept
-  {
-    return static_cast< double >(size_) / capacity_;
-  }
+template< class Key, class Value, class Hash, class Equal >
+double abramov::HashTable< Key, Value, Hash, Equal >::loadFactor() const noexcept
+{
+  return static_cast< double >(size_) / capacity_;
+}
 
 template< class Key, class Value, class Hash, class Equal >
 void abramov::HashTable< Key, Value, Hash, Equal >::rehash(size_t k)
@@ -106,6 +111,56 @@ void abramov::HashTable< Key, Value, Hash, Equal >::rehash(size_t k)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+size_t abramov::HashTable< Key, Value, Hash, Equal >::findInsertPosition(const Key &k) const
+{
+  size_t pos = hash_(k) % capacity_;
+  size_t att = 0;
+  while (table_[pos] && !equal_(table_[pos]->data_.first, k))
+  {
+    pos = (pos + att * att) % capacity_;
+    ++att;
+  }
+  return pos;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
+{
+  size_t removed = 0;
+  size_t orig_pos = hash_(k) % capacity_;
+  size_t pos = orig_pos;
+  size_t att = 0;
+  do
+  {
+    Node< Key, Value > *curr = table_[pos];
+    Node< Key, Value > *prev = nullptr;
+    while (curr)
+    {
+      if (equal_(curr->data_.first, k))
+      {
+        Node< Key, Value > *del = curr;
+        if (prev)
+        {
+          prev->next_ = curr->next_;
+        }
+        else
+        {
+          table_[pos] = curr->next_;
+        }
+      }
+      else
+      {
+        prev = curr;
+        curr = curr->next_;
+      }
+    }
+    ++att;
+    pos = (orig_pos + att * att) & capacity_;
+  } while (pos != orig_pos);
+  return removed;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t abramov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return size_;
@@ -116,4 +171,36 @@ bool abramov::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 {
   return size_ == 0;
 }
+
+template< class Key, class Value, class Hash, class Equal >
+bool abramov::HashTable< Key, Value, Hash, Equal >::isPrime(size_t k) const noexcept
+{
+  if (k % 2 == 0)
+  {
+    return true;
+  }
+  for (size_t i = 3; i < static_cast< int >(std::ceil(std::sqrt(k))); ++i)
+  {
+    if (k % i == 0)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t abramov::HashTable< Key, Value, Hash, Equal >::getLargerPrimeCapacity(size_t k) const noexcept
+{
+  size_t cand = 2 * cand + 1;
+  while (true)
+  {
+    if (isPrime(cand))
+    {
+      return cand;
+    }
+    ++cand;
+  }
+}
 #endif
+
