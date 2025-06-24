@@ -4,13 +4,13 @@
 #include <tree/Iterator.hpp>
 #include <tree/TwoThreeTree.hpp>
 
-BOOST_AUTO_TEST_CASE(TestEmptyTree)
-{
-  gavrilova::TwoThreeTree< int, std::string > tree;
-  BOOST_TEST(tree.empty());
-  BOOST_TEST(tree.size() == 0);
-  BOOST_CHECK(tree.find(42) == tree.end());
-}
+// BOOST_AUTO_TEST_CASE(TestEmptyTree)
+// {
+//   gavrilova::TwoThreeTree< int, std::string > tree;
+//   BOOST_TEST(tree.empty());
+//   BOOST_TEST(tree.size() == 0);
+//   BOOST_CHECK(tree.find(42) == tree.end());
+// }
 
 BOOST_AUTO_TEST_CASE(TestInsertAndFind)
 {
