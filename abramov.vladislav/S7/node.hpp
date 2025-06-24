@@ -17,7 +17,7 @@ namespace abramov
 
 template< class Key, class Value >
 abramov::Node< Key, Value >::Node(const Key &k, const Value &v):
-  data_(std::make_pair< Key, Value >(k, v)),
+  data_(std::make_pair(k, v)),
   next_(nullptr),
   active_(true)
 {}

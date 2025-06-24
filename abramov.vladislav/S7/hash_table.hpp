@@ -16,6 +16,7 @@ namespace abramov
     using cIter = ConstIterator< Key, Value, Hash, Equal >;
 
     HashTable();
+    ~HashTable();
     void insert(const Key &k, const Value &v);
     double loadFactor() const noexcept;
     void rehash(size_t k);
@@ -65,6 +66,16 @@ void abramov::HashTable< Key, Value, Hash, Equal >::initTable()
   {
     table_[i] = nullptr;
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+abramov::HashTable< Key, Value, Hash, Equal >::~HashTable()
+{
+  for (size_t i = 0; i < capacity_; ++i)
+  {
+    delete table_[i];
+  }
+  delete[] table_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -160,6 +171,10 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
         {
           table_[pos] = curr->next_;
         }
+        curr = curr->next_;
+        delete del;
+        ++removed;
+        --size_;
       }
       else
       {
@@ -168,7 +183,7 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
       }
     }
     ++att;
-    pos = (orig_pos + att * att) & capacity_;
+    pos = (orig_pos + att * att) % capacity_;
   } while (pos != orig_pos);
   return removed;
 }
