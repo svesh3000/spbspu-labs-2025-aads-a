@@ -205,16 +205,7 @@ void tkach::import(std::istream& in, AvlTree< std::string, AvlTree< std::string,
         break;
       }
     }
-    auto it = temp.find(name_of_dict);
-    if (it == temp.end())
-    {
-      temp[name_of_dict] = temp_dict;
-    }
-    else
-    {
-      AvlTree< std::string, List< std::string > > merged = mergeDicts({&temp_dict, &temp[name_of_dict]});
-      temp[name_of_dict] = merged;
-    }
+    temp[name_of_dict] = mergeDicts({&temp_dict, &temp[name_of_dict]});
   }
   if (!in2.eof())
   {
@@ -470,7 +461,9 @@ void tkach::addTranslation(std::istream& in, AvlTree< std::string, AvlTree< std:
     }
     if (!findTranslation(it2->second, translation))
     {
-      it2->second.pushBack(translation);
+      List< std::string > new_translations_list;
+      new_translations_list.pushBack(translation);
+      it2->second = mergeTranslations(it2->second, new_translations_list);
     }
   }
   else
@@ -482,7 +475,9 @@ void tkach::addTranslation(std::istream& in, AvlTree< std::string, AvlTree< std:
       {
         if (!findTranslation(it2->second, translation))
         {
-          it2->second.pushBack(translation);
+          List< std::string > new_translations_list;
+          new_translations_list.pushBack(translation);
+          it2->second = mergeTranslations(it2->second, new_translations_list);
         }
       }
     }
