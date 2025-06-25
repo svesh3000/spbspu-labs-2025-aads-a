@@ -403,12 +403,13 @@ void brevnov::soldTeam(std::istream& in, League& league)
   {
     brevnov::Team& sTeam = (*teamFind).second;
     auto pl = sTeam.players_.begin();
-    while (!sTeam.players_.empty())
+    while (pl != sTeam.players_.end())
     {
       sTeam.budget_ += (*pl).second.price_;
       league.fa_.insert(*pl);
-      pl = sTeam.players_.erase(pl);
+      pl++;
     }
+    sTeam.players_.clear();
   }
   else
   {
