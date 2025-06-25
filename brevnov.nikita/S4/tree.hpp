@@ -381,7 +381,7 @@
       try
       {
         newNode = new Node{ nullptr, nullptr, nullptr,1 ,  { std::forward< Args >(args)... } };
-        if (!root_)
+        if (empty())
         {
           root_ = newNode;
           size_ = 1;
