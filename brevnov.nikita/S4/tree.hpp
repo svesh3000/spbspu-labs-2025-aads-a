@@ -564,27 +564,24 @@
     template< typename Key, typename Value, typename Cmp >
     typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(ConstIter pos) noexcept
     {
-      if (pos == cend())
+      if (pos == cend() || empty())
       {
-          return end();
+        return end();
       }
 
       Node* todelete = pos.node_;
-      Node* parent = todelete->parent;
-      Iter result = Iter(parent, parent ? false : true);
+      if (!todelete)
+      {
+        return end();
+      }
 
-      if (todelete->left == nullptr && todelete->right == nullptr)
+      Node* parent = todelete->parent;
+      Iter result = (parent ? Iter(parent, false) : begin());
+      if (!todelete->left && !todelete->right)
       {
         if (parent)
         {
-          if (parent->left == todelete)
-          {
-            parent->left = nullptr;
-          }
-          else
-          {
-            parent->right = nullptr;
-          }
+          (parent->left == todelete) ? parent->left = nullptr : parent->right = nullptr;
           result = Iter(parent, false);
         }
         else
@@ -593,9 +590,9 @@
           result = end();
         }
       }
-      else if (todelete->left == nullptr || todelete->right == nullptr)
+      else if (!todelete->left || !todelete->right)
       {
-        Node* child = (todelete->left != nullptr) ? todelete->left : todelete->right;
+        Node* child = todelete->left ? todelete->left : todelete->right;
         if (parent)
         {
           if (parent->left == todelete)
@@ -618,21 +615,20 @@
       }
       else
       {
-        Node* next = todelete->right;
-        while (next->left != nullptr)
+        Node* successor = todelete->right;
+        while (successor->left)
         {
-          next = next->left;
+          successor = successor->left;
         }
-        todelete->data = next->data;
-        return erase(Iter(next, false));
-      }
-      if (todelete == root_)
-      {
-        result = begin();
+        todelete->data = successor->data;
+        return erase(Iter(successor, false));
       }
       delete todelete;
       size_--;
-      fixHeight(root_);
+      if (root_)
+      {
+        fixHeight(root_);
+      }
       return result;
     }
 
