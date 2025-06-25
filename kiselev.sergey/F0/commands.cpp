@@ -109,7 +109,7 @@ void kiselev::doAddElement(std::istream& in, std::ostream& out, Dicts& dicts)
     out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
-  Dict dict = dictIt->second;
+  Dict& dict = dictIt->second;
   auto engIt = dict.find(eng);
   if (engIt == dict.end())
   {
@@ -134,7 +134,7 @@ void kiselev::doDeleteElement(std::istream& in, std::ostream& out, Dicts& dicts)
     out << "<DICTIONARY NOT FOUND>\n";
     return;
   }
-  Dict dict = dictIt->second;
+  Dict& dict = dictIt->second;
   auto engIt = dict.find(eng);
   if (engIt == dict.end())
   {
@@ -235,18 +235,21 @@ void kiselev::doUnionDict(std::istream& in, std::ostream& out, Dicts& dicts)
   }
   Dict res = unionTwoDict(first->second, second->second);
   std::string nextDict;
-  while (in >> nextDict)
+  if (in.get() != '\n')
   {
-    auto it = dicts.find(nextDict);
-    if (it == dicts.end())
+    while (in >> nextDict)
     {
-      out << "<DICTIONARY NOT FOUND>\n";
-      return;
-    }
-    res = unionTwoDict(res, it->second);
-    if (in.get() == '\n')
-    {
-      break;
+      if (in.get() == '\n')
+      {
+        break;
+      }
+      auto it = dicts.find(nextDict);
+      if (it == dicts.end())
+      {
+        out << "<DICTIONARY NOT FOUND>\n";
+        return;
+      }
+      res = unionTwoDict(res, it->second);
     }
   }
   dicts[nameNewDict] = res;
@@ -437,18 +440,21 @@ void kiselev::doIntersectDict(std::istream& in, std::ostream& out, Dicts& dicts)
   }
   Dict res = intersectTwoDict(first->second, second->second);
   std::string nextDict;
-  while (in >> nextDict)
+  if (in.get() != '\n')
   {
-    auto it = dicts.find(nextDict);
-    if (it == dicts.end())
+    while (in >> nextDict)
     {
-      out << "<DICTIONARY NOT FOUND>\n";
-      return;
-    }
-    res = intersectTwoDict(res, it->second);
-    if (in.get() == '\n')
-    {
-      break;
+      if (in.get() == '\n')
+      {
+        break;
+      }
+      auto it = dicts.find(nextDict);
+      if (it == dicts.end())
+      {
+        out << "<DICTIONARY NOT FOUND>\n";
+        return;
+      }
+      res = intersectTwoDict(res, it->second);
     }
   }
   dicts[nameNewDict] = res;
@@ -473,7 +479,7 @@ void kiselev::doComplementDict(std::istream& in, std::ostream& out, Dicts& dicts
     return;
   }
   Dict res;
-  for (auto it = first->second.end(); it != first->second.end(); ++it)
+  for (auto it = first->second.begin(); it != first->second.end(); ++it)
   {
     if (second->second.find(it->first) == second->second.end())
     {
