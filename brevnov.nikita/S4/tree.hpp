@@ -568,85 +568,58 @@
       {
         return end();
       }
-      Node* del = pos.node_;
-      Node* parent = del->parent;
-      Iter next(pos.node_, pos.isEnd_);
-      next++;
-      if (!del->left && !del->right)
+
+      Node* todelete = pos.getNode();
+      Node* parent = todelete->parent;
+      Iter result = Iter(parent);
+
+      if (todelete->left == nullptr && todelete->right == nullptr)
       {
-        if (parent)
+        if (parent->left == todelete)
         {
-          if (parent->left == del)
-          {
-            parent->left = nullptr;
-          }
-          else
-          {
-            parent->right = nullptr;
-          }
+          parent->left = nullptr;
         }
         else
         {
-          root_ = nullptr;
-          size_ = 0;
-          return end();
+          parent->right = nullptr;
         }
-        delete del;
-        size_--;
-        fixHeight(root_);
-        return next;
+        result = Iter(parent);
       }
-      if (!del->left || !del->right)
+      else if (todelete->left == nullptr || todelete->right == nullptr)
       {
-        Node* child = del->left ? del->left : del->right;
-        if (parent)
+        Node* child = (todelete->left != nullptr) ? todelete->left : todelete->right;
+        if (parent->left == todelete)
         {
-          if (parent->left == del)
-          {
-            parent->left = child;
-          }
-          else
-          {
-            parent->right = child;
-          }
+          parent->left = child;
         }
         else
         {
-          root_ = child;
+          parent->right = child;
         }
-        if (child)
-        {
-          child->parent = parent;
-        }
-        delete del;
-        size_--;
-        fixHeight(root_);
-        return next;
-      }
-      Node* successor = del->right;
-      while (successor->left)
-      {
-        successor = successor->left;
-      }
-      Node* succParent = successor->parent;
-      Node* succChild = successor->right;
-      std::swap(del->data, successor->data);
-      if (succParent->left == successor)
-      {
-        succParent->left = succChild;
+        child->parent = parent;
+        result = Iter(child);
       }
       else
       {
-        succParent->right = succChild;
+        Node* next = todelete->right;
+        while (next->left != nullptr)
+        {
+          next = next->left;
+        }
+        todelete->data = next->data;
+        return erase(Iter(next));
       }
-      if (succChild)
+
+      if (todelete == root_)
       {
-        succChild->parent = succParent;
+        root_ = (parent != fakeRoot_) ? parent : fakeRoot_;
+        result = begin();
       }
-      delete successor;
+
+      delete todelete;
       size_--;
       fixHeight(root_);
-      return next;
+      return result;
     }
 
     template< typename Key, typename Value, typename Cmp >
