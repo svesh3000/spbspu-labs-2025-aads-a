@@ -2,6 +2,7 @@
 #define HASH_TABLE_HPP
 #include <cmath>
 #include <cstddef>
+#include <algorithm>
 #include <functional>
 #include "node.hpp"
 #include "iterator.hpp"
@@ -14,9 +15,13 @@ namespace abramov
   {
     using Iter = Iterator< Key, Value, Hash, Equal >;
     using cIter = ConstIterator< Key, Value, Hash, Equal >;
+    using Hash_t = HashTable< Key, Value, Hash, Equal >;
+    using cHash = const HashTable< Key, Value, Hash, Equal >;
 
     HashTable();
+    HashTable(const HashTable< Key, Value, Hash, Equal > &other);
     ~HashTable();
+    HashTable< Key, Value, Hash, Equal > &operator=(const HashTable< Key, Value, Hash, Equal > &other);
     void insert(const Key &k, const Value &v);
     double loadFactor() const noexcept;
     void rehash(size_t k);
@@ -41,6 +46,7 @@ namespace abramov
 
     void initTable();
     void resizeIfNeed();
+    void swap(HashTable< Key, Value, Hash, Equal > &other) noexcept;
     size_t findInsertPosition(const Key &k) const;
     bool isPrime(size_t k) const noexcept;
     size_t getLargerPrimeCapacity(size_t k) const noexcept;
@@ -66,6 +72,48 @@ void abramov::HashTable< Key, Value, Hash, Equal >::initTable()
   {
     table_[i] = nullptr;
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+abramov::HashTable< Key, Value, Hash, Equal >::HashTable(cHash &other):
+  table_(nullptr),
+  capacity_(other.capacity_),
+  size_(0),
+  hash_(other.hash_),
+  equal_(other.equal_)
+{
+  initTable();
+  for (size_t i = 0; i < other.capacity_; ++i)
+  {
+    Node< Key, Value > *curr = other.table_[i];
+    while (curr)
+    {
+      insert(curr->data_.first, curr->data_.second);
+      curr = curr->next_;
+    }
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void abramov::HashTable< Key, Value, Hash, Equal >::swap(Hash_t &other) noexcept
+{
+  std::swap(table_, other.table_);
+  std::swap(capacity_, other.capacity_);
+  std::swap(size_, other.size_);
+  std::swap(hash_, other.hash_);
+  std::swap(equal_, other.equal_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename abramov::HashTable< Key, Value, Hash, Equal >::Hash_t&
+abramov::HashTable< Key, Value, Hash, Equal >::operator=(cHash &other)
+{
+  if (this != std::addressof(other))
+  {
+    HashTable< Key, Value, Hash, Equal > temp(other);
+    swap(temp);
+  }
+  return *this;
 }
 
 template< class Key, class Value, class Hash, class Equal >
