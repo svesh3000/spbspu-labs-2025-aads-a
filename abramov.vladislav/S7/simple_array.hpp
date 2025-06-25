@@ -1,6 +1,7 @@
 #ifndef SIMPLE_ARRAY_HPP
 #define SIMPLE_ARRAY_HPP
 #include <cstddef>
+#include <algorithm>
 
 namespace abramov
 {
@@ -8,7 +9,9 @@ namespace abramov
   struct SimpleArray
   {
     SimpleArray();
+    SimpleArray(const SimpleArray< T > &other);
     ~SimpleArray();
+    SimpleArray< T > &operator=(const SimpleArray< T > &other);
     T &operator[](size_t id) noexcept;
     const T &operator[](size_t id) const noexcept;
     void pushBack(const T &val);
@@ -19,6 +22,7 @@ namespace abramov
     size_t size_;
 
     void resize(size_t k);
+    void swap(SimpleArray< T > &rhs) noexcept;
   };
 }
 
@@ -30,9 +34,37 @@ abramov::SimpleArray< T >::SimpleArray():
 {}
 
 template< class T >
+abramov::SimpleArray< T >::SimpleArray(const SimpleArray< T > &other):
+  data_(new T[other.capacity_]),
+  capacity_(other.capacity_),
+  size_(other.size_)
+{
+  for (size_t i = 0; i < size_; ++i)
+  {
+    data_[i] = other.data_[i];
+  }
+}
+
+template< class T >
 abramov::SimpleArray< T >::~SimpleArray()
 {
   delete[] data_;
+}
+
+template< class T >
+void abramov::SimpleArray< T >::swap(SimpleArray< T > &other) noexcept
+{
+  std::swap(data_, other.data_);
+  std::swap(capacity_, other.capacity_);
+  std::swap(size_, other.size_);
+}
+
+template< class T >
+abramov::SimpleArray< T > &abramov::SimpleArray< T >::operator=(const SimpleArray< T > &other)
+{
+  SimpleArray< T > temp(other);
+  swap(temp);
+  return *this;
 }
 
 template< class T >
