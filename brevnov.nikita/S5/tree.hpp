@@ -556,7 +556,7 @@ namespace brevnov
     try
     {
       newNode = new Node{ nullptr, nullptr, nullptr,1 ,  { std::forward< Args >(args)... } };
-      if (!root_)
+      if (empty())
       {
         root_ = newNode;
         size_ = 1;
@@ -739,11 +739,11 @@ namespace brevnov
   template< typename Key, typename Value, typename Cmp >
   typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(ConstIter pos) noexcept
   {
-    if (pos == cend())
+    if (pos == cend() || empty())
     {
       return end();
     }
-    Node* del = pos.node_;
+    Node* toDelete = pos.node_;
     Node* replace = nullptr;
     Node* child = nullptr;
     if (size_ == 1)
@@ -752,13 +752,13 @@ namespace brevnov
       size_ = 0;
       return end();
     }
-    if (!del->left || !del->right)
+    if (!toDelete->left || !toDelete->right)
     {
-      replace = del;
+      replace = toDelete;
     }
     else
     {
-      replace = del->right;
+      replace = toDelete->right;
       while (replace->left)
       {
         replace = replace->left;
@@ -781,15 +781,18 @@ namespace brevnov
     {
       replace->parent->right = child;
     }
-    if (replace != del)
+    if (replace != toDelete)
     {
-      del->data = std::move(replace->data);
+      toDelete->data = std::move(replace->data);
     }
-    fixHeight(root_);
     Iter next(pos.node_, pos.isEnd_);
     ++next;
     delete replace;
     --size_;
+    if (root_)
+    {
+      fixHeight(root_);
+    }
     return next;
   }
 
