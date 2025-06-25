@@ -13,7 +13,7 @@ namespace abramov
     const std::string &getName() const noexcept;
     size_t getEdgeCount() const noexcept;
     size_t getVertexCount() const noexcept;
-    const SimpleArray< Edge > *getEdjes(const std::string &vert) const;
+    const SimpleArray< Edge > *getEdges(const std::string &vert) const;
     bool hasVertex(const std::string &vert) const;
   private:
     HashTable< std::string, SimpleArray< Edge > > adj_list;
@@ -60,12 +60,12 @@ size_t abramov::Graph::getVertexCount() const noexcept
   return adj_list.size();
 }
 
-const abramov::SimpleArray< Edge > *abramov::Graph::getEdges(const std::string &vert) const
+const abramov::SimpleArray< abramov::Edge > *abramov::Graph::getEdges(const std::string &vert) const
 {
   auto it = adj_list.cfind(vert);
   if (it != adj_list.cend())
   {
-    return it->second;
+    return &(it->second);
   }
   return nullptr;
 }
