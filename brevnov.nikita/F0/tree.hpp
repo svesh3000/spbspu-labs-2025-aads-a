@@ -806,7 +806,6 @@ namespace brevnov
     std::swap(del->data, successor->data);
     Node* succParent = successor->parent;
     Node* succChild = successor->right;
-    
     if (succParent->left == successor)
     {
       succParent->left = succChild;
