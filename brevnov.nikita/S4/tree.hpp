@@ -566,38 +566,55 @@
     {
       if (pos == cend())
       {
-        return end();
+          return end();
       }
 
-      Node* todelete = pos.getNode();
+      Node* todelete = pos.node_;
       Node* parent = todelete->parent;
-      Iter result = Iter(parent);
+      Iter result = Iter(parent, parent ? false : true);
 
       if (todelete->left == nullptr && todelete->right == nullptr)
       {
-        if (parent->left == todelete)
+        if (parent)
         {
-          parent->left = nullptr;
+          if (parent->left == todelete)
+          {
+            parent->left = nullptr;
+          }
+          else
+          {
+            parent->right = nullptr;
+          }
+          result = Iter(parent, false);
         }
         else
         {
-          parent->right = nullptr;
+          root_ = nullptr;
+          result = end();
         }
-        result = Iter(parent);
       }
       else if (todelete->left == nullptr || todelete->right == nullptr)
       {
         Node* child = (todelete->left != nullptr) ? todelete->left : todelete->right;
-        if (parent->left == todelete)
+        if (parent)
         {
-          parent->left = child;
+          if (parent->left == todelete)
+          {
+            parent->left = child;
+          }
+          else
+          {
+            parent->right = child;
+          }
+          child->parent = parent;
+          result = Iter(child, false);
         }
         else
         {
-          parent->right = child;
+          root_ = child;
+          child->parent = nullptr;
+          result = Iter(child, false);
         }
-        child->parent = parent;
-        result = Iter(child);
       }
       else
       {
@@ -607,14 +624,12 @@
           next = next->left;
         }
         todelete->data = next->data;
-        return erase(Iter(next));
+        return erase(Iter(next, false));
       }
-
       if (todelete == root_)
       {
         result = begin();
       }
-
       delete todelete;
       size_--;
       fixHeight(root_);
