@@ -8,8 +8,8 @@
 int main(int argc, char** argv)
 {
   using namespace alymova;
-  using TranslateSet = List< std::string >;
-  using Dictionary = TwoThreeTree< std::string, TranslateSet, std::less< std::string > >;
+  using WordSet = List< std::string >;
+  using Dictionary = TwoThreeTree< std::string, WordSet, std::less< std::string > >;
   using DictSet = TwoThreeTree< std::string, Dictionary, std::less< std::string > >;
   using CommandSet = TwoThreeTree< std::string, std::function< void() >, std::less< std::string > >;
   std::setlocale(LC_CTYPE, "rus");

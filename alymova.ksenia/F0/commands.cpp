@@ -10,7 +10,9 @@
 
 namespace
 {
-  alymova::List< std::string >::ListConstIterator findTranslate(const alymova::TranslateSet& list, const std::string& word)
+  using namespace alymova;
+
+  List< std::string >::ListConstIterator findTranslate(const WordSet& list, const std::string& word)
   {
     auto it = list.begin();
     for (; it != list.end(); it++)
@@ -22,15 +24,15 @@ namespace
     }
     return it;
   }
-  void unionLists(alymova::List< std::string >& list, const alymova::List< std::string >& unioned)
+  void unionLists(List< std::string >& list, const List< std::string >& unioned)
   {
-    alymova::List< std::string > copy(unioned);
+    List< std::string > copy(unioned);
     list.sort();
     copy.sort();
     list.merge(copy);
     list.unique();
   }
-  void intersectLists(alymova::List< std::string >& list, const alymova::List< std::string >& intersected)
+  void intersectLists(List< std::string >& list, const List< std::string >& intersected)
   {
     for (auto it = list.begin(); it != list.end();)
     {
@@ -121,12 +123,12 @@ void alymova::addWord(std::istream& in, std::ostream& out, DictSet& set)
   auto it_word = dict.find(word);
   if (it_word == dict.end())
   {
-    List< std::string > translates{translate};
+    WordSet translates{translate};
     dict.emplace(word, translates);
     out << "<WORD AND TRANSLATE WERE ADDED>";
     return;
   }
-  List< std::string >& translates = it_word->second;
+  WordSet& translates = it_word->second;
   if (findTranslate(translates, translate) == translates.cend())
   {
     translates.push_back(translate);
@@ -171,7 +173,7 @@ void alymova::containSubword(std::istream& in, std::ostream& out, const DictSet&
     throw std::logic_error("<INVALID COMMAND>");
   }
   const Dictionary& dict = set.at(name);
-  List< std::string > suitable;
+  WordSet suitable;
   for (auto it = dict.begin(); it != dict.end(); it++)
   {
     if (it->first.find(subword) != std::string::npos)
@@ -209,7 +211,7 @@ void alymova::addTranslate(std::istream& in, std::ostream& out, DictSet& set)
     throw std::logic_error("<INVALID COMMAND>");
   }
   Dictionary& dict = set.at(name);
-  List< std::string >& translates = dict.at(word);
+  WordSet& translates = dict.at(word);
   if (findTranslate(translates, translate) != translates.cend())
   {
     out << "<TRANSLATE WAS ALREADY ADDED>";
@@ -222,17 +224,17 @@ void alymova::addTranslate(std::istream& in, std::ostream& out, DictSet& set)
 void alymova::findEnglishEquivalent(std::istream& in, std::ostream& out, const DictSet& set)
 {
   std::string name;
-  List< std::string > translates;
+  WordSet translates;
   in >> name >> translates;
   if (!in)
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
   const Dictionary& dict = set.at(name);
-  List< std::string > equivalents;
+  WordSet equivalents;
   for (auto it = dict.begin(); it != dict.end(); it++)
   {
-    List< std::string > current_translates = it->second;
+    WordSet current_translates = it->second;
     intersectLists(current_translates, translates);
     if (!current_translates.empty())
     {
@@ -256,7 +258,7 @@ void alymova::removeTranslate(std::istream& in, std::ostream& out, DictSet& set)
     throw std::logic_error("<INVALID COMMAND>");
   }
   Dictionary& dict = set.at(name);
-  List< std::string >& translates = dict.at(word);
+  WordSet& translates = dict.at(word);
   auto it_translate = findTranslate(translates, translate);
   if (it_translate == translates.cend())
   {
@@ -298,7 +300,7 @@ void alymova::printContent(std::istream& in, std::ostream& out, const DictSet& s
 
 void alymova::translate(std::istream& in, std::ostream& out, const DictSet& set)
 {
-  List< std::string > names;
+  WordSet names;
   std::string word;
   in >> names >> word;
   if (!in)
@@ -311,7 +313,7 @@ void alymova::translate(std::istream& in, std::ostream& out, const DictSet& set)
   {
     dicts.push_back(set.at(*it));
   }
-  List< std::string > translates;
+  WordSet translates;
   for (auto it = dicts.begin(); it != dicts.end(); it++)
   {
     auto it_word = it->find(word);
@@ -414,7 +416,7 @@ alymova::DictSet alymova::readDictionaryFile(std::istream& in)
   {
     Dictionary dict;
     std::string key;
-    List< std::string > value;
+    WordSet value;
     for (size_t i = 0; i < size && in; i++)
     {
       in >> key >> value;

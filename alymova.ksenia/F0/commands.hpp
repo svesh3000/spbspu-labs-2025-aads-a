@@ -7,8 +7,8 @@
 
 namespace alymova
 {
-  using TranslateSet = List< std::string >;
-  using Dictionary = TwoThreeTree< std::string, TranslateSet, std::less< std::string > >;
+  using WordSet = List< std::string >;
+  using Dictionary = TwoThreeTree< std::string, WordSet, std::less< std::string > >;
   using DictSet = TwoThreeTree< std::string, Dictionary, std::less< std::string > >;
 
   void create(std::istream& in, std::ostream& out, DictSet& set);
