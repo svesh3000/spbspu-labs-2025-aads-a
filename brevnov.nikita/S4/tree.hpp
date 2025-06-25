@@ -612,7 +612,6 @@
 
       if (todelete == root_)
       {
-        root_ = (parent != fakeRoot_) ? parent : fakeRoot_;
         result = begin();
       }
 
