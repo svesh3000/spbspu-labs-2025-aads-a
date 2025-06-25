@@ -4,6 +4,22 @@ abramov::GraphCollection::GraphCollection():
   graphs(HashTable< std::string, Graph >{})
 {}
 
+abramov::GraphCollection::GraphCollection(const GraphCollection &other):
+  graphs(other.graphs)
+{}
+
+void abramov::GraphCollection::swap(GraphCollection &other) noexcept
+{
+  std::swap(graphs, other.graphs);
+}
+
+abramov::GraphCollection &abramov::GraphCollection::operator=(const GraphCollection &other)
+{
+  GraphCollection temp(other);
+  swap(temp);
+  return *this;
+}
+
 void abramov::GraphCollection::addGraph(const Graph &graph)
 {
   graphs.insert(graph.getName(), graph);

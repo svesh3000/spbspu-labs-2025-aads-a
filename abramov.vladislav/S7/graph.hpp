@@ -9,6 +9,8 @@ namespace abramov
   struct Graph
   {
     Graph(const std::string &n);
+    Graph(const Graph &other);
+    Graph &operator=(const Graph &other);
     void addEdge(const std::string &from, const std::string &to, size_t w);
     const std::string &getName() const noexcept;
     size_t getEdgeCount() const noexcept;
@@ -19,6 +21,8 @@ namespace abramov
     HashTable< std::string, SimpleArray< Edge > > adj_list;
     std::string name;
     size_t edge_count;
+
+    void swap(Graph &other) noexcept;
   };
 }
 #endif

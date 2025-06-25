@@ -6,6 +6,26 @@ abramov::Graph::Graph(const std::string &n):
   edge_count(0)
 {}
 
+abramov::Graph::Graph(const Graph &other):
+  adj_list(other.adj_list),
+  name(other.name),
+  edge_count(other.edge_count)
+{}
+
+void abramov::Graph::swap(Graph &other) noexcept
+{
+  std::swap(adj_list, other.adj_list);
+  std::swap(name, other.name);
+  std::swap(edge_count, other.edge_count);
+}
+
+abramov::Graph &abramov::Graph::operator=(const Graph &other)
+{
+  Graph temp(other);
+  swap(temp);
+  return *this;
+}
+
 void abramov::Graph::addEdge(const std::string &from, const std::string &to, size_t w)
 {
   Edge edge(from, to, w);
