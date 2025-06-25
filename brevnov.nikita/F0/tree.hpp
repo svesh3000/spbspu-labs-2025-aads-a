@@ -744,52 +744,84 @@ namespace brevnov
       return end();
     }
     Node* del = pos.node_;
-    Node* replace = nullptr;
-    Node* child = nullptr;
-    if (size_ == 1)
+    Node* parent = del->parent;
+    Iter next(pos.node_, pos.isEnd_);
+    next++;
+    if (!del->left && !del->right)
     {
-      delete root_;
-      size_ = 0;
-      return end();
+      if (parent)
+      {
+        if (parent->left == del)
+        {
+          parent->left = nullptr;
+        }
+        else
+        {
+          parent->right = nullptr;
+        }
+      }
+      else
+      {
+        root_ = nullptr;
+        size_ = 0;
+        return end();
+      }
+      delete del;
+      size_--;
+      fixHeight(root_);
+      return next;
     }
     if (!del->left || !del->right)
     {
-      replace = del;
-    }
-    else
-    {
-      replace = del->right;
-      while (replace->left)
+      Node* child = del->left ? del->left : del->right;
+      if (parent)
       {
-        replace = replace->left;
+        if (parent->left == del)
+        {
+          parent->left = child;
+        }
+        else
+        {
+          parent->right = child;
+        }
       }
+      else
+      {
+        root_ = child;
+      }
+      if (child)
+      {
+        child->parent = parent;
+      }
+      delete del;
+      size_--;
+      fixHeight(root_);
+      return next;
     }
-    child = replace->left ? replace->left : replace->right;
-    if (child)
+    Node* successor = del->right;
+    while (successor->left)
     {
-      child->parent = replace->parent;
+      successor = successor->left;
     }
-    if (!replace->parent)
+    std::swap(del->data, successor->data);
+    Node* succParent = successor->parent;
+    Node* succChild = successor->right;
+    
+    if (succParent->left == successor)
     {
-      root_ = child;
-    }
-    else if (replace == replace->parent->left)
-    {
-      replace->parent->left = child;
+      succParent->left = succChild;
     }
     else
     {
-      replace->parent->right = child;
+      succParent->right = succChild;
     }
-    if (replace != del)
+    if (succChild)
     {
-      del->data = std::move(replace->data);
+      succChild->parent = succParent;
     }
+    delete successor;
+    size_--;
     fixHeight(root_);
-    Iter next(pos.node_, pos.isEnd_);
-    ++next;
-    delete replace;
-    --size_;
     return next;
   }
 

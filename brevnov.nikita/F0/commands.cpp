@@ -4,10 +4,12 @@ namespace
   void addPlayer(std::istream& in, brevnov::League& league, std::string teamName)
   {
     std::string playerName, position;
-    size_t raiting, price;
-    in >> playerName >> position >> raiting >> price;
-    if (raiting > 0 && price > 0 && brevnov::checkPosition(position))
+    int rait, pr;
+    in >> playerName >> position >> rait >> pr;
+    if (rait > 0 && pr > 0 && brevnov::checkPosition(position))
     {
+      size_t raiting = rait;
+      size_t price = pr;
       auto clubFind = league.teams_.find(teamName);
       if (clubFind != league.teams_.end())
       {
@@ -35,14 +37,19 @@ namespace
         }
       }
     }
+    else
+    {
+      std::cerr << "Not correct parameters!\n";
+    }
   }
 
   void addT(std::istream& in, brevnov::League& league, std::string teamName)
   {
-    size_t budget = 0;
-    in >> budget;
-    if (budget > 0)
+    int bud = 0;
+    in >> bud;
+    if (bud > 0)
     {
+      size_t budget = bud;
       if (league.teams_.find(teamName) == league.teams_.end())
       {
         std::pair< std::string, brevnov::Team > pair(teamName, brevnov::Team(budget));
@@ -96,11 +103,11 @@ namespace
       }
       pl++;
     }
-    if (rait != 0)
+    if (maxpl != league.fa_.end())
     {
       club.budget_ -= (*maxpl).second.price_;
       out << "Bought " << (*maxpl).first << " " << (*maxpl).second << "\n";
-      club.players_.insert((*maxpl));
+      club.players_.insert(*maxpl);
       league.fa_.erase(maxpl);
     }
     else
@@ -153,9 +160,9 @@ void brevnov::deleteTeam(std::istream& in, League& league)
   auto clubFind = league.teams_.find(teamName);
   if (clubFind != league.teams_.end())
   {
-    brevnov::Team& club = (*clubFind).second;
+    Team& club = (*clubFind).second;
     auto pl = club.players_.begin();
-    while (club.players_.empty())
+    while (!club.players_.empty())
     {
       league.fa_.insert((*pl));
       pl = club.players_.erase(pl);
@@ -207,6 +214,7 @@ void brevnov::updateRating(std::istream& in, League& league)
   if (raiting <= 0)
   {
     std::cerr << "Not correct raiting!\n";
+    return;
   }
   auto clubFind = league.teams_.find(teamName);
   if (clubFind != league.teams_.end())
@@ -287,15 +295,15 @@ void brevnov::transfer(std::istream& in, std::ostream& out, League& league)
   }
   else
   {
-    std::cerr << "BuyTeam no found!\n";
+    std::cerr << "BuyTeam not found!\n";
   }
 }
 
 void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName, pos;
-  size_t bud = 0;
-  in >> bud;
+  int budh = 0;
+  in >> budh;
   in >> pos >> teamName;
   if (!checkPosition(pos))
   {
@@ -303,10 +311,12 @@ void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
     return;
   }
   Position sPos = definePosition(pos);
-  if (bud == 0)
+  if (budh <= 0)
   {
     std::cerr << "Not correct budget!\n";
+    return;
   }
+  size_t bud = budh;
   auto findTeam = league.teams_.find(teamName);
   if (findTeam != league.teams_.end())
   {
@@ -329,35 +339,33 @@ void brevnov::buyPosition(std::istream& in, std::ostream& out, League& league)
 void brevnov::buyTeam(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName;
-  size_t bud = 0;
-  in >> bud;
-  in >> teamName;
-  if (bud == 0)
+  int budh = 0;
+  in >> budh >> teamName;
+  if (budh <= 0)
   {
     std::cerr << "Not correct budget!\n";
+    return;
   }
+  size_t bud = budh;
   auto findTeam = league.teams_.find(teamName);
-  if (findTeam != league.teams_.end())
-  {
-    Team& club = (*findTeam).second;
-    if (club.budget_ <  bud)
-    {
-      std::cerr << "Team have not enough money!\n";
-    }
-    else
-    {
-      buyP(out, league, club, bud / 6, Position::LF);
-      buyP(out, league, club, bud / 6, Position::RF);
-      buyP(out, league, club, bud / 6, Position::CF);
-      buyP(out, league, club, bud / 6, Position::LB);
-      buyP(out, league, club, bud / 6, Position::RB);
-      buyP(out, league, club, bud / 6, Position::G);
-    }
-  }
-  else
+  if (findTeam == league.teams_.end())
   {
     std::cerr << "Team not found!\n";
+    return;
   }
+  Team& club = (*findTeam).second;
+  if (club.budget_ <  bud)
+  {
+    std::cerr << "Team have not enough money!\n";
+    return;
+  }
+  size_t bud_per_pos = std::max(budh / 6, 1);
+  buyP(out, league, club, bud_per_pos, Position::LF);
+  buyP(out, league, club, bud_per_pos, Position::RF);
+  buyP(out, league, club, bud_per_pos, Position::CF);
+  buyP(out, league, club, bud_per_pos, Position::LB);
+  buyP(out, league, club, bud_per_pos, Position::RB);
+  buyP(out, league, club, bud_per_pos, Position::G);
 }
 
 void brevnov::soldPlayer(std::istream& in, League& league)
@@ -481,12 +489,13 @@ void brevnov::viewPosition(std::istream& in, std::ostream& out, League& league)
 void brevnov::buyPlayer(std::istream& in, std::ostream& out, League& league)
 {
   std::string teamName;
-  size_t bud = 0;
-  in >> bud >> teamName;
-  if (bud == 0)
+  int budh = 0;
+  in >> budh >> teamName;
+  if (budh <= 0)
   {
     std::cerr << "Not correct budget!\n";
   }
+  size_t bud = budh;
   auto findTeam = league.teams_.find(teamName);
   if (findTeam != league.teams_.end())
   {
@@ -537,24 +546,18 @@ void brevnov::startTeam(std::istream& in, std::ostream& out, League& league)
   if (findTeam != league.teams_.end())
   {
     Team& club = (*findTeam).second;
-    auto pl = club.players_.begin();
-    auto maxpl = pl;
     for (size_t i = 0; i < 6; i++)
     {
-      pl = club.players_.begin();
       size_t rait = 0;
       Position pos = static_cast<Position>(i);
-      while (pl != club.players_.end())
+      auto maxpl = club.players_.end();
+      for (auto pl = club.players_.begin(); pl != club.players_.end(); ++pl)
       {
-        if ((*pl).second.position_ == pos)
+        if (pl->second.position_ == pos && pl->second.raiting_ > rait)
         {
-          if ((*pl).second.raiting_ > rait)
-          {
-            maxpl = pl;
-            rait = (*pl).second.raiting_;
-          }
+          maxpl = pl;
+          rait = pl->second.raiting_;
         }
-        pl++;
       }
       if (rait > 0)
       {
