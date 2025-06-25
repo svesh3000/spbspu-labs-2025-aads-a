@@ -564,72 +564,61 @@
     template< typename Key, typename Value, typename Cmp >
     typename AVLTree< Key, Value, Cmp >::Iter AVLTree< Key, Value, Cmp >::erase(ConstIter pos) noexcept
     {
-      if (pos == cend() || empty())
+      if (pos == cend())
       {
         return end();
       }
-
-      Node* todelete = pos.node_;
-      if (!todelete)
+      Node* toDelete = pos.node_;
+      Node* replace = nullptr;
+      Node* child = nullptr;
+      if (size_ == 1)
       {
+        delete root_;
+        size_ = 0;
         return end();
       }
-
-      Node* parent = todelete->parent;
-      Iter result = (parent ? Iter(parent, false) : begin());
-      if (!todelete->left && !todelete->right)
+      if (!toDelete->left || !toDelete->right)
       {
-        if (parent)
-        {
-          (parent->left == todelete) ? parent->left = nullptr : parent->right = nullptr;
-          result = Iter(parent, false);
-        }
-        else
-        {
-          root_ = nullptr;
-          result = end();
-        }
-      }
-      else if (!todelete->left || !todelete->right)
-      {
-        Node* child = todelete->left ? todelete->left : todelete->right;
-        if (parent)
-        {
-          if (parent->left == todelete)
-          {
-            parent->left = child;
-          }
-          else
-          {
-            parent->right = child;
-          }
-          child->parent = parent;
-          result = Iter(child, false);
-        }
-        else
-        {
-          root_ = child;
-          child->parent = nullptr;
-          result = Iter(child, false);
-        }
+        replace = toDelete;
       }
       else
       {
-        Node* successor = todelete->right;
-        while (successor->left)
+        replace = toDelete->right;
+        while (replace->left)
         {
-          successor = successor->left;
+          replace = replace->left;
         }
-        todelete->data = successor->data;
-        return erase(Iter(successor, false));
       }
-      delete todelete;
-      size_--;
+      child = replace->left ? replace->left : replace->right;
+      if (child)
+      {
+        child->parent = replace->parent;
+      }
+      if (!replace->parent)
+      {
+        root_ = child;
+      }
+      else if (replace == replace->parent->left)
+      {
+        replace->parent->left = child;
+      }
+      else
+      {
+        replace->parent->right = child;
+      }
+      if (replace != toDelete)
+      {
+        toDelete->data = std::move(replace->data);
+      }
+      Iter next(pos.node_, pos.isEnd_);
+      ++next;
+      delete replace;
+      --size_;
       if (root_)
       {
         fixHeight(root_);
       }
-      return result;
+      return next;
     }
 
     template< typename Key, typename Value, typename Cmp >
