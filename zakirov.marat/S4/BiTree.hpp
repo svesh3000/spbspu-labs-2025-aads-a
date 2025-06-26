@@ -23,8 +23,8 @@ namespace zakirov
     BiTree(BiTree && rhs) noexcept;
     ~BiTree();
   
-    BiTree< K, T, C > & operator=(const BiTree< K, T, C > & x);
-    BiTree< K, T, C > & operator=(BiTree< K, T, C > && x);
+    BiTree< K, T, C > & operator=(const BiTree< K, T, C > & other);
+    BiTree< K, T, C > & operator=(BiTree< K, T, C > && other);
 
     BiIter< K, T, C > begin() noexcept;
     BiIter< K, T, C > end() noexcept;
@@ -85,6 +85,22 @@ namespace zakirov
   BiTree< K, T, C >::~BiTree()
   {
     clear();
+  }
+
+  template < class K, class T, class C >
+  BiTree< K, T, C > & BiTree< K, T, C >::operator=(const BiTree< K, T, C > & other)
+  {
+    BiTree< K, T, C > temp(other);
+    swap(temp);
+    return *this;
+  }
+
+  template < class K, class T, class C >
+  BiTree< K, T, C > & BiTree< K, T, C >::operator=(BiTree< K, T, C > && other)
+  {
+    BiTree< K, T, C > temp(std::move(other));
+    swap(temp);
+    return *this;
   }
 
   template < class K, class T, class C >
