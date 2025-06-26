@@ -9,5 +9,7 @@ namespace abramov
   void printVertsSorted(const GraphCollection &collect, const std::string &name, std::ostream &out);
   void printOutVerts(const GraphCollection &collect, const std::string &n, const std::string &v, std::ostream &out);
   void printInVerts(const GraphCollection &collect, const std::string &n, const std::string &v, std::ostream &out);
+  void addEdgeToGraph(GraphCollection &collect, const std::string &name, std::istream &in);
+  void cutEdgeFromGraph(GraphCollection &collect, const std::string &name, std::istream &in);
 }
 #endif

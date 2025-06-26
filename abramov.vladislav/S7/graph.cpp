@@ -43,6 +43,41 @@ void abramov::Graph::addEdge(const std::string &from, const std::string &to, siz
   ++edge_count;
 }
 
+bool abramov::Graph::cutEdge(const std::string &from, const std::string &to, size_t w)
+{
+  if (!hasVertex(from) || !hasVertex(to))
+  {
+    return false;
+  }
+  SimpleArray< Edge > *edges = const_cast< SimpleArray< Edge >* >(getEdges(from));
+  if (!edges || edges->size() == 0)
+  {
+    return false;
+  }
+  SimpleArray< Edge > new_edges;
+  bool removed = false;
+  size_t orig_size = edges->size();
+  for (size_t i = 0; i < orig_size; ++i)
+  {
+    const Edge &edge = (*edges)[i];
+    if (edge.to != to || edge.weight != w)
+    {
+      new_edges.pushBack(edge);
+    }
+    else
+    {
+      removed = true;
+    }
+  }
+  if (removed)
+  {
+    *edges = new_edges;
+    --edge_count;
+    return true;
+  }
+  return false;
+}
+
 const std::string &abramov::Graph::getName() const noexcept
 {
   return name;

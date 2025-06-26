@@ -15,6 +15,7 @@ namespace abramov
     Graph(const Graph &other);
     Graph &operator=(const Graph &other);
     void addEdge(const std::string &from, const std::string &to, size_t w);
+    bool cutEdge(const std::string &from, const std::string &to, size_t w);
     const std::string &getName() const noexcept;
     size_t getEdgeCount() const noexcept;
     size_t getVertexCount() const noexcept;

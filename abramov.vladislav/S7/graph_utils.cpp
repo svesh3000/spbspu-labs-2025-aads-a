@@ -165,3 +165,36 @@ void abramov::printInVerts(const GraphCollection &collect, const std::string &n,
   }
   printVertsWeights(vert_names, src_verts, out);
 }
+
+void abramov::addEdgeToGraph(GraphCollection &collect, const std::string &name, std::istream &in)
+{
+  Graph &graph = collect.getGraph(name);
+  std::string from;
+  std::string to;
+  size_t w;
+  in >> from >> to >> w;
+  if (in)
+  {
+    graph.addEdge(from, to, w);
+  }
+  else
+  {
+    throw std::logic_error("Invalid arguments\n");
+  }
+}
+
+void abramov::cutEdgeFromGraph(GraphCollection &collect, const std::string &name, std::istream &in)
+{
+  Graph &graph = collect.getGraph(name);
+  std::string from;
+  std::string to;
+  size_t w;
+  if (!(in >> from >> to >> w))
+  {
+    throw std::logic_error("Invalid arguments\n");
+  }
+  if (!graph.cutEdge(from, to, w))
+  {
+    throw std::logic_error("There is no such edge\n");
+  }
+}
