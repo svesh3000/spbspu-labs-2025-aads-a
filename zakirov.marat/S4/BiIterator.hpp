@@ -8,17 +8,20 @@ namespace zakirov
   class BiIter: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    ~BiIter() = default;
-    T & operator*() const;
-    T * operator->() const;
-    BiIter< K, T > & operator++();
-    BiIter< K, T > operator++(int);
-    BiIter< K, T > & operator--();
-    BiIter< K, T > operator--(int);
-    bool operator!=(const BiIter< K, T > &) const;
-    bool operator==(const BiIter< K, T > &) const;
+    explicit BiIter() noexcept;
+
+    std::pair< K, T > & operator*() noexcept;
+    std::pair< K, T > * operator->() noexcept;
+    BiIter< K, T > & operator++() noexcept;
+    BiIter< K, T > operator++(int) noexcept;
+    BiIter< K, T > & operator--() noexcept;
+    BiIter< K, T > operator--(int) noexcept;
+    bool operator!=(const BiIter< K, T > &) const noexcept;
+    bool operator==(const BiIter< K, T > &) const noexcept;
+
   private:
-    BiIter(BiNode< K, T > * node);
+    friend class BiTree< K, T >;
+    explicit BiIter(BiNode< K, T > * node) noexcept;
     BiNode< K, T > * node_;
   };
 
@@ -26,17 +29,20 @@ namespace zakirov
   class CBiIter: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
-    ~CBiIter() = default;
-    T & operator*() const;
-    T * operator->() const;
-    CBiIter< K, T > & operator++();
-    CBiIter< K, T > operator++(int);
-    CBiIter< K, T > & operator--();
-    CBiIter< K, T > operator--(int);
-    bool operator!=(const CBiIter< K, T > &) const;
-    bool operator==(const CBiIter< K, T > &) const;
+    explicit CBiIter() noexcept;
+
+    std::pair< K, T > & operator*() const noexcept;
+    std::pair< K, T > * operator->() const noexcept;
+    CBiIter< K, T > & operator++() noexcept;
+    CBiIter< K, T > operator++(int) noexcept;
+    CBiIter< K, T > & operator--() noexcept;
+    CBiIter< K, T > operator--(int) noexcept;
+    bool operator!=(const CBiIter< K, T > &) const noexcept;
+    bool operator==(const CBiIter< K, T > &) const noexcept;
+
   private:
-    CBiIter(BiNode< K, T > * node);
+    friend class BiTree< K, T >;
+    explicit CBiIter(BiNode< K, T > * node) noexcept;
     BiNode< K, T > * node_;
   };
 }
