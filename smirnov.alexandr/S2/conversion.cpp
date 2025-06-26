@@ -74,7 +74,7 @@ long long smirnov::evaluatePostfix(Queue< std::string > & postfix)
   constexpr long long min_val = std::numeric_limits< long long >::min();
   while (!postfix.empty())
   {
-    const std::string & token = postfix.front();
+    std::string token = postfix.front();
     postfix.pop();
     size_t pos = 0;
     long long num = 0;
