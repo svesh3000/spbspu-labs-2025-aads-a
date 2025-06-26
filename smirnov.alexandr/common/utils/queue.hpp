@@ -2,6 +2,7 @@
 #define QUEUE_HPP
 #include <stdexcept>
 #include <list/list.hpp>
+#include <list/list_utils.hpp>
 
 namespace smirnov
 {
