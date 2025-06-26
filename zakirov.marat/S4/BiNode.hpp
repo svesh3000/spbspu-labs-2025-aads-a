@@ -7,10 +7,10 @@ namespace zakirov
   struct BiNode
   {
     BiNode(K key, const T & data);
-    BiNode< K, T > left;
-    BiNode< K, T > right;
-    BiNode< K, T > parent;
-    std::pair< K, T > value;
+    BiNode< K, T > left_;
+    BiNode< K, T > right_;
+    BiNode< K, T > parent_;
+    std::pair< K, T > value_;
   };
 }
 
