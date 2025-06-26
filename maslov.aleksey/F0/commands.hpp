@@ -8,6 +8,7 @@ namespace maslov
 {
   using Dict = HashTable< std::string, int >;
   using Dicts = HashTable< std::string, Dict >;
+
   void createDictionary(std::istream & in, Dicts & dicts);
   void showDictionary(std::ostream & out, const Dicts & dicts);
   void loadText(std::istream & in, Dicts & dicts);

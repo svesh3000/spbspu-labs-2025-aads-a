@@ -295,7 +295,7 @@ void maslov::createWordRange(std::istream & in, Dicts & dicts)
   if (resultDict.empty())
   {
     dicts.erase(resultName);
-    throw std::runtime_error("<EMPTY DICTIONARY>");
+    throw std::runtime_error("<EMPTY INTERVAL>");
   }
 }
 
@@ -342,18 +342,11 @@ void maslov::loadFile(const std::string & filename, Dicts & dicts)
     file >> dictName >> wordCount;
     Dict & currDict = dicts[dictName];
     std::string word;
-    int freq;
+    int freq = 0;
     for (size_t j = 0; j < wordCount; ++j)
     {
       file >> word >> freq;
-      if (currDict.find(word) != currDict.end())
-      {
-        currDict[word] += freq;
-      }
-      else
-      {
-        currDict[word] = freq;
-      }
+      currDict[word] += freq;
     }
   }
 }
