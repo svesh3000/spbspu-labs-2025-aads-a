@@ -72,3 +72,23 @@ bool abramov::Graph::hasVertex(const std::string &vert) const
 {
   return adj_list.cfind(vert) != adj_list.cend();
 }
+
+typename abramov::Graph::Iterator abramov::Graph::begin()
+{
+  return adj_list.begin();
+}
+
+typename abramov::Graph::Iterator abramov::Graph::end()
+{
+  return adj_list.end();
+}
+
+typename abramov::Graph::ConstIterator abramov::Graph::cbegin() const
+{
+  return adj_list.cbegin();
+}
+
+typename abramov::Graph::ConstIterator abramov::Graph::cend() const
+{
+  return adj_list.cend();
+}

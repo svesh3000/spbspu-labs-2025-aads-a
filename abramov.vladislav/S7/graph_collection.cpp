@@ -25,6 +25,21 @@ void abramov::GraphCollection::addGraph(const Graph &graph)
   graphs.insert(graph.getName(), graph);
 }
 
+const abramov::Graph &abramov::GraphCollection::cgetGraph(const std::string &name) const
+{
+  auto it = graphs.cfind(name);
+  if (it == graphs.cend())
+  {
+    throw std::logic_error("There is no such graph\n");
+  }
+  return it->second;
+}
+
+abramov::Graph &abramov::GraphCollection::getGraph(const std::string &name)
+{
+  return const_cast< Graph& >(static_cast< const GraphCollection& >(*this).cgetGraph(name));
+}
+
 abramov::SimpleArray< std::string > abramov::GraphCollection::getAllGraphsSorted() const
 {
   SimpleArray< std::string > names;

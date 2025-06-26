@@ -8,6 +8,9 @@ namespace abramov
 {
   struct Graph
   {
+    using Iterator = typename HashTable< std::string, SimpleArray< Edge > >::Iter;
+    using ConstIterator = typename HashTable< std::string, SimpleArray< Edge > >::cIter;
+
     Graph(const std::string &n);
     Graph(const Graph &other);
     Graph &operator=(const Graph &other);
@@ -17,6 +20,10 @@ namespace abramov
     size_t getVertexCount() const noexcept;
     const SimpleArray< Edge > *getEdges(const std::string &vert) const;
     bool hasVertex(const std::string &vert) const;
+    Iterator begin();
+    Iterator end();
+    ConstIterator cbegin() const;
+    ConstIterator cend() const;
   private:
     HashTable< std::string, SimpleArray< Edge > > adj_list;
     std::string name;

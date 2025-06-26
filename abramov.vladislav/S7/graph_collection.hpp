@@ -12,6 +12,8 @@ namespace abramov
     GraphCollection(const GraphCollection &other);
     GraphCollection &operator=(const GraphCollection &other);
     void addGraph(const Graph &graph);
+    Graph &getGraph(const std::string &name);
+    const Graph &cgetGraph(const std::string &name) const;
     SimpleArray< std::string > getAllGraphsSorted() const;
     void printAllGraphs(std::ostream &out) const;
   private:

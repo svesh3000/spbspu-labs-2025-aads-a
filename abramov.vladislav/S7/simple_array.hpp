@@ -16,6 +16,7 @@ namespace abramov
     const T &operator[](size_t id) const noexcept;
     void pushBack(const T &val);
     size_t size() const noexcept;
+    bool empty() const noexcept;
   private:
     T *data_;
     size_t capacity_;
@@ -113,5 +114,11 @@ template< class T >
 size_t abramov::SimpleArray< T >::size() const noexcept
 {
   return size_;
+}
+
+template< class T >
+bool abramov::SimpleArray< T >::empty() const noexcept
+{
+  return size_ == 0;
 }
 #endif
