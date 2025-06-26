@@ -1,5 +1,5 @@
-#ifndef MY_LIST_HPP
-#define MY_LIST_HPP
+#ifndef FWD_LIST_HPP
+#define FWD_LIST_HPP
 #include <cstddef>
 #include <utility>
 #include "fwd_list_node.hpp"
@@ -31,34 +31,36 @@ namespace zakirov
     FwdIterator< T > end() noexcept;
     CFwdIterator< T > cend() const noexcept;
     void push_front(const T & data);
-    void push_front(const T && data);
+    void push_front(T && data);
     void pop_front() noexcept;
     void insert_after(FwdIterator< T > element, const T & data);
     void erase_after(FwdIterator< T > element) noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void swap(FwdList & other);
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst);
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > i);
-    void splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i);
-    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last);
+    void swap(FwdList & other) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i) noexcept;
+    void splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept;
     void assign(size_t n, const T & val);
     template< typename InputIterator >
     void assign(InputIterator first, InputIterator last);
     void assign(std::initializer_list< T > init_list);
     void clear() noexcept;
-    void remove(T data) noexcept;
-    template< typename P>
+    template< typename P >
     void remove_if(P predicate) noexcept;
+    void remove(const T & data) noexcept;
   private:
     FwdListNode< T > * fake_node_;
+    size_t size_;
   };
 
   template< typename T >
   FwdList< T >::FwdList():
-    fake_node_(reinterpret_cast< FwdListNode< T >* >(new char[sizeof(FwdListNode< T >)]))
+    fake_node_(reinterpret_cast< FwdListNode< T >* >(new char[sizeof(FwdListNode< T >)])),
+    size_(0)
   {
     fake_node_->next_ = fake_node_;
   }
@@ -87,25 +89,13 @@ namespace zakirov
 
   template< typename T >
   FwdList< T >::FwdList(std::initializer_list< T > init_list):
-    FwdList()
-  {
-    FwdIterator< T > inserter = begin();
-    for (auto i = init_list.begin(); i != init_list.end(); ++i, ++inserter)
-    {
-      insert_after(inserter, *i);
-    }
-  }
+    FwdList(init_list.begin(), init_list.end())
+  {}
 
   template< typename T >
   FwdList< T >::FwdList(const FwdList & other):
-    FwdList()
-  {
-    FwdIterator< T > inserter = before_begin();
-    for (CFwdIterator< T > i = other.cbegin(); i != other.cend(); ++i, ++inserter)
-    {
-      insert_after(inserter, *i);
-    }
-  }
+    FwdList(other.cbegin(), other.cend())
+  {}
 
   template< typename T >
   FwdList< T >::FwdList(FwdList && other) noexcept:
@@ -126,25 +116,21 @@ namespace zakirov
   template< typename T >
   FwdList< T > & FwdList< T >::operator=(const FwdList< T > & fwdlst)
   {
-    clear();
-    FwdIterator<T> inserter = begin();
-    CFwdIterator<T> left = fwdlst.cbegin();
-    CFwdIterator<T> right = fwdlst.cend();
-    for (; left != right; ++left, ++inserter)
+    if (this != std::addressof(fwdlst))
     {
-      insert_after(inserter, *left);
+      assign(fwdlst.cbegin(), fwdlst.cend());
     }
+
     return *this;
   }
 
   template< typename T >
   FwdList< T > & FwdList< T >::operator=(FwdList< T > && fwdlst) noexcept
   {
-    if (this != &fwdlst)
+    if (this != std::addressof(fwdlst))
     {
-      FwdListNode<T> * temporary_node = fake_node_;
-      fake_node_ = fwdlst.fake_node_;
-      fwdlst.fake_node_ = temporary_node;
+      clear();
+      swap(fwdlst);
     }
 
     return *this;
@@ -160,13 +146,13 @@ namespace zakirov
   template< typename T >
   T & FwdList< T >::front() noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->data_;
   }
 
   template< typename T >
   const T & FwdList< T >::front() const noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->data_;
   }
 
   template< typename T >
@@ -211,6 +197,7 @@ namespace zakirov
     FwdListNode< T > * new_begin = (fake_node_->next_)->next_;
     delete fake_node_->next_;
     fake_node_->next_ = new_begin;
+    --size_;
   }
 
   template< typename T >
@@ -219,22 +206,16 @@ namespace zakirov
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
     new_element->next_ = fake_node_->next_;
     fake_node_->next_ = new_element;
+    ++size_;
   }
 
   template< typename T >
-  void FwdList< T >::push_front(const T && data)
+  void FwdList< T >::push_front(T && data)
   {
     FwdListNode< T > * new_element = new FwdListNode< T >(std::move(data));
     new_element->next_ = fake_node_->next_;
     fake_node_->next_ = new_element;
-  }
-
-  template< typename T >
-  void FwdList< T >::erase_after(FwdIterator< T > element) noexcept
-  {
-    FwdListNode< T > * temp_element = element.node_->next_->next_;
-    delete element.node_->next_;
-    element.node_->next_ = temp_element;
+    ++size_;
   }
 
   template< typename T >
@@ -243,110 +224,105 @@ namespace zakirov
     FwdListNode< T > * new_element = new FwdListNode< T >(data);
     new_element->next_ = element.node_->next_;
     element.node_->next_ = new_element;
+    ++size_;
+  }
+
+  template< typename T >
+  void FwdList< T >::erase_after(FwdIterator< T > element) noexcept
+  {
+    FwdListNode< T > * temp_element = element.node_->next_->next_;
+    delete element.node_->next_;
+    element.node_->next_ = temp_element;
+    --size_;
   }
 
   template< typename T >
   bool FwdList< T >::empty() const noexcept
   {
-    if (fake_node_->next_ == fake_node_)
-    {
-      return 1;
-    }
-
-    return 0;
+    return fake_node_->next_ == fake_node_;
   }
 
   template< typename T >
   size_t FwdList< T >::size() const noexcept
   {
-    size_t counter = 0;
-    FwdListNode< T > * nailed_ptr = fake_node_;
-    FwdListNode< T > * fillable_ptr = fake_node_->next_;
-    while (nailed_ptr != fillable_ptr)
+    return size_;
+  }
+
+  template< typename T >
+  void FwdList< T >::swap(FwdList & other) noexcept
+  {
+    std::swap(fake_node_, other.fake_node_);
+    std::swap(size_, other.size_);
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst) noexcept
+  {
+    splice_after(pos, fwdlst, fwdlst.before_begin(), fwdlst.end());
+  }
+
+  template< typename T >
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > i) noexcept
+  {
+    FwdListNode< T > * next_base = pos.node_->next_;
+    FwdListNode< T > * next_new = i.node_->next_->next_;
+    if (i.node_->next_ == fwdlst.fake_node_)
     {
-      ++counter;
-      fillable_ptr = fillable_ptr->next_;
+      return;
     }
 
-    return counter;
-  }
-
-  template< typename T >
-  void FwdList< T >::swap(FwdList & other)
-  {
-    FwdListNode< T > * temporary_node = other.fake_node_;
-    other.fake_node_ = fake_node_;
-    fake_node_ = temporary_node;
-  }
-
-  template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst)
-  {
-    splice_after(pos, fwdlst, fwdlst.begin(), fwdlst.end());
-  }
-
-  template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > i)
-  {
-    FwdList< T > * next_base = pos.node_->next_;
-    FwdList< T > * next_new = i.node_->next_->next_;
     pos.node_->next_ = i.node_->next_;
     pos.node_->next_->next_ = next_base;
     i.node_->next_ = next_new;
+    --fwdlst.size_;
+    ++size_;
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, const FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList & fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept
   {
-    FwdIterator< T > after_first = first;
-    ++after_first;
-    for (; after_first != last; ++after_first, ++first)
+    FwdIterator< T > after_iter = first;
+    ++after_iter;
+    while (after_iter != last)
     {
       splice_after(pos, fwdlst, first);
+      after_iter = first;
+      ++after_iter;
+      ++pos;
     }
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst) noexcept
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst);
+    splice_after(pos, fwdlst);
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > i) noexcept
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst, i);
+    splice_after(pos, fwdlst, i);
   }
 
   template< typename T >
-  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last)
+  void FwdList< T >::splice_after(FwdIterator< T > pos, FwdList && fwdlst, FwdIterator< T > first, FwdIterator< T > last) noexcept
   {
-    FwdList & l_value_fwdlst = fwdlst;
-    splice_after(pos, l_value_fwdlst, first, last);
+    splice_after(pos, fwdlst, first, last);
   }
 
   template< typename T >
   void FwdList< T >::assign(size_t n, const T & val)
   {
-    clear();
-    for (size_t i = 0; i < n; ++i)
-    {
-      push_front(val);
-    }
+    FwdList< T > inserter(n, val);
+    swap(inserter);
   }
 
   template< typename T >
   template< typename InputIterator >
   void FwdList< T >::assign(InputIterator first, InputIterator last)
   {
-    clear();
-    FwdIterator< T > inserter = begin();
-    for (; first != last; ++first, ++inserter)
-    {
-      insert_after(inserter, *first);
-    }
+    FwdList< T > inserter(first, last);
+    swap(inserter);
   }
 
   template< typename T >
@@ -362,40 +338,22 @@ namespace zakirov
     {
       pop_front();
     }
-  }
 
-  template< typename T >
-  void FwdList< T >::remove(T data) noexcept
-  {
-    FwdIterator< T > prev = end();
-    FwdIterator< T > real = begin();
-    for (FwdIterator< T > i = begin(); i != end(); ++i)
-    {
-      if (i.node_->data_ == data)
-      {
-        erase_after(prev);
-        ++real;
-      }
-      else
-      {
-        ++prev;
-        ++real;
-      }
-    }
+    size_ = 0;
   }
 
   template< typename T >
   template< typename P >
   void FwdList< T >::remove_if(P predicate) noexcept
   {
-    FwdIterator< T > prev = end();
+    FwdIterator< T > prev = before_begin();
     FwdIterator< T > real = begin();
-    for (FwdIterator< T > i = begin(); i != end(); ++i)
+    while (real != end())
     {
       if (predicate(*real))
       {
-        erase_after(prev);
         ++real;
+        erase_after(prev);
       }
       else
       {
@@ -403,6 +361,15 @@ namespace zakirov
         ++real;
       }
     }
+  }
+
+  template< typename T >
+  void FwdList< T >::remove(const T & data) noexcept
+  {
+    remove_if([&](const T & value)
+    {
+      return data == value;
+    });
   }
 }
 

@@ -10,7 +10,7 @@
 void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 {
   std::string sequence_name;
-  list_pair_it fillable_iterator = forward_list.before_begin();
+  auto fillable_iterator = forward_list.before_begin();
   while (in >> sequence_name && !in.eof())
   {
     list_ull sequence_num;
@@ -24,7 +24,7 @@ void zakirov::get_list_pair(std::istream & in, list_pair & forward_list)
 void zakirov::get_list_ull(std::istream & in, list_ull & forward_list)
 {
   unsigned long long int sequence_element = 0;
-  list_ull_it fillable_iterator = forward_list.before_begin();
+  auto fillable_iterator = forward_list.before_begin();
   while (in >> sequence_element)
   {
     forward_list.insert_after(fillable_iterator, sequence_element);
@@ -41,29 +41,29 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   }
 
   list_iter list_iterators;
-  it_to_it iter_list = list_iterators.before_begin();
-  list_pair_it pair_iter = forward_list.begin();
+  auto iter_list = list_iterators.before_begin();
+  auto pair_iter = forward_list.begin();
   unsigned long long number_sum = 0;
   size_t list_size = 0;
   size_t deleted = 0;
 
-  for (list_pair_it i = forward_list.begin(); i != forward_list.end(); ++i, ++iter_list)
+  for (auto i = forward_list.begin(); i != forward_list.end(); ++i, ++iter_list)
   {
-    list_iterators.insert_after(iter_list, (*i).second.begin());
+    list_iterators.insert_after(iter_list, i->second.begin());
     ++list_size;
   }
 
-  list_pair_it output_iter = forward_list.begin();
-  out << (* output_iter).first;
+  auto output_iter = forward_list.begin();
+  out << output_iter->first;
   ++output_iter;
   for (; output_iter != forward_list.end(); ++output_iter)
   {
-    out << ' ' << (* output_iter).first;
+    out << ' ' << output_iter->first;
   }
 
   out << '\n';
   list_ull list_added;
-  list_ull_it iter_added = list_added.before_begin();
+  auto iter_added = list_added.before_begin();
   bool flag_overflow = false;
 
   while (deleted != list_size)
@@ -72,7 +72,7 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
     number_sum = 0;
     iter_list = list_iterators.begin();
     pair_iter = forward_list.begin();
-    while ((* iter_list) == (* pair_iter).second.end() && iter_list != list_iterators.end())
+    while (*iter_list == pair_iter->second.end() && iter_list != list_iterators.end())
     {
       ++iter_list;
       ++pair_iter;
@@ -88,10 +88,10 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
       break;
     }
 
-    if ((* iter_list) != (* pair_iter).second.end())
+    if (*iter_list != pair_iter->second.end())
     {
-      out << ** iter_list;
-      number_sum += (** iter_list);
+      out << **iter_list;
+      number_sum += (**iter_list);
       ++(* iter_list);
     }
     else
@@ -104,16 +104,16 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
 
     for (; iter_list != list_iterators.end(); ++iter_list)
     {
-      if ((* iter_list) != (* pair_iter).second.end())
+      if (*iter_list != pair_iter->second.end())
       {
-        if (number_sum > std::numeric_limits< unsigned long long >::max() - ** iter_list)
+        if (number_sum > std::numeric_limits< unsigned long long >::max() - **iter_list)
         {
           flag_overflow = true;
         }
 
-        out << ' ' << ** iter_list;
-        number_sum += (** iter_list);
-        ++(* iter_list);
+        out << ' ' << **iter_list;
+        number_sum += **iter_list;
+        ++(*iter_list);
       }
       else
       {
@@ -143,11 +143,11 @@ void zakirov::output_result(std::ostream & out, list_pair & forward_list)
   else
   {
     iter_added = list_added.begin();
-    out << * iter_added;
+    out << *iter_added;
     ++iter_added;
     for (; iter_added != list_added.end(); ++iter_added)
     {
-      out << ' ' << * iter_added;
+      out << ' ' << *iter_added;
     }
 
     out << '\n';
