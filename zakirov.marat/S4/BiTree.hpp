@@ -25,6 +25,10 @@ namespace zakirov
   
     BiTree< K, T, C > & operator=(const BiTree< K, T, C > & other);
     BiTree< K, T, C > & operator=(BiTree< K, T, C > && other);
+    T & operator[](const K & key);
+
+    T & at(const K & key);
+    const T & at(const K & key) const;
 
     BiIter< K, T, C > begin() noexcept;
     BiIter< K, T, C > end() noexcept;
@@ -33,10 +37,6 @@ namespace zakirov
 
     T size() const noexcept;
     bool empty() const noexcept;
-
-    T & operator[](const K & key);
-    T & at(const K & key);
-    const T & at(const K & key) const;
 
     std::pair< BiIter, bool > insert(const std::pair< K, T > & value);
     BiIter insert(CBiIter pos, const T & value);
@@ -208,6 +208,18 @@ namespace zakirov
 
     CBiIter< K, T, C > res(last);
     return res
+  }
+
+  template < class K, class T, class C >
+  T BiTree< K, T, C >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template < class K, class T, class C >
+  bool BiTree< K, T, C >::empty() const noexcept
+  {
+    return size_ == 0;
   }
 }
 
