@@ -6,6 +6,8 @@
 namespace abramov
 {
   std::ifstream &readGraphs(std::ifstream &in, GraphCollection &collect);
-  void printVertSorted(const GraphCollection &collect, const std::string &name, std::ostream &out);
+  void printVertsSorted(const GraphCollection &collect, const std::string &name, std::ostream &out);
+  void printOutVerts(const GraphCollection &collect, const std::string &n, const std::string &v, std::ostream &out);
+  void printInVerts(const GraphCollection &collect, const std::string &n, const std::string &v, std::ostream &out);
 }
 #endif
