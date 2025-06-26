@@ -30,6 +30,9 @@ namespace gavrilova {
     TwoThreeTree();
     TwoThreeTree(const TwoThreeTree& other);
     TwoThreeTree(TwoThreeTree&& other) noexcept;
+    TwoThreeTree(std::initializer_list< value_type > il);
+    template < typename InputIterator >
+    TwoThreeTree(InputIterator first, InputIterator last);
 
     ~TwoThreeTree();
 
@@ -53,9 +56,13 @@ namespace gavrilova {
     void clear() noexcept;
 
     std::pair< Iterator, bool > insert(const value_type& value);
+    template < class InputIterator >
+    void insert(InputIterator first, InputIterator last);
+    void insert(std::initializer_list< value_type > il);
 
     size_t erase(const Key& key);
     Iterator erase(Iterator pos);
+    Iterator erase(Iterator first, Iterator last);
 
     void swap(TwoThreeTree& other) noexcept;
     Iterator find(const Key& key);
@@ -80,7 +87,7 @@ namespace gavrilova {
     Node* copy_subtree(Node* node, Node* parent);
     bool is_leaf(Node* node) const;
     void clear_recursive(Node* node) noexcept;
-    Node* find_leaf(const Key& key);
+    Node* find_leaf(const Key& key, size_t& counter_for_allocate);
 
     void push_to_2node(Node* node, const Key& key, const Value& value);
 
@@ -131,6 +138,21 @@ namespace gavrilova {
     other.fake_ = nullptr;
     other.size_ = 0;
   }
+
+  template < class Key, class Value, class Cmp >
+  template < class InputIterator >
+  TwoThreeTree< Key, Value, Cmp >::TwoThreeTree(InputIterator first, InputIterator last):
+    TwoThreeTree()
+  {
+    for (auto it = first; it != last; it++) {
+      insert(*it);
+    }
+  }
+
+  template < class Key, class Value, class Cmp >
+  TwoThreeTree< Key, Value, Cmp >::TwoThreeTree(std::initializer_list< value_type > il):
+    TwoThreeTree(il.begin(), il.end())
+  {}
 
   template < class Key, class Value, class Cmp >
   TwoThreeTree< Key, Value, Cmp >::~TwoThreeTree()
@@ -292,8 +314,8 @@ namespace gavrilova {
       return {Iterator(new_root, 0, fake_), true};
     }
 
-    Node* leaf = find_leaf(key);
-
+    size_t nodes_to_alloc_count = 0;
+    Node* leaf = find_leaf(key, nodes_to_alloc_count);
     if (!leaf->is_3_node) {
       push_to_2node(leaf, key, value.second);
       ++size_;
@@ -301,146 +323,153 @@ namespace gavrilova {
       return {Iterator(leaf, new_pos, fake_), true};
     }
 
-    Node* node_to_promote = nullptr;
-    Node* new_right_node = nullptr;
-
-    try {
-      value_type temp_data[3] = {leaf->data[0], leaf->data[1], value};
-
-      if (cmp_(temp_data[1].first, temp_data[0].first)) {
-        std::swap(temp_data[0], temp_data[1]);
-      }
-      if (cmp_(temp_data[2].first, temp_data[1].first)) {
-        std::swap(temp_data[1], temp_data[2]);
-      }
-      if (cmp_(temp_data[1].first, temp_data[0].first)) {
-        std::swap(temp_data[0], temp_data[1]);
-      }
-
-      leaf->data[0] = temp_data[0];
-      leaf->data[1] = {};
-      leaf->is_3_node = false;
-
-      new_right_node = new Node();
-      new_right_node->data[0] = temp_data[2];
-      new_right_node->parent = nullptr;
-      new_right_node->children[0] = new_right_node->children[1] = new_right_node->children[2] = fake_;
-
-      node_to_promote = new Node();
-      node_to_promote->data[0] = temp_data[1];
-      node_to_promote->parent = nullptr;
-      node_to_promote->children[0] = leaf;
-      node_to_promote->children[1] = new_right_node;
-      node_to_promote->children[2] = fake_;
-
-      Node* current_child = leaf;
-
-      while (true) {
-        Node* parent = current_child->parent;
-
-        if (parent == fake_) {
-          node_to_promote->parent = fake_;
-
-          node_to_promote->children[0]->parent = node_to_promote;
-          node_to_promote->children[1]->parent = node_to_promote;
-          fake_->children[0] = node_to_promote;
-          node_to_promote = nullptr;
-          break;
+    Node** preallocated_nodes = nullptr;
+    if (nodes_to_alloc_count > 0) {
+      preallocated_nodes = new Node* [nodes_to_alloc_count] { nullptr };
+      try {
+        for (size_t i = 0; i < nodes_to_alloc_count; ++i) {
+          preallocated_nodes[i] = new Node();
         }
-
-        if (!parent->is_3_node) {
-          if (cmp_(node_to_promote->data[0].first, parent->data[0].first)) {
-            parent->data[1] = parent->data[0];
-            parent->data[0] = node_to_promote->data[0];
-            parent->children[2] = parent->children[1];
-            parent->children[1] = node_to_promote->children[1];
-            parent->children[0] = node_to_promote->children[0];
-          } else {
-            parent->data[1] = node_to_promote->data[0];
-            parent->children[2] = node_to_promote->children[1];
-
-            parent->children[1] = node_to_promote->children[0];
-          }
-          parent->is_3_node = true;
-
-          parent->children[0]->parent = parent;
-          parent->children[1]->parent = parent;
-          parent->children[2]->parent = parent;
-
-          delete node_to_promote;
-          node_to_promote = nullptr;
-          break;
+      } catch (const std::bad_alloc&) {
+        for (size_t i = 0; i < nodes_to_alloc_count; ++i) {
+          delete preallocated_nodes[i];
         }
-
-        value_type parent_temp_data[3];
-        Node* parent_temp_children[4];
-
-        int child_idx = (parent->children[0] == current_child) ? 0 : (parent->children[1] == current_child) ? 1
-                                                                                                            : 2;
-
-        if (child_idx == 0) {
-          parent_temp_data[0] = node_to_promote->data[0];
-          parent_temp_data[1] = parent->data[0];
-          parent_temp_data[2] = parent->data[1];
-          parent_temp_children[0] = node_to_promote->children[0];
-          parent_temp_children[1] = node_to_promote->children[1];
-          parent_temp_children[2] = parent->children[1];
-          parent_temp_children[3] = parent->children[2];
-        } else if (child_idx == 1) {
-          parent_temp_data[0] = parent->data[0];
-          parent_temp_data[1] = node_to_promote->data[0];
-          parent_temp_data[2] = parent->data[1];
-          parent_temp_children[0] = parent->children[0];
-          parent_temp_children[1] = node_to_promote->children[0];
-          parent_temp_children[2] = node_to_promote->children[1];
-          parent_temp_children[3] = parent->children[2];
-        } else {
-          parent_temp_data[0] = parent->data[0];
-          parent_temp_data[1] = parent->data[1];
-          parent_temp_data[2] = node_to_promote->data[0];
-          parent_temp_children[0] = parent->children[0];
-          parent_temp_children[1] = parent->children[1];
-          parent_temp_children[2] = node_to_promote->children[0];
-          parent_temp_children[3] = node_to_promote->children[1];
-        }
-
-        delete node_to_promote;
-
-        Node* new_parent_right_sibling = new Node();
-
-        parent->data[0] = parent_temp_data[0];
-        parent->data[1] = {};
-        parent->is_3_node = false;
-        parent->children[0] = parent_temp_children[0];
-        parent->children[1] = parent_temp_children[1];
-        parent->children[2] = fake_;
-        parent->children[0]->parent = parent;
-        parent->children[1]->parent = parent;
-
-        new_parent_right_sibling->data[0] = parent_temp_data[2];
-        new_parent_right_sibling->children[0] = parent_temp_children[2];
-        new_parent_right_sibling->children[1] = parent_temp_children[3];
-        new_parent_right_sibling->children[2] = fake_;
-        new_parent_right_sibling->children[0]->parent = new_parent_right_sibling;
-        new_parent_right_sibling->children[1]->parent = new_parent_right_sibling;
-
-        node_to_promote = new Node();
-        node_to_promote->data[0] = parent_temp_data[1];
-        node_to_promote->children[0] = parent;
-        node_to_promote->children[1] = new_parent_right_sibling;
-        node_to_promote->children[2] = fake_;
-
-        current_child = parent;
+        delete[] preallocated_nodes;
+        throw;
       }
-
-    } catch (const std::bad_alloc&) {
-      delete node_to_promote;
-      delete new_right_node;
-      throw;
     }
 
+    size_t nodes_used = 0;
+    value_type temp_data[3] = {leaf->data[0], leaf->data[1], value};
+
+    if (cmp_(temp_data[1].first, temp_data[0].first)) {
+      std::swap(temp_data[0], temp_data[1]);
+    }
+    if (cmp_(temp_data[2].first, temp_data[1].first)) {
+      std::swap(temp_data[1], temp_data[2]);
+    }
+    if (cmp_(temp_data[1].first, temp_data[0].first)) {
+      std::swap(temp_data[0], temp_data[1]);
+    }
+
+    value_type promoted_value = temp_data[1];
+
+    leaf->data[0] = temp_data[0];
+    leaf->data[1] = {};
+    leaf->is_3_node = false;
+
+    Node* new_right_node = preallocated_nodes[nodes_used++];
+    new_right_node->data[0] = temp_data[2];
+    new_right_node->children[0] = new_right_node->children[1] = new_right_node->children[2] = fake_;
+
+    Node* left_child_of_promo = leaf;
+    Node* right_child_of_promo = new_right_node;
+    Node* current_child = leaf;
+
+    while (true) {
+      Node* parent = current_child->parent;
+
+      if (parent == fake_) {
+        Node* new_root = preallocated_nodes[nodes_used++];
+        new_root->data[0] = promoted_value;
+        new_root->children[0] = left_child_of_promo;
+        new_root->children[1] = right_child_of_promo;
+        new_root->children[2] = fake_;
+        new_root->parent = fake_;
+        new_root->children[0]->parent = new_root;
+        new_root->children[1]->parent = new_root;
+        fake_->children[0] = new_root;
+        break;
+      }
+
+      right_child_of_promo->parent = parent;
+
+      if (!parent->is_3_node) {
+        if (cmp_(promoted_value.first, parent->data[0].first)) {
+          parent->data[1] = parent->data[0];
+          parent->data[0] = promoted_value;
+          parent->children[2] = parent->children[1];
+          parent->children[1] = right_child_of_promo;
+        } else {
+          parent->data[1] = promoted_value;
+          parent->children[2] = right_child_of_promo;
+        }
+        parent->is_3_node = true;
+        break;
+      }
+
+      value_type parent_temp_data[3];
+      Node* parent_temp_children[4];
+      int child_idx = get_child_index(current_child);
+
+      if (child_idx == 0) {
+        parent_temp_data[0] = promoted_value;
+        parent_temp_data[1] = parent->data[0];
+        parent_temp_data[2] = parent->data[1];
+        parent_temp_children[0] = left_child_of_promo;
+        parent_temp_children[1] = right_child_of_promo;
+        parent_temp_children[2] = parent->children[1];
+        parent_temp_children[3] = parent->children[2];
+      } else if (child_idx == 1) {
+        parent_temp_data[0] = parent->data[0];
+        parent_temp_data[1] = promoted_value;
+        parent_temp_data[2] = parent->data[1];
+        parent_temp_children[0] = parent->children[0];
+        parent_temp_children[1] = left_child_of_promo;
+        parent_temp_children[2] = right_child_of_promo;
+        parent_temp_children[3] = parent->children[2];
+      } else {
+        parent_temp_data[0] = parent->data[0];
+        parent_temp_data[1] = parent->data[1];
+        parent_temp_data[2] = promoted_value;
+        parent_temp_children[0] = parent->children[0];
+        parent_temp_children[1] = parent->children[1];
+        parent_temp_children[2] = left_child_of_promo;
+        parent_temp_children[3] = right_child_of_promo;
+      }
+
+      promoted_value = parent_temp_data[1];
+
+      parent->data[0] = parent_temp_data[0];
+      parent->data[1] = {};
+      parent->is_3_node = false;
+      parent->children[0] = parent_temp_children[0];
+      parent->children[1] = parent_temp_children[1];
+      parent->children[2] = fake_;
+      parent->children[0]->parent = parent;
+      parent->children[1]->parent = parent;
+
+      Node* new_parent_right_sibling = preallocated_nodes[nodes_used++];
+      new_parent_right_sibling->data[0] = parent_temp_data[2];
+      new_parent_right_sibling->children[0] = parent_temp_children[2];
+      new_parent_right_sibling->children[1] = parent_temp_children[3];
+      new_parent_right_sibling->children[2] = fake_;
+      new_parent_right_sibling->children[0]->parent = new_parent_right_sibling;
+      new_parent_right_sibling->children[1]->parent = new_parent_right_sibling;
+
+      left_child_of_promo = parent;
+      right_child_of_promo = new_parent_right_sibling;
+      current_child = parent;
+    }
+
+    delete[] preallocated_nodes;
     ++size_;
     return {find(key), true};
+  }
+
+  template < class Key, class Value, class Cmp >
+  template < class InputIterator >
+  void TwoThreeTree< Key, Value, Cmp >::insert(InputIterator first, InputIterator last)
+  {
+    for (auto it = first; it != last; it++) {
+      insert(*it);
+    }
+  }
+
+  template < class Key, class Value, class Cmp >
+  void TwoThreeTree< Key, Value, Cmp >::insert(std::initializer_list< value_type > il)
+  {
+    insert(il.begin(), il.end());
   }
 
   template < class Key, class Value, class Cmp >
@@ -453,6 +482,7 @@ namespace gavrilova {
 
     Iterator next_it = pos;
     ++next_it;
+    Key next_key = next_it->first;
 
     Node* node_to_process = pos.node_;
     int key_idx_to_remove = pos.key_pos_;
@@ -478,7 +508,7 @@ namespace gavrilova {
     --size_;
 
     if (next_it != end()) {
-      return find(next_it->first);
+      return find(next_key);
     } else {
       return end();
     }
@@ -493,6 +523,28 @@ namespace gavrilova {
     }
     erase(it);
     return 1;
+  }
+
+  template < class Key, class Value, class Cmp >
+  typename TwoThreeTree< Key, Value, Cmp >::Iterator TwoThreeTree< Key, Value, Cmp >::erase(Iterator first, Iterator last)
+  {
+    if (first == last || first == end()) {
+      return end();
+    }
+
+    Key key_last;
+    if (last != end()) {
+      key_last = last->first;
+    }
+
+    while (first != last) {
+      first = erase(first);
+
+      if (last != end()) {
+        last = find(key_last);
+      }
+    }
+    return first;
   }
 
   template < class Key, class Value, class Cmp >
@@ -703,10 +755,19 @@ namespace gavrilova {
   }
 
   template < class Key, class Value, class Cmp >
-  typename TwoThreeTree< Key, Value, Cmp >::Node* TwoThreeTree< Key, Value, Cmp >::find_leaf(const Key& key)
+  typename TwoThreeTree< Key, Value, Cmp >::Node* TwoThreeTree< Key, Value, Cmp >::find_leaf(const Key& key, size_t& counter_for_allocate)
   {
+    counter_for_allocate = 0;
     Node* current = fake_->children[0];
+    if (current->is_3_node) {
+      ++counter_for_allocate;
+    }
     while (current != fake_ && !is_leaf(current)) {
+      if (current->is_3_node) {
+        ++counter_for_allocate;
+      } else {
+        counter_for_allocate = 0;
+      }
       if (cmp_(key, current->data[0].first)) {
         current = current->children[0];
       } else if (!current->is_3_node || cmp_(key, current->data[1].first)) {
@@ -714,6 +775,11 @@ namespace gavrilova {
       } else {
         current = current->children[2];
       }
+    }
+    if (current != fake_ && current->is_3_node) {
+      ++counter_for_allocate;
+    } else if (current != fake_ && !current->is_3_node) {
+      counter_for_allocate = 0;
     }
     return current;
   }
