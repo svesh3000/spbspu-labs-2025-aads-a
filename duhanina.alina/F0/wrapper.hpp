@@ -7,6 +7,8 @@
 
 namespace duhanina
 {
+  using str = std::string;
+
   void build_codes_wrapper(std::istream&, std::ostream&);
   void show_codes_wrapper(std::istream&, std::ostream&);
   void save_codes_wrapper(std::istream&, std::ostream&);
@@ -20,7 +22,7 @@ namespace duhanina
   void suggest_encodings_wrapper(std::istream& in, std::ostream& out);
   void check_encoding_wrapper(std::istream& in, std::ostream& out);
 
-  Tree< std::string, std::function< void() >, std::less< std::string > > initialize_commands(std::istream& in, std::ostream& out);
+  Tree< str, std::function< void() >, std::less< str > > initialize_commands(std::istream& in, std::ostream& out);
 }
 
 #endif
