@@ -30,11 +30,10 @@ namespace zakirov
     bool empty() const noexcept;
 
     T & operator[](const K & key);
-    T & operator[](K && key);
-    T & at(const K & key) const;
-    T & at(K && key) const;
+    T & at(const K & key);
+    const T & at(const K & key) const;
 
-    std::pair< iterator, bool > insert(const T & value);
+    std::pair< BiIter, bool > insert(const std::pair< K, V > & value);
     BiIter insert(CBiIter pos, const T & value);
     BiIter erase(BiIter pos);
     BiIter erase(CBiIter pos);
@@ -81,6 +80,37 @@ namespace zakirov
   BiTree< K, T, C >::~BiTree()
   {
     clear();
+  }
+
+  template < class K, class T, class C >
+  T & BiTree< K, T, C >::operator[](const K & key)
+  {
+    BiIter< K, T, C > result = insert(std::make_pair(key, T())).first;
+    return *result;
+  }
+
+  template < class K, class T, class C >
+  T & BiTree< K, T, C >::at(const K & key)
+  {
+    BiIter< K, T, C > iter = find(key);
+    if (!iter)
+    {
+      throw std::out_of_range("No element in tree")
+    }
+
+    return *iter;
+  }
+
+  template < class K, class T, class C >
+  const T & BiTree< K, T, C >::at(const K & key) const
+  {
+    CBiIter< K, T, C > iter = find(key);
+    if (!iter)
+    {
+      throw std::out_of_range("No element in tree")
+    }
+
+    return *iter;
   }
 }
 

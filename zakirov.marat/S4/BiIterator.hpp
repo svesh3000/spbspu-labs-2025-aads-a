@@ -124,7 +124,7 @@ namespace zakirov
   template< class K, class T >
   std::pair< K, T > & BiIter< K, T, C >::operator*() noexcept
   {
-    return node_->value;
+    return node_->value_;
   }
 
   template< class K, class T >
