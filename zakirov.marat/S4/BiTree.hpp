@@ -8,6 +8,12 @@
 
 namespace zakirov
 {
+  template< class K, class T, class C >
+  class BiIter;
+
+  template< class K, class T, class C >
+  class CBiIter;
+
   template < class K, class T, class C = std::less< K > >
   class BiTree
   {
@@ -17,14 +23,13 @@ namespace zakirov
     BiTree(BiTree && rhs) noexcept;
     ~BiTree();
   
-    BiTree< K, T > & operator=(const BiTree< K, T > & x);
-    BiTree< K, T > & operator=(BiTree< K, T > && x);
-    BiTree< K, T > & operator=(initializer_list< T > init_list);
+    BiTree< K, T, C > & operator=(const BiTree< K, T, C > & x);
+    BiTree< K, T, C > & operator=(BiTree< K, T, C > && x);
 
-    BiIter< K, T > begin() const noexcept;
-    BiIter< K, T > end() const noexcept;
-    CBiIter< K, T > cbegin() const noexcept;
-    CBiIter< K, T > cend() const noexcept; 
+    BiIter< K, T, C > begin() noexcept;
+    BiIter< K, T, C > end() noexcept;
+    CBiIter< K, T, C > cbegin() const noexcept;
+    CBiIter< K, T, C > cend() const noexcept; 
 
     T size() const noexcept;
     bool empty() const noexcept;
@@ -33,7 +38,7 @@ namespace zakirov
     T & at(const K & key);
     const T & at(const K & key) const;
 
-    std::pair< BiIter, bool > insert(const std::pair< K, V > & value);
+    std::pair< BiIter, bool > insert(const std::pair< K, T > & value);
     BiIter insert(CBiIter pos, const T & value);
     BiIter erase(BiIter pos);
     BiIter erase(CBiIter pos);
@@ -111,6 +116,82 @@ namespace zakirov
     }
 
     return *iter;
+  }
+
+  template < class K, class T, class C >
+  BiIter< K, T, C > BiTree< K, T, C >::begin() noexcept
+  {
+    BiNode< K, T > * first = head_;
+    if (!first)
+    {
+      BiIter< K, T, C > res(first);
+      return res;
+    }
+
+    while (first->left_)
+    {
+      first = first->left_;
+    }
+
+    BiIter< K, T, C > res(first);
+    return res
+  }
+
+  template < class K, class T, class C >
+  BiIter< K, T, C > BiTree< K, T, C >::end() noexcept
+  {
+    BiNode< K, T > * last = head_;
+    if (!last)
+    {
+      BiIter< K, T, C > res(last);
+      return res;
+    }
+
+    while (last->right_)
+    {
+      last = last->right_;
+    }
+
+    BiIter< K, T, C > res(last);
+    return res
+  }
+
+  template < class K, class T, class C >
+  CBiIter< K, T, C > BiTree< K, T, C >::cbegin() const noexcept
+  {
+    BiNode< K, T > * first = head_;
+    if (!first)
+    {
+      CBiIter< K, T, C > res(first);
+      return res;
+    }
+
+    while (first->left_)
+    {
+      first = first->left_;
+    }
+
+    CBiIter< K, T, C > res(first);
+    return res
+  }
+
+  template < class K, class T, class C >
+  CBiIter< K, T, C > BiTree< K, T, C >::cend() const noexcept
+  {
+    BiNode< K, T > * last = head_;
+    if (!last)
+    {
+      CBiIter< K, T, C > res(last);
+      return res;
+    }
+
+    while (last->right_)
+    {
+      last = last->right_;
+    }
+
+    CBiIter< K, T, C > res(last);
+    return res
   }
 }
 

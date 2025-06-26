@@ -85,10 +85,10 @@ namespace detail
 
 namespace zakirov
 {
-  template< class K, class T, Class C >
+  template< class K, class T, class C >
   class BiTree;
 
-  template< class K, class T, Class C >
+  template< class K, class T, class C >
   class BiIter: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
@@ -97,9 +97,9 @@ namespace zakirov
     std::pair< K, T > & operator*() noexcept;
     std::pair< K, T > * operator->() noexcept;
     BiIter< K, T, C > & operator++() noexcept;
-    BiIter< K, T, C > operator++(int) noexcept;
+    BiIter< K, T, C > & operator++(int) noexcept;
     BiIter< K, T, C > & operator--() noexcept;
-    BiIter< K, T, C > operator--(int) noexcept;
+    BiIter< K, T, C > & operator--(int) noexcept;
     bool operator!=(const BiIter< K, T, C > & other) const noexcept;
     bool operator==(const BiIter< K, T, C > & other) const noexcept;
 
@@ -111,12 +111,12 @@ namespace zakirov
     BiNode< K, T > * node_;
   };
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C >::BiIter() noexcept:
     node_(nullptr)
   {}
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C >::BiIter(BiNode< K, T > * node) noexcept:
     node_(node)
   {}
@@ -127,20 +127,20 @@ namespace zakirov
     return node_->value_;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   std::pair< K, T > * BiIter< K, T, C >::operator->() noexcept
   {
     return std::addressof(node_->value_);
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C > & BiIter< K, T, C >::operator++() noexcept
   {
     next();
     return *this;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C > BiIter< K, T, C >::operator++(int) noexcept
   {
     BiIter< K, T, C > * start_value = *this;
@@ -148,14 +148,14 @@ namespace zakirov
     return start_value;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C > & BiIter< K, T, C >::operator--() noexcept
   {
     prev();
     return *this;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   BiIter< K, T, C > BiIter< K, T, C >::operator--(int) noexcept
   {
     BiIter< K, T, C > * start_value = *this;
@@ -163,31 +163,31 @@ namespace zakirov
     return start_value;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   bool BiIter< K, T, C >::operator!=(const BiIter< K, T, C > & other) const noexcept
   {
     return node_ != other.node_;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   bool BiIter< K, T, C >::operator==(const BiIter< K, T, C > & other) const noexcept
   {
     return node_ != other.node_;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   void BiIter< K, T, C >::next()
   {
     detail::next(node_);
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   void BiIter< K, T, C >::prev()
   {
     detail::prev(node_);
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   class CBiIter: public std::iterator< std::bidirectional_iterator_tag, T >
   {
   public:
@@ -210,77 +210,77 @@ namespace zakirov
     BiNode< K, T > * node_;
   };
 
-  template< class K, class T >
+  template< class K, class T, class C >
   CBiIter< K, T, C >::CBiIter() noexcept:
     node_(nullptr)
   {}
 
-  template< class K, class T >
+  template< class K, class T, class C >
   CBiIter< K, T, C >::CBiIter(BiNode< K, T > * node) noexcept:
     node_(node)
   {}
 
-  template< class K, class T >
+  template< class K, class T, class C >
   std::pair< K, T > & CBiIter< K, T, C >::operator*() const noexcept
   {
     return node_->data_;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   std::pair< K, T > * CBiIter< K, T, C >::operator->() const noexcept
   {
     return std::addressof(node_->data_);
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   CBiIter< K, T, C > & CBiIter< K, T, C >::operator++() noexcept
   {
     next();
     return *this;
   }
 
-  template< class K, class T >
-  CBiIter< K, T, C > CBiIter< K, T, C >::operator++(int) noexcept
+  template< class K, class T, class C >
+  CBiIter< K, T, C > & CBiIter< K, T, C >::operator++(int) noexcept
   {
     BiIter< K, T, C > * start_value = *this;
     next();
     return start_value;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   CBiIter< K, T, C > & CBiIter< K, T, C >::operator--() noexcept
   {
     prev();
     return *this;
   }
 
-  template< class K, class T >
-  CBiIter< K, T, C > CBiIter< K, T, C >::operator--(int) noexcept
+  template< class K, class T, class C >
+  CBiIter< K, T, C > & CBiIter< K, T, C >::operator--(int) noexcept
   {
     BiIter< K, T, C > * start_value = *this;
     prev();
     return start_value;
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   bool CBiIter< K, T, C >::operator!=(const CBiIter< K, T, C > & other) const noexcept
   {
     return node_ != other.node_
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   bool CBiIter< K, T, C >::operator==(const CBiIter< K, T, C > & other) const noexcept
   {
     return node_ == other.node_
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   void CBiIter< K, T, C >::next()
   {
     detail::next(node_);
   }
 
-  template< class K, class T >
+  template< class K, class T, class C >
   void CBiIter< K, T, C >::prev()
   {
     detail::prev(node_);
