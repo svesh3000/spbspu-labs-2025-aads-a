@@ -7,7 +7,15 @@ namespace zakirov
   template < class K, class T >
   struct BiNode
   {
-    BiNode(K key, const T & data);
+    BiNode() = default;
+    BiNode(std::pair< K, T > value):
+    left_(nullptr),
+    right_(nullptr),
+    parent_(nullptr),
+    value_.first(value.first),
+    value_.second(value.second)
+  {}
+
     BiNode< K, T > * left_;
     BiNode< K, T > * right_;
     BiNode< K, T > * parent_;
@@ -15,12 +23,12 @@ namespace zakirov
   };
 
   template < class K, class T >
-  BiNode< K, T >::BiNode(K key, const T & data):
+  BiNode< K, T >::BiNode(std::pair< K, T > value):
     left_(nullptr),
     right_(nullptr),
     parent_(nullptr),
-    value_.first(key),
-    value_.second(data)
+    value_.first(value.first),
+    value_.second(value.second)
   {}
 }
 
