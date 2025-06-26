@@ -2,16 +2,17 @@
 #define BITREE_HPP
 #include <initializer_list>
 #include <utility>
+#include <functional>
 #include "BiNode.hpp"
 #include "BiIterator.hpp"
 
 namespace zakirov
 {
-  template < class K, class T >
+  template < class K, class T, class C = std::less< K > >
   class BiTree
   {
   public:
-    BiTree();
+    BiTree() noexcept;
     BiTree(const BiTree & rhs);
     BiTree(BiTree && rhs) noexcept;
     ~BiTree();
@@ -20,14 +21,13 @@ namespace zakirov
     BiTree< K, T > & operator=(BiTree< K, T > && x);
     BiTree< K, T > & operator=(initializer_list< T > init_list);
 
-    BiIter< K, T > begin();
-    BiIter< K, T > end();
-    CBiIter< K, T > cbegin();
-    CBiIter< K, T > cend(); 
+    BiIter< K, T > begin() const noexcept;
+    BiIter< K, T > end() const noexcept;
+    CBiIter< K, T > cbegin() const noexcept;
+    CBiIter< K, T > cend() const noexcept; 
 
     T size() const noexcept;
     bool empty() const noexcept;
-    max_size
 
     T & operator[](const K & key);
     T & operator[](K && key);
@@ -48,8 +48,40 @@ namespace zakirov
     T count (const K & k) const;
   private:
     BiNode< K, T > * head_;
+    C cmp_;
     size_t size_;
   };
+
+  template < class K, class T, class C >
+  BiTree< K, T, C >::BiTree() noexcept:
+    head_(nullptr),
+    size_(0)
+  {}
+
+  template < class K, class T, class C >
+  BiTree< K, T, C >::BiTree(const BiTree< K, T, C > & other):
+    BiTree()
+  {
+    for (CBiIter< K, T, C > i = other.cbegin(); i != other.cend(); ++i)
+    {
+      insert(*it);
+    }
+  }
+
+  template < class K, class T, class C >
+  BiTree< K, T, C >::BiTree(BiTree< K, T, C > && other) noexcept:
+    head_(other.head_),
+    size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.size_ = nullptr;
+  }
+
+  template < class K, class T, class C >
+  BiTree< K, T, C >::~BiTree()
+  {
+    clear();
+  }
 }
 
 #endif
