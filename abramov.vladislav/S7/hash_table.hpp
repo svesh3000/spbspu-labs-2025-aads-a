@@ -121,7 +121,13 @@ abramov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 {
   for (size_t i = 0; i < capacity_; ++i)
   {
-    delete table_[i];
+    Node< Key, Value > *curr = table_[i];
+    while (curr)
+    {
+      Node< Key, Value > *next = curr->next_;
+      delete curr;
+      curr = next;
+    }
   }
   delete[] table_;
 }
