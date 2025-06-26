@@ -26,6 +26,14 @@ abramov::Graph &abramov::Graph::operator=(const Graph &other)
   return *this;
 }
 
+void abramov::Graph::addVertex(const std::string &vert)
+{
+  if (adj_list.find(vert) == adj_list.end())
+  {
+    adj_list.insert(vert, SimpleArray< Edge >());
+  }
+}
+
 void abramov::Graph::addEdge(const std::string &from, const std::string &to, size_t w)
 {
   Edge edge(from, to, w);

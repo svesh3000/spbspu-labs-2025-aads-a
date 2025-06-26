@@ -198,3 +198,46 @@ void abramov::cutEdgeFromGraph(GraphCollection &collect, const std::string &name
     throw std::logic_error("There is no such edge\n");
   }
 }
+
+void abramov::mergeGraphs(GraphCollection &collect, const std::string &name, std::istream &in)
+{
+  std::string n1;
+  std::string n2;
+  in >> n1 >> n2;
+  const Graph &graph1 = collect.cgetGraph(n1);
+  const Graph &graph2 = collect.cgetGraph(n2);
+  Graph res(n);
+  for (auto it = graph1.cbegin(); it != graph1.cend(); ++it)
+  {
+    res.addVertex(it->first);
+  }
+  for (auto it = graph2.cbegin(); it != graph2.cend(); ++it)
+  {
+    res.addVertex(it->first);
+  }
+  for (auto it = graph1.cbegin(); it != graph1.cend(); ++it)
+  {
+    const SimpleArray< Edge > *edges1 = graph1.getEdges(it->first);
+    if (edges)
+    {
+      for (size_t i = 0; i < edges->size(); ++i)
+      {
+        const Edge &edge = (*edges)[i];
+        res.addEdge(edge.from, edge.to, edge.weight);
+      }
+    }
+  }
+  for (auto it = graph2.cbegin(); it != graph2.cend(); ++it)
+  {
+    const SimpleArray< Edge > *edges2 = graph2.getEdges(it->first);
+    if (edges)
+    {
+      for (size_t i = 0; i < edges->size(); ++i)
+      {
+        const Edge &edge = (*edges)[i];
+        res.addEdge(edge.from, edge.to, edge.weight);
+      }
+    }
+  }
+  collection.addGraph(res);
+}
