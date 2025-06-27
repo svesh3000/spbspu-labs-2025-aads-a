@@ -3,12 +3,12 @@
 
 #include <cstddef>
 #include <memory>
+#include <utility>
 #include <string>
 #include <vector>
-#include <set>
-#include <map>
-#include <boost/variant2.hpp>
-#include <utility>
+#include <set.hpp>
+#include <map.hpp>
+#include <variant.hpp>
 #include "compare.hpp"
 
 namespace rychkov
@@ -202,17 +202,17 @@ namespace rychkov
     struct Struct
     {
       std::string name;
-      std::set< Variable, NameCompare > fields;
+      Set< Variable, NameCompare > fields;
     };
     struct Enum
     {
       std::string name;
-      std::map< std::string, int, NameCompare > fields;
+      Map< std::string, int, NameCompare > fields;
     };
     struct Union
     {
       std::string name;
-      std::set< Variable, NameCompare > fields;
+      Set< Variable, NameCompare > fields;
     };
     struct Alias
     {
@@ -221,7 +221,7 @@ namespace rychkov
     };
     struct Declaration
     {
-      using declared = boost::variant2::variant< Variable, Struct, Enum, Union, Alias, Function, Statement >;
+      using declared = Variant< Variable, Struct, Enum, Union, Alias, Function, Statement >;
       declared data;
       DynMemWrapper< Expression > value = nullptr;
       ScopeType scope = UNSPECIFIED;
@@ -248,7 +248,7 @@ namespace rychkov
     };
     struct Expression
     {
-      using operand = boost::variant2::variant< DynMemWrapper< Expression >, Variable,
+      using operand = Variant< DynMemWrapper< Expression >, Variable,
             Declaration, Literal, CastOperation, Body >;
 
       const Operator* operation;

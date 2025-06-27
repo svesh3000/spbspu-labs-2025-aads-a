@@ -72,12 +72,12 @@ bool rychkov::entities::Expression::full() const noexcept
 bool rychkov::entities::is_body(const Expression& expr)
 {
   return (expr.operation == nullptr) && !expr.operands.empty()
-      && boost::variant2::holds_alternative< Body >(expr.operands[0]);
+      && holds_alternative< Body >(expr.operands[0]);
 }
 bool rychkov::entities::is_decl(const Expression& expr)
 {
   return (expr.operation == nullptr) && !expr.operands.empty()
-      && boost::variant2::holds_alternative< Declaration >(expr.operands[0]);
+      && holds_alternative< Declaration >(expr.operands[0]);
 }
 bool rychkov::entities::is_operator(const Expression& expr)
 {
@@ -94,41 +94,41 @@ void rychkov::entities::remove_bridge(Expression& expr)
   {
     return;
   }
-  if (!boost::variant2::holds_alternative< DynMemWrapper< Expression > >(expr.operands[0]))
+  if (!holds_alternative< DynMemWrapper< Expression > >(expr.operands[0]))
   {
     return;
   }
-  Expression temp = std::move(*boost::variant2::get< DynMemWrapper< Expression > >(expr.operands[0]));
+  Expression temp = std::move(*get< DynMemWrapper< Expression > >(expr.operands[0]));
   expr = std::move(temp);
 }
 
 const rychkov::typing::Type* rychkov::entities::get_type(const Expression::operand& operand)
 {
-  if (boost::variant2::holds_alternative< DynMemWrapper< Expression > >(operand))
+  if (holds_alternative< DynMemWrapper< Expression > >(operand))
   {
-    return &boost::variant2::get< DynMemWrapper< Expression > >(operand)->result_type;
+    return &get< DynMemWrapper< Expression > >(operand)->result_type;
   }
-  else if (boost::variant2::holds_alternative< Variable >(operand))
+  else if (holds_alternative< Variable >(operand))
   {
-    return &boost::variant2::get< Variable >(operand).type;
+    return &get< Variable >(operand).type;
   }
-  else if (boost::variant2::holds_alternative< Literal >(operand))
+  else if (holds_alternative< Literal >(operand))
   {
-    return &boost::variant2::get< Literal >(operand).result_type;
+    return &get< Literal >(operand).result_type;
   }
-  else if (boost::variant2::holds_alternative< CastOperation >(operand))
+  else if (holds_alternative< CastOperation >(operand))
   {
-    return &boost::variant2::get< Variable >(operand).type;
+    return &get< Variable >(operand).type;
   }
   return nullptr;
 }
 bool rychkov::entities::is_lvalue(const Expression::operand& operand)
 {
-  if (boost::variant2::holds_alternative< DynMemWrapper< Expression > >(operand))
+  if (holds_alternative< DynMemWrapper< Expression > >(operand))
   {
-    return is_lvalue(&*boost::variant2::get< DynMemWrapper< Expression > >(operand));
+    return is_lvalue(&*get< DynMemWrapper< Expression > >(operand));
   }
-  return boost::variant2::holds_alternative< entities::Variable >(operand);
+  return holds_alternative< entities::Variable >(operand);
 }
 bool rychkov::entities::is_lvalue(const Expression* expr)
 {

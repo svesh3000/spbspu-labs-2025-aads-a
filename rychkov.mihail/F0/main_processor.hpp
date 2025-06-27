@@ -62,7 +62,7 @@ namespace rychkov
   private:
     Stage last_stage_ = CPARSER;
     std::vector< std::string > include_dirs_;
-    std::map< std::string, ParseCell > parsed_;
+    Map< std::string, ParseCell > parsed_;
     std::string save_file_ = "save.json";
     size_t generated_files = 0;
   };

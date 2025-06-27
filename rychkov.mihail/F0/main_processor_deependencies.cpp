@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <algorithm>
-#include <set>
-#include <map>
+#include <set.hpp>
+#include <map.hpp>
 #include "compare.hpp"
 #include "print_content.hpp"
 
@@ -15,10 +15,10 @@ namespace rychkov
     std::string symbol;
     bool search_uses = false;
     bool started = false;
-    std::set< std::pair< std::string, size_t >, NameCompare > actives;
+    Set< std::pair< std::string, size_t >, NameCompare > actives;
     std::string current;
-    std::map< std::string, std::set< entities::Variable, NameCompare > > dep_map;
-    std::set< entities::Variable, NameCompare > result;
+    Map< std::string, Set< entities::Variable, NameCompare > > dep_map;
+    Set< entities::Variable, NameCompare > result;
     size_t depth = 0;
 
     bool operator()(const typing::Type& type);
@@ -110,18 +110,18 @@ bool rychkov::DependencyVisitor::operator()(const typing::Type& type)
 bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
 {
   ++depth;
-  if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
+  if (holds_alternative< entities::Statement >(decl.data))
   {
-    const entities::Statement& statement = boost::variant2::get< entities::Statement >(decl.data);
+    const entities::Statement& statement = get< entities::Statement >(decl.data);
     if (operator()(statement.conditions))
     {
       CParser::clear_scope(actives, --depth);
       return true;
     }
   }
-  else if (boost::variant2::holds_alternative< entities::Variable >(decl.data))
+  else if (holds_alternative< entities::Variable >(decl.data))
   {
-    const entities::Variable& var = boost::variant2::get< entities::Variable >(decl.data);
+    const entities::Variable& var = get< entities::Variable >(decl.data);
     if (depth == 1)
     {
       current = var.name;
@@ -156,9 +156,9 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
       return true;
     }
   }
-  else if (boost::variant2::holds_alternative< entities::Function >(decl.data))
+  else if (holds_alternative< entities::Function >(decl.data))
   {
-    const entities::Function& func = boost::variant2::get< entities::Function >(decl.data);
+    const entities::Function& func = get< entities::Function >(decl.data);
     for (const std::string& param: func.parameters)
     {
       if (!param.empty())
@@ -200,17 +200,17 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
   else if (search_uses)
   {
     const std::string* name = nullptr;
-    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    if (holds_alternative< entities::Struct >(decl.data))
     {
-      name = &boost::variant2::get< entities::Struct >(decl.data).name;
+      name = &get< entities::Struct >(decl.data).name;
     }
-    else if (boost::variant2::holds_alternative< entities::Enum >(decl.data))
+    else if (holds_alternative< entities::Enum >(decl.data))
     {
-      name = &boost::variant2::get< entities::Enum >(decl.data).name;
+      name = &get< entities::Enum >(decl.data).name;
     }
-    else if (boost::variant2::holds_alternative< entities::Union >(decl.data))
+    else if (holds_alternative< entities::Union >(decl.data))
     {
-      name = &boost::variant2::get< entities::Union >(decl.data).name;
+      name = &get< entities::Union >(decl.data).name;
     }
     if (name != nullptr)
     {
@@ -236,27 +236,27 @@ bool rychkov::DependencyVisitor::operator()(const entities::Declaration& decl)
       return true;
     }
     const std::string* name = nullptr;
-    if (search_uses && boost::variant2::holds_alternative< entities::Variable >(decl.data))
+    if (search_uses && holds_alternative< entities::Variable >(decl.data))
     {
-      const entities::Variable& var = boost::variant2::get< entities::Variable >(decl.data);
+      const entities::Variable& var = get< entities::Variable >(decl.data);
       out << '\t' << var << '\n';
     }
-    else if (search_uses && boost::variant2::holds_alternative< entities::Function >(decl.data))
+    else if (search_uses && holds_alternative< entities::Function >(decl.data))
     {
-      const entities::Function& func = boost::variant2::get< entities::Function >(decl.data);
+      const entities::Function& func = get< entities::Function >(decl.data);
       out << '\t' << func << '\n';
     }
-    else if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    else if (holds_alternative< entities::Struct >(decl.data))
     {
-      name = &boost::variant2::get< entities::Struct >(decl.data).name;
+      name = &get< entities::Struct >(decl.data).name;
     }
-    else if (boost::variant2::holds_alternative< entities::Enum >(decl.data))
+    else if (holds_alternative< entities::Enum >(decl.data))
     {
-      name = &boost::variant2::get< entities::Enum >(decl.data).name;
+      name = &get< entities::Enum >(decl.data).name;
     }
-    else if (boost::variant2::holds_alternative< entities::Union >(decl.data))
+    else if (holds_alternative< entities::Union >(decl.data))
     {
-      name = &boost::variant2::get< entities::Union >(decl.data).name;
+      name = &get< entities::Union >(decl.data).name;
     }
     if (name != nullptr)
     {
@@ -280,7 +280,7 @@ bool rychkov::DependencyVisitor::operator()(const DynMemWrapper< entities::Expre
 }
 bool rychkov::DependencyVisitor::operator()(const entities::Expression::operand& operand)
 {
-  return boost::variant2::visit(*this, operand);
+  return visit(*this, operand);
 }
 bool rychkov::DependencyVisitor::operator()(const entities::Expression& root)
 {

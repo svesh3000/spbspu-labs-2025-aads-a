@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include <set>
-#include <map>
+#include <set.hpp>
+#include <map.hpp>
 #include <stack.hpp>
 
 #include "type_parser.hpp"
@@ -35,14 +35,14 @@ namespace rychkov
     static const Operator comma;
     static const Operator inline_if;
 
-    std::set< entities::Alias, NameCompare > aliases;
-    std::multiset< std::pair< entities::Variable, size_t >, NameCompare > variables;
-    std::multiset< entities::Variable, NameCompare > defined_functions;
+    Set< entities::Alias, NameCompare > aliases;
+    MultiSet< std::pair< entities::Variable, size_t >, NameCompare > variables;
+    MultiSet< entities::Variable, NameCompare > defined_functions;
 
-    std::set< std::pair< entities::Struct, size_t >, NameCompare > structs;
-    std::set< std::pair< entities::Union, size_t >, NameCompare > unions;
-    std::set< std::pair< entities::Enum, size_t >, NameCompare > enums;
-    std::set< std::pair< typing::Type, size_t >, NameCompare > base_types = {
+    Set< std::pair< entities::Struct, size_t >, NameCompare > structs;
+    Set< std::pair< entities::Union, size_t >, NameCompare > unions;
+    Set< std::pair< entities::Enum, size_t >, NameCompare > enums;
+    Set< std::pair< typing::Type, size_t >, NameCompare > base_types = {
           {{"int", typing::BASIC}, 0},
           {{"char", typing::BASIC}, 0},
           {{"float", typing::BASIC}, 0},
@@ -84,7 +84,7 @@ namespace rychkov
   private:
     static constexpr int min_priority = -1;
 
-    std::map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
+    Map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
           {CONST, &TypeParser::append_const},
           {VOLATILE, &TypeParser::append_volatile},
           {SIGNED, &TypeParser::append_signed},

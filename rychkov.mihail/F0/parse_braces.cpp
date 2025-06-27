@@ -12,19 +12,19 @@ void rychkov::CParser::parse_open_brace(CParseContext& context)
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
+    if (holds_alternative< entities::Struct >(decl.data))
     {
-      entities::Struct& data = boost::variant2::get< entities::Struct >(decl.data);
+      entities::Struct& data = get< entities::Struct >(decl.data);
       if (data.name.empty())
       {
         log(context, "struct must have name");
         return;
       }
     }
-    else if (boost::variant2::holds_alternative< entities::Function >(decl.data))
+    else if (holds_alternative< entities::Function >(decl.data))
     {
-      entities::Function& data = boost::variant2::get< entities::Function >(decl.data);
+      entities::Function& data = get< entities::Function >(decl.data);
       for (size_t i = 0; i < data.parameters.size(); i++)
       {
         if (!data.parameters[i].empty())
@@ -49,14 +49,14 @@ void rychkov::CParser::parse_open_brace(CParseContext& context)
     }
     decl.value = entities::Body{};
     stack_.push(&*decl.value);
-    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    entities::Body& body = get< entities::Body >(stack_.top()->operands[0]);
     stack_.push(&body.data[0]);
     return;
   }
   if (stack_.top()->empty())
   {
     stack_.top()->operands.emplace_back(entities::Body{});
-    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    entities::Body& body = get< entities::Body >(stack_.top()->operands[0]);
     stack_.push(&body.data[0]);
     return;
   }
@@ -75,22 +75,22 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
   }
   if (entities::is_body(*stack_.top()))
   {
-    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    entities::Body& body = get< entities::Body >(stack_.top()->operands[0]);
     body.data.pop_back();
     stack_.pop();
     clear_scope();
     if (entities::is_decl(*stack_.top()))
     {
-      entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
-      if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+      entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
+      if (holds_alternative< entities::Struct >(decl.data))
       {
-        entities::Struct& structure = boost::variant2::get< entities::Struct >(decl.data);
+        entities::Struct& structure = get< entities::Struct >(decl.data);
         for (const entities::Expression& i: body.data)
         {
           if (entities::is_decl(i))
           {
-            const entities::Declaration& var_decl = boost::variant2::get< entities::Declaration >(i.operands[0]);
-            if (!boost::variant2::holds_alternative< entities::Variable >(var_decl.data))
+            const entities::Declaration& var_decl = get< entities::Declaration >(i.operands[0]);
+            if (!holds_alternative< entities::Variable >(var_decl.data))
             {
               log(context, "struct body must consist only of variable declarations");
               continue;
@@ -100,7 +100,7 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
               log(context, "struct fields cannot have default values");
               continue;
             }
-            const entities::Variable& var = boost::variant2::get< entities::Variable >(var_decl.data);
+            const entities::Variable& var = get< entities::Variable >(var_decl.data);
             if (structure.fields.find(var.name) == structure.fields.end())
             {
               structure.fields.insert(var);
@@ -115,14 +115,14 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
           }
         }
       }
-      if (boost::variant2::holds_alternative< entities::Function >(decl.data))
+      if (holds_alternative< entities::Function >(decl.data))
       {
         program_.emplace_back();
         stack_.top() = &program_.back();
       }
-      if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
+      if (holds_alternative< entities::Statement >(decl.data))
       {
-        entities::Statement& statement = boost::variant2::get< entities::Statement >(decl.data);
+        entities::Statement& statement = get< entities::Statement >(decl.data);
         if ((statement.type == entities::Statement::IF) || (statement.type == entities::Statement::WHILE))
         {
           stack_.pop();
@@ -134,9 +134,9 @@ void rychkov::CParser::parse_close_brace(CParseContext& context)
     }
     else if (entities::is_body(*stack_.top()))
     {
-      entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
-      body.data.emplace_back();
-      stack_.push(&body.data.back());
+      entities::Body& upper_body = get< entities::Body >(stack_.top()->operands[0]);
+      upper_body.data.emplace_back();
+      stack_.push(&upper_body.data.back());
     }
     return;
   }

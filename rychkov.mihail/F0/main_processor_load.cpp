@@ -47,7 +47,7 @@ bool rychkov::MainProcessor::load(std::ostream& out, std::ostream& err, std::str
     return false;
   }
   boost::json::value doc = boost::json::parse(in);
-  std::map< std::string, ParseCell > new_parsed;
+  Map< std::string, ParseCell > new_parsed;
   size_t ngenerated = 0;
   for (const boost::json::object::value_type& file: doc.as_object())
   {

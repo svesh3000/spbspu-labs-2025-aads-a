@@ -56,7 +56,7 @@ bool rychkov::MainProcessor::external(ParserContext& context)
     {
       if (entities::is_decl(expr))
       {
-        const entities::Declaration& decl = boost::variant2::get< entities::Declaration >(expr.operands[0]);
+        const entities::Declaration& decl = get< entities::Declaration >(expr.operands[0]);
         if (decl.scope == entities::EXTERN)
         {
           printer(decl);
@@ -83,9 +83,9 @@ bool rychkov::MainProcessor::exposition(ParserContext& context)
   {
     return false;
   }
-  decltype(parser.structs)::iterator struct_p = parser.structs.find(structure);
-  decltype(parser.unions)::iterator union_p = parser.unions.find(structure);
-  decltype(parser.enums)::iterator enum_p = parser.enums.find(structure);
+  decltype(parser.structs)::const_iterator struct_p = parser.structs.find(structure);
+  decltype(parser.unions)::const_iterator union_p = parser.unions.find(structure);
+  decltype(parser.enums)::const_iterator enum_p = parser.enums.find(structure);
   ContentPrinter printer(context.out);
   if (struct_p != parser.structs.end())
   {

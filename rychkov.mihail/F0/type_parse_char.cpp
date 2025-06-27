@@ -1,11 +1,11 @@
 #include "type_parser.hpp"
 
 #include <utility>
-#include <map>
+#include <map.hpp>
 
 void rychkov::TypeParser::append(CParseContext& context, char c)
 {
-  static const std::map< char, void(TypeParser::*)(CParseContext&) > dispatch_map = {
+  static const Map< char, void(TypeParser::*)(CParseContext&) > dispatch_map = {
         {'*', &TypeParser::append_asterisk},
         {'[', &TypeParser::append_open_bracket},
         {']', &TypeParser::append_close_bracket},

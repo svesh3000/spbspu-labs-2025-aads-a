@@ -5,10 +5,10 @@
 #include <iosfwd>
 #include <string>
 #include <vector>
-#include <set>
-#include <map>
 #include <memory>
 #include <stack.hpp>
+#include <set.hpp>
+#include <map.hpp>
 
 #include "log.hpp"
 #include "content.hpp"
@@ -22,8 +22,8 @@ namespace rychkov
   public:
     std::vector< std::string > include_paths;
     std::unique_ptr< Lexer > next;
-    std::set< Macro, NameCompare > macros;
-    std::multiset< Macro, NameCompare > legacy_macros;
+    Set< Macro, NameCompare > macros;
+    MultiSet< Macro, NameCompare > legacy_macros;
 
     Preprocessor();
     Preprocessor(std::unique_ptr< Lexer > lexer, std::vector< std::string > search_dirs);
@@ -55,7 +55,7 @@ namespace rychkov
       SKIP_ELSE
     };
 
-    std::map< std::string, void(Preprocessor::*)(std::istream&, CParseContext&) > directives_ = {
+    Map< std::string, void(Preprocessor::*)(std::istream&, CParseContext&) > directives_ = {
           {"include", &rychkov::Preprocessor::include},
           {"define", &rychkov::Preprocessor::define},
           {"pragma", &rychkov::Preprocessor::pragma},

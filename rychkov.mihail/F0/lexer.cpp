@@ -24,60 +24,60 @@ rychkov::Lexer::Lexer(std::unique_ptr< CParser > cparser):
       }
 {}
 
-const std::set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases{
+const rychkov::Set< std::vector< rychkov::Operator >, rychkov::NameCompare > rychkov::Lexer::cases{
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "+", false, true, false, 2},
-        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+", false, false, false, 4}
+        {Operator::UNARY, Operator::ARITHMETIC, "+", false, true, false, 2},
+        {Operator::BINARY, Operator::ARITHMETIC, "+", false, false, false, 4}
       },
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, false, false, 1},
-        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "++", true, true, true, 2},
+        {Operator::UNARY, Operator::INCREMENT, "++", true, false, false, 1},
+        {Operator::UNARY, Operator::INCREMENT, "++", true, true, true, 2},
       },
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::ARITHMETIC, "-", false, true, false, 2},
-        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "-", false, false, false, 4}
+        {Operator::UNARY, Operator::ARITHMETIC, "-", false, true, false, 2},
+        {Operator::BINARY, Operator::ARITHMETIC, "-", false, false, false, 4}
       },
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, false, false, 1},
-        {rychkov::Operator::UNARY, rychkov::Operator::INCREMENT, "--", true, true, true, 2},
+        {Operator::UNARY, Operator::INCREMENT, "--", true, false, false, 1},
+        {Operator::UNARY, Operator::INCREMENT, "--", true, true, true, 2},
       },
-      {{rychkov::Operator::BINARY, rychkov::Operator::FIELD_ACCESS, ".", true, false, true, 1}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::FIELD_ACCESS, "->", false, false, true, 1}},
-      {{rychkov::Operator::UNARY, rychkov::Operator::LOGIC, "!", false, true, false, 2}},
-      {{rychkov::Operator::UNARY, rychkov::Operator::BIT, "~", false, true, false, 2}},
+      {{Operator::BINARY, Operator::FIELD_ACCESS, ".", true, false, true, 1}},
+      {{Operator::BINARY, Operator::FIELD_ACCESS, "->", false, false, true, 1}},
+      {{Operator::UNARY, Operator::LOGIC, "!", false, true, false, 2}},
+      {{Operator::UNARY, Operator::BIT, "~", false, true, false, 2}},
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::DEREFERENCE, "*", false, true, true, 2},
-        {rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*", false, false, false, 3}
+        {Operator::UNARY, Operator::DEREFERENCE, "*", false, true, true, 2},
+        {Operator::BINARY, Operator::ARITHMETIC, "*", false, false, false, 3}
       },
-      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "/", false, false, false, 3}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::MODULUS, "%", false, false, false, 3}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "<<", false, false, false, 5}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, ">>", false, false, false, 5}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, ">", false, false, false, 6}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, ">=", false, false, false, 6}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "<", false, false, false, 6}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "<=", false, false, false, 6}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "==", false, false, false, 7}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::COMPARE, "!=", false, false, false, 7}},
+      {{Operator::BINARY, Operator::ARITHMETIC, "/", false, false, false, 3}},
+      {{Operator::BINARY, Operator::MODULUS, "%", false, false, false, 3}},
+      {{Operator::BINARY, Operator::BIT, "<<", false, false, false, 5}},
+      {{Operator::BINARY, Operator::BIT, ">>", false, false, false, 5}},
+      {{Operator::BINARY, Operator::COMPARE, ">", false, false, false, 6}},
+      {{Operator::BINARY, Operator::COMPARE, ">=", false, false, false, 6}},
+      {{Operator::BINARY, Operator::COMPARE, "<", false, false, false, 6}},
+      {{Operator::BINARY, Operator::COMPARE, "<=", false, false, false, 6}},
+      {{Operator::BINARY, Operator::COMPARE, "==", false, false, false, 7}},
+      {{Operator::BINARY, Operator::COMPARE, "!=", false, false, false, 7}},
       {
-        {rychkov::Operator::UNARY, rychkov::Operator::ADDRESSOF, "&", true, true, false, 2},
-        {rychkov::Operator::BINARY, rychkov::Operator::BIT, "&", false, false, false, 8}
+        {Operator::UNARY, Operator::ADDRESSOF, "&", true, true, false, 2},
+        {Operator::BINARY, Operator::BIT, "&", false, false, false, 8}
       },
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "^", false, false, false, 9}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "|", false, false, false, 10}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::LOGIC, "&&", false, false, false, 11}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::LOGIC, "||", false, false, false, 12}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "+=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "-=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "*=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::ARITHMETIC, "/=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::MODULUS, "%=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "<<=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, ">>=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "&=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "^=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::BIT, "|=", true, true, true, 14}},
-      {{rychkov::Operator::BINARY, rychkov::Operator::ASSIGN, "=", true, true, true, 14}}
+      {{Operator::BINARY, Operator::BIT, "^", false, false, false, 9}},
+      {{Operator::BINARY, Operator::BIT, "|", false, false, false, 10}},
+      {{Operator::BINARY, Operator::LOGIC, "&&", false, false, false, 11}},
+      {{Operator::BINARY, Operator::LOGIC, "||", false, false, false, 12}},
+      {{Operator::BINARY, Operator::ARITHMETIC, "+=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::ARITHMETIC, "-=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::ARITHMETIC, "*=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::ARITHMETIC, "/=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::MODULUS, "%=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::BIT, "<<=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::BIT, ">>=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::BIT, "&=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::BIT, "^=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::BIT, "|=", true, true, true, 14}},
+      {{Operator::BINARY, Operator::ASSIGN, "=", true, true, true, 14}}
     };
 
 void rychkov::Lexer::append_name(CParseContext& context, std::string name)
@@ -221,9 +221,9 @@ void rychkov::Lexer::append_char_literal(CParseContext& context, std::string nam
 }
 void rychkov::Lexer::flush(CParseContext& context)
 {
-  if (boost::variant2::holds_alternative< entities::Literal >(buf_))
+  if (holds_alternative< entities::Literal >(buf_))
   {
-    entities::Literal& lit = boost::variant2::get< entities::Literal >(buf_);
+    entities::Literal& lit = get< entities::Literal >(buf_);
     if (lit.type == entities::Literal::String)
     {
       lit.result_type.array_has_length = true;
@@ -239,22 +239,22 @@ void rychkov::Lexer::flush(CParseContext& context)
       next->append(context, lit);
     }
   }
-  else if (boost::variant2::holds_alternative< operator_value >(buf_))
+  else if (holds_alternative< operator_value >(buf_))
   {
     if (next == nullptr)
     {
-      context.out << "<oper> " << (*boost::variant2::get< operator_value >(buf_))[0].token << '\n';
+      context.out << "<oper> " << (*get< operator_value >(buf_))[0].token << '\n';
     }
     else
     {
-      next->append(context, *boost::variant2::get< operator_value >(buf_));
+      next->append(context, *get< operator_value >(buf_));
     }
   }
   buf_.emplace< 0 >();
 }
 void rychkov::Lexer::append(CParseContext& context, char c)
 {
-  if (boost::variant2::holds_alternative< operator_value >(buf_))
+  if (holds_alternative< operator_value >(buf_))
   {
     append_operator(context, c);
     return;
@@ -281,7 +281,7 @@ void rychkov::Lexer::append_new(CParseContext& context, char c)
 }
 void rychkov::Lexer::append_operator(CParseContext& context, char c)
 {
-  operator_value& oper = boost::variant2::get< operator_value >(buf_);
+  operator_value& oper = get< operator_value >(buf_);
   decltype(cases)::const_iterator oper_p = cases.find((*oper)[0].token + c);
   if (oper_p != cases.cend())
   {

@@ -176,7 +176,7 @@ void rychkov::ContentPrinter::operator()(const entities::Declaration& decl)
   }
   indent() << "<object>:\n";
   indent_++;
-  boost::variant2::visit(*this, decl.data);
+  visit(*this, decl.data);
   indent_--;
   if (decl.value != nullptr)
   {

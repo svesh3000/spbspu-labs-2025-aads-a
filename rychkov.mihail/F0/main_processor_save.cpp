@@ -119,7 +119,7 @@ boost::json::value rychkov::Serializer::operator()(const entities::Alias& alias)
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Declaration& decl)
 {
-  return boost::json::object{{"obj", "decl"}, {"data", boost::variant2::visit(*this, decl.data)},
+  return boost::json::object{{"obj", "decl"}, {"data", visit(*this, decl.data)},
         {"value", operator()(decl.value)}, {"scope", decl.scope}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Literal& lit)
@@ -154,5 +154,5 @@ boost::json::value rychkov::Serializer::operator()(const DynMemWrapper< entities
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Expression::operand& root)
 {
-  return boost::variant2::visit(*this, root);
+  return visit(*this, root);
 }

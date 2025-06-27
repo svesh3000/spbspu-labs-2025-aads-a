@@ -1,9 +1,9 @@
 #include "cparser.hpp"
 
 #include <iostream>
-#include <map>
 #include <algorithm>
 #include <utility>
+#include <map.hpp>
 #include "print_content.hpp"
 
 using namespace std::literals::string_literals;
@@ -32,7 +32,8 @@ void rychkov::CParser::prepare_type()
 }
 void rychkov::CParser::clear_program()
 {
-  program_ = {{}};
+  program_.clear();
+  program_.emplace_back();
   stack_ = {};
   stack_.push(&program_[0]);
   type_parser_.clear();
@@ -124,10 +125,10 @@ void rychkov::CParser::append(CParseContext& context, std::string name)
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
+    if (holds_alternative< entities::Struct >(decl.data))
     {
-      entities::Struct& data = boost::variant2::get< entities::Struct >(decl.data);
+      entities::Struct& data = get< entities::Struct >(decl.data);
       if (data.name.empty())
       {
         data.name = std::move(name);
@@ -155,7 +156,7 @@ void rychkov::CParser::append(CParseContext& context, char c)
     return;
   }
   using append_signature = void(CParser::*)(CParseContext&);
-  using append_map = std::map< char, append_signature >;
+  using append_map = Map< char, append_signature >;
   static const append_map dispatch_map = {
         {';', &CParser::parse_semicolon},
         {'{', &CParser::parse_open_brace},
@@ -189,10 +190,10 @@ bool rychkov::CParser::flush_type_parser(CParseContext& context)
     type_parser_.prepare();
     if (entities::is_decl(*stack_.top()))
     {
-      entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
-      if (boost::variant2::holds_alternative< entities::Alias >(decl.data))
+      entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
+      if (holds_alternative< entities::Alias >(decl.data))
       {
-        entities::Alias& alias = boost::variant2::get< entities::Alias >(decl.data);
+        entities::Alias& alias = get< entities::Alias >(decl.data);
         if (!alias.name.empty())
         {
           log(context, "duplicating types in typedef declaration");
@@ -252,14 +253,14 @@ bool rychkov::CParser::append_empty(CParseContext& context)
   }
   if (entities::is_body(*stack_.top()))
   {
-    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    entities::Body& body = get< entities::Body >(stack_.top()->operands[0]);
     body.data.emplace_back();
     stack_.push(&body.data.back());
     return true;
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
+    entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
     if (decl.value != nullptr)
     {
       stack_.pop();

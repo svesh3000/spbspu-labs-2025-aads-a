@@ -1,10 +1,10 @@
 #include "main_processor.hpp"
 
 #include <iostream>
-#include <map>
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <map.hpp>
 #include "compare.hpp"
 #include "print_content.hpp"
 
@@ -12,9 +12,9 @@ namespace rychkov
 {
   struct DiffVisitor
   {
-    std::set< std::string > files;
-    std::multimap< entities::Variable, std::vector< std::string >, NameCompare > appearances;
-    std::multimap< Macro, std::vector< std::string >, NameCompare > macros;
+    Set< std::string > files;
+    MultiMap< entities::Variable, std::vector< std::string >, NameCompare > appearances;
+    MultiMap< Macro, std::vector< std::string >, NameCompare > macros;
     std::string current_file;
 
     void operator()(const std::pair< const std::string, ParseCell >& cell)
@@ -34,15 +34,15 @@ namespace rychkov
     {
       if (entities::is_decl(expr))
       {
-        const entities::Declaration& decl = boost::variant2::get< entities::Declaration >(expr.operands[0]);
+        const entities::Declaration& decl = get< entities::Declaration >(expr.operands[0]);
         entities::Variable declared;
-        if (boost::variant2::holds_alternative< entities::Variable >(decl.data))
+        if (holds_alternative< entities::Variable >(decl.data))
         {
-          operator()(boost::variant2::get< entities::Variable >(decl.data));
+          operator()(get< entities::Variable >(decl.data));
         }
-        else if (boost::variant2::holds_alternative< entities::Function >(decl.data))
+        else if (holds_alternative< entities::Function >(decl.data))
         {
-          const entities::Function& func = boost::variant2::get< entities::Function >(decl.data);
+          const entities::Function& func = get< entities::Function >(decl.data);
           operator()({func.type, func.name});
         }
       }
@@ -132,7 +132,7 @@ bool rychkov::MainProcessor::intersections(ParserContext& context)
 }
 bool rychkov::MainProcessor::diff(ParserContext& context)
 {
-  std::set< std::string > files;
+  Set< std::string > files;
   if (last_stage_ != CPARSER)
   {
     return false;
@@ -154,7 +154,7 @@ bool rychkov::MainProcessor::diff(ParserContext& context)
     {
       empty = false;
       ContentPrinter{context.out, 0}(i->first.name);
-      std::set< std::string > files_list;
+      Set< std::string > files_list;
       for (; i != to; ++i)
       {
         files_list.insert(i->second.begin(), i->second.end());
@@ -175,7 +175,7 @@ bool rychkov::MainProcessor::diff(ParserContext& context)
     {
       empty = false;
       ContentPrinter{context.out, 0}(j->first.name);
-      std::set< std::string > files_list;
+      Set< std::string > files_list;
       for (; j != to; ++j)
       {
         files_list.insert(j->second.begin(), j->second.end());

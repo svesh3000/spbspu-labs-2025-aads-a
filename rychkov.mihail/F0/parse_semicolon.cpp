@@ -26,17 +26,17 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
 
   if (entities::is_body(*stack_.top()))
   {
-    entities::Body& body = boost::variant2::get< entities::Body >(stack_.top()->operands[0]);
+    entities::Body& body = get< entities::Body >(stack_.top()->operands[0]);
     body.data.emplace_back();
     stack_.push(&body.data.back());
     return;
   }
   if (entities::is_decl(*stack_.top()))
   {
-    entities::Declaration& decl = boost::variant2::get< entities::Declaration >(stack_.top()->operands[0]);
-    if (boost::variant2::holds_alternative< entities::Struct >(decl.data))
+    entities::Declaration& decl = get< entities::Declaration >(stack_.top()->operands[0]);
+    if (holds_alternative< entities::Struct >(decl.data))
     {
-      entities::Struct& data = boost::variant2::get< entities::Struct >(decl.data);
+      entities::Struct& data = get< entities::Struct >(decl.data);
       if (data.name.empty())
       {
         log(context, "struct must have name");
@@ -48,9 +48,9 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       append_empty(context);
       return;
     }
-    if (boost::variant2::holds_alternative< entities::Variable >(decl.data))
+    if (holds_alternative< entities::Variable >(decl.data))
     {
-      entities::Variable& data = boost::variant2::get< entities::Variable >(decl.data);
+      entities::Variable& data = get< entities::Variable >(decl.data);
       if (data.name.empty())
       {
         log(context, "variable must have name");
@@ -79,15 +79,15 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       append_empty(context);
       return;
     }
-    if (boost::variant2::holds_alternative< entities::Function >(decl.data))
+    if (holds_alternative< entities::Function >(decl.data))
     {
       stack_.pop();
       append_empty(context);
       return;
     }
-    if (boost::variant2::holds_alternative< entities::Alias >(decl.data))
+    if (holds_alternative< entities::Alias >(decl.data))
     {
-      entities::Alias& data = boost::variant2::get< entities::Alias >(decl.data);
+      entities::Alias& data = get< entities::Alias >(decl.data);
       if (data.name.empty())
       {
         log(context, "missing alias name");
@@ -100,9 +100,9 @@ void rychkov::CParser::parse_semicolon(CParseContext& context)
       append_empty(context);
       return;
     }
-    if (boost::variant2::holds_alternative< entities::Statement >(decl.data))
+    if (holds_alternative< entities::Statement >(decl.data))
     {
-      entities::Statement& data = boost::variant2::get< entities::Statement >(decl.data);
+      entities::Statement& data = get< entities::Statement >(decl.data);
       if ((data.type == entities::Statement::RETURN) || (data.type == entities::Statement::IF)
           || (data.type == entities::Statement::WHILE))
       {

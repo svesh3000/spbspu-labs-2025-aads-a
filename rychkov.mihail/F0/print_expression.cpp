@@ -8,7 +8,7 @@ void rychkov::ContentPrinter::operator()(const DynMemWrapper< entities::Expressi
 }
 void rychkov::ContentPrinter::operator()(const entities::Expression::operand& oper)
 {
-  boost::variant2::visit(*this, oper);
+  visit(*this, oper);
 }
 void rychkov::ContentPrinter::operator()(const entities::Expression& expr)
 {
