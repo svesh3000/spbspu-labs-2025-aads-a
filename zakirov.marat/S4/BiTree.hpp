@@ -33,7 +33,7 @@ namespace zakirov
     BiIter< K, T, C > begin() noexcept;
     BiIter< K, T, C > end() noexcept;
     CBiIter< K, T, C > cbegin() const noexcept;
-    CBiIter< K, T, C > cend() const noexcept; 
+    CBiIter< K, T, C > cend() const noexcept;
 
     T size() const noexcept;
     bool empty() const noexcept;
