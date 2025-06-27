@@ -140,19 +140,12 @@ void maslevtsov::Graph::cut(const std::string& vertice1, const std::string& vert
     throw std::invalid_argument("non-existing edge given");
   }
   bool is_deleted = false;
-  auto cur = to_cut_it->second.cbegin();
-  auto next = ++to_cut_it->second.cbegin();
-  if (*cur == weight) {
-    to_cut_it->second.pop_front();
-    return;
-  }
-  while (next != to_cut_it->second.cend()) {
-    if (*next == weight) {
-      to_cut_it->second.erase_after(cur);
+  for (auto it = to_cut_it->second.begin(); it != to_cut_it->second.end();) {
+    if (*it == weight) {
+      it = to_cut_it->second.erase(it);
       is_deleted = true;
-      ++cur;
-      next = cur;
-      ++next;
+    } else {
+      ++it;
     }
   }
   if (!is_deleted) {

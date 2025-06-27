@@ -4,15 +4,15 @@
 #include <iterator>
 #include <type_traits>
 
-namespace detail {
-  enum class VectorIteratorType
-  {
-    CONSTANT,
-    NONCONSTANT,
-  };
-}
-
 namespace maslevtsov {
+  namespace detail {
+    enum class VectorIteratorType
+    {
+      CONSTANT,
+      NONCONSTANT,
+    };
+  }
+
   template< class T, detail::VectorIteratorType it_type >
   class VectorIterator final: public std::iterator< std::bidirectional_iterator_tag, T >
   {
