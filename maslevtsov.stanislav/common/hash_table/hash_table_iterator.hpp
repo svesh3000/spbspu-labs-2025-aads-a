@@ -81,14 +81,14 @@ namespace maslevtsov {
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::reference_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator*() const noexcept
   {
-    return *hash_table_->slots_[index_].get_data_ptr();
+    return hash_table_->slots_[index_].data;
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::pointer_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator->() const noexcept
   {
-    return std::addressof(*hash_table_->slots_[index_].get_data_ptr());
+    return std::addressof(hash_table_->slots_[index_].data);
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
