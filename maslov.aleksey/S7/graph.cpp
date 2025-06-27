@@ -21,7 +21,7 @@ namespace
 
 void maslov::Graph::extract(const Graph & graph, const std::set< std::string > & extractVertexes)
 {
-  for (auto it = extractVertexes.begin(); it != extractVertexes.end(); it++)
+  for (auto it = extractVertexes.cbegin(); it != extractVertexes.cend(); it++)
   {
     addVertex(*it);
   }
@@ -30,7 +30,7 @@ void maslov::Graph::extract(const Graph & graph, const std::set< std::string > &
     const auto vertexes = it->first;
     if (hasVertex(vertexes.first) && hasVertex(vertexes.second))
     {
-      for (auto itWeight = it->second.begin(); itWeight != it->second.end(); ++itWeight)
+      for (auto itWeight = it->second.cbegin(); itWeight != it->second.cend(); ++itWeight)
       {
         addEdge(vertexes.first, vertexes.second, *itWeight);
       }
@@ -42,12 +42,12 @@ void maslov::Graph::merge(const Graph & graph)
 {
   for (auto it = graph.edges.cbegin(); it != graph.edges.cend(); it++)
   {
-    for (auto itWeight = it->second.begin(); itWeight != it->second.end(); ++itWeight)
+    for (auto itWeight = it->second.cbegin(); itWeight != it->second.cend(); ++itWeight)
     {
       addEdge(it->first.first, it->first.second, *itWeight);
     }
   }
-  for (auto it = graph.vertexes.begin(); it != graph.vertexes.end(); it++)
+  for (auto it = graph.vertexes.cbegin(); it != graph.vertexes.cend(); it++)
   {
     addVertex(*it);
   }

@@ -330,7 +330,7 @@ namespace maslov
     auto it = find(key);
     if (it == cend())
     {
-        throw std::out_of_range("ERROR: key not found");
+      throw std::out_of_range("ERROR: key not found");
     }
     return it->second;
   }
