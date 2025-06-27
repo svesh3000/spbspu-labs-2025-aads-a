@@ -4,8 +4,8 @@
 #include <iosfwd>
 #include <string>
 #include <vector>
-#include <map>
 
+#include <map.hpp>
 #include <parser.hpp>
 
 #include "log.hpp"

@@ -5,10 +5,10 @@
 #include <iosfwd>
 #include <string>
 #include <vector>
-#include <stack>
 #include <set>
 #include <map>
 #include <memory>
+#include <stack.hpp>
 
 #include "log.hpp"
 #include "content.hpp"
@@ -55,7 +55,7 @@ namespace rychkov
       SKIP_ELSE
     };
 
-    const std::map< std::string, void(Preprocessor::*)(std::istream&, CParseContext&) > directives_ = {
+    std::map< std::string, void(Preprocessor::*)(std::istream&, CParseContext&) > directives_ = {
           {"include", &rychkov::Preprocessor::include},
           {"define", &rychkov::Preprocessor::define},
           {"pragma", &rychkov::Preprocessor::pragma},
@@ -77,7 +77,7 @@ namespace rychkov
     std::vector< std::string > expansion_list_;
 
     std::string buf_;
-    std::stack< IfStage > conditional_pairs_;
+    rychkov::Stack< IfStage > conditional_pairs_;
 
     static void remove_whitespaces(std::string& str);
     bool skip_all() const noexcept;

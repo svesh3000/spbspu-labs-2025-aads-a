@@ -33,8 +33,8 @@ namespace rychkov
   private:
     using operator_value = const std::vector< Operator >*;
 
-    const std::map< std::string, CParser::TypeKeyword > type_keywords_;
-    const std::map< std::string, void(CParser::*)(CParseContext&) > keywords_;
+    std::map< std::string, CParser::TypeKeyword > type_keywords_;
+    std::map< std::string, void(CParser::*)(CParseContext&) > keywords_;
 
     boost::variant2::variant< boost::variant2::monostate, operator_value, entities::Literal > buf_;
 

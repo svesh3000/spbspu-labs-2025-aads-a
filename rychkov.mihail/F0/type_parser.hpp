@@ -2,7 +2,7 @@
 #define TYPE_PARSER_HPP
 
 #include <string>
-#include <stack>
+#include <stack.hpp>
 #include "log.hpp"
 #include "content.hpp"
 
@@ -45,7 +45,7 @@ namespace rychkov
       bool is_function_paremeter = false;
     };
     typing::Type combined_;
-    std::stack< ParseCell > stack_;
+    rychkov::Stack< ParseCell > stack_;
     std::string var_name_;
     std::vector< std::string > parameters_;
 

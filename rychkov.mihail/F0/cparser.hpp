@@ -4,10 +4,11 @@
 #include <cstddef>
 #include <iosfwd>
 #include <string>
-#include <set>
-#include <map>
 #include <vector>
 #include <utility>
+#include <set>
+#include <map>
+#include <stack.hpp>
 
 #include "type_parser.hpp"
 #include "content.hpp"
@@ -83,7 +84,7 @@ namespace rychkov
   private:
     static constexpr int min_priority = -1;
 
-    const std::map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
+    std::map< TypeKeyword, void(TypeParser::*)(CParseContext&) > type_keywords = {
           {CONST, &TypeParser::append_const},
           {VOLATILE, &TypeParser::append_volatile},
           {SIGNED, &TypeParser::append_signed},
@@ -92,7 +93,7 @@ namespace rychkov
         };
 
     std::vector< entities::Expression > program_;
-    std::stack< entities::Expression* > stack_;
+    rychkov::Stack< entities::Expression* > stack_;
     TypeParser type_parser_;
 
     bool global_scope() const noexcept;
