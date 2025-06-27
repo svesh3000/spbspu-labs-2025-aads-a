@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <vector/declaration.hpp>
 #include "hash_table_iterator.hpp"
+#include "slot.hpp"
 
 namespace maslevtsov {
   template< class Key, class T, class Hash = std::hash< Key >, class KeyEqual = std::equal_to< Key > >
@@ -62,25 +63,7 @@ namespace maslevtsov {
     friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
     friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
 
-    enum class SlotState
-    {
-      EMPTY,
-      OCCUPIED,
-      DELETED,
-    };
-
-    struct Slot
-    {
-      value_type data;
-      SlotState state;
-
-      Slot():
-        data(),
-        state(SlotState::EMPTY)
-      {}
-    };
-
-    Vector< Slot > slots_;
+    Vector< detail::Slot< value_type > > slots_;
     size_type size_;
     Hash hasher_;
     KeyEqual key_equal_;

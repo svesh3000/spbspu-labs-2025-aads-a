@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <iterator>
+#include "slot.hpp"
 
 namespace maslevtsov {
   namespace detail {
@@ -59,11 +60,9 @@ namespace maslevtsov {
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::HashTableIterator&
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator++() noexcept
   {
-    using hash_table_t = HashTable< Key, T, Hash, KeyEqual >;
-
     ++index_;
     size_t slots_size = hash_table_->slots_.size();
-    while (index_ < slots_size && hash_table_->slots_[index_].state != hash_table_t::SlotState::OCCUPIED) {
+    while (index_ < slots_size && hash_table_->slots_[index_].state != detail::SlotState::OCCUPIED) {
       ++index_;
     }
     return *this;
@@ -82,14 +81,14 @@ namespace maslevtsov {
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::reference_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator*() const noexcept
   {
-    return hash_table_->slots_[index_].data;
+    return *hash_table_->slots_[index_].get_data_ptr();
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >
   typename HashTableIterator< Key, T, Hash, KeyEqual, it_type >::pointer_type
     HashTableIterator< Key, T, Hash, KeyEqual, it_type >::operator->() const noexcept
   {
-    return std::addressof(hash_table_->slots_[index_].data);
+    return std::addressof(*hash_table_->slots_[index_].get_data_ptr());
   }
 
   template< class Key, class T, class Hash, class KeyEqual, detail::HashTableIteratorType it_type >

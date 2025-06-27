@@ -62,8 +62,8 @@ template< class T >
 typename maslevtsov::Vector< T >::Vector& maslevtsov::Vector< T >::operator=(Vector&& rhs) noexcept
 {
   if (this != &rhs) {
-    Vector< T > copied_rhs(std::move(rhs));
-    swap(copied_rhs);
+    Vector< T > moved_rhs(std::move(rhs));
+    swap(moved_rhs);
   }
   return *this;
 }
