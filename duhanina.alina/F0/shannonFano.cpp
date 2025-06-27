@@ -64,7 +64,17 @@ namespace
     duhanina::NodeSymb* subtree = nodes[start];
     for (size_t i = start + 1; i < end; i++)
     {
-      subtree = new duhanina::NodeSymb(subtree->freq + nodes[i]->freq, subtree, nodes[i]);
+      duhanina::NodeSymb* new_node = nullptr;
+      try
+      {
+        new_node = new duhanina::NodeSymb(subtree->freq + nodes[i]->freq, subtree, nodes[i]);
+      }
+      catch (...)
+      {
+        delete_tree(subtree);
+        throw std::runtime_error("Error memory");
+      }
+      subtree = new_node;
     }
     return subtree;
   }
@@ -137,11 +147,23 @@ namespace
       }
     }
     duhanina::DynamicArray< duhanina::NodeSymb* > nodes;
-    for (size_t i = 0; i < sorted_freq.size(); i++)
+    try
     {
-      char ch = sorted_freq[i].first;
-      size_t freq = sorted_freq[i].second;
-      nodes.push_back(new duhanina::NodeSymb(ch, freq));
+      for (size_t i = 0; i < sorted_freq.size(); i++)
+      {
+        char ch = sorted_freq[i].first;
+        size_t freq = sorted_freq[i].second;
+        nodes.push_back(new duhanina::NodeSymb(ch, freq));
+      }
+    }
+    catch (...)
+    {
+      for (size_t i = 0; i < nodes.size(); i++)
+      {
+        delete nodes[i];
+        nodes[i] = nullptr;
+      }
+      throw std::runtime_error("Error memory");
     }
     while (nodes.size() > 1)
     {
@@ -326,7 +348,12 @@ namespace
     {
       throw std::runtime_error("FILE_NOT_FOUND");
     }
-    std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+    std::string text;
+    char ch;
+    while (in.get(ch))
+    {
+      text += ch;
+    }
     std::string encoded = encode_text(text, table);
     write_bits_to_file(encoded, output_file);
     double original_size = text.size();
@@ -400,7 +427,12 @@ void duhanina::build_codes(str_t input_file, str_t encoding_id, std::ostream& ou
   {
     throw std::runtime_error("FILE_NOT_FOUND");
   }
-  std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+  std::string text;
+  char ch;
+  while (in.get(ch))
+  {
+    text += ch;
+  }
   CodeTable table = build_code_table(text);
   encoding_store[encoding_id] = table;
   out << "Code table successfully built and saved with ID '" << encoding_id << "'\n";
@@ -527,8 +559,18 @@ void duhanina::compare(str_t file1, str_t file2, str_t encod_id1, str_t encod_id
   {
     throw std::runtime_error("FILE_NOT_FOUND");
   }
-  std::string text1((std::istreambuf_iterator< char >(in1)), std::istreambuf_iterator< char >());
-  std::string text2((std::istreambuf_iterator< char >(in2)), std::istreambuf_iterator< char >());
+  std::string text1;
+  char ch1;
+  while (in1.get(ch1))
+  {
+    text1 += ch1;
+  }
+  std::string text2;
+  char ch2;
+  while (in2.get(ch2))
+  {
+    text2 += ch2;
+  }
   if (text1 == text2)
   {
     throw std::runtime_error("IDENTICAL_TEXTS");
@@ -601,7 +643,12 @@ void duhanina::check_encoding(str_t input_file, str_t encoding_id, std::ostream&
   {
     throw std::runtime_error("FILE_NOT_FOUND");
   }
-  std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+  std::string text;
+  char ch;
+  while (in.get(ch))
+  {
+    text += ch;
+  }
   auto missing = find_missing_chars(text, it->second.char_to_code);
   if (missing.empty())
   {
@@ -621,7 +668,12 @@ void duhanina::suggest_encodings(str_t input_file, std::ostream& out)
   {
     throw std::runtime_error("FILE_NOT_FOUND");
   }
-  std::string text((std::istreambuf_iterator< char >(in)), std::istreambuf_iterator< char >());
+  std::string text;
+  char ch;
+  while (in.get(ch))
+  {
+    text += ch;
+  }
   out << "Encoding compatibility report:\n";
   for (auto encoding_it = encoding_store.begin(); encoding_it != encoding_store.end(); ++encoding_it)
   {
