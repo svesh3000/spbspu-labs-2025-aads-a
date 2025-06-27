@@ -23,8 +23,8 @@ namespace mozhegova
     bool hasVert(const std::string & v) const;
     BiTree< std::string, bool > getVertexes() const;
     HashTable< std::pair< std::string, std::string >, BiTree< size_t, size_t >, HashPair > getEdges() const;
-    BiTree< std::string, BiTree< size_t, size_t > > getOutBound(const std::string & v) const;
-    BiTree< std::string, BiTree< size_t, size_t > > getInBound(const std::string & v) const;
+    BiTree< std::string, BiTree< size_t, size_t > > getOutBounds(const std::string & v) const;
+    BiTree< std::string, BiTree< size_t, size_t > > getInBounds(const std::string & v) const;
     bool removeEdge(const std::string & v1, const std::string & v2, size_t weigh);
     void addEdges(const Graph & graph);
   private:

@@ -10,14 +10,14 @@ namespace mozhegova
     edges[pairVert][weight]++;
   }
 
-  void addVertex(const std::string & v)
+  void Graph::addVertex(const std::string & v)
   {
     vertexes.insert(std::make_pair(v, true));
   }
 
-  bool hasVert(const std::string & v) const
+  bool Graph::hasVert(const std::string & v) const
   {
-    return vertices.find(v) != vertices.cend();
+    return vertexes.find(v) != vertexes.cend();
   }
 
   BiTree< std::string, bool > Graph::getVertexes() const
@@ -30,7 +30,7 @@ namespace mozhegova
     return edges;
   }
 
-  BiTree< std::string, BiTree< size_t, size_t > > Graph::getOutBound(const std::string & v) const
+  BiTree< std::string, BiTree< size_t, size_t > > Graph::getOutBounds(const std::string & v) const
   {
     if (!hasVert(v))
     {
@@ -51,7 +51,7 @@ namespace mozhegova
     return temp;
   }
 
-  BiTree< std::string, BiTree< size_t, size_t > > Graph::getInBound(const std::string & v) const
+  BiTree< std::string, BiTree< size_t, size_t > > Graph::getInBounds(const std::string & v) const
   {
     if (!hasVert(v))
     {
@@ -98,7 +98,7 @@ namespace mozhegova
     {
       for (auto cit2 = cit->second.cbegin(); cit2 != cit->second.cend(); ++cit2)
       {
-        for (size_t i = 0; i < it2->second; ++i)
+        for (size_t i = 0; i < cit2->second; ++i)
         {
           addEdge(cit->first.first, cit->first.second, cit2->first);
         }

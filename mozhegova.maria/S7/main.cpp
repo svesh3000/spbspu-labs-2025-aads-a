@@ -8,7 +8,7 @@
 
 namespace
 {
-  void inputGraphs(std::istream & in, BiTree< std::string, mozhegova::Graph > & graphs)
+  void inputGraphs(std::istream & in, mozhegova::BiTree< std::string, mozhegova::Graph > & graphs)
   {
     std::string graphname;
     size_t edgecount = 0;
@@ -20,7 +20,7 @@ namespace
         std::string v1, v2;
         size_t weight = 0;
         in >> v1 >> v2 >> weight;
-        graph.addEdge(v1, v2, weight);
+        temp.addEdge(v1, v2, weight);
       }
       graphs[graphname] = temp;
     }

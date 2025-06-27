@@ -33,7 +33,7 @@ void mozhegova::printOutbounds(std::istream & in, std::ostream & out, const MapO
 {
   std::string graphname, vert;
   in >> graphname >> vert;
-  BiTree< std::string, BiTree< size_t, size_t > > outbounds = graphs.at(graphname).getOutbounds(vert);
+  BiTree< std::string, BiTree< size_t, size_t > > outbounds = graphs.at(graphname).getOutBounds(vert);
   if (outbounds.empty())
   {
     out << '\n';
@@ -57,7 +57,7 @@ void mozhegova::printInbounds(std::istream & in, std::ostream & out, const MapOf
 {
   std::string graphname, vert;
   in >> graphname >> vert;
-  BiTree< std::string, BiTree< size_t, size_t > > outbounds = graphs.at(graphname).getInbounds(vert);
+  BiTree< std::string, BiTree< size_t, size_t > > outbounds = graphs.at(graphname).getInBounds(vert);
   if (outbounds.empty())
   {
     out << '\n';
@@ -122,7 +122,7 @@ void mozhegova::create(std::istream & in, MapOfGraphs & graphs)
   {
     std::string vert;
     in >> vert;
-    newGraph.addVertex(vert);
+    temp.addVertex(vert);
   }
   graphs[graphname] = temp;
 }
@@ -171,7 +171,7 @@ void mozhegova::extract(std::istream & in, MapOfGraphs & graphs)
     verttemp[vert] = true;
     temp.addVertex(vert);
   }
-  auto edges = graph.getGraphEdges();
+  auto edges = graph.getEdges();
   for (auto it = edges.begin(); it != edges.end(); ++it)
   {
     auto a = verttemp.find(it->first.first);
