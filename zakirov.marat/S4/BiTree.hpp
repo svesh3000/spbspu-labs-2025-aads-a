@@ -329,13 +329,13 @@ namespace zakirov
     else if (!to_deleted->left_)
     {
       child = to_deleted->right_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -347,13 +347,13 @@ namespace zakirov
     else if (!to_deleted->right_)
     {
       child = to_deleted->left_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -364,7 +364,7 @@ namespace zakirov
     }
     else
     {
-      child = to_deleted->right_; 
+      child = to_deleted->right_;
       while (child->left_)
       {
         child = child->left_;
@@ -385,13 +385,13 @@ namespace zakirov
       child->left_ = to_deleted->left_;
       to_deleted->left_->parent_ = child;
       child->parent_ = to_deleted->parent_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -440,13 +440,13 @@ namespace zakirov
     else if (!to_deleted->left_)
     {
       child = to_deleted->right_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -458,13 +458,13 @@ namespace zakirov
     else if (!to_deleted->right_)
     {
       child = to_deleted->left_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -475,7 +475,7 @@ namespace zakirov
     }
     else
     {
-      child = to_deleted->right_; 
+      child = to_deleted->right_;
       while (child->left_)
       {
         child = child->left_;
@@ -496,13 +496,13 @@ namespace zakirov
       child->left_ = to_deleted->left_;
       to_deleted->left_->parent_ = child;
       child->parent_ = to_deleted->parent_;
-      if (to_deleted->parent_) 
+      if (to_deleted->parent_)
       {
-        if (to_deleted->parent_->left_ == to_deleted) 
+        if (to_deleted->parent_->left_ == to_deleted)
         {
           to_deleted->parent_->left_ = child;
-        } 
-        else 
+        }
+        else
         {
           to_deleted->parent_->right_ = child;
         }
@@ -694,7 +694,7 @@ namespace zakirov
         root->parent_->right_ = new_root;
       }
     }
- 
+
     root->parent_ = new_root;
     root->left_ = new_root->right_;
     new_root->right_ = root;
