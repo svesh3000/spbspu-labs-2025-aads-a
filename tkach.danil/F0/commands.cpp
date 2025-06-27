@@ -843,7 +843,6 @@ void tkach::printEngWordsWithTraslation(std::istream& in, std::ostream& out, con
     throw std::logic_error("<INVALID NUMBER>");
   }
   AvlTree< std::string, std::string > tree_word;
-  bool translation_found = false;
   for (size_t i = 0; i < static_cast< size_t >(number_of_dictionaries); ++i)
   {
     std::string current_dict_name;
@@ -860,12 +859,11 @@ void tkach::printEngWordsWithTraslation(std::istream& in, std::ostream& out, con
     {
       if (findTranslation(it2->second, translation))
       {
-        translation_found = true;
         tree_word[it2->first];
       }
     }
   }
-  if (!translation_found)
+  if (tree_word.empty())
   {
     throw std::logic_error("<NO WORD WITH THIS TRASLATION>");
   }
