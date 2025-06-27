@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
 
   std::cout << "Welcome to the CMD-PAINT\n";
 
-  std::map< std::string, std::function< void() > > cmds;
+  TwoThreeTree< std::string, std::function< void() > > cmds;
 
   cmds["open"] = std::bind(open, std::ref(std::cin), std::ref(std::cout), std::ref(projects));
   cmds["close"] = std::bind(close, std::ref(std::cin), std::ref(std::cout), std::ref(projects));

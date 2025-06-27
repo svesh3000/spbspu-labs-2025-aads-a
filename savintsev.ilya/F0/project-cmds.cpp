@@ -84,7 +84,7 @@ namespace
     {
       throw std::runtime_error("Incorrect description of the shape");
     }
-    projs[proj].push_back({shape_name, shape});
+    projs[proj].push_back(std::make_pair(shape_name, shape));
     return proj;
   }
   struct CloneLayer
@@ -438,7 +438,7 @@ void savintsev::array_shapes(std::istream & in, std::ostream & out, Projects & p
     Shape* clone = base->clone();
     clone->set_name(name + "_" + std::to_string(i));
     clone->move(dx * i, dy * i);
-    pos = pr.insert(pos, {type, clone});
+    pos = pr.insert(pos, std::make_pair(type, clone));
     ++pos;
   }
 
@@ -505,9 +505,9 @@ namespace
   {
     std::ostream & out;
     size_t index;
-    const std::unordered_map< std::string, std::string > & shape_names;
+    const savintsev::TwoThreeTree< std::string, std::string > & shape_names;
 
-    PrintShapeIndexed(std::ostream & o, const std::unordered_map< std::string, std::string > & names):
+    PrintShapeIndexed(std::ostream & o, const savintsev::TwoThreeTree< std::string, std::string > & names):
       out(o),
       index(1),
       shape_names(names)
@@ -543,7 +543,7 @@ void savintsev::print_shapes(std::istream & in, std::ostream & out, Projects & p
   std::string proj;
   in >> proj;
 
-  std::unordered_map< std::string, std::string > shape_type;
+  TwoThreeTree< std::string, std::string > shape_type;
   shape_type["rectangle"] = "Rectan";
   shape_type["complexquad"] = "Cxquad";
   shape_type["concave"] = "Concav";

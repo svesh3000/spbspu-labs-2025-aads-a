@@ -1,7 +1,6 @@
 #include "file-system.hpp"
 #include <fstream>
 #include <algorithm>
-#include <unordered_map>
 #include "shape-utils.hpp"
 
 std::string savintsev::get_filename(const std::string & filename)
@@ -51,7 +50,7 @@ bool savintsev::validate_savi_file(const std::string & filename)
     return false;
   }
 
-  std::unordered_map< std::string, int > shape_arg;
+  TwoThreeTree< std::string, int > shape_arg;
   shape_arg["rectangle"] = 4;
   shape_arg["circle"] = 3;
   shape_arg["triangle"] = 6;
