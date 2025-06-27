@@ -32,19 +32,11 @@ int main(const int argc, const char * const * argv)
   std::ifstream in(argv[2]);
   while (!in.eof())
   {
-    if (in.eof())
-    {
-      break;
-    }
     int key = 0;
     std::string val;
     if (in >> key >> val)
     {
       tree.insert({ key, val });
     }
-  }
-  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
-  {
-    std::cout << it->second << "\n";
   }
 }
