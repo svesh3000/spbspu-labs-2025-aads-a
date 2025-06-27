@@ -6,18 +6,18 @@
 #include <vector/definition.hpp>
 #include "declaration.hpp"
 
-namespace maslevtsov {
-  namespace detail {
-    template< class Key >
-    size_t get_odd_step(const Key& key, size_t capacity)
-    {
-      boost::hash2::siphash_64 siphasher;
-      siphasher.update(&key, sizeof(key));
-      size_t odd_step = 1 + 2 * (siphasher.result() % (capacity / 2));
-      return odd_step;
-    }
-  }
-}
+// namespace maslevtsov {
+//   namespace detail {
+//     template< class Key >
+//     size_t get_odd_step(const Key& key, size_t capacity)
+//     {
+//       boost::hash2::siphash_64 siphasher;
+//       siphasher.update(&key, sizeof(key));
+//       size_t odd_step = 1 + 2 * (siphasher.result() % (capacity / 2));
+//       return 1;
+//     }
+//   }
+// }
 
 template< class Key, class T, class Hash, class KeyEqual >
 maslevtsov::HashTable< Key, T, Hash, KeyEqual >::HashTable() noexcept:
@@ -188,7 +188,7 @@ std::pair< typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::iterator, b
     return {iterator(this, index), false};
   }
   index = hasher_(key) % slots_.size();
-  size_t odd_step = detail::get_odd_step(key, slots_.size());
+  size_t odd_step = 1;
   size_t first_deleted = slots_.size();
   for (size_t i = 0; i < slots_.size(); ++i) {
     if (slots_[index].state == detail::SlotState::EMPTY) {
@@ -322,7 +322,7 @@ void maslevtsov::HashTable< Key, T, Hash, KeyEqual >::rehash(size_type count)
     if (it->state == detail::SlotState::OCCUPIED) {
       const Key& key = it->data.first;
       size_t index = hasher_(key) % new_slots.size();
-      size_t odd_step = detail::get_odd_step(key, new_slots.size());
+      size_t odd_step = 1;
       while (new_slots[index].state == detail::SlotState::OCCUPIED) {
         index = (index + odd_step) % new_slots.size();
       }
@@ -337,7 +337,7 @@ typename maslevtsov::HashTable< Key, T, Hash, KeyEqual >::size_type
   maslevtsov::HashTable< Key, T, Hash, KeyEqual >::find_index(const Key& key) const noexcept
 {
   size_t index = hasher_(key) % slots_.size();
-  size_t odd_step = detail::get_odd_step(key, slots_.size());
+  size_t odd_step = 1;
   for (size_t i = 0; i < slots_.size(); ++i) {
     if (slots_[index].state == detail::SlotState::EMPTY) {
       return slots_.size();
