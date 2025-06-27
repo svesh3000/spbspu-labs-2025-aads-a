@@ -45,10 +45,10 @@ namespace zakirov
     size_t erase(const K & key) noexcept;
     void clear() noexcept;
 
-    BiIter find(const K & key);
-    CBiIter find(const K & key) const;
-    pair< CBiIter, CBiIter > equal_range (const K & k) const;
-    pair< BiIter, BiIter > equal_range (const K & k);
+    BiIter< K, T, C > find(const K & key);
+    CBiIter< K, T, C > find(const K & key) const;
+    std::pair< BiIter< K, T, C >, BiIter< K, T, C > > equal_range (const K & k);
+    std::pair< CBiIter< K, T, C >, CBiIter< K, T, C > > equal_range (const K & k) const;
     T count (const K & k) const;
   private:
     std::pair< BiIter< K, T, C >, bool > find_place_check(const K & k);
@@ -541,6 +541,91 @@ namespace zakirov
     {
       it = erase(it);
     }
+  }
+
+  template < class K, class T, class C >
+  BiIter< K, T, C > BiTree< K, T, C >::find(const K & key)
+  {
+    BiNode< K, T > * current = head_;
+
+    while (current)
+    {
+      if (cmp_(key, current->value_.first))
+      {
+        current = current->left_;
+      }
+      else if (cmp_(current->value_.first, key))
+      {
+        current = current->right_;
+      }
+      else
+      {
+        return BiIter< K, T, C >(current);
+      }
+    }
+
+    return end();
+  }
+
+  template < class K, class T, class C >
+  CBiIter< K, T, C > BiTree< K, T, C >::find(const K & key) const
+  {
+    BiNode< K, T > * searcher = head_;
+
+    while (searcher)
+    {
+      if (cmp_(key, searcher->value_.first))
+      {
+        searcher = searcher->left_;
+      }
+      else if (cmp_(searcher->value_.first, key))
+      {
+        searcher = searcher->right_;
+      }
+      else
+      {
+        return BiIter< K, T, C >(searcher);
+      }
+    }
+
+    return cend();
+  }
+
+  template < class K, class T, class C >
+  std::pair< BiIter< K, T, C >, BiIter< K, T, C > > BiTree< K, T, C >::equal_range (const K & k)
+  {
+    BiIter< K, T, C > first = find(k);
+    BiIter< K, T, C > second(first);
+    if (first)
+    {
+      ++second;
+    }
+
+    return std::makepair(first, second);
+  }
+
+  template < class K, class T, class C >
+  std::pair< CBiIter< K, T, C >, CBiIter< K, T, C > > BiTree< K, T, C >::equal_range (const K & k) const
+  {
+    CBiIter< K, T, C > first = find(k);
+    CBiIter< K, T, C > second(first);
+    if (first)
+    {
+      ++second;
+    }
+
+    return std::makepair(first, second);
+  }
+
+  template < class K, class T, class C >
+  T BiTree< K, T, C >::count (const K & k) const
+  {
+    if (find(k) != end())
+    {
+      return 1;
+    }
+
+    return 0;
   }
 
   template < class K, class T, class C >
