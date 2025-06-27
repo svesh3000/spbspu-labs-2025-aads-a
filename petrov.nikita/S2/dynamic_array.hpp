@@ -19,6 +19,7 @@ namespace petrov
     this_t & operator=(const this_t & rhs);
     this_t & operator=(this_t && rhs);
     T & operator[](const size_t & pos);
+    const T & operator[](const size_t & pos) const;
     template< typename T1 >
     void push_back(T1 && val);
     void pop_back();
@@ -60,10 +61,10 @@ namespace petrov
         massive_[i] = rhs.massive_[i];
       }
     }
-    catch(...)
+    catch (...)
     {
       delete massive_;
-      throw std::exception();
+      throw;
     }
   }
 
@@ -104,8 +105,15 @@ namespace petrov
   template< typename T >
   T & DynamicArray< T >::operator[](const size_t & pos)
   {
+    return const_cast< T & >(static_cast< const DynamicArray< T > * >(this)->operator[](pos));
+  }
+
+  template< typename T >
+  const T & DynamicArray< T >::operator[](const size_t & pos) const
+  {
     return massive_[pos];
   }
+
 
   template< typename T >
   template< typename T1 >
@@ -143,10 +151,10 @@ namespace petrov
         massive_[size_++] = std::forward< T1 >(val);
       }
     }
-    catch(...)
+    catch (...)
     {
       delete[] temp;
-      throw std::exception();
+      throw;
     }
   }
 
