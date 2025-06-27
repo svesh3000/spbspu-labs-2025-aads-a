@@ -8,14 +8,16 @@
 #include "slot.hpp"
 
 namespace maslevtsov {
-  template< class Key, class T, class Hash = std::hash< Key >, class KeyEqual = std::equal_to< Key > >
+  template< class Key, class T, class Hash = std::hash< Key >, class ProbeHash = std::hash< Key >,
+    class KeyEqual = std::equal_to< Key > >
   class HashTable
   {
   public:
     using value_type = std::pair< Key, T >;
     using size_type = std::size_t;
-    using iterator = HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
-    using const_iterator = HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
+    using iterator = HashTableIterator< Key, T, Hash, ProbeHash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
+    using const_iterator =
+      HashTableIterator< Key, T, Hash, ProbeHash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
 
     HashTable() noexcept;
     template< class InputIt >
@@ -60,12 +62,13 @@ namespace maslevtsov {
     void rehash(size_type count);
 
   private:
-    friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
-    friend class HashTableIterator< Key, T, Hash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
+    friend class HashTableIterator< Key, T, Hash, ProbeHash, KeyEqual, detail::HashTableIteratorType::CONSTANT >;
+    friend class HashTableIterator< Key, T, Hash, ProbeHash, KeyEqual, detail::HashTableIteratorType::NONCONSTANT >;
 
     Vector< detail::Slot< value_type > > slots_;
     size_type size_;
     Hash hasher_;
+    ProbeHash probe_hasher_;
     KeyEqual key_equal_;
     float max_load_factor_ = 1.0;
 

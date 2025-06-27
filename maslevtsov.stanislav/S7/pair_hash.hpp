@@ -1,19 +1,28 @@
 #ifndef PAIR_HASH_HPP
 #define PAIR_HASH_HPP
 
-#include <cstddef>
-#include <utility>
-#include <functional>
+#include <string>
+#include <boost/hash2/siphash.hpp>
 
 namespace maslevtsov {
-  template< class Key >
-  struct PairKeyHash
+  struct PairStringStdHash
   {
-    size_t operator()(const std::pair< Key, Key >& pair) const
+    size_t operator()(const std::pair< std::string, std::string >& str_pair) const
     {
-      size_t hash1 = std::hash< Key >{}(pair.first);
-      size_t hash2 = std::hash< Key >{}(pair.second);
+      size_t hash1 = std::hash< std::string >{}(str_pair.first);
+      size_t hash2 = std::hash< std::string >{}(str_pair.second);
       return hash1 ^ hash2;
+    }
+  };
+
+  struct PairStringSipHash
+  {
+    size_t operator()(const std::pair< std::string, std::string >& str_pair) const
+    {
+      boost::hash2::siphash_64 siphasher;
+      siphasher.update(str_pair.first.data(), str_pair.first.size());
+      siphasher.update(str_pair.second.data(), str_pair.second.size());
+      return siphasher.result();
     }
   };
 }

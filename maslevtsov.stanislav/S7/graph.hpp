@@ -12,15 +12,16 @@ namespace maslevtsov {
   {
   public:
     using vertices_pair_t = std::pair< std::string, std::string >;
-    using edges_set_t = maslevtsov::HashTable< vertices_pair_t, Vector< unsigned >, PairKeyHash< std::string > >;
+    using weights_t = Vector< unsigned >;
+    using edges_set_t = maslevtsov::HashTable< vertices_pair_t, weights_t, PairStringStdHash, PairStringSipHash >;
 
-    Graph();
+    Graph() = default;
     Graph(const Graph& src1, const Graph& src2);
     Graph(const Graph& src, Vector< std::string >& vertices);
 
     Tree< std::string, int > get_vertices() const;
-    Tree< std::string, Vector< unsigned > > get_outbound(const std::string& vertice) const;
-    Tree< std::string, Vector< unsigned > > get_inbound(const std::string& vertice) const;
+    Tree< std::string, weights_t > get_outbound(const std::string& vertice) const;
+    Tree< std::string, weights_t > get_inbound(const std::string& vertice) const;
     void bind(const std::string& vertice1, const std::string& vertice2, unsigned weight);
     bool check_vertice_existence(const std::string& vertice);
     void add_vertice(const std::string& vertice);

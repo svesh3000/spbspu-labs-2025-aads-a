@@ -47,10 +47,6 @@ namespace {
   }
 }
 
-maslevtsov::Graph::Graph():
-  edges_set_()
-{}
-
 maslevtsov::Graph::Graph(const Graph& src1, const Graph& src2):
   Graph()
 {
@@ -80,10 +76,10 @@ maslevtsov::Tree< std::string, int > maslevtsov::Graph::get_vertices() const
   return vertices;
 }
 
-maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
+maslevtsov::Tree< std::string, maslevtsov::Graph::weights_t >
   maslevtsov::Graph::get_outbound(const std::string& vertice) const
 {
-  Tree< std::string, Vector< unsigned > > outbound;
+  Tree< std::string, weights_t > outbound;
   for (auto i = edges_set_.cbegin(); i != edges_set_.cend(); ++i) {
     if (i->first.first == vertice && !i->second.empty()) {
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
@@ -95,10 +91,10 @@ maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
   return outbound;
 }
 
-maslevtsov::Tree< std::string, maslevtsov::Vector< unsigned > >
+maslevtsov::Tree< std::string, maslevtsov::Graph::weights_t >
   maslevtsov::Graph::get_inbound(const std::string& vertice) const
 {
-  Tree< std::string, Vector< unsigned > > outbound;
+  Tree< std::string, weights_t > outbound;
   for (auto i = edges_set_.cbegin(); i != edges_set_.cend(); ++i) {
     if (i->first.second == vertice && !i->second.empty()) {
       for (auto j = i->second.cbegin(); j != i->second.cend(); ++j) {
