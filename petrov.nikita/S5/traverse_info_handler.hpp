@@ -3,13 +3,18 @@
 
 #include <functional>
 #include <string>
+#include <queue.hpp>
+#include <iostream>
 
 namespace petrov
 {
-  struct SumUpKeys
+  struct SumUpKeysDisplayValues
   {
     int result = 0;
     void operator()(const std::pair< const int, std::string > & key_value);
+    std::ostream & displayValuesInTraverseOrder(std::ostream & out);
+  private:
+    Queue< std::string > queue_;
   };
 }
 

@@ -74,7 +74,9 @@ namespace petrov
     capacity_(rhs.capacity_),
     size_(rhs.size_),
     front_index_(rhs.front_index_)
-  {}
+  {
+    rhs.massive_ = nullptr;
+  }
 
   template< typename T >
   DynamicArray< T >::~DynamicArray()

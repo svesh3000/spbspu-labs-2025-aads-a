@@ -9,8 +9,8 @@ BOOST_AUTO_TEST_CASE(traverse_empty_tree)
 {
   std::ostringstream out;
   petrov::AVLTree< int, std::string > tree;
-  petrov::SumUpKeys summator;
-  petrov::SumUpKeys new_summator = tree.traverse_lnr(summator);
+  petrov::SumUpKeysDisplayValues summator;
+  petrov::SumUpKeysDisplayValues new_summator = tree.traverse_lnr(summator);
   out << new_summator.result;
   BOOST_TEST(out.str() == "0");
 }
@@ -22,8 +22,8 @@ BOOST_AUTO_TEST_CASE(traverse_three_element_tree)
   tree.insert({ 5, "good" });
   tree.insert({ 6, "vibes" });
   tree.insert({ 7, "forever" });
-  petrov::SumUpKeys summator;
-  petrov::SumUpKeys new_summator = tree.traverse_lnr(summator);
+  petrov::SumUpKeysDisplayValues summator;
+  petrov::SumUpKeysDisplayValues new_summator = tree.traverse_lnr(summator);
   out << new_summator.result;
   BOOST_TEST(out.str() == "18");
 }
@@ -32,15 +32,30 @@ BOOST_AUTO_TEST_CASE(traverse_five_element_tree)
 {
   std::ostringstream out;
   petrov::AVLTree< int, std::string > tree;
-  petrov::SumUpKeys summator;
+  petrov::SumUpKeysDisplayValues summator;
   tree.insert({ 5, "good" });
   tree.insert({ 6, "vibes" });
   tree.insert({ 7, "forever" });
   tree.insert({ 15, "trust" });
   tree.insert({ 16, "me" });
-  petrov::SumUpKeys new_summator = tree.traverse_lnr(summator);
+  petrov::SumUpKeysDisplayValues new_summator = tree.traverse_lnr(summator);
   out << new_summator.result;
   BOOST_TEST(out.str() == "49");
+}
+
+BOOST_AUTO_TEST_CASE(traverse_five_element_tree_output)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  petrov::SumUpKeysDisplayValues summator;
+  tree.insert({ 5, "good" });
+  tree.insert({ 6, "vibes" });
+  tree.insert({ 7, "forever" });
+  tree.insert({ 15, "trust" });
+  tree.insert({ 16, "me" });
+  petrov::SumUpKeysDisplayValues new_summator = tree.traverse_lnr(summator);
+  new_summator.displayValuesInTraverseOrder(out);
+  BOOST_TEST(out.str() == "good vibes forever trust me");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
