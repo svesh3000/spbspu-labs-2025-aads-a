@@ -131,101 +131,26 @@ namespace
     }
     else
     {
-      std::string current_dict_name;
+      tkach::HashDynArray< std::string > current_dict_name(count_of_dicts);
       for (size_t i = 0; i < static_cast< size_t >(count_of_dicts); ++i)
       {
-        if (!(in >> current_dict_name) || current_dict_name.empty())
+        if (!(in >> current_dict_name[0]) || current_dict_name.empty())
         {
           throw std::logic_error("<INVALID ARGUMENTS>");
         }
-        auto it = avltree.find(current_dict_name);
+        auto it = avltree.find(current_dict_name[i]);
         if (it == avltree.cend())
         {
           throw std::logic_error("<INVALID DICTIONARY>");
         }
+      }
+      for (size_t i = 0; i < static_cast< size_t >(count_of_dicts); ++i)
+      {
+        auto it = avltree.find(current_dict_name[i]);
         writeDictToFile(outFile, it->first, it->second);
         outFile << "\n";
       }
     }
-  }
-}
-
-void tkach::import(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
-{
-  tree_of_dict temp(avltree);
-  std::string file_name = "";
-  int count_of_dict = 0;
-  if (!(in >> file_name))
-  {
-    throw std::logic_error("<INVALID ARGUMENTS>");
-  }
-  std::fstream in2(file_name);
-  if (!in2.is_open())
-  {
-    throw std::logic_error("<INVALID IMPORT>");
-  }
-  if (!(in >> count_of_dict) || count_of_dict < 0)
-  {
-    throw std::logic_error("<INVALID NUMBER>");
-  }
-  HashDynArray< std::string > main_name_dict(count_of_dict);
-  for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
-  {
-    if (!(in >> main_name_dict[i]))
-    {
-      throw std::logic_error("<INVALID ARGUMENTS>");
-    }
-  }
-  std::string name_of_dict = "";
-  while (in2 >> name_of_dict)
-  {
-    if (name_of_dict.empty())
-    {
-      continue;
-    }
-    tree_of_words temp_dict;
-    std::string eng_word;
-    while (in2 >> eng_word)
-    {
-      List< std::string > translations;
-      std::string translation;
-      while (in2 >> translation)
-      {
-        translations.pushBack(translation);
-        if (in2.peek() == '\n')
-        {
-          in2.get();
-          break;
-        }
-      }
-      temp_dict[eng_word] = mergeTranslations(translations, temp_dict[eng_word]);
-      if (in2.peek() == '\n')
-      {
-        in2.get();
-        break;
-      }
-    }
-    temp[name_of_dict] = mergeDicts({&temp_dict, &temp[name_of_dict]});
-  }
-  if (!in2.eof())
-  {
-    throw std::logic_error("<INVALID IMPORT>");
-  }
-  if (count_of_dict != 0)
-  {
-    for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
-    {
-      auto it = temp.find(main_name_dict[i]);
-      if (it == temp.end())
-      {
-        throw std::logic_error("<INVALID IMPORT>");
-      }
-      avltree[main_name_dict[i]] = temp[main_name_dict[i]];
-    }
-  }
-  else
-  {
-    avltree = std::move(temp);
   }
 }
 
@@ -256,6 +181,7 @@ void tkach::addWord(std::istream& in, AvlTree< std::string, AvlTree< std::string
     }
     translations.pushBack(translation);
   }
+  translations = mergeTranslations(translations, translations);
   auto it = avltree.find(dict_name);
   if (it == avltree.end())
   {
@@ -266,7 +192,6 @@ void tkach::addWord(std::istream& in, AvlTree< std::string, AvlTree< std::string
   else
   {
     tree_of_words& current_dict = it->second;
-    auto it2 = current_dict.find(eng_word);
     current_dict[eng_word] = mergeTranslations(translations, current_dict[eng_word]);
   }
 }
@@ -733,6 +658,86 @@ void tkach::copyTranslations(std::istream& in, AvlTree< std::string, AvlTree< st
     }
     tree_of_words& target = it->second;
     target[eng_word] = mergeTranslations(word_it->second, target[eng_word]);
+  }
+}
+
+void tkach::import(std::istream& in, AvlTree< std::string, AvlTree< std::string, List< std::string > > >& avltree)
+{
+  tree_of_dict temp(avltree);
+  std::string file_name = "";
+  int count_of_dict = 0;
+  if (!(in >> file_name))
+  {
+    throw std::logic_error("<INVALID ARGUMENTS>");
+  }
+  std::fstream in2(file_name);
+  if (!in2.is_open())
+  {
+    throw std::logic_error("<INVALID IMPORT>");
+  }
+  if (!(in >> count_of_dict) || count_of_dict < 0)
+  {
+    throw std::logic_error("<INVALID NUMBER>");
+  }
+  HashDynArray< std::string > main_name_dict(count_of_dict);
+  for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
+  {
+    if (!(in >> main_name_dict[i]))
+    {
+      throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    auto it = temp.find(main_name_dict[i]);
+    if (it == temp.end())
+    {
+      throw std::logic_error("<INVALID IMPORT>");
+    }
+  }
+  std::string name_of_dict = "";
+  while (in2 >> name_of_dict)
+  {
+    if (name_of_dict.empty())
+    {
+      continue;
+    }
+    tree_of_words temp_dict;
+    std::string eng_word;
+    while (in2 >> eng_word)
+    {
+      List< std::string > translations;
+      std::string translation;
+      while (in2 >> translation)
+      {
+        translations.pushBack(translation);
+        if (in2.peek() == '\n')
+        {
+          in2.get();
+          break;
+        }
+      }
+      temp_dict[eng_word] = mergeTranslations(translations, temp_dict[eng_word]);
+      if (in2.peek() == '\n')
+      {
+        in2.get();
+        break;
+      }
+    }
+    temp[name_of_dict] = mergeDicts({&temp_dict, &temp[name_of_dict]});
+  }
+  if (!in2.eof())
+  {
+    throw std::logic_error("<INVALID IMPORT>");
+  }
+  if (count_of_dict != 0)
+  {
+    for (size_t i = 0; i < static_cast< size_t >(count_of_dict); ++i)
+    {
+      auto it = temp.find(main_name_dict[i]);
+      avltree[main_name_dict[i]] = temp[main_name_dict[i]];
+    }
+  }
+  else
+  {
+    avltree = std::move(temp);
   }
 }
 
