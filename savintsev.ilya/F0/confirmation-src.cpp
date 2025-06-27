@@ -11,7 +11,7 @@ savintsev::ConfirmationPrompt::ConfirmationPrompt(std::istream & in, std::ostrea
 bool savintsev::ConfirmationPrompt::ask(const std::string & message)
 {
   std::string answer;
-  while (true)
+  while (in_)
   {
     out_ << message << " [Y / N]: ";
     in_ >> answer;
