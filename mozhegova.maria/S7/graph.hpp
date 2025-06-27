@@ -3,7 +3,7 @@
 
 #include <string>
 #include <hashTable.hpp>
-#include <dynamicArray.hpp>
+#include <tree.hpp>
 
 namespace mozhegova
 {
