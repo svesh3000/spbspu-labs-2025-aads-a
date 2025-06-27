@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     duhanina::print_help(std::cout);
     return 0;
   }
-  auto commands = duhanina::initialize_commands(std::cin, std::cout);
+  auto commands = duhanina::initTree(std::cin, std::cout);
   std::string cmd;
   while (std::cin >> cmd)
   {

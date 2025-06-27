@@ -136,7 +136,7 @@ void duhanina::check_encoding_wrapper(std::istream& in, std::ostream& out)
   check_encoding(input_file, encoding_id, out);
 }
 
-duhanina::Tree< str, std::function< void() >, std::less< str > > duhanina::initialize_commands(std::istream& in, std::ostream& out)
+duhanina::Tree< std::string, std::function< void() >, std::less< std::string > > duhanina::initTree(std::istream& in, std::ostream& out)
 {
   Tree< str, std::function< void() >, std::less< str > > commands;
 

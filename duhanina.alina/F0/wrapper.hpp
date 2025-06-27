@@ -22,7 +22,7 @@ namespace duhanina
   void suggest_encodings_wrapper(std::istream& in, std::ostream& out);
   void check_encoding_wrapper(std::istream& in, std::ostream& out);
 
-  Tree< str, std::function< void() >, std::less< str > > initialize_commands(std::istream& in, std::ostream& out);
+  Tree< str, std::function< void() >, std::less< str > > initTree(std::istream& in, std::ostream& out);
 }
 
 #endif
