@@ -1,7 +1,8 @@
 #ifndef CITERATOR_HPP
 #define CITERATOR_HPP
 #include <iterator>
-#include "node.hpp"
+#include "decls.hpp"
+#include "hash_node.hpp"
 
 namespace abramov
 {
@@ -9,47 +10,47 @@ namespace abramov
   struct HashTable;
 
   template< class Key, class Value, class Hash, class Equal >
-  struct ConstIterator: std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
+  struct ConstHashIterator: std::iterator< std::forward_iterator_tag, std::pair< Key, Value > >
   {
     using cHash = const HashTable< Key, Value, Hash, Equal >;
-    using cIter = const ConstIterator< Key, Value, Hash, Equal >;
+    using cIter = const ConstHashIterator< Key, Value, Hash, Equal >;
 
-    ConstIterator();
-    ConstIterator(const HashTable< Key, Value, Hash, Equal > *t, size_t i, const Node< Key, Value > *n);
-    ConstIterator(const ConstIterator< Key, Value, Hash, Equal > &c_iter) = default;
-    ~ConstIterator() = default;
-    ConstIterator< Key, Value, Hash, Equal > &operator=(const ConstIterator< Key, Value, Hash, Equal > &c_iter) = default;
-    ConstIterator< Key, Value, Hash, Equal > &operator++() noexcept;
-    ConstIterator< Key, Value, Hash, Equal > operator++(int) noexcept;
-    bool operator==(const ConstIterator< Key, Value, Hash, Equal > &c_iter) const noexcept;
-    bool operator!=(const ConstIterator< Key, Value, Hash, Equal > &c_iter) const noexcept;
+    ConstHashIterator();
+    ConstHashIterator(const HashTable< Key, Value, Hash, Equal > *t, size_t i, const HashNode< Key, Value > *n);
+    ConstHashIterator(const ConstHashIterator< Key, Value, Hash, Equal > &c_iter) = default;
+    ~ConstHashIterator() = default;
+    ConstHashIterator< Key, Value, Hash, Equal > &operator=(const ConstHashIterator< Key, Value, Hash, Equal > &c_iter) = default;
+    ConstHashIterator< Key, Value, Hash, Equal > &operator++() noexcept;
+    ConstHashIterator< Key, Value, Hash, Equal > operator++(int) noexcept;
+    bool operator==(const ConstHashIterator< Key, Value, Hash, Equal > &c_iter) const noexcept;
+    bool operator!=(const ConstHashIterator< Key, Value, Hash, Equal > &c_iter) const noexcept;
     const std::pair< Key, Value > &operator*() const noexcept;
     const std::pair< Key, Value > *operator->() const noexcept;
   private:
     const HashTable< Key, Value, Hash, Equal > *table_;
     size_t ind_;
-    const Node< Key, Value > *node_;
+    const HashNode< Key, Value > *node_;
 
     void goNext() noexcept;
   };
 }
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal >::ConstIterator():
+abramov::ConstHashIterator< Key, Value, Hash, Equal >::ConstHashIterator():
   table_(nullptr),
   ind_(0),
   node_(nullptr)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal >::ConstIterator(cHash *t, size_t i, const Node< Key, Value > *n):
+abramov::ConstHashIterator< Key, Value, Hash, Equal >::ConstHashIterator(cHash *t, size_t i, const HashNode< Key, Value > *n):
   table_(t),
   ind_(i),
   node_(n)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal > &abramov::ConstIterator< Key, Value, Hash, Equal >::operator++() noexcept
+abramov::ConstHashIterator< Key, Value, Hash, Equal > &abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator++() noexcept
 {
   if (node_)
   {
@@ -63,7 +64,7 @@ abramov::ConstIterator< Key, Value, Hash, Equal > &abramov::ConstIterator< Key, 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void abramov::ConstIterator< Key, Value, Hash, Equal >::goNext() noexcept
+void abramov::ConstHashIterator< Key, Value, Hash, Equal >::goNext() noexcept
 {
   ++ind_;
   while (ind_ < table_->capacity_ && !table_->table_[ind_])
@@ -81,33 +82,33 @@ void abramov::ConstIterator< Key, Value, Hash, Equal >::goNext() noexcept
 }
 
 template< class Key, class Value, class Hash, class Equal >
-abramov::ConstIterator< Key, Value, Hash, Equal > abramov::ConstIterator< Key, Value, Hash, Equal >::operator++(int) noexcept
+abramov::ConstHashIterator< Key, Value, Hash, Equal > abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator++(int) noexcept
 {
-  ConstIterator< Key, Value, Hash, Equal > tmp(*this);
+  ConstHashIterator< Key, Value, Hash, Equal > tmp(*this);
   ++(*this);
   return tmp;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool abramov::ConstIterator< Key, Value, Hash, Equal >::operator==(cIter &rhs) const noexcept
+bool abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator==(cIter &rhs) const noexcept
 {
   return node_ == rhs.node_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool abramov::ConstIterator< Key, Value, Hash, Equal >::operator!=(cIter &rhs) const noexcept
+bool abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator!=(cIter &rhs) const noexcept
 {
   return !(*this == rhs);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-const std::pair< Key, Value > &abramov::ConstIterator< Key, Value, Hash, Equal >::operator*() const noexcept
+const std::pair< Key, Value > &abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator*() const noexcept
 {
   return node_->data_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-const std::pair< Key, Value > *abramov::ConstIterator< Key, Value, Hash, Equal >::operator->() const noexcept
+const std::pair< Key, Value > *abramov::ConstHashIterator< Key, Value, Hash, Equal >::operator->() const noexcept
 {
   return std::addressof(node_->data_);
 }
