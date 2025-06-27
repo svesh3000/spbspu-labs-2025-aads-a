@@ -8,13 +8,8 @@ namespace zakirov
   struct BiNode
   {
     BiNode() = default;
-    BiNode(std::pair< K, T > value):
-    left_(nullptr),
-    right_(nullptr),
-    parent_(nullptr),
-    value_.first(value.first),
-    value_.second(value.second)
-  {}
+    BiNode(const BiNode< K, T > * other);
+    BiNode(std::pair< K, T > value);
 
     BiNode< K, T > * left_;
     BiNode< K, T > * right_;
@@ -23,12 +18,24 @@ namespace zakirov
   };
 
   template < class K, class T >
+  BiNode< K, T >::BiNode(const BiNode< K, T > * other):
+    BiNode()
+  {
+    if (other)
+    {
+      left_ = other->left_;
+      right_ = other->right_;
+      parent_ = other->parent_;
+      value_ = other->value_;
+    }
+  }
+
+  template < class K, class T >
   BiNode< K, T >::BiNode(std::pair< K, T > value):
     left_(nullptr),
     right_(nullptr),
     parent_(nullptr),
-    value_.first(value.first),
-    value_.second(value.second)
+    value_(std::make_pair(value.first, value.second))
   {}
 }
 

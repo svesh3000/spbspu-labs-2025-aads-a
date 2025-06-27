@@ -63,7 +63,7 @@ namespace zakirov
   template < class K, class T, class C >
   BiTree< K, T, C >::BiTree() noexcept:
     head_(nullptr),
-    size_(0)
+    size_(0),
     cmp_(C())
   {}
 
@@ -71,7 +71,7 @@ namespace zakirov
   BiTree< K, T, C >::BiTree(const BiTree< K, T, C > & other):
     BiTree()
   {
-    for (CBiIter< K, T, C > i = other.cbegin(); i != other.cend(); ++i)
+    for (CBiIter< K, T, C > it = other.cbegin(); it != other.cend(); ++it)
     {
       insert(*it);
     }
@@ -121,7 +121,7 @@ namespace zakirov
     BiIter< K, T, C > iter = find(key);
     if (!iter)
     {
-      throw std::out_of_range("No element in tree")
+      throw std::out_of_range("No element in tree");
     }
 
     return *iter;
@@ -133,7 +133,7 @@ namespace zakirov
     CBiIter< K, T, C > iter = find(key);
     if (!iter)
     {
-      throw std::out_of_range("No element in tree")
+      throw std::out_of_range("No element in tree");
     }
 
     return *iter;
@@ -155,7 +155,7 @@ namespace zakirov
     }
 
     BiIter< K, T, C > res(first);
-    return res
+    return res;
   }
 
   template < class K, class T, class C >
@@ -174,7 +174,7 @@ namespace zakirov
     }
 
     BiIter< K, T, C > res(last);
-    return res
+    return res;
   }
 
   template < class K, class T, class C >
@@ -193,7 +193,7 @@ namespace zakirov
     }
 
     CBiIter< K, T, C > res(first);
-    return res
+    return res;
   }
 
   template < class K, class T, class C >
@@ -212,7 +212,7 @@ namespace zakirov
     }
 
     CBiIter< K, T, C > res(last);
-    return res
+    return res;
   }
 
   template < class K, class T, class C >
@@ -304,7 +304,7 @@ namespace zakirov
     BiNode< K, T > * to_deleted = pos.node_;
     BiNode< K, T > * next = pos.node_;
     BiNode< K, T > * child;
-    detail::next(next);
+    detail::next_node(next);
     if (!to_deleted)
     {
       return pos;
@@ -312,13 +312,13 @@ namespace zakirov
 
     if (!to_deleted->left_ && !to_deleted->right_)
     {
-      if (parent->left == to_deleted)
+      if (to_deleted->parent_->left == to_deleted)
       {
-        parent->left = nullptr;
+        to_deleted->parent_->left = nullptr;
       }
       else
       {
-        parent->right = nullptr;
+        to_deleted->parent_->right = nullptr;
       }
 
       delete to_deleted;
@@ -415,7 +415,7 @@ namespace zakirov
     BiNode< K, T > * to_deleted = pos.node_;
     BiNode< K, T > * next = pos.node_;
     BiNode< K, T > * child;
-    detail::next(next);
+    detail::next_node(next);
     if (!to_deleted)
     {
       return pos;
@@ -423,13 +423,13 @@ namespace zakirov
 
     if (!to_deleted->left_ && !to_deleted->right_)
     {
-      if (parent->left == to_deleted)
+      if (to_deleted->parent_->left == to_deleted)
       {
-        parent->left = nullptr;
+        to_deleted->parent_->left = nullptr;
       }
       else
       {
-        parent->right = nullptr;
+        to_deleted->parent_->right = nullptr;
       }
 
       delete to_deleted;
@@ -523,20 +523,20 @@ namespace zakirov
   template < class K, class T, class C >
   size_t BiTree< K, T, C >::erase(const K & key) noexcept
   {
-    BiIter< K, T > it = find(k);
+    BiIter< K, T, C > it = find(key);
     if (it == end())
     {
       return 0;
     }
 
-    erase(it)
+    erase(it);
     return 1;
   }
 
   template < class K, class T, class C >
   void BiTree< K, T, C >::clear() noexcept
   {
-    BiIter< K, T > it = first();
+    BiIter< K, T, C > it = begin();
     while (it != end())
     {
       it = erase(it);
@@ -601,7 +601,7 @@ namespace zakirov
       ++second;
     }
 
-    return std::makepair(first, second);
+    return std::make_pair(first, second);
   }
 
   template < class K, class T, class C >
@@ -614,7 +614,7 @@ namespace zakirov
       ++second;
     }
 
-    return std::makepair(first, second);
+    return std::make_pair(first, second);
   }
 
   template < class K, class T, class C >
@@ -651,7 +651,7 @@ namespace zakirov
       }
 
       BiIter<K, T, C> res(pos);
-      return make_pair(res, true)
+      return std::make_pair(res, true);
     }
     else if (cmp_(k, pos->value_.first, k))
     {
@@ -661,11 +661,11 @@ namespace zakirov
       }
 
       BiIter<K, T, C> res(pos);
-      return make_pair(res, true)
+      return std::make_pair(res, true);
     }
 
     BiIter<K, T, C> res(pos);
-    return make_pair(res, false)
+    return std::make_pair(res, false);
   }
 
   template< class K, class T, class C >
@@ -715,7 +715,7 @@ namespace zakirov
       throw std::invalid_argument("Invalid rotation");
     }
 
-    BiTree< T >* new_root = root->right_;
+    BiNode< T, K > * new_root = root->right_;
     new_root->parent_ = root->parent_;
     if (root->parent_)
     {
