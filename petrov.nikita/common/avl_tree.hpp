@@ -1040,7 +1040,24 @@ namespace petrov
   template< typename F >
   F AVLTree< K, T, Cmp >::traverse_rnl(F f) const
   {
-
+    petrov::Stack< node_t * > stack;
+    node_t * node = root_;
+    while (!stack.empty() || node)
+    {
+      if (node)
+      {
+        stack.push(node);
+        node = node->right;
+      }
+      else
+      {
+        node = stack.top();
+        stack.pop();
+        f(node->data);
+        node = node->left;
+      }
+    }
+    return f;
   }
 
   template< typename K, typename T, typename Cmp >
