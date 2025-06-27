@@ -22,14 +22,14 @@ namespace duhanina
     NodeSymb* left;
     NodeSymb* right;
 
-    NodeSymb(char s, size_t f) :
+    NodeSymb(char s, size_t f):
       symbol(s),
       freq(f),
       left(nullptr),
       right(nullptr)
     {}
 
-    NodeSymb(size_t f, NodeSymb* l, NodeSymb* r) :
+    NodeSymb(size_t f, NodeSymb* l, NodeSymb* r):
       symbol(0),
       freq(f),
       left(l),

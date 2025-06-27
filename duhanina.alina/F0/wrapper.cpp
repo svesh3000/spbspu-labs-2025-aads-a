@@ -1,7 +1,7 @@
 #include "wrapper.hpp"
 #include "shannonFano.hpp"
 
-void duhanina::build_codes_wrapper(std::istream & in, std::ostream & out)
+void duhanina::build_codes_wrapper(std::istream& in, std::ostream& out)
 {
   std::string input_file;
   std::string encoding_name;

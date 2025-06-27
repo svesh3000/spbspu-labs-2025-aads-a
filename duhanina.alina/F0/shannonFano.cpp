@@ -249,7 +249,7 @@ namespace
       {
         throw std::runtime_error("INVALID_HEADER");
       }
-      bit_count |= static_cast<size_t>(static_cast<unsigned char>(byte)) << (8 * i);
+      bit_count |= static_cast< size_t >(static_cast< unsigned char >(byte)) << (8 * i);
     }
     std::string bits;
     bits.reserve(bit_count);
@@ -285,10 +285,9 @@ namespace
     out << table.total_chars << "\n";
     for (auto it = table.char_to_code.begin(); it != table.char_to_code.end(); it++)
     {
-      out << static_cast<int>(it->first) << " " << it->second << "\n";
+      out << static_cast< int >(it->first) << " " << it->second << "\n";
     }
   }
-
 
   duhanina::CodeTable load_code_table(str_t filename)
   {
@@ -314,8 +313,8 @@ namespace
       }
       int char_code = std::stoi(line.substr(0, space_pos));
       std::string code = line.substr(space_pos + 1);
-      table.char_to_code[static_cast<char>(char_code)] = code;
-      table.code_to_char[code] = static_cast<char>(char_code);
+      table.char_to_code[static_cast< char >(char_code)] = code;
+      table.code_to_char[code] = static_cast< char >(char_code);
     }
     return table;
   }
@@ -382,7 +381,7 @@ namespace
       }
       else
       {
-        out << "[0x" << std::hex << static_cast<int>(c) << "] ";
+        out << "[0x" << std::hex << static_cast< int >(c) << "] ";
       }
     }
     out << "\n";
@@ -425,12 +424,11 @@ void duhanina::show_codes(str_t encoding_id, std::ostream& out)
     }
     else
     {
-      out << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(it->first) << std::dec << "\t" << it->second << "\n";
+      out << "0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast< int >(it->first) << std::dec << "\t" << it->second << "\n";
     }
   }
   out << "Total characters: " << table.total_chars << "\n";
 }
-
 
 void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& out)
 {
@@ -444,7 +442,6 @@ void duhanina::save_codes(str_t encoding_id, str_t output_file, std::ostream& ou
   out << "Code table successfully saved to file '" << output_file << "'\n";
 }
 
-
 void duhanina::load_codes(str_t codes_file, str_t encoding_id, std::ostream& out)
 {
   validate_extension(codes_file, CODE_TABLE_EXT);
@@ -456,7 +453,6 @@ void duhanina::load_codes(str_t codes_file, str_t encoding_id, std::ostream& out
   encoding_store[encoding_id] = table;
   out << "Code table successfully loaded from file '" << codes_file << "' with ID '" << encoding_id << "'\n";
 }
-
 
 void duhanina::clear_codes(str_t encoding_id, std::ostream& out)
 {
@@ -470,7 +466,6 @@ void duhanina::clear_codes(str_t encoding_id, std::ostream& out)
   }
 }
 
-
 void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
   validate_extension(codes_file, CODE_TABLE_EXT);
@@ -480,7 +475,6 @@ void duhanina::encode_file_with_codes(str_t input_file, str_t output_file, str_t
   encode_file_impl(input_file, output_file, table, out);
 }
 
-
 void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t codes_file, std::ostream& out)
 {
   validate_extension(codes_file, CODE_TABLE_EXT);
@@ -489,7 +483,6 @@ void duhanina::decode_file_with_codes(str_t input_file, str_t output_file, str_t
   CodeTable table = load_code_table(codes_file);
   decode_file_impl(input_file, output_file, table, out);
 }
-
 
 void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
@@ -502,7 +495,6 @@ void duhanina::encode_file(str_t input_file, str_t output_file, str_t encoding_i
   }
   encode_file_impl(input_file, output_file, it->second, out);
 }
-
 
 void duhanina::decode_file(str_t input_file, str_t output_file, str_t encoding_id, std::ostream& out)
 {
@@ -564,7 +556,6 @@ void duhanina::compare(str_t file1, str_t file2, str_t encod_id1, str_t encod_id
   out << "Difference in compression ratio: " << std::fixed << std::setprecision(2) << std::fabs(ratio1 - ratio2) * 100 << "%\n";
 }
 
-
 void duhanina::list_encodings(std::ostream& out)
 {
   if (encoding_store.empty())
@@ -578,7 +569,6 @@ void duhanina::list_encodings(std::ostream& out)
     out << "  " << it->first << " (" << it->second.char_to_code.size() << " symbols, total " << it->second.total_chars << ")\n";
   }
 }
-
 
 void duhanina::print_help(std::ostream& out)
 {
