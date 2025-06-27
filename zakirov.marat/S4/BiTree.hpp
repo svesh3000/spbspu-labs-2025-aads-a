@@ -44,12 +44,14 @@ namespace zakirov
     BiIter< K, T, C > erase(CBiIter< K, T, C > pos) noexcept;
     size_t erase(const K & key) noexcept;
     void clear() noexcept;
+    void swap(BiTree< K, T, C > & other) noexcept;
 
     BiIter< K, T, C > find(const K & key);
     CBiIter< K, T, C > find(const K & key) const;
     std::pair< BiIter< K, T, C >, BiIter< K, T, C > > equal_range (const K & k);
     std::pair< CBiIter< K, T, C >, CBiIter< K, T, C > > equal_range (const K & k) const;
     T count (const K & k) const;
+
   private:
     std::pair< BiIter< K, T, C >, bool > find_place_check(const K & k);
     std::pair< BiIter< K, T, C >, bool > find_place(const K & k,  BiNode< K, T > * pos);
@@ -83,7 +85,7 @@ namespace zakirov
     size_(other.size_)
   {
     other.head_ = nullptr;
-    other.size_ = nullptr;
+    other.size_ = 0;
   }
 
   template < class K, class T, class C >
@@ -112,7 +114,7 @@ namespace zakirov
   T & BiTree< K, T, C >::operator[](const K & key)
   {
     BiIter< K, T, C > result = insert(std::make_pair(key, T())).first;
-    return *result;
+    return result.node_->value_.second;
   }
 
   template < class K, class T, class C >
@@ -237,15 +239,15 @@ namespace zakirov
       return std::make_pair(begin(), true);
     }
 
-    std::pair< BiIter< K, T, C >, bool > place = find_place(head_);
+    std::pair< BiIter< K, T, C >, bool > place = find_place(value.first, head_);
     if (!place.second)
     {
-      place.second = value.second;
+      place.first.node_->value_.second = value.second;
       return place;
     }
 
     BiIter< K, T, C > result;
-    if (cmp_(value.first, place.first.node_->value.first))
+    if (cmp_(value.first, place.first.node_->value_.first))
     {
       place.first.node_->left_ = new BiNode< K, T >(value);
       place.first.node_->left_->parent_ = place.first.node_->left_;
@@ -312,13 +314,13 @@ namespace zakirov
 
     if (!to_deleted->left_ && !to_deleted->right_)
     {
-      if (to_deleted->parent_->left == to_deleted)
+      if (to_deleted->parent_->left_ == to_deleted)
       {
-        to_deleted->parent_->left = nullptr;
+        to_deleted->parent_->left_ = nullptr;
       }
       else
       {
-        to_deleted->parent_->right = nullptr;
+        to_deleted->parent_->right_ = nullptr;
       }
 
       delete to_deleted;
@@ -544,6 +546,14 @@ namespace zakirov
   }
 
   template < class K, class T, class C >
+  void BiTree< K, T, C >::swap(BiTree< K, T, C > & other) noexcept
+  {
+    std::swap(head_, other.head_);
+    std::swap(size_, other.size_);
+    std::swap(cmp_, other.cmp_);
+  }
+
+  template < class K, class T, class C >
   BiIter< K, T, C > BiTree< K, T, C >::find(const K & key)
   {
     BiNode< K, T > * current = head_;
@@ -653,7 +663,7 @@ namespace zakirov
       BiIter<K, T, C> res(pos);
       return std::make_pair(res, true);
     }
-    else if (cmp_(k, pos->value_.first, k))
+    else if (cmp_(k, pos->value_.first))
     {
       if (pos->left_)
       {

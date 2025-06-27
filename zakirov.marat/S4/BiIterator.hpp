@@ -219,13 +219,13 @@ namespace zakirov
   template< class K, class T, class C >
   std::pair< K, T > & CBiIter< K, T, C >::operator*() const noexcept
   {
-    return node_->data_;
+    return node_->value_;
   }
 
   template< class K, class T, class C >
   std::pair< K, T > * CBiIter< K, T, C >::operator->() const noexcept
   {
-    return std::addressof(node_->data_);
+    return std::addressof(node_->value_);
   }
 
   template< class K, class T, class C >
