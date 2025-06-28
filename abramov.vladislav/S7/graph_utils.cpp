@@ -25,7 +25,28 @@ namespace
       out << "\n";
     }
   }
+
+  void addEdgesVertexes(const Graph &graph, Graph &res)
+  {
+    for (auto it = graph.cbegin(); it != graph.cend(); ++it)
+    {
+      res.addVertex(it->first);
+    }
+    for (auto it = graph.cbegin(); it != graph.cend(); ++it)
+    {
+      const SimpleArray< Edge > *edges = graph.getEdges(it->first);
+      if (edges)
+      {
+        for (size_t i = 0; i < edges->size(); ++i)
+        {
+          const Edge &edge = (*edges)[i];
+          res.addEdge(edge.from, edge.to, edge.weight);
+        }
+      }
+    }
+  }
 }
+
 
 std::ifstream &abramov::readGraphs(std::ifstream &in, GraphCollection &collect)
 {
@@ -199,6 +220,44 @@ void abramov::cutEdgeFromGraph(GraphCollection &collect, const std::string &name
   }
 }
 
+void abramov::createGraph(GraphCollection &collect, std::istream &in)
+{
+  std::string name;
+  in >> name;
+  Graph res(name);
+  try
+  {
+    res = collect.cgetGraph(name);
+    throw std::runtime_error("There is such graph\n");
+  }
+  catch (const std::logic_error &)
+  {}
+  size_t k = 0;
+  if (in.peek() == '\n')
+  {
+    throw std::logic_error("Invalid argument\n");
+  }
+  if (!(in >> k))
+  {
+    throw std::logic_error("Invalid argument\n");
+  }
+  if (!k)
+  {
+    collect.addGraph(res);
+    return;
+  }
+  std::string vert;
+  for (size_t i = 0; i < k; ++i)
+  {
+    if (!(in >> vert))
+    {
+      throw std::logic_error("Invalid argument\n");
+    }
+    res.addVertex(vert);
+  }
+  collect.addGraph(res);
+}
+
 void abramov::mergeGraphs(GraphCollection &collect, const std::string &name, std::istream &in)
 {
   std::string n1;
@@ -206,38 +265,52 @@ void abramov::mergeGraphs(GraphCollection &collect, const std::string &name, std
   in >> n1 >> n2;
   const Graph &graph1 = collect.cgetGraph(n1);
   const Graph &graph2 = collect.cgetGraph(n2);
-  Graph res(n);
-  for (auto it = graph1.cbegin(); it != graph1.cend(); ++it)
+  Graph res(name);
+  addEdgesVertexes(graph1, res);
+  addEdgesVertexes(graph2, res);
+  collect.addGraph(res);
+}
+
+void extractGraph(GraphCollection &collect, const std::string &name, std::istream in)
+{
+  std::string new_name;
+  in >> new_name;
+  size_t k = 0;
+  in >> k;
+  SimpleArray< std::string > verts;
+  for (size_t i = 0; i < k; ++i)
   {
-    res.addVertex(it->first);
+    std::string vert;
+    in >> vert;
+    verts.pushBack(vert);
   }
-  for (auto it = graph2.cbegin(); it != graph2.cend(); ++it)
+  const Graph &src_graph = collect.cgetGraph(name);
+  for (size_t i = 0; i < verts.size(); ++i)
   {
-    res.addVertex(it->first);
+    if (!src_graph.hasVertex(verts[i]))
+    {
+      throw std::logic_error("There is no such vertex\n");
+    }
   }
-  for (auto it = graph1.cbegin(); it != graph1.cend(); ++it)
+  Graph res(new_name);
+  for (size_t i = 0; i < verts.size(); ++i)
   {
-    const SimpleArray< Edge > *edges1 = graph1.getEdges(it->first);
+    const SimpleArray< Edge > *edges = src_graph.getEdges(verts[i]);
     if (edges)
     {
-      for (size_t i = 0; i < edges->size(); ++i)
+      for (size_t j = 0; j < edges->size(); ++j)
       {
-        const Edge &edge = (*edges)[i];
-        res.addEdge(edge.from, edge.to, edge.weight);
+        for (size_t n = 0; n < verts.size(); ++n)
+        {
+          const Edge &edge = (*edges)[j];
+          if (verts[n] == edge.to)
+          {
+            res.addEdge(edge.from, edge.to, edge.weight);
+            break;
+          }
+        }
       }
     }
   }
-  for (auto it = graph2.cbegin(); it != graph2.cend(); ++it)
-  {
-    const SimpleArray< Edge > *edges2 = graph2.getEdges(it->first);
-    if (edges)
-    {
-      for (size_t i = 0; i < edges->size(); ++i)
-      {
-        const Edge &edge = (*edges)[i];
-        res.addEdge(edge.from, edge.to, edge.weight);
-      }
-    }
-  }
-  collection.addGraph(res);
+  collect.addGraph(res);
 }
