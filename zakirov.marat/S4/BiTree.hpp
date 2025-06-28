@@ -35,7 +35,7 @@ namespace zakirov
     CBiIter< K, T, C > cbegin() const noexcept;
     CBiIter< K, T, C > cend() const noexcept;
 
-    T size() const noexcept;
+    size_t size() const noexcept;
     bool empty() const noexcept;
 
     std::pair< BiIter< K, T, C >, bool > insert(const std::pair< K, T > & value);
@@ -163,20 +163,8 @@ namespace zakirov
   template < class K, class T, class C >
   BiIter< K, T, C > BiTree< K, T, C >::end() noexcept
   {
-    BiNode< K, T > * last = head_;
-    if (!last)
-    {
-      BiIter< K, T, C > res(last);
-      return res;
-    }
-
-    while (last->right_)
-    {
-      last = last->right_;
-    }
-
-    BiIter< K, T, C > res(last);
-    return res;
+    BiIter< K, T, C > it;
+    return it;
   }
 
   template < class K, class T, class C >
@@ -201,24 +189,12 @@ namespace zakirov
   template < class K, class T, class C >
   CBiIter< K, T, C > BiTree< K, T, C >::cend() const noexcept
   {
-    BiNode< K, T > * last = head_;
-    if (!last)
-    {
-      CBiIter< K, T, C > res(last);
-      return res;
-    }
-
-    while (last->right_)
-    {
-      last = last->right_;
-    }
-
-    CBiIter< K, T, C > res(last);
-    return res;
+    CBiIter< K, T, C > it;
+    return it;
   }
 
   template < class K, class T, class C >
-  T BiTree< K, T, C >::size() const noexcept
+  size_t BiTree< K, T, C >::size() const noexcept
   {
     return size_;
   }
@@ -249,15 +225,17 @@ namespace zakirov
     BiIter< K, T, C > result;
     if (cmp_(value.first, place.first.node_->value_.first))
     {
-      place.first.node_->left_ = new BiNode< K, T >(value);
-      place.first.node_->left_->parent_ = place.first.node_->left_;
-      result.node_ = place.first.node_->left_;
+      BiNode< K, T > * inserter = new BiNode< K, T >(value);
+      place.first.node_->left_ = inserter;
+      inserter->parent_ = place.first.node_;
+      result.node_ = inserter;
     }
     else
     {
-      place.first.node_->right_ = new BiNode< K, T >(value);
-      place.first.node_->right_->parent_ = place.first.node_->right_;
-      result.node_ = place.first.node_->right_;
+      BiNode< K, T > * inserter = new BiNode< K, T >(value);
+      place.first.node_->right_ = inserter;
+      inserter->parent_ = place.first.node_;
+      result.node_ = inserter;
     }
 
     ++size_;
@@ -305,8 +283,8 @@ namespace zakirov
   {
     BiNode< K, T > * to_deleted = pos.node_;
     BiNode< K, T > * next = pos.node_;
-    BiNode< K, T > * child;
-    detail::next_node(next);
+    BiNode< K, T > * child(nullptr);
+    next = detail::next_node(next);
     if (!to_deleted)
     {
       return pos;
@@ -314,13 +292,21 @@ namespace zakirov
 
     if (!to_deleted->left_ && !to_deleted->right_)
     {
-      if (to_deleted->parent_->left_ == to_deleted)
+      if (to_deleted->parent_)
       {
-        to_deleted->parent_->left_ = nullptr;
+        if (to_deleted->parent_->left_ == to_deleted)
+        {
+          to_deleted->parent_->left_ = nullptr;
+        }
+        else
+        {
+          to_deleted->parent_->right_ = nullptr;
+        }
       }
-      else
+
+      if (to_deleted == head_)
       {
-        to_deleted->parent_->right_ = nullptr;
+        head_ = child;
       }
 
       delete to_deleted;
@@ -341,10 +327,14 @@ namespace zakirov
         {
           to_deleted->parent_->right_ = child;
         }
-      }
 
-      child->parent_ = to_deleted->parent_;
-      to_deleted->parent_->right_ = child;
+        child->parent_ = to_deleted->parent_;
+        to_deleted->parent_->right_ = child;
+      }
+      else
+      {
+        child->parent_ = nullptr;
+      }
     }
     else if (!to_deleted->right_)
     {
@@ -359,10 +349,14 @@ namespace zakirov
         {
           to_deleted->parent_->right_ = child;
         }
-      }
 
-      child->parent_ = to_deleted->parent_;
-      to_deleted->parent_->left_ = child;
+        child->parent_ = to_deleted->parent_;
+        to_deleted->parent_->left_ = child;
+      }
+      else
+      {
+        child->parent_ = nullptr;
+      }
     }
     else
     {
@@ -386,7 +380,6 @@ namespace zakirov
 
       child->left_ = to_deleted->left_;
       to_deleted->left_->parent_ = child;
-      child->parent_ = to_deleted->parent_;
       if (to_deleted->parent_)
       {
         if (to_deleted->parent_->left_ == to_deleted)
@@ -398,9 +391,13 @@ namespace zakirov
           to_deleted->parent_->right_ = child;
         }
       }
+      else
+      {
+        child->parent_ = nullptr;
+      }
     }
 
-    if (to_deleted == head_)
+    if (cmp_(to_deleted->value_.first, head_->value_.first))
     {
       head_ = child;
     }
@@ -414,123 +411,14 @@ namespace zakirov
   template < class K, class T, class C >
   BiIter< K, T, C > BiTree< K, T, C >::erase(CBiIter< K, T, C > pos) noexcept
   {
-    BiNode< K, T > * to_deleted = pos.node_;
-    BiNode< K, T > * next = pos.node_;
-    BiNode< K, T > * child;
-    detail::next_node(next);
-    if (!to_deleted)
-    {
-      return pos;
-    }
-
-    if (!to_deleted->left_ && !to_deleted->right_)
-    {
-      if (to_deleted->parent_->left == to_deleted)
-      {
-        to_deleted->parent_->left = nullptr;
-      }
-      else
-      {
-        to_deleted->parent_->right = nullptr;
-      }
-
-      delete to_deleted;
-      --size_;
-      BiIter< K, T, C > res(next);
-      return res;
-    }
-    else if (!to_deleted->left_)
-    {
-      child = to_deleted->right_;
-      if (to_deleted->parent_)
-      {
-        if (to_deleted->parent_->left_ == to_deleted)
-        {
-          to_deleted->parent_->left_ = child;
-        }
-        else
-        {
-          to_deleted->parent_->right_ = child;
-        }
-      }
-
-      child->parent_ = to_deleted->parent_;
-      to_deleted->parent_->right_ = child;
-    }
-    else if (!to_deleted->right_)
-    {
-      child = to_deleted->left_;
-      if (to_deleted->parent_)
-      {
-        if (to_deleted->parent_->left_ == to_deleted)
-        {
-          to_deleted->parent_->left_ = child;
-        }
-        else
-        {
-          to_deleted->parent_->right_ = child;
-        }
-      }
-
-      child->parent_ = to_deleted->parent_;
-      to_deleted->parent_->left_ = child;
-    }
-    else
-    {
-      child = to_deleted->right_;
-      while (child->left_)
-      {
-        child = child->left_;
-      }
-
-      if (child != to_deleted->right_)
-      {
-        child->parent_->left_ = child->right_;
-        if (child->right_)
-        {
-          child->right_->parent_ = child->parent_;
-        }
-
-        child->right_ = to_deleted->right_;
-        to_deleted->right_->parent_ = child;
-      }
-
-      child->left_ = to_deleted->left_;
-      to_deleted->left_->parent_ = child;
-      child->parent_ = to_deleted->parent_;
-      if (to_deleted->parent_)
-      {
-        if (to_deleted->parent_->left_ == to_deleted)
-        {
-          to_deleted->parent_->left_ = child;
-        }
-        else
-        {
-          to_deleted->parent_->right_ = child;
-        }
-      }
-    }
-
-    if (to_deleted == head_)
-    {
-      head_ = child;
-    }
-
-    delete to_deleted;
-    --size_;
-    BiIter< K, T, C > res(next);
-    return res;
+    BiIter< K, T, C > it(pos.node_);
+    return erase(it);
   }
 
   template < class K, class T, class C >
   size_t BiTree< K, T, C >::erase(const K & key) noexcept
   {
     BiIter< K, T, C > it = find(key);
-    if (it == end())
-    {
-      return 0;
-    }
-
     erase(it);
     return 1;
   }
@@ -630,7 +518,7 @@ namespace zakirov
   template < class K, class T, class C >
   T BiTree< K, T, C >::count (const K & k) const
   {
-    if (find(k) != end())
+    if (find(k) != nullptr)
     {
       return 1;
     }
@@ -657,24 +545,24 @@ namespace zakirov
     {
       if (pos->right_)
       {
-        find_place(k, pos->right_);
+        return find_place(k, pos->right_);
       }
 
-      BiIter<K, T, C> res(pos);
+      BiIter< K, T, C > res(pos);
       return std::make_pair(res, true);
     }
     else if (cmp_(k, pos->value_.first))
     {
       if (pos->left_)
       {
-        find_place(k, pos->left_);
+        return find_place(k, pos->left_);
       }
 
-      BiIter<K, T, C> res(pos);
+      BiIter< K, T, C > res(pos);
       return std::make_pair(res, true);
     }
 
-    BiIter<K, T, C> res(pos);
+    BiIter< K, T, C > res(pos);
     return std::make_pair(res, false);
   }
 

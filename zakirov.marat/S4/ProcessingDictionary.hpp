@@ -1,10 +1,10 @@
 #ifndef PROCESSINGDICTIONARY_HPP
 #define PROCESSINGDICTIONARY_HPP
 #include <iostream>
-#include <map>
 #include <string>
 #include <list>
 #include <limits>
+#include <map>
 
 namespace zakirov
 {

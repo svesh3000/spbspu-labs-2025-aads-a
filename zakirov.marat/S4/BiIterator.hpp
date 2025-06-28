@@ -168,19 +168,19 @@ namespace zakirov
   template< class K, class T, class C >
   bool BiIter< K, T, C >::operator==(const BiIter< K, T, C > & other) const noexcept
   {
-    return node_ != other.node_;
+    return node_ == other.node_;
   }
 
   template< class K, class T, class C >
   void BiIter< K, T, C >::next_node()
   {
-    detail::next_node(node_);
+    node_ = detail::next_node(node_);
   }
 
   template< class K, class T, class C >
   void BiIter< K, T, C >::prev_node()
   {
-    detail::prev_node(node_);
+    node_ = detail::prev_node(node_);
   }
 
   template< class K, class T, class C >
@@ -273,13 +273,13 @@ namespace zakirov
   template< class K, class T, class C >
   void CBiIter< K, T, C >::next_node()
   {
-    detail::next_node(node_);
+    node_ = detail::next_node(node_);
   }
 
   template< class K, class T, class C >
   void CBiIter< K, T, C >::prev_node()
   {
-    detail::prev_node(node_);
+    node_ = detail::prev_node(node_);
   }
 }
 

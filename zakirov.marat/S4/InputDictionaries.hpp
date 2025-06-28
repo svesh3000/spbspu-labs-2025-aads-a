@@ -2,8 +2,8 @@
 #define INPUTDICTIONARIES_HPP
 #include <istream>
 #include <list>
-#include <map>
 #include <string>
+#include <map>
 
 namespace zakirov
 {
