@@ -198,9 +198,10 @@ void finaev::extract(std::istream& in, graphsTree& graphs)
   graphs[newGraph] = gr;
 }
 
-finaev::AVLtree< std::string, std::function< void() > > finaev::createCommandsHandler(std::istream& in, std::ostream& out, graphsTree& graphs)
+using cmdMap = finaev::AVLtree< std::string, std::function< void() > >;
+cmdMap finaev::createCommandsHandler(std::istream& in, std::ostream& out, graphsTree& graphs)
 {
-  finaev::AVLtree< std::string, std::function< void() > > commands;
+  cmdMap commands;
   commands["graphs"] = std::bind(printGraphs, std::ref(out), std::cref(graphs));
   commands["vertexes"] = std::bind(vertexes, std::ref(in), std::ref(out), std::cref(graphs));
   commands["outbound"] = std::bind(outBound, std::ref(in), std::ref(out), std::cref(graphs));

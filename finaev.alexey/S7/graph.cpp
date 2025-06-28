@@ -52,7 +52,7 @@ finaev::AVLtree< std::string, bool > finaev::Graph::getVertexes() const
   return vertexes_;
 }
 
-std::unordered_map< std::pair< std::string, std::string >, finaev::AVLtree< size_t, size_t >, finaev::HashForPair  > finaev::Graph::getEdges() const
+typename finaev::Graph::hashMapForEdges finaev::Graph::getEdges() const
 {
   return edges_;
 }

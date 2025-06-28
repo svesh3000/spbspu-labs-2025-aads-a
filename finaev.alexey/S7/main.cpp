@@ -4,7 +4,7 @@
 #include "graph.hpp"
 #include "commands.hpp"
 
-namespacestd::string cmd;
+namespace
 {
   void inputGraphs(std::istream& in, finaev::AVLtree< std::string, finaev::Graph >& graphs)
   {
