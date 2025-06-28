@@ -9,6 +9,8 @@
 
 #include "iterator.hpp"
 #include "constIterator.hpp"
+#include "stack.hpp"
+#include "queue.hpp"
 
 namespace dribas
 {
@@ -91,14 +93,14 @@ namespace dribas
     const T& at(const Key&) const;
     T& operator[](const Key&);
 
-    std::pair< iterator, bool > insert(const std::pair< Key, T >& val);
-    std::pair< iterator, bool > insert(std::pair< Key, T >&& val);
+    std::pair< iterator, bool > insert(const std::pair< Key, T >&);
+    std::pair< iterator, bool > insert(std::pair< Key, T >&&);
     template< class InputIterator >
-    void insert(InputIterator first, InputIterator last);
-    void insert (std::initializer_list< std::pair< Key, T > > il);
-    iterator  erase (const_iterator position);
-    size_t erase (const Key& k);
-    iterator  erase (const_iterator first, const_iterator last);
+    void insert(InputIterator, InputIterator);
+    void insert (std::initializer_list< std::pair< Key, T > >);
+    iterator  erase(const_iterator);
+    size_t erase(const Key&);
+    iterator  erase(const_iterator, const_iterator);
 
     iterator begin() noexcept;
     const_iterator begin() const noexcept;
@@ -108,16 +110,16 @@ namespace dribas
     const_iterator cend() const noexcept;
 
     template< class... Args >
-    std::pair< iterator, bool > emplace(Args&&... args);
+    std::pair< iterator, bool > emplace(Args&&...);
     template< class... Args >
-    iterator emplace_hint(const_iterator hint, Args&&... args);
+    iterator emplace_hint(const_iterator, Args&&...);
 
-    std::pair< const_iterator, const_iterator > equal_range (const Key& k)const;
-    std::pair< iterator, iterator > equal_range (const Key& k);
-    iterator upper_bound (const Key& k);
-    const_iterator upper_bound (const Key& k) const;
-    iterator lower_bound(const Key& key);
-    const_iterator lower_bound(const Key& key) const;
+    std::pair< const_iterator, const_iterator > equal_range (const Key&)const;
+    std::pair< iterator, iterator > equal_range (const Key&);
+    iterator upper_bound (const Key&);
+    const_iterator upper_bound (const Key&) const;
+    iterator lower_bound(const Key&);
+    const_iterator lower_bound(const Key&) const;
 
     void swap(AVLTree&) noexcept;
     void clear() noexcept;
@@ -125,7 +127,20 @@ namespace dribas
     size_t size() const noexcept;
     iterator find(const Key&);
     const_iterator find(const Key&) const;
-    size_t count(const Key& k) const;
+    size_t count(const Key&) const;
+
+    template< class F >
+    F traverse_lnr(F) const;
+    template< class F >
+    F traverse_rnl(F) const;
+    template< class F >
+    F traverse_breadth(F) const;
+    template< class F >
+    F traverse_lnr(F);
+    template< class F >
+    F traverse_rnl(F);
+    template< class F >
+    F traverse_breadth(F);
 
   private:
     NodeType* fakeleaf_;
@@ -143,6 +158,95 @@ namespace dribas
     NodeType* removeNode(NodeType*, const Key&);
     NodeType* findMin(NodeType*);
   };
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_lnr(F f) const
+  {
+    return const_cast< AVLTree* >(this)->traverse_lnr(f);
+  }
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_rnl(F f) const
+  {
+    return const_cast< AVLTree* >(this)->traverse_rnl(f);
+  }
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_breadth(F f) const
+  {
+    return const_cast< AVLTree* >(this)->traverse_breadth(f);
+  }
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_lnr(F f)
+  {
+    if (root_ == fakeleaf_) {
+      return f;
+    }
+    Stack< NodeType* > stack;
+    NodeType* current = root_;
+    while (current != fakeleaf_ || !stack.empty()) {
+      while (current != fakeleaf_) {
+        stack.push(current);
+        current = current->left;
+      }
+      current = stack.top();
+      stack.pop();
+      f(current->value);
+      current = current->right;
+    }
+
+    return f;
+  }
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_rnl(F f)
+  {
+    if (root_ == fakeleaf_) {
+      return f;
+    }
+    Stack< NodeType* > stack;
+    NodeType* current = root_;
+    while (current != fakeleaf_ || !stack.empty()) {
+      while (current != fakeleaf_) {
+        stack.push(current);
+        current = current->right;
+      }
+      current = stack.top();
+      stack.pop();
+      f(current->value);
+      current = current->left;
+    }
+    return f;
+  }
+
+  template< class Key, class T, class Cmp >
+  template< typename F >
+  F AVLTree< Key, T, Cmp >::traverse_breadth(F f)
+  {
+    if (root_ == fakeleaf_) {
+      return f;
+    }
+    Queue< NodeType* > queue;
+    queue.push(root_);
+    while (!queue.empty()) {
+      NodeType* current = queue.front();
+      queue.pop();
+      f(current->value);
+      if (current->left != fakeleaf_) {
+        queue.push(current->left);
+      }
+      if (current->right != fakeleaf_) {
+        queue.push(current->right);
+      }
+    }
+    return f;
+  }
 
   template< class Key, class T, class Compare >
   template< class... Args >
