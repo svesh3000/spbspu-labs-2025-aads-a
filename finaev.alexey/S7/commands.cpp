@@ -74,11 +74,11 @@ void finaev::inBound(std::istream& in, std::ostream& out, const graphsTree& grap
   std::string name, vert;
   in >> name >> vert;
   Graph gr = graphs.at(name);
-  if (!gr.hasVert(name))
+  if (!gr.hasVert(vert))
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  AVLtree< std::string, AVLtree< size_t, size_t > > vertTree  = gr.getInBound(name);
+  AVLtree< std::string, AVLtree< size_t, size_t > > vertTree  = gr.getInBound(vert);
   if (vertTree.empty())
   {
     out << "\n";
@@ -121,7 +121,10 @@ void finaev::cut(std::istream& in, graphsTree& graphs)
   {
     throw std::invalid_argument("<INVALID ARGUMENT>");
   }
-  graphs.at(name).removeEdge(vert1, vert2, weight);
+  if (!graphs.at(name).removeEdge(vert1, vert2, weight))
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
 }
 
 void finaev::create(std::istream& in, graphsTree& graphs)
