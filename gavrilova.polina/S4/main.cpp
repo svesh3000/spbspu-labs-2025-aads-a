@@ -3,15 +3,15 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <tree/TwoThreeTree.hpp>
 #include "commands.hpp"
 
 namespace {
-
   void loadDatasetsFromFile(const std::string& filename, gavrilova::Dataset& datasets)
   {
     std::ifstream file(filename);
     if (!file) {
-      throw std::runtime_error("Failed to open file: " + filename);
+      throw std::runtime_error("Failed to open file");
     }
 
     std::string datasetName;
@@ -21,7 +21,7 @@ namespace {
       while (file >> key) {
         std::string value;
         if (!(file >> value)) {
-          throw std::runtime_error("Invalid data format in file");
+          throw std::runtime_error("Invalid data format");
         }
         dataset.insert({key, value});
       }
@@ -30,29 +30,37 @@ namespace {
     }
   }
 
-  void processCommand(const std::string& command, gavrilova::Dataset& datasets)
+  void handlePrint(gavrilova::Dataset& datasets,
+      std::istream& in, std::ostream& out)
   {
-    if (command == "print") {
-      std::string datasetName;
-      std::cin >> datasetName;
-      gavrilova::printDataset(std::cout, datasetName, datasets);
-    } else if (command == "complement") {
-      std::string newName, firstName, secondName;
-      std::cin >> newName >> firstName >> secondName;
-      gavrilova::complementDataset(newName, firstName, secondName, datasets);
-    } else if (command == "intersect") {
-      std::string newName, firstName, secondName;
-      std::cin >> newName >> firstName >> secondName;
-      gavrilova::intersectDatasets(newName, firstName, secondName, datasets);
-    } else if (command == "union") {
-      std::string newName, firstName, secondName;
-      std::cin >> newName >> firstName >> secondName;
-      gavrilova::unionDatasets(newName, firstName, secondName, datasets);
-    } else {
-      throw std::invalid_argument("Unknown command: " + command);
-    }
+    std::string datasetName;
+    in >> datasetName;
+    gavrilova::printDataset(out, datasetName, datasets);
   }
 
+  void handleComplement(gavrilova::Dataset& datasets,
+      std::istream& in, std::ostream&)
+  {
+    std::string newName, firstName, secondName;
+    in >> newName >> firstName >> secondName;
+    gavrilova::complementDataset(newName, firstName, secondName, datasets);
+  }
+
+  void handleIntersect(gavrilova::Dataset& datasets,
+      std::istream& in, std::ostream&)
+  {
+    std::string newName, firstName, secondName;
+    in >> newName >> firstName >> secondName;
+    gavrilova::intersectDatasets(newName, firstName, secondName, datasets);
+  }
+
+  void handleUnion(gavrilova::Dataset& datasets,
+      std::istream& in, std::ostream&)
+  {
+    std::string newName, firstName, secondName;
+    in >> newName >> firstName >> secondName;
+    gavrilova::unionDatasets(newName, firstName, secondName, datasets);
+  }
 }
 
 int main(int argc, char* argv[])
@@ -67,12 +75,29 @@ int main(int argc, char* argv[])
     loadDatasetsFromFile(argv[1], datasets);
   } catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n";
+    return 1;
   }
+
+  using namespace std::placeholders;
+  gavrilova::TwoThreeTree< std::string, std::function< void(gavrilova::Dataset&) > > commands;
+
+  commands.insert({"print",
+      std::bind(handlePrint, _1, std::ref(std::cin), std::ref(std::cout))});
+  commands.insert({"complement",
+      std::bind(handleComplement, _1, std::ref(std::cin), std::ref(std::cout))});
+  commands.insert({"intersect",
+      std::bind(handleIntersect, _1, std::ref(std::cin), std::ref(std::cout))});
+  commands.insert({"union",
+      std::bind(handleUnion, _1, std::ref(std::cin), std::ref(std::cout))});
 
   std::string command;
   while (std::cin >> command) {
     try {
-      processCommand(command, datasets);
+      auto it = commands.find(command);
+      if (it == commands.end()) {
+        throw std::invalid_argument("Unknown command");
+      }
+      it->second(datasets);
     } catch (const std::invalid_argument&) {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
@@ -81,5 +106,4 @@ int main(int argc, char* argv[])
       std::cerr << "Error: " << e.what() << "\n";
     }
   }
-
 }
