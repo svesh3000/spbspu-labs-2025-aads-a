@@ -22,7 +22,7 @@ namespace finaev
     AVLtree(const AVLtree& other);
     AVLtree(AVLtree&& other);
     AVLtree< Key, Value, Cmp >& operator=(const AVLtree& other);
-    AVLtree< Key, Value, Cmp>& operator=(AVLtree&& other) noexcept;
+    AVLtree< Key, Value, Cmp>& operator=(AVLtree&& other);
 
     iter begin() noexcept;
     iter end() noexcept;
@@ -89,11 +89,19 @@ namespace finaev
     cmp_(other.cmp_),
     size_(other.size_)
   {
-    fakeroot_->left = copyTree(other.fakeroot_->left);
-    root_ = fakeroot_->left;
-    if (root_)
+    try
     {
-      root_->parent = fakeroot_;
+      fakeroot_->left = copyTree(other.fakeroot_->left);
+      root_ = fakeroot_->left;
+      if (root_)
+      {
+        root_->parent = fakeroot_;
+      }
+    }
+    catch(...)
+    {
+      delete fakeroot_;
+      throw;
     }
   }
 
@@ -111,7 +119,7 @@ namespace finaev
   }
 
   template< class Key, class Value, class Cmp >
-  AVLtree< Key, Value, Cmp >& AVLtree< Key, Value, Cmp >::operator=(AVLtree&& other) noexcept
+  AVLtree< Key, Value, Cmp >& AVLtree< Key, Value, Cmp >::operator=(AVLtree&& other)
   {
     if (this == std::addressof(other))
     {
