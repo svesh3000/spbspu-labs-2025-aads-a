@@ -2,12 +2,12 @@
 #define SPBSPU_LABS_2025_TP_A_KIZHIN_EVGENIY_F0_FREQ_DICT_HPP
 
 #include <iosfwd>
-#include <map>
 #include <set>
 #include <string>
+#include <map.hpp>
 
 namespace kizhin {
-  using WordMap = std::map< std::string, std::size_t >;
+  using WordMap = Map< std::string, std::size_t >;
   using WordSet = std::set< std::string >;
   using WordAndSize = std::pair< const std::string, std::size_t >;
   struct SizeDescendingComp;

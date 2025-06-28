@@ -9,6 +9,7 @@
 #include <set>
 #include <sstream>
 #include <tuple>
+#include <map.hpp>
 #include "freq-dict.hpp"
 
 namespace kizhin {
@@ -28,7 +29,7 @@ kizhin::CommandProcessor::CommandProcessor(State& state, std::istream& in,
 
 void kizhin::CommandProcessor::processCommands()
 {
-  using CmdContainer = std::map< std::string, std::function< void(const CmdArgs&) > >;
+  using CmdContainer = Map< std::string, std::function< void(const CmdArgs&) > >;
   using std::placeholders::_1;
   static const CmdContainer commands = {
     { "ls", std::bind(&CommandProcessor::handleLs, this, _1) },
