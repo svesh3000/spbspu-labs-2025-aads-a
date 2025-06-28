@@ -1,7 +1,7 @@
 #include "graph.hpp"
 #include <algorithm>
 
-void finaev::Graph::addVertex(const std::string & str) 
+void finaev::Graph::addVertex(const std::string & str)
 {
   vertexes_.insert(std::make_pair(str, true));
 }
@@ -35,7 +35,7 @@ bool finaev::Graph::removeEdge(const std::string& first, const std::string& seco
     return false;
   }
   auto pos = it->second.find(weigth);
-  if (pos == it->second.end()) 
+  if (pos == it->second.end())
   {
     return false;
   }
