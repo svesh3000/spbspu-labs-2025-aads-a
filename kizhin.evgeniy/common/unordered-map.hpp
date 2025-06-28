@@ -16,7 +16,7 @@ namespace kizhin {
   public:
     using key_type = Key;
     using mapped_type = T;
-    using value_type = std::pair< Key, T >;
+    using value_type = std::pair< const Key, T >;
     using hasher = Hash;
     using key_equal = KeyEqual;
     using reference = value_type&;
@@ -102,7 +102,7 @@ namespace kizhin {
   template < typename K, typename T, typename H, typename E >
   struct UnorderedMap< K, T, H, E >::Node
   {
-    value_type value{};
+    alignas(value_type) char value[sizeof(value_type)];
     enum {
       empty,
       occupied,
@@ -192,7 +192,7 @@ namespace kizhin {
   {
     assert(node_ && "Dereferencing empty iterator");
     assert(node_ != end_ && "Dereferencing end iterator");
-    return node_->value;
+    return *reinterpret_cast< pointer >(node_->value);
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -351,7 +351,8 @@ namespace kizhin {
     Node* curr = begin_ + hashFunc()(key) % capacity;
     const Node* const stop = curr == begin_ ? end_ : curr - 1;
     while (curr != stop) {
-      if (curr->state == Node::occupied && keyEq()(curr->value.first, key)) {
+      const bool isOcc = curr->state == Node::occupied;
+      if (isOcc && keyEq()(reinterpret_cast< const_pointer >(curr->value)->first, key)) {
         return const_iterator{ curr, end_ };
       }
       ++curr;
@@ -380,7 +381,8 @@ namespace kizhin {
     Node* curr = begin_ + hashFunc()(value.first) % capacity;
     Node* firstDeleted = nullptr;
     while (curr->state != Node::empty) {
-      if (curr->state == Node::occupied && keyEq()(curr->value.first, value.first)) {
+      pointer currVal = reinterpret_cast< pointer >(curr->value);
+      if (curr->state == Node::occupied && keyEq()(currVal->first, value.first)) {
         return std::make_pair(iterator{ curr, end_ }, false);
       }
       if (curr->state == Node::deleted && !firstDeleted) {
@@ -390,7 +392,7 @@ namespace kizhin {
       curr = curr == end_ ? begin_ : curr;
     }
     curr = firstDeleted ? firstDeleted : curr;
-    curr->value = std::move(value);
+    new (reinterpret_cast< pointer >(curr->value)) value_type(std::move(value));
     curr->state = Node::occupied;
     ++size_;
     return std::make_pair(iterator{ curr, end_ }, true);
@@ -454,6 +456,7 @@ namespace kizhin {
   {
     assert(position != end() && "UnorderedMap: cannot erase element past the end");
     position.node_->state = Node::deleted;
+    (reinterpret_cast< pointer >(position.node_->value))->~value_type();
     ++position;
     --size_;
     return iterator{ position.node_, position.end_ };
