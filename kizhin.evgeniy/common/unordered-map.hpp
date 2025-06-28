@@ -109,7 +109,7 @@ namespace kizhin {
     using difference_type = std::ptrdiff_t;
     using pointer = cond_t< UnorderedMap::const_pointer, UnorderedMap::pointer >;
     using reference = cond_t< UnorderedMap::const_reference, UnorderedMap::reference >;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = std::forward_iterator_tag;
 
     Iterator() noexcept = default;
     template < bool RhsConst, std::enable_if_t< IsConst && !RhsConst, int > = 0 >
@@ -346,7 +346,7 @@ namespace kizhin {
   typename UnorderedMap< K, T, H, E >::size_type UnorderedMap< K, T, H, E >::count(
       const key_type& key) const
   {
-    return static_cast< size_type >(find(key) == end());
+    return static_cast< size_type >(find(key) != end());
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -390,6 +390,7 @@ namespace kizhin {
   {
     position.node_->state = Node::deleted;
     ++position;
+    --size_;
     return iterator{ position.node_, position.end_ };
   }
 
@@ -443,6 +444,24 @@ namespace kizhin {
   {
     lhs.swap(rhs);
   }
+
+  template < typename K, typename T, typename H, typename E >
+  bool operator==(const UnorderedMap< K, T, H, E >& lhs,
+      const UnorderedMap< K, T, H, E >& rhs)
+  {
+    if (lhs.size() != rhs.size()) {
+      return false;
+    }
+    return std::is_permutation(lhs.begin(), lhs.end(), rhs.begin() /*, lhs.keyEq()*/);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  bool operator!=(const UnorderedMap< K, T, H, E >& lhs,
+      const UnorderedMap< K, T, H, E >& rhs)
+  {
+    return !(lhs == rhs);
+  }
 }
 
 #endif
+
