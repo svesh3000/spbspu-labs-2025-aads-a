@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <stdexcept>
 #include <utility>
@@ -67,6 +68,11 @@ namespace kizhin {
     void clear() noexcept;
     void swap(UnorderedMap&) noexcept;
 
+    size_type bucketCount() const noexcept;
+
+    float loadFactor() const noexcept;
+    float maxLoadFactor() const;
+    void maxLoadFactor(float);
     void rehash(size_type);
     void reserve(size_type);
 
@@ -76,13 +82,10 @@ namespace kizhin {
   private:
     struct Node;
 
-    constexpr static const double maxLoadFactor = 0.75;
-
     Node* begin_ = nullptr;
+    Node* end_ = nullptr;
     size_type size_ = 0;
-    size_type capacity_ = 0;
-
-    void resize(size_type);
+    float maxLoadFact_ = 1.0;
   };
 
   template < typename K, typename T, typename H, typename E >
@@ -210,8 +213,9 @@ namespace kizhin {
   template < typename K, typename T, typename H, typename E >
   UnorderedMap< K, T, H, E >::UnorderedMap(UnorderedMap&& rhs) noexcept:
     begin_(std::exchange(rhs.begin_, nullptr)),
+    end_(std::exchange(rhs.end_, nullptr)),
     size_(std::exchange(rhs.size_, 0)),
-    capacity_(std::exchange(rhs.capacity_, 0))
+    maxLoadFact_(rhs.maxLoadFact_)
   {}
 
   template < typename K, typename T, typename H, typename E >
@@ -265,27 +269,27 @@ namespace kizhin {
   typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H,
       E >::begin() noexcept
   {
-    return iterator{ begin_, begin_ + capacity_ };
+    return iterator{ begin_, end_ };
   }
 
   template < typename K, typename T, typename H, typename E >
   typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::end() noexcept
   {
-    return iterator{ begin_ + capacity_, begin_ + capacity_ };
+    return iterator{ end_, end_ };
   }
 
   template < typename K, typename T, typename H, typename E >
   typename UnorderedMap< K, T, H, E >::const_iterator UnorderedMap< K, T, H, E >::begin()
       const noexcept
   {
-    return const_iterator{ begin_, begin_ + capacity_ };
+    return const_iterator{ begin_, end_ };
   }
 
   template < typename K, typename T, typename H, typename E >
   typename UnorderedMap< K, T, H, E >::const_iterator UnorderedMap< K, T, H, E >::end()
       const noexcept
   {
-    return const_iterator{ begin_ + capacity_, begin_ + capacity_ };
+    return const_iterator{ end_, end_ };
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -330,14 +334,15 @@ namespace kizhin {
     if (empty()) {
       return end();
     }
-    Node* curr = begin_ + hashFunc()(key) % capacity_;
-    const Node* const stop = curr == begin_ ? begin_ + capacity_ : curr - 1;
+    const size_type capacity = bucketCount();
+    Node* curr = begin_ + hashFunc()(key) % capacity;
+    const Node* const stop = curr == begin_ ? end_ : curr - 1;
     while (curr != stop) {
       if (curr->state == Node::occupied && keyEq()(curr->value.first, key)) {
-        return const_iterator{ curr, begin_ + capacity_ };
+        return const_iterator{ curr, end_ };
       }
-      const size_type nextIndex = (curr - begin_ + 1) % capacity_;
-      curr = begin_ + nextIndex;
+      ++curr;
+      curr = curr == end_ ? begin_ : curr;
     }
     return end();
   }
@@ -353,26 +358,27 @@ namespace kizhin {
   std::pair< typename UnorderedMap< K, T, H, E >::iterator, bool > UnorderedMap< K, T, H,
       E >::insert(const value_type& value)
   {
-    if (size() + 1 > static_cast< size_type >(capacity_ * maxLoadFactor)) {
-      resize(capacity_ + std::max(capacity_, 4ul));
+    if (loadFactor() >= maxLoadFactor()) {
+      rehash(std::max< size_type >(bucketCount() * 2, 4));
     }
-    Node* curr = begin_ + hashFunc()(value.first) % capacity_;
+    const size_type capacity = bucketCount();
+    Node* curr = begin_ + hashFunc()(value.first) % capacity;
     Node* firstDeleted = nullptr;
     while (curr->state != Node::empty) {
       if (curr->state == Node::occupied && keyEq()(curr->value.first, value.first)) {
-        return std::make_pair(iterator{ curr, begin_ + capacity_ }, false);
+        return std::make_pair(iterator{ curr, end_ }, false);
       }
       if (curr->state == Node::deleted && !firstDeleted) {
         firstDeleted = curr;
       }
-      const size_type nextIndex = (curr - begin_ + 1) % capacity_;
-      curr = begin_ + nextIndex;
+      ++curr;
+      curr = curr == end_ ? begin_ : curr;
     }
     curr = firstDeleted ? firstDeleted : curr;
     curr->value = value;
     curr->state = Node::occupied;
     ++size_;
-    return std::make_pair(iterator{ curr, begin_ + capacity_ }, true);
+    return std::make_pair(iterator{ curr, end_ }, true);
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -398,8 +404,8 @@ namespace kizhin {
   void UnorderedMap< K, T, H, E >::clear() noexcept
   {
     delete[] std::exchange(begin_, nullptr);
+    end_ = nullptr;
     size_ = 0;
-    capacity_ = 0;
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -407,8 +413,59 @@ namespace kizhin {
   {
     using std::swap;
     swap(begin_, rhs.begin_);
+    swap(end_, rhs.end_);
     swap(size_, rhs.size_);
-    swap(capacity_, rhs.capacity_);
+    swap(maxLoadFact_, rhs.maxLoadFact_);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  typename UnorderedMap< K, T, H, E >::size_type UnorderedMap< K, T, H, E >::bucketCount()
+      const noexcept
+  {
+    return end_ - begin_;
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  float UnorderedMap< K, T, H, E >::loadFactor() const noexcept
+  {
+    return empty() ? maxLoadFact_ : static_cast< float >(size()) / bucketCount();
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  float UnorderedMap< K, T, H, E >::maxLoadFactor() const
+  {
+    return maxLoadFact_;
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  void UnorderedMap< K, T, H, E >::maxLoadFactor(const float maxLoadFact)
+  {
+    assert(maxLoadFact > 0.001f && "UnorderedMap: maxLoadFact must be grater than zero");
+    maxLoadFact_ = maxLoadFact;
+    if (loadFactor() > maxLoadFact_) {
+      rehash(bucketCount() * 2);
+    }
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  void UnorderedMap< K, T, H, E >::rehash(const size_type newBucketCount)
+  {
+    if (newBucketCount < bucketCount()) {
+      return;
+    }
+    UnorderedMap resized{};
+    resized.begin_ = new Node[newBucketCount];
+    resized.end_ = resized.begin_ + newBucketCount;
+    resized.insert(begin(), end());
+    swap(resized);
+    std::swap(maxLoadFact_, resized.maxLoadFact_);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  void UnorderedMap< K, T, H, E >::reserve(const size_type buckets)
+  {
+    const size_type requiredBuckets = std::ceil(buckets / maxLoadFactor());
+    rehash(requiredBuckets);
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -421,21 +478,6 @@ namespace kizhin {
   typename UnorderedMap< K, T, H, E >::key_equal UnorderedMap< K, T, H, E >::keyEq() const
   {
     return key_equal{};
-  }
-
-  template < typename K, typename T, typename H, typename E >
-  void UnorderedMap< K, T, H, E >::resize(const size_type newSize)
-  {
-    if (newSize < capacity_) {
-      return;
-    }
-    UnorderedMap resized{};
-    resized.begin_ = new Node[newSize];
-    resized.capacity_ = newSize;
-    for (const_reference value: *this) {
-      resized.insert(value);
-    }
-    swap(resized);
   }
 
   template < typename K, typename T, typename H, typename E >
