@@ -1,7 +1,7 @@
 #include "main_processor.hpp"
 
 #include <fstream>
-#include <algorithm>
+#include <algorithm.hpp>
 #include "print_content.hpp"
 
 void rychkov::MainProcessor::help(std::ostream& out)
@@ -39,7 +39,7 @@ bool rychkov::MainProcessor::tree(ParserContext& context)
   {
     return false;
   }
-  std::for_each(parser.begin(), parser.end(), ContentPrinter{context.out});
+  for_each(parser.begin(), parser.end(), ContentPrinter{context.out});
   return true;
 }
 bool rychkov::MainProcessor::external(ParserContext& context)
@@ -119,8 +119,8 @@ bool rychkov::MainProcessor::defines(ParserContext& context)
   }
   ContentPrinter printer(context.out, 1);
   context.out << "<actual>:\n";
-  std::for_each(preproc.macros.begin(), preproc.macros.end(), printer);
+  for_each(preproc.macros.begin(), preproc.macros.end(), printer);
   context.out << "<legacy>:\n";
-  std::for_each(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), printer);
+  for_each(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), printer);
   return true;
 }

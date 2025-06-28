@@ -1,7 +1,6 @@
 #include "cparser.hpp"
 
 #include <iostream>
-#include <algorithm>
 #include <utility>
 #include <map.hpp>
 #include "print_content.hpp"
@@ -29,6 +28,12 @@ const rychkov::TypeParser& rychkov::CParser::next() const
 void rychkov::CParser::prepare_type()
 {
   type_parser_.prepare();
+}
+void rychkov::CParser::prepare_to_rewrite()
+{
+  program_.clear();
+  stack_ = {};
+  type_parser_.clear();
 }
 void rychkov::CParser::clear_program()
 {

@@ -5,6 +5,7 @@
 #include <utility>
 #include <stdexcept>
 #include <algorithm>
+#include <algorithm.hpp>
 
 using namespace std::literals::string_literals;
 
@@ -83,7 +84,7 @@ bool rychkov::MainProcessor::init(ParserContext& context, int argc, char** argv)
   }
 
   std::sort(files.begin(), files.end());
-  files.erase(std::unique(files.begin(), files.end()), files.end());
+  files.erase(rychkov::unique(files.begin(), files.end()), files.end());
 
   std::string ext = (last_stage_ == PREPROCESSOR ? ".i" : (last_stage_ == LEXER ? ".lex" : ".json"));
   for (const std::string& filename: files)

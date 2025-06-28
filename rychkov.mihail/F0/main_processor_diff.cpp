@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <utility>
+#include <algorithm.hpp>
 #include <map.hpp>
 #include "compare.hpp"
 #include "print_content.hpp"
@@ -26,9 +26,9 @@ namespace rychkov
       }
       const Preprocessor& preproc = cell.second.preproc;
       const CParser& parser = *preproc.next->next;
-      *this = std::for_each(parser.begin(), parser.end(), std::move(*this));
-      *this = std::for_each(preproc.macros.begin(), preproc.macros.end(), std::move(*this));
-      *this = std::for_each(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), std::move(*this));
+      *this = for_each(parser.begin(), parser.end(), std::move(*this));
+      *this = for_each(preproc.macros.begin(), preproc.macros.end(), std::move(*this));
+      *this = for_each(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), std::move(*this));
     }
     void operator()(const entities::Expression& expr)
     {
@@ -104,7 +104,7 @@ bool rychkov::MainProcessor::intersections(ParserContext& context)
   {
     return false;
   }
-  DiffVisitor visitor = std::for_each(parsed_.begin(), parsed_.end(), DiffVisitor{});
+  DiffVisitor visitor = for_each(parsed_.begin(), parsed_.end(), DiffVisitor{});
   bool empty = true;
   for (const decltype(visitor.appearances)::value_type& list: visitor.appearances)
   {
@@ -112,7 +112,7 @@ bool rychkov::MainProcessor::intersections(ParserContext& context)
     {
       empty = false;
       ContentPrinter{context.out, 0}(list.first);
-      std::for_each(list.second.begin(), list.second.end(), ContentPrinter{context.out, 1});
+      for_each(list.second.begin(), list.second.end(), ContentPrinter{context.out, 1});
     }
   }
   for (const decltype(visitor.macros)::value_type& list: visitor.macros)
@@ -121,7 +121,7 @@ bool rychkov::MainProcessor::intersections(ParserContext& context)
     {
       empty = false;
       ContentPrinter{context.out, 0}(list.first);
-      std::for_each(list.second.begin(), list.second.end(), ContentPrinter{context.out, 1});
+      for_each(list.second.begin(), list.second.end(), ContentPrinter{context.out, 1});
     }
   }
   if (empty)
@@ -143,7 +143,7 @@ bool rychkov::MainProcessor::diff(ParserContext& context)
     context.in >> name;
     files.insert(name);
   }
-  DiffVisitor visitor = std::for_each(parsed_.begin(), parsed_.end(), DiffVisitor{std::move(files)});
+  DiffVisitor visitor = for_each(parsed_.begin(), parsed_.end(), DiffVisitor{std::move(files)});
   bool empty = true;
   using MacroIter = decltype(visitor.macros)::const_iterator;
   MacroIter i = visitor.macros.begin();
@@ -159,7 +159,7 @@ bool rychkov::MainProcessor::diff(ParserContext& context)
       {
         files_list.insert(i->second.begin(), i->second.end());
       }
-      std::for_each(files_list.begin(), files_list.end(), ContentPrinter{context.out, 1});
+      for_each(files_list.begin(), files_list.end(), ContentPrinter{context.out, 1});
     }
     else
     {
@@ -180,7 +180,7 @@ bool rychkov::MainProcessor::diff(ParserContext& context)
       {
         files_list.insert(j->second.begin(), j->second.end());
       }
-      std::for_each(files_list.begin(), files_list.end(), ContentPrinter{context.out, 1});
+      for_each(files_list.begin(), files_list.end(), ContentPrinter{context.out, 1});
     }
     else
     {

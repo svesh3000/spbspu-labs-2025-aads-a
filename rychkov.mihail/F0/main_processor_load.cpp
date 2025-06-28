@@ -7,6 +7,7 @@
 #include <utility>
 #include <stdexcept>
 #include <boost/json.hpp>
+#include <algorithm.hpp>
 
 namespace rychkov
 {
@@ -60,15 +61,16 @@ bool rychkov::MainProcessor::load(std::ostream& out, std::ostream& err, std::str
       const boost::json::object& obj = file.value().as_object();
 
       const boost::json::array& macros = obj.at("macros").as_array();
-      std::transform(macros.begin(), macros.end(),
+      rychkov::transform(macros.begin(), macros.end(),
             std::inserter(preproc.macros, preproc.macros.end()), Loader::as_macro);
       const boost::json::array& legacy = obj.at("old_macro").as_array();
-      std::transform(legacy.begin(), legacy.end(),
+      rychkov::transform(legacy.begin(), legacy.end(),
             std::inserter(preproc.legacy_macros, preproc.legacy_macros.end()), Loader::as_macro);
 
       const boost::json::array& pgm = obj.at("pgm").as_array();
       CParser& parser = *preproc.next->next;
-      Loader loader = std::for_each(pgm.begin(), pgm.end(), Loader{parser});
+      parser.prepare_to_rewrite();
+      Loader loader = for_each(pgm.begin(), pgm.end(), Loader{parser});
       cell_p.first->second.real_file = obj.at("real").as_bool();
       ngenerated += !cell_p.first->second.real_file;
       cell_p.first->second.cache = boost::json::value_to< std::string >(obj.at("cache"));
@@ -94,7 +96,7 @@ rychkov::Macro rychkov::Loader::as_macro(const boost::json::value& val)
         boost::json::value_to< std::string >(obj.at("body")), obj.at("fstyle").as_bool()};
   const boost::json::array& params = obj.at("params").as_array();
   result.parameters.reserve(params.size());
-  std::transform(params.begin(), params.end(), std::back_inserter(result.parameters),
+  rychkov::transform(params.begin(), params.end(), std::back_inserter(result.parameters),
         boost::json::value_to< std::string >);
   return result;
 }
@@ -246,7 +248,7 @@ rychkov::entities::Function rychkov::Loader::as_func(const boost::json::value& v
   entities::Function result{std::move(temp.type), std::move(temp.name)};
   const boost::json::array& params = obj.at("parameters").as_array();
   result.parameters.reserve(params.size());
-  std::transform(params.begin(), params.end(), std::back_inserter(result.parameters),
+  rychkov::transform(params.begin(), params.end(), std::back_inserter(result.parameters),
         static_cast< std::string(*)(const boost::json::value&) >(boost::json::value_to< std::string >));
   return result;
 }
@@ -400,6 +402,7 @@ rychkov::entities::Body rychkov::Loader::as_body(const boost::json::value& val)
 {
   const boost::json::array& data = val.as_array();
   entities::Body result;
+  result.data.resize(0);
   result.data.reserve(data.size());
   ++depth;
   for (const boost::json::value& expr: data)

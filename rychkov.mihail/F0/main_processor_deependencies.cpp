@@ -1,7 +1,7 @@
 #include "main_processor.hpp"
 
 #include <iostream>
-#include <algorithm>
+#include <algorithm.hpp>
 #include <set.hpp>
 #include <map.hpp>
 #include "compare.hpp"
@@ -49,7 +49,7 @@ bool rychkov::MainProcessor::dependencies(ParserContext& context)
   {
     return false;
   }
-  DependencyVisitor visitor = std::for_each(parser.begin(), parser.end(),
+  DependencyVisitor visitor = for_each(parser.begin(), parser.end(),
         DependencyVisitor{context.out, std::move(symbol)});
   if (!visitor.started)
   {
@@ -59,7 +59,7 @@ bool rychkov::MainProcessor::dependencies(ParserContext& context)
   {
     context.out << "depend from:\n";
     visitor.prepare_deps(visitor.dep_map[visitor.symbol]);
-    std::for_each(visitor.result.begin(), visitor.result.end(), ContentPrinter{context.out, 1});
+    for_each(visitor.result.begin(), visitor.result.end(), ContentPrinter{context.out, 1});
   }
   return true;
 }
@@ -75,7 +75,7 @@ bool rychkov::MainProcessor::uses(ParserContext& context)
   {
     return false;
   }
-  if (!std::for_each(parser.begin(), parser.end(), DependencyVisitor{context.out, symbol, true}).started)
+  if (!for_each(parser.begin(), parser.end(), DependencyVisitor{context.out, symbol, true}).started)
   {
     context.out << "no symbol \"" << symbol << "\" in file \"" << filename << "\"\n";
   }
@@ -102,8 +102,18 @@ bool rychkov::DependencyVisitor::operator()(const typing::Type& type)
   }
   if (typing::is_function(&type))
   {
-    return operator()(*type.base) || std::any_of(type.function_parameters.begin(),
-          type.function_parameters.end(), *this);
+    if (operator()(*type.base))
+    {
+      return true;
+    }
+    for (const typing::Type& param: type.function_parameters)
+    {
+      if (operator()(param))
+      {
+        return true;
+      }
+    }
+    return false;
   }
   return type.base == nullptr ? type.name == symbol : operator()(*type.base);
 }

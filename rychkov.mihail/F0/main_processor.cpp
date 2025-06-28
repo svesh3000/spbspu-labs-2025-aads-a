@@ -5,7 +5,7 @@
 #include <sstream>
 #include <cctype>
 #include <utility>
-#include <algorithm>
+#include <algorithm.hpp>
 
 rychkov::Parser::map_type< rychkov::MainProcessor > rychkov::MainProcessor::call_map = {
       {"save", &rychkov::MainProcessor::save},
@@ -233,10 +233,10 @@ bool rychkov::MainProcessor::unopen_defines(ParserContext& context)
       }
     };
     std::getline(preprocessed, line);
-    std::string::iterator from = std::find_if(line.begin(), line.end(), is_name_char{});
+    std::string::iterator from = find_if(line.begin(), line.end(), is_name_char{});
     while (from != line.end())
     {
-      std::string::iterator to = std::find_if_not(from, line.end(), is_name_char{});
+      std::string::iterator to = find_if_not(from, line.end(), is_name_char{});
       std::string name{from, to};
       if ((preproc.macros.find(name) != preproc.macros.end())
             || (preproc.legacy_macros.find(name) != preproc.legacy_macros.end()))
@@ -245,7 +245,7 @@ bool rychkov::MainProcessor::unopen_defines(ParserContext& context)
         std::cout << line << '\n';
         nfound++;
       }
-      from = std::find_if(to, line.end(), is_name_char{});
+      from = find_if(to, line.end(), is_name_char{});
     }
     line_number++;
   }

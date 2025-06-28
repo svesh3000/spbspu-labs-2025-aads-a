@@ -61,6 +61,7 @@ namespace rychkov
     std::vector< entities::Expression >::const_iterator end() const;
     const TypeParser& next() const;
     void prepare_type();
+    void prepare_to_rewrite();
     void clear_program();
     void push_back(entities::Expression expr);
 

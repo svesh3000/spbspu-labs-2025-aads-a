@@ -2,9 +2,9 @@
 
 #include <fstream>
 #include <sstream>
-#include <algorithm>
 #include <iterator>
 #include <boost/json.hpp>
+#include <algorithm.hpp>
 #include "print_content.hpp"
 
 namespace rychkov
@@ -49,9 +49,9 @@ bool rychkov::MainProcessor::save(std::ostream& err, std::string filename) const
     boost::json::array macros(preproc.macros.size());
     boost::json::array legacy_macros(preproc.legacy_macros.size());
     boost::json::array program;
-    std::transform(preproc.macros.begin(), preproc.macros.end(), macros.begin(), serial);
-    std::transform(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), legacy_macros.begin(), serial);
-    std::transform(src.begin(), src.end(), std::back_inserter(program), serial);
+    rychkov::transform(preproc.macros.begin(), preproc.macros.end(), macros.begin(), serial);
+    rychkov::transform(preproc.legacy_macros.begin(), preproc.legacy_macros.end(), legacy_macros.begin(), serial);
+    rychkov::transform(src.begin(), src.end(), std::back_inserter(program), serial);
     doc[file.first] = boost::json::object{{"macros", std::move(macros)},
           {"old_macro", std::move(legacy_macros)}, {"pgm", std::move(program)},
           {"real", file.second.real_file}, {"cache", file.second.cache}};
@@ -80,26 +80,26 @@ boost::json::value rychkov::Serializer::operator()(const entities::Variable& var
 boost::json::value rychkov::Serializer::operator()(const entities::Function& func)
 {
   boost::json::array parameters(func.parameters.size());
-  std::copy(func.parameters.begin(), func.parameters.end(), parameters.begin());
+  rychkov::copy(func.parameters.begin(), func.parameters.end(), parameters.begin());
   return boost::json::object{{"obj", "func"}, {"parameters", std::move(parameters)},
         {"sign", operator()(entities::Variable{func.type, func.name})}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Body& body)
 {
   boost::json::array result(body.data.size());
-  std::transform(body.data.begin(), body.data.end(), result.begin(), *this);
+  rychkov::transform(body.data.begin(), body.data.end(), result.begin(), *this);
   return result;
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Statement& statement)
 {
   boost::json::array conditions(statement.conditions.size());
-  std::transform(statement.conditions.begin(), statement.conditions.end(), conditions.begin(), *this);
+  rychkov::transform(statement.conditions.begin(), statement.conditions.end(), conditions.begin(), *this);
   return boost::json::object{{"obj", "stmtnt"}, {"type", statement.type}, {"conditions", std::move(conditions)}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Struct& structure)
 {
   boost::json::array fields(structure.fields.size());
-  std::transform(structure.fields.begin(), structure.fields.end(), fields.begin(), *this);
+  rychkov::transform(structure.fields.begin(), structure.fields.end(), fields.begin(), *this);
   return boost::json::object{{"obj", "struct"}, {"name", structure.name}, {"fields", std::move(fields)}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Enum& structure)
@@ -110,7 +110,7 @@ boost::json::value rychkov::Serializer::operator()(const entities::Enum& structu
 boost::json::value rychkov::Serializer::operator()(const entities::Union& structure)
 {
   boost::json::array fields(structure.fields.size());
-  std::transform(structure.fields.begin(), structure.fields.end(), fields.begin(), *this);
+  rychkov::transform(structure.fields.begin(), structure.fields.end(), fields.begin(), *this);
   return boost::json::object{{"obj", "union"}, {"name", structure.name}, {"fields", std::move(fields)}};
 }
 boost::json::value rychkov::Serializer::operator()(const entities::Alias& alias)
@@ -143,7 +143,7 @@ boost::json::value rychkov::Serializer::operator()(const entities::Expression& e
     return operator()(expr.operands[0]);
   }
   boost::json::array operands(expr.operands.size());
-  std::transform(expr.operands.begin(), expr.operands.end(), operands.begin(), *this);
+  rychkov::transform(expr.operands.begin(), expr.operands.end(), operands.begin(), *this);
   return boost::json::object{{"obj", "expr"}, {"token", expr.operation->token},
         {"rallign", expr.operation->right_align}, {"size", expr.operation->type},
         {"operands", std::move(operands)}, {"res_t", operator()(expr.result_type)}};

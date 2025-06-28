@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <utility>
-#include <algorithm>
 
 void rychkov::Preprocessor::append(CParseContext& context, char c)
 {
