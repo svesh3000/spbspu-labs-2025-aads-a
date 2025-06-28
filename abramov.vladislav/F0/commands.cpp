@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 
-void abramov::getCommands(CommandTree &commands, DictionaryCollection &collect)
+void abramov::getCommands(CommandTable &commands, DictionaryCollection &collect)
 {
   commands["adddict"] = std::bind(addDict, std::ref(collect), std::ref(std::cin));
   commands["addtodict"] = std::bind(addToDict, std::ref(collect), std::ref(std::cin));

@@ -1,13 +1,12 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <functional>
-#include <binary_tree/binary_tree.hpp>
 #include "dictionary_collection.hpp"
 
 namespace abramov
 {
-  using CommandTree = BinarySearchTree< std::string, std::function< void() > >;
-  void getCommands(CommandTree &commands, DictionaryCollection &collect);
+  using CommandTable = HashTable< std::string, std::function< void() > >;
+  void getCommands(CommandTable &commands, DictionaryCollection &collect);
   void addDict(DictionaryCollection &collect, std::istream &in);
   void addToDict(DictionaryCollection &collect, std::istream &in);
   void deleteDict(DictionaryCollection &collect, std::istream &in);

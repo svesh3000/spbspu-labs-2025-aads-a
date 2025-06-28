@@ -6,8 +6,8 @@
 #include <functional>
 #include "decls.hpp"
 #include "hash_node.hpp"
-#include "iterator.hpp"
-#include "cIterator.hpp"
+#include "hash_iterator.hpp"
+#include "hash_cIterator.hpp"
 
 namespace abramov
 {
@@ -27,6 +27,8 @@ namespace abramov
     double loadFactor() const noexcept;
     void rehash(size_t k);
     size_t erase(const Key &k);
+    Value &at(const Key &k);
+    Value &operator[](const Key &k);
     HashIterator< Key, Value, Hash, Equal > begin();
     HashIterator< Key, Value, Hash, Equal > end();
     HashIterator< Key, Value, Hash, Equal > find(const Key &k);
@@ -244,6 +246,18 @@ size_t abramov::HashTable< Key, Value, Hash, Equal >::erase(const Key &k)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+Value &abramov::HashTable< Key, Value, Hash, Equal >::operator[](const Key &k)
+{
+  auto it = find(k);
+  if (it != end())
+  {
+    return it->second;
+  }
+  insert(k, Value());
+  return find(k)->second;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 typename abramov::HashTable< Key, Value, Hash, Equal >::Iter
 abramov::HashTable< Key, Value, Hash, Equal >::end()
 {
@@ -291,7 +305,6 @@ abramov::HashTable< Key, Value, Hash, Equal >::find(const Key & k)
   } while (pos != orig_pos);
   return end();
 }
-
 
 template< class Key, class Value, class Hash, class Equal >
 typename abramov::HashTable< Key, Value, Hash, Equal >::cIter
@@ -341,6 +354,18 @@ abramov::HashTable< Key, Value, Hash, Equal >::cfind(const Key & k) const
   } while (pos != orig_pos);
   return cend();
 }
+
+template< class Key, class Value, class Hash, class Equal >
+Value &abramov::HashTable< Key, Value, Hash, Equal >::at(const Key &k)
+{
+  auto it = find(k);
+  if (it == end())
+  {
+    throw std::out_of_range("There is no such element\n");
+  }
+  return it->second;
+}
+
 
 template< class Key, class Value, class Hash, class Equal >
 size_t abramov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
