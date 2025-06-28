@@ -71,9 +71,12 @@ finaev::AVLtree< std::string, finaev::AVLtree< size_t, size_t > > finaev::Graph:
   AVLtree< std::string, AVLtree< size_t, size_t > > temp;
   for (auto iter = edges_.cbegin(); iter != edges_.cend(); ++iter)
   {
-    for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
+    if (iter->first.first == str)
     {
-      temp[iter->first.second][iter2->first] = iter2->second;
+      for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
+      {
+        temp[iter->first.second][iter2->first] = iter2->second;
+      }
     }
   }
   return temp;
@@ -88,9 +91,12 @@ finaev::AVLtree< std::string, finaev::AVLtree< size_t, size_t > > finaev::Graph:
   AVLtree< std::string, AVLtree< size_t, size_t > > temp;
   for (auto iter = edges_.cbegin(); iter != edges_.cend(); ++iter)
   {
-    for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
+    if (iter->first.second == str)
     {
-      temp[iter->first.second][iter2->first] = iter2->second;
+      for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
+      {
+        temp[iter->first.second][iter2->first] = iter2->second;
+      }
     }
   }
   return temp;
