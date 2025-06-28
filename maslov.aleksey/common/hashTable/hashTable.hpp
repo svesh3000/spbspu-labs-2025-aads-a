@@ -43,13 +43,13 @@ namespace maslov
     const T & at(const Key & key) const;
     T & operator[](const Key & key);
     T & operator[](Key && key);
-    iterator find(const Key & key);
-    cIterator find(const Key & key) const;
+    iterator find(const Key & key) noexcept;
+    cIterator find(const Key & key) const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    float loadFactor() const;
+    float loadFactor() const noexcept;
     void rehash(size_t newCapacity);
     float maxLoadFactor() const noexcept;
     void maxLoadFactor(float ml);
@@ -66,10 +66,10 @@ namespace maslov
     size_t erase(const Key & key);
     void clear() noexcept;
 
-    iterator begin();
-    cIterator cbegin() const;
-    iterator end();
-    cIterator cend() const;
+    iterator begin() noexcept;
+    cIterator cbegin() const noexcept;
+    iterator end() noexcept;
+    cIterator cend() const noexcept;
 
     void swap(HashTable & rhs) noexcept;
 
@@ -82,8 +82,8 @@ namespace maslov
     size_t capacity_;
     size_t size_;
     float maxLoadFactor_= 0.7f;
-    std::pair< size_t, size_t > calculatePositions(const Key & key) const;
-    std::pair< size_t, bool > findPosition(const Key & key) const;
+    std::pair< size_t, size_t > calculatePositions(const Key & key) const noexcept;
+    std::pair< size_t, bool > findPosition(const Key & key) const noexcept;
   };
 
   template< class Key, class T, class HS1, class HS2, class EQ >
@@ -183,7 +183,7 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  float HashTable< Key, T, HS1, HS2, EQ >::loadFactor() const
+  float HashTable< Key, T, HS1, HS2, EQ >::loadFactor() const noexcept
   {
     return static_cast< float >(size_) / capacity_;
   }
@@ -225,7 +225,7 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  std::pair< size_t, size_t > HashTable< Key, T, HS1, HS2, EQ >::calculatePositions(const Key & key) const
+  std::pair< size_t, size_t > HashTable< Key, T, HS1, HS2, EQ >::calculatePositions(const Key & key) const noexcept
   {
     size_t h1 = HS1{}(key) % capacity_;
     size_t h2 = HS2{}(key) % (capacity_ - 1) + 1;
@@ -233,7 +233,7 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  std::pair< size_t, bool > HashTable< Key, T, HS1, HS2, EQ >::findPosition(const Key & key) const
+  std::pair< size_t, bool > HashTable< Key, T, HS1, HS2, EQ >::findPosition(const Key & key) const noexcept
   {
     auto pos = calculatePositions(key);
     size_t deleted = capacity_;
@@ -264,31 +264,31 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::begin()
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::begin() noexcept
   {
     return iterator(slots_, capacity_, 0);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::end()
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::end() noexcept
   {
     return iterator(slots_, capacity_, capacity_);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::cbegin() const
+  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::cbegin() const noexcept
   {
     return cIterator(slots_, capacity_, 0);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::cend() const
+  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::cend() const noexcept
   {
     return cIterator(slots_, capacity_, capacity_);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::find(const Key & key)
+  HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::find(const Key & key) noexcept
   {
     auto pair = findPosition(key);
     size_t pos = pair.first;
@@ -301,7 +301,7 @@ namespace maslov
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
-  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable<Key, T, HS1, HS2, EQ >::find(const Key & key) const
+  HashConstIterator< Key, T, HS1, HS2, EQ > HashTable<Key, T, HS1, HS2, EQ >::find(const Key & key) const noexcept
   {
     auto pair = findPosition(key);
     size_t pos = pair.first;
@@ -330,7 +330,7 @@ namespace maslov
     auto it = find(key);
     if (it == cend())
     {
-        throw std::out_of_range("ERROR: key not found");
+      throw std::out_of_range("ERROR: key not found");
     }
     return it->second;
   }

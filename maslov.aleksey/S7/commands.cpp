@@ -3,16 +3,16 @@
 
 namespace
 {
-  void printBounds(std::ostream & out, std::vector< std::pair< std::string, std::vector< int > > > bounds)
+  void printBounds(std::ostream & out, const std::vector< std::pair< std::string, std::vector< int > > > & bounds)
   {
     if (bounds.empty())
     {
       out << '\n';
     }
-    for (auto it = bounds.begin(); it != bounds.end(); it++)
+    for (auto it = bounds.cbegin(); it != bounds.cend(); it++)
     {
       out << it->first;
-      for (auto itWeight = it->second.begin(); itWeight != it->second.end(); itWeight++)
+      for (auto itWeight = it->second.cbegin(); itWeight != it->second.cend(); itWeight++)
       {
         out << ' ' << *itWeight;
       }
@@ -23,7 +23,7 @@ namespace
 
 void maslov::getGraphs(std::ostream & out, const map & graphs)
   {
-    if(graphs.empty())
+    if (graphs.empty())
     {
       out << '\n';
     }
@@ -78,7 +78,7 @@ void maslov::getGraphs(std::ostream & out, const map & graphs)
   void maslov::createEdge(std::istream & in, map & graphs)
   {
     std::string graphName, v1, v2;
-    int weight;
+    int weight = 0;
     in >> graphName >> v1 >> v2 >> weight;
     Graph & graph = graphs.at(graphName);
     graph.addEdge(v1, v2, weight);
@@ -87,7 +87,7 @@ void maslov::getGraphs(std::ostream & out, const map & graphs)
   void maslov::deleteEdge(std::istream & in, map & graphs)
   {
     std::string graphName, v1, v2;
-    int weight;
+    int weight = 0;
     in >> graphName >> v1 >> v2 >> weight;
     Graph & graph = graphs.at(graphName);
     graph.deleteEdge(v1, v2, weight);

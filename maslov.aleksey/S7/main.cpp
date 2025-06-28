@@ -16,7 +16,7 @@ namespace
       for (size_t i = 0; i < edgeCount; ++i)
       {
         std::string vertexName1, vertexName2;
-        int weight;
+        int weight = 0;
         in >> vertexName1 >> vertexName2 >> weight;
         graph.addEdge(vertexName1, vertexName2, weight);
       }
@@ -61,6 +61,7 @@ int main(int argc, char * argv[])
     }
     catch (const std::exception &)
     {
+      std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";
     }
