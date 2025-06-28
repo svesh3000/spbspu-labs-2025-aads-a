@@ -134,7 +134,7 @@ namespace
       tkach::HashDynArray< std::string > current_dict_name(count_of_dicts);
       for (size_t i = 0; i < static_cast< size_t >(count_of_dicts); ++i)
       {
-        if (!(in >> current_dict_name[0]) || current_dict_name.empty())
+        if (!(in >> current_dict_name[i]) || current_dict_name.empty())
         {
           throw std::logic_error("<INVALID ARGUMENTS>");
         }
@@ -357,11 +357,17 @@ void tkach::addTranslation(std::istream& in, AvlTree< std::string, AvlTree< std:
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
+  auto it = avltree.begin();
   if (dict_name_specified)
   {
     if (!(in >> dict_name) || dict_name.empty())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
     }
   }
   if (!(in >> eng_word) || eng_word.empty())
@@ -374,11 +380,6 @@ void tkach::addTranslation(std::istream& in, AvlTree< std::string, AvlTree< std:
   }
   if (dict_name_specified)
   {
-    auto it = avltree.find(dict_name);
-    if (it == avltree.end())
-    {
-      throw std::logic_error("<INVALID DICTIONARY>");
-    }
     auto it2 = it->second.find(eng_word);
     if (it2 == it->second.end())
     {
@@ -419,11 +420,17 @@ void tkach::removeTranslation(std::istream& in, AvlTree< std::string, AvlTree< s
   {
     throw std::logic_error("<INVALID NUMBER>");
   }
+  auto it = avltree.begin();
   if (dict_name_specified)
   {
     if (!(in >> dict_name) || dict_name.empty())
     {
       throw std::logic_error("<INVALID ARGUMENTS>");
+    }
+    it = avltree.find(dict_name);
+    if (it == avltree.end())
+    {
+      throw std::logic_error("<INVALID DICTIONARY>");
     }
   }
   if (!(in >> eng_word) || eng_word.empty())
@@ -436,11 +443,6 @@ void tkach::removeTranslation(std::istream& in, AvlTree< std::string, AvlTree< s
   }
   if (dict_name_specified)
   {
-    auto it = avltree.find(dict_name);
-    if (it == avltree.end())
-    {
-      throw std::logic_error("<INVALID DICTIONARY>");
-    }
     auto it2 = it->second.find(eng_word);
     if (it2 == it->second.end())
     {
