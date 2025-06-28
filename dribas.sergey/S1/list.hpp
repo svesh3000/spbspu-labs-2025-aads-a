@@ -20,12 +20,12 @@ namespace dribas
     using iter = Iterator< T >;
     using citer = ConstIterator< T >;
     List();
-    List(const List< T >& rhs);
-    List(List< T >&& rhs) noexcept;
-    explicit List (size_t n, const T& val);
-    List(std::initializer_list< T > ilist);
+    List(const List< T >&);
+    List(List< T >&&) noexcept;
+    explicit List (size_t, const T&);
+    List(std::initializer_list< T >);
     template< class InputIterator >
-    List (InputIterator first, InputIterator last);
+    List (InputIterator, InputIterator);
     ~List();
 
     iter begin() noexcept;
@@ -40,40 +40,40 @@ namespace dribas
     T& back();
     const T& back() const;
 
-    List< T >& operator=(const List< T >& other);
-    List< T >& operator=(List< T >&& other) noexcept;
+    List< T >& operator=(const List< T >&);
+    List< T >& operator=(List< T >&&) noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    iter insert(iter position, const T& val);
-    iter insert(iter position, size_t n, const T& val);
+    iter insert(iter, const T&);
+    iter insert(iter, size_t, const T&);
     template< class InputIterator >
-    iter insert(iter position, InputIterator first, InputIterator last);
-    iter insert(iter position, std::initializer_list< T > il);
+    iter insert(iter, InputIterator, InputIterator);
+    iter insert(iter, std::initializer_list< T >);
 
 
     template< class Predicate >
     void remove_if(Predicate) noexcept;
     void remove(const T&) noexcept;
-    iter erase(citer position);
-    iter erase(citer first, citer last);
-    void splice(citer pos, List< T >& other) noexcept;
-    void splice(citer pos, List< T >&& other) noexcept;
-    void splice(citer pos, List< T >& other, citer it) noexcept;
-    void splice(citer pos, List< T >&& other, citer it) noexcept;
-    void splice(citer pos, List< T >& other, citer first, citer last) noexcept;
-    void splice(citer pos, List< T >&& other, citer first, citer last) noexcept;
+    iter erase(citer);
+    iter erase(citer, citer);
+    void splice(citer, List< T >&) noexcept;
+    void splice(citer, List< T >&&) noexcept;
+    void splice(citer, List< T >&, citer) noexcept;
+    void splice(citer, List< T >&&, citer) noexcept;
+    void splice(citer, List< T >&, citer, citer) noexcept;
+    void splice(citer, List< T >&&, citer, citer) noexcept;
     template< class InputIt >
-    void assign(InputIt first, InputIt last);
+    void assign(InputIt, InputIt);
     template< class R >
-    void assign_range(R&& rg );
-    void assign(size_t count, const T& value);
-    void push_front(const T& value);
-    void push_back(const T& value);
+    void assign_range(R&&);
+    void assign(size_t, const T&);
+    void push_front(const T&);
+    void push_back(const T&);
     void pop_front() noexcept;
     void pop_back() noexcept;
-    void swap(List< T >& rhs) noexcept;
+    void swap(List< T >&) noexcept;
     void clear() noexcept;
 
   private:
@@ -143,9 +143,9 @@ namespace dribas
     }
   }
 
-  template <class T>
-  template <class InputIterator>
-  Iterator<T> List<T>::insert(Iterator< T > position, InputIterator first, InputIterator last)
+  template < class T >
+  template < class InputIterator >
+  Iterator< T > List< T >::insert(Iterator< T > position, InputIterator first, InputIterator last)
   {
     Iterator< T > result = end();
     if (first != last) {

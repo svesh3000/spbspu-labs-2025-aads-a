@@ -6,18 +6,17 @@
 namespace dribas
 {
   template< class T >
-  class Queue {
+  class Queue
+  {
   public:
     Queue();
     Queue(const Queue< T >&);
     Queue(Queue< T >&&) noexcept;
     ~Queue();
 
-    Queue& operator=(const Queue&);
-    Queue& operator=(Queue&&) noexcept;
+    Queue& operator=(const Queue< T >&);
+    Queue& operator=(Queue< T >&&) noexcept;
 
-    T& front();
-    const T& front() const;
     T& back();
     const T& back() const;
 
@@ -25,7 +24,7 @@ namespace dribas
     void pop();
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void swap(Queue&) noexcept;
+    void swap(Queue< T >&) noexcept;
 
   private:
     size_t size_;
@@ -64,8 +63,8 @@ namespace dribas
     }
   }
 
-  template< class T>
-  Queue< T >::Queue(Queue< T >&& other) noexcept :
+  template< class T >
+  Queue< T >::Queue(Queue< T >&& other) noexcept:
     size_(other.size_),
     capacity_(other.capacity_),
     head_(other.head_),
@@ -88,7 +87,7 @@ namespace dribas
   template< class T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& other)
   {
-    if (this != &other) {
+    if (this != std::addressof(other)) {
       Queue< T > tmp(other);
       swap(tmp);
     }
@@ -98,19 +97,9 @@ namespace dribas
   template< class T >
   Queue< T >& Queue< T >::operator=(Queue< T >&& other) noexcept
   {
-    if (this != &other) {
-      delete[] queue_;
-      size_ = other.size_;
-      capacity_ = other.capacity_;
-      head_ = other.head_;
-      tail_ = other.tail_;
-      queue_ = other.queue_;
-
-      other.size_ = 0;
-      other.capacity_ = 0;
-      other.head_ = 0;
-      other.tail_ = 0;
-      other.queue_ = nullptr;
+    if (this != std::addressof(other)) {
+      Queue< T > tmp(std::move(other));
+      swap(tmp);
     }
     return *this;
   }
@@ -156,28 +145,16 @@ namespace dribas
   }
 
   template< class T >
-  T& Queue< T >::front()
-  {
-
-    return queue_[head_];
-  }
-
-  template< class T >
-  const T& Queue< T >::front() const
-  {
-    return queue_[head_];
-  }
-
-  template< class T >
   T& Queue< T >::back()
   {
-    return queue_[(tail_ + capacity_ - 1) % capacity_];
+
+    return queue_[head_];
   }
 
   template< class T >
   const T& Queue< T >::back() const
   {
-    return queue_[(tail_ + capacity_ - 1) % capacity_];
+    return queue_[head_];
   }
 
   template< class T >
