@@ -14,42 +14,22 @@ int main(int argc, char ** argv)
 
   zakirov::Stack< zakirov::Postfix > stack_qs;
   std::string reader;
-  if (argc == 1)
+  std::fstream file;
+  std::istream & input_s = (argc == 1) ? std::cin : (file.open(argv[1]), file);
+
+  while (input_s)
   {
-    while (std::cin)
+    std::getline(input_s, reader);
+    if (!reader.empty())
     {
-      getline(std::cin, reader);
-      if (!reader.empty())
+      try
       {
-        try
-        {
-          stack_qs.push(zakirov::Postfix(reader));
-        }
-        catch (const std::invalid_argument & e)
-        {
-          std::cerr << e.what() << '\n';
-          return 1;
-        }
+        stack_qs.push(zakirov::Postfix(reader));
       }
-    }
-  }
-  else if (argc == 2)
-  {
-    std::ifstream file(argv[1]);
-    while (file)
-    {
-      std::getline(file, reader);
-      if (!reader.empty())
+      catch (const std::invalid_argument & e)
       {
-        try
-        {
-          stack_qs.push(zakirov::Postfix(reader));
-        }
-        catch (const std::invalid_argument & e)
-        {
-          std::cerr << e.what() << '\n';
-          return 1;
-        }
+        std::cerr << e.what() << '\n';
+        return 1;
       }
     }
   }

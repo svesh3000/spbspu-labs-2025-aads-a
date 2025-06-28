@@ -22,8 +22,8 @@ namespace zakirov
     const T & front() const noexcept;
     T & back() noexcept;
     const T & back() const noexcept;
-    void push (const T & value);
-    void push (T && value);
+    void push(const T & value);
+    void push(T && value);
     void pop() noexcept;
     void swap(Queue & other) noexcept;
   private:
