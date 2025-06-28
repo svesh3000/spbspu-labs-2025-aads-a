@@ -95,7 +95,7 @@ finaev::AVLtree< std::string, finaev::AVLtree< size_t, size_t > > finaev::Graph:
     {
       for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
       {
-        temp[iter->first.second][iter2->first] = iter2->second;
+        temp[iter->first.first][iter2->first] = iter2->second;
       }
     }
   }
