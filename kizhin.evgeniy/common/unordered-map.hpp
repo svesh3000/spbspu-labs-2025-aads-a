@@ -60,10 +60,21 @@ namespace kizhin {
     const_iterator find(const key_type&) const;
     size_type count(const key_type&) const;
 
+    template < typename... Args >
+    std::pair< iterator, bool > emplace(Args&&...);
+    template < typename... Args >
+    iterator emplace_hint(const_iterator, Args&&...);
     std::pair< iterator, bool > insert(const value_type&);
+    std::pair< iterator, bool > insert(value_type&&);
+    iterator insert(const_iterator, const value_type&);
+    iterator insert(const_iterator, value_type&&);
     template < typename InputIt >
     void insert(InputIt, InputIt);
+    void insert(std::initializer_list< value_type >);
+
     iterator erase(const_iterator);
+    size_type erase(const key_type&);
+    iterator erase(const_iterator, const_iterator);
 
     void clear() noexcept;
     void swap(UnorderedMap&) noexcept;
@@ -85,7 +96,7 @@ namespace kizhin {
     Node* begin_ = nullptr;
     Node* end_ = nullptr;
     size_type size_ = 0;
-    float maxLoadFact_ = 1.0;
+    float maxLoadFact_ = 0.75;
   };
 
   template < typename K, typename T, typename H, typename E >
@@ -226,9 +237,11 @@ namespace kizhin {
   }
 
   template < typename K, typename T, typename H, typename E >
-  UnorderedMap< K, T, H, E >::UnorderedMap(std::initializer_list< value_type > list):
-    UnorderedMap(list.begin(), list.end())
-  {}
+  UnorderedMap< K, T, H, E >::UnorderedMap(const std::initializer_list< value_type > list)
+  {
+    reserve(list.size());
+    insert(list.begin(), list.end());
+  }
 
   template < typename K, typename T, typename H, typename E >
   UnorderedMap< K, T, H, E >::~UnorderedMap()
@@ -355,13 +368,15 @@ namespace kizhin {
   }
 
   template < typename K, typename T, typename H, typename E >
+  template < typename... Args >
   std::pair< typename UnorderedMap< K, T, H, E >::iterator, bool > UnorderedMap< K, T, H,
-      E >::insert(const value_type& value)
+      E >::emplace(Args&&... args)
   {
     if (loadFactor() >= maxLoadFactor()) {
       rehash(std::max< size_type >(bucketCount() * 2, 4));
     }
     const size_type capacity = bucketCount();
+    value_type value(std::forward< Args >(args)...);
     Node* curr = begin_ + hashFunc()(value.first) % capacity;
     Node* firstDeleted = nullptr;
     while (curr->state != Node::empty) {
@@ -375,10 +390,46 @@ namespace kizhin {
       curr = curr == end_ ? begin_ : curr;
     }
     curr = firstDeleted ? firstDeleted : curr;
-    curr->value = value;
+    curr->value = std::move(value);
     curr->state = Node::occupied;
     ++size_;
     return std::make_pair(iterator{ curr, end_ }, true);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  template < typename... Args >
+  typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::emplace_hint(
+      const_iterator, Args&&... args)
+  {
+    return emplace(std::forward< Args >(args)...).first;
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  std::pair< typename UnorderedMap< K, T, H, E >::iterator, bool > UnorderedMap< K, T, H,
+      E >::insert(const value_type& value)
+  {
+    return emplace(value);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  std::pair< typename UnorderedMap< K, T, H, E >::iterator, bool > UnorderedMap< K, T, H,
+      E >::insert(value_type&& value)
+  {
+    return emplace(std::move(value));
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::insert(
+      const_iterator hint, const value_type& value)
+  {
+    return emplace(hint, value);
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::insert(
+      const_iterator hint, value_type&& value)
+  {
+    return emplace(hint, std::move(value));
   }
 
   template < typename K, typename T, typename H, typename E >
@@ -391,13 +442,43 @@ namespace kizhin {
   }
 
   template < typename K, typename T, typename H, typename E >
+  void UnorderedMap< K, T, H, E >::insert(const std::initializer_list< value_type > list)
+  {
+    reserve(size() + list.size());
+    insert(list.begin(), list.end());
+  }
+
+  template < typename K, typename T, typename H, typename E >
   typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::erase(
       const_iterator position)
   {
+    assert(position != end() && "UnorderedMap: cannot erase element past the end");
     position.node_->state = Node::deleted;
     ++position;
     --size_;
     return iterator{ position.node_, position.end_ };
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  typename UnorderedMap< K, T, H, E >::size_type UnorderedMap< K, T, H, E >::erase(
+      const key_type& key)
+  {
+    const_iterator position = find(key);
+    if (position == end()) {
+      return 0;
+    }
+    erase(position);
+    return 1;
+  }
+
+  template < typename K, typename T, typename H, typename E >
+  typename UnorderedMap< K, T, H, E >::iterator UnorderedMap< K, T, H, E >::erase(
+      const_iterator first, const_iterator last)
+  {
+    while (first != last) {
+      first = erase(first);
+    }
+    return iterator{ first.node_, first.end_ };
   }
 
   template < typename K, typename T, typename H, typename E >
