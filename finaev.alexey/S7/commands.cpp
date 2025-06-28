@@ -46,7 +46,7 @@ void finaev::outBound(std::istream& in, std::ostream& out, const graphsTree& gra
   {
     throw std::logic_error("<INVALID COMMAND>");
   }
-  AVLtree< std::string, AVLtree< size_t, size_t > > vertTree  = gr.getOutBound(name);
+  AVLtree< std::string, AVLtree< size_t, size_t > > vertTree  = gr.getOutBound(vert);
   if (vertTree.empty())
   {
     out << "\n";
