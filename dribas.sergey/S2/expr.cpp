@@ -24,7 +24,9 @@ namespace
 
   int countDigits(long long int num)
   {
-    if (num == 0) return 1;
+    if (num == 0) {
+      return 1;
+    }
     int count = 0;
     num = std::abs(num);
     while (num != 0) {
@@ -90,11 +92,9 @@ namespace
 
   bool isOperator(const std::string& in)
   {
-    const std::string operations[6] = { "+", "-", "*", "/", "%", "|"};
-    for (std::string s: operations)
-    {
-      if (in == s)
-      {
+    const std::string operations[6] = { "+", "-", "*", "/", "%", "|" };
+    for (std::string s: operations) {
+      if (in == s) {
         return true;
       }
     }
@@ -118,10 +118,10 @@ namespace
 }
 long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 {
-  Stack<long long> operandStack;
+  Stack< long long > operandStack;
 
   while (!postfixQueue.empty()) {
-    std::string token = postfixQueue.front();
+    std::string token = postfixQueue.back();
     postfixQueue.pop();
 
     if (isOperator(token)) {
@@ -186,12 +186,12 @@ long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
 
 dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQueue)
 {
-  dribas::Stack< std::string > operatorStack;
-  dribas::Queue< std::string > postfixQueue;
+  Stack< std::string > operatorStack;
+  Queue< std::string > postfixQueue;
   bool hasError = false;
 
   while (!infixQueue.empty() && !hasError) {
-    std::string token = infixQueue.front();
+    std::string token = infixQueue.back();
     infixQueue.pop();
 
     if (token == "(") {
@@ -231,7 +231,7 @@ dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQ
   return postfixQueue;
 }
 
-dribas::Queue< std::string > dribas::inputInfix(std::string& input)
+dribas::Queue< std::string > dribas::inputInfix(const std::string& input)
 {
   Queue< std::string > queue;
 
