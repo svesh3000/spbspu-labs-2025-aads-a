@@ -6,21 +6,22 @@
 namespace dribas
 {
   template< class T >
-  class Stack {
+  class Stack
+  {
   public:
     Stack();
     Stack(const Stack< T >&);
     Stack(Stack< T >&&) noexcept;
     ~Stack();
 
-    Stack& operator=(const Stack&);
-    Stack& operator=(Stack&&) noexcept;
+    Stack< T >& operator=(const Stack< T >&);
+    Stack< T >& operator=(Stack< T >&&) noexcept;
 
     T& top();
     const T& top() const;
     void push(const T&);
     void pop();
-    void swap(Stack&) noexcept;
+    void swap(Stack< T >&) noexcept;
     size_t size() const noexcept;
     bool empty() const noexcept;
 
@@ -74,7 +75,7 @@ namespace dribas
   template< class T >
   Stack< T >& Stack< T >::operator=(const Stack< T >& other)
   {
-    if (this != &other) {
+    if (this != std::addressof(other)) {
       Stack< T > tmp(other);
       swap(tmp);
     }
@@ -84,14 +85,9 @@ namespace dribas
   template< class T >
   Stack< T >& Stack< T >::operator=(Stack< T >&& other) noexcept
   {
-    if (this != &other) {
-      delete[] stack_;
-      capacity_ = other.capacity_;
-      size_ = other.size_;
-      stack_ = other.stack_;
-      other.capacity_ = 0;
-      other.size_ = 0;
-      other.stack_ = nullptr;
+    if (this != std::addressof(other)) {
+      Stack< T > temp(std::move(other));
+      swap(temp);
     }
     return *this;
   }

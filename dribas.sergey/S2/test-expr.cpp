@@ -10,11 +10,11 @@ BOOST_AUTO_TEST_CASE(infixtopostfixTest)
   queue1.push("10");
 
   dribas::Queue< std::string > queue2 = dribas::infixToPostfix(queue1);
-  BOOST_CHECK(queue2.front() == "10");
+  BOOST_CHECK(queue2.back() == "10");
   queue2.pop();
-  BOOST_TEST(queue2.front() == "10");
+  BOOST_TEST(queue2.back() == "10");
   queue2.pop();
-  BOOST_TEST(queue2.front() == "+");
+  BOOST_TEST(queue2.back() == "+");
 }
 
 BOOST_AUTO_TEST_CASE(calcPostfix)

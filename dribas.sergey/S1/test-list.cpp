@@ -1,4 +1,7 @@
 #include <boost/test/unit_test.hpp>
+#include <algorithm>
+#include <functional>
+
 #include "list.hpp"
 
 using namespace dribas;
@@ -85,16 +88,10 @@ BOOST_AUTO_TEST_CASE(removeIf)
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);
-  list.remove_if([=](int x) -> bool
-  {
-    return x == 1;
-  });
+  list.remove_if(std::bind(std::equal_to< int >(), std::placeholders::_1, 1)  );
   BOOST_CHECK(list.front() == 2);
   list.clear();
-  list.remove_if([=](int x) -> bool
-  {
-    return x == 1;
-  });
+  list.remove_if(std::bind(std::equal_to< int >(), std::placeholders::_1, 1));
   BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_CASE(remove )
