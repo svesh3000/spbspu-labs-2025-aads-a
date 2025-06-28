@@ -8,7 +8,7 @@ namespace
   }
 }
 
-void lanovenko::input_pantsir_status(std::istream& in, Tree< std::string, Pantsir, std::less< std::string > >& pantsir_status_sets)
+void lanovenko::input_pantsir_status(std::istream& in, std::map< std::string, Pantsir >& pantsir_status_sets)
 {
   std::string status_name;
   Pantsir current;
@@ -19,10 +19,10 @@ void lanovenko::input_pantsir_status(std::istream& in, Tree< std::string, Pantsi
   pantsir_status_sets[status_name] = current;
 }
 
-void lanovenko::input_targets(std::istream& in, Tree< std::string, Target, std::less< std::string > >& rhs)
+void lanovenko::input_targets(std::istream& in, std::map< std::string, Target >& rhs)
 {
   std::string id;
-  while (!(std::cin >> id).eof())
+  while (!(in >> id).eof())
   {
     Target current;
     if (!is_equal_id(id) || !(std::cin >> current))
