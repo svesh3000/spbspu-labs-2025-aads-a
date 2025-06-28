@@ -187,7 +187,7 @@ namespace lanovenko
       {
         if (slots_[i].occupied && !slots_[i].deleted)
         {
-          auto pos = findPosition(slots_[i].data.first);
+          auto pos = find_position(slots_[i].data.first);
           tmp[pos.first] = slots_[i];
         }
       }
