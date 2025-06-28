@@ -1064,9 +1064,28 @@ namespace petrov
   template< typename F >
   F AVLTree< K, T, Cmp >::traverse_breadth(F f) const
   {
-
+    petrov::Queue< node_t * > queue;
+    node_t * node = root_;
+    if (node)
+    {
+      queue.push(node);
+    }
+    while (!queue.empty())
+    {
+      node = queue.front();
+      f(node->data);
+      queue.pop();
+      if (node->left)
+      {
+        queue.push(node->left);
+      }
+      if (node->right)
+      {
+        queue.push(node->right);
+      }
+    }
+    return f;
   }
-
 }
 
 #endif

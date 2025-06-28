@@ -132,6 +132,7 @@ namespace petrov
         massive_ = temp;
         capacity_ = 5;
         size_++;
+        front_index_ = 0;;
       }
       else if (size_ == capacity_)
       {
