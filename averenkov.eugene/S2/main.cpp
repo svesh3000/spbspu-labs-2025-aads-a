@@ -170,16 +170,11 @@ long long evaluatePostfix(averenkov::Queue< std::string >& postfixQueue)
     {
       long long num = 0;
       bool negative = false;
-      size_t i = 0;
       if (token[0] == '-')
       {
         negative = true;
-        i = 1;
       }
-      for (; i < token.size(); ++i)
-      {
-        num = num * 10 + (token[i] - '0');
-      }
+      num = std::stoi(token);
       evalStack.push(negative ? -num : num);
     }
     else if (isOperator(token[0]))
@@ -259,16 +254,9 @@ void processExpressions(std::istream& input)
     {
       continue;
     }
-    try
-    {
-      averenkov::Queue< std::string > postfixQueue = infixToPostfix(line);
-      long long result = evaluatePostfix(postfixQueue);
-      results.push(result);
-    }
-    catch (const std::exception& e)
-    {
-      throw std::runtime_error("Error in expression");
-    }
+    averenkov::Queue< std::string > postfixQueue = infixToPostfix(line);
+    long long result = evaluatePostfix(postfixQueue);
+    results.push(result);
   }
   if (!results.empty())
   {
@@ -281,6 +269,7 @@ void processExpressions(std::istream& input)
     }
   }
   std::cout << "\n";
+
 }
 
 int main(int argc, char* argv[])

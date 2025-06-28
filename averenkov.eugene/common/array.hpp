@@ -36,7 +36,9 @@ namespace averenkov
     size_t last_;
     size_t capacity_;
     size_t first_;
+    void resize(size_t capac);
     void resize();
+    Array< T > copy(const Array& other, size_t capacity);
 
   };
 
@@ -50,22 +52,12 @@ namespace averenkov
 
   template< class T >
   Array< T >::Array(const Array& rhs):
-    Array()
+    data_(nullptr),
+    last_(0),
+    capacity_(1),
+    first_(0)
   {
-    Array temp;
-    try
-    {
-      temp.data_ = new T[rhs.capacity_];
-      for (size_t i = 0; i < temp.last_; ++i)
-      {
-        temp.data_[i] = rhs.data_[i];
-      }
-    }
-    catch (...)
-    {
-      throw;
-    }
-    swap(temp);
+    this = copy(rhs, rhs.capacity_);
   }
 
 
@@ -179,16 +171,30 @@ namespace averenkov
   }
 
   template< class T >
+  void Array< T >::resize(size_t capac)
+  {
+    auto arr = copy(*this, capac * 2);
+    swap(arr);
+  }
+
+  template< class T >
   void Array< T >::resize()
   {
-    size_t new_capacity = capacity_ * 2;
+    auto arr = copy(*this, capacity_ * 2);
+    swap(arr);
+  }
+
+  template< class T >
+  Array< T > Array< T >::copy(const Array& other, size_t capacity)
+  {
+    Array< T > new_array;
     T* new_data = nullptr;
     try
     {
-      new_data = new T[new_capacity];
-      for (size_t i = 0; i < last_; ++i)
+      new_data = new T[capacity];
+      for (size_t i = 0; i < other.last_; ++i)
       {
-        new_data[i] = data_[i];
+        new_data[i] = other.data_[i];
       }
     }
     catch (...)
@@ -196,12 +202,13 @@ namespace averenkov
       delete[] new_data;
       throw;
     }
-    delete[] data_;
-    data_ = new_data;
-    capacity_ = new_capacity;
+    new_array.data_ = new_data;
+    new_array.capacity_ = capacity;
+    new_array.last_ = other.last_;
+    return new_array;
   }
-}
 
+}
 
 #endif
 
