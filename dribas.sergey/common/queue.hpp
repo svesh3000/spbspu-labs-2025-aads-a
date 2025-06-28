@@ -6,7 +6,8 @@
 namespace dribas
 {
   template< class T >
-  class Queue{
+  class Queue
+  {
   public:
     Queue();
     Queue(const Queue< T >&);
@@ -16,8 +17,6 @@ namespace dribas
     Queue& operator=(const Queue< T >&);
     Queue& operator=(Queue< T >&&) noexcept;
 
-    T& front();
-    const T& front() const;
     T& back();
     const T& back() const;
 
@@ -146,28 +145,16 @@ namespace dribas
   }
 
   template< class T >
-  T& Queue< T >::front()
-  {
-
-    return queue_[head_];
-  }
-
-  template< class T >
-  const T& Queue< T >::front() const
-  {
-    return queue_[head_];
-  }
-
-  template< class T >
   T& Queue< T >::back()
   {
-    return queue_[(tail_ + capacity_ - 1) % capacity_];
+
+    return queue_[head_];
   }
 
   template< class T >
   const T& Queue< T >::back() const
   {
-    return queue_[(tail_ + capacity_ - 1) % capacity_];
+    return queue_[head_];
   }
 
   template< class T >

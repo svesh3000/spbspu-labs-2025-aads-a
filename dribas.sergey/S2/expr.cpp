@@ -121,7 +121,7 @@ long long dribas::evaluatePostfix(Queue< std::string >& postfixQueue)
   Stack< long long > operandStack;
 
   while (!postfixQueue.empty()) {
-    std::string token = postfixQueue.front();
+    std::string token = postfixQueue.back();
     postfixQueue.pop();
 
     if (isOperator(token)) {
@@ -191,7 +191,7 @@ dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQ
   bool hasError = false;
 
   while (!infixQueue.empty() && !hasError) {
-    std::string token = infixQueue.front();
+    std::string token = infixQueue.back();
     infixQueue.pop();
 
     if (token == "(") {

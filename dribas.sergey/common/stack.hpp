@@ -6,15 +6,16 @@
 namespace dribas
 {
   template< class T >
-  class Stack{
+  class Stack
+  {
   public:
     Stack();
     Stack(const Stack< T >&);
     Stack(Stack< T >&&) noexcept;
     ~Stack();
 
-    Stack& operator=(const Stack< T >&);
-    Stack& operator=(Stack< T >&&) noexcept;
+    Stack< T >& operator=(const Stack< T >&);
+    Stack< T >& operator=(Stack< T >&&) noexcept;
 
     T& top();
     const T& top() const;
