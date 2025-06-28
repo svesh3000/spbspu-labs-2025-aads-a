@@ -327,6 +327,9 @@ namespace kizhin {
   typename UnorderedMap< K, T, H, E >::const_iterator UnorderedMap< K, T, H, E >::find(
       const key_type& key) const
   {
+    if (empty()) {
+      return end();
+    }
     Node* curr = begin_ + hashFunc()(key) % capacity_;
     const Node* const stop = curr == begin_ ? begin_ + capacity_ : curr - 1;
     while (curr != stop) {
