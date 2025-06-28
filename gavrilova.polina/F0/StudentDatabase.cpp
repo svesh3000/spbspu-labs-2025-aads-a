@@ -309,7 +309,7 @@ gavrilova::StudentDatabase::getStudentsInGroup(const std::string& groupName) con
   if (it == groups.end()) {
     return result;
   }
-  // ИСПРАВЛЕНИЕ: Функтор теперь принимает неконстантный SharedPtr
+
   struct StudentCollector {
     FwdList< SharedPtr< const student::Student > >& list;
     void operator()(const std::pair< const StudentID, SharedPtr< student::Student > >& p) const
@@ -317,6 +317,7 @@ gavrilova::StudentDatabase::getStudentsInGroup(const std::string& groupName) con
       list.push_front(p.second);
     }
   };
+  
   it->second.traverse_rnl(StudentCollector{result});
   return result;
 }
@@ -507,7 +508,7 @@ gavrilova::FwdList< gavrilova::SharedPtr< const gavrilova::student::Student > >
 gavrilova::StudentDatabase::getTopStudents(size_t n) const
 {
   FwdList< SharedPtr< const student::Student > > allStudents;
-  // ИСПРАВЛЕНИЕ: Функтор теперь принимает неконстантный SharedPtr
+
   struct StudentCollector {
     FwdList< SharedPtr< const student::Student > >& list;
     void operator()(const std::pair< const StudentID, SharedPtr< student::Student > >& p) const
@@ -539,7 +540,7 @@ gavrilova::FwdList< gavrilova::SharedPtr< const gavrilova::student::Student > >
 gavrilova::StudentDatabase::getRiskStudents(double threshold) const
 {
   FwdList< SharedPtr< const student::Student > > result;
-  // ИСПРАВЛЕНИЕ: Функтор теперь принимает неконстантный SharedPtr
+
   struct RiskStudentCollector {
     FwdList< SharedPtr< const student::Student > >& list;
     double threshold;
