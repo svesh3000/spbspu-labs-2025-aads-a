@@ -3,7 +3,7 @@
 
 void petrov::SumUpKeysDisplayValues::operator()(const std::pair< const int, std::string > & key_val)
 {
-  if (result > 0 && key_val.first > 0 && result <= std::numeric_limits< int >::max() - key_val.first)
+  if ((result > 0 || key_val.first > 0) && result <= std::numeric_limits< int >::max() - key_val.first)
   {
     result += key_val.first;
   }
