@@ -115,6 +115,12 @@ namespace petrov
     void clear() noexcept;
     void swap(this_t & rhs) noexcept;
     template< typename F >
+    F traverse_lnr(F f);
+    template< typename F >
+    F traverse_rnl(F f);
+    template< typename F >
+    F traverse_breadth(F f);
+    template< typename F >
     F traverse_lnr(F f) const;
     template< typename F >
     F traverse_rnl(F f) const;
@@ -1014,6 +1020,30 @@ namespace petrov
 
   template< typename K, typename T, typename Cmp >
   template< typename F >
+  F AVLTree< K, T, Cmp >::traverse_lnr(F f)
+  {
+    petrov::Stack< node_t * > stack;
+    node_t * node = root_;
+    while (!stack.empty() || node)
+    {
+      if (node)
+      {
+        stack.push(node);
+        node = node->left;
+      }
+      else
+      {
+        node = stack.top();
+        stack.pop();
+        f(node->data);
+        node = node->right;
+      }
+    }
+    return f;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< typename F >
   F AVLTree< K, T, Cmp >::traverse_lnr(F f) const
   {
     petrov::Stack< node_t * > stack;
@@ -1038,6 +1068,30 @@ namespace petrov
 
   template< typename K, typename T, typename Cmp >
   template< typename F >
+  F AVLTree< K, T, Cmp >::traverse_rnl(F f)
+  {
+    petrov::Stack< node_t * > stack;
+    node_t * node = root_;
+    while (!stack.empty() || node)
+    {
+      if (node)
+      {
+        stack.push(node);
+        node = node->right;
+      }
+      else
+      {
+        node = stack.top();
+        stack.pop();
+        f(node->data);
+        node = node->left;
+      }
+    }
+    return f;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< typename F >
   F AVLTree< K, T, Cmp >::traverse_rnl(F f) const
   {
     petrov::Stack< node_t * > stack;
@@ -1055,6 +1109,33 @@ namespace petrov
         stack.pop();
         f(node->data);
         node = node->left;
+      }
+    }
+    return f;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< typename F >
+  F AVLTree< K, T, Cmp >::traverse_breadth(F f)
+  {
+    petrov::Queue< node_t * > queue;
+    node_t * node = root_;
+    if (node)
+    {
+      queue.push(node);
+    }
+    while (!queue.empty())
+    {
+      node = queue.front();
+      f(node->data);
+      queue.pop();
+      if (node->left)
+      {
+        queue.push(node->left);
+      }
+      if (node->right)
+      {
+        queue.push(node->right);
       }
     }
     return f;
