@@ -10,6 +10,7 @@ namespace finaev
   {
   public:
     DynamicArr();
+    explicit DynamicArr(size_t size);
     ~DynamicArr();
     DynamicArr(const DynamicArr< T >&);
     DynamicArr(DynamicArr< T >&&) noexcept;
@@ -52,6 +53,14 @@ namespace finaev
     data_(new T[capacity_])
   {}
 
+  template< class T >
+  DynamicArr< T >::DynamicArr(size_t size):
+    capacity_(size),
+    size_(0),
+    head_(0),
+    data_(new T[capacity_])
+  {}
+  
   template< class T >
   DynamicArr< T >::~DynamicArr()
   {

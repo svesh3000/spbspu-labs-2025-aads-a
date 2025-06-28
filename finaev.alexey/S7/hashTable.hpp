@@ -53,7 +53,7 @@ namespace finaev
 
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable():
-    table_(),
+    table_(16),
     size_(0)
   {}
 
