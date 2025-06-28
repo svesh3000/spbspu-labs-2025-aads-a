@@ -90,7 +90,7 @@ namespace
     return result;
   }
 
-  bool isOperator(std::string in)
+  bool isOperator(const std::string& in)
   {
     const std::string operations[6] = { "+", "-", "*", "/", "%", "|" };
     for (std::string s: operations) {
@@ -101,7 +101,7 @@ namespace
     return false;
   }
 
-  bool getPrecedence(std::string lhs, std::string rhs)
+  bool getPrecedence(const std::string& lhs, const std::string& rhs)
   {
     std::map< std::string, int > precedence;
     precedence["+"] = 1;
@@ -231,7 +231,7 @@ dribas::Queue< std::string > dribas::infixToPostfix(Queue< std::string >& infixQ
   return postfixQueue;
 }
 
-dribas::Queue< std::string > dribas::inputInfix(std::string& input)
+dribas::Queue< std::string > dribas::inputInfix(const std::string& input)
 {
   Queue< std::string > queue;
 

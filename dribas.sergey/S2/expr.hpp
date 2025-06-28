@@ -7,7 +7,7 @@
 
 namespace dribas
 {
-  Queue< std::string > inputInfix(std::string&);
+  Queue< std::string > inputInfix(const std::string&);
   long long evaluatePostfix(Queue< std::string >&);
   Queue< std::string > infixToPostfix(Queue< std::string >&);
 
