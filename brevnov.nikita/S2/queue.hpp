@@ -10,8 +10,6 @@ namespace brevnov
 
     T& front();
     const T& front() const;
-    T& back();
-    const T& back() const;
 
     void pop() noexcept;
     void push(const T&);
@@ -35,18 +33,6 @@ namespace brevnov
   const T& Queue< T >::front() const
   {
     return array_.front();
-  }
-
-  template< typename T >
-  T& Queue< T >::back()
-  {
-    return array_.back();
-  }
-
-  template< typename T >
-  const T& Queue< T >::back() const
-  {
-    return array_.back();
   }
 
   template< typename T >

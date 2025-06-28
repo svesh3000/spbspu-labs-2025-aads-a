@@ -2,114 +2,117 @@
 #include <limits>
 #include <stdexcept>
 
-int get_priority(const std::string& operation)
+namespace
 {
-  if (operation == "+" or operation == "-")
+  int get_priority(const std::string& operation)
   {
-    return 1;
+    if (operation == "+" or operation == "-")
+    {
+      return 1;
+    }
+    else if (operation == "*" or operation == "/" or operation == "%")
+    {
+      return 2;
+    }
+    return 0;
   }
-  else if (operation == "*" or operation == "/" or operation == "%")
+
+  bool is_operator(const std::string& a)
   {
-    return 2;
+    return a == "+" || a == "-" || a == "*" || a == "/" || a == "%";
   }
-  return 0;
+
+  void check_multiplicate(long long int a, long long int b)
+  {
+    long long int max = std::numeric_limits< long long int >::max();
+    long long int min = std::numeric_limits< long long int >::min();
+    bool is_Overflow = false;
+    if (a > 0 && b > 0 && a > max / b)
+    {
+      is_Overflow = true;
+    }
+    else if (a > 0 && b < 0 && b < min / a)
+    {
+      is_Overflow = true;
+    }
+    else if (a < 0 && b > 0 && a < min / b)
+    {
+      is_Overflow = true;
+    }
+    else if (a < 0 && b < 0 && b < max / a)
+    {
+      is_Overflow = true;
+    }
+    if (is_Overflow)
+    {
+      throw std::logic_error("Overflow");
+    }
+  }
+
+  void check_sum(long long int a, long long int b)
+  {
+    long long int max = std::numeric_limits< long long int >::max();
+    if (a > max - b)
+    {
+      throw std::logic_error("Overflow");
+    }
+  }
+
+  void check_difference(long long int a, long long b)
+  {
+    long long int min = std::numeric_limits< long long int >::min();
+    if (a < min + b)
+    {
+      throw std::logic_error("Underflow");
+    }
+  }
+
+  void check_division(long long int b)
+  {
+    if (b == 0)
+    {
+      throw std::logic_error("Dividing by 0");
+    }
+  }
+
+  long long int calculating(long long int a, long long b, const std::string& operation)
+  {
+    switch (operation.front())
+    {
+    case '+':
+      check_sum(a, b);
+      return a + b;
+    case '-':
+      check_difference(a, b);
+      return a - b;
+    case '*':
+      check_multiplicate(a, b);
+      return a * b;
+    case '/':
+      check_division(b);
+      return a / b;
+    case '%':
+      check_division(b);
+      return a >= 0 ? a % b : (b - std::abs(a % b)) % b;
+    default:
+      throw std::logic_error("Invalid operation");
+    }
+  }
 }
 
-bool is_operator(const std::string& a)
+brevnov::queue brevnov::convert_expression(queue& infix)
 {
-  return a == "+" || a == "-" || a == "*" || a == "/" || a == "%";
-}
-
-void check_Multiplicate(long long int a, long long int b)
-{
-  long long int max = std::numeric_limits< long long int >::max();
-  long long int min = std::numeric_limits< long long int >::min();
-  bool is_Overflow = false;
-  if (a > 0 && b > 0 && a > max / b)
-  {
-    is_Overflow = true;
-  }
-  else if (a > 0 && b < 0 && b < min / a)
-  {
-    is_Overflow = true;
-  }
-  else if (a < 0 && b > 0 && a < min / b)
-  {
-    is_Overflow = true;
-  }
-  else if (a < 0 && b < 0 && b < max / a)
-  {
-    is_Overflow = true;
-  }
-  if (is_Overflow)
-  {
-    throw std::logic_error("Overflow");
-  }
-}
-
-void check_Sum(long long int a, long long int b)
-{
-  long long int max = std::numeric_limits< long long int >::max();
-  if (a > max - b)
-  {
-    throw std::logic_error("Overflow");
-  }
-}
-
-void check_Difference(long long int a, long long b)
-{
-  long long int min = std::numeric_limits< long long int >::min();
-  if (a < min + b)
-  {
-    throw std::logic_error("Underflow");
-  }
-}
-
-void check_Division(long long int b)
-{
-  if (b == 0)
-  {
-    throw std::logic_error("Dividing by 0");
-  }
-}
-
-long long int calculating(long long int a, long long b, const std::string& operation)
-{
-  switch (operation.front())
-  {
-  case '+':
-    check_Sum(a, b);
-    return a + b;
-  case '-':
-    check_Difference(a, b);
-    return a - b;
-  case '*':
-    check_Multiplicate(a, b);
-    return a * b;
-  case '/':
-    check_Division(b);
-    return a / b;
-  case '%':
-    check_Division(b);
-    return a >= 0 ? a % b : (b - std::abs(a % b)) % b;
-  default:
-    throw std::logic_error("Invalid operation");
-  }
-}
-
-brevnov::queue brevnov::convert_example(queue& infix)
-{
-  queue postfix_examples;
+  queue postfix_expressions;
   while (!infix.empty())
   {
-    example infix_example = infix.front();
+    expression infix_expression = infix.front();
     infix.pop();
-    example postfix_example;
+    expression postfix_expression;
     Stack< std::string > operators;
-    while (!infix_example.empty())
+    while (!infix_expression.empty())
     {
-      std::string part = infix_example.front();
-      infix_example.pop();
+      std::string part = infix_expression.front();
+      infix_expression.pop();
       if (part == "(")
       {
         operators.push(part);
@@ -118,7 +121,7 @@ brevnov::queue brevnov::convert_example(queue& infix)
       {
         while (!operators.empty() && operators.top() != "(")
         {
-          postfix_example.push(operators.top());
+          postfix_expression.push(operators.top());
           operators.pop();
         }
         operators.pop();
@@ -127,38 +130,38 @@ brevnov::queue brevnov::convert_example(queue& infix)
       {
         while (!operators.empty() && get_priority(operators.top()) >= get_priority(part))
         {
-          postfix_example.push(operators.top());
+          postfix_expression.push(operators.top());
           operators.pop();
         }
         operators.push(part);
       }
       else
       {
-        postfix_example.push(part);
+        postfix_expression.push(part);
       }
     }
     while (!operators.empty())
     {
-      postfix_example.push(operators.top());
+      postfix_expression.push(operators.top());
       operators.pop();
     }
-    postfix_examples.push(postfix_example);
+    postfix_expressions.push(postfix_expression);
   }
-  return postfix_examples;
+  return postfix_expressions;
 }
 
-brevnov::stack_number brevnov::calculation_example(queue& postfix_examples)
+brevnov::stack_number brevnov::calculation_expression(queue& postfix_expressions)
 {
   stack_number results;
-  while (!postfix_examples.empty())
+  while (!postfix_expressions.empty())
   {
     stack_number numbers;
-    example postfix_example = postfix_examples.front();
-    postfix_examples.pop();
-    while (!postfix_example.empty())
+    expression postfix_expression = postfix_expressions.front();
+    postfix_expressions.pop();
+    while (!postfix_expression.empty())
     {
-      std::string part = postfix_example.front();
-      postfix_example.pop();
+      std::string part = postfix_expression.front();
+      postfix_expression.pop();
       if (is_operator(part))
       {
         if (numbers.size() < 2)
@@ -176,12 +179,12 @@ brevnov::stack_number brevnov::calculation_example(queue& postfix_examples)
       {
         try
         {
-          long long int number = stoll(part);
+          long long int number = std::stoll(part);
           numbers.push(number);
         }
         catch (...)
         {
-          throw std::logic_error("Invalid number");
+          throw;
         }
       }
     }
@@ -195,7 +198,7 @@ brevnov::stack_number brevnov::calculation_example(queue& postfix_examples)
   return results;
 }
 
-void brevnov::input_example(std::istream& input, queue& examples)
+void brevnov::input_expression(std::istream& input, queue& expressions)
 {
   std::string line;
   while (std::getline(input, line))
@@ -204,7 +207,7 @@ void brevnov::input_example(std::istream& input, queue& examples)
     {
       continue;
     }
-    example infix_example;
+    expression infix_expression;
     std::string part;
     size_t start = 0;
     size_t end = line.find(' ');
@@ -213,7 +216,7 @@ void brevnov::input_example(std::istream& input, queue& examples)
       part = line.substr(start, end - start);
       if (!part.empty())
       {
-        infix_example.push(part);
+        infix_expression.push(part);
       }
       start = end + 1;
       end = line.find(' ', start);
@@ -221,9 +224,9 @@ void brevnov::input_example(std::istream& input, queue& examples)
     part = line.substr(start);
     if (!part.empty())
     {
-      infix_example.push(part);
+      infix_expression.push(part);
     }
-    examples.push(infix_example);
+    expressions.push(infix_expression);
   }
 }
 

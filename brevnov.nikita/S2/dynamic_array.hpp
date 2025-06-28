@@ -31,24 +31,22 @@ namespace brevnov
     size_t size() const noexcept;
     bool empty() const noexcept;
 
-    void reallocate();
     void swap(Dynamic_array< T >&) noexcept;
   private:
     T** data_;
     size_t capacity_;
     size_t size_;
     size_t begin_;
+    void reallocate();
   };
 
   template< typename T >
   Dynamic_array< T >::Dynamic_array():
-    data_(nullptr),
+    data_(new T*[5]),
     capacity_(5),
     size_(0),
     begin_(0)
-  {
-    data_ = new T*[capacity_];
-  }
+  {}
 
   template< typename T >
   Dynamic_array< T >::Dynamic_array(const Dynamic_array< T >& arr):
@@ -93,7 +91,6 @@ namespace brevnov
   {
     clear();
     delete[] data_;
-    capacity_ = 0;
   }
 
   template< typename T >
@@ -192,12 +189,10 @@ namespace brevnov
   template< typename T >
   void Dynamic_array< T >::clear() noexcept
   {
-    while(!empty())
+    while (!empty())
     {
       popFront();
     }
-    size_ = 0;
-    begin_ = 0;
   }
 
   template< typename T >
