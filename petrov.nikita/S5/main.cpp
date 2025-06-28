@@ -42,10 +42,6 @@ int main(const int argc, const char * const * argv)
   }
   SumUpKeysDisplayValues sum_and_display;
   std::string traverse_order(argv[1]);
-  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
-  {
-    std::cout << it->second << '\n';
-  }
   if (tree.empty())
   {
     std::cout << "<EMPTY>";
