@@ -15,20 +15,14 @@ namespace mozhegova::detail
     TreeNode * right;
     size_t h;
 
-    explicit TreeNode(std::pair< Key, T > val, TreeNode * fake):
+    TreeNode() = default;
+
+    explicit TreeNode(const std::pair< Key, T > & val, TreeNode * fake):
       data(val),
       parent(nullptr),
       left(fake),
       right(fake),
       h(1)
-    {}
-
-    TreeNode():
-      data(std::pair< Key, T >()),
-      parent(nullptr),
-      left(nullptr),
-      right(nullptr),
-      h(0)
     {}
   };
 }

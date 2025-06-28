@@ -42,39 +42,17 @@ int main(int argc, char * argv[])
   }
   BiTree< std::string, BiTree< int, std::string > > dicts;
   inputDicts(file, dicts);
+  BiTree< std::string, std::function< void() > > cmds;
+  cmds["print"] = std::bind(print, std::ref(std::cin), std::ref(std::cout), std::cref(dicts));
+  cmds["complement"] = std::bind(complement, std::ref(std::cin), std::ref(dicts));
+  cmds["intersect"] = std::bind(intersect, std::ref(std::cin), std::ref(dicts));
+  cmds["union"] = std::bind(unionCmd, std::ref(std::cin), std::ref(dicts));
   std::string command;
-  while ((!std::cin.eof()) && (std::cin >> command))
+  while (!(std::cin >> command).eof())
   {
     try
     {
-      if (command == "print")
-      {
-        std::string name;
-        std::cin >> name;
-        print(std::cout, name, dicts);
-      }
-      else if (command == "complement")
-      {
-        std::string newDict, dict1, dict2;
-        std::cin >> newDict >> dict1 >> dict2;
-        complement(newDict, dict1, dict2, dicts);
-      }
-      else if (command == "intersect")
-      {
-        std::string newDict, dict1, dict2;
-        std::cin >> newDict >> dict1 >> dict2;
-        intersect(newDict, dict1, dict2, dicts);
-      }
-      else if (command == "union")
-      {
-        std::string newDict, dict1, dict2;
-        std::cin >> newDict >> dict1 >> dict2;
-        unionCmd(newDict, dict1, dict2, dicts);
-      }
-      else
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
+      cmds.at(command)();
     }
     catch (const std::out_of_range &)
     {
@@ -82,7 +60,7 @@ int main(int argc, char * argv[])
     }
     catch (const std::exception & e)
     {
-      std::cerr << e.what() << '\n';
+      std::cerr << e.what() << "\n";
       return 1;
     }
     std::cin.clear();
