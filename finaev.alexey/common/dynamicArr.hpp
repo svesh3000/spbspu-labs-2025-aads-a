@@ -45,7 +45,7 @@ namespace finaev
 
   template< class T >
   DynamicArr< T >::DynamicArr():
-    capacity_(1),
+    capacity_(10),
     size_(0),
     head_(0),
     data_(new T[capacity_])
@@ -53,10 +53,10 @@ namespace finaev
 
   template< class T >
   DynamicArr< T >::DynamicArr(size_t size):
-    capacity_(size),
-    size_(0),
+    capacity_(size + 10),
+    size_(size),
     head_(0),
-    data_(new T[capacity_])
+    data_(new T[size])
   {}
 
   template< class T >

@@ -40,6 +40,7 @@ namespace finaev
     Iter erase(Iter) noexcept;
     std::pair< Iter, bool > insert(pair& val);
 
+    void rehash(size_t n);
   private:
     DynamicArr< Slot< Key, Value > > table_;
     size_t size_;
@@ -49,7 +50,6 @@ namespace finaev
 
     size_t findIndex(const Key & k) const;
     size_t findIndexIn(const Key & k, const DynamicArr< Slot< Key, Value > >& table) const;
-    void rehash(size_t n);
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -120,7 +120,7 @@ namespace finaev
       {
         break;
       }
-      currSlot = (baseSlot + i * i) % table_.size();
+      currSlot = (baseSlot + i) % table_.size();
       ++i;
     }
     return table_.size();
@@ -129,12 +129,12 @@ namespace finaev
   template< class Key, class Value, class Hash, class Equal >
   size_t HashTable< Key, Value, Hash, Equal >::findIndexIn(const Key& k, const DynamicArr< Slot< Key, Value > >& table) const
   {
-    size_t homeSlot = hasher_(k) % table.size();
-    size_t currSlot = homeSlot;
+    size_t baseSlot = hasher_(k) % table.size();
+    size_t currSlot = baseSlot;
     size_t i = 1;
     while (table[currSlot].occupied)
     {
-      currSlot = (homeSlot + i * i) % table.size();
+      currSlot = (baseSlot + i) % table.size();
       ++i;
     }
     return currSlot;
@@ -242,6 +242,10 @@ namespace finaev
   template< class Key, class Value, class Hash, class Equal >
   std::pair< typename HashTable< Key, Value, Hash, Equal >::Iter, bool > HashTable< Key, Value, Hash, Equal >::insert(pair& val)
   {
+    if (table_.size() == 0)
+    {
+      rehash(16);
+    }
     if (size_ >= table_.size() * max_load_factor_)
     {
       rehash(table_.size() * 2);
