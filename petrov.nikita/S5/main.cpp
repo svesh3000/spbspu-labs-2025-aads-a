@@ -46,7 +46,7 @@ int main(const int argc, const char * const * argv)
   {
     std::cout << "<EMPTY>" << '\n';
   }
-  if (traverse_order == "ascending")
+  else if (traverse_order == "ascending")
   {
     SumUpKeysDisplayValues new_sum_and_display = tree.traverse_lnr(sum_and_display);
     std::cout << new_sum_and_display.result << ' ';
