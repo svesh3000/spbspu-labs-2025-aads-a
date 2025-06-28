@@ -29,11 +29,11 @@ int main(const int argc, const char * const * argv)
     std::cerr << '\n';
     return 1;
   }
-  AVLTree< int, std::string > tree;
+  AVLTree< long long, std::string > tree;
   std::ifstream in(argv[2]);
   while (!in.eof())
   {
-    int key = 0;
+    long long key = 0;
     std::string val;
     if (in >> key >> val)
     {

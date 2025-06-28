@@ -11,7 +11,7 @@ namespace petrov
   struct SumUpKeysDisplayValues
   {
     int result = 0;
-    void operator()(const std::pair< const int, std::string > & key_value);
+    void operator()(const std::pair< const long long, std::string > & key_value);
     std::ostream & displayValuesInTraverseOrder(std::ostream & out);
   private:
     Queue< std::string > queue_;

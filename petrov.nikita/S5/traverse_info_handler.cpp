@@ -1,13 +1,13 @@
 #include "traverse_info_handler.hpp"
 #include <limits>
 
-void petrov::SumUpKeysDisplayValues::operator()(const std::pair< const int, std::string > & key_val)
+void petrov::SumUpKeysDisplayValues::operator()(const std::pair< const long long, std::string > & key_val)
 {
-  if ((result > 0 || key_val.first > 0) && result <= std::numeric_limits< int >::max() - key_val.first)
+  if ((result > 0 || key_val.first > 0) && result <= std::numeric_limits< long long >::max() - key_val.first)
   {
     result += key_val.first;
   }
-  else if (result < 0 && key_val.first < 0 && result >= std::numeric_limits< int >::min() - key_val.first)
+  else if (result < 0 && key_val.first < 0 && result >= std::numeric_limits< long long >::min() - key_val.first)
   {
     result += key_val.first;
   }
