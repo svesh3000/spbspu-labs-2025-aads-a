@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <AVLtree.hpp>
+#include "hashTable.hpp"
 
 namespace finaev
 {
@@ -18,7 +19,7 @@ namespace finaev
   class Graph
   {
   public:
-    using hashMapForEdges = std::unordered_map< std::pair< std::string, std::string >, AVLtree< size_t, size_t >, HashForPair >;
+    using hashMapForEdges = HashTable< std::pair< std::string, std::string >, AVLtree< size_t, size_t >, HashForPair >;
 
     void addVertex(const std::string& str);
     void addEdge(std::string first, std::string second, size_t weigth);
