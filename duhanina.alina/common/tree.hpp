@@ -25,11 +25,11 @@ namespace duhanina
     explicit Tree(std::initializer_list< std::pair< Key, Value > >);
 
     Tree(const Tree& other);
-    Tree(Tree&& other);
+    Tree(Tree&& other) noexcept;
     ~Tree();
 
     Tree& operator=(const Tree& other);
-    Tree& operator=(Tree&& other);
+    Tree& operator=(Tree&& other) noexcept;
 
     Iterator_t begin() const noexcept;
     ConstIterator_t cbegin() const noexcept;
@@ -37,8 +37,8 @@ namespace duhanina
     ConstIterator_t cend() const noexcept;
 
     void push(const Key& k, const Value& v);
-    Value& get(const Key& k) const;
-    Value& drop(const Key& k);
+    const Value& get(const Key& k) const;
+    void drop(const Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -136,44 +136,14 @@ namespace duhanina
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::Tree(const Tree& other):
-    fakeRoot_(nullptr),
-    size_(0)
-  {
-    Node_t* newRoot = nullptr;
-    Node_t* tempFakeRoot = nullptr;
-    try
-    {
-      tempFakeRoot = new Node_t(Key(), Value(), nullptr);
-      newRoot = copyTree(other.getRoot(), tempFakeRoot);
-      fakeRoot_ = tempFakeRoot;
-      setRoot(newRoot);
-      size_ = other.size_;
-    }
-    catch (...)
-    {
-      clear(newRoot);
-      delete tempFakeRoot;
-      throw;
-    }
-  }
+    Tree(other.cbegin(), other.cend())
+  {}
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::Tree(Tree&& other):
-    fakeRoot_(other.fakeRoot_),
-    size_(other.size_)
-  {
-    try
-    {
-      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-      other.size_ = 0;
-    }
-    catch (...)
-    {
-      fakeRoot_ = nullptr;
-      size_ = 0;
-      throw;
-    }
-  }
+  Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
+    fakeRoot_(std::exchange(other.fakeRoot_, new Node_t(Key(), Value(), nullptr))),
+    size_(std::exchange(other.size_, 0))
+  {}
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::~Tree()
@@ -187,38 +157,18 @@ namespace duhanina
   {
     if (this != std::addressof(other))
     {
-      Node_t* oldFakeRoot = fakeRoot_;
-      Node_t* oldRoot = fakeRoot_->left;
-      size_t oldSize = size_;
-      Node_t* newFakeRoot = nullptr;
-      Node_t* newRoot = nullptr;
-      try
-      {
-        newFakeRoot = new Node_t(Key(), Value(), nullptr);
-        newRoot = copyTree(other.getRoot(), newFakeRoot);
-        fakeRoot_ = newFakeRoot;
-        setRoot(newRoot);
-        size_ = other.size_;
-        clear(oldRoot);
-        delete oldFakeRoot;
-      }
-      catch (...)
-      {
-        clear(newRoot);
-        delete newFakeRoot;
-        fakeRoot_ = oldFakeRoot;
-        size_ = oldSize;
-        throw;
-      }
+      Tree< Key, Value, Compare> temp(other);
+      swap(temp);
     }
     return *this;
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other)
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
+<<<<<<< HEAD
       Node_t* oldFakeRoot = fakeRoot_;
       size_t oldSize = size_;
       try
@@ -236,6 +186,10 @@ namespace duhanina
         size_ = oldSize;
         throw;
       }
+=======
+      Tree< Key, Value, Compare > temp(std::move(other));
+      swap(temp);
+>>>>>>> master
     }
     return *this;
   }
@@ -298,9 +252,9 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::get(const Key& k) const
+  const Value& Tree< Key, Value, Compare >::get(const Key& k) const
   {
-    Node_t* node = find(getRoot(), k);
+    const Node_t* node = find(getRoot(), k);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -309,12 +263,19 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::drop(const Key& k)
+  void Tree< Key, Value, Compare >::drop(const Key& k)
   {
-    auto* result = new Value(std::move(get(k)));
+    Node_t* node = find(getRoot(), k);
+    if (!node)
+    {
+      throw std::out_of_range("Key not found");
+    }
     setRoot(remove(getRoot(), k));
     size_--;
+<<<<<<< HEAD
     return *result;
+=======
+>>>>>>> master
   }
 
   template < typename Key, typename Value, typename Compare >

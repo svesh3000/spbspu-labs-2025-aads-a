@@ -81,10 +81,15 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
+<<<<<<< HEAD
     Dictionary& dict1 = storage.get(name1);
     Dictionary& dict2 = storage.get(name2);
+=======
+    const Dictionary& dict1 = storage.get(name1);
+    const Dictionary& dict2 = storage.get(name2);
+>>>>>>> master
     Dictionary result;
-    for (auto it = dict1.begin(); it != dict1.end(); ++it)
+    for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
     {
       if (dict2.count(it->first) == 0)
       {
@@ -100,10 +105,15 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
+<<<<<<< HEAD
     Dictionary& dict1 = storage.get(name1);
     Dictionary& dict2 = storage.get(name2);
+=======
+    const Dictionary& dict1 = storage.get(name1);
+    const Dictionary& dict2 = storage.get(name2);
+>>>>>>> master
     Dictionary result;
-    for (auto it = dict1.begin(); it != dict1.end(); ++it)
+    for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
     {
       if (dict2.count(it->first) > 0)
       {
@@ -119,10 +129,15 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
+<<<<<<< HEAD
     Dictionary& dict1 = storage.get(name1);
     Dictionary& dict2 = storage.get(name2);
+=======
+    const Dictionary& dict1 = storage.get(name1);
+    const Dictionary& dict2 = storage.get(name2);
+>>>>>>> master
     Dictionary result = dict1;
-    for (auto it = dict2.begin(); it != dict2.end(); ++it)
+    for (auto it = dict2.cbegin(); it != dict2.cend(); ++it)
     {
       if (result.count(it->first) == 0)
       {
