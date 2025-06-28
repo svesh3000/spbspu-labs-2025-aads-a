@@ -16,6 +16,7 @@ namespace finaev
   public:
     using Iter = HashTableIterator< Key, Value, Hash, Equal >;
     using constIter = HashTableConstIterator< Key, Value, Hash, Equal >;
+    using pair = const std::pair< Key, Value >;
 
     HashTable();
 
@@ -37,7 +38,7 @@ namespace finaev
     const Value& at(const Key& key) const;
     size_t erase(const Key& key) noexcept;
     Iter erase(Iter) noexcept;
-    std::pair< Iter, bool > insert(const std::pair< Key, Value > & val);
+    std::pair< Iter, bool > insert(pair& val);
 
   private:
     DynamicArr< Slot< Key, Value > > table_;
@@ -150,7 +151,7 @@ namespace finaev
         size_++;
       }
     }
-  }  
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::Iter HashTable< Key, Value, Hash, Equal >::find(const Key& k)
@@ -231,7 +232,7 @@ namespace finaev
 
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< typename HashTable< Key, Value, Hash, Equal >::Iter, bool > HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& val)
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::Iter, bool > HashTable< Key, Value, Hash, Equal >::insert(pair& val)
   {
     if (size_ >= table_.size() * max_load_factor_)
     {

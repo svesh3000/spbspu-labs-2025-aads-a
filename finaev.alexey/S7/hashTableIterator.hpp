@@ -17,7 +17,7 @@ namespace finaev
     friend class HashTableConstIterator< Key, Value, Hash, Equal >;
   public:
     using this_t = HashTableIterator< Key, Value, Hash, Equal >;
-    
+
     HashTableIterator();
     HashTableIterator(const this_t &) = default;
     this_t & operator=(const this_t &) = default;
