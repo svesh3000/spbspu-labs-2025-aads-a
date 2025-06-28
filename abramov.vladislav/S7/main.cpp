@@ -24,7 +24,7 @@ int main(int argc, char **argv)
   {
     try
     {
-      if (command == "graph")
+      if (command == "graphs")
       {
         collection.printAllGraphs(std::cout);
       }

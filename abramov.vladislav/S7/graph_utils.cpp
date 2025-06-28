@@ -233,7 +233,19 @@ void abramov::createGraph(GraphCollection &collect, std::istream &in)
   catch (const std::logic_error &)
   {}
   size_t k = 0;
-  in >> k;
+  if (in.peek() == '\n')
+  {
+    throw std::logic_error("Invalid argument\n");
+  }
+  if (!(in >> k))
+  {
+    throw std::logic_error("Invalid argument\n");
+  }
+  if (!k)
+  {
+    collect.addGraph(res);
+    return;
+  }
   std::string vert;
   for (size_t i = 0; i < k; ++i)
   {
