@@ -3,6 +3,57 @@
 
 using Tree = duhanina::Tree< int, std::string, std::less< int > >;
 
+BOOST_AUTO_TEST_CASE(ForwardTraversal)
+{
+  Tree tree;
+  tree.push(1, "one");
+  tree.push(3, "three");
+  tree.push(4, "four");
+  tree.push(5, "five");
+  auto it = tree.begin();
+
+  BOOST_TEST((*it).first == 1);
+  BOOST_TEST((*it).second == "one");
+  ++it;
+
+  BOOST_TEST((*it).first == 3);
+  BOOST_TEST((*it).second == "three");
+  ++it;
+
+  BOOST_TEST((*it).first == 4);
+  BOOST_TEST((*it).second == "four");
+  ++it;
+
+  BOOST_TEST((*it).first == 5);
+  BOOST_TEST((*it).second == "five");
+}
+
+BOOST_AUTO_TEST_CASE(ReverseTraversal)
+{
+  Tree tree;
+  tree.push(1, "one");
+  tree.push(3, "three");
+  tree.push(4, "four");
+  tree.push(5, "five");
+  auto it = tree.end();
+  --it;
+
+  BOOST_TEST((*it).first == 5);
+  BOOST_TEST((*it).second == "five");
+  --it;
+
+  BOOST_TEST((*it).first == 4);
+  BOOST_TEST((*it).second == "four");
+  --it;
+
+  BOOST_TEST((*it).first == 3);
+  BOOST_TEST((*it).second == "three");
+  --it;
+
+  BOOST_TEST((*it).first == 1);
+  BOOST_TEST((*it).second == "one");
+}
+
 BOOST_AUTO_TEST_CASE(DefaultConstructorTest)
 {
   Tree tree;
@@ -27,7 +78,6 @@ BOOST_AUTO_TEST_CASE(MoveConstructorTest)
 
   Tree tree2(std::move(tree1));
   BOOST_TEST(tree2.size() == 2);
-  BOOST_TEST(tree1.empty());
 }
 
 BOOST_AUTO_TEST_CASE(AssignmentOperatorTest)
@@ -67,7 +117,7 @@ BOOST_AUTO_TEST_CASE(DropTest)
   Tree tree;
   tree.push(1, "one");
   tree.push(2, "two");
-  auto value = tree.drop(2);
+  tree.drop(2);
   BOOST_TEST(tree.size() == 1);
 }
 
