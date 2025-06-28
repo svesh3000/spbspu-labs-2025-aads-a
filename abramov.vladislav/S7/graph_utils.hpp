@@ -11,6 +11,7 @@ namespace abramov
   void printInVerts(const GraphCollection &collect, const std::string &n, const std::string &v, std::ostream &out);
   void addEdgeToGraph(GraphCollection &collect, const std::string &name, std::istream &in);
   void cutEdgeFromGraph(GraphCollection &collect, const std::string &name, std::istream &in);
+  void createGraph(GraphCollection &collect, std::istream &in);
   void mergeGraphs(GraphCollection &collect, const std::string &name, std::istream &in);
 }
 #endif

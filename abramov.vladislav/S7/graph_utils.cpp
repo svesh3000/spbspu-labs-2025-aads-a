@@ -220,6 +220,32 @@ void abramov::cutEdgeFromGraph(GraphCollection &collect, const std::string &name
   }
 }
 
+void abramov::createGraph(GraphCollection &collect, std::istream &in)
+{
+  std::string name;
+  in >> name;
+  Graph res(name);
+  try
+  {
+    res = collect.cgetGraph(name);
+    throw std::logic_error("There is such graph\n");
+  }
+  catch (const std::logic_error &)
+  {}
+  size_t k = 0;
+  in >> k;
+  std::string vert;
+  for (size_t i = 0; i < k; ++i)
+  {
+    if (!(in >> vert))
+    {
+      throw std::logic_error("Invalid argument\n");
+    }
+    res.addVertex(vert);
+  }
+  collect.addGraph(res);
+}
+
 void abramov::mergeGraphs(GraphCollection &collect, const std::string &name, std::istream &in)
 {
   std::string n1;

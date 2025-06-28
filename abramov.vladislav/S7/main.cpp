@@ -62,6 +62,7 @@ int main(int argc, char **argv)
       }
       else if (command == "create")
       {
+        createGraph(collection, std::cin);
       }
       else if (command == "merge")
       {
