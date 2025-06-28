@@ -56,6 +56,11 @@ abramov::SimpleArray< std::string > abramov::GraphCollection::getAllGraphsSorted
 
 void abramov::GraphCollection::printAllGraphs(std::ostream &out) const
 {
+  if (graphs.empty())
+  {
+    out << "\n";
+    return;
+  }
   auto names = getAllGraphsSorted();
   for (size_t i = 0; i < names.size(); ++i)
   {
