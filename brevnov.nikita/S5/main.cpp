@@ -3,19 +3,23 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <limits>
 #include <utility>
-#include "tree.hpp"
 #include "keySum.hpp"
+#include "tree.hpp"
 
 using namespace brevnov;
 using Tree = AVLTree< int, std::string >;
 
-void input(std::istream& input, Tree& tree)
+namespace
 {
-  std::pair< int, std::string > pair;
-  while (input >> pair.first >> pair.second)
+  void input(std::istream& input, Tree& tree)
   {
-    tree.insert(pair);
+    std::pair< int, std::string > pair;
+    while (input >> pair.first >> pair.second)
+    {
+      tree.insert(pair);
+    }
   }
 }
 
