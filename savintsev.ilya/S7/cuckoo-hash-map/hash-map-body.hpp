@@ -180,8 +180,8 @@ namespace savintsev
 
   private:
 
-    Array< std::pair< std::pair< Key, T >, bool > > t1_;
-    Array< std::pair< std::pair< Key, T >, bool > > t2_;
+    std::vector< std::pair< std::pair< Key, T >, bool > > t1_;
+    std::vector< std::pair< std::pair< Key, T >, bool > > t2_;
 
     size_t capacity_;
     size_t size_;
@@ -510,8 +510,8 @@ namespace savintsev
   template< typename Key, typename T, typename HS1, typename HS2, typename EQ >
   void HashMap< Key, T, HS1, HS2, EQ >::rehash(size_t n)
   {
-    Array< std::pair< std::pair< Key, T >, bool > > new_t1(n);
-    Array< std::pair< std::pair< Key, T >, bool > > new_t2(n);
+    std::vector< std::pair< std::pair< Key, T >, bool > > new_t1(n);
+    std::vector< std::pair< std::pair< Key, T >, bool > > new_t2(n);
 
     const size_t old_capacity = capacity_;
     const size_t old_size = size_;

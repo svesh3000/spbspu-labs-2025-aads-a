@@ -13,15 +13,15 @@ namespace savintsev
 {
   struct Graph
   {
-    HashMap< std::string, HashMap< std::string, std::vector< int > > > edges;
+    HashMap< std::string, HashMap< std::string, Array< int > > > edges;
     std::set< std::string > vertexes;
   };
 
   HashMap< std::string, Graph > graphs;
 
-  std::vector< std::string > split(const std::string & line)
+  Array< std::string > split(const std::string & line)
   {
-    std::vector< std::string > result;
+    Array< std::string > result;
     size_t start = 0;
     while (start < line.length())
     {
@@ -56,7 +56,7 @@ namespace savintsev
     }
   }
 
-  void cmd_vertexes(const std::vector< std::string > & args)
+  void cmd_vertexes(const Array< std::string > & args)
   {
     if (args.size() < 2)
     {
@@ -84,7 +84,7 @@ namespace savintsev
     }
   }
 
-  void cmd_outbound(const std::vector< std::string > & args)
+  void cmd_outbound(const Array< std::string > & args)
   {
     if (args.size() < 3)
     {
@@ -101,7 +101,7 @@ namespace savintsev
       return;
     }
 
-    TwoThreeTree< std::string, std::vector< int > > out;
+    TwoThreeTree< std::string, Array< int > > out;
     auto targets = graphs[g].edges.find(v);
     if (targets != graphs[g].edges.end())
     {
@@ -121,7 +121,7 @@ namespace savintsev
     for (auto it = out.begin(); it != out.end(); ++it)
     {
       std::cout << it->first;
-      for (std::vector< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
+      for (Array< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
       {
         std::cout << ' ' << *wt;
       }
@@ -129,7 +129,7 @@ namespace savintsev
     }
   }
 
-  void cmd_inbound(const std::vector< std::string > & args)
+  void cmd_inbound(const Array< std::string > & args)
   {
     if (args.size() < 3)
     {
@@ -146,7 +146,7 @@ namespace savintsev
       return;
     }
 
-    TwoThreeTree< std::string, std::vector< int > > in;
+    TwoThreeTree< std::string, Array< int > > in;
     for (auto it = graphs[g].edges.begin(); it != graphs[g].edges.end(); ++it)
     {
       auto jt = it->second.find(v);
@@ -160,7 +160,7 @@ namespace savintsev
     for (auto it = in.begin(); it != in.end(); ++it)
     {
       std::cout << it->first;
-      for (std::vector< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
+      for (Array< int >::iterator wt = it->second.begin(); wt != it->second.end(); ++wt)
       {
         std::cout << ' ' << *wt;
       }
@@ -168,7 +168,7 @@ namespace savintsev
     }
   }
 
-  void cmd_bind(const std::vector< std::string > & args)
+  void cmd_bind(const Array< std::string > & args)
   {
     if (args.size() < 5)
     {
@@ -192,7 +192,7 @@ namespace savintsev
     graphs[g].edges[a][b].push_back(w);
   }
 
-  void cmd_cut(const std::vector< std::string > & args)
+  void cmd_cut(const Array< std::string > & args)
   {
     if (args.size() < 5)
     {
@@ -213,8 +213,8 @@ namespace savintsev
       return;
     }
 
-    std::vector< int > & weights = graphs[g].edges[a][b];
-    std::vector< int >::iterator it = find(weights.begin(), weights.end(), w);
+    Array< int > & weights = graphs[g].edges[a][b];
+    Array< int >::iterator it = std::find(weights.begin(), weights.end(), w);
     if (it == weights.end())
     {
       std::cout << "<INVALID COMMAND>\n";
@@ -228,7 +228,7 @@ namespace savintsev
     }
   }
 
-  void cmd_create(const std::vector< std::string > & args)
+  void cmd_create(const Array< std::string > & args)
   {
     if (args.size() < 2)
     {
@@ -252,7 +252,7 @@ namespace savintsev
   }
 
 
-  void cmd_merge(const std::vector< std::string > & args)
+  void cmd_merge(const Array< std::string > & args)
   {
     if (args.size() < 4)
     {
@@ -293,7 +293,7 @@ namespace savintsev
     graphs[newg] = g;
   }
 
-  void cmd_extract(const std::vector< std::string > & args)
+  void cmd_extract(const Array< std::string > & args)
   {
     if (args.size() < 5)
     {
@@ -365,7 +365,7 @@ int main(int argc, char* argv[])
     {
       continue;
     }
-    std::vector< std::string > header = split(line);
+    Array< std::string > header = split(line);
     if (header.size() != 2)
     {
       continue;
@@ -382,7 +382,7 @@ int main(int argc, char* argv[])
       {
         continue;
       }
-      std::vector< std::string > e = split(line);
+      Array< std::string > e = split(line);
       if (e.size() != 3)
       {
         continue;
@@ -400,7 +400,7 @@ int main(int argc, char* argv[])
 
   using namespace std::placeholders;
 
-  savintsev::HashMap< std::string, std::function< void(const std::vector< std::string > &) > > cmd_map;
+  savintsev::HashMap< std::string, std::function< void(const Array< std::string > &) > > cmd_map;
   cmd_map["graphs"] = std::bind(cmd_graphs);
   cmd_map["vertexes"] = std::bind(cmd_vertexes, _1);
   cmd_map["outbound"] = std::bind(cmd_outbound, _1);
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
     {
       continue;
     }
-    std::vector< std::string > args = split(input);
+    Array< std::string > args = split(input);
     if (args.empty())
     {
       continue;
