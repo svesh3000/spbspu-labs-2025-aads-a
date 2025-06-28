@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
-#include "dict-utils.hpp"
+#include "dict-input-output.hpp"
 
 namespace
 {
