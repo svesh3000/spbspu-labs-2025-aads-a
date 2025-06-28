@@ -213,11 +213,6 @@ namespace
     size_t& counter;
   };
 
-  std::string get_id(const std::pair< std::string, lanovenko::Target >& rhs)
-  {
-    return rhs.first;
-  }
-
   struct EraseFromMap
   {
     void operator()(std::pair< const std::string, lanovenko::targets >& rhs) const
@@ -235,6 +230,18 @@ namespace
   bool is_same_line(const std::pair< std::string, lanovenko::Target >& lhs, const std::string& rhs)
   {
     return lhs.second.type == rhs;
+  }
+
+  bool present_with_type(const std::map<std::string, lanovenko::Target>& rhs, const std::string& type)
+  {
+    for (const auto& pair: rhs)
+    {
+      if (is_same_line(pair, type))
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   void print_target(const std::pair< const std::string, lanovenko::Target >& rhs, std::ostream& out)
@@ -401,11 +408,11 @@ void lanovenko::engage_balanced(std::istream& in, std::ostream& out, targets& tr
     targets_vec.push_back(target);
   }
 
-  for (size_t i = 0; i < targets_vec.size(); ++i) 
+  for (size_t i = 0; i < targets_vec.size(); ++i)
   {
-    for (size_t j = i + 1; j < targets_vec.size(); ++j) 
+    for (size_t j = i + 1; j < targets_vec.size(); ++j)
     {
-      if (!score_comparator(targets_vec[i], targets_vec[j])) 
+      if (!score_comparator(targets_vec[i], targets_vec[j]))
       {
         std::swap(targets_vec[i], targets_vec[j]);
       }
@@ -434,7 +441,7 @@ void lanovenko::engage_balanced(std::istream& in, std::ostream& out, targets& tr
 
   std::vector<std::string> destroyed_ids;
   for (const auto& target : processed_targets) {
-    destroyed_ids.push_back(target.first); 
+    destroyed_ids.push_back(target.first);
   }
 
   for (const auto& id : destroyed_ids) {
@@ -511,7 +518,7 @@ void lanovenko::engage_top_threats(std::istream& in, std::ostream& out, targets&
   std::vector<std::string> destroyed_ids;
   for (const auto& target : processed_targets)
   {
-    destroyed_ids.push_back(target.first); 
+    destroyed_ids.push_back(target.first);
   }
 
   for (const auto& id : destroyed_ids)
@@ -588,7 +595,7 @@ void lanovenko::solve_threat(std::istream& in, std::ostream& out, targets& trg, 
   Pantsir& new_pantsir = ps[new_status];
 
   in >> type;
-  if (!is_equal_type(type))
+  if (!is_equal_type(type) || !present_with_type(new_targets, type))
   {
     throw std::logic_error(" < INCORRECT TYPE >\n");
   }
@@ -667,6 +674,45 @@ void lanovenko::solve_threat(std::istream& in, std::ostream& out, targets& trg, 
   Eraser{ trg, trgs, destroyed_ids.begin(), destroyed_ids.end() }();
 
   trgs.erase(current_name);
+}
+
+void lanovenko::target_list(std::istream& in, std::ostream& out, const targets_sets& trgs)
+{
+  std::string name;
+  if (!(in >> name) || trgs.find(name) == trgs.end())
+  {
+    throw std::logic_error("< INCORRECT NAME >");
+  }
+
+  const targets& curr = trgs.at(name);
+  struct Printer {
+    std::ostream& out;
+    targets::const_iterator it;
+    void operator()() {
+      if (it != targets::const_iterator()) {
+        print_target(*it, out);
+        ++it;
+        (*this)();
+      }
+    }
+  };
+  Printer{ out, curr.begin() }();
+}
+
+void lanovenko::all_targets(std::ostream& out, const targets& trs)
+{
+  struct Printer {
+    std::ostream& out;
+    targets::const_iterator it;
+    void operator()() {
+      if (it != targets::const_iterator()) {
+        print_target(*it, out);
+        ++it;
+        (*this)();
+      }
+    }
+  };
+  Printer{ out, trs.begin() }();
 }
 
 void lanovenko::system_status(std::istream& in, std::ostream& out, const pantsir_s& ps)
