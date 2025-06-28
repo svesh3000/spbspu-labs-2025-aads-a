@@ -44,7 +44,7 @@ int main(const int argc, const char * const * argv)
   std::string traverse_order(argv[1]);
   if (tree.empty())
   {
-    std::cout << "<EMPTY>" << '\n';
+    std::cout << "<EMPTY>";
   }
   else if (traverse_order == "ascending")
   {
