@@ -14,7 +14,6 @@ namespace lanovenko
   class HashIterator
   {
   public:
-    friend class HashTable< Key, T, HS1, HS2, EQ >;
     using this_t = HashIterator< Key, T, HS1, HS2, EQ >;
     using node = Node< Key, T >;
 
