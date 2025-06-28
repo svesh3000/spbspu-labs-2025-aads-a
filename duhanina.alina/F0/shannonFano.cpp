@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <list.hpp>
+#include <array.hpp>
 
 namespace
 {
