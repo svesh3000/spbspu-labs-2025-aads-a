@@ -87,7 +87,7 @@ namespace lanovenko
 
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashTable< Key, T, HS1, HS2, EQ >::HashTable(size_t capacity):
-    slots_(new HashNode< Key, T >[capacity]{}),
+    slots_(new Node< Key, T >[capacity]{}),
     capacity_(capacity),
     size_(0)
   {}
@@ -182,10 +182,10 @@ namespace lanovenko
     {
       return;
     }
-    HashNode< Key, T >* tmp = nullptr;
+    Node< Key, T >* tmp = nullptr;
     try
     {
-      tmp = new HashNode< Key, T >[newCapacity];
+      tmp = new Node< Key, T >[newCapacity];
       for (size_t i = 0; i < capacity_; ++i)
       {
         if (slots_[i].occupied && !slots_[i].deleted)
@@ -410,7 +410,7 @@ namespace lanovenko
   {
     if (ml > 0.0f && ml <= 1.0f)
     {
-      maxLoadFactor_ = ml;
+      max_load_factor_ = ml;
       if (loadFactor() > max_load_factor_)
       {
         rehash(capacity_ * 2);

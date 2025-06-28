@@ -33,8 +33,9 @@ namespace
 
 namespace lanovenko
 {
-  struct Graph
+  class Graph
   {
+  public:
     void add_edge(const std::string& v1, const std::string& v2, int weight);
     void add_vertex(const std::string& v);
     void delete_edge(const std::string& v1, const std::string& v2, int weight);
