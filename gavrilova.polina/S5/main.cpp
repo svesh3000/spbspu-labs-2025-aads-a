@@ -42,12 +42,12 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Collector< int, std::string > collector;
+  Collector< long long int, std::string > collector;
 
   try {
-    ArrayBuffer< std::pair< int, std::string > > data = detail::parse_file< int, std::string >(argv[2]);
+    ArrayBuffer< std::pair< long long int, std::string > > data = detail::parse_file< long long int, std::string >(argv[2]);
 
-    TwoThreeTree< int, std::string > tree;
+    TwoThreeTree< long long int, std::string > tree;
 
     for (size_t i = 0; i < data.size(); ++i) {
       tree.insert({data[i].first, data[i].second});
