@@ -261,56 +261,24 @@ namespace savintsev
   template< typename T >
   const T & Array< T >::front() const
   {
-    std::cout << "front(): " << data_[start_] << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
-
     return data_[start_];
   }
 
   template< typename T >
   T & Array< T >::front()
   {
-    std::cout << "front(): " << data_[start_] << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
-
     return data_[start_];
   }
 
   template< typename T >
   const T & Array< T >::back() const
   {
-    std::cout << "back(): " << data_[start_ + size_ - 1] << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
-
     return data_[start_ + size_ - 1];
   }
 
   template< typename T >
   T & Array< T >::back()
   {
-    std::cout << "back(): " << data_[start_ + size_ - 1] << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
-
     return data_[start_ + size_ - 1];
   }
 
@@ -336,14 +304,6 @@ namespace savintsev
 
     data_[start_ + size_] = std::forward< U >(rhs);
     ++size_;
-
-    std::cout << "push_back(): " << rhs << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
   }
 
   template< typename T >
@@ -353,14 +313,6 @@ namespace savintsev
     {
       --size_;
     }
-
-    std::cout << "pop_back(): " << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
   }
 
   template< typename T >
@@ -371,14 +323,6 @@ namespace savintsev
       ++start_;
       --size_;
     }
-
-    std::cout << "pop_front(): " << '\n';
-    std::cout << "array:";
-    for (size_t i = start_; i < (size_ + start_); ++i)
-    {
-      std::cout << ' ' << data_[i];
-    }
-    std::cout << '\n';
   }
 }
 
