@@ -228,7 +228,7 @@ void abramov::createGraph(GraphCollection &collect, std::istream &in)
   try
   {
     res = collect.cgetGraph(name);
-    throw std::logic_error("There is such graph\n");
+    throw std::runtime_error("There is such graph\n");
   }
   catch (const std::logic_error &)
   {}
