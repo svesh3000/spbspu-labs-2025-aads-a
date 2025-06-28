@@ -170,7 +170,7 @@ namespace savintsev
   template< typename U >
   void Array< T >::push_back(U && rhs)
   {
-    if (size_ + 1 >= capacity_)
+    if (size_ + start_ >= capacity_)
     {
       size_t new_capacity = capacity_ ? capacity_ * 2 : 1;
       T * new_data = new T[new_capacity];
@@ -186,7 +186,7 @@ namespace savintsev
       start_ = 0;
     }
 
-    data_[start_ + size_] = std::forward< U >(rhs);
+    data_[size_] = std::forward< U >(rhs);
     ++size_;
   }
 
