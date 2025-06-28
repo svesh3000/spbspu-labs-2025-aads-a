@@ -1,8 +1,20 @@
 #include "traverse_info_handler.hpp"
+#include <limits>
 
 void petrov::SumUpKeysDisplayValues::operator()(const std::pair< const int, std::string > & key_val)
 {
-  result += key_val.first;
+  if (result > 0 && key_val.first > 0 && result <= std::numeric_limits< int >::max() - key_val.first)
+  {
+    result += key_val.first;
+  }
+  else if (result < 0 && key_val.first < 0 && result >= std::numeric_limits< int >::min() - key_val.first)
+  {
+    result += key_val.first;
+  }
+  else
+  {
+    throw std::out_of_range("ERROR: Out of range");
+  }
   queue_.push(key_val.second);
 }
 

@@ -42,27 +42,41 @@ int main(const int argc, const char * const * argv)
   }
   SumUpKeysDisplayValues sum_and_display;
   std::string traverse_order(argv[1]);
-  if (tree.empty())
+  try
   {
-    std::cout << "<EMPTY>";
+    if (tree.empty())
+    {
+      std::cout << "<EMPTY>";
+    }
+    else if (traverse_order == "ascending")
+    {
+      SumUpKeysDisplayValues new_sum_and_display = tree.traverse_lnr(sum_and_display);
+      std::cout << new_sum_and_display.result << ' ';
+      new_sum_and_display.displayValuesInTraverseOrder(std::cout);
+    }
+    else if (traverse_order == "descending")
+    {
+      SumUpKeysDisplayValues new_sum_and_display = tree.traverse_rnl(sum_and_display);
+      std::cout << new_sum_and_display.result << ' ';
+      new_sum_and_display.displayValuesInTraverseOrder(std::cout);
+    }
+    else if (traverse_order == "breadth")
+    {
+      SumUpKeysDisplayValues new_sum_and_display = tree.traverse_breadth(sum_and_display);
+      std::cout << new_sum_and_display.result << ' ';
+      new_sum_and_display.displayValuesInTraverseOrder(std::cout);
+    }
+    else
+    {
+      std::cerr << "ERROR: Invalid argument";
+      std::cerr << '\n';
+      return 2;
+    }
   }
-  else if (traverse_order == "ascending")
+  catch(const std::out_of_range & e)
   {
-    SumUpKeysDisplayValues new_sum_and_display = tree.traverse_lnr(sum_and_display);
-    std::cout << new_sum_and_display.result << ' ';
-    new_sum_and_display.displayValuesInTraverseOrder(std::cout);
-  }
-  else if (traverse_order == "descending")
-  {
-    SumUpKeysDisplayValues new_sum_and_display = tree.traverse_rnl(sum_and_display);
-    std::cout << new_sum_and_display.result << ' ';
-    new_sum_and_display.displayValuesInTraverseOrder(std::cout);
-  }
-  else if (traverse_order == "breadth")
-  {
-    SumUpKeysDisplayValues new_sum_and_display = tree.traverse_breadth(sum_and_display);
-    std::cout << new_sum_and_display.result << ' ';
-    new_sum_and_display.displayValuesInTraverseOrder(std::cout);
+    std::cerr << e.what() << '\n';
+    return 3;
   }
   std::cout << '\n';
 }
