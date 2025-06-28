@@ -26,8 +26,6 @@ namespace finaev
     T& operator[](size_t index);
     const T& operator[](size_t index) const;
 
-    void resize(size_t n);
-
     size_t size() const noexcept;
     bool empty() const noexcept;
 
@@ -209,34 +207,6 @@ namespace finaev
       throw std::out_of_range("out of range");
     }
     return data_[index];
-  }
-
-  template< class T >
-  void DynamicArr< T >::resize(size_t n)
-  {
-    if (size_ == n)
-    {
-      return;
-    }
-    T* newData = nullptr;
-    try
-    {
-      newData = new T[n];
-      for (size_t i = 0; i < n; ++i)
-      {
-        size_t index = (head_ + i) % capacity_;
-        newData[i] = data_[index];
-      }
-    }
-    catch (...)
-    {
-      delete[] newData;
-      throw;
-    }
-    delete[] data_;
-    data_ = newData;
-    capacity_ = n;
-    head_ = 0;
   }
 
   template< class T >

@@ -48,6 +48,7 @@ namespace finaev
     float max_load_factor_ = 0.7;
 
     size_t findIndex(const Key & k) const;
+    size_t findIndexIn(const Key & k, const DynamicArr< Slot< Key, Value > >& table) const;
     void rehash(size_t n);
   };
 
@@ -126,31 +127,38 @@ namespace finaev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  size_t HashTable< Key, Value, Hash, Equal >::findIndexIn(const Key& k, const DynamicArr< Slot< Key, Value > >& table) const
+  {
+    size_t homeSlot = hasher_(k) % table.size();
+    size_t currSlot = homeSlot;
+    size_t i = 1;
+    while (table[currSlot].occupied)
+    {
+      currSlot = (homeSlot + i * i) % table.size();
+      ++i;
+    }
+    return currSlot;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t n)
   {
     if (n < table_.size())
     {
       return;
     }
-    DynamicArr< Slot< Key, Value > > old_table = std::move(table_);
-    table_.resize(n);
+    DynamicArr< Slot< Key, Value > > temp(n);
     for (size_t i = 0; i < table_.size(); ++i)
     {
-      table_[i].occupied = false;
-      table_[i].deleted = false;
-    }
-    size_ = 0;
-    for (size_t i = 0; i < old_table.size(); ++i)
-    {
-      if (old_table[i].occupied && !old_table[i].deleted)
+      if (table_[i].occupied)
       {
-        size_t new_index = findIndex(old_table[i].data.first);
-        table_[new_index].data = old_table[i].data;
-        table_[new_index].occupied = true;
-        table_[new_index].deleted = false;
-        size_++;
+        size_t newId = findIndexIn(table_[i].data.first, temp);
+        temp[newId].data = table_[i].data;
+        temp[newId].occupied = true;
+        temp[newId].deleted = false;
       }
     }
+    table_.swap(temp);
   }
 
   template< class Key, class Value, class Hash, class Equal >
