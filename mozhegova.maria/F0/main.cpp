@@ -6,6 +6,7 @@
 #include <functional>
 #include <hashTable.hpp>
 #include <dynamicArray.hpp>
+#include <tree.hpp>
 #include "commands.hpp"
 
 int main(int argc, char * argv[])
@@ -30,7 +31,7 @@ int main(int argc, char * argv[])
     }
   }
 
-  std::map< std::string, std::function< void() > > cmds;
+  BiTree< std::string, std::function< void() > > cmds;
   cmds["generatelinks"] = std::bind(generateLinks, std::ref(std::cin), std::ref(texts));
   cmds["removelinks"] = std::bind(removeLinks, std::ref(std::cin), std::ref(texts));
   cmds["printlinks"] = std::bind(printLinks, std::ref(std::cin), std::ref(std::cout), std::cref(texts));
