@@ -2,6 +2,7 @@
 #include <cstring>
 #include <functional>
 #include <limits>
+#include <hash_table/definition.hpp>
 #include "bfs_commands.hpp"
 #include "graph_commands.hpp"
 
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  std::unordered_map< std::string, std::function< void() > > commands;
+  maslevtsov::HashTable< std::string, std::function< void() > > commands;
   commands["save-graphs"] = std::bind(save_graphs, std::cref(graphs), std::ref(std::cin));
   commands["open-graphs"] = std::bind(open_graphs, std::ref(graphs), std::ref(std::cin), std::ref(std::cout));
 

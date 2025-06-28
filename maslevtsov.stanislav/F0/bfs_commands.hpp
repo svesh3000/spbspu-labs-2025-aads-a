@@ -5,7 +5,7 @@
 #include "graph.hpp"
 
 namespace maslevtsov {
-  using graphs_t = std::unordered_map< std::string, Graph >;
+  using graphs_t = maslevtsov::HashTable< std::string, Graph >;
 
   void traverse_breadth_first(const graphs_t& graphs, std::istream& in, std::ostream& out);
   void get_min_path(const graphs_t& graphs, std::istream& in, std::ostream& out);

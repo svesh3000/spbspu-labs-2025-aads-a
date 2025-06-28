@@ -1,7 +1,7 @@
 #include "graph_commands.hpp"
 #include <fstream>
-#include <algorithm>
-#include <iterator>
+#include <vector/definition.hpp>
+#include <hash_table/definition.hpp>
 #include "graph.hpp"
 
 bool maslevtsov::check_graphs_format(std::istream& in)
@@ -199,8 +199,12 @@ void maslevtsov::create_subgraph(graphs_t& graphs, std::istream& in)
   if (graphs.find(new_gr_name) != graphs.end()) {
     throw std::invalid_argument("invalid graph names");
   }
-  std::vector< unsigned > vertices(vertice_count);
-  std::copy_n(std::istream_iterator< unsigned >(in), vertice_count, vertices.begin());
+  maslevtsov::Vector< unsigned > vertices;
+  unsigned vertice = 0;
+  for (size_t i = 0; i != vertice_count; ++i) {
+    in >> vertice;
+    vertices.push_back(vertice);
+  }
   Graph new_gr(graphs.at(gr_name), vertices);
   graphs[new_gr_name] = new_gr;
 }

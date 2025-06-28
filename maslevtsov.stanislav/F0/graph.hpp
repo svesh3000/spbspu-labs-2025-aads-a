@@ -1,19 +1,19 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
-#include <unordered_map>
+#include <hash_table/declaration.hpp>
 #include <string>
-#include <vector>
+#include <vector/declaration.hpp>
 
 namespace maslevtsov {
   class Graph
   {
   public:
-    using adjacency_list_t = std::unordered_map< unsigned, std::vector< unsigned > >;
+    using adjacency_list_t = maslevtsov::HashTable< unsigned, maslevtsov::Vector< unsigned > >;
 
     Graph() = default;
     Graph(const Graph& gr1, const Graph& gr2);
-    Graph(const Graph& src, const std::vector< unsigned >& vertices);
+    Graph(const Graph& src, const maslevtsov::Vector< unsigned >& vertices);
 
     const adjacency_list_t& get_adj_list() const;
 

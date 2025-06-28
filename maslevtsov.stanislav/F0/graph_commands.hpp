@@ -5,7 +5,7 @@
 #include "graph.hpp"
 
 namespace maslevtsov {
-  using graphs_t = std::unordered_map< std::string, Graph >;
+  using graphs_t = maslevtsov::HashTable< std::string, Graph >;
 
   bool check_graphs_format(std::istream& in);
   void print_help_manual(std::ostream& out);

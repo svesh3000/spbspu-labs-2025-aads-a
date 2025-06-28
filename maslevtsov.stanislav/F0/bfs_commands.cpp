@@ -1,47 +1,19 @@
 #include "bfs_commands.hpp"
-#include <algorithm>
-#include <queue>
-#include <functional>
-#include <stack>
+#include <stack.hpp>
+#include <queue.hpp>
+#include <hash_table/definition.hpp>
 
 namespace {
-  using distances_t = std::unordered_map< unsigned, size_t >;
-  using parents_t = std::unordered_map< unsigned, unsigned >;
-  using nodes_queue_t = std::queue< unsigned >;
-  using node_neighbour_pair_t = std::pair< const unsigned, std::vector< unsigned > >;
-  using node_distance_pair_t = std::pair< const unsigned, size_t >;
-
-  struct PathProcessor
-  {
-    unsigned current_node_;
-    distances_t& distances_;
-    parents_t& parents_;
-    nodes_queue_t& nodes_queue_;
-
-    PathProcessor(unsigned current_node, distances_t& distances, parents_t& parents, nodes_queue_t& nodes_queue):
-      current_node_(current_node),
-      distances_(distances),
-      parents_(parents),
-      nodes_queue_(nodes_queue)
-    {}
-
-    int operator()(unsigned neighbor)
-    {
-      if (distances_.find(neighbor) == distances_.end()) {
-        distances_[neighbor] = distances_[current_node_] + 1;
-        parents_[neighbor] = current_node_;
-        nodes_queue_.push(neighbor);
-      }
-      return 0;
-    }
-  };
+  using distances_t = maslevtsov::HashTable< unsigned, size_t >;
+  using parents_t = maslevtsov::HashTable< unsigned, unsigned >;
+  using node_neighbour_pair_t = std::pair< const unsigned, maslevtsov::Vector< unsigned > >;
 
   void get_bfs_from(const maslevtsov::Graph& graph, unsigned start, distances_t& distances, parents_t& parents)
   {
     distances_t distances_result;
     parents_t parents_result;
-    const std::unordered_map< unsigned, std::vector< unsigned > >& adj_list = graph.get_adj_list();
-    nodes_queue_t to_visit;
+    const maslevtsov::HashTable< unsigned, maslevtsov::Vector< unsigned > >& adj_list = graph.get_adj_list();
+    maslevtsov::Queue< unsigned > to_visit;
     distances_result[start] = 0;
     to_visit.push(start);
     while (!to_visit.empty()) {
@@ -51,17 +23,28 @@ namespace {
       if (adj_list_it->second.empty()) {
         continue;
       }
-      std::vector< int > dump(adj_list_it->second.size());
-      std::transform(adj_list_it->second.begin(), adj_list_it->second.end(), dump.begin(),
-        PathProcessor(current_node, distances_result, parents_result, to_visit));
+      maslevtsov::Vector< int > dump(adj_list_it->second.size());
+      for (auto i = adj_list_it->second.begin(); i != adj_list_it->second.end(); ++i) {
+        if (distances_result.find(*i) == distances_result.end()) {
+          distances_result[*i] = distances_result[current_node] + 1;
+          parents_result[*i] = current_node;
+          to_visit.push(*i);
+        }
+      }
     }
     distances = std::move(distances_result);
     parents = std::move(parents_result);
   }
 
-  bool compare_distances(const node_distance_pair_t& left, const node_distance_pair_t& right)
+  distances_t::const_iterator find_max_distance(const distances_t& distances)
   {
-    return left.second < right.second;
+    distances_t::const_iterator largest = distances.cbegin();
+    for (auto i = ++distances.cbegin(); i != distances.cend(); ++i) {
+      if (largest->second < i->second) {
+        largest = i;
+      }
+    }
+    return largest;
   }
 
   size_t get_max_distance(const maslevtsov::Graph& graph, const node_neighbour_pair_t& node_neighbour_pair)
@@ -69,39 +52,22 @@ namespace {
     distances_t distances;
     parents_t parents;
     get_bfs_from(graph, node_neighbour_pair.first, distances, parents);
-    auto max_el_it = std::max_element(distances.begin(), distances.end(), compare_distances);
-    return max_el_it != distances.end() ? max_el_it->second : 0;
+    auto max_el_it = find_max_distance(distances);
+    return max_el_it != distances.cend() ? max_el_it->second : 0;
   }
 
-  unsigned get_first_component_element(const std::pair< const unsigned, unsigned >& node_parent_pair)
+  void sort(maslevtsov::Vector< unsigned >& vector)
   {
-    return node_parent_pair.first;
-  }
-
-  unsigned get_second_component_element(const std::pair< const unsigned, unsigned >& node_parent_pair)
-  {
-    return node_parent_pair.second;
-  }
-
-  int get_component(const maslevtsov::Graph& graph, const node_neighbour_pair_t& node_neighbour_pair,
-    std::vector< std::vector< unsigned > >& components)
-  {
-    distances_t distances;
-    parents_t parents;
-    get_bfs_from(graph, node_neighbour_pair.first, distances, parents);
-    std::vector< unsigned > component;
-    if (parents.empty()) {
-      return 0;
+    if (vector.empty()) {
+      return;
     }
-    std::transform(parents.begin(), parents.end(), std::back_inserter(component), get_first_component_element);
-    std::transform(parents.begin(), parents.end(), std::back_inserter(component), get_second_component_element);
-    std::sort(component.begin(), component.end());
-    auto first_to_erase = std::unique(component.begin(), component.end());
-    component.erase(first_to_erase, component.end());
-    if (std::find(components.begin(), components.end(), component) == components.end()) {
-      components.push_back(component);
+    for (size_t i = 0; i < vector.size() - 1; ++i) {
+      for (size_t j = 0; j < vector.size() - i - 1; ++j) {
+        if (vector[j] > vector[j + 1]) {
+          std::swap(vector[j], vector[j + 1]);
+        }
+      }
     }
-    return 0;
   }
 }
 
@@ -111,7 +77,7 @@ void maslevtsov::traverse_breadth_first(const graphs_t& graphs, std::istream& in
   unsigned start_node = 0;
   in >> graph_name >> start_node;
   auto gr_it = graphs.find(graph_name);
-  if (gr_it == graphs.cend() || gr_it->second.get_adj_list().find(start_node) == gr_it->second.get_adj_list().cend()) {
+  if (gr_it == graphs.end() || gr_it->second.get_adj_list().find(start_node) == gr_it->second.get_adj_list().end()) {
     throw std::invalid_argument("non-existing graph");
   }
   distances_t distances;
@@ -137,7 +103,7 @@ void maslevtsov::get_min_path(const graphs_t& graphs, std::istream& in, std::ost
   if (distances.find(goal_node) == distances.end()) {
     throw std::invalid_argument("non-existing path");
   }
-  std::stack< unsigned > restored_path;
+  maslevtsov::Stack< unsigned > restored_path;
   unsigned current_node = goal_node;
   while (current_node != start_node) {
     restored_path.push(current_node);
@@ -160,12 +126,16 @@ void maslevtsov::get_graph_width(const graphs_t& graphs, std::istream& in, std::
   if (gr_it == graphs.cend()) {
     throw std::invalid_argument("non-existing graph");
   }
-  const std::unordered_map< unsigned, std::vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
-  std::vector< size_t > all_distances;
-  using namespace std::placeholders;
-  auto distance_collector = std::bind(get_max_distance, std::ref(gr_it->second), _1);
-  std::transform(adj_list.begin(), adj_list.end(), std::back_inserter(all_distances), distance_collector);
-  out << *std::max_element(all_distances.begin(), all_distances.end()) << '\n';
+  const maslevtsov::HashTable< unsigned, maslevtsov::Vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
+  maslevtsov::Vector< size_t > all_distances;
+  size_t max_distance = get_max_distance(gr_it->second, *adj_list.begin());
+  for (auto i = ++adj_list.begin(); i != adj_list.end(); ++i) {
+    size_t distance = get_max_distance(gr_it->second, *i);
+    if (max_distance < distance) {
+      max_distance = distance;
+    }
+  }
+  out << max_distance << '\n';
 }
 
 void maslevtsov::get_graph_components(const graphs_t& graphs, std::istream& in, std::ostream& out)
@@ -176,12 +146,34 @@ void maslevtsov::get_graph_components(const graphs_t& graphs, std::istream& in, 
   if (gr_it == graphs.cend()) {
     throw std::invalid_argument("non-existing graph");
   }
-  const std::unordered_map< unsigned, std::vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
-  std::vector< std::vector< unsigned > > all_components;
-  std::vector< int > dump;
-  using namespace std::placeholders;
-  auto component_collector = std::bind(get_component, std::ref(gr_it->second), _1, std::ref(all_components));
-  std::transform(adj_list.begin(), adj_list.end(), std::back_inserter(dump), component_collector);
+  const maslevtsov::HashTable< unsigned, maslevtsov::Vector< unsigned > >& adj_list = gr_it->second.get_adj_list();
+  maslevtsov::HashTable< unsigned, bool > visited_vertices;
+  maslevtsov::Vector< maslevtsov::Vector< unsigned > > all_components;
+  for (auto vertice_it = adj_list.begin(); vertice_it != adj_list.end(); ++vertice_it) {
+    if (visited_vertices.find(vertice_it->first) != visited_vertices.end()) {
+      continue;
+    }
+    distances_t distances;
+    parents_t parents;
+    get_bfs_from(gr_it->second, vertice_it->first, distances, parents);
+    maslevtsov::Vector< unsigned > component;
+    for (auto parent_it = parents.begin(); parent_it != parents.end(); ++parent_it) {
+      if (visited_vertices.find(parent_it->first) == visited_vertices.end()) {
+        visited_vertices[parent_it->first] = true;
+        component.push_back(parent_it->first);
+      }
+      if (visited_vertices.find(parent_it->second) == visited_vertices.end()) {
+        visited_vertices[parent_it->second] = true;
+        component.push_back(parent_it->second);
+      }
+    }
+    if (component.empty() && visited_vertices.find(vertice_it->first) == visited_vertices.end()) {
+      component.push_back(vertice_it->first);
+      visited_vertices[vertice_it->first] = true;
+    }
+    sort(component);
+    all_components.push_back(component);
+  }
   for (auto i = all_components.begin(); i != all_components.end(); ++i) {
     out << *i->begin();
     for (auto j = ++i->begin(); j != i->end(); ++j) {

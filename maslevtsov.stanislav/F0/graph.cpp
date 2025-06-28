@@ -1,7 +1,7 @@
 #include "graph.hpp"
 #include <iostream>
-#include <algorithm>
-#include <functional>
+#include <hash_table/definition.hpp>
+#include <vector/definition.hpp>
 
 namespace {
   struct DelimiterIn
@@ -23,9 +23,15 @@ namespace {
     return in;
   }
 
-  bool is_neighbour_in_src(const std::vector< unsigned >& src, unsigned neighbour)
+  maslevtsov::Vector< unsigned >::const_iterator find_neighbour(const maslevtsov::Vector< unsigned >& vertices,
+    unsigned vertice)
   {
-    return std::find(src.begin(), src.end(), neighbour) != src.end();
+    for (auto i = vertices.cbegin(); i != vertices.cend(); ++i) {
+      if (vertice == *i) {
+        return i;
+      }
+    }
+    return vertices.cend();
   }
 }
 
@@ -49,15 +55,18 @@ maslevtsov::Graph::Graph(const Graph& gr1, const Graph& gr2):
   }
 }
 
-maslevtsov::Graph::Graph(const Graph& src, const std::vector< unsigned >& vertices):
+maslevtsov::Graph::Graph(const Graph& src, const maslevtsov::Vector< unsigned >& vertices):
   Graph()
 {
   for (unsigned vertice: vertices) {
     auto src_it = src.adjacency_list_.find(vertice);
     if (src_it != src.adjacency_list_.end()) {
-      std::vector< unsigned > filtered_edges;
-      auto is_nghbr_in_vrtcs = std::bind(is_neighbour_in_src, std::ref(vertices), std::placeholders::_1);
-      std::copy_if(src_it->second.begin(), src_it->second.end(), std::back_inserter(filtered_edges), is_nghbr_in_vrtcs);
+      maslevtsov::Vector< unsigned > filtered_edges;
+      for (unsigned neighbour: src_it->second) {
+        if (find_neighbour(vertices, neighbour) != vertices.cend()) {
+          filtered_edges.push_back(neighbour);
+        }
+      }
       adjacency_list_[vertice] = filtered_edges;
     } else {
       adjacency_list_.clear();
@@ -83,7 +92,7 @@ void maslevtsov::Graph::add_edge(unsigned vertice1, unsigned vertice2)
 {
   auto vertice1_it = adjacency_list_.find(vertice1);
   if (vertice1_it != adjacency_list_.end()) {
-    if (std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2) != vertice1_it->second.cend()) {
+    if (find_neighbour(vertice1_it->second, vertice2) != vertice1_it->second.cend()) {
       throw std::invalid_argument("edge already exist");
     }
   }
@@ -99,7 +108,7 @@ void maslevtsov::Graph::delete_vertice(unsigned vertice)
   auto neighbours_it = adjacency_list_.find(vertice)->second;
   for (auto i = neighbours_it.begin(); i != neighbours_it.end(); ++i) {
     auto neighbour_it = adjacency_list_.find(*i);
-    neighbour_it->second.erase(std::find(neighbour_it->second.begin(), neighbour_it->second.end(), vertice));
+    neighbour_it->second.erase(find_neighbour(neighbour_it->second, vertice));
   }
   adjacency_list_.erase(adjacency_list_.find(vertice));
 }
@@ -110,12 +119,13 @@ void maslevtsov::Graph::delete_edge(unsigned vertice1, unsigned vertice2)
   if (vertice1_it == adjacency_list_.end()) {
     throw std::invalid_argument("non-existing edge");
   }
-  if (std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2) == vertice1_it->second.cend()) {
+
+  if (find_neighbour(vertice1_it->second, vertice2) == vertice1_it->second.cend()) {
     throw std::invalid_argument("non-existing edge");
   }
-  vertice1_it->second.erase(std::find(vertice1_it->second.begin(), vertice1_it->second.end(), vertice2));
+  vertice1_it->second.erase(find_neighbour(vertice1_it->second, vertice2));
   auto vertice2_it = adjacency_list_.find(vertice2);
-  vertice2_it->second.erase(std::find(vertice2_it->second.begin(), vertice2_it->second.end(), vertice1));
+  vertice2_it->second.erase(find_neighbour(vertice2_it->second, vertice1));
 }
 
 std::istream& maslevtsov::operator>>(std::istream& in, Graph& gr)
