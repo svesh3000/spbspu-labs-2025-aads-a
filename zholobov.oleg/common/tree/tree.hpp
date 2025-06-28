@@ -4,6 +4,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include <queue.hpp>
+#include <stack.hpp>
 #include "node.hpp"
 #include "tree_iterators.hpp"
 
@@ -83,6 +85,19 @@ namespace zholobov {
 
     std::pair< iterator, iterator > equal_range(const key_type& key);
     std::pair< const_iterator, const_iterator > equal_range(const key_type& key) const;
+
+    template < typename F >
+    F traverse_lnr(F f);
+    template < typename F >
+    F traverse_lnr(F f) const;
+    template < typename F >
+    F traverse_rnl(F f);
+    template < typename F >
+    F traverse_rnl(F f) const;
+    template < typename F >
+    F traverse_breadth(F f);
+    template < typename F >
+    F traverse_breadth(F f) const;
 
   private:
     int height(node_type* node) const;
@@ -519,6 +534,128 @@ namespace zholobov {
   Tree< Key, T, Compare >::equal_range(const key_type& key) const
   {
     return std::make_pair(lower_bound(key), upper_bound(key));
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_lnr(F f)
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->left;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->right;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_lnr(F f) const
+  {
+    zholobov::Stack< const node_type* > nodeStack;
+    const node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->left;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->right;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_rnl(F f)
+  {
+    zholobov::Stack< node_type* > nodeStack;
+    node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->right;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->left;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_rnl(F f) const
+  {
+    zholobov::Stack< const node_type* > nodeStack;
+    const node_type* current = fakeRoot_->left;
+    while ((current != nullptr) || !nodeStack.empty()) {
+      while (current != nullptr) {
+        nodeStack.push(current);
+        current = current->right;
+      }
+      current = nodeStack.top();
+      nodeStack.pop();
+      f(current->data);
+      current = current->left;
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_breadth(F f)
+  {
+    node_type* root = fakeRoot_->left;
+    if (root != nullptr) {
+      zholobov::Queue< node_type* > nodeQueue;
+      nodeQueue.push(root);
+      while (!nodeQueue.empty()) {
+        node_type* current = nodeQueue.front();
+        nodeQueue.pop();
+        f(current->data);
+        if (current->left != nullptr) {
+          nodeQueue.push(current->left);
+        }
+        if (current->right != nullptr) {
+          nodeQueue.push(current->right);
+        }
+      }
+    }
+    return f;
+  }
+
+  template < typename Key, typename T, typename Compare >
+  template < typename F >
+  F Tree< Key, T, Compare >::traverse_breadth(F f) const
+  {
+    const node_type* root = fakeRoot_->left;
+    if (root != nullptr) {
+      zholobov::Queue< const node_type* > nodeQueue;
+      nodeQueue.push(root);
+      while (!nodeQueue.empty()) {
+        const node_type* current = nodeQueue.front();
+        nodeQueue.pop();
+        f(current->data);
+        if (current->left != nullptr) {
+          nodeQueue.push(current->left);
+        }
+        if (current->right != nullptr) {
+          nodeQueue.push(current->right);
+        }
+      }
+    }
+    return f;
   }
 
   template < typename Key, typename T, typename Compare >
