@@ -963,7 +963,7 @@ std::pair< typename kizhin::Map< K, T, C >::iterator, bool > kizhin::Map< K, T,
   const_iterator rootPos{ root_ };
   value_type value(std::forward< Args >(args)...);
   const bool result = count(value.first);
-  return std::make_pair(emplaceHint(rootPos, std::move(value)), result);
+  return std::make_pair(emplaceHint(rootPos, std::move(value)), !result);
 }
 
 template < typename K, typename T, typename C >
