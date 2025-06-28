@@ -22,55 +22,64 @@ int main(int argc, char **argv)
   std::string command;
   while (!(std::cin >> command).eof())
   {
-    if (command == "graph")
+    try
     {
-      collection.printAllGraphs(std::cout);
+      if (command == "graph")
+      {
+        collection.printAllGraphs(std::cout);
+      }
+      else if (command == "vertexes")
+      {
+        std::string name;
+        std::cin >> name;
+        printVertsSorted(collection, name, std::cout);
+      }
+      else if (command == "outbound")
+      {
+        std::string name;
+        std::string vert;
+        std::cin >> name >> vert;
+        printOutVerts(collection, name, vert, std::cout);
+      }
+      else if (command == "inbound")
+      {
+        std::string name;
+        std::string vert;
+        std::cin >> name >> vert;
+        printInVerts(collection, name, vert, std::cout);
+      }
+      else if (command == "bind")
+      {
+        std::string name;
+        std::cin >> name;
+        addEdgeToGraph(collection, name, std::cin);
+      }
+      else if (command == "cut")
+      {
+        std::string name;
+        std::cin >> name;
+        cutEdgeFromGraph(collection, name, std::cin);
+      }
+      else if (command == "create")
+      {
+      }
+      else if (command == "merge")
+      {
+        std::string name;
+        std::cin >> name;
+        mergeGraphs(collection, name, std::cin);
+      }
+      else if (command == "extract")
+      {
+      }
+      else
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
-    else if (command == "vertexes")
-    {
-      std::string name;
-      std::cin >> name;
-      printVertsSorted(collection, name, std::cout);
-    }
-    else if (command == "outbound")
-    {
-      std::string name;
-      std::string vert;
-      std::cin >> name >> vert;
-      printOutVerts(collection, name, vert, std::cout);
-    }
-    else if (command == "inbound")
-    {
-      std::string name;
-      std::string vert;
-      std::cin >> name >> vert;
-      printInVerts(collection, name, vert, std::cout);
-    }
-    else if (command == "bind")
-    {
-      std::string name;
-      std::cin >> name;
-      addEdgeToGraph(collection, name, std::cin);
-    }
-    else if (command == "cut")
-    {
-      std::string name;
-      std::cin >> name;
-      cutEdgeFromGraph(collection, name, std::cin);
-    }
-    else if (command == "create")
-    {
-    }
-    else if (command == "merge")
-    {
-      std::string name;
-      std::cin >> name;
-      mergeGraphs(collection, name, std::cin);
-    }
-    else if (command == "extract")
-    {
-    }
-    else
+    catch (const std::exception &)
     {
       std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
