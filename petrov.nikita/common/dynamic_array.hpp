@@ -74,7 +74,9 @@ namespace petrov
     capacity_(rhs.capacity_),
     size_(rhs.size_),
     front_index_(rhs.front_index_)
-  {}
+  {
+    rhs.massive_ = nullptr;
+  }
 
   template< typename T >
   DynamicArray< T >::~DynamicArray()
@@ -130,25 +132,30 @@ namespace petrov
         massive_ = temp;
         capacity_ = 5;
         size_++;
+        front_index_ = 0;
       }
-      else if (size_ == capacity_)
+      else if ((size_ + front_index_) == capacity_)
       {
         temp = new T[capacity_ * 2];
         size_t i = 0;
+        size_t j = front_index_;
         while (i < size_)
         {
-          temp[i] = massive_[i];
+          temp[i] = massive_[j];
           ++i;
+          ++j;
         }
         temp[i] = std::forward< T1 >(val);
         delete[] massive_;
         massive_ = temp;
         capacity_ *= 2;
         size_++;
+        front_index_ = 0;
       }
       else
       {
-        massive_[size_++] = std::forward< T1 >(val);
+        massive_[size_ + front_index_] = std::forward< T1 >(val);
+        size_++;
       }
     }
     catch (...)
