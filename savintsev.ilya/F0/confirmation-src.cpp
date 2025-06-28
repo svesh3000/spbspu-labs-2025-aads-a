@@ -25,6 +25,7 @@ bool savintsev::ConfirmationPrompt::ask(const std::string & message)
       return false;
     }
   }
+  return false;
 }
 
 bool savintsev::ConfirmationPrompt::is_yes(const std::string & answer)

@@ -148,7 +148,7 @@ void savintsev::cleanup_projects_with_backup(Projects & projects)
 {
   struct ProjectProcessor
   {
-    void operator()(std::pair< const std::string, Project > & proj_pair) const
+    void operator()(std::pair< std::string, Project > & proj_pair) const
     {
       Project & proj = proj_pair.second;
       write_savi_file(proj_pair.first + "_backup", proj);
@@ -164,7 +164,7 @@ void savintsev::cleanup_projects_without_backup(Projects& projects)
 {
   struct ProjectProcessor
   {
-    void operator()(std::pair< const std::string, Project > & proj_pair) const
+    void operator()(std::pair< std::string, Project > & proj_pair) const
     {
       Project & proj = proj_pair.second;
       std::for_each(proj.begin(), proj.end(), Deleter());
