@@ -5,7 +5,7 @@
 #include "iterator.hpp"
 #include "node.hpp"
 
-namespace
+namespace lanovenko
 {
   template< class Key >
   struct XXHash
@@ -17,10 +17,7 @@ namespace
       return hasher.result();
     }
   };
-}
 
-namespace lanovenko
-{
   template< class Key, class T, class HS1 = std::hash< Key >, class HS2 = XXHash< Key >, class EQ = std::equal_to< Key > >
   class HashTable
   {
@@ -438,7 +435,7 @@ namespace lanovenko
     }
     std::pair< Key, T > temp(std::forward< Args >(args)...);
     const Key& key = temp.first;
-    auto pair = findPosition(key);
+    auto pair = find_position(key);
     size_t pos = pair.first;
     bool hasFind = pair.second;
 
@@ -480,13 +477,13 @@ namespace lanovenko
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::insert(cIterator hint, const std::pair< Key, T >& pair)
   {
-    return emplaceHint(hint, pair);
+    return emplace_hint(hint, pair);
   }
 
   template< class Key, class T, class HS1, class HS2, class EQ >
   HashIterator< Key, T, HS1, HS2, EQ > HashTable< Key, T, HS1, HS2, EQ >::insert(cIterator hint, std::pair< Key, T >&& pair)
   {
-    return emplaceHint(hint, std::move(pair));
+    return emplace_hint(hint, std::move(pair));
   }
 }
 

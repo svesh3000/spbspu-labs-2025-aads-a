@@ -7,7 +7,8 @@
 #include <stdexcept>
 #include "hash_table.hpp"
 
-namespace
+
+namespace lanovenko
 {
   struct PairHash1
   {
@@ -29,10 +30,7 @@ namespace
       return hasher.result();
     }
   };
-}
 
-namespace lanovenko
-{
   class Graph
   {
   public:
