@@ -60,7 +60,7 @@ namespace finaev
     head_(0),
     data_(new T[capacity_])
   {}
-  
+
   template< class T >
   DynamicArr< T >::~DynamicArr()
   {
