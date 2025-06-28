@@ -186,7 +186,7 @@ namespace savintsev
       start_ = 0;
     }
 
-    data_[size_] = std::forward< U >(rhs);
+    data_[start_ + size_] = std::forward< U >(rhs);
     ++size_;
   }
 
