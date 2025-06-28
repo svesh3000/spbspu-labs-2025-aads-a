@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <hashTable.hpp>
-#include "dynamicArray.hpp"
+#include <dynamicArray.hpp>
 #include "commands.hpp"
 
 int main(int argc, char * argv[])
