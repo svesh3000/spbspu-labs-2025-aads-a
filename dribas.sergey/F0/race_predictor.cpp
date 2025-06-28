@@ -1,7 +1,7 @@
 #include "race_predictor.hpp"
 #include <cmath>
 #include <iomanip>
-#include <streamGuard.hpp>
+#include "streamGuard.hpp"
 
 namespace
 {

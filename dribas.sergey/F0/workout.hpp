@@ -3,11 +3,9 @@
 
 #include <string>
 #include <ctime>
-#include <fstream>
-#include <cmath>
 #include <istream>
 #include <ostream>
-#include <map>
+#include <avlTree.hpp>
 
 namespace dribas
 {
@@ -25,13 +23,12 @@ namespace dribas
 
   struct training_suite
   {
-    std::map< size_t, std::map< time_t, workout > > suite;
+    AVLTree< size_t, AVLTree< time_t, workout > > suite;
   };
 
-  workout parseGpx(const std::string& gpxContent);
-
-  std::istream& operator>>(std::istream& is, workout& w);
-  std::ostream& operator<<(std::ostream& os, const workout& w);
+  workout parseGpx(std::istream&);
+  std::istream& operator>>(std::istream&, workout&);
+  std::ostream& operator<<(std::ostream&, const workout&);
 }
 
 #endif

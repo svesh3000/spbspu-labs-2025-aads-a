@@ -15,7 +15,6 @@ namespace dribas
     double halfMarathon;
     double marathon;
   };
-  
   RacePrediction predict_result(const AVLTree< time_t, workout >&);
   std::ostream& operator<<(std::ostream&, const RacePrediction&);
 }
