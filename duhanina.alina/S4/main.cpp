@@ -81,18 +81,8 @@ namespace
     std::string newName = readNextToken(args, pos);
     std::string name1 = readNextToken(args, pos);
     std::string name2 = readNextToken(args, pos);
-<<<<<<< HEAD
-<<<<<<< HEAD
-    Dictionary& dict1 = storage.get(name1);
-    Dictionary& dict2 = storage.get(name2);
-=======
     const Dictionary& dict1 = storage.get(name1);
     const Dictionary& dict2 = storage.get(name2);
->>>>>>> master
-=======
-    const Dictionary& dict1 = storage.get(name1);
-    const Dictionary& dict2 = storage.get(name2);
->>>>>>> 6567b55bdf821a85e8d5a8131f387b89e517c88c
     Dictionary result;
     for (auto it = dict1.cbegin(); it != dict1.cend(); ++it)
     {
