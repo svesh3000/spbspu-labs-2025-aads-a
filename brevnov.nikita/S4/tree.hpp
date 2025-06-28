@@ -183,71 +183,71 @@
     }
 
     template< typename Key, typename Value, typename Cmp >
-    typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* y) noexcept
+    typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::rightRotate(Node* par) noexcept
     {
-      if (!y || !y->left)
+      if (!par || !par->left)
       {
-        return y;
+        return par;
       }
-      Node* x = y->left;
-      Node* T2 = x->right;
-      x->right = y;
-      y->left = T2;
-      x->parent = y->parent;
-      y->parent = x;
-      if (T2)
+      Node* n = par->left;
+      Node* ch = n->right;
+      n->right = par;
+      par->left = ch;
+      n->parent = par->parent;
+      par->parent = n;
+      if (ch)
       {
-        T2->parent = y;
+        ch->parent = par;
       }
-      if (!x->parent)
+      if (!n->parent)
       {
-        root_ = x;
+        root_ = n;
       }
-      else if (x->parent->left == y)
+      else if (n->parent->left == par)
       {
-        x->parent->left = x;
+        n->parent->left = n;
       }
       else
       {
-        x->parent->right = x;
+        n->parent->right = n;
       }
-      y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
-      x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
-      return x;
+      par->nodeHeight = std::max(height(par->left), height(par->right)) + 1;
+      n->nodeHeight = std::max(height(n->left), height(n->right)) + 1;
+      return n;
     }
 
     template< typename Key, typename Value, typename Cmp >
-    typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* x) noexcept
+    typename AVLTree< Key, Value, Cmp >::Node* AVLTree< Key, Value, Cmp >::leftRotate(Node* par) noexcept
     {
-      if (!x || !x->right)
+      if (!par || !par->right)
       {
-        return x;
+        return par;
       }
-      Node* y = x->right;
-      Node* T2 = y->left;
-      y->left = x;
-      x->right = T2;
-      y->parent = x->parent;
-      x->parent = y;
-      if (T2)
+      Node* n = par->right;
+      Node* ch = n->left;
+      n->left = par;
+      par->right = ch;
+      n->parent = par->parent;
+      par->parent = n;
+      if (ch)
       {
-        T2->parent = x;
+        ch->parent = par;
       }
-      if (!y->parent)
+      if (!n->parent)
       {
-        root_ = y;
+        root_ = n;
       }
-      else if (y->parent->left == x)
+      else if (n->parent->left == par)
       {
-        y->parent->left = y;
+        n->parent->left = n;
       }
       else
       {
-        y->parent->right = y;
+        n->parent->right = n;
       }
-      x->nodeHeight = std::max(height(x->left), height(x->right)) + 1;
-      y->nodeHeight = std::max(height(y->left), height(y->right)) + 1;
-      return y;
+      par->nodeHeight = std::max(height(par->left), height(par->right)) + 1;
+      n->nodeHeight = std::max(height(n->left), height(n->right)) + 1;
+      return n;
     }
 
     template< typename Key, typename Value, typename Cmp >

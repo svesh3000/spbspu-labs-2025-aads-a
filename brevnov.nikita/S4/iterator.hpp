@@ -19,11 +19,10 @@ namespace brevnov
     using iterator = Iterator< Key, Value, Cmp, IsConst >;
 
     Iterator();
-    template < bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
+    template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
     Iterator(const Iterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
     template< bool OtherIsConst, std::enable_if_t< IsConst && !OtherIsConst, int > = 0 >
     iterator& operator=(const Iterator< Key, Value, Cmp, OtherIsConst >&) noexcept;
-    Iterator(TreeNode< Key, Value >*, bool);
 
     iterator& operator++() noexcept;
     iterator operator++(int) noexcept;
@@ -39,6 +38,7 @@ namespace brevnov
   private:
     TreeNode< Key, Value >* node_;
     bool isEnd_;
+    Iterator(TreeNode< Key, Value >*, bool);
     friend class Iterator< Key, Value, Cmp, !IsConst >;
     friend class AVLTree< Key, Value, Cmp >;
   };
