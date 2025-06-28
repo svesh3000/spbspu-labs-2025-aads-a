@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <AVLtree.hpp>
-#include "hashTable.hpp"
+#include <hashTable.hpp>
 
 namespace finaev
 {

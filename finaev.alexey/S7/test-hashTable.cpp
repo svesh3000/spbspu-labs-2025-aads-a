@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <dynamicArr.hpp>
-#include "hashTable.hpp"
+#include <hashTable.hpp>
 
 BOOST_AUTO_TEST_CASE(constr_and_insert)
 {
