@@ -328,7 +328,7 @@ namespace kizhin {
       const key_type& key) const
   {
     Node* curr = begin_ + hashFunc()(key) % capacity_;
-    const Node* const stop = curr;
+    const Node* const stop = curr == begin_ ? begin_ + capacity_ : curr - 1;
     while (curr != stop) {
       if (curr->state == Node::occupied && keyEq()(curr->value.first, key)) {
         return const_iterator{ curr, begin_ + capacity_ };
