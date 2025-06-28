@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(copyConstructor)
   lanovenko::HashTable< int, std::string > hashTable1;
   hashTable1.insert(1, "one");
   hashTable1.insert(2, "two");
-  maslov::HashTable< int, std::string > hashTable2(hashTable1);
+  lanovenko::HashTable< int, std::string > hashTable2(hashTable1);
   std::ostringstream out;
   printHashTable(out, hashTable2);
   BOOST_TEST(out.str() == "1 one 2 two");
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE(rehash)
 BOOST_AUTO_TEST_CASE(maxLoadFactor)
 {
   lanovenko::HashTable< int, std::string > hashTable;
-  BOOST_TEST(hashTable.maxLoadFactor() == 0.7f);
-  hashTable.maxLoadFactor(0.5f);
-  BOOST_TEST(hashTable.maxLoadFactor() == 0.5f);
+  BOOST_TEST(hashTable.max_load_factor() == 0.7f);
+  hashTable.max_load_factor(0.5f);
+  BOOST_TEST(hashTable.max_load_factor() == 0.5f);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -184,11 +184,11 @@ BOOST_AUTO_TEST_CASE(emplaceHint)
   hashTable.insert(1, "one");
   hashTable.insert(2, "two");
   auto hint = hashTable.cbegin();
-  auto it1 = hashTable.emplaceHint(hint, 1, "first");
+  auto it1 = hashTable.emplace_hint(hint, 1, "first");
   BOOST_TEST(it1->first == 1);
   BOOST_TEST(it1->second == "one");
 
-  auto it2 = hashTable.emplaceHint(hint, 3, "three");
+  auto it2 = hashTable.emplace_hint(hint, 3, "three");
   BOOST_TEST(it2->first == 3);
   BOOST_TEST(it2->second == "three");
 }
