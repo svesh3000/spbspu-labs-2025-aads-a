@@ -452,7 +452,12 @@ namespace kizhin {
     if (lhs.size() != rhs.size()) {
       return false;
     }
-    return std::is_permutation(lhs.begin(), lhs.end(), rhs.begin() /*, lhs.keyEq()*/);
+    using namespace std::placeholders;
+    using UMap = UnorderedMap< K, T, H, E >;
+    static const auto getKey = std::bind(&UMap::value_type::first, _1);
+    const auto keyEq = lhs.keyEq();
+    const auto valEq = std::bind(keyEq, std::bind(getKey, _1), std::bind(getKey, _2));
+    return std::is_permutation(lhs.begin(), lhs.end(), rhs.begin(), valEq);
   }
 
   template < typename K, typename T, typename H, typename E >
