@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <stdexcept>
 #include <cctype>
 #include <climits>
@@ -9,80 +8,159 @@
 
 namespace
 {
-  bool isOperator(char c)
+  bool isOperator(const std::string& c)
   {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+    return c == "+" || c == "-" || c == "*" || c == "/" || c == "%";
   }
 
-  int precedence(char op)
+  bool higherEqualPrecedence(const std::string& op1, const std::string& op2)
   {
-    if (op == '+' || op == '-')
+    if ((op1 == "+" || op1 == "-") && (op2 == "*" || op2 == "/" || op2 == "%"))
     {
-      return 1;
+      return false;
     }
-    if (op == '*' || op == '/' || op == '%')
+    return true;
+  }
+
+  void processToken(const std::string& token, duhanina::Stack< std::string >& operators, duhanina::Queue< std::string >& output)
+  {
+    if (token.empty())
     {
-      return 2;
+      return;
     }
-    return 0;
+    if (std::isdigit(token[0]))
+    {
+      output.push(token);
+    }
+    else if (token == "(")
+    {
+      operators.push(token);
+    }
+    else if (token == ")")
+    {
+      while (!operators.empty() && operators.top() != "(")
+      {
+        output.push(std::string(operators.top()));
+        operators.pop();
+      }
+      if (operators.empty())
+      {
+        throw std::runtime_error("Mismatched parentheses");
+      }
+      operators.pop();
+    }
+    else if (isOperator(token))
+    {
+      while (!operators.empty() && operators.top() != "(" && higherEqualPrecedence(operators.top(), token))
+      {
+        output.push(std::string(operators.top()));
+        operators.pop();
+      }
+      operators.push(token);
+    }
+    else
+    {
+      throw std::runtime_error("Invalid token");
+    }
   }
 
   duhanina::Queue< std::string > infixToPostfix(const std::string& infix)
   {
-    duhanina::Stack< char > operators;
+    duhanina::Stack< std::string > operators;
     duhanina::Queue< std::string > output;
-    std::stringstream ss(infix);
-    std::string token;
-    while (ss >> token)
+    size_t start = 0;
+    size_t end = infix.find(' ');
+    while (end != std::string::npos)
     {
-      if (std::isdigit(token[0]))
+      if (end != start)
       {
-        output.push(token);
+        processToken(infix.substr(start, end - start), operators, output);
       }
-      else if (token[0] == '(')
-      {
-        operators.push(token[0]);
-      }
-      else if (token[0] == ')')
-      {
-        while (!operators.empty() && operators.top() != '(')
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        if (!operators.empty() && operators.top() == '(')
-        {
-          operators.pop();
-        }
-        else
-        {
-          throw std::runtime_error("Mismatched parentheses");
-        }
-      }
-      else if (isOperator(token[0]))
-      {
-        while (!operators.empty() && precedence(operators.top()) >= precedence(token[0]))
-        {
-          output.push(std::string(1, operators.top()));
-          operators.pop();
-        }
-        operators.push(token[0]);
-      }
-      else
-      {
-        throw std::runtime_error("Invalid token");
-      }
+      start = end + 1;
+      end = infix.find(' ', start);
+    }
+    if (start < infix.length())
+    {
+      processToken(infix.substr(start), operators, output);
     }
     while (!operators.empty())
     {
-      if (operators.top() == '(' || operators.top() == ')')
+      if (operators.top() == "(")
       {
         throw std::runtime_error("Mismatched parentheses");
       }
-      output.push(std::string(1, operators.top()));
+      output.push(std::string(operators.top()));
       operators.pop();
     }
     return output;
+  }
+
+  long long checkedAdd(long long a, long long b)
+  {
+    if ((b > 0 && a > LLONG_MAX - b) || (b < 0 && a < LLONG_MIN - b))
+    {
+      throw std::runtime_error("Overflow");
+    }
+    return a + b;
+  }
+
+  long long checkedSub(long long a, long long b)
+  {
+    if ((b > 0 && a < LLONG_MIN + b) || (b < 0 && a > LLONG_MAX + b))
+    {
+      throw std::runtime_error("Overflow");
+    }
+    return a - b;
+  }
+
+  long long checkedMul(long long a, long long b)
+  {
+    if (a > 0)
+    {
+      if (b > 0 && a > LLONG_MAX / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+      if (b < 0 && b < LLONG_MIN / a)
+      {
+        throw std::runtime_error("Overflow");
+      }
+    }
+    else
+    {
+      if (b > 0 && a < LLONG_MIN / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+      if (b < 0 && a < LLONG_MAX / b)
+      {
+        throw std::runtime_error("Overflow");
+      }
+    }
+    return a * b;
+  }
+
+  long long checkedDiv(long long a, long long b)
+  {
+    if (b == 0)
+    {
+      throw std::runtime_error("Division by zero");
+    }
+    return a / b;
+  }
+
+ long long checkedMod(long long a, long long b)
+ {
+    if (b == 0)
+    {
+      throw std::runtime_error("Modulus by zero");
+    }
+    long long result = a % b;
+    if (result <= 0 && a < 0)
+    {
+      return result + b;
+    }
+    return result;
   }
 
   long long calcPostfix(duhanina::Queue< std::string >& postfix)
@@ -92,11 +170,7 @@ namespace
     {
       std::string token = postfix.front();
       postfix.pop();
-      if (std::isdigit(token[0]))
-      {
-        operands.push(std::stoll(token));
-      }
-      else if (isOperator(token[0]))
+      if (isOperator(token))
       {
         long long operand2 = operands.top();
         operands.pop();
@@ -105,58 +179,19 @@ namespace
         switch (token[0])
         {
         case '+':
-          if ((operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX - operand2) ||
-              (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MIN - operand2))
-          {
-            throw std::runtime_error("Overflow in addition");
-          }
-          operands.push(operand1 + operand2);
+          operands.push(checkedAdd(operand1, operand2));
           break;
         case '-':
-          if ((operand2 > 0 && operand1 < LLONG_MIN + operand2) ||
-              (operand2 < 0 && operand1 > LLONG_MAX + operand2))
-          {
-            throw std::runtime_error("Overflow in subtraction");
-          }
-          operands.push(operand1 - operand2);
+          operands.push(checkedSub(operand1, operand2));
           break;
         case '*':
-          if (operand1 > 0 && operand2 > 0 && operand1 > LLONG_MAX / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 < 0 && operand2 < 0 && operand1 < LLONG_MAX / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 > 0 && operand2 < 0 && operand2 < LLONG_MIN / operand1)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          if (operand1 < 0 && operand2 > 0 && operand1 < LLONG_MIN / operand2)
-          {
-            throw std::runtime_error("Overflow in multiplication");
-          }
-          operands.push(operand1 * operand2);
+          operands.push(checkedMul(operand1, operand2));
           break;
         case '/':
-          if (operand2 == 0)
-          {
-            throw std::runtime_error("Division by zero");
-          }
-          operands.push(operand1 / operand2);
+          operands.push(checkedDiv(operand1, operand2));
           break;
         case '%':
-          if (operand2 == 0)
-          {
-            throw std::runtime_error("Modulus by zero");
-          }
-          if (operand1 % operand2 < 0)
-          {
-            operands.push(operand1 % operand2 + operand2);
-            break;
-          }
-          operands.push(operand1 % operand2);
+          operands.push(checkedMod(operand1, operand2));
           break;
         default:
           throw std::runtime_error("Invalid operator");
@@ -164,7 +199,7 @@ namespace
       }
       else
       {
-        throw std::runtime_error("Invalid token");
+        operands.push(std::stoll(token));
       }
     }
     if (operands.size() != 1)
@@ -234,3 +269,4 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
+
