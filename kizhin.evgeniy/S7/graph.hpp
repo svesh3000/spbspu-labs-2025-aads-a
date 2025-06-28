@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 #include <unordered_map>
+#include <unordered-map.hpp>
 
 namespace kizhin {
   using Vertex = std::string;
@@ -30,7 +31,7 @@ namespace kizhin {
   bool operator==(const VertexPair&, const VertexPair&);
   bool operator<(const VertexPair&, const VertexPair&);
 
-  using Graph = std::unordered_map< VertexPair, WeightContiner >;
+  using Graph = UnorderedMap< VertexPair, WeightContiner >;
   using VertexContainer = std::set< Vertex >;
   using SortedGraph = std::map< Graph::key_type, Graph::mapped_type >;
 
