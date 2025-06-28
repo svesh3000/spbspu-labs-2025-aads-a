@@ -351,8 +351,8 @@ namespace kizhin {
     Node* curr = begin_ + hashFunc()(key) % capacity;
     const Node* const stop = curr == begin_ ? end_ : curr - 1;
     while (curr != stop) {
-      const bool isOcc = curr->state == Node::occupied;
-      if (isOcc && keyEq()(reinterpret_cast< const_pointer >(curr->value)->first, key)) {
+      pointer currVal = reinterpret_cast< pointer >(curr->value);
+      if (curr->state == Node::occupied && keyEq()(currVal->first, key)) {
         return const_iterator{ curr, end_ };
       }
       ++curr;
@@ -487,6 +487,7 @@ namespace kizhin {
   template < typename K, typename T, typename H, typename E >
   void UnorderedMap< K, T, H, E >::clear() noexcept
   {
+    erase(begin(), end());
     delete[] std::exchange(begin_, nullptr);
     end_ = nullptr;
     size_ = 0;
