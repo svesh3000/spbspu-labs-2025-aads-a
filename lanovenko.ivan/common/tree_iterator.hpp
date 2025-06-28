@@ -11,16 +11,20 @@ namespace lanovenko
   class Tree;
 
   template< typename Key, typename Value, typename Comparator >
-  class TreeIterator final : public std::iterator< std::forward_iterator_tag, Value >
+  class TreeIterator final: public std::iterator< std::bidirectional_iterator_tag, Value >
   {
   public:
     using this_t = TreeIterator< Key, Value, Comparator >;
+
     ~TreeIterator() = default;
     TreeIterator() noexcept;
     TreeIterator(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
+
     this_t& operator++() noexcept;
     this_t operator++(int) noexcept;
+    this_t& operator--() noexcept;
+    this_t operator--(int) noexcept;
     std::pair< Key, Value >& operator*() noexcept;
     std::pair< Key, Value >* operator->() noexcept;
     bool operator!=(const this_t& rhs) const noexcept;
@@ -61,6 +65,37 @@ namespace lanovenko
   {
     this_t result(*this);
     ++(*this);
+    return result;
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator >& TreeIterator< Key, Value, Comparator >::operator--() noexcept
+  {
+    if (node_->left)
+    {
+      node_ = node_->left;
+      while (node_->right)
+      {
+        node_ = node_->right;
+      }
+      return *this;
+    }
+    else
+    {
+      while (node_->parent && node_->parent->left == node_)
+      {
+        node_ = node_->parent;
+      }
+      node_ = node_->parent;
+      return *this;
+    }
+  }
+
+  template< typename Key, typename Value, typename Comparator >
+  TreeIterator< Key, Value, Comparator > TreeIterator< Key, Value, Comparator >::operator--(int) noexcept
+  {
+    this_t result(*this);
+    --(*this);
     return result;
   }
 

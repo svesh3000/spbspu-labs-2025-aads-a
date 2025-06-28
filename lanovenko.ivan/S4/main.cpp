@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  std::string command = "";
+  std::string command;
   while (!(std::cin >> command).eof())
   {
     try

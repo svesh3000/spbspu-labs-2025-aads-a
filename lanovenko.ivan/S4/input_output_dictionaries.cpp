@@ -19,16 +19,16 @@ void lanovenko::getDictionaries(std::istream& in, map_t& dictionaries)
 
 void lanovenko::printDictionary(const map_t& dictionaries)
 {
-  std::string name = "";
+  std::string name;
   std::cin >> name;
-  const Tree< int, std::string, std::less < int > > dictionary = dictionaries.at(name);
+  const Tree< int, std::string, std::less< int > > dictionary = dictionaries.at(name);
   if (dictionary.empty())
   {
     std::cout << "<EMPTY>" << "\n";
     return;
   }
   std::cout << name;
-  for (const auto& pair : dictionary)
+  for (const auto& pair: dictionary)
   {
     std::cout << ' ' << pair.first << ' ' << pair.second;
   }
