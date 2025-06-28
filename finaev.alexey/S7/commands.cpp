@@ -17,6 +17,10 @@ void finaev::vertexes(std::istream& in, std::ostream& out, const graphsTree& gra
 {
   std::string name;
   in >> name;
+  if (graphs.find(name) == graphs.cEnd())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   AVLtree< std::string, bool > vertexes = graphs.at(name).getVertexes();
   if (vertexes.empty())
   {
@@ -33,8 +37,12 @@ void finaev::outBound(std::istream& in, std::ostream& out, const graphsTree& gra
 {
   std::string name, vert;
   in >> name >> vert;
+  if (graphs.find(name) == graphs.cEnd())
+  {
+    throw std::logic_error("<INVALID COMMAND>");
+  }
   Graph gr = graphs.at(name);
-  if (!gr.hasVert(name))
+  if (!gr.hasVert(vert))
   {
     throw std::logic_error("<INVALID COMMAND>");
   }

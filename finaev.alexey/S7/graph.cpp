@@ -69,12 +69,11 @@ finaev::AVLtree< std::string, finaev::AVLtree< size_t, size_t > > finaev::Graph:
     throw std::logic_error("<INVALID COMMAND>");
   }
   AVLtree< std::string, AVLtree< size_t, size_t > > temp;
-  for (auto i = edges_.cbegin(); i != edges_.cend(); ++i)
+  for (auto iter = edges_.cbegin(); iter != edges_.cend(); ++iter)
   {
-    const AVLtree< size_t, size_t >& weights = i->second;
-    if (i->first.first == str)
+    for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
     {
-      temp[i->first.second] = weights;
+      temp[iter->first.second][iter2->first] = iter2->second;
     }
   }
   return temp;
@@ -87,12 +86,11 @@ finaev::AVLtree< std::string, finaev::AVLtree< size_t, size_t > > finaev::Graph:
     throw std::logic_error("<INVALID COMMAND>");
   }
   AVLtree< std::string, AVLtree< size_t, size_t > > temp;
-  for (auto i = edges_.cbegin(); i != edges_.cend(); ++i)
+  for (auto iter = edges_.cbegin(); iter != edges_.cend(); ++iter)
   {
-    const AVLtree< size_t, size_t >& weights = i->second;
-    if (i->first.second == str)
+    for (auto iter2 = iter->second.cBegin(); iter2 != iter->second.cEnd(); iter2++)
     {
-      temp[i->first.first] = weights;
+      temp[iter->first.second][iter2->first] = iter2->second;
     }
   }
   return temp;
