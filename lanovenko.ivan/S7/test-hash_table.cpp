@@ -206,3 +206,5 @@ BOOST_AUTO_TEST_CASE(clear)
   printHashTable(out, hashTable);
   BOOST_TEST(out.str() == "1 first");
 }
+
+BOOST_AUTO_TEST_SUITE_END()
