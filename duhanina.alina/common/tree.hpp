@@ -5,8 +5,6 @@
 #include <utility>
 #include "iterator.hpp"
 #include "cIterator.hpp"
-#include "stack.hpp"
-#include "queue.hpp"
 
 namespace duhanina
 {
@@ -25,11 +23,11 @@ namespace duhanina
     explicit Tree(std::initializer_list< std::pair< Key, Value > >);
 
     Tree(const Tree& other);
-    Tree(Tree&& other);
+    Tree(Tree&& other) noexcept;
     ~Tree();
 
     Tree& operator=(const Tree& other);
-    Tree& operator=(Tree&& other);
+    Tree& operator=(Tree&& other) noexcept;
 
     Iterator_t begin() const noexcept;
     ConstIterator_t cbegin() const noexcept;
@@ -37,8 +35,8 @@ namespace duhanina
     ConstIterator_t cend() const noexcept;
 
     void push(const Key& k, const Value& v);
-    Value& get(const Key& k) const;
-    Value& drop(const Key& k);
+    const Value& get(const Key& k) const;
+    void drop(const Key& k);
 
     size_t size() const noexcept;
     bool empty() const noexcept;
@@ -70,24 +68,6 @@ namespace duhanina
     ConstIterator_t lower_bound(const Key& key) const noexcept;
     Iterator_t upper_bound(const Key& key) noexcept;
     ConstIterator_t upper_bound(const Key& key) const noexcept;
-
-    template < typename F >
-    F traverse_lnr(F f) const;
-
-    template < typename F >
-    F traverse_lnr(F f);
-
-    template < typename F >
-    F traverse_rnl(F f) const;
-
-    template < typename F >
-    F traverse_rnl(F f);
-
-    template < typename F >
-    F traverse_breadth(F f) const;
-
-    template < typename F >
-    F traverse_breadth(F f);
 
   private:
     using Node_t = Node< Key, Value >;
@@ -140,20 +120,10 @@ namespace duhanina
   {}
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >::Tree(Tree&& other):
-    fakeRoot_(other.fakeRoot_),
-    size_(other.size_)
-  {
-    try
-    {
-      other.size_ = 0;
-      other.fakeRoot_ = new Node_t(Key(), Value(), nullptr);
-    }
-    catch (...)
-    {
-      other.fakeRoot_ = nullptr;
-    }
-  }
+  Tree< Key, Value, Compare >::Tree(Tree&& other) noexcept:
+    fakeRoot_(std::exchange(other.fakeRoot_, new Node_t(Key(), Value(), nullptr))),
+    size_(std::exchange(other.size_, 0))
+  {}
 
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >::~Tree()
@@ -165,13 +135,16 @@ namespace duhanina
   template < typename Key, typename Value, typename Compare >
   Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(const Tree< Key, Value, Compare >& other)
   {
-    Tree< Key, Value, Compare> temp(other);
-    swap(temp);
+    if (this != std::addressof(other))
+    {
+      Tree< Key, Value, Compare> temp(other);
+      swap(temp);
+    }
     return *this;
   }
 
   template < typename Key, typename Value, typename Compare >
-  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other)
+  Tree< Key, Value, Compare >& Tree< Key, Value, Compare >::operator=(Tree< Key, Value, Compare >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
@@ -239,9 +212,9 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::get(const Key& k) const
+  const Value& Tree< Key, Value, Compare >::get(const Key& k) const
   {
-    Node_t* node = find(getRoot(), k);
+    const Node_t* node = find(getRoot(), k);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -250,12 +223,15 @@ namespace duhanina
   }
 
   template < typename Key, typename Value, typename Compare >
-  Value& Tree< Key, Value, Compare >::drop(const Key& k)
+  void Tree< Key, Value, Compare >::drop(const Key& k)
   {
-    auto* result = new Value(std::move(get(k)));
+    Node_t* node = find(getRoot(), k);
+    if (!node)
+    {
+      throw std::out_of_range("Key not found");
+    }
     setRoot(remove(getRoot(), k));
     size_--;
-    return *result;
   }
 
   template < typename Key, typename Value, typename Compare >
@@ -556,144 +532,6 @@ namespace duhanina
     {
       return cend();
     }
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_lnr(F f) const
-  {
-    Stack< const Node_t* > stack;
-    const Node_t* current = getRoot();
-    while (current || !stack.empty())
-    {
-      while (current)
-      {
-        stack.push(current);
-        current = current->left;
-      }
-      current = stack.top();
-      stack.pop();
-      f(current->data);
-      current = current->right;
-    }
-    return f;
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_lnr(F f)
-  {
-    Stack< Node_t* > stack;
-    Node_t* current = getRoot();
-    while (current || !stack.empty())
-    {
-      while (current)
-      {
-        stack.push(current);
-        current = current->left;
-      }
-      current = stack.top();
-      stack.pop();
-      f(current->data);
-      current = current->right;
-    }
-    return f;
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_rnl(F f) const
-  {
-    Stack< const Node_t* > stack;
-    const Node_t* current = getRoot();
-    while (current || !stack.empty())
-    {
-      while (current)
-      {
-        stack.push(current);
-        current = current->right;
-      }
-      current = stack.top();
-      stack.pop();
-      f(current->data);
-      current = current->left;
-    }
-    return f;
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_rnl(F f)
-  {
-    Stack< Node_t* > stack;
-    Node_t* current = getRoot();
-    while (current || !stack.empty())
-    {
-      while (current)
-      {
-        stack.push(current);
-        current = current->right;
-      }
-      current = stack.top();
-      stack.pop();
-      f(current->data);
-      current = current->left;
-    }
-    return f;
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_breadth(F f) const
-  {
-    if (!getRoot())
-    {
-      return f;
-    }
-    Queue< const Node_t* > queue;
-    queue.push(getRoot());
-    while (!queue.empty())
-    {
-      const Node_t* current = queue.front();
-      queue.pop();
-      f(current->data);
-      if (current->left)
-      {
-        queue.push(current->left);
-      }
-      if (current->right)
-      {
-        queue.push(current->right);
-      }
-    }
-    return f;
-  }
-
-  template < typename Key, typename Value, typename Compare >
-  template < typename F >
-  F Tree< Key, Value, Compare >::traverse_breadth(F f)
-  {
-    if (!getRoot())
-    {
-      return f;
-    }
-    Queue< Node_t* > queue;
-    queue.push(getRoot());
-    while (!queue.empty())
-    {
-      Node_t* current = queue.front();
-      queue.pop();
-      f(current->data);
-      if (current->left)
-      {
-        queue.push(current->left);
-      }
-      if (current->right)
-      {
-        queue.push(current->right);
-      }
-    }
-    return f;
   }
 
   template < typename Key, typename Value, typename Compare >

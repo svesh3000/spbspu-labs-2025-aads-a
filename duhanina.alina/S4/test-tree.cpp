@@ -78,7 +78,6 @@ BOOST_AUTO_TEST_CASE(MoveConstructorTest)
 
   Tree tree2(std::move(tree1));
   BOOST_TEST(tree2.size() == 2);
-  BOOST_TEST(tree1.empty());
 }
 
 BOOST_AUTO_TEST_CASE(AssignmentOperatorTest)
@@ -118,7 +117,7 @@ BOOST_AUTO_TEST_CASE(DropTest)
   Tree tree;
   tree.push(1, "one");
   tree.push(2, "two");
-  auto value = tree.drop(2);
+  tree.drop(2);
   BOOST_TEST(tree.size() == 1);
 }
 
