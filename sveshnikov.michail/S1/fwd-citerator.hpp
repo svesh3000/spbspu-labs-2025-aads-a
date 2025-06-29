@@ -14,7 +14,6 @@ namespace sveshnikov
   {
   public:
     ConstIterator();
-    ConstIterator(const node_t< T > *node);
     ConstIterator(const ConstIterator< T > &) = default;
     ~ConstIterator() = default;
     ConstIterator< T > &operator=(const ConstIterator< T > &) = default;
@@ -26,7 +25,8 @@ namespace sveshnikov
     bool operator==(const ConstIterator< T > &) const noexcept;
 
   private:
-    const node_t< T > *node_;
+    node_t< T > *node_;
+    explicit ConstIterator(node_t< T > *node);
     friend class FwdList< T >;
   };
 
@@ -36,7 +36,7 @@ namespace sveshnikov
   {}
 
   template< typename T >
-  ConstIterator< T >::ConstIterator(const node_t< T > *node):
+  ConstIterator< T >::ConstIterator(node_t< T > *node):
     node_(node)
   {}
 

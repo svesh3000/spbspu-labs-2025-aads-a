@@ -1,60 +1,64 @@
 #include "io-sequences.hpp"
 #include <iostream>
+#include <cstddef>
 #include <limits>
 
 namespace
 {
-  iter_list_ull_t getElement(iter_t it, size_t index);
-  std::ostream &outputOneList(std::ostream &out, const list_pair_t &list, size_t size);
-  list_ull_t findSums(const list_pair_t &list);
+  using list_ull_t = sveshnikov::FwdList< unsigned long long >;
+  using pair_t = std::pair< std::string, list_ull_t >;
 
-  iter_list_ull_t getElement(iter_t it, size_t index)
+  unsigned long long getElement(const list_ull_t &list, size_t index);
+  std::ostream &outputOneList(std::ostream &out, const sveshnikov::list_pair_t &list, size_t size);
+  list_ull_t findSums(const sveshnikov::list_pair_t &list);
+
+  unsigned long long getElement(const list_ull_t &list, size_t index)
   {
-    iter_list_ull_t it_data = it->second.cbegin();
+    auto it_data = list.cbegin();
     for (size_t i = 0; i < index; i++)
     {
       it_data++;
     }
-    return it_data;
+    return *it_data;
   }
 
-  std::ostream &outputOneList(std::ostream &out, const list_pair_t &list, size_t size)
+  std::ostream &outputOneList(std::ostream &out, const sveshnikov::list_pair_t &list, size_t size)
   {
     bool first = true;
-    iter_t it = list.cbegin();
+    auto it = list.cbegin();
     for (size_t len = 0; len < list.getSize(); it++, len++)
     {
       if (size >= it->second.getSize())
       {
         continue;
       }
-      iter_list_ull_t it_data = getElement(it, size);
-      out << (first ? "" : " ") << *it_data;
+      unsigned long long data = getElement(it->second, size);
+      out << (first ? "" : " ") << data;
       first = false;
     }
     return out;
   }
 
-  list_ull_t findSums(const list_pair_t &list)
+  list_ull_t findSums(const sveshnikov::list_pair_t &list)
   {
     size_t num_new_lists = sveshnikov::getMaxSizeLists(list);
     list_ull_t list_sums;
     for (size_t size_list = 0; size_list < num_new_lists; size_list++)
     {
       unsigned long long sum = 0;
-      iter_t it = list.cbegin();
+      auto it = list.cbegin();
       for (size_t len = 0; len < list.getSize(); it++, len++)
       {
         if (size_list >= it->second.getSize())
         {
           continue;
         }
-        iter_list_ull_t it_data = getElement(it, size_list);
-        if (sum > std::numeric_limits< unsigned long long >::max() - *it_data)
+        unsigned long long data = getElement(it->second, size_list);
+        if (sum > std::numeric_limits< unsigned long long >::max() - data)
         {
           throw std::overflow_error("ERROR: Overflow when calculating the amount!");
         }
-        sum += *it_data;
+        sum += data;
       }
       list_sums.push_back(sum);
     }
@@ -89,7 +93,7 @@ void sveshnikov::inputLists(std::istream &in, list_pair_t &list)
 std::ostream &sveshnikov::outputNamesLists(std::ostream &out, const list_pair_t &list)
 {
   out << list.cbegin()->first;
-  for (iter_t it = ++list.cbegin(); it != list.cend(); it++)
+  for (auto it = ++list.cbegin(); it != list.cend(); it++)
   {
     out << " " << it->first;
   }
@@ -113,7 +117,7 @@ std::ostream &sveshnikov::outputSumsNewLists(std::ostream &out, const list_pair_
 {
   list_ull_t list_sums = findSums(list);
   out << *list_sums.cbegin();
-  for (iter_list_ull_t it = ++list_sums.cbegin(); it != list_sums.cend(); it++)
+  for (auto it = ++list_sums.cbegin(); it != list_sums.cend(); it++)
   {
     out << " " << *it;
   }
@@ -123,7 +127,7 @@ std::ostream &sveshnikov::outputSumsNewLists(std::ostream &out, const list_pair_
 size_t sveshnikov::getMaxSizeLists(const list_pair_t &list)
 {
   size_t num_lines = list.cbegin()->second.getSize();
-  for (iter_t it = ++list.cbegin(); it != list.cend(); it++)
+  for (auto it = ++list.cbegin(); it != list.cend(); it++)
   {
     num_lines = std::max(num_lines, it->second.getSize());
   }
