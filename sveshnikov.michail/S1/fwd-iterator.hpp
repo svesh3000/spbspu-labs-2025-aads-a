@@ -14,7 +14,6 @@ namespace sveshnikov
   {
   public:
     Iterator();
-    Iterator(node_t< T > *node);
     Iterator(const Iterator< T > &) = default;
     ~Iterator() = default;
     Iterator< T > &operator=(const Iterator< T > &) = default;
@@ -29,6 +28,7 @@ namespace sveshnikov
 
   private:
     node_t< T > *node_;
+    explicit Iterator(node_t< T > *node);
     friend class FwdList< T >;
   };
 

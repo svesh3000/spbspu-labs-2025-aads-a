@@ -3,7 +3,7 @@
 
 namespace sveshnikov
 {
-  template < typename T >
+  template< typename T >
   struct node_t
   {
     T data_;
