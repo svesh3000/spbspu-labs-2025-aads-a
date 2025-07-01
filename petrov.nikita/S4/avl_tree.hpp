@@ -432,14 +432,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   bool AVLTree< K, T, Cmp >::empty() const noexcept
   {
-    if (!size_)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    return !size_;
   }
 
   template< typename K, typename T, typename Cmp >
