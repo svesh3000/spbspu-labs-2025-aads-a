@@ -2,7 +2,7 @@
 
 sveshnikov::Queue< sveshnikov::Postfix > sveshnikov::inputInfix(std::istream &in)
 {
-  sveshnikov::Queue< sveshnikov::Postfix > infix_exprs;
+  Queue< Postfix > infix_exprs;
   while (!in.eof())
   {
     std::string expr;
@@ -11,7 +11,7 @@ sveshnikov::Queue< sveshnikov::Postfix > sveshnikov::inputInfix(std::istream &in
     {
       continue;
     }
-    sveshnikov::Postfix postf_expr(splitIntoTokens(expr));
+    Postfix postf_expr(splitIntoTokens(expr));
     infix_exprs.push(postf_expr);
   }
   return infix_exprs;
@@ -19,26 +19,14 @@ sveshnikov::Queue< sveshnikov::Postfix > sveshnikov::inputInfix(std::istream &in
 
 sveshnikov::Queue< std::string > sveshnikov::splitIntoTokens(const std::string &expr)
 {
-  sveshnikov::Queue< std::string > splited_expr;
-  std::string token;
-  for (auto it = expr.cbegin(); it != expr.cend(); it++)
+  Queue< std::string > splited_expr;
+  size_t end = 0;
+  size_t start = expr.find_first_not_of(" \n");
+  while (start != std::string::npos)
   {
-    if (std::isspace(*it))
-    {
-      if (!token.empty())
-      {
-        splited_expr.push(token);
-        token.clear();
-      }
-    }
-    else
-    {
-      token += *it;
-    }
-  }
-  if (!token.empty())
-  {
-    splited_expr.push(token);
+    end = expr.find_first_of(" \n", start);
+    splited_expr.push(expr.substr(start, end - start));
+    start = expr.find_first_not_of(" \n", end);
   }
   return splited_expr;
 }
