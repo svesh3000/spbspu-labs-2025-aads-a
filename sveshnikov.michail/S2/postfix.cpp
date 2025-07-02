@@ -1,18 +1,59 @@
 #include "postfix.hpp"
-#include <limits>
 #include <stdexcept>
+#include <limits>
 
 namespace
 {
   constexpr long long max_ll = std::numeric_limits< long long >::max();
   constexpr long long min_ll = std::numeric_limits< long long >::min();
-  bool isOperator(std::string op);
-  void isDivisionByZero(long long operand);
-  size_t getPriority(std::string op);
 
-  bool isOperator(std::string op)
+  bool isOperator(const std::string &op);
+  size_t getPriority(const std::string &op);
+  bool comparePriorities(const std::string &op1, const std::string &op2);
+
+  void isDivisionByZero(long long operand);
+
+  long long add(long long res, long long op);
+  long long subtract(long long res, long long op);
+  long long multiply(long long res, long long op);
+  long long divide(long long res, long long op);
+  long long moduloDivide(long long res, long long op);
+  long long power(long long res, long long exp);
+  long long doublePower(long long res, long long op);
+
+  bool isOperator(const std::string &op)
   {
-    return (op == "+" || op == "-" || op == "*" || op == "%" || op == "/");
+    return (op == "+" || op == "-" || op == "*" || op == "%" || op == "/" || op == "^^");
+  }
+
+  size_t getPriority(const std::string &op)
+  {
+    if (op == "(")
+    {
+      return 0;
+    }
+    if (op == ")")
+    {
+      return 1;
+    }
+    if (op == "+" || op == "-")
+    {
+      return 2;
+    }
+    if (op == "*" || op == "/" || op == "%")
+    {
+      return 3;
+    }
+    if (op == "^^")
+    {
+      return 4;
+    }
+    throw std::invalid_argument("ERROR: Unknown operator!");
+  }
+
+  bool comparePriorities(const std::string &op1, const std::string &op2)
+  {
+    return getPriority(op1) <= getPriority(op2);
   }
 
   void isDivisionByZero(long long operand)
@@ -23,24 +64,95 @@ namespace
     }
   }
 
-  size_t getPriority(std::string op)
+  long long add(long long res, long long op)
   {
-    switch (op[0])
+    if (op > 0 && res > max_ll - op)
     {
-    case '(':
-      return 0;
-    case ')':
-      return 1;
-    case '+':
-    case '-':
-      return 2;
-    case '*':
-    case '/':
-    case '%':
-      return 3;
-    default:
-      throw std::invalid_argument("ERROR: Unknown operator!");
+      throw std::overflow_error("ERROR: Overflow when calculating the amount!");
     }
+    else if (op < 0 && res < min_ll + op)
+    {
+      throw std::underflow_error("ERROR: Underflow when calculating the amount!");
+    }
+    return res + op;
+  }
+
+  long long subtract(long long res, long long op)
+  {
+    if (op > 0 && res < min_ll + op)
+    {
+      throw std::underflow_error("ERROR: Underflow when calculating the difference!");
+    }
+    else if (op < 0 && res > max_ll + op)
+    {
+      throw std::overflow_error("ERROR: Overflow when calculating the difference!");
+    }
+    return res - op;
+  }
+
+  long long multiply(long long res, long long op)
+  {
+    if ((op == -1 && res == min_ll) || (op == min_ll && res == -1))
+    {
+      throw std::overflow_error("ERROR: Overflow when calculating the product!");
+    }
+    if (res != 0)
+    {
+      if ((op > 0 && res > max_ll / op) || (op < 0 && res < max_ll / op))
+      {
+        throw std::overflow_error("ERROR: Overflow when calculating the product!");
+      }
+      if ((op > 0 && res < min_ll / op) || (op < 0 && res > min_ll / op))
+      {
+        throw std::underflow_error("ERROR: Underflow when calculating the product!");
+      }
+    }
+    return res * op;
+  }
+
+  long long divide(long long res, long long op)
+  {
+    isDivisionByZero(op);
+    return res / op;
+  }
+
+  long long moduloDivide(long long res, long long op)
+  {
+    isDivisionByZero(op);
+    res %= op;
+    if (res < 0)
+    {
+      res += std::abs(op);
+    }
+    return res;
+  }
+
+  long long power(long long res, long long exp)
+  {
+    if (exp < 0)
+    {
+      throw std::logic_error("Error: negative degree!");
+    }
+    if (res == 0 && exp == 0)
+    {
+      throw std::logic_error("Error: Raising zero to zero degree!");
+    }
+    if (exp == 0)
+    {
+      return 1;
+    }
+    long long base = res;
+    for (long long i = 1; i < exp; i++)
+    {
+      res = multiply(res, base);
+    }
+    return res;
+  }
+
+  long long doublePower(long long res, long long op)
+  {
+    op = power(op, op);
+    return power(res, op);
   }
 }
 
@@ -80,7 +192,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       {
         throw std::logic_error("ERROR: Incorrect infix notation!");
       }
-      push_out_stack(stack, getPriority(infix.front()));
+      push_out_stack(stack, infix.front());
       stack.pop();
     }
     else if (isOperator(infix.front()))
@@ -90,7 +202,7 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
       {
         throw std::logic_error("ERROR: Incorrect infix notation!");
       }
-      push_out_stack(stack, getPriority(infix.front()));
+      push_out_stack(stack, infix.front());
       stack.push(infix.front());
     }
     else
@@ -105,16 +217,16 @@ sveshnikov::Postfix::Postfix(Queue< std::string > infix):
     }
     infix.pop();
   }
-  push_out_stack(stack, 0);
+  push_out_stack(stack, ")");
   if (num_close_paren != num_open_paren || num_operands != num_operators + 1)
   {
     throw std::logic_error("ERROR: Incorrect infix notation!");
   }
 }
 
-void sveshnikov::Postfix::push_out_stack(Stack< std::string > &stack, size_t priority)
+void sveshnikov::Postfix::push_out_stack(Stack< std::string > &stack, const std::string &op)
 {
-  while (!stack.empty() && priority <= getPriority(stack.top()))
+  while (!stack.empty() && comparePriorities(op, stack.top()))
   {
     expr_.push(stack.top());
     stack.pop();
@@ -158,7 +270,8 @@ sveshnikov::Postfix sveshnikov::Postfix::operator*(const Postfix &other) const
   return arith_operator_impl(other, "*");
 }
 
-sveshnikov::Postfix sveshnikov::Postfix::arith_operator_impl(Postfix other, std::string op) const
+sveshnikov::Postfix sveshnikov::Postfix::arith_operator_impl(Postfix other,
+    const std::string &op) const
 {
   Postfix new_postfix(*this);
   while (!other.expr_.empty())
@@ -181,66 +294,33 @@ long long sveshnikov::Postfix::calculate() const
     queue.pop();
     if (isOperator(curr))
     {
-      const long long op = stack.top();
+      long long op = stack.top();
       stack.pop();
-      long long res = stack.top();
+      res = stack.top();
       stack.pop();
       if (curr == "+")
       {
-        if (op > 0 && res > max_ll - op)
-        {
-          throw std::overflow_error("ERROR: Overflow when calculating the amount!");
-        }
-        else if (op < 0 && res < min_ll + op)
-        {
-          throw std::underflow_error("ERROR: Underflow when calculating the amount!");
-        }
-        res += op;
+        res = add(res, op);
       }
       if (curr == "-")
       {
-        if (op > 0 && res < min_ll + op)
-        {
-          throw std::underflow_error("ERROR: Underflow when calculating the difference!");
-        }
-        else if (op < 0 && res > max_ll + op)
-        {
-          throw std::overflow_error("ERROR: Overflow when calculating the difference!");
-        }
-        res -= op;
+        res = subtract(res, op);
       }
       if (curr == "/")
       {
-        isDivisionByZero(op);
-        res /= op;
+        res = divide(res, op);
       }
       if (curr == "%")
       {
-        isDivisionByZero(op);
-        res %= op;
-        if (res < 0)
-        {
-          res += std::abs(op);
-        }
+        res = moduloDivide(res, op);
       }
       if (curr == "*")
       {
-        if ((op == -1 && res == min_ll) || (op == min_ll && res == -1))
-        {
-          throw std::overflow_error("ERROR: Overflow when calculating the product!");
-        }
-        if (res != 0)
-        {
-          if ((op > 0 && res > max_ll / op) || (op < 0 && res < max_ll / op))
-          {
-            throw std::overflow_error("ERROR: Overflow when calculating the product!");
-          }
-          if ((op > 0 && res < min_ll / op) || (op < 0 && res > min_ll / op))
-          {
-            throw std::underflow_error("ERROR: Underflow when calculating the product!");
-          }
-        }
-        res *= op;
+        res = multiply(res, op);
+      }
+      if (curr == "^^")
+      {
+        res = doublePower(res, op);
       }
       stack.push(res);
     }

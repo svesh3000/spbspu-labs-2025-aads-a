@@ -27,8 +27,8 @@ namespace sveshnikov
 
   private:
     Queue< std::string > expr_;
-    Postfix arith_operator_impl(Postfix other, std::string op) const;
-    void push_out_stack(Stack< std::string > &stack, size_t priority);
+    Postfix arith_operator_impl(Postfix other, const std::string &op) const;
+    void push_out_stack(Stack< std::string > &stack, const std::string &op);
   };
 }
 

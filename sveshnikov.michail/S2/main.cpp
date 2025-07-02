@@ -5,18 +5,19 @@
 
 int main(int argc, char **argv)
 {
-  sveshnikov::Queue< sveshnikov::Postfix > infix_exprs;
-  sveshnikov::Stack< long long > results;
+  using namespace sveshnikov;
+  Queue< Postfix > infix_exprs;
+  Stack< long long > results;
   try
   {
     if (argc == 1)
     {
-      infix_exprs = sveshnikov::inputInfix(std::cin);
+      infix_exprs = inputInfix(std::cin);
     }
     else
     {
       std::ifstream in(argv[1]);
-      infix_exprs = sveshnikov::inputInfix(in);
+      infix_exprs = inputInfix(in);
     }
     while (!infix_exprs.empty())
     {
