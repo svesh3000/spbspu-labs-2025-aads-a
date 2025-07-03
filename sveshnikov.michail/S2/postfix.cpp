@@ -70,7 +70,7 @@ namespace
     {
       throw std::overflow_error("ERROR: Overflow when calculating the amount!");
     }
-    else if (op < 0 && res < min_ll + op)
+    else if (op < 0 && res < min_ll - op)
     {
       throw std::underflow_error("ERROR: Underflow when calculating the amount!");
     }
