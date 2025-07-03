@@ -1,5 +1,6 @@
 #ifndef TREE_HPP
 #define TREE_HPP
+#include <queue.hpp>
 #include "tree-iter.hpp"
 #include "tree-citer.hpp"
 
@@ -41,6 +42,19 @@ namespace sveshnikov
     std::pair< ConstIter< Key, T >, ConstIter< Key, T > > equal_range(const Key &k) const;
     std::pair< Iter< Key, T >, Iter< Key, T > > equal_range(const Key &k);
     size_t count(const Key &k) const;
+
+    template< typename F >
+    F traverse_lnr(F f) const;
+    template< typename F >
+    F traverse_lnr(F f);
+    template< typename F >
+    F traverse_rnl(F f) const;
+    template< typename F >
+    F traverse_rnl(F f);
+    template< typename F >
+    F traverse_breadth(F f) const;
+    template< typename F >
+    F traverse_breadth(F f);
 
   private:
     tree_node_t< Key, T > *root_;
@@ -574,6 +588,122 @@ namespace sveshnikov
   {
     std::pair< ConstIter< Key, T >, ConstIter< Key, T > > it_pair = equal_range(k);
     return (it_pair.first == it_pair.second) ? 0 : 1;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_lnr(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    for (auto it = cbegin(); it != cend(); it++)
+    {
+      f(*it);
+    }
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_lnr(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    for (auto it = begin(); it != end(); it++)
+    {
+      f(*it);
+    }
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_rnl(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    for (auto it = --cend(); it != cbegin(); it++)
+    {
+      f(*it);
+    }
+    f(*cbegin());
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_rnl(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    for (auto it = --end(); it != begin(); it++)
+    {
+      f(*it);
+    }
+    f(*begin());
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_breadth(F f) const
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    Queue< tree_node_t< Key, T > * > queue;
+
+    queue.push(root_);
+    while (!queue.empty())
+    {
+      if (queue.front()->left_)
+      {
+        queue.push(queue.front()->left_);
+      }
+      if (queue.front()->right_ && queue.front()->right_ != fake_leaf_)
+      {
+        queue.push(queue.front()->right_);
+      }
+      f(queue.front());
+      queue.pop();
+    }
+    return f;
+  }
+
+  template< typename Key, typename T, typename Cmp >
+  template< typename F >
+  F AvlTree< Key, T, Cmp >::traverse_breadth(F f)
+  {
+    if (empty())
+    {
+      throw std::logic_error("Error: Tree is empty!");
+    }
+    Queue< tree_node_t< Key, T > * > queue;
+
+    queue.push(root_);
+    while (!queue.empty())
+    {
+      if (queue.front()->left_)
+      {
+        queue.push(queue.front()->left_);
+      }
+      if (queue.front()->right_ && queue.front()->right_ != fake_leaf_)
+      {
+        queue.push(queue.front()->right_);
+      }
+      f(queue.front());
+      queue.pop();
+    }
+    return f;
   }
 }
 
