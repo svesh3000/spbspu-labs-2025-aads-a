@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <tree.hpp>
+#include "kv-aggregator.hpp"
 
 BOOST_AUTO_TEST_CASE(traverse_lnr)
 {

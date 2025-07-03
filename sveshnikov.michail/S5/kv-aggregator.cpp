@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <limits>
 
-void sveshnikov::KeyValueAggregator::operator()(const std::pair< int, std::string > &key_value)
+void sveshnikov::KeyValAggr::operator()(const std::pair< int, std::string > &key_value)
 {
   constexpr int max_int = std::numeric_limits< int >::max();
   constexpr int min_int = std::numeric_limits< int >::min();

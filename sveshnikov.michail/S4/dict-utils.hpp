@@ -2,7 +2,7 @@
 #define DICT_UTILS_HPP
 #include <iostream>
 #include <functional>
-#include <tree.hpp>
+#include <tree/tree.hpp>
 
 namespace sveshnikov
 {
