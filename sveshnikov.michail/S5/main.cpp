@@ -3,6 +3,7 @@
 #include <functional>
 #include <tree/tree.hpp>
 #include "kv-aggregator.hpp"
+#include "commands.hpp"
 
 sveshnikov::AvlTree< int, std::string > loadData(char *filename);
 
@@ -25,6 +26,31 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  KeyValAggr f;
+  AvlTree< std::string, std::function< void(KeyValAggr &) > > command_holder;
+  command_holder["ascending"] = std::bind(ascend< KeyValAggr & >, std::ref(data), std::ref(f));
+  command_holder["descending"] = std::bind(descend< KeyValAggr & >, std::ref(data), std::ref(f));
+  command_holder["breadth"] = std::bind(breadthTrav< KeyValAggr & >, std::ref(data), std::ref(f));
+  try
+  {
+    command_holder.at(argv[1])(f);
+    std::cout << f.key_sum_ << ' ' << f.values_ << '\n';
+  }
+  catch (const std::out_of_range &)
+  {
+    std::cout << "<INVALID COMMAND>" << '\n';
+    return 0;
+  }
+  catch (const std::logic_error &)
+  {
+    std::cout << "<EMPTY>" << '\n';
+    return 0;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
   return 0;
 }
 

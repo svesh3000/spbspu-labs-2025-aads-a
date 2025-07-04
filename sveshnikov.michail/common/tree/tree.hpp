@@ -673,7 +673,7 @@ namespace sveshnikov
       {
         queue.push(queue.front()->right_);
       }
-      f(queue.front());
+      f(queue.front()->data_);
       queue.pop();
     }
     return f;
@@ -700,7 +700,7 @@ namespace sveshnikov
       {
         queue.push(queue.front()->right_);
       }
-      f(queue.front());
+      f(queue.front()->data_);
       queue.pop();
     }
     return f;

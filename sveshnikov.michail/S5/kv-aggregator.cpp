@@ -10,7 +10,7 @@ void sveshnikov::KeyValAggr::operator()(const std::pair< int, std::string > &key
   {
     throw std::overflow_error("ERROR: Overflow when calculating the amount of keys!");
   }
-  if (key_value.first < 0 && key_sum_ < max_int - key_value.first)
+  if (key_value.first < 0 && key_sum_ < min_int - key_value.first)
   {
     throw std::underflow_error("ERROR: Underflow when calculating the amount of keys!");
   }
