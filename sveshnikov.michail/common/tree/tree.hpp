@@ -628,7 +628,7 @@ namespace sveshnikov
     {
       throw std::logic_error("Error: Tree is empty!");
     }
-    for (auto it = --cend(); it != cbegin(); it++)
+    for (auto it = --cend(); it != cbegin(); it--)
     {
       f(*it);
     }
@@ -644,7 +644,7 @@ namespace sveshnikov
     {
       throw std::logic_error("Error: Tree is empty!");
     }
-    for (auto it = --end(); it != begin(); it++)
+    for (auto it = --end(); it != begin(); it--)
     {
       f(*it);
     }
