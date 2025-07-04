@@ -596,7 +596,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     for (auto it = cbegin(); it != cend(); it++)
     {
@@ -611,7 +611,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     for (auto it = begin(); it != end(); it++)
     {
@@ -626,7 +626,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     for (auto it = --cend(); it != cbegin(); it--)
     {
@@ -642,7 +642,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     for (auto it = --end(); it != begin(); it--)
     {
@@ -658,7 +658,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     Queue< tree_node_t< Key, T > * > queue;
 
@@ -685,7 +685,7 @@ namespace sveshnikov
   {
     if (empty())
     {
-      throw std::logic_error("Error: Tree is empty!");
+      throw std::logic_error("ERROR: Tree is empty!");
     }
     Queue< tree_node_t< Key, T > * > queue;
 

@@ -12,7 +12,7 @@ int main(int argc, char **argv)
   using namespace sveshnikov;
   if (argc != 3)
   {
-    std::cerr << "Error: Not enough parameters!\n";
+    std::cerr << "ERROR: Not enough parameters!\n";
     return 1;
   }
   AvlTree< int, std::string > data;
@@ -38,13 +38,12 @@ int main(int argc, char **argv)
   }
   catch (const std::out_of_range &)
   {
-    std::cout << "<INVALID COMMAND>" << '\n';
-    return 0;
+    std::cerr << "ERROR: Invalid command!" << '\n';
+    return 1;
   }
   catch (const std::logic_error &)
   {
     std::cout << "<EMPTY>" << '\n';
-    return 0;
   }
   catch (const std::exception &e)
   {
