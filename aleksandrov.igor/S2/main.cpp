@@ -2,8 +2,8 @@
 #include <fstream>
 #include "queue.hpp"
 #include "stack.hpp"
-#include "infix-part.hpp"
-#include "expr-utils.hpp"
+#include "expression-part.hpp"
+#include "expression-utils.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -25,29 +25,34 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
-  std::istream& input = file.is_open() ? file : std::cin;
+  std::istream& in = file.is_open() ? file : std::cin;
 
   Stack< long long int > results;
   try
   {
-    Queue< Queue< InfixPart > > infixExprs = getInfixExprs(input);
-    Queue< Queue< InfixPart > > postfixExprs = infixesToPostfixes(infixExprs);
-    results = evalPostfixExprs(postfixExprs);
+    Queue< Queue< ExpressionPart > > exprs;
+    getExpressions(in, exprs);
+
+    Queue< Queue< ExpressionPart > > postfixes(getPostfixForms(exprs));
+
+    results = evalPostfixExpressions(postfixes);
   }
   catch (const std::exception& e)
   {
-    std::cerr << "ERROR: " << e.what() << "\n";
+    std::cerr << "ERROR: " << e.what() << '\n';
     return 1;
   }
 
   if (!results.empty())
   {
-    std::cout << results.drop();
+    std::cout << results.top();
+    results.pop();
   }
   while (!results.empty())
   {
-    std::cout << " " << results.drop();
+    std::cout << ' ' << results.top();
+    results.pop();
   }
-  std::cout << "\n";
+  std::cout << '\n';
 }
 

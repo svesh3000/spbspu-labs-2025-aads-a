@@ -1,95 +1,236 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include <list>
+#include <utility>
 #include <cstddef>
+#include <stdexcept>
 #include <cassert>
 
 namespace aleksandrov
 {
-  template< typename T >
+  constexpr size_t minQueueCapacity = 64;
+
+  template< class T >
   class Queue
   {
   public:
-    Queue() = default;
-    Queue(const Queue< T >&);
-    Queue(Queue< T >&&) noexcept;
+    Queue();
+    Queue(const Queue&);
+    Queue(Queue&&) noexcept;
+    ~Queue() noexcept;
 
-    Queue< T >& operator=(const Queue< T >&);
-    Queue< T >& operator=(Queue< T >&&) noexcept;
+    Queue& operator=(const Queue&);
+    Queue& operator=(Queue&&) noexcept;
 
+    T& front();
+    const T& front() const;
+
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    size_t capacity() const noexcept;
+
+    void clear() noexcept;
     void push(const T&);
     void push(T&&);
-    T drop();
-    bool empty();
-    size_t size();
-    T& front();
+    template< class... Args >
+    void emplace(Args&&...);
+    void pop();
+    void swap(Queue&) noexcept;
+
   private:
-    std::list< T > list_;
+    T* data_;
+    T* first_;
+    size_t size_;
+    size_t capacity_;
+
+    T* copyData(const Queue&);
+    void resize();
   };
 
-  template< typename T >
-  Queue< T >::Queue(const Queue< T >& rhs):
-    list_(rhs.list_)
+  template< class T >
+  Queue< T >::Queue():
+    data_(static_cast< T* >(operator new(minQueueCapacity * sizeof(T)))),
+    first_(data_),
+    size_(0),
+    capacity_(minQueueCapacity)
   {}
 
-  template< typename T >
-  Queue< T >::Queue(Queue< T >&& rhs) noexcept:
-    list_(std::move(rhs.list_))
+  template< class T >
+  Queue< T >::Queue(const Queue& rhs):
+    data_(copyData(rhs)),
+    first_(rhs.empty() ? nullptr : data_ + std::distance(rhs.data_, rhs.first_)),
+    size_(rhs.size_),
+    capacity_(rhs.capacity_)
   {}
 
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
+  template< class T >
+  Queue< T >::Queue(Queue&& rhs) noexcept:
+    data_(std::exchange(rhs.data_, nullptr)),
+    first_(std::exchange(rhs.first_, nullptr)),
+    size_(std::exchange(rhs.size_, 0)),
+    capacity_(std::exchange(rhs.capacity_, 0))
+  {}
+
+  template< class T >
+  Queue< T >::~Queue() noexcept
   {
-    list_ = rhs.list_;
+    clear();
+  }
+
+  template< class T >
+  Queue< T >& Queue< T >::operator=(const Queue& rhs)
+  {
+    Queue newQueue(rhs);
+    swap(newQueue);
     return *this;
   }
 
-  template< typename T >
-  Queue< T >& Queue< T >::operator=(Queue< T >&& rhs) noexcept
+  template< class T >
+  Queue< T >& Queue< T >::operator=(Queue&& rhs) noexcept
   {
-    list_ = std::move(rhs.list_);
+    Queue newQueue(std::move(rhs));
+    swap(newQueue);
     return *this;
   }
 
-  template< typename T >
-  void Queue< T >::push(const T& rhs)
-  {
-    list_.push_back(rhs);
-  }
-
-  template< typename T >
-  void Queue< T >::push(T&& rhs)
-  {
-    list_.push_back(std::move(rhs));
-  }
-
-  template< typename T >
-  T Queue< T >::drop()
-  {
-    assert(!empty());
-    T first = list_.front();
-    list_.pop_front();
-    return first;
-  }
-
-  template< typename T >
-  bool Queue< T >::empty()
-  {
-    return list_.empty();
-  }
-
-  template< typename T >
-  size_t Queue< T >::size()
-  {
-    return list_.size();
-  }
-
-  template< typename T >
+  template< class T >
   T& Queue< T >::front()
   {
     assert(!empty());
-    return list_.front();
+    return *first_;
+  }
+
+  template< class T >
+  const T& Queue< T >::front() const
+  {
+    assert(!empty());
+    return *first_;
+  }
+
+  template< class T >
+  bool Queue< T >::empty() const noexcept
+  {
+    return !size_;
+  }
+
+  template< class T >
+  size_t Queue< T >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< class T >
+  size_t Queue< T >::capacity() const noexcept
+  {
+    return capacity_;
+  }
+
+  template< class T >
+  void Queue< T >::clear() noexcept
+  {
+    while (!empty())
+    {
+      pop();
+    }
+  }
+
+  template< class T >
+  void Queue< T >::push(const T& el)
+  {
+    emplace(el);
+  }
+
+  template< class T >
+  void Queue< T >::push(T&& el)
+  {
+    emplace(std::move(el));
+  }
+
+  template< class T >
+  template< class... Args >
+  void Queue< T >::emplace(Args&&... args)
+  {
+    if (size_ == capacity_)
+    {
+      resize();
+    }
+    size_t sizeFromFirst = data_ + capacity_ - first_;
+    if (size_ < sizeFromFirst)
+    {
+      new (first_ + size_) T(std::forward< Args >(args)...);
+    }
+    else
+    {
+      new (first_ - (capacity_ - size_)) T(std::forward< Args >(args)...);
+    }
+    ++size_;
+  }
+
+  template< class T >
+  void Queue< T >::pop()
+  {
+    assert(!empty());
+    (first_ ? first_++ : first_ = data_)->~T();
+    if (empty())
+    {
+      first_ = data_;
+    }
+    --size_;
+  }
+
+  template< class T >
+  void Queue< T >::swap(Queue& rhs) noexcept
+  {
+    std::swap(data_, rhs.data_);
+    std::swap(first_, rhs.first_);
+    std::swap(size_, rhs.size_);
+    std::swap(capacity_, rhs.capacity_);
+  }
+
+  template< class T >
+  T* Queue< T >::copyData(const Queue& rhs)
+  {
+    T* copy = static_cast< T* >(operator new(rhs.capacity_ * sizeof(T)));
+    for (size_t i = 0; i < rhs.size_; ++i)
+    {
+      new (copy + i) T(rhs.data_[i]);
+    }
+    return copy;
+  }
+
+  template< class T >
+  void Queue< T >::resize()
+  {
+    size_t newCapacity = capacity_ * 2;
+    T* newData = static_cast< T* >(operator new(newCapacity * sizeof(T)));
+    size_t shift = std::distance(data_, first_);
+    size_t i = shift;
+    try
+    {
+      for (; i < size_ - shift; ++i)
+      {
+        new (newData + i) T(std::move_if_noexcept(data_[i]));
+      }
+      if (shift)
+      {
+        for (size_t j = 0; j < shift; ++j, ++i)
+        {
+          new (newData + i) T(std::move_if_noexcept(data_[j]));
+        }
+      }
+    }
+    catch (const std::bad_alloc&)
+    {
+      for (size_t j = 0; j < i; ++j)
+      {
+        newData[j].~T();
+      }
+      throw;
+    }
+    clear();
+    data_ = newData;
+    size_ = capacity_;
+    capacity_ = newCapacity;
   }
 }
 
