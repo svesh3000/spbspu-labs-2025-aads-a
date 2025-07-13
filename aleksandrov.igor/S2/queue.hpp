@@ -75,6 +75,7 @@ namespace aleksandrov
   Queue< T >::~Queue() noexcept
   {
     clear();
+    operator delete(data_);
   }
 
   template< class T >
@@ -191,9 +192,22 @@ namespace aleksandrov
   T* Queue< T >::copyData(const Queue& rhs)
   {
     T* copy = static_cast< T* >(operator new(rhs.capacity_ * sizeof(T)));
-    for (size_t i = 0; i < rhs.size_; ++i)
+    size_t i = 0;
+    try
     {
-      new (copy + i) T(rhs.data_[i]);
+      for (; i < rhs.size_; ++i)
+      {
+        new (copy + i) T(rhs.data_[i]);
+      }
+    }
+    catch (const std::bad_alloc&)
+    {
+      for (size_t j = 0; j < i; ++j)
+      {
+        (copy + j)->~T();
+      }
+      operator delete(copy);
+      throw;
     }
     return copy;
   }
@@ -225,9 +239,11 @@ namespace aleksandrov
       {
         newData[j].~T();
       }
+      operator delete(newData);
       throw;
     }
     clear();
+    operator delete(data_);
     data_ = newData;
     size_ = capacity_;
     capacity_ = newCapacity;
