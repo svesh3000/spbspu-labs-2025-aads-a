@@ -25,9 +25,7 @@ namespace petrov
   public:
     using node_t = ListNode< T >;
     using this_t = ConstForwardListIterator< T >;
-    ConstForwardListIterator():
-      node_(nullptr)
-    {}
+    ConstForwardListIterator();
     ConstForwardListIterator(const this_t & rhs) = default;
     ~ConstForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
@@ -39,9 +37,7 @@ namespace petrov
     bool operator!=(const this_t & rhs) const;
   private:
     const ListNode< T > * node_;
-    explicit ConstForwardListIterator(const node_t * node):
-      node_(node)
-    {}
+    explicit ConstForwardListIterator(const node_t * node);
   };
 
   template< typename T >
@@ -51,9 +47,7 @@ namespace petrov
   public:
     using node_t = ListNode< T >;
     using this_t = ForwardListIterator< T >;
-    ForwardListIterator():
-      node_(nullptr)
-    {}
+    ForwardListIterator();
     ForwardListIterator(const this_t & rhs) = default;
     ~ForwardListIterator() = default;
     this_t & operator=(const this_t & rhs) = default;
@@ -65,9 +59,7 @@ namespace petrov
     bool operator!=(const this_t & rhs) const;
   private:
     ListNode< T > * node_;
-    explicit ForwardListIterator(node_t * node):
-      node_(node)
-    {}
+    explicit ForwardListIterator(node_t * node);
   };
 
   template< typename T >
@@ -78,11 +70,7 @@ namespace petrov
     using node_t = ListNode< T >;
     using const_it_t = ConstForwardListIterator< T >;
     using it_t = ForwardListIterator< T >;
-    ForwardRingList():
-      head_(nullptr),
-      tail_(nullptr),
-      size_(0)
-    {}
+    ForwardRingList();
     ForwardRingList(const this_t & rhs);
     ForwardRingList(this_t && rhs);
     ~ForwardRingList();
@@ -114,6 +102,11 @@ namespace petrov
     node_t * tail_;
     size_t size_;
   };
+  
+  template< typename T >
+  ConstForwardListIterator< T >::ConstForwardListIterator():
+    node_(nullptr)
+  {}
 
   template< typename T >
   typename ConstForwardListIterator< T >::this_t & ConstForwardListIterator< T >::operator++()
@@ -159,6 +152,16 @@ namespace petrov
   }
 
   template< typename T >
+  ConstForwardListIterator< T >::ConstForwardListIterator(const node_t * node):
+    node_(node)
+  {}
+
+  template< typename T >
+  ForwardListIterator< T >::ForwardListIterator():
+    node_(nullptr)
+  {}
+
+  template< typename T >
   typename ForwardListIterator< T >::this_t & ForwardListIterator< T >::operator++()
   {
     assert(node_ != nullptr);
@@ -202,6 +205,18 @@ namespace petrov
   }
 
   template< typename T >
+  ForwardListIterator< T >::ForwardListIterator(node_t * node):
+    node_(node)
+  {}
+
+  template< typename T >
+  ForwardRingList< T >::ForwardRingList():
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {}
+
+  template< typename T >
   ForwardRingList< T >::ForwardRingList(const this_t & rhs):
     head_(nullptr),
     tail_(nullptr),
@@ -213,7 +228,6 @@ namespace petrov
     }
     auto it = rhs.cbegin();
     head_ = new node_t{ *it, nullptr };
-    head_->data = *it;
     auto subhead = head_;
     try
     {
@@ -242,7 +256,7 @@ namespace petrov
   ForwardRingList< T >::ForwardRingList(this_t && rhs):
     head_(nullptr),
     tail_(nullptr),
-    size_(rhs.size_)
+    size_(0)
   {
     swap(rhs);
   }
@@ -298,10 +312,6 @@ namespace petrov
         while (it++ != cend());
         return true;
       }
-      else if (size() == rhs.size() && size() == 0)
-      {
-        return true;
-      }
       else
       {
         return false;
@@ -342,7 +352,7 @@ namespace petrov
   template< typename T >
   T & ForwardRingList< T >::front()
   {
-    return const_cast< T >(static_cast< const T >(this)->front());
+    return const_cast< T >(static_cast< const ForwardRingList< T > * >(this)->front());
   }
 
   template< typename T >
@@ -354,7 +364,7 @@ namespace petrov
   template< typename T >
   T & ForwardRingList< T >::back()
   {
-    return const_cast< T >(static_cast< const T >(this)->back());
+    return const_cast< T >(static_cast< const ForwardRingList< T > * >(this)->back());
   }
 
   template< typename T >
@@ -388,7 +398,7 @@ namespace petrov
     }
     else
     {
-      auto temp = tail_->next;
+      auto temp = head_;
       tail_->next = new node_t{ std::forward< T1 >(val), nullptr };
       head_ = tail_->next;
       head_->next = temp;
@@ -425,64 +435,44 @@ namespace petrov
     {
       return;
     }
-    auto subhead = head_;
-    auto prev_subhead = tail_;
-    while (subhead != tail_ && size() != 1)
+    auto prev = head_;
+    auto curr = head_->next;
+    while (curr != tail_)
     {
-      if (subhead->data == val)
+      if (curr->data == val)
       {
-        auto todelete = subhead;
-        subhead = todelete->next;
-        prev_subhead->next = subhead;
-        if (todelete == head_)
-        {
-          head_ = subhead;
-        }
-        else if (todelete == tail_)
-        {
-          tail_ = prev_subhead;
-        }
+        auto todelete = curr;
+        curr = todelete->next;
+        prev->next = curr;
         delete todelete;
-        todelete = nullptr;
         size_--;
       }
       else
       {
-        prev_subhead = subhead;
-        subhead = subhead->next;
+        curr = curr->next;
+        prev = prev->next;
       }
     }
-    if (size() == 1)
+    if (tail_->data == val)
     {
-      if (head_->data == val)
-      {
-        pop_front();
-      }
+      auto todelete = tail_;
+      tail_ = prev;
+      tail_->next = head_;
+      delete todelete;
+      size_--;
     }
-    else
+    if (head_->data == val)
     {
-      if (subhead->data == val)
-      {
-        auto todelete = subhead;
-        subhead = todelete->next;
-        prev_subhead->next = subhead;
-        if (todelete == head_)
-        {
-          head_ = subhead;
-        }
-        else if (todelete == tail_)
-        {
-          tail_ = prev_subhead;
-        }
-        delete todelete;
-        todelete = nullptr;
-        size_--;
-      }
-      else
-      {
-        prev_subhead = subhead;
-        subhead = subhead->next;
-      }
+      auto todelete = head_;
+      head_ = todelete->next;
+      tail_->next = head_;
+      delete todelete;
+      size_--;
+    }
+    if (!size_)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
     }
   }
 
@@ -490,7 +480,49 @@ namespace petrov
   template< typename Cond >
   void ForwardRingList< T >::remove_if(Cond cond)
   {
-    
+    if (empty())
+    {
+      return;
+    }
+    auto prev = head_;
+    auto curr = head_->next;
+    while (curr != tail_)
+    {
+      if (cond(curr->data))
+      {
+        auto todelete = curr;
+        curr = todelete->next;
+        prev->next = curr;
+        delete todelete;
+        size_--;
+      }
+      else
+      {
+        curr = curr->next;
+        prev = prev->next;
+      }
+    }
+    if (cond(tail_->data))
+    {
+      auto todelete = tail_;
+      tail_ = prev;
+      tail_->next = head_;
+      delete todelete;
+      size_--;
+    }
+    if (cond(head_->data))
+    {
+      auto todelete = head_;
+      head_ = todelete->next;
+      tail_->next = head_;
+      delete todelete;
+      size_--;
+    }
+    if (!size_)
+    {
+      head_ = nullptr;
+      tail_ = nullptr;
+    }
   }
 
   template< typename T >
@@ -500,14 +532,13 @@ namespace petrov
     {
       return;
     }
-    auto it = begin();
-    while (it != end())
+    while (head_ != tail_)
     {
-      auto temp = it.node_->next;
-      delete it.node_;
-      it.node_ = temp;
+      auto todelete = head_;
+      head_ = head_->next;
+      delete todelete;
     }
-    delete it.node_;
+    delete head_;
     head_ = nullptr;
     tail_ = nullptr;
     size_ = 0;
@@ -520,19 +551,19 @@ namespace petrov
     {
       return;
     }
-    auto prev = end();
-    auto next = ++begin();
-    auto it = begin();
-    while (it != end())
+    auto prev = tail_;
+    auto curr = head_;
+    auto next = head_->next;
+    while (curr != tail_)
     {
-      it.node_->next = prev.node_;
-      prev = it;
-      it = next++;
+      curr->next = prev;
+      prev = curr;
+      curr = next;
+      next = next->next;
     }
-    it.node_->next = prev.node_;
-    prev = it;
-    auto temp = begin().node_;
-    head_ = end().node_;
+    curr->next = prev;
+    auto temp = head_;
+    head_ = tail_;
     tail_ = temp;
   }
 
