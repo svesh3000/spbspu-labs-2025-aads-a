@@ -73,6 +73,7 @@ namespace petrov
     ForwardRingList();
     ForwardRingList(const this_t & rhs);
     ForwardRingList(this_t && rhs);
+    ForwardRingList(size_t n, const T & val);
     ~ForwardRingList();
     this_t & operator=(const this_t & rhs);
     this_t & operator=(this_t && rhs);
@@ -88,13 +89,20 @@ namespace petrov
     const T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
+    void assign(size_t n, const T & val);
     template< typename T1 >
-    void push_front (T1 && val);
+    void push_front(T1 && val);
+    template< class THIS_T >
+    void splice(const it_t pos, THIS_T && rhs);
+    template< class THIS_T >
+    void splice(const it_t pos, THIS_T && rhs, const it_t i);
+    template< class THIS_T >
+    void splice(const it_t pos, THIS_T && rhs, const it_t first, const it_t last);
     void pop_front();
     void remove(const T & val);
     template< typename Cond >
     void remove_if(Cond cond);
-    void clear();
+    void clear() noexcept;
     void reverse();
     void swap(this_t & rhs) noexcept;
   private:
@@ -254,11 +262,32 @@ namespace petrov
 
   template< typename T >
   ForwardRingList< T >::ForwardRingList(this_t && rhs):
+    head_(rhs.head_),
+    tail_(rhs.tail_),
+    size_(rhs.size_)
+  {
+    rhs.head_ = nullptr;
+    rhs.tail_ = nullptr;
+  }
+
+  template< typename T >
+  ForwardRingList< T >::ForwardRingList(size_t n, const T & val):
     head_(nullptr),
     tail_(nullptr),
     size_(0)
   {
-    swap(rhs);
+    try
+    {
+      for (size_t i = 0; i < n; i++)
+      {
+        push_front(val);
+      }
+    }
+    catch (const std::bad_alloc & e)
+    {
+      clear();
+      throw;
+    }
   }
 
   template< typename T >
@@ -386,6 +415,37 @@ namespace petrov
   }
 
   template< typename T >
+  void ForwardRingList< T >::assign(size_t n, const T & val)
+  {
+    node_t * new_head = new node_t{ val, nullptr };
+    node_t * new_tail = new_head;
+    try
+    {
+      for (size_t i = 0; i < n - 1; i++)
+      {
+        new_tail->next = new node_t{ val, nullptr };
+        new_tail = new_tail->next;
+      }
+    }
+    catch (const std::bad_alloc & e)
+    {
+      while (new_head->next)
+      {
+        auto todelete = new_head;
+        new_head = todelete->next;
+        delete todelete;
+      }
+      delete new_head;
+      throw;
+    }
+    clear();
+    head_ = new_head;
+    tail_ = new_tail;
+    tail_->next = head_;
+    size_ = n;
+  }
+
+  template< typename T >
   template< typename T1 >
   void ForwardRingList< T >::push_front(T1 && val)
   {
@@ -394,7 +454,6 @@ namespace petrov
       head_ = new node_t{ std::forward< T1 >(val), head_ };
       tail_ = head_;
       tail_->next = head_;
-      size_++;
     }
     else
     {
@@ -402,8 +461,133 @@ namespace petrov
       tail_->next = new node_t{ std::forward< T1 >(val), nullptr };
       head_ = tail_->next;
       head_->next = temp;
-      size_++;
     }
+    size_++;
+  }
+
+  template< typename T >
+  template< class THIS_T >
+  void ForwardRingList< T >::splice(const it_t pos, THIS_T && rhs)
+  {
+    if (!rhs.empty())
+    {
+      if (pos.node_ != tail_)
+      {
+        auto temp = pos.node_->next;
+        pos.node_->next = rhs.head_;
+        rhs.tail_->next = temp;
+      }
+      else
+      {
+        pos.node_->next = rhs.head_;
+        rhs.tail_->next = head_;
+        tail_ = rhs.tail_;
+      }
+      size_ += rhs.size_;
+      rhs.head_ = nullptr;
+      rhs.tail_ = nullptr;
+      rhs.size_ = 0;
+    }
+  }
+
+  template< typename T >
+  template< class THIS_T >
+  void ForwardRingList< T >::splice(const it_t pos, THIS_T && rhs, const it_t i)
+  {
+    auto added = i.node_->next;
+    if (added == rhs.head_)
+    {
+      rhs.tail_->next = rhs.head_->next;
+      rhs.head_ = rhs.tail_->next;
+    }
+    else if (added == rhs.tail_)
+    {
+      rhs.tail_ = i.node_;
+      rhs.tail_->next = rhs.head_;
+    }
+    else
+    {
+      i.node_->next = added->next;
+    }
+    rhs.size_--;
+    if (rhs.empty())
+    {
+      rhs.head_ = nullptr;
+      rhs.tail_ = nullptr;
+    }
+    if (pos.node_ != tail_)
+    {
+      auto temp = pos.node_->next;
+      pos.node_->next = added;
+      added->next = temp;
+    }
+    else
+    {
+      pos.node_->next = added;
+      added->next = head_;
+      tail_ = added;
+    }
+    size_++;
+  }
+
+  template< typename T >
+  template< class THIS_T >
+  void ForwardRingList< T >::splice(const it_t pos, THIS_T && rhs, const it_t first, const it_t last)
+  {
+    if (first.node_->next == last.node_)
+    {
+      return;
+    }
+    size_t nodes_removed = 0;
+    bool is_head_removed = false;
+    bool is_tail_removed = false;
+    auto added_head = first.node_->next;
+    if (added_head == rhs.head_)
+    {
+      is_head_removed = true;
+    }
+    else if (added_head == rhs.tail_)
+    {
+      is_tail_removed = true;
+    }
+    nodes_removed++;
+    auto added_tail = added_head;
+    while (added_tail->next != last.node_)
+    {
+      added_tail = added_tail->next;
+      if (added_tail == rhs.head_)
+      {
+        is_head_removed = true;
+      }
+      else if (added_tail == rhs.tail_)
+      {
+        is_tail_removed = true;
+      }
+      nodes_removed++;
+    }
+    first.node_->next = last.node_;
+    if (is_head_removed)
+    {
+      rhs.head_ = last.node_;
+    }
+    if (is_tail_removed)
+    {
+      rhs.tail_ = first.node_;
+    }
+    rhs.size_ -= nodes_removed;
+    if (pos.node_ != tail_)
+    {
+      auto temp = pos.node_->next;
+      pos.node_->next = added_head;
+      added_tail->next = temp;
+    }
+    else
+    {
+      pos.node_->next = added_head;
+      added_tail->next = head_;
+      tail_ = added_tail;
+    }
+    size_ += nodes_removed;
   }
 
   template< typename T >
@@ -526,7 +710,7 @@ namespace petrov
   }
 
   template< typename T >
-  void ForwardRingList< T >::clear()
+  void ForwardRingList< T >::clear() noexcept
   {
     if (empty())
     {

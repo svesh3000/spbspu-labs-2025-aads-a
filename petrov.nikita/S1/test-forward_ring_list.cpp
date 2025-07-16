@@ -882,6 +882,782 @@ BOOST_AUTO_TEST_CASE(remove_if_elements_from_list_to_make_it_empty)
 BOOST_AUTO_TEST_SUITE_END()
 
 
+BOOST_AUTO_TEST_SUITE(fill_constructor)
+
+BOOST_AUTO_TEST_CASE(fill_with_one_element)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(1, 1);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(fill_with_three_elements)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(3, 3);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  BOOST_TEST(out.str() == "3 3 3");
+}
+
+BOOST_AUTO_TEST_CASE(fill_with_five_elements)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  BOOST_TEST(out.str() == "5 5 5 5 5");
+}
+
+BOOST_AUTO_TEST_CASE(fill_with_seven_elements)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(7, 7);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  BOOST_TEST(out.str() == "7 7 7 7 7 7 7");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(splice_method_all_list)
+
+BOOST_AUTO_TEST_CASE(splice_empty_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  petrov::ForwardRingList< int > second;
+  auto pos = first.begin();
+  for (size_t i = 0; i < 6; i++)
+  {
+    ++pos;
+  }
+  first.splice(pos, second);
+  auto it = first.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != first.cend());
+  out << " " << second.empty();
+  BOOST_TEST(out.str() == "7 7 7 7 7 7 7 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_to_one_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(1, 1);
+  petrov::ForwardRingList< int > second(3, 3);
+  auto pos = first.begin();
+  first.splice(pos, second);
+  auto it = first.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != first.cend());
+  out << " " << *it;
+  out << " " << second.empty();
+  BOOST_TEST(out.str() == "1 3 3 3 1 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_not_empty_list_after_middle)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  petrov::ForwardRingList< int > second(3, 3);
+  auto pos = first.begin();
+  for (size_t i = 0; i < 3; i++)
+  {
+    ++pos;
+  }
+  first.splice(pos, second);
+  auto it = first.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != first.cend());
+  out << " " << second.empty();
+  BOOST_TEST(out.str() == "7 7 7 7 3 3 3 7 7 7 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_not_empty_list_after_head)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  petrov::ForwardRingList< int > second(3, 3);
+  auto pos = first.begin();
+  first.splice(pos, second);
+  auto it = first.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != first.cend());
+  out << " " << second.empty();
+  BOOST_TEST(out.str() == "7 3 3 3 7 7 7 7 7 7 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_not_empty_list_after_tail)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  first.push_front(5);
+  petrov::ForwardRingList< int > second(3, 3);
+  auto pos = first.end();
+  first.splice(pos, second);
+  auto it = first.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != first.cend());
+  out << " " << *it;
+  out << " " << second.empty() << " " << first.size();
+  BOOST_TEST(out.str() == "5 7 7 7 7 7 7 7 3 3 3 5 1 11");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(splice_method_one_node)
+
+BOOST_AUTO_TEST_CASE(splice_node_to_middle)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto it = second.begin();
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  BOOST_TEST(out.str() == "7 7 2 7 7 7 7 7 1 3");
+}
+
+BOOST_AUTO_TEST_CASE(splice_to_one_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(1, 1);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  BOOST_TEST(out.str() == "1 2 1 1 3");
+}
+
+BOOST_AUTO_TEST_CASE(splice_node_after_head)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  BOOST_TEST(out.str() == "7 2 7 7 7 7 7 7 1 3");
+}
+
+BOOST_AUTO_TEST_CASE(splice_node_after_tail)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(7, 7);
+  first.push_front(5);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  for (size_t i = 0; i < 7; i++)
+  {
+    ++pos;
+  }
+  auto it = second.begin();
+  first.splice(pos, first, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  BOOST_TEST(out.str() == "5 7 7 7 7 7 7 7 2 5 1 3");
+}
+
+BOOST_AUTO_TEST_CASE(splice_node_from_tail)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 4);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  ++it;
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "4 3 4 4 1 2 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_node_from_head)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 4);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 3; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  ++it;
+  ++it;
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2; 
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "4 1 4 4 2 3 2");
+}
+
+BOOST_AUTO_TEST_CASE(splice_node_from_one_element_list)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 4);
+  petrov::ForwardRingList< int > second(1, 5);
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  first.splice(pos, second, it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << second.empty();
+  BOOST_TEST(out.str() == "4 5 4 4 1");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(splice_method_range)
+
+BOOST_AUTO_TEST_CASE(first_eq_last_middle)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(1, 1);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  auto it = second.begin();
+  ++it;
+  ++it;
+  auto first_it = it;
+  auto last_it = it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++) << " " << *(it_2++) << " " << second.size();
+  BOOST_TEST(out.str() == "1 4 5 1 2 1 3 3 1");
+}
+
+BOOST_AUTO_TEST_CASE(first_eq_last_begin)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(2, 1);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto it = second.begin();
+  auto first_it = it;
+  auto last_it = it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++) << " " << *(it_2++);
+  BOOST_TEST(out.str() == "1 1 2 3 4 5 1 1 1");
+}
+
+BOOST_AUTO_TEST_CASE(first_eq_last_end)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  ++pos;
+  auto it = second.begin();
+  ++it;
+  ++it;
+  ++it;
+  ++it;
+  auto first_it = it;
+  auto last_it = it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++) << " " << *(it_2++);
+  BOOST_TEST(out.str() == "10 10 10 1 2 3 4 10 5 5");
+}
+
+BOOST_AUTO_TEST_CASE(splice_one_el_btw)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto first_it = second.begin();
+  auto it = second.begin();
+  ++it;
+  ++it;
+  auto last_it = it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 2 10 10 1 3 4 5 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_three_el_btw)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto first_it = second.begin();
+  auto last_it = second.end();
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 2 3 4 10 10 1 5 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_three_el_end)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto last_it = second.begin();
+  auto first_it = second.begin();
+  ++first_it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 3 4 5 10 10 1 2 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_three_el_begin)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto last_it = second.begin();
+  ++last_it;
+  ++last_it;
+  ++last_it;
+  auto first_it = second.end();
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 1 2 3 10 10 4 5 4");
+}
+
+BOOST_AUTO_TEST_CASE(splice_with_cycle_two)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto last_it = second.begin();
+  ++last_it;
+  auto first_it = second.begin();
+  ++first_it;
+  ++first_it;
+  ++first_it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 5 1 10 10 2 3 4 2");
+}
+
+BOOST_AUTO_TEST_CASE(splice_one_btw)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto first_it = ++second.begin();
+  auto last_it = second.begin();
+  ++last_it;
+  ++last_it;
+  ++last_it;
+  first.splice(pos, second, first_it, last_it);
+  auto it_1 = first.cbegin();
+  out << *(it_1++);
+  do
+  {
+    out << " " << *it_1;
+  }
+  while (it_1++ != first.cend());
+  out << " " << *it_1;
+  auto it_2 = second.cbegin();
+  out << " " << *(it_2++);
+  do
+  {
+    out << " " << *it_2;
+  }
+  while (it_2++ != second.cend());
+  out << " " << *it_2;
+  BOOST_TEST(out.str() == "10 10 3 10 10 1 2 4 5 1");
+}
+
+BOOST_AUTO_TEST_CASE(splice_with_cycle_two_size_test)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > first(3, 10);
+  petrov::ForwardRingList< int > second;
+  for (int i = 1; i <= 5; i++)
+  {
+    second.push_front(i);
+  }
+  second.reverse();
+  auto pos = first.begin();
+  ++pos;
+  auto last_it = second.begin();
+  ++last_it;
+  auto first_it = second.begin();
+  ++first_it;
+  ++first_it;
+  ++first_it;
+  first.splice(pos, second, first_it, last_it);
+  out << first.size() << " " << second.size();
+  BOOST_TEST(out.str() == "5 3");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(assign_method)
+
+BOOST_AUTO_TEST_CASE(assign_one)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  fwd_list.assign(1, 1);
+  auto it = fwd_list.cbegin();
+  out << *(it++) << " " << *(it++) << " " << *it << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "1 1 1 1");
+}
+
+BOOST_AUTO_TEST_CASE(assign_two)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  fwd_list.assign(2, 2);
+  auto it = fwd_list.cbegin();
+  out << *(it++) << " " << *(it++) << " " << *it << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "2 2 2 2");
+}
+
+BOOST_AUTO_TEST_CASE(assign_five)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  fwd_list.assign(5, 10);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  out << " " << *it << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "10 10 10 10 10 10 5");
+}
+
+BOOST_AUTO_TEST_CASE(assign_seven)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  fwd_list.assign(7, 5);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  out << " " << *it << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "5 5 5 5 5 5 5 5 7");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
