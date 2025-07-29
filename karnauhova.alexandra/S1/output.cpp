@@ -1,6 +1,8 @@
 #include "output.hpp"
 
-void karnauhova::output_names(karnauhova::Fwd_list< std::pair< std::string, karnauhova::Fwd_list< unsigned long long > > > l, std::ostream& out)
+using UllList = karnauhova::Fwd_list< unsigned long long >;
+
+void karnauhova::output_names(karnauhova::Fwd_list< std::pair< std::string, UllList > > l, std::ostream& out)
 {
   if (l.size() == 0)
   {
@@ -16,7 +18,7 @@ void karnauhova::output_names(karnauhova::Fwd_list< std::pair< std::string, karn
   out << "\n";
 }
 
-void karnauhova::output_element_lists(karnauhova::Fwd_list< unsigned long long > lists, size_t index, std::ostream& out, bool& first)
+void karnauhova::output_element_lists(UllList lists, size_t index, std::ostream& out, bool& first)
 {
   size_t count = 1;
   auto it = lists.begin();
@@ -37,7 +39,7 @@ void karnauhova::output_element_lists(karnauhova::Fwd_list< unsigned long long >
   out << *it;
 }
 
-void karnauhova::output_lists(karnauhova::Fwd_list< std::pair< std::string, karnauhova::Fwd_list< unsigned long long > > > l, std::ostream& out)
+void karnauhova::output_lists(karnauhova::Fwd_list< std::pair< std::string, UllList > > l, std::ostream& out)
 {
   size_t max_length = max_lenght(l);
   for (size_t i = 0; i < max_length; ++i)
@@ -51,7 +53,7 @@ void karnauhova::output_lists(karnauhova::Fwd_list< std::pair< std::string, karn
   }
 }
 
-size_t karnauhova::max_lenght(karnauhova::Fwd_list< std::pair< std::string, karnauhova::Fwd_list< unsigned long long > > > l)
+size_t karnauhova::max_lenght(karnauhova::Fwd_list< std::pair< std::string, UllList > > l)
 {
   size_t max = 0;
   for (const auto& it : l)

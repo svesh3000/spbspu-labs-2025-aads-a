@@ -2,7 +2,9 @@
 #include <limits>
 #include "output.hpp"
 
-int karnauhova::element_lists(karnauhova::Fwd_list< unsigned long long > lists, size_t index)
+using UllList = karnauhova::Fwd_list< unsigned long long >;
+
+int karnauhova::element_lists(UllList lists, size_t index)
 {
   size_t count = 1;
   auto it = lists.begin();
@@ -18,7 +20,7 @@ int karnauhova::element_lists(karnauhova::Fwd_list< unsigned long long > lists, 
   return *it;
 }
 
-void karnauhova::count_lists(karnauhova::Fwd_list< std::pair< std::string, karnauhova::Fwd_list< unsigned long long > > > l, std::ostream& out)
+void karnauhova::count_lists(karnauhova::Fwd_list< std::pair< std::string, UllList > > l, std::ostream& out)
 {
   size_t max_length = max_lenght(l);
   unsigned long long sum = 0;
