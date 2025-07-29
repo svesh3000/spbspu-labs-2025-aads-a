@@ -36,6 +36,8 @@ namespace karnauhova
 
     T& front();
     T& back();
+    const T& front() const;
+    const T& back() const;
     void clear() noexcept;
     void swap(Fwd_list< T >& other) noexcept;
     void push_front(const T& data);
@@ -204,11 +206,23 @@ namespace karnauhova
   template< typename T >
   T& Fwd_list< T >::front()
   {
-    return fake_->next->data;
+    return const_cast< T& >(static_cast< const Fwd_list< T >* >(this)->front());
   }
 
   template< typename T >
   T& Fwd_list< T >::back()
+  {
+    return const_cast< T& >(static_cast< const Fwd_list< T >* >(this)->back());
+  }
+
+  template< typename T >
+  const T& Fwd_list< T >::front() const
+  {
+    return fake_->next->data;
+  }
+
+  template< typename T >
+  const T& Fwd_list< T >::back() const
   {
     NodeList< T >* now = fake_;
     while (now->next != fake_)

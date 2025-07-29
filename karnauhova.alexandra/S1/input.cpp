@@ -7,7 +7,7 @@
 std::pair< std::string, karnauhova::Fwd_list< unsigned long long > > karnauhova::input_line(std::istream& in, std::string name)
 {
   unsigned long long x = 0;
-  karnauhova::Fwd_list< unsigned long long > numbers;
+  Fwd_list< unsigned long long > numbers;
   while (in >> x)
   {
     if (!x)

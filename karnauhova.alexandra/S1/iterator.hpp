@@ -22,6 +22,8 @@ namespace karnauhova
 
     T& operator*();
     T* operator->();
+    const T& operator*() const;
+    const T* operator->() const;
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
   };
@@ -60,11 +62,23 @@ namespace karnauhova
   template< typename T >
   T& ListIterator< T >::operator*()
   {
-    return node->data;
+    return const_cast< T& >(static_cast< const ListIterator< T >* >(this)->operator*());
   }
 
   template< typename T >
   T* ListIterator< T >::operator->()
+  {
+    return const_cast< T* >(static_cast< const ListIterator< T >* >(this)->operator->());;
+  }
+
+  template< typename T >
+  const T& ListIterator< T >::operator*() const
+  {
+    return node->data;
+  }
+
+  template< typename T >
+  const T* ListIterator< T >::operator->() const
   {
     return std::addressof(node->data);
   }

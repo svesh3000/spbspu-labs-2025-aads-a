@@ -10,7 +10,7 @@ namespace karnauhova
   {
     const NodeList< T >* node;
     using this_t = ConstListIterator< T >;
-    ConstListIterator() : node(nullptr) {}
+    ConstListIterator();
     ConstListIterator(const NodeList< T >* element);
     ~ConstListIterator() = default;
     ConstListIterator(const this_t&) = default;
@@ -24,6 +24,11 @@ namespace karnauhova
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
   };
+
+  template< typename T >
+  ConstListIterator< T >::ConstListIterator():
+    node(nullptr)
+  {}
 
   template< typename T >
   ConstListIterator< T >::ConstListIterator(const NodeList< T >* element):
