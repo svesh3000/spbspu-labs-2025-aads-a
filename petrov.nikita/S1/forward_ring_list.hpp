@@ -1,11 +1,13 @@
 #ifndef FORWARD_RING_LIST_HPP
 #define FORWARD_RING_LIST_HPP
 
-#include <iterator>
-#include <cstddef>
 #include <memory>
+#include <cstddef>
 #include <cassert>
+#include <iterator>
+#include <functional>
 #include <initializer_list>
+
 
 namespace petrov
 {
@@ -74,6 +76,7 @@ namespace petrov
     using node_t = ListNode< T >;
     using const_it_t = ConstForwardListIterator< T >;
     using it_t = ForwardListIterator< T >;
+
     ForwardRingList();
     ForwardRingList(const this_t & rhs);
     ForwardRingList(this_t && rhs);
@@ -82,6 +85,7 @@ namespace petrov
     template < class InputIterator, class = typename std::iterator_traits< InputIterator >::value_type >
     ForwardRingList(InputIterator first, InputIterator last);
     ~ForwardRingList();
+
     this_t & operator=(const this_t & rhs);
     this_t & operator=(this_t && rhs);
     this_t & operator=(std::initializer_list< T > il);
@@ -91,20 +95,25 @@ namespace petrov
     bool operator>(const this_t & rhs) const;
     bool operator<=(const this_t & rhs) const;
     bool operator>=(const this_t & rhs) const;
+  
     const_it_t cbegin() const;
     const_it_t cend() const;
     it_t begin();
     it_t end();
+
     T & front();
     const T & front() const;
     T & back();
     const T & back() const;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
-    template< class InputIterator, class = typename std::iterator_traits< InputIterator >::value_type >
-    void assign(InputIterator first, InputIterator last);
+
     void assign(size_t n, const T & val);
     void assign(std::initializer_list< T > il);
+    template< class InputIterator, class = typename std::iterator_traits< InputIterator >::value_type >
+    void assign(InputIterator first, InputIterator last);
+
     template< typename T1 >
     void push_front(T1 && val);
     template< class... Args >
@@ -123,6 +132,11 @@ namespace petrov
     void splice(const_it_t pos, This_t && rhs, const_it_t i);
     template< class This_t >
     void splice(const_it_t pos, This_t && rhs, const_it_t first, const_it_t last);
+    template< typename This_t >
+    void merge(This_t && rhs);
+    template< typename This_t, typename Compare >
+    void merge(This_t && rhs, Compare comp);
+
     void pop_front();
     it_t erase(const_it_t pos);
     it_t erase(const_it_t pos, const_it_t last);
@@ -130,22 +144,24 @@ namespace petrov
     template< typename Cond >
     void remove_if(Cond cond);
     void clear() noexcept;
+
     void reverse();
     void sort();
     template< typename Compare >
     void sort(Compare comp);
-    template< typename This_t >
-    void merge(This_t && rhs);
-    template< typename This_t, typename Compare >
-    void merge(This_t && rhs, Compare comp);
+
     void unique();
     template< typename BinPred >
     void unique(BinPred binary_pred);
+
     void swap(this_t & rhs) noexcept;
+
   private:
     node_t * head_;
     node_t * tail_;
     size_t size_;
+    template< typename T1 >
+    void push_back(T1 && val);
     template< typename Compare >
     void sortImpl(node_t * low, node_t * high, Compare comp);
   };
@@ -281,36 +297,26 @@ namespace petrov
   ForwardRingList< T >::ForwardRingList(const this_t & rhs):
     head_(nullptr),
     tail_(nullptr),
-    size_(rhs.size_)
+    size_(0)
   {
     if (rhs.empty())
     {
       return;
     }
     auto it = rhs.cbegin();
-    head_ = new node_t{ *it, nullptr };
-    auto subhead = head_;
     try
     {
-      while (it++ != rhs.cend())
+      do
       {
-        subhead->next = new node_t{ *it, nullptr };
-        subhead = subhead->next;
+        push_back(*it);
       }
+      while (it++ != rhs.cend());
     }
     catch (...)
     {
-      while (head_->next)
-      {
-        auto todelete = head_;
-        head_ = todelete->next;
-        delete todelete;
-      }
-      delete head_;
+      clear();
       throw;
     }
-    subhead->next = head_;
-    tail_ = subhead;
   }
 
   template< typename T >
@@ -336,7 +342,7 @@ namespace petrov
         push_front(val);
       }
     }
-    catch (const std::bad_alloc & e)
+    catch (...)
     {
       clear();
       throw;
@@ -353,15 +359,14 @@ namespace petrov
     {
       for (auto it = il.begin(); it != il.end(); ++it)
       {
-        push_front(*it);
+        push_back(*it);
       }
     }
-    catch(const std::bad_alloc & e)
+    catch (...)
     {
       clear();
       throw;
     }
-    reverse();
   }
 
   template< typename T >
@@ -375,15 +380,14 @@ namespace petrov
     {
       for (auto it = first; it != last; ++it)
       {
-        push_front(*it);
+        push_back(*it);
       }
     }
-    catch(const std::bad_alloc & e)
+    catch (...)
     {
       clear();
       throw;
     }
-    reverse();
   }
 
   template< typename T >
@@ -461,7 +465,7 @@ namespace petrov
   template< typename T >
   bool ForwardRingList< T >::operator<(const this_t & rhs) const
   {
-    if (empty() && rhs.empty())
+    if ((empty() && rhs.empty()) || rhs.empty())
     {
       return false;
     }
@@ -469,13 +473,9 @@ namespace petrov
     {
       return true;
     }
-    else if (rhs.empty())
-    {
-      return false;
-    }
     auto lhs_first_it = cbegin();
-    auto rhs_first_it = rhs.cbegin();
     auto lhs_last_it = cend();
+    auto rhs_first_it = rhs.cbegin();
     auto rhs_last_it = rhs.cend();
     do
     {
@@ -574,110 +574,22 @@ namespace petrov
   template< class InputIterator, class >
   void ForwardRingList< T >::assign(InputIterator first, InputIterator last)
   {
-    if (first == last)
-    {
-      return;
-    }
-    node_t * new_head = new node_t{ *first, nullptr };
-    node_t * new_tail = new_head;
-    size_t count = 1;
-    try
-    {
-      for (auto it = ++first; it != last; ++it)
-      {
-        new_tail->next = new node_t{ *it, nullptr };
-        new_tail = new_tail->next;
-        count++;
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    clear();
-    head_ = new_head;
-    tail_ = new_tail;
-    tail_->next = head_;
-    size_ = count;
+    this_t cpy(first, last);
+    swap(cpy);
   }
 
   template< typename T >
   void ForwardRingList< T >::assign(size_t n, const T & val)
   {
-    if (!n)
-    {
-      return;
-    }
-    node_t * new_head = new node_t{ val, nullptr };
-    node_t * new_tail = new_head;
-    try
-    {
-      for (size_t i = 0; i < n - 1; i++)
-      {
-        new_tail->next = new node_t{ val, nullptr };
-        new_tail = new_tail->next;
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    clear();
-    head_ = new_head;
-    tail_ = new_tail;
-    tail_->next = head_;
-    size_ = n;
+    this_t cpy(n, val);
+    swap(cpy);
   }
 
   template< typename T >
   void ForwardRingList< T >::assign(std::initializer_list< T > il)
   {
-    if (!il.size())
-    {
-      clear();
-      return;
-    }
-    auto it = il.begin();
-    node_t * new_head = new node_t{ *(it++), nullptr };
-    node_t * new_tail = new_head;
-    try
-    {
-      for (; it != il.end(); ++it)
-      {
-        new_tail->next = new node_t{ *it, nullptr };
-        new_tail = new_tail->next;
-      }
-    }
-    catch (const std::bad_alloc & e)
-    {
-      while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    clear();
-    head_ = new_head;
-    tail_ = new_tail;
-    tail_->next = head_;
-    size_ = il.size();
+    this_t cpy(il);
+    swap(cpy);
   }
 
   template< typename T >
@@ -686,16 +598,14 @@ namespace petrov
   {
     if (empty())
     {
-      head_ = new node_t{ std::forward< T1 >(val), head_ };
+      head_ = new node_t{ std::forward< T1 >(val), nullptr };
       tail_ = head_;
       tail_->next = head_;
     }
     else
     {
-      auto temp = head_;
-      tail_->next = new node_t{ std::forward< T1 >(val), nullptr };
+      tail_->next = new node_t{ std::forward< T1 >(val), head_ };
       head_ = tail_->next;
-      head_->next = temp;
     }
     size_++;
   }
@@ -730,18 +640,7 @@ namespace petrov
   template< typename T1 >
   typename ForwardRingList< T >::it_t ForwardRingList< T >::insert(const_it_t pos, T1 && val)
   {
-    if (pos.node_ != tail_)
-    {
-      auto temp = pos.node_->next;
-      pos.node_->next = new node_t{ std::forward< T1 >(val), temp };
-    }
-    else
-    {
-      tail_->next = new node_t{ std::forward< T1 >(val), head_ };
-      tail_ = tail_->next;
-    }
-    size_++;
-    return it_t(pos.node_->next);
+    return insert(pos, 1ull, std::forward< T >(val));
   }
 
   template< typename T >
@@ -751,41 +650,10 @@ namespace petrov
     {
       return it_t(pos.node_);
     }
-    node_t * new_head = new node_t{ val, nullptr };
-    node_t * new_tail = new_head;
-    try
-    {
-      for (size_t i = 0; i < n - 1; i++)
-      {
-        new_tail->next = new node_t{ val, nullptr };
-        new_tail = new_tail->next;
-      }
-    }
-    catch(const std::bad_alloc & e)
-    {
-       while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    if (pos.node_ != tail_)
-    {
-      auto temp = pos.node_->next;
-      pos.node_->next = new_head;
-      new_tail->next = temp;
-    }
-    else
-    {
-      tail_->next = new_head;
-      new_tail->next = head_;
-      tail_ = new_tail;
-    }
-    size_ += n;
-    return it_t(new_tail);
+    this_t to_splice(n, val);
+    it_t ret_it(to_splice.tail_);
+    splice(pos, to_splice);
+    return ret_it;
   }
 
   template< typename T >
@@ -796,43 +664,10 @@ namespace petrov
     {
       return it_t(pos.node_);
     }
-    node_t * new_head = new node_t{ *first, nullptr };
-    node_t * new_tail = new_head;
-    size_t count = 1;
-    try
-    {
-      for (auto it = ++first; it != last; ++it)
-      {
-        new_tail->next = new node_t{ *it, nullptr };
-        new_tail = new_tail->next;
-        count++;
-      }
-    }
-    catch(const std::bad_alloc & e)
-    {
-       while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    if (pos.node_ != tail_)
-    {
-      auto temp = pos.node_->next;
-      pos.node_->next = new_head;
-      new_tail->next = temp;
-    }
-    else
-    {
-      tail_->next = new_head;
-      new_tail->next = head_;
-      tail_ = new_tail;
-    }
-    size_ += count;
-    return it_t(new_tail);
+    this_t to_splice(first, last);
+    it_t ret_it(to_splice.tail_);
+    splice(pos, to_splice);
+    return ret_it;
   }
 
   template< typename T >
@@ -842,42 +677,10 @@ namespace petrov
     {
       return it_t(pos.node_);
     }
-    auto it = il.begin();
-    node_t * new_head = new node_t{ *(it++), nullptr };
-    node_t * new_tail = new_head;
-    try
-    {
-      for (; it != il.end(); ++it)
-      {
-        new_tail->next = new node_t{ *it, nullptr };
-        new_tail = new_tail->next;
-      }
-    }
-    catch(const std::bad_alloc & e)
-    {
-       while (new_head->next)
-      {
-        auto todelete = new_head;
-        new_head = todelete->next;
-        delete todelete;
-      }
-      delete new_head;
-      throw;
-    }
-    if (pos.node_ != tail_)
-    {
-      auto temp = pos.node_->next;
-      pos.node_->next = new_head;
-      new_tail->next = temp;
-    }
-    else
-    {
-      tail_->next = new_head;
-      new_tail->next = head_;
-      tail_ = new_tail;
-    }
-    size_ += il.size();
-    return it_t(new_tail);
+    this_t to_splice(il);
+    it_t ret_it(to_splice.tail_);
+    splice(pos, to_splice);
+    return ret_it;
   }
 
   template< typename T >
@@ -1097,49 +900,8 @@ namespace petrov
   template< typename T >
   void ForwardRingList< T >::remove(const T & val)
   {
-    if (empty())
-    {
-      return;
-    }
-    auto prev = head_;
-    auto curr = head_->next;
-    while (curr != tail_)
-    {
-      if (curr->data == val)
-      {
-        auto todelete = curr;
-        curr = todelete->next;
-        prev->next = curr;
-        delete todelete;
-        size_--;
-      }
-      else
-      {
-        curr = curr->next;
-        prev = prev->next;
-      }
-    }
-    if (tail_->data == val)
-    {
-      auto todelete = tail_;
-      tail_ = prev;
-      tail_->next = head_;
-      delete todelete;
-      size_--;
-    }
-    if (head_->data == val)
-    {
-      auto todelete = head_;
-      head_ = todelete->next;
-      tail_->next = head_;
-      delete todelete;
-      size_--;
-    }
-    if (!size_)
-    {
-      head_ = nullptr;
-      tail_ = nullptr;
-    }
+    using namespace std::placeholders;
+    remove_if(std::bind(std::equal_to< T >{}, _1, val));
   }
 
   template< typename T >
@@ -1350,6 +1112,24 @@ namespace petrov
   }
 
   template< typename T >
+  template< typename T1 >
+  void ForwardRingList< T >::push_back(T1 && val)
+  {
+    if (empty())
+    {
+      head_ = new node_t{ std::forward< T1 >(val), nullptr };
+      tail_ = head_;
+      tail_->next = head_;
+    }
+    else
+    {
+      tail_->next = new node_t{ std::forward< T1 >(val), head_ };
+      tail_ = tail_->next;
+    }
+    size_++;
+  }
+
+  template< typename T >
   template< typename Compare >
   void ForwardRingList< T >::sortImpl(node_t * low, node_t * high, Compare comp)
   {
@@ -1382,3 +1162,4 @@ namespace petrov
 }
 
 #endif
+

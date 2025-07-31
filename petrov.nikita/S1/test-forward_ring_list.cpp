@@ -884,6 +884,14 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(fill_constructor)
 
+BOOST_AUTO_TEST_CASE(fill_with_zero_element)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(0, 1);
+  out << fwd_list.empty() << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "1 0");
+}
+
 BOOST_AUTO_TEST_CASE(fill_with_one_element)
 {
   std::ostringstream out;
@@ -1603,6 +1611,15 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(assign_method)
 
+BOOST_AUTO_TEST_CASE(assign_empty)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(5, 5);
+  fwd_list.assign(0, 1);
+  out << fwd_list.empty() << " " << fwd_list.size();
+  BOOST_TEST(out.str() == "1 0");
+}
+
 BOOST_AUTO_TEST_CASE(assign_one)
 {
   std::ostringstream out;
@@ -1974,6 +1991,22 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(insert_fill)
 
+BOOST_AUTO_TEST_CASE(insert_nothing)
+{
+  std::ostringstream out;
+  petrov::ForwardRingList< int > fwd_list(2, 1);
+  auto ret_it = fwd_list.insert(fwd_list.cbegin(), 0ull, 2);
+  auto it = fwd_list.cbegin();
+  out << *(it++);
+  do
+  {
+    out << " " << *it;
+  }
+  while (it++ != fwd_list.cend());
+  out << " " << *it << " " << fwd_list.size() << " " << *ret_it;
+  BOOST_TEST(out.str() == "1 1 1 2 1");
+}
+
 BOOST_AUTO_TEST_CASE(insert_to_one)
 {
   std::ostringstream out;
@@ -2222,15 +2255,8 @@ BOOST_AUTO_TEST_CASE(zero_el)
   auto second_it = first.cend();
   petrov::ForwardRingList< int > second { 1, 2, 3 };
   second.assign(first_it, second_it);
-  auto it = second.cbegin();
-  out << *(it++);
-  do
-  {
-    out << " " << *it;
-  }
-  while (it++ != second.cend());
-  out << " " << *it << " " << second.size();
-  BOOST_TEST(out.str() == "1 2 3 1 3");
+  out << second.empty() << " " << second.size();
+  BOOST_TEST(out.str() == "1 0");
 }
 
 BOOST_AUTO_TEST_CASE(one_el)
