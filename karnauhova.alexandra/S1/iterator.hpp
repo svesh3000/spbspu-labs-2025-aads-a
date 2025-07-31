@@ -8,10 +8,10 @@ namespace karnauhova
   template< typename T >
   struct ListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
-    NodeList< T >* node;
+  public:
     using this_t = ListIterator< T >;
 
-    ListIterator(): node(nullptr) {};
+    ListIterator();
     ListIterator(NodeList< T >* element);
     ~ListIterator() = default;
     ListIterator(const this_t&) = default;
@@ -26,7 +26,15 @@ namespace karnauhova
     const T* operator->() const;
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
+    T getData();
+  private:
+    NodeList< T >* node;
   };
+
+  template< typename T >
+  ListIterator< T >::ListIterator():
+    node(nullptr)
+  {}
 
   template< typename T >
   ListIterator< T >::ListIterator(NodeList< T >* element):
@@ -81,6 +89,12 @@ namespace karnauhova
   const T* ListIterator< T >::operator->() const
   {
     return std::addressof(node->data);
+  }
+
+  template< typename T >
+  T ListIterator< T >::getData()
+  {
+    return node->data;
   }
 }
 #endif

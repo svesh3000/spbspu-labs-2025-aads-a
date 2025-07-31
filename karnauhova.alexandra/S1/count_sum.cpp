@@ -51,7 +51,7 @@ void karnauhova::count_lists(karnauhova::Fwd_list< std::pair< std::string, UllLi
   for (size_t i = 1; i < max_length; i++)
   {
     out << " ";
-    out << it.node->data;
+    out << it.getData();
     it++;
   }
   out << "\n";

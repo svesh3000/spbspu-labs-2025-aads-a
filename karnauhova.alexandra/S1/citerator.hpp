@@ -8,7 +8,7 @@ namespace karnauhova
   template< typename T >
   struct ConstListIterator : public std::iterator< std::forward_iterator_tag, T >
   {
-    const NodeList< T >* node;
+  public:
     using this_t = ConstListIterator< T >;
     ConstListIterator();
     ConstListIterator(const NodeList< T >* element);
@@ -23,6 +23,8 @@ namespace karnauhova
     const T* operator->() const;
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
+  private:
+    const NodeList< T >* node;
   };
 
   template< typename T >
