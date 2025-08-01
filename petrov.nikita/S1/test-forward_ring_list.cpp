@@ -1079,7 +1079,7 @@ BOOST_AUTO_TEST_CASE(splice_node_to_middle)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   BOOST_TEST(out.str() == "7 7 2 7 7 7 7 7 1 3");
@@ -1110,7 +1110,7 @@ BOOST_AUTO_TEST_CASE(splice_to_one_element_list)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   BOOST_TEST(out.str() == "1 2 1 1 3");
@@ -1140,7 +1140,7 @@ BOOST_AUTO_TEST_CASE(splice_node_after_head)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   BOOST_TEST(out.str() == "7 2 7 7 7 7 7 7 1 3");
@@ -1176,7 +1176,7 @@ BOOST_AUTO_TEST_CASE(splice_node_after_tail)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   BOOST_TEST(out.str() == "5 7 7 7 7 7 7 7 2 5 1 3");
@@ -1207,7 +1207,7 @@ BOOST_AUTO_TEST_CASE(splice_node_from_tail)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   out << " " << *it_2;
@@ -1240,7 +1240,7 @@ BOOST_AUTO_TEST_CASE(splice_node_from_head)
   out << " " << *(it_2++);
   do
   {
-    out << " " << *it_2; 
+    out << " " << *it_2;
   }
   while (it_2++ != second.cend());
   out << " " << *it_2;

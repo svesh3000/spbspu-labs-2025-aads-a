@@ -95,7 +95,7 @@ namespace petrov
     bool operator>(const this_t & rhs) const;
     bool operator<=(const this_t & rhs) const;
     bool operator>=(const this_t & rhs) const;
-  
+
     const_it_t cbegin() const;
     const_it_t cend() const;
     it_t begin();
@@ -179,7 +179,7 @@ namespace petrov
     data{T(std::forward< Args >(args)...)},
     next(next)
   {}
-  
+
   template< typename T >
   ConstForwardListIterator< T >::ConstForwardListIterator():
     node_(nullptr)
@@ -1012,7 +1012,7 @@ namespace petrov
       size_++;
     }
     auto prev_it = begin();
-    auto lhs_it = ++begin(); 
+    auto lhs_it = ++begin();
     while (!rhs.empty())
     {
       if (comp(*rhs_it, *lhs_it))
@@ -1128,7 +1128,7 @@ namespace petrov
       if (i->next == high)
       {
         sortImpl(low, i, comp);
-        sortImpl(i->next, high, comp);  
+        sortImpl(i->next, high, comp);
       }
       else
       {
