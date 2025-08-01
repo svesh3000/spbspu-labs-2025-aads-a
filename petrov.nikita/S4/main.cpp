@@ -1,14 +1,13 @@
-#include <fstream>
-#include <string>
-#include <iostream>
 #include <limits>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <functional>
 #include "avl_tree.hpp"
 #include "commands.hpp"
 
 namespace
 {
-  int checkArguments(const int argc);
-
   int checkArguments(const int argc)
   {
     if (argc == 2)
@@ -31,6 +30,7 @@ int main(int argc, const char * const * argv)
     std::cerr << "\n";
     return 1;
   }
+
   using subtree_t = AVLTree< int, std::string, std::less< int > >;
   using maintree_t = AVLTree< std::string, subtree_t >;
   maintree_t tree;
@@ -62,41 +62,28 @@ int main(int argc, const char * const * argv)
     }
     tree.insert({ dataset, subtree });
   }
-  std::string command_name;
-  while (!std::cin.eof())
+
+  AVLTree< std::string, std::function< void() > > cmds;
+  cmds["print"] = std::bind(print, std::ref(std::cout), std::ref(std::cin), std::cref(tree));
+  cmds["complement"] = std::bind(complement, std::ref(std::cin), std::ref(tree));
+  cmds["intersect"] = std::bind(intersect, std::ref(std::cin), std::ref(tree));
+  cmds["union"] = std::bind(unionCMD, std::ref(std::cin), std::ref(tree));
+
+  std::string command;
+  while (!(std::cin >> command).eof())
   {
-    std::cin >> command_name;
-    if (std::cin.eof())
-    {
-      continue;
-    }
     try
     {
-      if (command_name == "print")
-      {
-        print(std::cout, std::cin, tree);
-      }
-      else if (command_name == "complement")
-      {
-        complement(std::cin, tree);
-      }
-      else if (command_name == "intersect")
-      {
-        intersect(std::cin, tree);
-      }
-      else if (command_name == "union")
-      {
-        unionCMD(std::cin, tree);
-      }
-      else
-      {
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-        std::cout << "<INVALID COMMAND>" << "\n";
-      }
+      cmds.at(command)();
     }
     catch (const std::logic_error & e)
     {
       std::cout << e.what() << "\n";
+    }
+    catch (...)
+    {
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << "<INVALID COMMAND>" << "\n";
     }
   }
 }

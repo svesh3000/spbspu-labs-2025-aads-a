@@ -375,7 +375,7 @@ namespace petrov
       }
       else if (!(Cmp{}(key, temp->data.first) && Cmp{}(temp->data.first, key)))
       {
-        break;
+        return insert({ key, T() }).first->second;
       }
     }
     return temp->data.second;
@@ -706,14 +706,11 @@ namespace petrov
         break;
       }
     }
-    if (temp)
+    if (!temp)
     {
-      return temp->data->second;
+      throw std::out_of_range("ERROR: This key doesn't exist");
     }
-    else
-    {
-      throw std::out_of_range();
-    }
+    return temp->data.second;
   }
 
   template< typename K, typename T, typename Cmp >
