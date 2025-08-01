@@ -916,7 +916,7 @@ namespace petrov
       delete todelete;
       size_--;
     }
-    if (cond(head_->data))
+    if (size_ && cond(head_->data))
     {
       auto todelete = head_;
       head_ = todelete->next;

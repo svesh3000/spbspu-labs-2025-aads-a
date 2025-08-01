@@ -60,6 +60,10 @@ std::istream & petrov::inputValuesIntoFwdRingList(std::istream & in, list_type &
   {
     in.clear();
     in >> sequence_name;
+    if (sequence_name.empty())
+    {
+      break;
+    }
     petrov::ForwardRingList< size_t > sublist = {};
     while (!in.eof() && in)
     {
