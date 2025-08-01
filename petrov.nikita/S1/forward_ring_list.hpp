@@ -351,23 +351,8 @@ namespace petrov
 
   template< typename T >
   ForwardRingList< T >::ForwardRingList(std::initializer_list< T > il):
-    head_(nullptr),
-    tail_(nullptr),
-    size_(0)
-  {
-    try
-    {
-      for (auto it = il.begin(); it != il.end(); ++it)
-      {
-        push_back(*it);
-      }
-    }
-    catch (...)
-    {
-      clear();
-      throw;
-    }
-  }
+    ForwardRingList(il.begin(), il.end())
+  {}
 
   template< typename T >
   template < class InputIterator, class >
@@ -673,14 +658,7 @@ namespace petrov
   template< typename T >
   typename ForwardRingList< T >::it_t ForwardRingList< T >::insert(const_it_t pos, std::initializer_list< T > il)
   {
-    if (!il.size())
-    {
-      return it_t(pos.node_);
-    }
-    this_t to_splice(il);
-    it_t ret_it(to_splice.tail_);
-    splice(pos, to_splice);
-    return ret_it;
+    return insert(pos, il.begin(), il.end());
   }
 
   template< typename T >
