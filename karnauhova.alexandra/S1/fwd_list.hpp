@@ -8,6 +8,12 @@
 
 namespace karnauhova
 {
+  template <typename T>
+  class ListIterator;
+
+  template <typename T>
+  class ConstListIterator;
+
   template< typename T >
   class Fwd_list
   {
@@ -43,6 +49,13 @@ namespace karnauhova
     void push_front(const T& data);
     void pop_front();
     void reverse() noexcept;
+
+    bool operator==(const Fwd_list& oth) const noexcept;
+    bool operator!=(const Fwd_list& oth) const noexcept;
+    bool operator<(const Fwd_list& oth) const noexcept;
+    bool operator>(const Fwd_list& oth) const noexcept;
+    bool operator<=(const Fwd_list& oth) const noexcept;
+    bool operator>=(const Fwd_list& oth) const noexcept;
 
     void remove(const T& value) noexcept;
     template< typename UnaryPredicate >
@@ -362,8 +375,9 @@ namespace karnauhova
       return end();
     }
     Node* prevNode = fake_;
-    while (prevNode->next != todelete) {
-        prevNode = prevNode->next;
+    while (prevNode->next != todelete)
+    {
+      prevNode = prevNode->next;
     }
     prevNode->next = todelete->next;
     delete todelete;
@@ -381,6 +395,72 @@ namespace karnauhova
       size_--;
     }
     return now;
+  }
+
+  template< typename T >
+  bool Fwd_list< T >::operator==(const Fwd_list& oth) const noexcept
+  {
+    if (size_ != oth.size_)
+    {
+      return false;
+    }
+    Iterator it = begin();
+    Iterator it_oth = oth.begin();
+    while (it != end())
+    {
+      if (*it != *it_oth)
+      {
+        return false;
+      }
+      it++;
+      it_oth++;
+    }
+    return true;
+  }
+
+  template< typename T >
+  bool Fwd_list< T >::operator!=(const Fwd_list& oth) const noexcept
+  {
+    return !(*this == oth);
+  }
+
+  template< typename T >
+  bool Fwd_list< T >::operator<(const Fwd_list& oth) const noexcept
+  {
+    Iterator it = begin();
+    Iterator it_oth = oth.begin();
+    while ((it != end()) && (it_oth != oth.end()))
+    {
+      if (*it < *it_oth)
+      {
+        return true;
+      }
+      if (*it > *it_oth)
+      {
+        return false;
+      }
+      it++;
+      it_oth++;
+    }
+    return size_ < oth.size_;
+  }
+
+  template< typename T >
+  bool Fwd_list< T >::operator>(const Fwd_list& oth) const noexcept
+  {
+    return !(*this < oth);
+  }
+
+  template< typename T >
+  bool Fwd_list< T >::operator>=(const Fwd_list& oth) const noexcept
+  {
+    return (*this > oth) || (*this == oth);
+  }
+  
+  template< typename T >
+  bool Fwd_list< T >::operator<=(const Fwd_list& oth) const noexcept
+  {
+    return (*this < oth) || (*this == oth);
   }
 }
 
