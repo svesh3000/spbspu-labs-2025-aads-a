@@ -8,12 +8,6 @@
 
 namespace karnauhova
 {
-  template <typename T>
-  class ListIterator;
-
-  template <typename T>
-  class ConstListIterator;
-
   template< typename T >
   class Fwd_list
   {

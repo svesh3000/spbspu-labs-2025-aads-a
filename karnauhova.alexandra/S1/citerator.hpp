@@ -5,6 +5,12 @@
 #include "nodelist.hpp"
 namespace karnauhova
 {
+  template <typename T>
+  class Fwd_list;
+
+  template <typename T>
+  struct ListIterator;
+
   template< typename T >
   struct ConstListIterator : public std::iterator< std::forward_iterator_tag, T >
   {
@@ -25,6 +31,8 @@ namespace karnauhova
     bool operator==(const this_t&) const;
   private:
     const NodeList< T >* node;
+    friend class Fwd_list< T >;
+    friend class ListIterator< T >;
   };
 
   template< typename T >
