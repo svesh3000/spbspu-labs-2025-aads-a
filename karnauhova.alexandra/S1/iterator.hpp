@@ -10,7 +10,7 @@ namespace karnauhova
 
   template <typename T>
   struct ConstListIterator;
-  
+
   template< typename T >
   struct ListIterator: public std::iterator< std::forward_iterator_tag, T >
   {

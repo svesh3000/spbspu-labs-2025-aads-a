@@ -450,7 +450,7 @@ namespace karnauhova
   {
     return (*this > oth) || (*this == oth);
   }
-  
+
   template< typename T >
   bool Fwd_list< T >::operator<=(const Fwd_list& oth) const noexcept
   {
