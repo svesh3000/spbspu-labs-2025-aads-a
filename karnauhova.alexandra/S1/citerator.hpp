@@ -17,7 +17,6 @@ namespace karnauhova
   public:
     using this_t = ConstListIterator< T >;
     ConstListIterator();
-    ConstListIterator(const NodeList< T >* element);
     ~ConstListIterator() = default;
     ConstListIterator(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
@@ -33,6 +32,7 @@ namespace karnauhova
     const NodeList< T >* node;
     friend class Fwd_list< T >;
     friend class ListIterator< T >;
+    explicit ConstListIterator(const NodeList< T >* element);
   };
 
   template< typename T >

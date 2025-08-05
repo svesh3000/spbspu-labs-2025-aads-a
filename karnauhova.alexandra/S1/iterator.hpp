@@ -18,7 +18,6 @@ namespace karnauhova
     using this_t = ListIterator< T >;
 
     ListIterator();
-    ListIterator(NodeList< T >* element);
     ~ListIterator() = default;
     ListIterator(const this_t&) = default;
     this_t& operator=(const this_t&) = default;
@@ -37,6 +36,7 @@ namespace karnauhova
     NodeList< T >* node;
     friend class Fwd_list< T >;
     friend class ConstListIterator< T >;
+    explicit ListIterator(NodeList< T >* element);
   };
 
   template< typename T >

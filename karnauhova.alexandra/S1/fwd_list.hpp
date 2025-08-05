@@ -61,6 +61,13 @@ namespace karnauhova
 
     Iterator erase(CIterator pos) noexcept;
     Iterator erase(CIterator first, CIterator last) noexcept;
+
+    void splice(CIterator pos, Fwd_list< T >& oth) noexcept;
+    void splice(CIterator pos, Fwd_list< T >&& oth) noexcept;
+    void splice(CIterator pos, Fwd_list< T >& oth, CIterator it) noexcept;
+    void splice(CIterator pos, Fwd_list< T >&& oth, CIterator it) noexcept;
+    void splice(CIterator pos, Fwd_list< T >& oth, CIterator first, CIterator last) noexcept;
+    void splice(CIterator pos, Fwd_list< T >&& oth, CIterator first, CIterator last) noexcept;
   private:
     Node* fake_;
     size_t size_;
@@ -455,6 +462,77 @@ namespace karnauhova
   bool Fwd_list< T >::operator<=(const Fwd_list& oth) const noexcept
   {
     return (*this < oth) || (*this == oth);
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >& oth) noexcept
+  {
+    if (oth.empty())
+    {
+      return;
+    }
+    Node* first = oth.fake_->next;
+    Node* last = first;
+    while (last->next != oth.fake_)
+    {
+      last = last->next;
+    }
+    Node* it_node = pos.node;
+    Node* next_node = it_node->next;
+    it_node->next = first;
+    last->next = next_node;
+    size_ += oth.size_;
+    oth.fake_->next = oth.fake_;
+    oth.size_ = 0;
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >&& oth) noexcept
+  {
+    splice(pos, oth);
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >& oth, CIterator first, CIterator last) noexcept
+  {
+    if (last != CIterator(oth->fake_) || first == last || this == std::addressof(oth))
+    {
+      return;
+    }
+    size_t distance = std::distance(first, last);
+    Node* prev_first = first.node;
+    Node* last_it = prev_first->next;
+    while (last_it != last.node && last_it != oth.fake_)
+    {
+      last_it = last_it->next;
+    }
+    Node* true_first = prev_first->next;
+    Node* true_last = last_it;
+    Node* next_pos = pos.node->next;
+    pos.node->next = true_first;
+    true_last->next = next_pos;
+    size_ += distance;
+    oth.size_ -= distance;
+    prev_first->next = last_it->next;
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >&& oth, CIterator first, CIterator last) noexcept
+  {
+    splice(pos, oth, first, last);
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >& oth, CIterator it) noexcept
+  {
+    CIterator end = it;
+    splice(pos, oth, it, end);
+  }
+
+  template< typename T >
+  void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >&& oth, CIterator it) noexcept
+  {
+    splice(pos, oth, it);
   }
 }
 
