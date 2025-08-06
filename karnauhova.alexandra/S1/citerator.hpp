@@ -6,7 +6,7 @@
 namespace karnauhova
 {
   template <typename T>
-  class Fwd_list;
+  class FwdList;
 
   template <typename T>
   struct ListIterator;
@@ -30,7 +30,7 @@ namespace karnauhova
     bool operator==(const this_t&) const;
   private:
     const NodeList< T >* node;
-    friend class Fwd_list< T >;
+    friend class FwdList< T >;
     friend class ListIterator< T >;
     explicit ConstListIterator(const NodeList< T >* element);
   };

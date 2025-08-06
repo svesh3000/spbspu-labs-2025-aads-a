@@ -3,7 +3,7 @@
 
 BOOST_AUTO_TEST_CASE(test_element_access)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(2);
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_element_access)
 
 BOOST_AUTO_TEST_CASE(test_capacity_list)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   BOOST_TEST(list.empty() == true);
   list.push_front(0);
   list.push_front(1);
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_capacity_list)
 
 BOOST_AUTO_TEST_CASE(test_clear_list)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(2);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_clear_list)
 
 BOOST_AUTO_TEST_CASE(test_reverse_list)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(2);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_reverse_list)
 
 BOOST_AUTO_TEST_CASE(test_remove)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(1);
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(test_remove)
 
 BOOST_AUTO_TEST_CASE(test_erase)
 {
-  karnauhova::Fwd_list< int > list;
+  karnauhova::FwdList< int > list;
   list.push_front(0);
   list.push_front(1);
   list.push_front(1);

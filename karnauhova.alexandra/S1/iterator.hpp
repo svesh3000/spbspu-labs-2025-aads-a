@@ -6,7 +6,7 @@
 namespace karnauhova
 {
   template <typename T>
-  class Fwd_list;
+  class FwdList;
 
   template <typename T>
   struct ConstListIterator;
@@ -34,7 +34,7 @@ namespace karnauhova
     T getData();
   private:
     NodeList< T >* node;
-    friend class Fwd_list< T >;
+    friend class FwdList< T >;
     friend class ConstListIterator< T >;
     explicit ListIterator(NodeList< T >* element);
   };
