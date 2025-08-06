@@ -68,6 +68,13 @@ namespace karnauhova
     void splice(CIterator pos, Fwd_list< T >&& oth, CIterator it) noexcept;
     void splice(CIterator pos, Fwd_list< T >& oth, CIterator first, CIterator last) noexcept;
     void splice(CIterator pos, Fwd_list< T >&& oth, CIterator first, CIterator last) noexcept;
+
+    Iterator insert(CIterator pos, const T& value);
+    Iterator insert(CIterator pos, T&& value);
+    Iterator insert(CIterator pos, size_t count, const T& value);
+    template < class InputIt >
+    Iterator insert(CIterator pos, InputIt first, InputIt last);
+    Iterator insert(CIterator pos, std::initializer_list< T > init);
   private:
     Node* fake_;
     size_t size_;
@@ -533,6 +540,62 @@ namespace karnauhova
   void Fwd_list< T >::splice(CIterator pos, Fwd_list< T >&& oth, CIterator it) noexcept
   {
     splice(pos, oth, it);
+  }
+
+  template< typename T >
+  Fwd_list< T >::Iterator Fwd_list< T >::insert(CIterator pos, const T& value)
+  {
+    Node* node = pos.node;
+    if (node == fake_)
+    {
+      push_front(value);
+      return begin();
+    }
+    node->next = new Node{value, node->next};
+    size_++;
+    return Iterator(node->next);
+  }
+
+  template< typename T >
+  Fwd_list< T >::Iterator Fwd_list< T >::insert(CIterator pos, T&& value)
+  {
+    return insert(pos, value);
+  }
+
+  template< typename T >
+  Fwd_list< T >::Iterator Fwd_list< T >::insert(CIterator pos, size_t count, const T& value)
+  {
+    if (count == 0)
+    {
+      return Iterator(pos.node);
+    }
+    Iterator res = insert(pos, value);
+    if (count != 1)
+    {
+      Fwd_list< T > list_val(--count, value);
+      splice(pos, list_val);
+    }
+    return res;
+  }
+
+  template < class T >
+  template < class InputIt >
+  Fwd_list< T >::Iterator Fwd_list< T >::insert(CIterator pos, InputIt first, InputIt last)
+  {
+    if (first == last)
+    {
+      return Iterator(pos.node);
+    }
+    Iterator res = insert(pos, *first);
+    Fwd_list< T > temp(++first, last);
+    splice(pos, temp);
+    return res;
+  }
+
+  template< typename T >
+  Fwd_list< T >::Iterator Fwd_list< T >::insert(CIterator pos, std::initializer_list< T > init)
+  {
+    return insert(pos, init.begin(), init.end());
   }
 }
 
