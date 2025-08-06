@@ -21,6 +21,13 @@ namespace
   }
 }
 
+namespace petrov
+{
+  using subtree_t = AVLTree< int, std::string, std::less< int > >;
+  using maintree_t = AVLTree< std::string, subtree_t >;
+  std::istream & inputDatasets(std::istream & in, maintree_t & tree);
+}
+
 int main(int argc, const char * const * argv)
 {
   using namespace petrov;
@@ -31,10 +38,56 @@ int main(int argc, const char * const * argv)
     return 1;
   }
 
-  using subtree_t = AVLTree< int, std::string, std::less< int > >;
-  using maintree_t = AVLTree< std::string, subtree_t >;
   maintree_t tree;
   std::ifstream input(argv[1]);
+  try
+  {
+    inputDatasets(input, tree);
+  }
+  catch (const std::bad_alloc & e)
+  {
+    std::cerr << e.what() << "\n";
+    return 2;
+  }
+  catch (const std::exception & e)
+  {
+    std::cerr << e.what() << "\n";
+    return 3;
+  }
+
+  AVLTree< std::string, std::function< void() > > cmds;
+  cmds.insert({ "print", std::bind(print, std::ref(std::cout), std::ref(std::cin), std::cref(tree))});
+  cmds.insert({ "complement", std::bind(complement, std::ref(std::cin), std::ref(tree))});
+  cmds.insert({ "intersect", std::bind(intersect, std::ref(std::cin), std::ref(tree))});
+  cmds.insert({ "union", std::bind(unionCMD, std::ref(std::cin), std::ref(tree))});
+
+  std::string command;
+  while (!(std::cin >> command).eof())
+  {
+    try
+    {
+      cmds.at(command)();
+    }
+    catch (const std::logic_error & e)
+    {
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      std::cout << e.what() << "\n";
+    }
+    catch (const std::bad_alloc & e)
+    {
+      std::cerr << e.what() << "\n";
+      return 2;
+    }
+    catch (const std::exception & e)
+    {
+      std::cerr << e.what() << "\n";
+      return 3;
+    }
+  }
+}
+
+std::istream & petrov::inputDatasets(std::istream & input, maintree_t & tree)
+{
   while (!input.eof())
   {
     subtree_t subtree;
@@ -62,28 +115,5 @@ int main(int argc, const char * const * argv)
     }
     tree.insert({ dataset, subtree });
   }
-
-  AVLTree< std::string, std::function< void() > > cmds;
-  cmds["print"] = std::bind(print, std::ref(std::cout), std::ref(std::cin), std::cref(tree));
-  cmds["complement"] = std::bind(complement, std::ref(std::cin), std::ref(tree));
-  cmds["intersect"] = std::bind(intersect, std::ref(std::cin), std::ref(tree));
-  cmds["union"] = std::bind(unionCMD, std::ref(std::cin), std::ref(tree));
-
-  std::string command;
-  while (!(std::cin >> command).eof())
-  {
-    try
-    {
-      cmds.at(command)();
-    }
-    catch (const std::logic_error & e)
-    {
-      std::cout << e.what() << "\n";
-    }
-    catch (...)
-    {
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-      std::cout << "<INVALID COMMAND>" << "\n";
-    }
-  }
+  return input;
 }

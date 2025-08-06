@@ -12,11 +12,18 @@ namespace petrov
   template< typename K, typename T >
   struct AVLTreeNode
   {
-    std::pair< const K, T > data;
-    AVLTreeNode< K, T > * left;
-    AVLTreeNode< K, T > * right;
-    AVLTreeNode< K, T > * parent;
-    int height;
+    template< typename A, typename B, typename C >
+    friend struct AVLTree;
+  public:
+    using val_t = std::pair< const K, T >;
+    using this_t = AVLTreeNode< K, T >;
+    val_t data;
+    this_t * left;
+    this_t * right;
+    this_t * parent;
+    AVLTreeNode(val_t val, this_t * l, this_t * r, this_t * p);
+  private:
+    int height_ = 1;
     void setHeight();
   };
 
@@ -122,28 +129,37 @@ namespace petrov
     void clearBiTree(node_t * node) noexcept;
     template< typename Pair >
     std::pair< const_it_t, bool > insertImpl(Pair && val);
+    bool isBalanced(node_t * node);
   };
+
+  template< typename K, typename T >
+  AVLTreeNode< K, T >::AVLTreeNode(val_t val, this_t * l, this_t * r, this_t * p):
+    data(val),
+    left(l),
+    right(r),
+    parent(p)
+  {}
 
   template< typename K, typename T >
   void AVLTreeNode< K, T >::setHeight()
   {
     if (left && right)
     {
-      height = std::max(left->height, right->height) + 1;
+      height_ = std::max(left->height_, right->height_) + 1;
     }
     else if (!left && !right)
     {
-      height = 1;
+      height_ = 1;
     }
     else
     {
       if (!left)
       {
-        height = right->height + 1;
+        height_ = right->height_ + 1;
       }
       else
       {
-        height = left->height + 1;
+        height_ = left->height_ + 1;
       }
     }
   }
@@ -313,9 +329,17 @@ namespace petrov
     size_(0),
     erased_(0)
   {
-    for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+    try
     {
-      insert({ it->first, it->second });
+      for (auto it = rhs.cbegin(); it != rhs.cend(); ++it)
+      {
+        insert({ it->first, it->second });
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
 
@@ -375,7 +399,7 @@ namespace petrov
       }
       else if (!(Cmp{}(key, temp->data.first) && Cmp{}(temp->data.first, key)))
       {
-        return insert({ key, T() }).first->second;
+        break;
       }
     }
     return temp->data.second;
@@ -459,59 +483,9 @@ namespace petrov
     auto return_it = position;
     ++return_it;
     node_t * balance_node_ptr = nullptr;
-    if (position.node_->left && position.node_->right)
+    auto temp = position.node_;
+    if (position.node_->left)
     {
-      auto temp = position.node_;
-      temp = temp->right;
-      if (temp->left)
-      {
-        while (temp->left)
-        {
-          temp = temp->left;
-        }
-        balance_node_ptr = temp->parent;
-        temp->parent->left = nullptr;
-        temp->parent = position.node_->parent;
-        temp->left = position.node_->left;
-        temp->right = position.node_->right;
-        temp->left->parent = temp;
-        temp->right->parent = temp;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
-      }
-      else
-      {
-        balance_node_ptr = temp->parent;
-        temp->parent = position.node_->parent;
-        temp->left = position.node_->left;
-        temp->left->parent = temp;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
-      }
-    }
-    else if (position.node_->left)
-    {
-      auto temp = position.node_;
       temp = temp->left;
       if (temp->right)
       {
@@ -523,42 +497,21 @@ namespace petrov
         temp->parent->right = nullptr;
         temp->parent = position.node_->parent;
         temp->left = position.node_->left;
-        temp->right = position.node_->right;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
+        temp->left->parent = temp;
       }
       else
       {
-        balance_node_ptr = temp->parent;
+        balance_node_ptr = temp;
         temp->parent = position.node_->parent;
+      }
+      if (position.node_->right)
+      {
         temp->right = position.node_->right;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
+        temp->right->parent = temp;
       }
     }
     else if (position.node_->right)
     {
-      auto temp = position.node_;
       temp = temp->right;
       if (temp->left)
       {
@@ -569,58 +522,40 @@ namespace petrov
         balance_node_ptr = temp->parent;
         temp->parent->left = nullptr;
         temp->parent = position.node_->parent;
-        temp->left = position.node_->left;
         temp->right = position.node_->right;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
+        temp->right->parent = temp;
       }
       else
       {
-        balance_node_ptr = temp->parent;
+        balance_node_ptr = temp;
         temp->parent = position.node_->parent;
-        temp->left = position.node_->left;
-        if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-        {
-          position.node_->parent->left = temp;
-        }
-        else if (position.node_->parent)
-        {
-          position.node_->parent->right = temp;
-        }
-        else
-        {
-          root_ = temp;
-        }
       }
     }
     else
     {
-      if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
-      {
-        position.node_->parent->left = nullptr;
-      }
-      else if (position.node_->parent)
-      {
-        position.node_->parent->right = nullptr;
-      }
-      else
-      {
-        root_ = nullptr;
-      }
+      balance_node_ptr = position.node_->parent;
+      temp = nullptr;
+    }
+    if (position.node_->parent && Cmp{}(position.node_->data.first, position.node_->parent->data.first))
+    {
+      position.node_->parent->left = temp;
+    }
+    else if (position.node_->parent)
+    {
+      position.node_->parent->right = temp;
+    }
+    else
+    {
+      root_ = temp;
     }
     while (balance_node_ptr)
     {
       balance_node_ptr->setHeight();
+      if (!isBalanced(balance_node_ptr))
+      {
+        balance(balance_node_ptr);
+        balance_node_ptr->setHeight();
+      }
       balance_node_ptr = balance_node_ptr->parent;
     }
     delete position.node_;
@@ -708,7 +643,7 @@ namespace petrov
     }
     if (!temp)
     {
-      throw std::out_of_range("ERROR: This key doesn't exist");
+      throw std::out_of_range("<INVALID COMMAND>");
     }
     return temp->data.second;
   }
@@ -716,20 +651,37 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   void AVLTree< K, T, Cmp >::clear() noexcept
   {
-    clearBiTree(root_);
-    root_ = nullptr;
-  }
-
-  template< typename K, typename T, typename Cmp >
-  void AVLTree< K, T, Cmp >::clearBiTree(node_t * root) noexcept
-  {
-    if (root)
+    if (root_)
     {
-      clearBiTree(root->left);
-      clearBiTree(root->right);
-      delete root;
-      root = nullptr;
-      size_--;
+      auto temp = root_;
+      while (size_)
+      {
+        while (temp->left)
+        {
+          temp = temp->left;
+        }
+        if (temp->right)
+        {
+          temp = temp->right;
+          continue;
+        }
+        auto todelete = temp;
+        if (todelete->parent)
+        {
+          temp = todelete->parent;
+          if (temp->left == todelete)
+          {
+            temp->left = nullptr;
+          }
+          else
+          {
+            temp->right = nullptr;
+          }
+        }
+        delete todelete;
+        size_--;
+      }
+      root_ = nullptr;
     }
   }
 
@@ -738,10 +690,10 @@ namespace petrov
   {
     if (node->left && node->right)
     {
-      if (std::less< int >{}(node->left->height, node->right->height))
+      if (node->left->height_ < node->right->height_)
       {
         node = node->right;
-        if (node->left && node->right && std::less< int >{}(node->left->height, node->right->height))
+        if (node->left && node->right && node->left->height_ < node->right->height_)
         {
           leftRotate(node);
         }
@@ -778,7 +730,7 @@ namespace petrov
       else
       {
         node = node->left;
-        if (node->left && node->right && std::less< int >{}(node->right->height, node->left->height))
+        if (node->left && node->right && node->right->height_ < node->left->height_)
         {
           rightRotate(node);
         }
@@ -858,10 +810,6 @@ namespace petrov
       grandpa->right = son;
       grandpa->parent = node;
       node->left = grandpa;
-      if (son)
-      {
-        son->parent = grandpa;
-      }
     }
     else
     {
@@ -870,10 +818,10 @@ namespace petrov
       grandpa->right = son;
       grandpa->parent = node;
       node->left = grandpa;
-      if (son)
-      {
-        son->parent = grandpa;
-      }
+    }
+    if (son)
+    {
+      son->parent = grandpa;
     }
   }
 
@@ -896,10 +844,6 @@ namespace petrov
       grandpa->left = son;
       grandpa->parent = node;
       node->right = grandpa;
-      if (son)
-      {
-        son->parent = grandpa;
-      }
     }
     else
     {
@@ -908,10 +852,10 @@ namespace petrov
       grandpa->left = son;
       grandpa->parent = node;
       node->right = grandpa;
-      if (son)
-      {
-        son->parent = grandpa;
-      }
+    }
+    if (son)
+    {
+      son->parent = grandpa;
     }
   }
 
@@ -929,7 +873,7 @@ namespace petrov
   {
     if (empty())
     {
-      root_ = new node_t{ std::forward< Pair >(val), nullptr, nullptr, nullptr, 1 };
+      root_ = new node_t{ std::forward< Pair >(val), nullptr, nullptr, nullptr };
       size_++;
     }
     else
@@ -947,7 +891,7 @@ namespace petrov
         }
         else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
         {
-          return std::pair< const_it_t, bool >{ const_it_t(temp), false };
+          return std::make_pair< const_it_t, bool >(const_it_t(temp), false);
         }
         else
         {
@@ -956,44 +900,54 @@ namespace petrov
       }
       if (Cmp{}(val.first, temp->data.first))
       {
-        temp->left = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp, 1 };
+        temp->left = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp };
         temp = temp->left;
       }
       else if (Cmp{}(temp->data.first, val.first))
       {
-        temp->right = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp, 1 };
+        temp->right = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp };
         temp = temp->right;
       }
       else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
       {
-        return std::pair< const_it_t, bool >{ const_it_t(temp), false };
+        return std::make_pair< const_it_t, bool >(const_it_t(temp), false);
       }
       size_++;
       while (temp->parent)
       {
         temp = temp->parent;
         temp->setHeight();
-        if (temp->left && temp->right && std::abs(temp->left->height - temp->right->height) > 1)
-        {
-          balance(temp);
-          temp->setHeight();
-        }
-        else if (!temp->left && temp->right && temp->right->height > 1)
-        {
-          balance(temp);
-          temp->setHeight();
-        }
-        else if (!temp->right && temp->left && temp->left->height > 1)
+        if (!isBalanced(temp))
         {
           balance(temp);
           temp->setHeight();
         }
       }
-      return std::pair< const_it_t, bool >{ const_it_t(temp), true };
+      return std::make_pair< const_it_t, bool >(const_it_t(temp), true);
     }
-    return std::pair< const_it_t, bool >{ const_it_t(root_), true };
+    return std::make_pair< const_it_t, bool >(const_it_t(root_), true);
   }
 
+  template< typename K, typename T, typename Cmp >
+  bool AVLTree< K, T, Cmp >::isBalanced(node_t * node)
+  {
+    if (node->left && node->right && std::abs(node->left->height_ - node->right->height_) > 1)
+    {
+      return false;
+    }
+    else if (!node->left && node->right && node->right->height_ > 1)
+    {
+      return false;
+    }
+    else if (!node->right && node->left && node->left->height_ > 1)
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
 }
 
 #endif
