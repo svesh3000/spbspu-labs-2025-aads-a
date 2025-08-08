@@ -2,6 +2,7 @@
 #define FWDLISTt_HPP
 #include <cstddef>
 #include <algorithm>
+#include <stdexcept>
 #include "iterator.hpp"
 #include "citerator.hpp"
 #include "nodelist.hpp"
