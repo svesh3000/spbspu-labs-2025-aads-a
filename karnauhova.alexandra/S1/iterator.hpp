@@ -78,13 +78,13 @@ namespace karnauhova
   template< typename T >
   T& ListIterator< T >::operator*()
   {
-    return const_cast< T& >(static_cast< const ListIterator< T >* >(this)->operator*());
+    return node->data;
   }
 
   template< typename T >
   T* ListIterator< T >::operator->()
   {
-    return const_cast< T* >(static_cast< const ListIterator< T >* >(this)->operator->());;
+    return const_cast< T* >(static_cast< const ListIterator< T >* >(this)->operator->());
   }
 
   template< typename T >

@@ -19,6 +19,7 @@ namespace karnauhova
     ConstListIterator();
     ~ConstListIterator() = default;
     ConstListIterator(const this_t&) = default;
+    ConstListIterator(ListIterator< T >& other);
     this_t& operator=(const this_t&) = default;
 
     this_t& operator++();
@@ -29,10 +30,10 @@ namespace karnauhova
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
   private:
-    const NodeList< T >* node;
+    NodeList< T >* node;
     friend class FwdList< T >;
     friend class ListIterator< T >;
-    explicit ConstListIterator(const NodeList< T >* element);
+    explicit ConstListIterator(NodeList< T >* element);
   };
 
   template< typename T >
@@ -40,8 +41,13 @@ namespace karnauhova
     node(nullptr)
   {}
 
+  template < class T >
+  ConstListIterator< T >::ConstListIterator(ListIterator< T >& other):
+  node(other.node)
+  {}
+
   template< typename T >
-  ConstListIterator< T >::ConstListIterator(const NodeList< T >* element):
+  ConstListIterator< T >::ConstListIterator(NodeList< T >* element):
     node(element)
   {}
   template< typename T >
