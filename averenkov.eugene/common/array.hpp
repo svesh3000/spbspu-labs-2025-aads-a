@@ -196,15 +196,17 @@ namespace averenkov
       {
         new_data[i] = other.data_[i];
       }
+      delete[] new_array.data_;
+      new_array.data_ = new_data;
+      new_array.capacity_ = capacity;
+      new_array.last_ = other.last_;
+      new_array.first_ = other.first_;
     }
     catch (...)
     {
       delete[] new_data;
       throw;
     }
-    new_array.data_ = new_data;
-    new_array.capacity_ = capacity;
-    new_array.last_ = other.last_;
     return new_array;
   }
 
