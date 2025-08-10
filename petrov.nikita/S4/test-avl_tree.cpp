@@ -927,3 +927,116 @@ BOOST_AUTO_TEST_CASE(count_three_el_exists)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(initializer_list_constructor)
+
+BOOST_AUTO_TEST_CASE(empty_il)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { };
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 0");
+}
+
+BOOST_AUTO_TEST_CASE(one_el_il)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 1, 1 } };
+  out << tree.cbegin()->first << " " << tree.cbegin()->second << " " << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 1 0 1");
+}
+
+BOOST_AUTO_TEST_CASE(three_el_il)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 1, 1 }, { -1, -1 }, { 0, 0 } };
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "-1 -1 0 0 1 1 0 3");
+}
+
+BOOST_AUTO_TEST_CASE(five_el_il)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 5, 5 }, { 1, 1 }, { 6, 6 }, { 7, 7 } };
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 1 4 4 5 5 6 6 7 7 0 5");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(erase_range)
+
+BOOST_AUTO_TEST_CASE(erase_empty)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  auto it = tree.erase(tree.cbegin(), tree.cend());
+  out << tree.empty() << " " << tree.size() << " ";
+  out << std::boolalpha << (it == tree.end());
+  BOOST_TEST(out.str() == "1 0 true");
+}
+
+BOOST_AUTO_TEST_CASE(erase_almost_all)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 5, 5 }, { 1, 1 }, { 6, 6 } };
+  auto it = tree.erase(++(tree.cbegin()), tree.cend());
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size() << " " << std::boolalpha << (it == tree.end());;
+  BOOST_TEST(out.str() == "1 1 0 1 true");
+}
+
+BOOST_AUTO_TEST_CASE(erase_three_between)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 5, 5 }, { 1, 1 }, { 6, 6 } };
+  auto first_it = ++tree.cbegin();
+  auto last_it = ++tree.cbegin();
+  ++last_it;
+  ++last_it;
+  ++last_it;
+  auto it = tree.erase(first_it, last_it);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size() << " "<< it->first << " " << it->second;
+  BOOST_TEST(out.str() == "1 1 7 7 0 2 7 7");
+}
+
+BOOST_AUTO_TEST_CASE(erase_nothing)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 5, 5 }, { 1, 1 }, { 6, 6 } };
+  auto first_it = ++tree.cbegin();
+  auto last_it = ++tree.cbegin();
+  auto it = tree.erase(first_it, last_it);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size() << " " << it->first << " " << it->second;
+  BOOST_TEST(out.str() == "1 1 4 4 5 5 6 6 7 7 0 5 4 4");
+}
+
+BOOST_AUTO_TEST_CASE(erase_all)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 5, 5 }, { 1, 1 }, { 6, 6 } };
+  auto it = tree.erase(tree.cbegin(), tree.cend());
+  out << tree.empty() << " " << tree.size() << " " << std::boolalpha << (it == tree.end());
+  BOOST_TEST(out.str() == "1 0 true");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
