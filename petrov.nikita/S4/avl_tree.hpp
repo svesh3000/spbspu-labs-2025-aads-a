@@ -87,6 +87,8 @@ namespace petrov
     using node_t = AVLTreeNode< K, T >;
     using const_it_t = ConstAVLTreeIterator< K, T, Cmp >;
     using it_t = AVLTreeIterator< K, T, Cmp >;
+    using pair_it_t = std::pair< it_t, it_t >;
+    using pair_const_it_t = std::pair< const_it_t, const_it_t >;
     AVLTree();
     AVLTree(const this_t & rhs);
     AVLTree(this_t && rhs);
@@ -114,6 +116,9 @@ namespace petrov
     const_it_t find(const K & key) const;
     T & at(const K & key);
     const T & at(const K & key) const;
+    pair_it_t equal_range(const K & key);
+    pair_const_it_t equal_range(const K & key) const;
+    size_t count(const K & key) const;
 
     void clear() noexcept;
     void swap(this_t & rhs) noexcept;
@@ -577,6 +582,65 @@ namespace petrov
     else
     {
       throw std::out_of_range("<INVALID COMMAND>");
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::pair_it_t AVLTree< K, T, Cmp >::equal_range(const K & key)
+  {
+    auto it = begin();
+    while (it != end())
+    {
+      if (it->first >= key)
+      {
+        break;
+      }
+      ++it;
+    }
+    if (it != end())
+    {
+      auto second_it = it;
+      return pair_it_t{ it, ++second_it };
+    }
+    else
+    {
+      return pair_it_t{ end(), end() };
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::pair_const_it_t AVLTree< K, T, Cmp >::equal_range(const K & key) const
+  {
+    auto it = cbegin();
+    while (it != cend())
+    {
+      if (it->first >= key)
+      {
+        break;
+      }
+      ++it;
+    }
+    if (it != cend())
+    {
+      auto second_it = it;
+      return pair_const_it_t{ it, ++second_it };
+    }
+    else
+    {
+      return pair_const_it_t{ cend(), cend() };
+    }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  size_t AVLTree< K, T, Cmp >::count(const K & key) const
+  {
+    if (findImpl(root_, key))
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
     }
   }
 

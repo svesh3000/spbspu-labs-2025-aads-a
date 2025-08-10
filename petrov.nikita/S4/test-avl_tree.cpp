@@ -809,3 +809,121 @@ BOOST_AUTO_TEST_CASE(ya_index_operator_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(equal_range_method)
+
+BOOST_AUTO_TEST_CASE(equal_range_example)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 0, "zero" });
+  tree.insert({ 1, "one" });
+  tree.insert({ 2, "two" });
+  auto p = tree.equal_range(1);
+  out << p.first->first << " " << p.first->second << " ";
+  out << p.second->first << " " << p.second->second << " ";
+  auto pp = tree.equal_range(-1);
+  out << pp.first->first << " " << pp.first->second << " ";
+  out << pp.second->first << " " << pp.second->second << " ";
+  auto ppp = tree.equal_range(3);
+  out << std::boolalpha << (ppp.first == tree.end()) << " ";
+  out << std::boolalpha << (ppp.second == tree.end());
+  BOOST_TEST(out.str() == "1 one 2 two 0 zero 1 one true true");
+}
+
+BOOST_AUTO_TEST_CASE(equal_range_example_const)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > first_tree;
+  first_tree.insert({ 0, "zero" });
+  first_tree.insert({ 1, "one" });
+  first_tree.insert({ 2, "two" });
+  const petrov::AVLTree< int, std::string > tree(first_tree);
+  auto p = tree.equal_range(1);
+  out << p.first->first << " " << p.first->second << " ";
+  out << p.second->first << " " << p.second->second << " ";
+  auto pp = tree.equal_range(-1);
+  out << pp.first->first << " " << pp.first->second << " ";
+  out << pp.second->first << " " << pp.second->second << " ";
+  auto ppp = tree.equal_range(3);
+  out << std::boolalpha << (ppp.first == tree.cend()) << " ";
+  out << std::boolalpha << (ppp.second == tree.cend());
+  BOOST_TEST(out.str() == "1 one 2 two 0 zero 1 one true true");
+}
+
+BOOST_AUTO_TEST_CASE(equal_range_example_almost_end)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 0, "zero" });
+  tree.insert({ 1, "one" });
+  tree.insert({ 2, "two" });
+  auto pair = tree.equal_range(2);
+  out << pair.first->first << " " << pair.first->second << " ";
+  out << std::boolalpha << (pair.second == tree.end());
+  BOOST_TEST(out.str() == "2 two true");
+}
+
+BOOST_AUTO_TEST_CASE(equal_range_empty_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  auto pair = tree.equal_range(0);
+  out << std::boolalpha << (pair.first == tree.end()) << " ";
+  out << std::boolalpha << (pair.second == tree.end()) << " ";
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(count_method)
+
+BOOST_AUTO_TEST_CASE(count_empty)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  out << tree.count(1);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(count_one_el_not_exists)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 0, 0 });
+  out << tree.count(1);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(count_one_el_exists)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 0, 0 });
+  out << tree.count(0);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_CASE(count_three_el_not_exists)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 0, 0 });
+  tree.insert({ 10, 10 });
+  tree.insert({ 5, 5 });
+  out << tree.count(3);
+  BOOST_TEST(out.str() == "0");
+}
+
+BOOST_AUTO_TEST_CASE(count_three_el_exists)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 0, 0 });
+  tree.insert({ 10, 10 });
+  tree.insert({ 5, 5 });
+  out << tree.count(0);
+  BOOST_TEST(out.str() == "1");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
