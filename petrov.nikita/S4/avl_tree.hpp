@@ -115,7 +115,7 @@ namespace petrov
 
     std::pair< it_t, bool > insert(const std::pair< K, T > & val);
     std::pair< it_t, bool > insert(std::pair< K, T > && val);
-    template< typename InputIterator >
+    template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
 
     it_t erase(it_t position);
@@ -129,6 +129,10 @@ namespace petrov
     const T & at(const K & key) const;
     pair_it_t equal_range(const K & key);
     pair_const_it_t equal_range(const K & key) const;
+    it_t lower_bound(const K & key);
+    const_it_t lower_bound(const K & key) const;
+    it_t upper_bound(const K & key);
+    const_it_t upper_bound(const K & key) const;
     size_t count(const K & key) const;
 
     void clear() noexcept;
@@ -142,7 +146,9 @@ namespace petrov
     template< typename Pair >
     std::pair< it_t, bool > insertImpl(Pair && val);
     bool isBalanced(node_t * node);
-    node_t * findImpl(node_t * temp, const K & key) const;
+    node_t * lazyFind(node_t * temp, const K & key) const;
+    template< class InputIterator, typename UnPred >
+    InputIterator findIf(InputIterator first, InputIterator last, const K & key, UnPred p) const;
     void deepRotation(node_t * node);
     void upwardBalancing(node_t * node);
     void eraseImpl(node_t * node);
@@ -488,7 +494,7 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  template< typename InputIterator >
+  template< class InputIterator >
   void AVLTree< K, T, Cmp >::insert(InputIterator first, InputIterator last)
   {
     for (auto it = first; it != last; ++it)
@@ -544,7 +550,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::find(const K & key)
   {
-    node_t * ret_val = findImpl(root_, key);
+    node_t * ret_val = lazyFind(root_, key);
     if (ret_val)
     {
       return it_t(ret_val);
@@ -555,7 +561,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp  >::const_it_t AVLTree< K, T, Cmp >::find(const K & key) const
   {
-    node_t * ret_val = findImpl(root_, key);
+    node_t * ret_val = lazyFind(root_, key);
     if (ret_val)
     {
       return const_it_t(ret_val);
@@ -572,7 +578,7 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   const T & AVLTree< K, T, Cmp >::at(const K & key) const
   {
-    node_t * ret_val = findImpl(root_, key);
+    node_t * ret_val = lazyFind(root_, key);
     if (ret_val)
     {
       return ret_val->data.second;
@@ -586,53 +592,47 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp >::pair_it_t AVLTree< K, T, Cmp >::equal_range(const K & key)
   {
-    auto it = begin();
-    while (it != end())
-    {
-      if (it->first >= key)
-      {
-        break;
-      }
-      ++it;
-    }
-    if (it != end())
-    {
-      auto second_it = it;
-      return pair_it_t{ it, ++second_it };
-    }
-    else
-    {
-      return pair_it_t{ end(), end() };
-    }
+    return pair_it_t{ lower_bound(key), upper_bound(key) };
   }
 
   template< typename K, typename T, typename Cmp >
   typename AVLTree< K, T, Cmp >::pair_const_it_t AVLTree< K, T, Cmp >::equal_range(const K & key) const
   {
-    auto it = cbegin();
-    while (it != cend())
-    {
-      if (it->first >= key)
-      {
-        break;
-      }
-      ++it;
-    }
-    if (it != cend())
-    {
-      auto second_it = it;
-      return pair_const_it_t{ it, ++second_it };
-    }
-    else
-    {
-      return pair_const_it_t{ cend(), cend() };
-    }
+    return pair_const_it_t{ lower_bound(key), upper_bound(key) };
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::lower_bound(const K & key)
+  {
+    using namespace std::placeholders;
+    return findIf(begin(), end(), key, std::bind(std::greater_equal< K >{}, _1, std::cref(key)));
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::lower_bound(const K & key) const
+  {
+    using namespace std::placeholders;
+    return findIf(cbegin(), cend(), key, std::bind(std::greater_equal< K >{}, _1, std::cref(key)));
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::upper_bound(const K & key)
+  {
+    using namespace std::placeholders;
+    return findIf(begin(), end(), key, std::bind(std::greater< K >{}, _1, std::cref(key)));
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::upper_bound(const K & key) const
+  {
+    using namespace std::placeholders;
+    return findIf(cbegin(), cend(), key, std::bind(std::greater< K >{}, _1, std::cref(key)));
   }
 
   template< typename K, typename T, typename Cmp >
   size_t AVLTree< K, T, Cmp >::count(const K & key) const
   {
-    if (findImpl(root_, key))
+    if (lazyFind(root_, key))
     {
       return 1;
     }
@@ -868,7 +868,7 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  typename AVLTree< K, T, Cmp >::node_t * AVLTree< K, T, Cmp >::findImpl(node_t * temp, const K & key) const
+  typename AVLTree< K, T, Cmp >::node_t * AVLTree< K, T, Cmp >::lazyFind(node_t * temp, const K & key) const
   {
     while (temp)
     {
@@ -887,6 +887,21 @@ namespace petrov
     }
     return nullptr;
   }
+
+  template< typename K, typename T, typename Cmp >
+  template< class InputIterator, typename UnPred >
+  InputIterator AVLTree< K, T, Cmp >::findIf(InputIterator first, InputIterator last, const K & key, UnPred p) const
+  {
+    for (auto it = first; it != last; ++it)
+    {
+      if (p(it->first))
+      {
+        return it;
+      }
+    }
+    return last;
+  }
+
 
   template< typename K, typename T, typename Cmp >
   void AVLTree< K, T, Cmp >::deepRotation(node_t * node)

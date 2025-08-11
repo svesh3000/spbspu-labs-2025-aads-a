@@ -829,7 +829,7 @@ BOOST_AUTO_TEST_CASE(equal_range_example)
   auto ppp = tree.equal_range(3);
   out << std::boolalpha << (ppp.first == tree.end()) << " ";
   out << std::boolalpha << (ppp.second == tree.end());
-  BOOST_TEST(out.str() == "1 one 2 two 0 zero 1 one true true");
+  BOOST_TEST(out.str() == "1 one 2 two 0 zero 0 zero true true");
 }
 
 BOOST_AUTO_TEST_CASE(equal_range_example_const)
@@ -849,7 +849,7 @@ BOOST_AUTO_TEST_CASE(equal_range_example_const)
   auto ppp = tree.equal_range(3);
   out << std::boolalpha << (ppp.first == tree.cend()) << " ";
   out << std::boolalpha << (ppp.second == tree.cend());
-  BOOST_TEST(out.str() == "1 one 2 two 0 zero 1 one true true");
+  BOOST_TEST(out.str() == "1 one 2 two 0 zero 0 zero true true");
 }
 
 BOOST_AUTO_TEST_CASE(equal_range_example_almost_end)
