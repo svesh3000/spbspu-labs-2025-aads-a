@@ -2,7 +2,7 @@
 
 karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
 {
-  karnauhova::Queue<std::string> inf;
+  Queue<std::string> inf;
   const char separator = ' ';
   size_t start = 0;
   size_t end = str.find(separator);
@@ -24,10 +24,10 @@ karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
 
 
 
-karnauhova::Queue< std::string > karnauhova::toPost(karnauhova::Queue< std::string > inf)
+karnauhova::Queue< std::string > karnauhova::toPost(Queue< std::string > inf)
 {
-  karnauhova::Stack< std::string > symbols;
-  karnauhova::Queue< std::string > post;
+  Stack< std::string > symbols;
+  Queue< std::string > post;
   while (!inf.empty())
   {
     std::string element = inf.front();

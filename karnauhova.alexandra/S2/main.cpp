@@ -31,7 +31,7 @@ int main(int argc, char** argv)
       std::ifstream file(argv[1]);
       if (file.is_open())
       {
-        calc = karnauhova::input_str(file);
+        calc = karnauhova::inputStr(file);
         file.close();
       }
       else
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     }
     else
     {
-      calc = karnauhova::input_str(std::cin);
+      calc = karnauhova::inputStr(std::cin);
     }
     output_sums(std::cout, calc);
   }

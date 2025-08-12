@@ -66,7 +66,7 @@ long long int karnauhova::calculator(long long int first, long long int second, 
   }
 }
 
-long long int karnauhova::procPost(karnauhova::Queue< std::string > post)
+long long int karnauhova::procPost(Queue< std::string > post)
 {
   long long int sum = 0;
   long long int first = 0;
