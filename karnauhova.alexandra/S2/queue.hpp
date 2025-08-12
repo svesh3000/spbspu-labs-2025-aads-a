@@ -16,8 +16,8 @@ namespace karnauhova
     Queue< T >& operator=(const Queue< T >& rhs);
     ~Queue();
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void pop();
     void push(const T& val);
@@ -67,7 +67,7 @@ namespace karnauhova
   template< typename T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       Queue< T > temp(rhs);
       swap(temp);
@@ -82,13 +82,13 @@ namespace karnauhova
   }
 
   template< typename T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return count_element_ == 0;
   }
 
   template< typename T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return count_element_;
   }
@@ -130,7 +130,11 @@ namespace karnauhova
   template< typename T >
   const T& Queue< T >::front() const
   {
-    return front();
+    if (empty())
+    {
+      throw std::logic_error("empty queue for front");
+    }
+    return data_[0];
   }
 
   template< typename T >

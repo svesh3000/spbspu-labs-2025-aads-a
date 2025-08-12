@@ -16,8 +16,8 @@ namespace karnauhova
     Stack< T >& operator=(const Stack< T >& rhs);
     ~Stack();
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void pop();
     void push(const T& val);
@@ -65,7 +65,7 @@ namespace karnauhova
   template< typename T >
   Stack< T >& Stack< T >::operator=(const Stack< T >& rhs)
   {
-    if (this != &rhs)
+    if (this != std::addressof(rhs))
     {
       Stack< T > temp(rhs);
       swap(temp);
@@ -80,13 +80,13 @@ namespace karnauhova
   }
 
   template< typename T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return count_element_ == 0;
   }
 
   template< typename T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return count_element_;
   }

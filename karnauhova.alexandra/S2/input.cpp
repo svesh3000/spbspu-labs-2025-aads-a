@@ -1,30 +1,30 @@
 #include "input.hpp"
 
-karnauhova::Queue< std::string > karnauhova::split_str(std::string str)
+karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
 {
-  karnauhova::Queue< std::string > inf;
-  std::string element;
-  char separator = ' ';
-  int i = 0;
-  while (str[i] != '\0')
+  karnauhova::Queue<std::string> inf;
+  const char separator = ' ';
+  size_t start = 0;
+  size_t end = str.find(separator);
+  while (end != std::string::npos)
   {
-    if (str[i] != separator)
+    if (end != start)
     {
-    element += str[i];
+      inf.push(str.substr(start, end - start));
     }
-    else
-    {
-      inf.push(element);
-      element.clear();
-    }
-    i++;
+    start = end + 1;
+    end = str.find(separator, start);
   }
-  inf.push(element);
+  if (start < str.length())
+  {
+    inf.push(str.substr(start));
+  }
   return inf;
 }
 
 
-karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::string > inf)
+
+karnauhova::Queue< std::string > karnauhova::toPost(karnauhova::Queue< std::string > inf)
 {
   karnauhova::Stack< std::string > symbols;
   karnauhova::Queue< std::string > post;
@@ -89,7 +89,7 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
   return post;
 }
 
-karnauhova::Stack< long long int > karnauhova::input_str(std::istream& in)
+karnauhova::Stack< long long int > karnauhova::inputStr(std::istream& in)
 {
   karnauhova::Stack< long long int > calc;
   std::string str;
@@ -99,8 +99,8 @@ karnauhova::Stack< long long int > karnauhova::input_str(std::istream& in)
     {
       continue;
     }
-    karnauhova::Queue< std::string > inf = karnauhova::split_str(str);
-    karnauhova::Queue< std::string > post = to_post(inf);
+    karnauhova::Queue< std::string > inf = karnauhova::splitStr(str);
+    karnauhova::Queue< std::string > post = toPost(inf);
     long long int sum = procPost(post);
     calc.push(sum);
   }
