@@ -1,42 +1,72 @@
 #include "calc_post.hpp"
-long long int karnauhova::calculator(long long int first, long long int second, std::string operat)
+#include <limits>
+
+namespace
 {
-  if (operat == "+")
+  void isNull(long long int number)
   {
-    if (std::numeric_limits<long long>::max() - first < second)
-    {
-      throw std::logic_error("Incorrect sum");
-    }
-    return first + second;
-  }
-  if (operat == "*")
-  {
-    if (std::numeric_limits<long long>::max() / first < second)
-    {
-      throw std::logic_error("Incorrect sum");
-    }
-    return first * second;
-  }
-  if (operat == "/")
-  {
-    if (second == 0)
+    if (number == 0)
     {
       throw std::logic_error("Dividing by zero!");
     }
-    return first / second;
   }
-  if (operat == "%")
+}
+
+long long int karnauhova::getSum(long long int first, long long int second)
+{
+  if (std::numeric_limits< long long >::max() - first < second)
   {
-    if (second == 0)
-    {
-      throw std::logic_error("Dividing by zero!");
-    }
-    return (first % second + second) % second;
+    throw std::logic_error("Incorrect sum");
   }
+  return first + second;
+}
+
+long long int karnauhova::getDifference(long long int first, long long int second)
+{
   return first - second;
 }
 
-long long int karnauhova::proc_post(karnauhova::Queue< std::string > post)
+long long int karnauhova::getMultiplicate(long long int first, long long int second)
+{
+  if (std::numeric_limits< long long >::max() / first < second)
+  {
+    throw std::logic_error("Incorrect sum");
+  }
+  return first * second;
+}
+
+long long int karnauhova::getDivisionMain(long long int first, long long int second)
+{
+  isNull(second);
+  return first / second;
+}
+
+long long int karnauhova::getDivisionRemain(long long int first, long long int second)
+{
+  isNull(second);
+  return (first % second + second) % second;
+}
+
+long long int karnauhova::calculator(long long int first, long long int second, std::string operat)
+{
+  switch (operat.front())
+  {
+    case '+':
+      return getSum(first, second);
+    case '-':
+      return getDifference(first, second);
+    case '*':
+      return getMultiplicate(first, second);
+    case '/':
+      return getDivisionMain(first, second);
+    case '%':
+      return getDivisionRemain(first, second);
+    default:
+      throw std::logic_error("Invalid operation");
+  }
+}
+
+long long int karnauhova::procPost(karnauhova::Queue< std::string > post)
 {
   long long int sum = 0;
   long long int first = 0;
@@ -72,7 +102,7 @@ long long int karnauhova::proc_post(karnauhova::Queue< std::string > post)
         sum += calculator(first, second, element);
         post.pop();
       }
-      catch(const std::exception& e)
+      catch (const std::exception& e)
       {
         post.pop();
         if (!post.empty())
@@ -83,7 +113,7 @@ long long int karnauhova::proc_post(karnauhova::Queue< std::string > post)
             std::stoll(it);
             sum += calculator(first, second, element);
           }
-          catch(const std::exception& e)
+          catch (const std::exception& e)
           {
             post.pop();
             second = calculator(first, second, element);

@@ -9,9 +9,9 @@
 
 namespace karnauhova
 {
-    karnauhova::Queue< std::string > split_str(std::string str);
-    karnauhova::Stack< long long int > input_str(std::istream& in);
-    karnauhova::Queue< std::string > to_post(karnauhova::Queue< std::string > inf);
+    Queue< std::string > split_str(std::string str);
+    Stack< long long int > input_str(std::istream& in);
+    Queue< std::string > to_post(Queue< std::string > inf);
 }
 
 #endif

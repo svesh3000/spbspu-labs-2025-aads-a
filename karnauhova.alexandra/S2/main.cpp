@@ -8,9 +8,9 @@ void output_sums(std::ostream& out, karnauhova::Stack< long long int > calc)
 {
   if (!calc.empty())
   {
-  long long int sum = calc.top();
-  out << sum;
-  calc.pop();
+    long long int sum = calc.top();
+    out << sum;
+    calc.pop();
   }
   while (!calc.empty())
   {
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     }
     output_sums(std::cout, calc);
   }
-  catch(const std::exception& e)
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;

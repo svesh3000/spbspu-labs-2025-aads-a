@@ -21,8 +21,6 @@ namespace karnauhova
 
     void pop();
     void push(const T& val);
-    T& back();
-    const T& back() const;
     T& front();
     const T& front() const;
 
@@ -118,22 +116,6 @@ namespace karnauhova
     }
       data_[count_element_++] = val;
     }
-
-  template< typename T >
-  T& Queue< T >::back()
-  {
-    if (empty())
-    {
-      throw std::logic_error("empty queue for back");
-    }
-    return data_[count_element_ - 1];
-  }
-
-  template< typename T >
-  const T& Queue< T >::back() const
-  {
-    return back();
-  }
 
   template< typename T >
   T& Queue< T >::front()

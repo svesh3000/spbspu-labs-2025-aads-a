@@ -72,14 +72,7 @@ karnauhova::Queue< std::string > karnauhova::to_post(karnauhova::Queue< std::str
       inf.pop();
       continue;
     }
-    try
-    {
-      std::stoll(element);
-    }
-    catch(const std::exception& e)
-    {
-      throw std::logic_error("No number");
-    }
+    std::stoll(element);
     post.push(element);
     inf.pop();
   }
@@ -108,7 +101,7 @@ karnauhova::Stack< long long int > karnauhova::input_str(std::istream& in)
     }
     karnauhova::Queue< std::string > inf = karnauhova::split_str(str);
     karnauhova::Queue< std::string > post = to_post(inf);
-    long long int sum = proc_post(post);
+    long long int sum = procPost(post);
     calc.push(sum);
   }
   in.clear();
