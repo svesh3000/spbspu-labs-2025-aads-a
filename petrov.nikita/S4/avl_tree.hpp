@@ -23,6 +23,8 @@ namespace petrov
     this_t * parent;
     template< typename Pair >
     AVLTreeNode(Pair && val, this_t * l, this_t * r, this_t * p);
+    template< class... Args >
+    AVLTreeNode(Args && ... args, this_t * l, this_t * r, this_t * p);
   private:
     int height_;
     void setHeight();
@@ -117,6 +119,8 @@ namespace petrov
     std::pair< it_t, bool > insert(std::pair< K, T > && val);
     template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
+    template< class... Args >
+    std::pair< it_t, bool > emplace(Args && ... args);
 
     it_t erase(it_t position);
     it_t erase(const_it_t position);
@@ -164,6 +168,15 @@ namespace petrov
   {
     setHeight();
   }
+
+  template< typename K, typename T >
+  template< class... Args >
+  AVLTreeNode< K, T >::AVLTreeNode(Args && ... args, this_t * l, this_t * r, this_t * p):
+    data{val_t(std::forward< Args >(args)...)},
+    left(l),
+    right(r),
+    parent(p)
+  {}
 
   template< typename K, typename T >
   void AVLTreeNode< K, T >::setHeight()
