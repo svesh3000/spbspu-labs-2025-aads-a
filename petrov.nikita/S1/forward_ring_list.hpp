@@ -16,10 +16,8 @@ namespace petrov
   {
     T data;
     ListNode< T > * next;
-    template< typename T1 >
-    ListNode(T1 && data, ListNode< T > * next);
     template< class... Args >
-    ListNode(Args && ... args, ListNode< T > * next);
+    ListNode(ListNode< T > * next, Args && ... args);
   };
 
   template< typename T >
@@ -114,8 +112,8 @@ namespace petrov
     template< class InputIterator, class = typename std::iterator_traits< InputIterator >::value_type >
     void assign(InputIterator first, InputIterator last);
 
-    template< typename T1 >
-    void push_front(T1 && val);
+    void push_front(const T & val);
+    void push_front(T && val);
     template< class... Args >
     it_t emplace_after(const_it_t pos, Args && ... args);
     template< class... Args >
@@ -160,22 +158,17 @@ namespace petrov
     node_t * head_;
     node_t * tail_;
     size_t size_;
-    template< typename T1 >
-    void push_back(T1 && val);
+    void push_back(const T & val);
+    void push_back(T && val);
+    template< class... Args >
+    void pushBackImpl(Args && ... args);
     template< typename Compare >
     void sortImpl(node_t * low, node_t * high, Compare comp);
   };
 
   template< typename T >
-  template< typename T1 >
-  ListNode< T >::ListNode(T1 && data, ListNode< T > * next):
-    data(std::forward< T1 >(data)),
-    next(next)
-  {}
-
-  template< typename T >
   template< class... Args >
-  ListNode< T >::ListNode(Args && ... args, ListNode< T > * next):
+  ListNode< T >::ListNode(ListNode< T > * next, Args && ... args):
     data{T(std::forward< Args >(args)...)},
     next(next)
   {}
@@ -578,21 +571,15 @@ namespace petrov
   }
 
   template< typename T >
-  template< typename T1 >
-  void ForwardRingList< T >::push_front(T1 && val)
+  void ForwardRingList< T >::push_front(const T & val)
   {
-    if (empty())
-    {
-      head_ = new node_t{ std::forward< T1 >(val), nullptr };
-      tail_ = head_;
-      tail_->next = head_;
-    }
-    else
-    {
-      tail_->next = new node_t{ std::forward< T1 >(val), head_ };
-      head_ = tail_->next;
-    }
-    size_++;
+    emplace_front(val);
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::push_front(T && val)
+  {
+    emplace_front(std::move(val));
   }
 
   template< typename T >
@@ -602,13 +589,14 @@ namespace petrov
     if (pos.node_ != tail_)
     {
       auto temp = pos.node_->next;
-      pos.node_->next = new node_t{ T(std::forward< Args >(args)...), temp };
+      pos.node_->next = new node_t{ temp, std::forward< Args >(args)... };
     }
     else
     {
-      tail_->next = new node_t{ T(std::forward< Args >(args)...), head_ };
+      tail_->next = new node_t{ head_, std::forward< Args >(args)... };
       tail_ = tail_->next;
     }
+    size_++;
     return it_t(pos.node_->next);
   }
 
@@ -616,9 +604,18 @@ namespace petrov
   template< class... Args >
   void ForwardRingList< T >::emplace_front(Args && ... args)
   {
-    auto temp = head_;
-    head_ = new node_t{ T(std::forward< Args >(args)...), temp };
-    tail_->next = head_;
+    if (empty())
+    {
+      head_ = new node_t{ nullptr, std::forward< Args >(args)... };
+      tail_ = head_;
+      tail_->next = head_;
+    }
+    else
+    {
+      tail_->next = new node_t{ head_, std::forward< Args >(args)... };
+      head_ = tail_->next;
+    }
+    size_++;
   }
 
   template< typename T >
@@ -1090,18 +1087,30 @@ namespace petrov
   }
 
   template< typename T >
-  template< typename T1 >
-  void ForwardRingList< T >::push_back(T1 && val)
+  void ForwardRingList< T >::push_back(const T & val)
+  {
+    pushBackImpl(val);
+  }
+
+  template< typename T >
+  void ForwardRingList< T >::push_back(T && val)
+  {
+    pushBackImpl(std::move(val));
+  }
+
+  template< typename T >
+  template< class... Args >
+  void ForwardRingList< T >::pushBackImpl(Args && ... args)
   {
     if (empty())
     {
-      head_ = new node_t{ std::forward< T1 >(val), nullptr };
+      head_ = new node_t{ nullptr, std::forward< Args >(args)... };
       tail_ = head_;
       tail_->next = head_;
     }
     else
     {
-      tail_->next = new node_t{ std::forward< T1 >(val), head_ };
+      tail_->next = new node_t{ head_, std::forward< Args >(args)... };
       tail_ = tail_->next;
     }
     size_++;
@@ -1113,7 +1122,7 @@ namespace petrov
   {
     if (low != high && !(high != tail_ && high->next == low))
     {
-      node_t fake(T(), low);
+      node_t fake(low, T());
       node_t * i = &fake;
       T pivot = high->data;
       for (auto j = low; j != high; j = j->next)
