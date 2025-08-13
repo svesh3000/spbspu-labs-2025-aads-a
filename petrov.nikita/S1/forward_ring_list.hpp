@@ -112,8 +112,8 @@ namespace petrov
     template< class InputIterator, class = typename std::iterator_traits< InputIterator >::value_type >
     void assign(InputIterator first, InputIterator last);
 
-    void push_front(const T & val);
-    void push_front(T && val);
+    template< typename T1 >
+    void push_front(T1 && val);
     template< class... Args >
     it_t emplace_after(const_it_t pos, Args && ... args);
     template< class... Args >
@@ -124,16 +124,16 @@ namespace petrov
     template< class InputIterator >
     it_t insert(const_it_t pos, InputIterator first, InputIterator last);
     it_t insert(const_it_t pos, std::initializer_list< T > il);
-    template< class This_t >
-    void splice(const_it_t pos, This_t && rhs);
-    template< class This_t >
-    void splice(const_it_t pos, This_t && rhs, const_it_t i);
-    template< class This_t >
-    void splice(const_it_t pos, This_t && rhs, const_it_t first, const_it_t last);
-    template< typename This_t >
-    void merge(This_t && rhs);
-    template< typename This_t, typename Compare >
-    void merge(This_t && rhs, Compare comp);
+    template< class ThisType >
+    void splice(const_it_t pos, ThisType && rhs);
+    template< class ThisType >
+    void splice(const_it_t pos, ThisType && rhs, const_it_t i);
+    template< class ThisType >
+    void splice(const_it_t pos, ThisType && rhs, const_it_t first, const_it_t last);
+    template< typename ThisType >
+    void merge(ThisType && rhs);
+    template< typename ThisType, typename Compare >
+    void merge(ThisType && rhs, Compare comp);
 
     void pop_front();
     it_t erase(const_it_t pos);
@@ -158,8 +158,8 @@ namespace petrov
     node_t * head_;
     node_t * tail_;
     size_t size_;
-    void push_back(const T & val);
-    void push_back(T && val);
+    template< typename T1 >
+    void push_back(T1 && val);
     template< class... Args >
     void pushBackImpl(Args && ... args);
     template< typename Compare >
@@ -549,14 +549,6 @@ namespace petrov
   }
 
   template< typename T >
-  template< class InputIterator, class >
-  void ForwardRingList< T >::assign(InputIterator first, InputIterator last)
-  {
-    this_t cpy(first, last);
-    swap(cpy);
-  }
-
-  template< typename T >
   void ForwardRingList< T >::assign(size_t n, const T & val)
   {
     this_t cpy(n, val);
@@ -571,15 +563,18 @@ namespace petrov
   }
 
   template< typename T >
-  void ForwardRingList< T >::push_front(const T & val)
+  template< class InputIterator, class >
+  void ForwardRingList< T >::assign(InputIterator first, InputIterator last)
   {
-    emplace_front(val);
+    this_t cpy(first, last);
+    swap(cpy);
   }
 
   template< typename T >
-  void ForwardRingList< T >::push_front(T && val)
+  template< typename T1 >
+  void ForwardRingList< T >::push_front(T1 && val)
   {
-    emplace_front(std::move(val));
+    emplace_front(std::forward< T1 >(val));
   }
 
   template< typename T >
@@ -622,7 +617,7 @@ namespace petrov
   template< typename T1 >
   typename ForwardRingList< T >::it_t ForwardRingList< T >::insert(const_it_t pos, T1 && val)
   {
-    return insert(pos, 1ull, std::forward< T >(val));
+    return emplace_after(pos, std::forward< T >(val));
   }
 
   template< typename T >
@@ -659,8 +654,8 @@ namespace petrov
   }
 
   template< typename T >
-  template< class This_t >
-  void ForwardRingList< T >::splice(const_it_t pos, This_t && rhs)
+  template< class ThisType >
+  void ForwardRingList< T >::splice(const_it_t pos, ThisType && rhs)
   {
     if (!rhs.empty())
     {
@@ -684,8 +679,8 @@ namespace petrov
   }
 
   template< typename T >
-  template< class This_t >
-  void ForwardRingList< T >::splice(const_it_t pos, This_t && rhs, const_it_t i)
+  template< class ThisType >
+  void ForwardRingList< T >::splice(const_it_t pos, ThisType && rhs, const_it_t i)
   {
     auto added = i.node_->next;
     if (added == rhs.head_)
@@ -724,8 +719,8 @@ namespace petrov
   }
 
   template< typename T >
-  template< class This_t >
-  void ForwardRingList< T >::splice(const_it_t pos, This_t && rhs, const_it_t first, const_it_t last)
+  template< class ThisType >
+  void ForwardRingList< T >::splice(const_it_t pos, ThisType && rhs, const_it_t first, const_it_t last)
   {
     if (first.node_->next == last.node_)
     {
@@ -781,6 +776,59 @@ namespace petrov
       tail_ = added_tail;
     }
     size_ += nodes_removed;
+  }
+
+  template< typename T >
+  template< typename ThisType >
+  void ForwardRingList< T >::merge(ThisType && rhs)
+  {
+    merge(std::forward< ThisType >(rhs), std::less_equal< T >{});
+  }
+
+  template< typename T >
+  template< typename ThisType, typename Compare >
+  void ForwardRingList< T >::merge(ThisType && rhs, Compare comp)
+  {
+    if (rhs.empty())
+    {
+      return;
+    }
+    auto rhs_it = rhs.begin();
+    if (comp(*rhs_it, *begin()))
+    {
+      auto temp = head_;
+      head_ = (rhs_it++).node_;
+      head_->next = temp;
+      tail_->next = head_;
+      rhs.size_--;
+      size_++;
+    }
+    auto prev_it = begin();
+    auto lhs_it = ++begin();
+    while (!rhs.empty())
+    {
+      if (comp(*rhs_it, *lhs_it))
+      {
+        prev_it.node_->next = (rhs_it++).node_;
+        prev_it.node_->next->next = lhs_it.node_;
+        ++prev_it;
+        rhs.size_--;
+        size_++;
+        continue;
+      }
+      else if (lhs_it.node_ == tail_)
+      {
+        tail_->next = (rhs_it++).node_;
+        tail_ = tail_->next;
+        tail_->next = head_;
+        rhs.size_--;
+        size_++;
+      }
+      ++prev_it;
+      ++lhs_it;
+    }
+    rhs.head_ = nullptr;
+    rhs.tail_ = nullptr;
   }
 
   template< typename T >
@@ -984,59 +1032,6 @@ namespace petrov
   }
 
   template< typename T >
-  template< typename This_t >
-  void ForwardRingList< T >::merge(This_t && rhs)
-  {
-    merge(std::forward< This_t >(rhs), std::less_equal< T >{});
-  }
-
-  template< typename T >
-  template< typename This_t, typename Compare >
-  void ForwardRingList< T >::merge(This_t && rhs, Compare comp)
-  {
-    if (rhs.empty())
-    {
-      return;
-    }
-    auto rhs_it = rhs.begin();
-    if (comp(*rhs_it, *begin()))
-    {
-      auto temp = head_;
-      head_ = (rhs_it++).node_;
-      head_->next = temp;
-      tail_->next = head_;
-      rhs.size_--;
-      size_++;
-    }
-    auto prev_it = begin();
-    auto lhs_it = ++begin();
-    while (!rhs.empty())
-    {
-      if (comp(*rhs_it, *lhs_it))
-      {
-        prev_it.node_->next = (rhs_it++).node_;
-        prev_it.node_->next->next = lhs_it.node_;
-        ++prev_it;
-        rhs.size_--;
-        size_++;
-        continue;
-      }
-      else if (lhs_it.node_ == tail_)
-      {
-        tail_->next = (rhs_it++).node_;
-        tail_ = tail_->next;
-        tail_->next = head_;
-        rhs.size_--;
-        size_++;
-      }
-      ++prev_it;
-      ++lhs_it;
-    }
-    rhs.head_ = nullptr;
-    rhs.tail_ = nullptr;
-  }
-
-  template< typename T >
   void ForwardRingList< T >::unique()
   {
     unique(std::equal_to< T >{});
@@ -1087,15 +1082,10 @@ namespace petrov
   }
 
   template< typename T >
-  void ForwardRingList< T >::push_back(const T & val)
+  template< typename T1 >
+  void ForwardRingList< T >::push_back(T1 && val)
   {
-    pushBackImpl(val);
-  }
-
-  template< typename T >
-  void ForwardRingList< T >::push_back(T && val)
-  {
-    pushBackImpl(std::move(val));
+    pushBackImpl(std::forward< T1 >(val));
   }
 
   template< typename T >
