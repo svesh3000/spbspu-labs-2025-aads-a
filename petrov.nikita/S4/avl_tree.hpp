@@ -21,10 +21,8 @@ namespace petrov
     this_t * left;
     this_t * right;
     this_t * parent;
-    template< typename Pair >
-    AVLTreeNode(Pair && val, this_t * l, this_t * r, this_t * p);
     template< class... Args >
-    AVLTreeNode(Args && ... args, this_t * l, this_t * r, this_t * p);
+    AVLTreeNode(this_t * l, this_t * r, this_t * p, Args && ... args);
   private:
     int height_;
     void setHeight();
@@ -112,15 +110,23 @@ namespace petrov
     it_t begin();
     it_t end();
 
+    const_it_t crbegin() const;
+    const_it_t crend() const;
+    it_t rbegin();
+    it_t rend();
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 
     std::pair< it_t, bool > insert(const std::pair< K, T > & val);
     std::pair< it_t, bool > insert(std::pair< K, T > && val);
+    it_t insert(const_it_t hint, const std::pair< K, T > & val);
     template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
     template< class... Args >
     std::pair< it_t, bool > emplace(Args && ... args);
+    template< class... Args >
+    it_t emplace_hint(const_it_t hint, Args && ... args);
 
     it_t erase(it_t position);
     it_t erase(const_it_t position);
@@ -147,8 +153,6 @@ namespace petrov
     void balance(node_t * node);
     void leftRotate(node_t * node);
     void rightRotate(node_t * node);
-    template< typename Pair >
-    std::pair< it_t, bool > insertImpl(Pair && val);
     bool isBalanced(node_t * node);
     node_t * lazyFind(node_t * temp, const K & key) const;
     template< class InputIterator, typename UnPred >
@@ -156,27 +160,20 @@ namespace petrov
     void deepRotation(node_t * node);
     void upwardBalancing(node_t * node);
     void eraseImpl(node_t * node);
+    template< class... Args >
+    std::pair< it_t, bool > emplaceImpl(node_t * subroot, Args && ... args);
   };
 
   template< typename K, typename T >
-  template< typename Pair >
-  AVLTreeNode< K, T >::AVLTreeNode(Pair && val, this_t * l, this_t * r, this_t * p):
-    data(std::forward< Pair >(val)),
+  template< class... Args >
+  AVLTreeNode< K, T >::AVLTreeNode(this_t * l, this_t * r, this_t * p, Args && ... args):
+    data{val_t(std::forward< Args >(args)...)},
     left(l),
     right(r),
     parent(p)
   {
     setHeight();
   }
-
-  template< typename K, typename T >
-  template< class... Args >
-  AVLTreeNode< K, T >::AVLTreeNode(Args && ... args, this_t * l, this_t * r, this_t * p):
-    data{val_t(std::forward< Args >(args)...)},
-    left(l),
-    right(r),
-    parent(p)
-  {}
 
   template< typename K, typename T >
   void AVLTreeNode< K, T >::setHeight()
@@ -240,6 +237,42 @@ namespace petrov
     assert(node_ != nullptr);
     this_t result(*this);
     ++(*this);
+    return result;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename ConstAVLTreeIterator< K, T, Cmp >::this_t & ConstAVLTreeIterator< K, T, Cmp >::operator--()
+  {
+    assert(node_ != nullptr);
+    if (node_->left)
+    {
+      node_ = node_->left;
+      while (node_->right)
+      {
+        node_ = node_->right;
+      }
+    }
+    else if (!node_->parent || Cmp{}(node_->parent->data.first, node_->data.first))
+    {
+      node_ = node_->parent;
+    }
+    else
+    {
+      while (node_->parent && Cmp{}(node_->data.first, node_->parent->data.first))
+      {
+        node_ = node_->parent;
+      }
+      node_ = node_->parent;
+    }
+    return *this;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename ConstAVLTreeIterator< K, T, Cmp >::this_t ConstAVLTreeIterator< K, T, Cmp >::operator--(int)
+  {
+    assert(node_ != nullptr);
+    this_t result(*this);
+    --(*this);
     return result;
   }
 
@@ -312,6 +345,42 @@ namespace petrov
     assert(node_ != nullptr);
     this_t result(*this);
     ++(*this);
+    return result;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTreeIterator< K, T, Cmp >::this_t & AVLTreeIterator< K, T, Cmp >::operator--()
+  {
+    assert(node_ != nullptr);
+    if (node_->left)
+    {
+      node_ = node_->left;
+      while (node_->right)
+      {
+        node_ = node_->right;
+      }
+    }
+    else if (!node_->parent || Cmp{}(node_->parent->data.first, node_->data.first))
+    {
+      node_ = node_->parent;
+    }
+    else
+    {
+      while (node_->parent && Cmp{}(node_->data.first, node_->parent->data.first))
+      {
+        node_ = node_->parent;
+      }
+      node_ = node_->parent;
+    }
+    return *this;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTreeIterator< K, T, Cmp >::this_t AVLTreeIterator< K, T, Cmp >::operator--(int)
+  {
+    assert(node_ != nullptr);
+    this_t result(*this);
+    --(*this);
     return result;
   }
 
@@ -483,6 +552,54 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::crbegin() const
+  {
+    auto temp = root_;
+    if (empty())
+    {
+      return const_it_t();
+    }
+    else
+    {
+      while (temp->right)
+      {
+        temp = temp->right;
+      }
+    }
+    return const_it_t(temp);
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::const_it_t AVLTree< K, T, Cmp >::crend() const
+  {
+    return const_it_t();
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::rbegin()
+  {
+    auto temp = root_;
+    if (empty())
+    {
+      return it_t();
+    }
+    else
+    {
+      while (temp->right)
+      {
+        temp = temp->right;
+      }
+    }
+    return it_t(temp);
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::rend()
+  {
+    return it_t();
+  }
+
+  template< typename K, typename T, typename Cmp >
   bool AVLTree< K, T, Cmp >::empty() const noexcept
   {
     return !size_;
@@ -497,13 +614,13 @@ namespace petrov
   template< typename K, typename T, typename Cmp >
   std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(const std::pair< K, T > & val)
   {
-    return insertImpl(val);
+    return emplace(val);
   }
 
   template< typename K, typename T, typename Cmp >
   std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(std::pair< K, T > && val)
   {
-    return insertImpl(std::move(val));
+    return emplace(std::move(val));
   }
 
   template< typename K, typename T, typename Cmp >
@@ -514,6 +631,79 @@ namespace petrov
     {
       insert({ it->first, it->second });
     }
+  }
+
+  template< typename K, typename T, typename Cmp >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::insert(const_it_t hint, const std::pair< K, T > & val)
+  {
+    return emplace_hint(hint, val);
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< class... Args >
+  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::emplace(Args && ... args)
+  {
+    return emplaceImpl(root_, std::forward< Args >(args)...);
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< class... Args >
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::emplace_hint(const_it_t hint, Args && ... args)
+  {
+    if (empty())
+    {
+      root_ = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      size_++;
+    }
+    else
+    {
+      std::pair< it_t, bool > ret_val;
+      node_t * added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      auto begin = cbegin();
+      if (hint == begin)
+      {
+        hint = begin;
+        if (Cmp{}(added->data.first, hint.node_->data.first))
+        {
+          hint.node_->left = added;
+          added->parent = hint.node_;
+          size_++;
+          upwardBalancing(added->parent);
+          return it_t(added);
+        }
+      }
+      else if (hint == cend())
+      {
+        hint = crbegin();
+        if (Cmp{}(hint.node_->data.first, added->data.first))
+        {
+          hint.node_->right = added;
+          added->parent = hint.node_;
+          size_++;
+          upwardBalancing(added->parent);
+          return it_t(added);
+        }
+      }
+      if (!Cmp{}(added->data.first, hint.node_->data.first))
+      {
+        delete added;
+        ret_val = emplace(std::forward< Args >(args)...);
+      }
+      else
+      {
+        for (auto it = hint; it != crend(); --it)
+        {
+          if (!Cmp{}(added->data.first, it.node_->data.first))
+          {
+            delete added;
+            ret_val = emplaceImpl(it.node_, std::forward< Args >(args)...);
+            break;
+          }
+        }
+      }
+      return ret_val.first;
+    }
+    return it_t(root_);
   }
 
   template< typename K, typename T, typename Cmp >
@@ -808,58 +998,6 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  template< typename Pair >
-  typename std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insertImpl(Pair && val)
-  {
-    if (empty())
-    {
-      root_ = new node_t{ std::forward< Pair >(val), nullptr, nullptr, nullptr };
-      size_++;
-    }
-    else
-    {
-      auto temp = root_;
-      while (temp->left || temp->right)
-      {
-        if (temp->left && Cmp{}(val.first, temp->data.first))
-        {
-          temp = temp->left;
-        }
-        else if (temp->right && Cmp{}(temp->data.first, val.first))
-        {
-          temp = temp->right;
-        }
-        else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-        {
-          return std::make_pair< it_t, bool >(it_t(temp), false);
-        }
-        else
-        {
-          break;
-        }
-      }
-      if (Cmp{}(val.first, temp->data.first))
-      {
-        temp->left = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp };
-        temp = temp->left;
-      }
-      else if (Cmp{}(temp->data.first, val.first))
-      {
-        temp->right = new node_t{ std::forward< Pair >(val), nullptr, nullptr, temp };
-        temp = temp->right;
-      }
-      else if (!Cmp{}(val.first, temp->data.first) && !Cmp{}(temp->data.first, val.first))
-      {
-        return std::make_pair< it_t, bool >(it_t(temp), false);
-      }
-      size_++;
-      upwardBalancing(temp->parent);
-      return std::make_pair< it_t, bool >(it_t(temp), true);
-    }
-    return std::make_pair< it_t, bool >(it_t(root_), true);
-  }
-
-  template< typename K, typename T, typename Cmp >
   bool AVLTree< K, T, Cmp >::isBalanced(node_t * node)
   {
     if (node->left && node->right && std::abs(node->left->height_ - node->right->height_) > 1)
@@ -1032,6 +1170,60 @@ namespace petrov
     upwardBalancing(balance_node_ptr);
     delete node;
     size_--;
+  }
+
+  template< typename K, typename T, typename Cmp >
+  template< class... Args >
+  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::emplaceImpl(node_t * subroot, Args && ... args)
+  {
+    if (empty())
+    {
+      root_ = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      size_++;
+    }
+    else
+    {
+      node_t * added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      auto temp = subroot;
+      while (temp->left || temp->right)
+      {
+        if (temp->left && Cmp{}(added->data.first, temp->data.first))
+        {
+          temp = temp->left;
+        }
+        else if (temp->right && Cmp{}(temp->data.first, added->data.first))
+        {
+          temp = temp->right;
+        }
+        else if (!Cmp{}(added->data.first, temp->data.first) && !Cmp{}(temp->data.first, added->data.first))
+        {
+          delete added;
+          return std::make_pair< it_t, bool >(it_t(temp), false);
+        }
+        else
+        {
+          break;
+        }
+      }
+      if (Cmp{}(added->data.first, temp->data.first))
+      {
+        temp->left = added;
+      }
+      else if (Cmp{}(temp->data.first, added->data.first))
+      {
+        temp->right = added;
+      }
+      else if (!Cmp{}(added->data.first, temp->data.first) && !Cmp{}(temp->data.first, added->data.first))
+      {
+        delete added;
+        return std::make_pair< it_t, bool >(it_t(temp), false);
+      }
+      added->parent = temp;
+      size_++;
+      upwardBalancing(temp);
+      return std::make_pair< it_t, bool >(it_t(added), true);
+    }
+    return std::make_pair< it_t, bool >(it_t(root_), true);
   }
 }
 

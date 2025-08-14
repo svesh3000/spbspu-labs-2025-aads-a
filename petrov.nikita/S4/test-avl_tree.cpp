@@ -1040,3 +1040,310 @@ BOOST_AUTO_TEST_CASE(erase_all)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(emplace_method)
+
+BOOST_AUTO_TEST_CASE(emplace_example)
+{
+  std::ostringstream out;
+  petrov::AVLTree< std::string, std::string > tree;
+  tree.emplace(std::make_pair(std::string("a"), std::string("a")));
+  tree.emplace(std::make_pair("b", "abcd"));
+  tree.emplace("d", "ddd");
+  tree.emplace("d", "DDD");
+  tree.emplace(std::piecewise_construct, std::forward_as_tuple("c"), std::forward_as_tuple(10, 'c'));
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.size();
+  BOOST_TEST(out.str() == "a a b abcd c cccccccccc d ddd 4");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(reverse_going_through_tree)
+
+BOOST_AUTO_TEST_CASE(one_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 1, "hi" });
+  for (auto it = tree.crbegin(); it != tree.crend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "hi");
+}
+
+BOOST_AUTO_TEST_CASE(two_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 1, "hi" });
+  tree.insert({ 2, "cute" });
+  for (auto it = tree.crbegin(); it != tree.crend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "cutehi");
+}
+
+BOOST_AUTO_TEST_CASE(ya_two_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 2, "cute" });
+  tree.insert({ 1, "hi" });
+  for (auto it = tree.rbegin(); it != tree.rend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "cutehi");
+}
+
+BOOST_AUTO_TEST_CASE(three_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 2, "cute" });
+  tree.insert({ 1, "hi" });
+  tree.insert({ 3, "cat" });
+  for (auto it = tree.crbegin(); it != tree.crend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "catcutehi");
+}
+
+BOOST_AUTO_TEST_CASE(five_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 3, "very" });
+  tree.insert({ 1, "hi" });
+  tree.insert({ 2, "cute" });
+  tree.insert({ 4, "tasty" });
+  tree.insert({ 5, "cat" });
+  for (auto it = tree.rbegin(); it != tree.rend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "cattastyverycutehi");
+}
+
+BOOST_AUTO_TEST_CASE(ya_five_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, std::string > tree;
+  tree.insert({ 1, "very" });
+  tree.insert({ 2, "hi" });
+  tree.insert({ 3, "cute" });
+  tree.insert({ 4, "tasty" });
+  tree.insert({ 5, "cat" });
+  for (auto it = tree.rbegin(); it != tree.rend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "cattastycutehivery");
+}
+
+BOOST_AUTO_TEST_CASE(eleven_element_avl_tree)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  tree.insert({ 6, 6 });
+  tree.insert({ 2, 2 });
+  tree.insert({ 1, 1 });
+  tree.insert({ 4, 4 });
+  tree.insert({ 3, 3 });
+  tree.insert({ 5, 5 });
+  tree.insert({ 9, 9 });
+  tree.insert({ 7, 7 });
+  tree.insert({ 8, 8 });
+  tree.insert({ 11, 11 });
+  tree.insert({ 10, 10 });
+  for (auto it = tree.rbegin(); it != tree.rend(); --it)
+  {
+    out << it->second;
+  }
+  BOOST_TEST(out.str() == "1110987654321");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(emplace_hint_method)
+
+BOOST_AUTO_TEST_CASE(empty_begin)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  auto ret_it = tree.emplace_hint(tree.cbegin(), 1, 1);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size() << " " << ret_it->first;
+  BOOST_TEST(out.str() == "1 1 1");
+}
+
+BOOST_AUTO_TEST_CASE(empty_end)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree;
+  auto ret_it = tree.emplace_hint(tree.cend(), 1, 1);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size() << " " << ret_it->first;
+  BOOST_TEST(out.str() == "1 1 1");
+}
+
+BOOST_AUTO_TEST_CASE(emplace_hint_three)
+{
+   std::ostringstream out;
+  petrov::AVLTree< int, char > tree;
+  auto it = tree.cbegin();
+  for (int i = 0; i < 3; ++i)
+  {
+    tree.emplace_hint(it, i, 'a');
+    it = tree.cend();
+  }
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size();
+  BOOST_TEST(out.str() == "0 1 2 3");
+}
+
+BOOST_AUTO_TEST_CASE(emplace_hint_end)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, char > tree;
+  auto it = tree.cbegin();
+  for (int i = 0; i < 10; ++i)
+  {
+    tree.emplace_hint(it, i, 'a');
+    it = tree.cend();
+  }
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size();
+  BOOST_TEST(out.str() == "0 1 2 3 4 5 6 7 8 9 10");
+}
+
+BOOST_AUTO_TEST_CASE(wrong_hint)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, char > tree;
+  auto it = tree.cbegin();
+  for (int i = 0; i < 10; ++i)
+  {
+    tree.emplace_hint(it, i, 'a');
+    it = tree.cbegin();
+  }
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size();
+  BOOST_TEST(out.str() == "0 1 2 3 4 5 6 7 8 9 10");
+}
+
+BOOST_AUTO_TEST_CASE(more_than_hint)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 1, 1 }, { 5, 5 }, { 6, 6 }, { 2, 2 } };
+  auto hint = tree.cbegin();
+  ++hint;
+  ++hint;
+  tree.emplace_hint(hint, 4, 4);
+  tree.emplace_hint(hint, 5, 5);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 1 2 2 4 4 5 5 6 6 7 7 0 6");
+}
+
+BOOST_AUTO_TEST_CASE(less_than_hint)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 1, 1 }, { 5, 5 }, { 6, 6 }, { 2, 2 } };
+  auto hint = tree.cbegin();
+  ++hint;
+  ++hint;
+  tree.emplace_hint(hint, 1, 1);
+  tree.emplace_hint(hint, 2, 2);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 1 2 2 4 4 5 5 6 6 7 7 0 6");
+}
+
+BOOST_AUTO_TEST_CASE(same_hint)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 7, 7 }, { 4, 4 }, { 1, 1 }, { 5, 5 }, { 6, 6 } };
+  auto hint = tree.cbegin();
+  ++hint;
+  ++hint;
+  tree.emplace_hint(hint, 2, 2);
+  tree.emplace_hint(hint, 3, 3);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "1 1 2 2 3 3 4 4 5 5 6 6 7 7 0 7");
+}
+
+BOOST_AUTO_TEST_CASE(different_hint)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, int > tree { { 1, 1 }, { 5, 5 }, { 6, 6 } };
+  auto hint = tree.cbegin();
+  ++hint;
+  tree.emplace_hint(hint, 4, 4);
+  --hint;
+  tree.emplace_hint(hint, 3, 3);
+  --hint;
+  tree.emplace_hint(hint, 2, 2);
+  tree.emplace_hint(tree.cend(), 7, 7);
+  tree.emplace_hint(tree.cbegin(), 0, 0);
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " " << it->second << " ";
+  }
+  out << tree.empty() << " " << tree.size();
+  BOOST_TEST(out.str() == "0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 0 8");
+}
+
+BOOST_AUTO_TEST_CASE(emplace_hint_begin)
+{
+  std::ostringstream out;
+  petrov::AVLTree< int, char > tree;
+  auto it = tree.cbegin();
+  for (int i = 9; i >= 0; --i)
+  {
+    tree.emplace_hint(it, i, 'a');
+    it = tree.cbegin();
+  }
+  for (auto it = tree.cbegin(); it != tree.cend(); ++it)
+  {
+    out << it->first << " ";
+  }
+  out << tree.size();
+  BOOST_TEST(out.str() == "0 1 2 3 4 5 6 7 8 9 10");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
