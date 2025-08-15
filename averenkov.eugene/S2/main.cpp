@@ -39,6 +39,32 @@ bool isOverflow(long long a, long long b)
   }
 }
 
+bool isAdditionOverflow(long long a, long long b)
+{
+  if (b > 0)
+  {
+    return a > std::numeric_limits< long long >::max() - b;
+  }
+  else if (b < 0)
+  {
+    return a < std::numeric_limits< long long >::min() - b;
+  }
+  return false;
+}
+
+bool isSubtractionOverflow(long long a, long long b)
+{
+  if (b > 0)
+  {
+    return a < std::numeric_limits< long long >::min() + b;
+  }
+  else if (b < 0)
+  {
+    return a > std::numeric_limits< long long >::max() + b;
+  }
+  return false;
+}
+
 bool isOperator(char c)
 {
   return c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
@@ -180,14 +206,14 @@ long long evaluatePostfix(averenkov::Queue< std::string >& postfixQueue)
       switch (token[0])
       {
         case '+':
-          if (a > 0 && b > 0 && a > std::numeric_limits< long long int >::max() - b)
+          if (isAdditionOverflow(a, b))
           {
             throw std::runtime_error("Overflow error");
           }
           result = a + b;
           break;
         case '-':
-          if (b > 0 && a < std::numeric_limits< long long int >::min() + b)
+          if (isSubtractionOverflow(a, b))
           {
             throw std::runtime_error("Overflow error");
           }
