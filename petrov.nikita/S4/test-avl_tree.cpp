@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
 #include <random>
-#include "avl_tree.hpp"
+#include <avl_tree.hpp>
 
 BOOST_AUTO_TEST_SUITE(empty_method)
 
