@@ -55,11 +55,8 @@ bool precedenceFirst(char first, char second)
 
 std::string readToken(const std::string& str, size_t& pos)
 {
-  while (pos < str.size() && std::isspace(str[pos]))
-  {
-    pos++;
-  }
-  if (pos >= str.size())
+  pos = str.find_first_not_of(" \t\n\r", pos);
+  if (pos == std::string::npos)
   {
     return "";
   }
@@ -68,34 +65,26 @@ std::string readToken(const std::string& str, size_t& pos)
     return std::string(1, str[pos++]);
   }
   size_t start = pos;
-  while (pos < str.size() && !std::isspace(str[pos]))
+  size_t end = str.find_first_of(" \t\n\r()", pos);
+  if (end == std::string::npos)
   {
-    if (isOperator(str[pos]) || str[pos] == '(' || str[pos] == ')')
-    {
-      if (pos > start)
-      {
-        break;
-      }
-      return std::string(1, str[pos++]);
-    }
-    pos++;
+    end = str.size();
   }
-  std::string token = str.substr(start, pos - start);
+  size_t op_pos = str.find_first_of("+-*/%^", pos);
+  if (op_pos != std::string::npos && op_pos < end)
+  {
+    end = op_pos;
+  }
+  std::string token = str.substr(start, end - start);
+  pos = end;
   if (token == "-" && (start == 0 || str[start - 1] == '('))
   {
-    if (pos < str.size())
-    {
-      std::string nextToken = readToken(str, pos);
-      if (nextToken.empty())
-      {
-        throw std::runtime_error("Error");
-      }
-      return "-" + nextToken;
-    }
-    else
+    std::string nextToken = readToken(str, pos);
+    if (nextToken.empty())
     {
       throw std::runtime_error("Error");
     }
+    return "-" + nextToken;
   }
   return token;
 }
