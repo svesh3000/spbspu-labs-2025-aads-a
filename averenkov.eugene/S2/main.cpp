@@ -9,8 +9,8 @@
 
 bool isOverflow(long long a, long long b)
 {
-  const long long int max = std::numeric_limits< long long int >::max();
-  const long long int min = std::numeric_limits< long long int >::min();
+  const long long int max = std::numeric_limits< long long >::max();
+  const long long int min = std::numeric_limits< long long >::min();
   if (a == 0 || b == 0)
   {
     return false;
@@ -41,28 +41,26 @@ bool isOverflow(long long a, long long b)
 
 bool isAdditionOverflow(long long a, long long b)
 {
-  if (b > 0)
+  if (b >= 0)
   {
     return a > std::numeric_limits< long long >::max() - b;
   }
-  else if (b < 0)
+  else
   {
     return a < std::numeric_limits< long long >::min() - b;
   }
-  return false;
 }
 
 bool isSubtractionOverflow(long long a, long long b)
 {
-  if (b > 0)
+  if (b >= 0)
   {
     return a < std::numeric_limits< long long >::min() + b;
   }
-  else if (b < 0)
+  else
   {
     return a > std::numeric_limits< long long >::max() + b;
   }
-  return false;
 }
 
 bool isOperator(char c)
