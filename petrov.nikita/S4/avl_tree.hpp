@@ -118,9 +118,9 @@ namespace petrov
     bool empty() const noexcept;
     size_t size() const noexcept;
 
-    std::pair< it_t, bool > insert(const std::pair< K, T > & val);
-    std::pair< it_t, bool > insert(std::pair< K, T > && val);
-    it_t insert(const_it_t hint, const std::pair< K, T > & val);
+    std::pair< it_t, bool > insert(const val_t & val);
+    std::pair< it_t, bool > insert(val_t && val);
+    it_t insert(const_it_t hint, const val_t & val);
     template< class InputIterator >
     void insert(InputIterator first, InputIterator last);
     template< class... Args >
@@ -612,13 +612,13 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(const std::pair< K, T > & val)
+  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(const val_t & val)
   {
     return emplace(val);
   }
 
   template< typename K, typename T, typename Cmp >
-  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(std::pair< K, T > && val)
+  std::pair< AVLTreeIterator< K, T, Cmp >, bool > AVLTree< K, T, Cmp >::insert(val_t && val)
   {
     return emplace(std::move(val));
   }
@@ -634,7 +634,7 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
-  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::insert(const_it_t hint, const std::pair< K, T > & val)
+  typename AVLTree< K, T, Cmp >::it_t AVLTree< K, T, Cmp >::insert(const_it_t hint, const val_t & val)
   {
     return emplace_hint(hint, val);
   }
@@ -883,6 +883,13 @@ namespace petrov
   }
 
   template< typename K, typename T, typename Cmp >
+  void AVLTree< K, T, Cmp >::swap(this_t & rhs) noexcept
+  {
+    std::swap(root_, rhs.root_);
+    std::swap(size_, rhs.size_);
+  }
+
+  template< typename K, typename T, typename Cmp >
   void AVLTree< K, T, Cmp >::balance(node_t * node)
   {
     if (node->left && node->right)
@@ -988,13 +995,6 @@ namespace petrov
     {
       son->parent = grandpa;
     }
-  }
-
-  template< typename K, typename T, typename Cmp >
-  void AVLTree< K, T, Cmp >::swap(this_t & rhs) noexcept
-  {
-    std::swap(root_, rhs.root_);
-    std::swap(size_, rhs.size_);
   }
 
   template< typename K, typename T, typename Cmp >
