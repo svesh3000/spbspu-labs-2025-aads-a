@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <iterator>
 #include <cassert>
+#include "stack.hpp"
+#include "queue.hpp"
 
 namespace petrov
 {
