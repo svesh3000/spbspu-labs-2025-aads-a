@@ -41,26 +41,28 @@ bool isOverflow(long long a, long long b)
 
 bool isAdditionOverflow(long long a, long long b)
 {
-  if (b >= 0)
+  if (b > 0)
   {
     return a > std::numeric_limits< long long >::max() - b;
   }
-  else
+  else if (b < 0)
   {
     return a < std::numeric_limits< long long >::min() - b;
   }
+  return false;
 }
 
 bool isSubtractionOverflow(long long a, long long b)
 {
-  if (b >= 0)
+  if (b > 0)
   {
     return a < std::numeric_limits< long long >::min() + b;
   }
-  else
+  else if (b < 0)
   {
     return a > std::numeric_limits< long long >::max() + b;
   }
+  return false;
 }
 
 bool isOperator(char c)
@@ -187,7 +189,7 @@ long long evaluatePostfix(averenkov::Queue< std::string >& postfixQueue)
       {
         negative = true;
       }
-      num = std::stoi(token);
+      num = std::stoll(token);
       evalStack.push(negative ? -num : num);
     }
     else if (isOperator(token[0]))

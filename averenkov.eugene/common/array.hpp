@@ -57,7 +57,7 @@ namespace averenkov
     capacity_(1),
     first_(0)
   {
-    this = copy(rhs, rhs.capacity_);
+    *this = copy(rhs, rhs.capacity_);
   }
 
 
