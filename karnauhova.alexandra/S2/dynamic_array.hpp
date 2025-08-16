@@ -34,6 +34,7 @@ namespace karnauhova
     void pop_back();
 
     void swap(DynamicArray& other) noexcept;
+    void clear();
   private:
     size_t size_;
     size_t capacity_;
@@ -233,6 +234,12 @@ namespace karnauhova
     delete[] data_;
     data_ = new_data;
     capacity_ = new_capac;
+  }
+
+  template < class T >
+  void DynamicArray< T >::clear()
+  {
+    size_ = 0;
   }
 }
 

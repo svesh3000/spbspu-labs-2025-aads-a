@@ -55,7 +55,8 @@ namespace karnauhova
     }
     if (++head_data_ >= array_.size())
     {
-      head_data_ = array_.size();
+      head_data_ = 0;
+      array_.clear();
     }
   }
 
