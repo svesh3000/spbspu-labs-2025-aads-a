@@ -10,7 +10,11 @@ karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
   {
     if (end != start)
     {
-      inf.push(str.substr(start, end - start));
+      std::string token = str.substr(start, end - start);
+      if (!token.empty())
+      {
+        inf.push(std::move(token));
+      }
     }
     start = end + 1;
     end = str.find(separator, start);
@@ -21,8 +25,6 @@ karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
   }
   return inf;
 }
-
-
 
 karnauhova::Queue< std::string > karnauhova::toPost(Queue< std::string > inf)
 {
