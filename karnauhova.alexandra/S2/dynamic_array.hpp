@@ -217,10 +217,9 @@ namespace karnauhova
   template < class T >
   void DynamicArray< T >::resize(size_t new_capac)
   {
-    T* new_data = nullptr;
+    T* new_data = new T[new_capac];
     try
     {
-      new_data = new T[new_capac];
       for (size_t i = 0; i < size_; i++)
       {
         new_data[i] = data_[i];
