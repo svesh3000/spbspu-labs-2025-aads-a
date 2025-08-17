@@ -62,13 +62,13 @@ namespace karnauhova
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
     size_(other.size_),
     capacity_(other.capacity_),
-    data_(new T*[capacity_])
+    data_(new T*[other.capacity_])
   {
     for (size_t i = 0; i < size_; ++i)
     {
       try
       {
-        data_[i] = other.data_[i];
+        data_[i] = new T(*other.data_[i]);
       }
       catch (const std::bad_alloc&)
       {
@@ -253,6 +253,10 @@ namespace karnauhova
   template < class T >
   void DynamicArray< T >::clear()
   {
+    while (!empty())
+    {
+      pop_back();
+    }
     size_ = 0;
   }
 }
