@@ -1,8 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include "queue.hpp"
-#include "stack.hpp"
-#include "expression-part.hpp"
 #include "expression-utils.hpp"
 
 int main(int argc, char* argv[])
@@ -33,14 +30,20 @@ int main(int argc, char* argv[])
     Queue< Queue< ExpressionPart > > exprs;
     getExpressions(in, exprs);
 
-    Queue< Queue< ExpressionPart > > postfixes(getPostfixForms(exprs));
+    Queue< Queue< ExpressionPart > > postfixes;
+    getPostfixForms(exprs, postfixes);
 
-    results = evalPostfixExpressions(postfixes);
+    evalPostfixExpressions(postfixes, results);
+  }
+  catch (const std::bad_alloc&)
+  {
+    std::cerr << "ERROR: Out of memory!\n";
+    return 2;
   }
   catch (const std::exception& e)
   {
     std::cerr << "ERROR: " << e.what() << '\n';
-    return 1;
+    return 2;
   }
 
   if (!results.empty())

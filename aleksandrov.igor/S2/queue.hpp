@@ -1,10 +1,11 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include <utility>
 #include <cstddef>
-#include <stdexcept>
 #include <cassert>
+#include <limits>
+#include <utility>
+#include <stdexcept>
 
 namespace aleksandrov
 {
@@ -27,38 +28,44 @@ namespace aleksandrov
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+    size_t maxSize() const noexcept;
     size_t capacity() const noexcept;
+    void shrinkToFit();
 
     void clear() noexcept;
     void push(const T&);
     void push(T&&);
     template< class... Args >
     void emplace(Args&&...);
-    void pop();
+    void pop() noexcept;
     void swap(Queue&) noexcept;
+
+    bool operator==(const Queue&) const;
+    bool operator!=(const Queue&) const;
 
   private:
     T* data_;
-    T* first_;
+    size_t first_;
     size_t size_;
     size_t capacity_;
 
-    T* copyData(const Queue&);
+    T* copyData(const Queue& other);
     void resize();
+    size_t getBiggerCapacity(size_t capacity) const noexcept;
   };
 
   template< class T >
   Queue< T >::Queue():
-    data_(static_cast< T* >(operator new(minQueueCapacity * sizeof(T)))),
-    first_(data_),
+    data_(nullptr),
+    first_(0),
     size_(0),
-    capacity_(minQueueCapacity)
+    capacity_(0)
   {}
 
   template< class T >
   Queue< T >::Queue(const Queue& rhs):
     data_(copyData(rhs)),
-    first_(rhs.empty() ? nullptr : data_ + std::distance(rhs.data_, rhs.first_)),
+    first_(rhs.first_),
     size_(rhs.size_),
     capacity_(rhs.capacity_)
   {}
@@ -66,7 +73,7 @@ namespace aleksandrov
   template< class T >
   Queue< T >::Queue(Queue&& rhs) noexcept:
     data_(std::exchange(rhs.data_, nullptr)),
-    first_(std::exchange(rhs.first_, nullptr)),
+    first_(std::exchange(rhs.first_, 0)),
     size_(std::exchange(rhs.size_, 0)),
     capacity_(std::exchange(rhs.capacity_, 0))
   {}
@@ -81,31 +88,31 @@ namespace aleksandrov
   template< class T >
   Queue< T >& Queue< T >::operator=(const Queue& rhs)
   {
-    Queue newQueue(rhs);
-    swap(newQueue);
+    Queue copy(rhs);
+    swap(copy);
     return *this;
   }
 
   template< class T >
   Queue< T >& Queue< T >::operator=(Queue&& rhs) noexcept
   {
-    Queue newQueue(std::move(rhs));
-    swap(newQueue);
+    Queue copy(std::move(rhs));
+    swap(copy);
     return *this;
   }
 
   template< class T >
   T& Queue< T >::front()
   {
-    assert(!empty());
-    return *first_;
+    assert(!empty() && "Cannot access to element in empty queue!");
+    return const_cast< T& >(static_cast< const Queue& >(*this).front());
   }
 
   template< class T >
   const T& Queue< T >::front() const
   {
-    assert(!empty());
-    return *first_;
+    assert(!empty() && "Cannot access to element in empty queue!");
+    return data_[first_];
   }
 
   template< class T >
@@ -121,9 +128,52 @@ namespace aleksandrov
   }
 
   template< class T >
+  size_t Queue< T >::maxSize() const noexcept
+  {
+    return std::numeric_limits< size_t >::max();
+  }
+
+  template< class T >
   size_t Queue< T >::capacity() const noexcept
   {
     return capacity_;
+  }
+
+  template< class T >
+  void Queue< T >::shrinkToFit()
+  {
+    if (capacity_ == size_)
+    {
+      return;
+    }
+    else if (capacity_ > size_)
+    {
+      T* newData = static_cast< T* >(operator new(size_ * sizeof(T)));
+      size_t i = first_;
+      try
+      {
+        for (; i < size_ + first_; i = (i + 1) % capacity_)
+        {
+          new (newData + i) T(std::move_if_noexcept(data_[i]));
+        }
+      }
+      catch (...)
+      {
+        for (size_t j = first_; j < i + first_; j = (j + 1) % i)
+        {
+          newData[j].~T();
+        }
+        operator delete(newData);
+        throw;
+      }
+      for (size_t i = first_; i < size_ + first_; i = (i + 1) % capacity_)
+      {
+        data_[i].~T();
+      }
+      operator delete(data_);
+      data_ = newData;
+      capacity_ = size_;
+    }
   }
 
   template< class T >
@@ -136,15 +186,15 @@ namespace aleksandrov
   }
 
   template< class T >
-  void Queue< T >::push(const T& el)
+  void Queue< T >::push(const T& value)
   {
-    emplace(el);
+    emplace(value);
   }
 
   template< class T >
-  void Queue< T >::push(T&& el)
+  void Queue< T >::push(T&& value)
   {
-    emplace(std::move(el));
+    emplace(std::move(value));
   }
 
   template< class T >
@@ -155,85 +205,104 @@ namespace aleksandrov
     {
       resize();
     }
-    size_t sizeFromFirst = data_ + capacity_ - first_;
-    if (size_ < sizeFromFirst)
-    {
-      new (first_ + size_) T(std::forward< Args >(args)...);
-    }
-    else
-    {
-      new (first_ - (capacity_ - size_)) T(std::forward< Args >(args)...);
-    }
+    size_t shift = (first_ + size_) % capacity_;
+    new (data_ + shift) T(std::forward< Args >(args)...);
     ++size_;
   }
 
   template< class T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
-    assert(!empty());
-    (first_ ? first_++ : first_ = data_)->~T();
-    if (empty())
-    {
-      first_ = data_;
-    }
+    assert(!empty() && "Cannot delete element from empty queue!");
+    data_[first_].~T();
+    first_ = size_ == 1 ? 0 : (first_ + 1) % capacity_;
     --size_;
   }
 
   template< class T >
-  void Queue< T >::swap(Queue& rhs) noexcept
+  void Queue< T >::swap(Queue& other) noexcept
   {
-    std::swap(data_, rhs.data_);
-    std::swap(first_, rhs.first_);
-    std::swap(size_, rhs.size_);
-    std::swap(capacity_, rhs.capacity_);
+    std::swap(data_, other.data_);
+    std::swap(first_, other.first_);
+    std::swap(size_, other.size_);
+    std::swap(capacity_, other.capacity_);
   }
 
   template< class T >
-  T* Queue< T >::copyData(const Queue& rhs)
+  bool Queue< T >::operator==(const Queue& rhs) const
   {
-    T* copy = static_cast< T* >(operator new(rhs.capacity_ * sizeof(T)));
-    size_t i = 0;
+    if (size_ != rhs.size_)
+    {
+      return false;
+    }
+    for (size_t i = first_; i < first_ + size_; i = (i + 1) % capacity_)
+    {
+      if (data_[i] != rhs.data_[i])
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template< class T >
+  bool Queue< T >::operator!=(const Queue& rhs) const
+  {
+    return !operator==(rhs);
+  }
+
+  template< class T >
+  T* Queue< T >::copyData(const Queue& other)
+  {
+    if (!other.capacity_)
+    {
+      return nullptr;
+    }
+    T* newData = static_cast< T* >(operator new(other.capacity_ * sizeof(T)));
+    size_t i = other.first_;
     try
     {
-      for (; i < rhs.size_; ++i)
+      for (; i < other.size_ + other.first_; i = (i + 1) % other.capacity_)
       {
-        new (copy + i) T(rhs.data_[i]);
+        new (newData + i) T(other.data_[i]);
       }
     }
-    catch (const std::bad_alloc&)
+    catch (...)
     {
-      for (size_t j = 0; j < i; ++j)
+      for (size_t j = other.first_; j < i + other.first_; j = (j + 1) % i)
       {
-        (copy + j)->~T();
+        newData[j].~T();
       }
-      operator delete(copy);
+      operator delete(newData);
       throw;
     }
-    return copy;
+    return newData;
   }
 
   template< class T >
   void Queue< T >::resize()
   {
-    size_t newCapacity = capacity_ * 2;
+    if (!capacity_)
+    {
+      data_ = static_cast< T* >(operator new(minQueueCapacity * sizeof(T)));
+      capacity_ = minQueueCapacity;
+      return;
+    }
+    size_t newCapacity = getBiggerCapacity(capacity_);
+    if (newCapacity == capacity_)
+    {
+      throw std::overflow_error("Reached maximum possible queue capacity!");
+    }
     T* newData = static_cast< T* >(operator new(newCapacity * sizeof(T)));
-    size_t shift = std::distance(data_, first_);
-    size_t i = shift;
+    size_t i = 0;
     try
     {
-      for (; i < size_ - shift; ++i)
+      for (size_t j = first_; i < size_; ++i, j = (j + 1) % capacity_)
       {
-        new (newData + i) T(std::move_if_noexcept(data_[i]));
-      }
-      if (shift)
-      {
-        for (size_t j = 0; j < shift; ++j, ++i)
-        {
-          new (newData + i) T(std::move_if_noexcept(data_[j]));
-        }
+        new (newData + i) T(std::move_if_noexcept(data_[j]));
       }
     }
-    catch (const std::bad_alloc&)
+    catch (...)
     {
       for (size_t j = 0; j < i; ++j)
       {
@@ -242,11 +311,29 @@ namespace aleksandrov
       operator delete(newData);
       throw;
     }
-    clear();
+    i = 0;
+    for (size_t j = first_; i < size_; ++i, j = (j + 1) % capacity_)
+    {
+      data_[j].~T();
+    }
     operator delete(data_);
     data_ = newData;
-    size_ = capacity_;
+    first_ = 0;
     capacity_ = newCapacity;
+  }
+
+  template< class T >
+  size_t Queue< T >::getBiggerCapacity(size_t capacity) const noexcept
+  {
+    if (!capacity)
+    {
+      return minQueueCapacity;
+    }
+    if (capacity > maxSize() / 2)
+    {
+      return capacity;
+    }
+    return capacity * 2;
   }
 }
 

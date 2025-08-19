@@ -13,15 +13,14 @@ namespace aleksandrov
 
   std::istream& operator>>(std::istream&, ExpressionPart&);
 
-  void getExpression(std::istream&, Expression&);
-  void getExpressions(std::istream&, Expressions&);
+  void getExpressions(std::istream& in, Expressions& dest);
 
   Expression getPostfixForm(Expression&);
-  Expressions getPostfixForms(Expressions&);
+  void getPostfixForms(Expressions& src, Expressions& dest);
 
   OperandType performOperation(OperationType, OperandType, OperandType);
   OperandType evalPostfixExpression(Expression&);
-  Stack< OperandType > evalPostfixExpressions(Expressions&);
+  void evalPostfixExpressions(Expressions& src, Stack< OperandType >& dest);
 }
 
 #endif

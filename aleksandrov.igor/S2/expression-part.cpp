@@ -17,41 +17,33 @@ namespace
     {
       return TokenType::Bracket;
     }
-    throw std::logic_error("Unsupported expression part character!");
+    throw std::logic_error("Incorrect expression part!");
   }
 
-  OperationType getOperationType(char c)
+  OperationType getOperationType(char c) noexcept
   {
-    if (c == '+')
+    switch (c)
     {
+    case '+':
       return OperationType::Addition;
-    }
-    else if (c == '-')
-    {
+    case '-':
       return OperationType::Subtraction;
-    }
-    else if (c == '*')
-    {
+    case '*':
       return OperationType::Multiplication;
-    }
-    else if (c == '/')
-    {
+    case '/':
       return OperationType::Division;
-    }
-    else
-    {
+    default:
       return OperationType::Modulo;
     }
   }
 
-  BracketType getBracketType(char c)
+  BracketType getBracketType(char c) noexcept
   {
-    if (c == '(')
+    switch (c)
     {
+    case '(':
       return BracketType::Opening;
-    }
-    else
-    {
+    default:
       return BracketType::Closing;
     }
   }

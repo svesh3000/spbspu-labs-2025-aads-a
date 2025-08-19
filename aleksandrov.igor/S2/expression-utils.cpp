@@ -8,25 +8,25 @@ namespace
 {
   using namespace aleksandrov;
 
-  const long long int max = std::numeric_limits< long long int >::max();
-  const long long int min = std::numeric_limits< long long int >::min();
+  constexpr long long int max = std::numeric_limits< long long int >::max();
+  constexpr long long int min = std::numeric_limits< long long int >::min();
 
   bool isLessImportant(const ExpressionPart& a, const ExpressionPart& b)
   {
     using Op = OperationType;
-    Op first = a.getOperation();
-    Op second = b.getOperation();
+    Op op1 = a.getOperation();
+    Op op2 = b.getOperation();
 
-    if (first == Op::Addition || first == Op::Subtraction)
+    if (op1 == Op::Addition || op1 == Op::Subtraction)
     {
-      return second == Op::Multiplication || second == Op::Division || second == Op::Modulo;
+      return op2 == Op::Multiplication || op2 == Op::Division || op2 == Op::Modulo;
     }
     return false;
   }
 
   short int sign(OperandType val)
   {
-    return (val > 0) ? 1 : ((val < 0) ? -1 : 0);
+    return val > 0 ? 1 : (val < 0 ? -1 : 0);
   }
 
   bool sameSign(OperandType a, OperandType b)
@@ -91,8 +91,8 @@ namespace
 
 std::istream& aleksandrov::operator>>(std::istream& in, ExpressionPart& token)
 {
-  std::istream::sentry s(in);
-  if (!s)
+  std::istream::sentry sentry(in);
+  if (!sentry)
   {
     return in;
   }
@@ -121,15 +121,6 @@ std::istream& aleksandrov::operator>>(std::istream& in, ExpressionPart& token)
   return in;
 }
 
-void aleksandrov::getExpression(std::istream& in, Expression& expr)
-{
-  ExpressionPart token('+');
-  while (in >> token)
-  {
-    expr.push(token);
-  }
-}
-
 void aleksandrov::getExpressions(std::istream& in, Expressions& exprs)
 {
   std::string line;
@@ -139,7 +130,11 @@ void aleksandrov::getExpressions(std::istream& in, Expressions& exprs)
     {
       std::istringstream iss(line);
       Expression expr;
-      getExpression(iss, expr);
+      ExpressionPart token('+');
+      while (iss >> token)
+      {
+        expr.push(token);
+      }
       exprs.push(expr);
     }
   }
@@ -203,60 +198,37 @@ aleksandrov::Expression aleksandrov::getPostfixForm(Expression& expr)
   return postfix;
 }
 
-Expressions aleksandrov::getPostfixForms(Expressions& src)
+void aleksandrov::getPostfixForms(Expressions& src, Expressions& dest)
 {
-  Expressions postfixes;
   while (!src.empty())
   {
-    Expression expr(src.front());
+    dest.push(getPostfixForm(src.front()));
     src.pop();
-    Expression postfix(getPostfixForm(expr));
-    postfixes.push(postfix);
   }
-  return postfixes;
 }
 
-aleksandrov::OperandType aleksandrov::performOperation(OperationType op, OperandType a, OperandType b)
+auto aleksandrov::performOperation(OperationType op, OperandType a, OperandType b) -> OperandType
 {
-  using Op = OperationType;
-  if (op == Op::Addition)
+  switch (op)
   {
+  case OperationType::Addition:
     return sum(a, b);
-  }
-  else if (op == Op::Subtraction)
-  {
+  case OperationType::Subtraction:
     return sum(a, -b);
-  }
-  else if (op == Op::Multiplication)
-  {
+  case OperationType::Multiplication:
     return multiply(a, b);
-  }
-  else if (op == Op::Division)
-  {
+  case OperationType::Division:
     return divide(a, b);
-  }
-  else if (op == Op::Modulo)
-  {
+  case OperationType::Modulo:
     return modulo(a, b);
-  }
-  else
-  {
+  default:
     throw std::logic_error("Unsupported operation!");
   }
 }
 
-aleksandrov::OperandType aleksandrov::evalPostfixExpression(Expression& expr)
+auto aleksandrov::evalPostfixExpression(Expression& expr) -> OperandType
 {
   Stack< OperandType > stack;
-  if (expr.size() == 1)
-  {
-    ExpressionPart token(expr.front());
-    expr.pop();
-    if (token.isOperand())
-    {
-      return token.getOperand();
-    }
-  }
   while (!expr.empty())
   {
     ExpressionPart token(expr.front());
@@ -275,7 +247,6 @@ aleksandrov::OperandType aleksandrov::evalPostfixExpression(Expression& expr)
       stack.pop();
       OperandType first = stack.top();
       stack.pop();
-
       OperationType op = token.getOperation();
       OperandType result = performOperation(op, first, second);
       stack.push(result);
@@ -288,16 +259,12 @@ aleksandrov::OperandType aleksandrov::evalPostfixExpression(Expression& expr)
   return stack.top();
 }
 
-Stack< OperandType > aleksandrov::evalPostfixExpressions(Expressions& src)
+void aleksandrov::evalPostfixExpressions(Expressions& src, Stack< OperandType >& dest)
 {
-  Stack< OperandType > results;
   while (!src.empty())
   {
-    Expression postfix(src.front());
+    dest.push(evalPostfixExpression(src.front()));
     src.pop();
-    OperandType result = evalPostfixExpression(postfix);
-    results.push(result);
   }
-  return results;
 }
 
