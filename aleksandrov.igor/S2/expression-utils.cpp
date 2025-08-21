@@ -63,7 +63,7 @@ void aleksandrov::getExpressions(Expressions& exprs, std::istream& in)
     Expression expr;
     while (in.peek() != '\n' && in.peek() != EOF)
     {
-      ExpressionPart token('+'); 
+      ExpressionPart token('+');
       if (!(in >> token))
       {
         throw std::logic_error("Incorrect expression part!");
