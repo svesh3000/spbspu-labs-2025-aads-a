@@ -10,6 +10,7 @@ namespace
     int x;
     int y;
 
+    Point() = delete;
     Point(int x, int y):
       x(x),
       y(y)
@@ -33,7 +34,7 @@ namespace
 
 BOOST_AUTO_TEST_CASE(queue_default_construction)
 {
-  using aleksandrov::minQueueCapacity;
+  using aleksandrov::minDequeCapacity;
 
   Queue< Point > q;
   BOOST_TEST(q.empty());
@@ -232,26 +233,26 @@ BOOST_AUTO_TEST_CASE(queue_emplace)
 
 BOOST_AUTO_TEST_CASE(queue_capacity_full)
 {
-  using aleksandrov::minQueueCapacity;
+  using aleksandrov::minDequeCapacity;
 
   Queue< int > q;
-  for (size_t i = 0; i < minQueueCapacity; ++i)
+  for (size_t i = 0; i < minDequeCapacity; ++i)
   {
     q.push(0);
   }
   BOOST_TEST(q.size() == q.capacity());
 
   q.push(1);
-  BOOST_TEST(q.size() == minQueueCapacity + 1);
+  BOOST_TEST(q.size() == minDequeCapacity + 1);
   BOOST_TEST(q.capacity() >= q.size());
 
   q.pop();
   BOOST_TEST(q.size() != q.capacity());
-  BOOST_TEST(q.capacity() > minQueueCapacity);
+  BOOST_TEST(q.capacity() > minDequeCapacity);
 
   q.clear();
   BOOST_TEST(q.empty());
-  BOOST_TEST(q.capacity() > minQueueCapacity);
+  BOOST_TEST(q.capacity() > minDequeCapacity);
 
   Queue< char > other;
   BOOST_TEST(other.capacity() < q.capacity());

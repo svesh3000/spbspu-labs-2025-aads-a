@@ -10,6 +10,7 @@ namespace
     char p;
     double q;
 
+    Bullet() = delete;
     Bullet(char p, double q):
       p(p),
       q(q)
@@ -33,7 +34,7 @@ namespace
 
 BOOST_AUTO_TEST_CASE(stack_default_construction)
 {
-  using aleksandrov::minStackCapacity;
+  using aleksandrov::minDequeCapacity;
 
   Stack< Bullet > rifle;
   BOOST_TEST(rifle.empty());
@@ -231,26 +232,26 @@ BOOST_AUTO_TEST_CASE(stack_emplace)
 
 BOOST_AUTO_TEST_CASE(stack_capacity_full)
 {
-  using aleksandrov::minStackCapacity;
+  using aleksandrov::minDequeCapacity;
 
   Stack< int > revolver;
-  for (size_t i = 0; i < minStackCapacity; ++i)
+  for (size_t i = 0; i < minDequeCapacity; ++i)
   {
     revolver.push(0);
   }
   BOOST_TEST(revolver.size() == revolver.capacity());
 
   revolver.push(1);
-  BOOST_TEST(revolver.size() == minStackCapacity + 1);
+  BOOST_TEST(revolver.size() == minDequeCapacity + 1);
   BOOST_TEST(revolver.capacity() >= revolver.size());
 
   revolver.pop();
   BOOST_TEST(revolver.size() != revolver.capacity());
-  BOOST_TEST(revolver.capacity() > minStackCapacity);
+  BOOST_TEST(revolver.capacity() > minDequeCapacity);
 
   revolver.clear();
   BOOST_TEST(revolver.empty());
-  BOOST_TEST(revolver.capacity() > minStackCapacity);
+  BOOST_TEST(revolver.capacity() > minDequeCapacity);
 
   Stack< char > other;
   BOOST_TEST(other.capacity() < revolver.capacity());

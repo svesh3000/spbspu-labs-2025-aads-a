@@ -5,9 +5,11 @@
 
 namespace
 {
-  using namespace aleksandrov;
+  using aleksandrov::BracketType;
+  using aleksandrov::OperationType;
+  using aleksandrov::TokenType;
 
-  TokenType getType(char c)
+  TokenType getExpressionPartType(char c)
   {
     if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%')
     {
@@ -33,7 +35,7 @@ namespace
     case '/':
       return OperationType::Division;
     default:
-      return OperationType::Modulo;
+      return OperationType::Modulus;
     }
   }
 
@@ -50,7 +52,7 @@ namespace
 }
 
 aleksandrov::ExpressionPart::ExpressionPart(char c):
-  type_(::getType(c))
+  type_(::getExpressionPartType(c))
 {
   if (type_ == TokenType::Operation)
   {
