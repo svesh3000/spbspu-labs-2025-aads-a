@@ -1,8 +1,9 @@
 #include "input.hpp"
+#include <sstream>
 
 karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
 {
-  Queue<std::string> inf;
+  Queue< std::string > inf;
   const char separator = ' ';
   size_t start = 0;
   size_t end = str.find(separator);
@@ -10,11 +11,7 @@ karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
   {
     if (end != start)
     {
-      std::string token = str.substr(start, end - start);
-      if (!token.empty())
-      {
-        inf.push(std::move(token));
-      }
+      inf.push(str.substr(start, end - start));
     }
     start = end + 1;
     end = str.find(separator, start);

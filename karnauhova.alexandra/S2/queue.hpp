@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <iostream>
 #include "dynamic_array.hpp"
 
 namespace karnauhova
@@ -53,7 +54,8 @@ namespace karnauhova
     {
       throw std::logic_error("empty queue for pop");
     }
-    if (++head_data_ >= array_.size())
+    ++head_data_;
+    if (head_data_ >= array_.size())
     {
       head_data_ = 0;
       array_.clear();

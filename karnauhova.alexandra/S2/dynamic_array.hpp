@@ -38,9 +38,9 @@ namespace karnauhova
   private:
     size_t size_;
     size_t capacity_;
-    T** data_;
+    T* data_;
 
-    void resize(size_t new_capac);
+    void resize();
   };
 
   template < class T >
@@ -53,26 +53,23 @@ namespace karnauhova
   template < class T >
   DynamicArray< T >::~DynamicArray()
   {
-    clear();
     delete[] data_;
-    capacity_ = 0;
   }
 
   template < class T >
   DynamicArray< T >::DynamicArray(const DynamicArray& other):
     size_(other.size_),
     capacity_(other.capacity_),
-    data_(new T*[other.capacity_])
+    data_(new T[other.capacity_])
   {
     for (size_t i = 0; i < size_; ++i)
     {
       try
       {
-        data_[i] = new T(*other.data_[i]);
+        data_[i] = other.data_[i];
       }
       catch (const std::bad_alloc&)
       {
-        clear();
         delete[] data_;
         throw;
       }
@@ -141,7 +138,7 @@ namespace karnauhova
     {
       throw std::out_of_range("Is empty");
     }
-    return *data_[0];
+    return data_[0];
   }
 
   template < class T >
@@ -151,7 +148,7 @@ namespace karnauhova
     {
       throw std::out_of_range("Is empty");
     }
-    return *data_[size_ - 1];
+    return data_[size_ - 1];
   }
 
   template < class T >
@@ -161,7 +158,7 @@ namespace karnauhova
     {
       throw std::out_of_range("Is empty");
     }
-    return *data_[size_ - 1];
+    return data_[size_ - 1];
   }
 
   template < class T >
@@ -171,7 +168,7 @@ namespace karnauhova
     {
       throw std::out_of_range("Index out of range");
     }
-    return *data_[index];
+    return data_[index];
   }
 
   template < class T >
@@ -181,7 +178,7 @@ namespace karnauhova
     {
       throw std::out_of_range("Index out of range");
     }
-    return *data_[index];
+    return data_[index];
   }
 
   template < class T >
@@ -189,9 +186,10 @@ namespace karnauhova
   {
     if (size_ >= capacity_)
     {
-      resize(5);
+      resize();
     }
-    data_[size_++] = new T(data);
+    data_[size_] = data;
+    size_++;
   }
 
   template < class T >
@@ -199,9 +197,10 @@ namespace karnauhova
   {
     if (size_ >= capacity_)
     {
-      resize(5);
+      resize();
     }
-    data_[size_++] = new T(std::move(data));
+    data_[size_] = std::move(data);
+    size_++;
   }
 
   template < class T >
@@ -211,8 +210,6 @@ namespace karnauhova
     {
       throw std::out_of_range("Is empty");
     }
-    delete data_[size_ - 1];
-    data_[size_ - 1] = nullptr;
     --size_;
   }
 
@@ -225,9 +222,9 @@ namespace karnauhova
   }
 
   template < class T >
-  void DynamicArray< T >::resize(size_t new_capac)
+  void DynamicArray< T >::resize()
   {
-    T** new_data = new T*[new_capac];
+    T* new_data = new T[5 + capacity_];
     try
     {
       for (size_t i = 0; i < size_; i++)
@@ -237,26 +234,17 @@ namespace karnauhova
     }
     catch (const std::bad_alloc& e)
     {
-      for (size_t i = 0; i < size_; i++)
-      {
-        delete new_data[i];
-      }
       delete[] new_data;
       throw;
     }
-    clear();
     delete[] data_;
     data_ = new_data;
-    capacity_ = new_capac;
+    capacity_ += 5;
   }
 
   template < class T >
   void DynamicArray< T >::clear()
   {
-    while (!empty())
-    {
-      pop_back();
-    }
     size_ = 0;
   }
 }
