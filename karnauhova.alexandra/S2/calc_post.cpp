@@ -1,5 +1,6 @@
 #include "calc_post.hpp"
 #include <limits>
+#include "input.hpp"
 
 namespace
 {
@@ -86,7 +87,7 @@ long long int karnauhova::procPost(Queue< std::string > post)
       throw std::logic_error("Incorrect");
     }
     element = post.front();
-    if (!(element == "+" || element == "/" || element == "-" || element == "*" || element == "%"))
+    if (!(isOperator(element)))
     {
       second = std::stoll(element);
       post.pop();

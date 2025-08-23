@@ -1,5 +1,9 @@
 #include "input.hpp"
-#include <sstream>
+
+bool karnauhova::isOperator(const std::string& element)
+{
+  return element == "+" || element == "/" || element == "-" || element == "*" || element == "%";
+}
 
 karnauhova::Queue< std::string > karnauhova::splitStr(const std::string& str)
 {
@@ -30,12 +34,12 @@ karnauhova::Queue< std::string > karnauhova::toPost(Queue< std::string > inf)
   while (!inf.empty())
   {
     std::string element = inf.front();
-    if (element == "+" || element == "/" || element == "-" || element == "*" || element == "%")
+    if (isOperator(element))
     {
       if (!symbols.empty())
       {
         std::string last = symbols.top();
-        if (last == "+" || last == "/" || last == "-" || last == "*" || last == "%")
+        if (isOperator(last))
         {
           post.push(last);
           symbols.pop();
@@ -58,7 +62,7 @@ karnauhova::Queue< std::string > karnauhova::toPost(Queue< std::string > inf)
         throw std::logic_error("Incorrect 1");
       }
       std::string last = symbols.top();
-      if (last != "(" && last != "+" && last != "/" && last != "-" && last != "*" && last != "%")
+      if (last != "(" && !isOperator(last))
       {
         throw std::logic_error("Incorrect 2");
       }
