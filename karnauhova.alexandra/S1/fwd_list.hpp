@@ -212,7 +212,7 @@ namespace karnauhova
 
   template< typename T >
   FwdList< T >::FwdList(const FwdList< T >& other):
-    fake_(reinterpret_cast<NodeList<T>*>(new char[sizeof(NodeList<T>)])),
+    fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
     size_(0)
   {
     fake_->next = fake_;
@@ -322,13 +322,13 @@ namespace karnauhova
   template< typename T >
   void FwdList< T >::assign(size_t size, const T& value )
   {
-    clear();
+    FwdList< T > temp;
     for (size_t i = 0; i < size; i++)
     {
-      push_front(value);
+      temp.push_front(value);
     }
-    reverse();
-    size_ = size;
+    temp.reverse();
+    swap(temp);
   }
 
   template< typename T >
@@ -337,7 +337,8 @@ namespace karnauhova
   {
     FwdList< T > temp;
     auto it_temp = temp.begin();
-    for (auto it = first; it != last; ++it) {
+    for (auto it = first; it != last; ++it)
+    {
       temp.insert(it_temp, *it);
       ++it_temp;
     }

@@ -45,7 +45,7 @@ void karnauhova::output_lists(karnauhova::FwdList< std::pair< std::string, UllLi
   for (size_t i = 0; i < max_length; ++i)
   {
     bool first = true;
-    for (const auto& it : l)
+    for (const auto& it: l)
     {
       output_element_lists(it.second, (i + 1), out, first);
     }
@@ -56,7 +56,7 @@ void karnauhova::output_lists(karnauhova::FwdList< std::pair< std::string, UllLi
 size_t karnauhova::max_lenght(karnauhova::FwdList< std::pair< std::string, UllList > > l)
 {
   size_t max = 0;
-  for (const auto& it : l)
+  for (const auto& it: l)
   {
     if ((it.second.size()) > max)
     {

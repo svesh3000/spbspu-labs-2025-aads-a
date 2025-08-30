@@ -5,14 +5,14 @@
 #include "nodelist.hpp"
 namespace karnauhova
 {
-  template <typename T>
+  template < typename T >
   class FwdList;
 
-  template <typename T>
+  template < typename T >
   struct ListIterator;
 
   template< typename T >
-  struct ConstListIterator : public std::iterator< std::forward_iterator_tag, T >
+  struct ConstListIterator: public std::iterator< std::forward_iterator_tag, T >
   {
   public:
     using this_t = ConstListIterator< T >;

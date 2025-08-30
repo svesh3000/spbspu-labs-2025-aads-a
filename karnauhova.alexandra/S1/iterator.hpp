@@ -5,10 +5,10 @@
 #include "nodelist.hpp"
 namespace karnauhova
 {
-  template <typename T>
+  template < typename T >
   class FwdList;
 
-  template <typename T>
+  template < typename T >
   struct ConstListIterator;
 
   template< typename T >
@@ -31,7 +31,6 @@ namespace karnauhova
     const T* operator->() const;
     bool operator!=(const this_t&) const;
     bool operator==(const this_t&) const;
-    T getData();
   private:
     NodeList< T >* node;
     friend class FwdList< T >;
@@ -97,12 +96,6 @@ namespace karnauhova
   const T* ListIterator< T >::operator->() const
   {
     return std::addressof(node->data);
-  }
-
-  template< typename T >
-  T ListIterator< T >::getData()
-  {
-    return node->data;
   }
 }
 #endif

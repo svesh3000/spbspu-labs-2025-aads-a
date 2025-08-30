@@ -32,7 +32,7 @@ void karnauhova::count_lists(karnauhova::FwdList< std::pair< std::string, UllLis
   FwdList< unsigned long long > sums;
   for (size_t i = 0; i < max_length; ++i)
   {
-    for (const auto& it : l)
+    for (const auto& it: l)
     {
       unsigned long long element = element_lists(it.second, (i + 1));
       if (std::numeric_limits< unsigned long long >::max() - element < sum)
@@ -51,7 +51,7 @@ void karnauhova::count_lists(karnauhova::FwdList< std::pair< std::string, UllLis
   for (size_t i = 1; i < max_length; i++)
   {
     out << " ";
-    out << it.getData();
+    out << *it;
     it++;
   }
   out << "\n";
