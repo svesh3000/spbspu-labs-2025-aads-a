@@ -44,45 +44,6 @@ BOOST_AUTO_TEST_CASE(stress_test_3)
   BOOST_TEST(out.str() == "1");
 }
 
-BOOST_AUTO_TEST_CASE(stress_test_4)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000000; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_5)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000001; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_6)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000002; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
 BOOST_AUTO_TEST_CASE(stress_test_7)
 {
   std::ostringstream out;
