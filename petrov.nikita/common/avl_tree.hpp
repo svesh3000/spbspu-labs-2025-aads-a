@@ -669,11 +669,13 @@ namespace petrov
     {
       root_ = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
       size_++;
+      return it_t(root_);
     }
-    else
+    std::pair< it_t, bool > ret_val;
+    node_t * added = nullptr;
+    try
     {
-      std::pair< it_t, bool > ret_val;
-      node_t * added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
       auto begin = cbegin();
       if (hint == begin)
       {
@@ -716,9 +718,13 @@ namespace petrov
           }
         }
       }
-      return ret_val.first;
     }
-    return it_t(root_);
+    catch (...)
+    {
+      delete added;
+      throw;
+    }
+    return ret_val.first;
   }
 
   template< typename K, typename T, typename Cmp >
@@ -1320,7 +1326,7 @@ namespace petrov
       balance_node_ptr = node->parent;
       temp = nullptr;
     }
-    if (node->parent && Cmp{}(node->data.first, node->parent->data.first))
+    if (node->parent && node->parent->left == node)
     {
       node->parent->left = temp;
     }
@@ -1345,10 +1351,12 @@ namespace petrov
     {
       root_ = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
       size_++;
+      return std::make_pair< it_t, bool >(it_t(root_), true);
     }
-    else
+    node_t * added = nullptr;
+    try
     {
-      node_t * added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
+      added = new node_t{ nullptr, nullptr, nullptr, std::forward< Args >(args)... };
       auto temp = subroot;
       while (temp->left || temp->right)
       {
@@ -1386,9 +1394,13 @@ namespace petrov
       added->parent = temp;
       size_++;
       upwardBalancing(temp);
-      return std::make_pair< it_t, bool >(it_t(added), true);
     }
-    return std::make_pair< it_t, bool >(it_t(root_), true);
+    catch (...)
+    {
+      delete added;
+      throw;
+    }
+    return std::make_pair< it_t, bool >(it_t(added), true);
   }
 }
 

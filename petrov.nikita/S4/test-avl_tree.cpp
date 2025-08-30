@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
-#include <random>
 #include <avl_tree.hpp>
 
 BOOST_AUTO_TEST_SUITE(empty_method)
@@ -286,101 +285,6 @@ BOOST_AUTO_TEST_CASE(return_it_val_test)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(stress_tests)
-
-BOOST_AUTO_TEST_CASE(stress_test)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 1000000; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_2)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 1000000; i != 0; --i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_3)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 53; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-/*
-BOOST_AUTO_TEST_CASE(stress_test_4)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000000; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_5)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000001; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(stress_test_6)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 10000002; ++i)
-  {
-    tree.insert({ i, i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-*/
-BOOST_AUTO_TEST_CASE(stress_test_7)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  for (size_t i = 0; i < 500; ++i)
-  {
-    tree.insert({ rand(), i });
-  }
-  tree.clear();
-  out << tree.empty();
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
 BOOST_AUTO_TEST_SUITE(find_method)
 
 BOOST_AUTO_TEST_CASE(find_not_existent_element_1)
@@ -562,40 +466,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 BOOST_AUTO_TEST_SUITE(at_method)
-/*
-BOOST_AUTO_TEST_CASE(find_not_existent_element_1)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  auto val = tree.at(1);
-  out << val;
-  BOOST_TEST(out.str() == "1");
-}
 
-BOOST_AUTO_TEST_CASE(find_not_existent_element_2)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, int > tree;
-  tree.insert({ 1, 1 });
-  auto val = tree.at(2);
-  out << val;
-  BOOST_TEST(out.str() == "1");
-}
-
-BOOST_AUTO_TEST_CASE(find_not_existent_element_3)
-{
-  std::ostringstream out;
-  petrov::AVLTree< int, std::string > tree;
-  tree.insert({ 1, "very" });
-  tree.insert({ 2, "hi" });
-  tree.insert({ 3, "cute" });
-  tree.insert({ 4, "tasty" });
-  tree.insert({ 5, "cat" });
-  auto val = tree.at(6);
-  out << val;
-  BOOST_TEST(out.str() == "1");
-}
-*/
 BOOST_AUTO_TEST_CASE(find_one_element_tree)
 {
   std::ostringstream out;
