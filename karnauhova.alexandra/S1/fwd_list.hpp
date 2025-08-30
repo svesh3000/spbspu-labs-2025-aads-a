@@ -320,7 +320,7 @@ namespace karnauhova
   }
 
   template< typename T >
-  void FwdList< T >::assign(size_t size, const T& value )
+  void FwdList< T >::assign(size_t size, const T& value)
   {
     FwdList< T > temp;
     auto it_temp = temp.begin();
@@ -349,7 +349,7 @@ namespace karnauhova
   {
     Node* now = fake_->next;
     Node* last = fake_;
-    while(now != fake_)
+    while (now != fake_)
     {
       if (now->data == value)
       {
