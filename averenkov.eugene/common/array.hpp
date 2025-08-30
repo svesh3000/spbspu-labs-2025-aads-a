@@ -53,7 +53,7 @@ namespace averenkov
 
   template< class T >
   Array< T >::Array(const Array& rhs):
-    data_(copy_data),
+    data_(copy_data(rhs, rhs.capacity)),
     last_(rhs.last_),
     capacity_(rhs.capacity_),
     first_(rhs.first_)
