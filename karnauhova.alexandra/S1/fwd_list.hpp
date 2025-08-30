@@ -214,13 +214,7 @@ namespace karnauhova
   FwdList< T >::FwdList(const FwdList< T >& other):
     FwdList()
   {
-    FwdList< T > temp;
-    auto it = other.begin();
-    for (size_t i = other.size(); i > 0; i--)
-    {
-      it = temp.insert(it, *it);
-    }
-    swap(temp);
+    assign(other.begin(), other.end());
   }
 
   template< typename T >
