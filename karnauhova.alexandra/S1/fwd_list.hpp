@@ -323,11 +323,12 @@ namespace karnauhova
   void FwdList< T >::assign(size_t size, const T& value )
   {
     FwdList< T > temp;
+    auto it_temp = temp.begin();
     for (size_t i = 0; i < size; i++)
     {
-      temp.push_front(value);
+      temp.insert(it_temp, value);
+      ++it_temp
     }
-    temp.reverse();
     swap(temp);
   }
 
@@ -374,7 +375,7 @@ namespace karnauhova
   {
     Node* now = fake_->next;
     Node* last = fake_;
-    while(now != fake_)
+    while (now != fake_)
     {
       if (c(now->data))
       {
