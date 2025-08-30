@@ -112,22 +112,22 @@ namespace karnauhova
   }
 
   template< typename T >
-  FwdList< T >::FwdList(size_t size, const T& value)
+  FwdList< T >::FwdList(size_t size, const T& value):
+    FwdList()
   {
     assign(size, value);
   }
 
   template< typename T >
   FwdList< T >::FwdList(std::initializer_list< T > it):
-    fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
-    size_(0)
+    FwdList()
   {
-    fake_->next = fake_;
     assign(it);
   }
 
   template< typename T >
-  FwdList< T >::FwdList(Iterator first, Iterator last)
+  FwdList< T >::FwdList(Iterator first, Iterator last):
+    FwdList()
   {
     assign(first, last);
   }
