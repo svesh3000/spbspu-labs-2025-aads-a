@@ -39,7 +39,7 @@ namespace averenkov
     void resize(size_t capac);
     void resize();
     Array< T > copy(const Array& other, size_t capacity);
-    T& copy_data(const Array& other, size_t capacity);
+    T* copy_data(const Array& other, size_t capacity);
 
   };
 
@@ -210,7 +210,7 @@ namespace averenkov
   }
 
   template< class T >
-  T& Array< T >::copy_data(const Array& other, size_t capacity)
+  T* Array< T >::copy_data(const Array& other, size_t capacity)
   {
     T* new_data = nullptr;
     try
