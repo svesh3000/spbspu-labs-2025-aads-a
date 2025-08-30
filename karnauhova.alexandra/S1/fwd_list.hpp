@@ -326,8 +326,7 @@ namespace karnauhova
     auto it_temp = temp.begin();
     for (size_t i = 0; i < size; i++)
     {
-      temp.insert(it_temp, value);
-      ++it_temp;
+      it_temp = temp.insert(it_temp, value);
     }
     swap(temp);
   }
@@ -340,8 +339,7 @@ namespace karnauhova
     auto it_temp = temp.begin();
     for (auto it = first; it != last; ++it)
     {
-      temp.insert(it_temp, *it);
-      ++it_temp;
+      it_temp = temp.insert(it_temp, *it);
     }
     swap(temp);
   }
