@@ -212,10 +212,8 @@ namespace karnauhova
 
   template< typename T >
   FwdList< T >::FwdList(const FwdList< T >& other):
-    fake_(reinterpret_cast< NodeList< T >* >(new char[sizeof(NodeList< T >)])),
-    size_(0)
+    FwdList()
   {
-    fake_->next = fake_;
     auto it = other.cbegin();
     for (size_t i = other.size(); i > 0; i--)
     {
