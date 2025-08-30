@@ -327,7 +327,7 @@ namespace karnauhova
     for (size_t i = 0; i < size; i++)
     {
       temp.insert(it_temp, value);
-      ++it_temp
+      ++it_temp;
     }
     swap(temp);
   }
