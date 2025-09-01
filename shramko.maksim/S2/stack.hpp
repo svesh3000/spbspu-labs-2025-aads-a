@@ -31,6 +31,7 @@ namespace shramko
     {
       std::string data;
       Node* next;
+
       explicit Node(const std::string& d, Node* n = nullptr);
       explicit Node(std::string&& d, Node* n = nullptr);
     };

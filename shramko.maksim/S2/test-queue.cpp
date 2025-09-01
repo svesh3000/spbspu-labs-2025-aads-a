@@ -12,6 +12,7 @@ namespace shramko
     }
     out << queue.front();
     queue.pop();
+
     while (!queue.empty())
     {
       out << " " << queue.front();

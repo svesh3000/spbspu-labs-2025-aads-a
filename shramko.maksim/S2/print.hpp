@@ -12,8 +12,10 @@ namespace shramko
     {
       return;
     }
+
     out << stack.top();
     stack.pop();
+
     while (!stack.empty())
     {
       out << " " << stack.top();

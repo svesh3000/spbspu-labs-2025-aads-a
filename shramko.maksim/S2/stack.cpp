@@ -46,6 +46,7 @@ namespace shramko
     {
       throw std::logic_error("Stack is empty");
     }
+
     Node* temp = head_;
     head_ = head_->next;
     delete temp;

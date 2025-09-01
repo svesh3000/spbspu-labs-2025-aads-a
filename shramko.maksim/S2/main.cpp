@@ -161,8 +161,8 @@ namespace
 
   bool isOverflowedAdd(long long a, long long b)
   {
-    const long long max = std::numeric_limits<long long>::max();
-    const long long min = std::numeric_limits<long long>::min();
+    const long long max = std::numeric_limits< long long >::max();
+    const long long min = std::numeric_limits< long long >::min();
     if (a > 0 && b > 0)
     {
       return (max - a < b);
@@ -176,7 +176,7 @@ namespace
 
   bool isOverflowedSubstr(long long a, long long b)
   {
-    const long long min_val = std::numeric_limits<long long>::min();
+    const long long min_val = std::numeric_limits< long long >::min();
     if (b == min_val)
     {
       return a > 0;
@@ -186,8 +186,8 @@ namespace
 
   bool isOverflowedMult(long long a, long long b)
   {
-    const long long max = std::numeric_limits<long long>::max();
-    const long long min = std::numeric_limits<long long>::min();
+    const long long max = std::numeric_limits< long long >::max();
+    const long long min = std::numeric_limits< long long >::min();
 
     if (a == 0 || b == 0)
     {
@@ -228,7 +228,7 @@ namespace
 
   bool isOverflowedDivide(long long a, long long b)
   {
-    const long long min = std::numeric_limits<long long>::min();
+    const long long min = std::numeric_limits< long long >::min();
     return (a == min && b == -1);
   }
 

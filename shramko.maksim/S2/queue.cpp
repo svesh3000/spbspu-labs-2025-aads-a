@@ -67,6 +67,7 @@ namespace shramko
     }
     Node* temp = head_;
     head_ = head_->next;
+
     if (!head_)
     {
       tail_ = nullptr;
