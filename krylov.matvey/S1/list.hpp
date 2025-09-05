@@ -75,10 +75,18 @@ namespace krylov
     size_(0)
   {
     Node< T >* current = other.head_;
-    while (current)
+    try
     {
-      push_back(current->data_);
-      current = current->next_;
+      while (current)
+      {
+        push_back(current->data_);
+        current = current->next_;
+      }
+    }
+    catch(const std::exception& e)
+    {
+      clear();
+      throw;
     }
   }
 
@@ -109,6 +117,7 @@ namespace krylov
     catch (const std::bad_alloc& e)
     {
       clear();
+      throw;
     }
   }
 
@@ -135,21 +144,7 @@ namespace krylov
     {
       return;
     }
-    if (position.current_->prev_)
-    {
-      position.current_->prev_->next_ = other.head_;
-    }
-    else
-    {
-      head_ = other.head_;
-    }
-    other.tail_->next_ = position.current_;
-    other.head_->prev_ = position.current_->prev_;
-    position.current_->prev_ = other.tail_;
-    size_ += other.size();
-    other.size_ = 0;
-    other.head_ = nullptr;
-    other.tail_ = nullptr;
+    splice(position, other, other.cbegin(), other.cend());
   }
 
   template< typename T >
@@ -165,35 +160,9 @@ namespace krylov
     {
       return;
     }
-    if (it.current_->prev_)
-    {
-      it.current_->prev_->next_ = it.current_->next_;
-    }
-    else
-    {
-      other.head_ = it.current_->next_;
-    }
-    if (it.current_->next_)
-    {
-      it.current_->next_->prev_ = it.current_->prev_;
-    }
-    else
-    {
-      other.tail_ = it.current_->prev_;
-    }
-    it.current_->prev_ = position.current_->prev_;
-    it.current_->next_ = position.current_;
-    if (position.current_->prev_)
-    {
-      position.current_->prev_->next_ = it.current_;
-    }
-    else
-    {
-      head_ = it.current_;
-    }
-    position.current_->prev_ = it.current_;
-    --other.size_;
-    ++size_;
+    ConstIterator< T > next = it;
+    ++next;
+    splice(position, other, it, next);
   }
 
   template< typename T >
