@@ -29,7 +29,7 @@ namespace krylov
     Node< T >* current_;
     const List< T >* list_;
     friend class List< T >;
-    Iterator(Node< T >* node) noexcept;
+    explicit Iterator(Node< T >* node) noexcept;
     Iterator(Node< T >* node, const List< T >* list) noexcept;
   };
 

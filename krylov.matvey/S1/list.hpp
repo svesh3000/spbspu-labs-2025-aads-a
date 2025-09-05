@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include <cstddef>
 #include <iterator>
+#include <functional>
 #include <stdexcept>
 #include "list-node.hpp"
 #include "list-iterators.hpp"
@@ -255,7 +256,7 @@ namespace krylov
   template< typename T >
   void List< T >::remove(const T& value) noexcept
   {
-    remove_if([&](const T& x) { return value == x; });
+    remove_if(std::bind(std::equal_to< T >(), std::placeholders::_1, value));
   }
 
   template< typename T >
