@@ -27,13 +27,11 @@ int main(int argc, char* argv[])
     std::cerr << "No such file\n";
     return 1;
   }
-
   if (dict.empty())
   {
     std::cout << "<EMPTY>\n";
     return 0;
   }
-
   try
   {
     KeySum func;
