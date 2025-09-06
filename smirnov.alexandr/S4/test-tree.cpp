@@ -2,13 +2,13 @@
 #include <tree/avlTee.hpp>
 
 using namespace smirnov;
+
 BOOST_AUTO_TEST_CASE(EmptyTreeTest)
 {
   AvlTree< int, int > tree;
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
-  BOOST_TEST(&*tree.cbegin() == nullptr);
-  BOOST_TEST(&*tree.cend() == nullptr);
+  BOOST_TEST((tree.cbegin() == tree.cend()));
 }
 
 BOOST_AUTO_TEST_CASE(InsertAndFindTest)
@@ -33,10 +33,10 @@ BOOST_AUTO_TEST_CASE(InsertAndFindTest)
   }
   BOOST_TEST(caught);
   auto it = tree.find(5);
-  BOOST_TEST(&*it != nullptr);
+  BOOST_TEST((it != tree.cend()));
   BOOST_TEST(it->second == "five");
   auto it_notfound = tree.find(100);
-  BOOST_TEST(&*it_notfound == nullptr);
+  BOOST_TEST((it_notfound == tree.cend()));
 }
 
 BOOST_AUTO_TEST_CASE(IteratorTraversalTest)
@@ -72,11 +72,11 @@ BOOST_AUTO_TEST_CASE(CopyConstructorAndAssignmentTest)
   tree1[1] = "one";
   AvlTree< int, std::string > tree2(tree1);
   BOOST_TEST(tree2.size() == 1);
-  BOOST_TEST(&*tree2.find(1) != nullptr);
+  BOOST_TEST((tree2.find(1) != tree2.cend()));
   AvlTree< int, std::string > tree3;
   tree3 = tree1;
   BOOST_TEST(tree3.size() == 1);
-  BOOST_TEST(&*tree3.find(1) != nullptr);
+  BOOST_TEST((tree3.find(1) != tree3.cend()));
 }
 
 BOOST_AUTO_TEST_CASE(MoveConstructorAndAssignmentTest)
@@ -102,6 +102,5 @@ BOOST_AUTO_TEST_CASE(ClearTest)
   tree.clear();
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
-  BOOST_TEST(&*tree.cbegin() == nullptr);
-  BOOST_TEST(&*tree.cend() == nullptr);
+  BOOST_TEST((tree.cbegin() == tree.cend()));
 }
