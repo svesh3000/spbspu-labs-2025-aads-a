@@ -3,23 +3,8 @@
 
 namespace shramko
 {
-  QueueString::Node::Node(const std::string& d, Node* n):
-    data(d),
-    next(n)
-  {}
-
-  QueueString::Node::Node(std::string&& d, Node* n):
-    data(std::move(d)),
-    next(n)
-  {}
-
-  QueueString::QueueString() noexcept:
-    head_(nullptr),
-    tail_(nullptr),
-    size_(0)
-  {}
-
-  QueueString::~QueueString()
+  template < typename T >
+  Queue< T >::~Queue()
   {
     while (head_)
     {
@@ -29,7 +14,63 @@ namespace shramko
     }
   }
 
-  void QueueString::push(const std::string& data)
+  template < typename T >
+  Queue< T >::Queue(const Queue& other)
+    : head_(nullptr), tail_(nullptr), size_(0)
+  {
+    Node** current = &head_;
+    for (Node* src = other.head_; src; src = src->next)
+    {
+      *current = new Node(src->data);
+      if (!tail_) tail_ = *current;
+      current = &(*current)->next;
+      ++size_;
+    }
+  }
+
+  template < typename T >
+  Queue< T >& Queue< T >::operator=(const Queue& other)
+  {
+    if (this != &other)
+    {
+      Queue temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template < typename T >
+  Queue< T >::Queue(Queue&& other) noexcept
+    : head_(other.head_), tail_(other.tail_), size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.size_ = 0;
+  }
+
+  template < typename T >
+  Queue< T >& Queue< T >::operator=(Queue&& other) noexcept
+  {
+    if (this != &other)
+    {
+      while (head_)
+      {
+        Node* temp = head_;
+        head_ = head_->next;
+        delete temp;
+      }
+      head_ = other.head_;
+      tail_ = other.tail_;
+      size_ = other.size_;
+      other.head_ = nullptr;
+      other.tail_ = nullptr;
+      other.size_ = 0;
+    }
+    return *this;
+  }
+
+  template < typename T >
+  void Queue< T >::push(const T& data)
   {
     Node* newNode = new Node(data);
     if (tail_)
@@ -41,10 +82,11 @@ namespace shramko
       head_ = newNode;
     }
     tail_ = newNode;
-    size_++;
+    ++size_;
   }
 
-  void QueueString::push(std::string&& data)
+  template < typename T >
+  void Queue< T >::push(T&& data)
   {
     Node* newNode = new Node(std::move(data));
     if (tail_)
@@ -56,106 +98,11 @@ namespace shramko
       head_ = newNode;
     }
     tail_ = newNode;
-    size_++;
+    ++size_;
   }
 
-  void QueueString::pop()
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Queue is empty");
-    }
-    Node* temp = head_;
-    head_ = head_->next;
-
-    if (!head_)
-    {
-      tail_ = nullptr;
-    }
-    delete temp;
-    size_--;
-  }
-
-  size_t QueueString::size() const noexcept
-  {
-    return size_;
-  }
-
-  bool QueueString::empty() const noexcept
-  {
-    return size_ == 0;
-  }
-
-  std::string& QueueString::front()
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Queue is empty");
-    }
-    return head_->data;
-  }
-
-  const std::string& QueueString::front() const
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Queue is empty");
-    }
-    return head_->data;
-  }
-
-  void QueueString::swap(QueueString& other) noexcept
-  {
-    std::swap(head_, other.head_);
-    std::swap(tail_, other.tail_);
-    std::swap(size_, other.size_);
-  }
-
-  QueueOfQueueString::Node::Node(QueueString& d, Node* n):
-    data(),
-    next(n)
-  {
-    shramko::QueueString temp;
-    while (!d.empty())
-    {
-      temp.push(d.front());
-      d.pop();
-    }
-    data.swap(temp);
-  }
-
-  QueueOfQueueString::QueueOfQueueString() noexcept:
-    head_(nullptr),
-    tail_(nullptr),
-    size_(0)
-  {}
-
-  QueueOfQueueString::~QueueOfQueueString()
-  {
-    while (head_)
-    {
-      Node* temp = head_;
-      head_ = head_->next;
-      delete temp;
-    }
-  }
-
-  void QueueOfQueueString::push(QueueString& data)
-  {
-    Node* newNode = new Node(data);
-    if (tail_)
-    {
-      tail_->next = newNode;
-    }
-    else
-    {
-      head_ = newNode;
-    }
-    tail_ = newNode;
-    size_++;
-  }
-
-  void QueueOfQueueString::pop()
+  template < typename T >
+  void Queue< T >::pop()
   {
     if (!head_)
     {
@@ -168,20 +115,23 @@ namespace shramko
       tail_ = nullptr;
     }
     delete temp;
-    size_--;
+    --size_;
   }
 
-  size_t QueueOfQueueString::size() const noexcept
+  template < typename T >
+  size_t Queue< T >::size() const noexcept
   {
     return size_;
   }
 
-  bool QueueOfQueueString::empty() const noexcept
+  template < typename T >
+  bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
-  QueueString& QueueOfQueueString::front()
+  template < typename T >
+  T& Queue< T >::front()
   {
     if (!head_)
     {
@@ -190,7 +140,8 @@ namespace shramko
     return head_->data;
   }
 
-  const QueueString& QueueOfQueueString::front() const
+  template < typename T >
+  const T& Queue< T >::front() const
   {
     if (!head_)
     {
@@ -199,10 +150,14 @@ namespace shramko
     return head_->data;
   }
 
-  void QueueOfQueueString::swap(QueueOfQueueString& other) noexcept
+  template < typename T >
+  void Queue< T >::swap(Queue& other) noexcept
   {
     std::swap(head_, other.head_);
     std::swap(tail_, other.tail_);
     std::swap(size_, other.size_);
   }
+
+  template class Queue<std::string>;
+  template class Queue<Queue<std::string>>;
 }

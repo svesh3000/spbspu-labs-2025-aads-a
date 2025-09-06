@@ -3,22 +3,8 @@
 
 namespace shramko
 {
-  StackString::Node::Node(const std::string& d, Node* n):
-    data(d),
-    next(n)
-  {}
-
-  StackString::Node::Node(std::string&& d, Node* n):
-    data(std::move(d)),
-    next(n)
-  {}
-
-  StackString::StackString() noexcept:
-    head_(nullptr),
-    size_(0)
-  {}
-
-  StackString::~StackString()
+  template < typename T >
+  Stack< T >::~Stack()
   {
     while (head_)
     {
@@ -28,92 +14,73 @@ namespace shramko
     }
   }
 
-  void StackString::push(const std::string& data)
+  template < typename T >
+  Stack< T >::Stack(const Stack& other)
+    : head_(nullptr), size_(0)
   {
-    head_ = new Node(data, head_);
-    size_++;
+    Node** current = &head_;
+    for (Node* src = other.head_; src; src = src->next)
+    {
+      *current = new Node(src->data);
+      current = &(*current)->next;
+      ++size_;
+    }
   }
 
-  void StackString::push(std::string&& data)
+  template < typename T >
+  Stack< T >& Stack< T >::operator=(const Stack& other)
+  {
+    if (this != &other)
+    {
+      Stack temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template < typename T >
+  Stack< T >::Stack(Stack&& other) noexcept
+    : head_(other.head_), size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.size_ = 0;
+  }
+
+  template < typename T >
+  Stack< T >& Stack< T >::operator=(Stack&& other) noexcept
+  {
+    if (this != &other)
+    {
+      while (head_)
+      {
+        Node* temp = head_;
+        head_ = head_->next;
+        delete temp;
+      }
+      head_ = other.head_;
+      size_ = other.size_;
+      other.head_ = nullptr;
+      other.size_ = 0;
+    }
+    return *this;
+  }
+
+  template < typename T >
+  void Stack< T >::push(const T& data)
+  {
+    head_ = new Node(data, head_);
+    ++size_;
+  }
+
+  template < typename T >
+  void Stack< T >::push(T&& data)
   {
     head_ = new Node(std::move(data), head_);
-    size_++;
+    ++size_;
   }
 
-  void StackString::pop()
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Stack is empty");
-    }
-
-    Node* temp = head_;
-    head_ = head_->next;
-    delete temp;
-    size_--;
-  }
-
-  size_t StackString::size() const noexcept
-  {
-    return size_;
-  }
-
-  bool StackString::empty() const noexcept
-  {
-    return size_ == 0;
-  }
-
-  std::string& StackString::top()
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Stack is empty");
-    }
-    return head_->data;
-  }
-
-  const std::string& StackString::top() const
-  {
-    if (!head_)
-    {
-      throw std::logic_error("Stack is empty");
-    }
-    return head_->data;
-  }
-
-  void StackString::swap(StackString& other) noexcept
-  {
-    std::swap(head_, other.head_);
-    std::swap(size_, other.size_);
-  }
-
-  StackLongLong::Node::Node(long long d, Node* n):
-    data(d),
-    next(n)
-  {}
-
-  StackLongLong::StackLongLong() noexcept:
-    head_(nullptr),
-    size_(0)
-  {}
-
-  StackLongLong::~StackLongLong()
-  {
-    while (head_)
-    {
-      Node* temp = head_;
-      head_ = head_->next;
-      delete temp;
-    }
-  }
-
-  void StackLongLong::push(long long data)
-  {
-    head_ = new Node(data, head_);
-    size_++;
-  }
-
-  void StackLongLong::pop()
+  template < typename T >
+  void Stack< T >::pop()
   {
     if (!head_)
     {
@@ -122,20 +89,23 @@ namespace shramko
     Node* temp = head_;
     head_ = head_->next;
     delete temp;
-    size_--;
+    --size_;
   }
 
-  size_t StackLongLong::size() const noexcept
+  template < typename T >
+  size_t Stack< T >::size() const noexcept
   {
     return size_;
   }
 
-  bool StackLongLong::empty() const noexcept
+  template < typename T >
+  bool Stack< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
-  long long& StackLongLong::top()
+  template < typename T >
+  T& Stack< T >::top()
   {
     if (!head_)
     {
@@ -144,7 +114,8 @@ namespace shramko
     return head_->data;
   }
 
-  const long long& StackLongLong::top() const
+  template < typename T >
+  const T& Stack< T >::top() const
   {
     if (!head_)
     {
@@ -153,9 +124,13 @@ namespace shramko
     return head_->data;
   }
 
-  void StackLongLong::swap(StackLongLong& other) noexcept
+  template < typename T >
+  void Stack< T >::swap(Stack& other) noexcept
   {
     std::swap(head_, other.head_);
     std::swap(size_, other.size_);
   }
+
+  template class Stack< std::string >;
+  template class Stack< long long >;
 }
