@@ -59,16 +59,18 @@ int main()
 
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
-    if (listOfPairs.begin()->second.size() != 0)
-    {
-      std::cout << *std::next(listOfPairs.begin()->second.begin(), i);
-    }
-    for (auto it = ++listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
+    bool isSpaceAvailable = false;
+    for (auto it = listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
       if (it->second.size() > i)
       {
+        if (isSpaceAvailable)
+        {
+          std::cout << " ";
+        }
         auto current = std::next(it->second.begin(), i);
-        std::cout << " " << *current;
+        std::cout << *current;
+        isSpaceAvailable = true;
       }
     }
     if ((--(listOfPairs.end()))->second.size() <= i)
@@ -78,6 +80,7 @@ int main()
     }
     std::cout << " " << *(std::next((--(listOfPairs.end()))->second.begin(), i)) << "\n";
   }
+
   if (wasOverflow)
   {
     std::cerr << "Overflow!\n";
