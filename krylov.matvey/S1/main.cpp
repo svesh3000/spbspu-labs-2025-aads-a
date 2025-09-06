@@ -7,7 +7,7 @@ int main()
 {
   using namespace krylov;
   List< std::pair< std::string, List< unsigned long long > > > listOfPairs;
-  std::string line = "";
+  std::string line;
   std::cin >> line;
   size_t maxSizeOfNumList = 0;
   while (!std::cin.eof())
@@ -15,15 +15,12 @@ int main()
     std::pair< std::string, List< unsigned long long > > pair;
     pair.first = line;
     std::cin >> line;
-    while (!std::cin.eof() && isdigit(line[0]))
+    while (!std::cin.eof() && std::isdigit(line[0]))
     {
-      pair.second.push_back(strtoull(line.c_str(), nullptr, 0));
+      pair.second.push_back(std::strtoull(line.c_str(), nullptr, 0));
       std::cin >> line;
     }
-    if (maxSizeOfNumList < pair.second.size())
-    {
-      maxSizeOfNumList = pair.second.size();
-    }
+    maxSizeOfNumList = std::max(pair.second.size(), maxSizeOfNumList);
     listOfPairs.push_back(pair);
   }
   if (listOfPairs.empty())
@@ -62,18 +59,13 @@ int main()
 
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
-    bool isSpaceAvailable = false;
-    for (auto it = listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
+    std::cout << *std::next(listOfPairs.begin()->second.begin(), i);
+    for (auto it = ++listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
       if (it->second.size() > i)
       {
-        if (isSpaceAvailable)
-        {
-          std::cout << " ";
-        }
         auto current = std::next(it->second.begin(), i);
         std::cout << *current;
-        isSpaceAvailable = true;
       }
     }
     if ((--(listOfPairs.end()))->second.size() <= i)

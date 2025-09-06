@@ -60,13 +60,9 @@ namespace krylov
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator++() noexcept
   {
-    if (current_ && current_->next_)
+    if (current_)
     {
       current_ = current_->next_;
-    }
-    else
-    {
-      current_ = nullptr;
     }
     return *this;
   }
@@ -82,7 +78,7 @@ namespace krylov
   template< typename T >
   ConstIterator< T >& ConstIterator< T >::operator--() noexcept
   {
-    if (!current_ && list_->head_)
+    if (!current_ && list_)
     {
       current_ = list_->tail_;
     }

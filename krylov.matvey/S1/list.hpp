@@ -271,13 +271,7 @@ namespace krylov
     {
       return *this;
     }
-    List< T > temp;
-    Node< T >* current = other.head_;
-    while (current)
-    {
-      temp.push_back(current->data_);
-      current = current->next_;
-    }
+    List< T > temp(other);
     swap(temp);
     return *this;
   }
@@ -290,12 +284,7 @@ namespace krylov
       return *this;
     }
     clear();
-    head_ = other.head_;
-    tail_ = other.tail_;
-    size_ = other.size_;
-    other.head_ = nullptr;
-    other.tail_ = nullptr;
-    other.size_ = 0;
+    swap(other);
     return *this;
   }
 
