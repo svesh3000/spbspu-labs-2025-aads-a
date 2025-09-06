@@ -61,14 +61,14 @@ int main()
   {
     if (listOfPairs.begin()->second.size() > i)
     {
-      std::cout << *std::next(listOfPairs.begin()->second.begin(), i) << " ";
+      std::cout << *std::next(listOfPairs.begin()->second.begin(), i);
     }
     for (auto it = ++listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
       if (it->second.size() > i)
       {
         auto current = std::next(it->second.begin(), i);
-        std::cout << *current;
+        std::cout << " " << *current;
       }
     }
     if ((--(listOfPairs.end()))->second.size() <= i)
