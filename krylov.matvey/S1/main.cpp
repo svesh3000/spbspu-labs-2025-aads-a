@@ -59,7 +59,10 @@ int main()
 
   for (size_t i = 0; i < maxSizeOfNumList; ++i)
   {
-    std::cout << *std::next(listOfPairs.begin()->second.begin(), i);
+    if (listOfPairs.begin()->second.size() > i)
+    {
+      std::cout << *std::next(listOfPairs.begin()->second.begin(), i) << " ";
+    }
     for (auto it = ++listOfPairs.begin(); it != --(listOfPairs.end()); ++it)
     {
       if (it->second.size() > i)
