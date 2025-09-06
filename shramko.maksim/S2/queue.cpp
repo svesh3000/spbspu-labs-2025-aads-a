@@ -4,6 +4,15 @@
 namespace shramko
 {
   template < typename T >
+  Queue< T >::Node::Node(const T& d, Node* n) : data(d), next(n) {}
+
+  template < typename T >
+  Queue< T >::Node::Node(T&& d, Node* n) : data(std::move(d)), next(n) {}
+
+  template < typename T >
+  Queue< T >::Queue() noexcept : head_(nullptr), tail_(nullptr), size_(0) {}
+
+  template < typename T >
   Queue< T >::~Queue()
   {
     while (head_)
@@ -15,8 +24,7 @@ namespace shramko
   }
 
   template < typename T >
-  Queue< T >::Queue(const Queue& other)
-    : head_(nullptr), tail_(nullptr), size_(0)
+  Queue< T >::Queue(const Queue& other) : head_(nullptr), tail_(nullptr), size_(0)
   {
     Node** current = &head_;
     for (Node* src = other.head_; src; src = src->next)
@@ -40,8 +48,7 @@ namespace shramko
   }
 
   template < typename T >
-  Queue< T >::Queue(Queue&& other) noexcept
-    : head_(other.head_), tail_(other.tail_), size_(other.size_)
+  Queue< T >::Queue(Queue&& other) noexcept : head_(other.head_), tail_(other.tail_), size_(other.size_)
   {
     other.head_ = nullptr;
     other.tail_ = nullptr;
@@ -158,6 +165,6 @@ namespace shramko
     std::swap(size_, other.size_);
   }
 
-  template class Queue<std::string>;
-  template class Queue<Queue<std::string>>;
+  template class Queue< std::string >;
+  template class Queue< Queue< std::string > >;
 }

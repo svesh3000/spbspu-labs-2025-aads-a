@@ -4,6 +4,15 @@
 namespace shramko
 {
   template < typename T >
+  Stack< T >::Node::Node(const T& d, Node* n) : data(d), next(n) {}
+
+  template < typename T >
+  Stack< T >::Node::Node(T&& d, Node* n) : data(std::move(d)), next(n) {}
+
+  template < typename T >
+  Stack< T >::Stack() noexcept : head_(nullptr), size_(0) {}
+
+  template < typename T >
   Stack< T >::~Stack()
   {
     while (head_)
@@ -15,8 +24,7 @@ namespace shramko
   }
 
   template < typename T >
-  Stack< T >::Stack(const Stack& other)
-    : head_(nullptr), size_(0)
+  Stack< T >::Stack(const Stack& other) : head_(nullptr), size_(0)
   {
     Node** current = &head_;
     for (Node* src = other.head_; src; src = src->next)
@@ -39,8 +47,7 @@ namespace shramko
   }
 
   template < typename T >
-  Stack< T >::Stack(Stack&& other) noexcept
-    : head_(other.head_), size_(other.size_)
+  Stack< T >::Stack(Stack&& other) noexcept : head_(other.head_), size_(other.size_)
   {
     other.head_ = nullptr;
     other.size_ = 0;
