@@ -4,7 +4,6 @@
 #include <tree/avlTee.hpp>
 #include "key_sum.hpp"
 
-
 namespace
 {
   using Tree = smirnov::AvlTree< int, std::string >;
@@ -22,7 +21,8 @@ namespace
     res = tree.traverse_breadth(res);
   }
 }
-int main(int argc, char* argv[])
+
+int main(int argc, char * argv[])
 {
   using namespace smirnov;
   AvlTree< int, std::string > dict;
