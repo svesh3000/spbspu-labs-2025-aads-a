@@ -4,6 +4,8 @@
 
 namespace sveshnikov
 {
+  using GraphsMap_t = std::unordered_map< std::string, sveshnikov::Graph >;
+
   void graph();
   void vertexes();
   void outbound();

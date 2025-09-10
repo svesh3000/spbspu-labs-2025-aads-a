@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <functional>
+#include <limits>
 #include "commands.hpp"
-#include "graph.hpp"
 
-std::unordered_map< std::string, sveshnikov::Graph > loadGraphs(char *filename);
+sveshnikov::GraphsMap_t loadGraphs(char *filename);
 
 int main(int argc, char **argv)
 {
@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     std::cerr << "ERROR: File is not specified!" << '\n';
     return 1;
   }
-  std::unordered_map< std::string, Graph > graph_map;
+  GraphsMap_t graph_map;
   try
   {
     graph_map = loadGraphs(argv[1]);
@@ -36,25 +36,44 @@ int main(int argc, char **argv)
   cmds["merge"] = std::bind(merge);
   cmds["extract"] = std::bind(extract);
 
+  std::string cmd;
+  while (std::cin >> cmd)
+  {
+    try
+    {
+      cmds.at(cmd)();
+    }
+    catch (const std::out_of_range &e)
+    {
+      std::cout << "<INVALID COMMAND>" << '\n';
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+    catch (std::exception &e)
+    {
+      std::cerr << e.what() << '\n';
+      return 1;
+    }
+  }
   return 0;
 }
 
-std::unordered_map< std::string, sveshnikov::Graph > loadGraphs(char *filename)
+sveshnikov::GraphsMap_t loadGraphs(char *filename)
 {
+  using namespace sveshnikov;
   std::ifstream in(filename);
   if (!in.is_open())
   {
     throw std::runtime_error("ERROR: Cannot open file!");
   }
 
-  std::unordered_map< std::string, sveshnikov::Graph > graph_map;
+  GraphsMap_t graph_map;
   std::string graph_name;
   size_t edges_count;
   while (in >> graph_name >> edges_count)
   {
     std::string vertex_name1, vertex_name2;
     unsigned int weight = 0;
-    sveshnikov::Graph graph;
+    Graph graph;
     for (size_t i = 0; i != edges_count; i++)
     {
       in >> vertex_name1 >> vertex_name2 >> weight;
