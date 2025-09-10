@@ -26,15 +26,15 @@ int main(int argc, char **argv)
   }
 
   std::unordered_map< std::string, std::function< void() > > cmds;
-  cmds["graph"] = std::bind(graph);
-  cmds["vertexes"] = std::bind(vertexes);
-  cmds["outbound"] = std::bind(outbound);
-  cmds["inbound"] = std::bind(inbound);
-  cmds["bind"] = std::bind(bind);
-  cmds["cut"] = std::bind(cut);
-  cmds["create"] = std::bind(create);
-  cmds["merge"] = std::bind(merge);
-  cmds["extract"] = std::bind(extract);
+  cmds["graph"] = std::bind(graph, cref(graph_map), ref(std::cout));
+  cmds["vertexes"] = std::bind(vertexes, cref(graph_map), ref(std::cin), ref(std::cout));
+  cmds["outbound"] = std::bind(outbound, cref(graph_map), ref(std::cin), ref(std::cout));
+  cmds["inbound"] = std::bind(inbound, cref(graph_map), ref(std::cin), ref(std::cout));
+  cmds["bind"] = std::bind(bind, ref(graph_map), ref(std::cin));
+  cmds["cut"] = std::bind(cut, ref(graph_map), ref(std::cin));
+  cmds["create"] = std::bind(create, ref(graph_map), ref(std::cin));
+  cmds["merge"] = std::bind(merge, ref(graph_map), ref(std::cin));
+  cmds["extract"] = std::bind(extract, ref(graph_map), ref(std::cin));
 
   std::string cmd;
   while (std::cin >> cmd)
