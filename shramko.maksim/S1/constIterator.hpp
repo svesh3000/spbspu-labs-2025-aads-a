@@ -2,6 +2,7 @@
 #define CONSTITERATOR_HPP
 
 #include <iterator>
+
 #include "FwdListNode.hpp"
 
 namespace shramko

@@ -8,8 +8,14 @@ namespace shramko
   {
     T dataValue;
     ListNode< T >* nextPtr;
-    ListNode(const T& val):
+
+    explicit ListNode(const T& val):
       dataValue(val),
+      nextPtr(nullptr)
+    {}
+
+    explicit ListNode(T&& val):
+      dataValue(std::move(val)),
       nextPtr(nullptr)
     {}
   };

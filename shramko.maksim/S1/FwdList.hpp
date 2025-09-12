@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <utility>
 #include <stdexcept>
+
 #include "FwdListNode.hpp"
 #include "constIterator.hpp"
 #include "iterator.hpp"
@@ -17,19 +18,21 @@ namespace shramko
   public:
     friend class ConstIterator< T >;
     friend class Iterator< T >;
+
     using const_iterator = ConstIterator< T >;
     using iterator = Iterator< T >;
 
     ForwardList();
-    ~ForwardList();
+    ~ForwardList() noexcept;
     ForwardList(const ForwardList< T >& other);
     ForwardList(ForwardList< T >&& other) noexcept;
     ForwardList< T >& operator=(ForwardList< T > other);
-    ForwardList< T >& operator=(ForwardList<T>&& other) noexcept;
+    ForwardList< T >& operator=(ForwardList< T >&& other) noexcept;
 
-
-    iterator begin() const noexcept;
-    iterator end() const noexcept;
+    iterator begin() noexcept;
+    iterator end() noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
 
@@ -37,14 +40,17 @@ namespace shramko
     const T& getBack() const;
     T& getFront();
     T& getBack();
+
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
 
     void addToFront(const T& value);
     void addToFront(T&& value);
     void removeFront();
+
     void swapLists(ForwardList< T >& other);
     void clearAll() noexcept;
+
     void addToBack(const T& value);
     void addToBack(T&& value);
 
@@ -53,11 +59,10 @@ namespace shramko
     ListNode< T >* tailNode_;
     size_t currentSize_;
 
-    void insertFrontNode(ListNode< T >* newNode);
+    void insertFrontNode(ListNode< T >* newNode) noexcept;
     void insertBackNode(ListNode< T >* newNode);
   };
 }
-
 
 template< typename T >
 shramko::ForwardList< T >::ForwardList():
@@ -96,7 +101,7 @@ shramko::ForwardList< T >& shramko::ForwardList< T >::operator=(ForwardList< T >
 }
 
 template< typename T >
-shramko::ForwardList< T >& shramko::ForwardList< T >::operator=(ForwardList&& other) noexcept
+shramko::ForwardList< T >& shramko::ForwardList< T >::operator=(ForwardList< T >&& other) noexcept
 {
   if (this != &other)
   {
@@ -111,25 +116,43 @@ shramko::ForwardList< T >& shramko::ForwardList< T >::operator=(ForwardList&& ot
 }
 
 template< typename T >
-shramko::ForwardList< T >::~ForwardList()
+shramko::ForwardList< T >::~ForwardList() noexcept
 {
   clearAll();
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::begin() const noexcept
+typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::begin() noexcept
 {
   return iterator(headNode_);
 }
 
 template< typename T >
-typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::end() const noexcept
+typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::end() noexcept
 {
   if (currentSize_ == 0)
   {
     return iterator(nullptr);
   }
   iterator it(tailNode_->nextPtr);
+  it.isFirstPass_ = false;
+  return it;
+}
+
+template< typename T >
+typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::begin() const noexcept
+{
+  return const_iterator(headNode_);
+}
+
+template< typename T >
+typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::end() const noexcept
+{
+  if (currentSize_ == 0)
+  {
+    return const_iterator(nullptr);
+  }
+  const_iterator it(tailNode_->nextPtr);
   it.isFirstPass_ = false;
   return it;
 }
@@ -175,13 +198,21 @@ const T& shramko::ForwardList< T >::getBack() const
 template< typename T >
 T& shramko::ForwardList< T >::getFront()
 {
-  return const_cast< T& >(static_cast< const ForwardList* >(this)->getFront());
+  if (isEmpty())
+  {
+    throw std::logic_error("List is empty!");
+  }
+  return headNode_->dataValue;
 }
 
 template< typename T >
 T& shramko::ForwardList< T >::getBack()
 {
-  return const_cast< T& >(static_cast< const ForwardList* >(this)->getBack());
+  if (isEmpty())
+  {
+    throw std::logic_error("List is empty!");
+  }
+  return tailNode_->dataValue;
 }
 
 template< typename T >
@@ -197,7 +228,7 @@ size_t shramko::ForwardList< T >::getSize() const noexcept
 }
 
 template< typename T >
-void shramko::ForwardList< T >::insertFrontNode(ListNode< T >* newNode)
+void shramko::ForwardList< T >::insertFrontNode(ListNode< T >* newNode) noexcept
 {
   newNode->nextPtr = headNode_;
   headNode_ = newNode;
@@ -268,7 +299,7 @@ void shramko::ForwardList< T >::addToBack(T&& value)
 }
 
 template< typename T >
-void shramko::ForwardList< T >::swapLists(ForwardList& other)
+void shramko::ForwardList< T >::swapLists(ForwardList< T >& other)
 {
   std::swap(headNode_, other.headNode_);
   std::swap(tailNode_, other.tailNode_);
