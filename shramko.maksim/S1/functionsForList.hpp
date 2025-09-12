@@ -10,7 +10,7 @@
 namespace shramko
 {
   using NumberList = ForwardList< unsigned long long >;
-  using PairList = ForwardList< std::pair< std::string, NumberList >>;
+  using PairList = ForwardList< std::pair< std::string, NumberList > >;
 
   void printNames(const PairList& lists, std::ostream& out);
   bool checkSumOverflow(int a, int b);
