@@ -1,16 +1,40 @@
 #include "graph.hpp"
 
+namespace
+{
+  void sort_weights(sveshnikov::Array< unsigned int > &weights);
+
+  void sort_weights(sveshnikov::Array< unsigned int > &weights)
+  {
+    if (weights.empty())
+    {
+      return;
+    }
+    for (size_t i = 0; i < weights.getSize() - 1; i++)
+    {
+      for (size_t j = 0; j < weights.getSize() - i - 1; j++)
+      {
+        if (weights[j] > weights[j + 1])
+        {
+          std::swap(weights[j], weights[j + 1]);
+        }
+      }
+    }
+  }
+}
+
 sveshnikov::Graph::Graph(const Graph &graph1, const Graph &graph2):
   graph_(graph1.graph_),
   vertexes_(graph1.vertexes_)
 {
   for (auto i = graph2.graph_.begin(); i != graph2.graph_.end(); i++)
   {
-    auto it = graph_.find(i->first);
-    if (it != graph_.end())
+    if (graph_.find(i->first) != graph_.end())
     {
-      auto list_edges = i->second;
-      graph_[i->first].splice(graph_[i->first].cbefore_begin(), list_edges);
+      for (size_t j = 0; j < i->second.getSize(); j++)
+      {
+        graph_[i->first].push_back(i->second[j]);
+      }
     }
     else
     {
@@ -42,18 +66,45 @@ void sveshnikov::Graph::cut(const std::string &vert_out, const std::string &vert
   {
     throw std::out_of_range("ERROR: edge was not found!");
   }
-  if (*edge_it->second.cbegin() == weight)
+  for (size_t i = 0; i != edge_it->second.getSize(); i++)
   {
-    edge_it->second.erase(edge_it->second.cbegin());
-    return;
-  }
-  for (auto i = ++edge_it->second.cbegin(); i != edge_it->second.cend(); i++)
-  {
-    if (*i == weight)
+    if (edge_it->second[i] == weight)
     {
-      edge_it->second.erase(i);
+      for (size_t j = i; j != edge_it->second.getSize() - 1; j++)
+      {
+        std::swap(edge_it->second[j], edge_it->second[j + 1]);
+      }
+      edge_it->second.pop_back();
       return;
     }
   }
   throw std::out_of_range("ERROR: edge with this weight was not found!");
 }
+
+sveshnikov::Array< std::string > sveshnikov::Graph::get_vertexes() const
+{
+  Array< std::string > verts;
+  for (auto i = vertexes_.begin(); i != vertexes_.end(); i++)
+  {
+    verts.push_back(i->first);
+  }
+  return verts;
+}
+
+sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
+    sveshnikov::Graph::get_outbounds(const std::string &vert) const
+{
+  AvlTree< std::string, sveshnikov::Array< unsigned int > > outbounds;
+  for (auto i = graph_.begin(); i != graph_.end(); i++)
+  {
+    if (i->first.first == vert)
+    {
+      outbounds[i->first.second] = i->second;
+      sort_weights(outbounds[i->first.second]);
+    }
+  }
+}
+
+sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
+    sveshnikov::Graph::get_inbounds(const std::string &vert) const
+{}

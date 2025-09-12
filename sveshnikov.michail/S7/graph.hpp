@@ -23,7 +23,7 @@ namespace sveshnikov
     AvlTree< std::string, Array< unsigned int > > get_inbounds(const std::string &vert) const;
 
   private:
-    std::unordered_map< std::pair< std::string, std::string >, FwdList< unsigned int >, PairHash >
+    std::unordered_map< std::pair< std::string, std::string >, Array< unsigned int >, PairHash >
         graph_;
     AvlTree< std::string, char > vertexes_;
   };
