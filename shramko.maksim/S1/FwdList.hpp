@@ -135,7 +135,7 @@ typename shramko::ForwardList< T >::iterator shramko::ForwardList< T >::end() no
     return iterator(nullptr);
   }
   iterator it(tailNode_->nextPtr);
-  it.isFirstPass_ = false;
+  it.isAtBegin_ = false;
   return it;
 }
 
@@ -153,7 +153,7 @@ typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::en
     return const_iterator(nullptr);
   }
   const_iterator it(tailNode_->nextPtr);
-  it.isFirstPass_ = false;
+  it.isAtBegin_ = false;
   return it;
 }
 
@@ -171,7 +171,7 @@ typename shramko::ForwardList< T >::const_iterator shramko::ForwardList< T >::ce
     return const_iterator(nullptr);
   }
   const_iterator it(tailNode_->nextPtr);
-  it.isFirstPass_ = false;
+  it.isAtBegin_ = false;
   return it;
 }
 

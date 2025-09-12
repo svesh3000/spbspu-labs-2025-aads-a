@@ -6,7 +6,6 @@ void shramko::printNames(const PairList& lists, std::ostream& out)
   {
     return;
   }
-  auto it = lists.begin();
   bool isFirst = true;
   for (auto it = lists.begin(); it != lists.end(); ++it)
   {
@@ -81,7 +80,10 @@ void shramko::processLists(const PairList& lists, size_t maxLen, bool& overflow,
           {
             overflow = true;
           }
-          currentSum += currentValue;
+          else
+          {
+            currentSum += currentValue;
+          }
         }
 
         if (!firstElement)

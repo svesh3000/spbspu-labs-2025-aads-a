@@ -1,6 +1,8 @@
 #ifndef FORWARDLISTNODE_HPP
 #define FORWARDLISTNODE_HPP
 
+#include <utility>
+
 namespace shramko
 {
   template< typename T >
