@@ -61,13 +61,13 @@ void shramko::processLists(const PairList& lists, size_t maxLen, bool& overflow,
           ++it;
         }
 
-        if (*it > static_cast<unsigned long long>(std::numeric_limits<int>::max()))
+        if (*it > static_cast< unsigned long long >(std::numeric_limits< int >::max()))
         {
           overflow = true;
         }
         else
         {
-          int currentValue = static_cast<int>(*it);
+          int currentValue = static_cast< int >(*it);
           if (checkSumOverflow(currentSum, currentValue))
           {
             overflow = true;

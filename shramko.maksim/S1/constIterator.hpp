@@ -22,18 +22,18 @@ namespace shramko
 
     ConstIterator():
       node_(nullptr),
-      isFirstPass_(true)
+      isAtBegin_(true)
     {}
 
     explicit ConstIterator(ListNode< T >* node):
       node_(node),
-      isFirstPass_(true)
+      isAtBegin_(true)
     {}
 
     ConstIterator& operator++()
     {
       node_ = node_->nextPtr;
-      isFirstPass_ = false;
+      isAtBegin_ = false;
       return *this;
     }
 
@@ -56,7 +56,7 @@ namespace shramko
 
     bool operator==(const ConstIterator& other) const
     {
-      return node_ == other.node_ && isFirstPass_ == other.isFirstPass_;
+      return node_ == other.node_ && isAtBegin_ == other.isAtBegin_;
     }
 
     bool operator!=(const ConstIterator& other) const
@@ -67,7 +67,7 @@ namespace shramko
   private:
     friend class ForwardList< T >;
     ListNode< T >* node_;
-    bool isFirstPass_;
+    bool isAtBegin_;
   };
 }
 
