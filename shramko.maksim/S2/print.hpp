@@ -6,7 +6,7 @@
 
 namespace shramko
 {
-  template < typename T >
+  template< typename T >
   void outputStack(std::ostream& out, Stack< T >& stack)
   {
     if (stack.empty())

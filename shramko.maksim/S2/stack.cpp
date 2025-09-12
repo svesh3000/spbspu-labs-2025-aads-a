@@ -1,7 +1,7 @@
-#include "queue.hpp"
+#include "stack.hpp"
 
 namespace shramko
 {
-  template class Queue< std::string >;
-  template class Queue< Queue< std::string > >;
+  template class Stack< std::string >;
+  template class Stack< long long >;
 }

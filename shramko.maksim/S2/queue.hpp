@@ -4,157 +4,123 @@
 #include <cstddef>
 #include <utility>
 #include <stdexcept>
+#include "../common/FwdList.hpp"
 
 namespace shramko
 {
-  template <typename T>
+  template< typename T >
   class Queue
   {
   public:
-    Queue() noexcept : head_(nullptr), tail_(nullptr), size_(0) {}
-    ~Queue()
-    {
-      while (head_)
-      {
-        Node* temp = head_;
-        head_ = head_->next;
-        delete temp;
-      }
-    }
-    Queue(const Queue& other)
-      : head_(nullptr), tail_(nullptr), size_(0)
-    {
-      Node** current = &head_;
-      for (Node* src = other.head_; src; src = src->next)
-      {
-        *current = new Node(src->data);
-        if (!tail_) tail_ = *current;
-        current = &(*current)->next;
-        ++size_;
-      }
-    }
-    Queue(Queue&& other) noexcept
-      : head_(other.head_), tail_(other.tail_), size_(other.size_)
-    {
-      other.head_ = nullptr;
-      other.tail_ = nullptr;
-      other.size_ = 0;
-    }
-    Queue& operator=(const Queue& other)
-    {
-      if (this != &other)
-      {
-        Queue temp(other);
-        swap(temp);
-      }
-      return *this;
-    }
-    Queue& operator=(Queue&& other) noexcept
-    {
-      if (this != &other)
-      {
-        while (head_)
-        {
-          Node* temp = head_;
-          head_ = head_->next;
-          delete temp;
-        }
-        head_ = other.head_;
-        tail_ = other.tail_;
-        size_ = other.size_;
-        other.head_ = nullptr;
-        other.tail_ = nullptr;
-        other.size_ = 0;
-      }
-      return *this;
-    }
+    Queue() noexcept;
+    ~Queue() = default;
+    Queue(const Queue& other);
+    Queue(Queue&& other) noexcept;
+    Queue& operator=(const Queue& other);
+    Queue& operator=(Queue&& other) noexcept;
 
-    void push(const T& data)
-    {
-      Node* newNode = new Node(data);
-      if (tail_)
-      {
-        tail_->next = newNode;
-      }
-      else
-      {
-        head_ = newNode;
-      }
-      tail_ = newNode;
-      ++size_;
-    }
-    void push(T&& data)
-    {
-      Node* newNode = new Node(std::move(data));
-      if (tail_)
-      {
-        tail_->next = newNode;
-      }
-      else
-      {
-        head_ = newNode;
-      }
-      tail_ = newNode;
-      ++size_;
-    }
-    void pop()
-    {
-      if (!head_)
-      {
-        throw std::logic_error("Queue is empty");
-      }
-      Node* temp = head_;
-      head_ = head_->next;
-      if (!head_)
-      {
-        tail_ = nullptr;
-      }
-      delete temp;
-      --size_;
-    }
-    size_t size() const noexcept
-    {
-      return size_;
-    }
-    bool empty() const noexcept
-    {
-      return size_ == 0;
-    }
-    T& front()
-    {
-      if (!head_)
-      {
-        throw std::logic_error("Queue is empty");
-      }
-      return head_->data;
-    }
-    const T& front() const
-    {
-      if (!head_)
-      {
-        throw std::logic_error("Queue is empty");
-      }
-      return head_->data;
-    }
-    void swap(Queue& other) noexcept
-    {
-      std::swap(head_, other.head_);
-      std::swap(tail_, other.tail_);
-      std::swap(size_, other.size_);
-    }
+    void push(const T& data);
+    void push(T&& data);
+    void pop();
+    size_t size() const noexcept;
+    bool empty() const noexcept;
+    T& front();
+    const T& front() const;
+    void swap(Queue& other) noexcept;
 
   private:
-    struct Node
-    {
-      T data;
-      Node* next;
-      explicit Node(const T& d, Node* n = nullptr) : data(d), next(n) {}
-      explicit Node(T&& d, Node* n = nullptr) : data(std::move(d)), next(n) {}
-    };
-    Node* head_;
-    Node* tail_;
-    size_t size_;
+    ForwardList< T > container_;
   };
+
+
+  template< typename T >
+  Queue< T >::Queue() noexcept: container_() {}
+
+  template< typename T >
+  Queue< T >::Queue(const Queue& other): container_(other.container_) {}
+
+  template< typename T >
+  Queue< T >::Queue(Queue&& other) noexcept: container_(std::move(other.container_)) {}
+
+  template< typename T >
+  Queue< T >& Queue< T >::operator=(const Queue& other)
+  {
+    if (this != &other)
+    {
+      container_ = other.container_;
+    }
+    return *this;
+  }
+
+  template< typename T >
+  Queue< T >& Queue< T >::operator=(Queue&& other) noexcept
+  {
+    if (this != &other)
+    {
+      container_ = std::move(other.container_);
+    }
+    return *this;
+  }
+
+  template< typename T >
+  void Queue< T >::push(const T& data)
+  {
+    container_.addToBack(data);
+  }
+
+  template< typename T >
+  void Queue< T >::push(T&& data)
+  {
+    container_.addToBack(std::move(data));
+  }
+
+  template< typename T >
+  void Queue< T >::pop()
+  {
+    if (container_.isEmpty())
+    {
+      throw std::logic_error("Queue is empty");
+    }
+    container_.removeFront();
+  }
+
+  template< typename T >
+  size_t Queue< T >::size() const noexcept
+  {
+    return container_.getSize();
+  }
+
+  template< typename T >
+  bool Queue< T >::empty() const noexcept
+  {
+    return container_.isEmpty();
+  }
+
+  template< typename T >
+  T& Queue< T >::front()
+  {
+    if (container_.isEmpty())
+    {
+      throw std::logic_error("Queue is empty");
+    }
+    return container_.getFront();
+  }
+
+  template< typename T >
+  const T& Queue< T >::front() const
+  {
+    if (container_.isEmpty())
+    {
+      throw std::logic_error("Queue is empty");
+    }
+    return container_.getFront();
+  }
+
+  template< typename T >
+  void Queue< T >::swap(Queue& other) noexcept
+  {
+    container_.swapLists(other.container_);
+  }
 }
 
 #endif
