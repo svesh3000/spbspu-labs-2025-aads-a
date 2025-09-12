@@ -78,7 +78,7 @@ sveshnikov::GraphsMap_t loadGraphs(char *filename)
     for (size_t i = 0; i != edges_count; i++)
     {
       in >> vertex_name1 >> vertex_name2 >> weight;
-      graph.bind(std::make_pair(vertex_name1, vertex_name2), weight);
+      graph.bind(vertex_name1, vertex_name2, weight);
     }
     graph_map[graph_name] = graph;
   }
