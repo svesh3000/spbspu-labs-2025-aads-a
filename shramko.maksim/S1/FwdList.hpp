@@ -26,7 +26,7 @@ namespace shramko
     ~ForwardList() noexcept;
     ForwardList(const ForwardList< T >& other);
     ForwardList(ForwardList< T >&& other) noexcept;
-    ForwardList< T >& operator=(ForwardList< T > other);
+    ForwardList< T >& operator=(const ForwardList< T > other);
     ForwardList< T >& operator=(ForwardList< T >&& other) noexcept;
 
     iterator begin() noexcept;
@@ -96,7 +96,11 @@ shramko::ForwardList< T >::ForwardList(ForwardList< T >&& other) noexcept:
 template< typename T >
 shramko::ForwardList< T >& shramko::ForwardList< T >::operator=(ForwardList< T > other)
 {
-  swapLists(other);
+  if (this != &other)
+  {
+    ForwardList< T > temp(other);
+    swapLists(temp);
+  }
   return *this;
 }
 
