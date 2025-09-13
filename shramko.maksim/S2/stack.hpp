@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <utility>
 #include <stdexcept>
-#include "../common/FwdList.hpp"
+#include <FwdList.hpp>
 
 namespace shramko
 {
@@ -14,8 +14,12 @@ namespace shramko
   public:
     Stack() noexcept = default;
     ~Stack() = default;
-    Stack(const Stack& other): container_(other.container_) {}
-    Stack(Stack&& other) noexcept: container_(std::move(other.container_)) {}
+    Stack(const Stack& other):
+      container_(other.container_)
+    {}
+    Stack(Stack&& other) noexcept:
+      container_(std::move(other.container_))
+    {}
     Stack& operator=(const Stack& other)
     {
       if (this != &other)

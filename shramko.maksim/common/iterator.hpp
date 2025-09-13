@@ -2,6 +2,7 @@
 #define ITERATOR_HPP
 
 #include <iterator>
+
 #include "FwdListNode.hpp"
 #include "constIterator.hpp"
 
@@ -31,7 +32,7 @@ namespace shramko
     Iterator operator++(int)
     {
       Iterator temp = *this;
-      ConstIterator< T >::operator++();
+      ConstIterator< T >::operator++(0);
       return temp;
     }
 

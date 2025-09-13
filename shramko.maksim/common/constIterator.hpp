@@ -2,6 +2,7 @@
 #define CONSTITERATOR_HPP
 
 #include <iterator>
+
 #include "FwdListNode.hpp"
 
 namespace shramko
@@ -19,16 +20,20 @@ namespace shramko
     using pointer = const T*;
     using reference = const T&;
 
-    ConstIterator() noexcept: node_(nullptr) {}
+    ConstIterator():
+      node_(nullptr),
+      isAtBegin_(true)
+    {}
 
-    explicit ConstIterator(ListNode< T >* node) noexcept: node_(node) {}
+    explicit ConstIterator(ListNode< T >* node):
+      node_(node),
+      isAtBegin_(true)
+    {}
 
-    ConstIterator& operator++() noexcept
+    ConstIterator& operator++()
     {
-      if (node_ != nullptr)
-      {
-        node_ = node_->nextPtr;
-      }
+      node_ = node_->nextPtr;
+      isAtBegin_ = false;
       return *this;
     }
 
@@ -41,28 +46,20 @@ namespace shramko
 
     reference operator*() const
     {
-      if (node_ == nullptr)
-      {
-        throw std::logic_error("Iterator at end or invalid");
-      }
       return node_->dataValue;
     }
 
     pointer operator->() const
     {
-      if (node_ == nullptr)
-      {
-        throw std::logic_error("Iterator at end or invalid");
-      }
-      return &(node_->dataValue);
+      return &node_->dataValue;
     }
 
-    bool operator==(const ConstIterator& other) const noexcept
+    bool operator==(const ConstIterator& other) const
     {
-      return node_ == other.node_;
+      return node_ == other.node_ && isAtBegin_ == other.isAtBegin_;
     }
 
-    bool operator!=(const ConstIterator& other) const noexcept
+    bool operator!=(const ConstIterator& other) const
     {
       return !(*this == other);
     }
@@ -70,6 +67,7 @@ namespace shramko
   private:
     friend class ForwardList< T >;
     ListNode< T >* node_;
+    bool isAtBegin_;
   };
 }
 
