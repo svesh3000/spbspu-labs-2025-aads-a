@@ -1,7 +1,6 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 #include <unordered_map>
-#include <list/fwdlist-ring.hpp>
 #include <tree/tree.hpp>
 #include <array.hpp>
 #include "pair_hash.hpp"

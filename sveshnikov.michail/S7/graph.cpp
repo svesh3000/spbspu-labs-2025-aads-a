@@ -103,8 +103,20 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       sort_weights(outbounds[i->first.second]);
     }
   }
+  return outbounds;
 }
 
 sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
     sveshnikov::Graph::get_inbounds(const std::string &vert) const
-{}
+{
+  AvlTree< std::string, sveshnikov::Array< unsigned int > > inbounds;
+  for (auto i = graph_.begin(); i != graph_.end(); i++)
+  {
+    if (i->first.second == vert)
+    {
+      inbounds[i->first.first] = i->second;
+      sort_weights(inbounds[i->first.first]);
+    }
+  }
+  return inbounds;
+}
