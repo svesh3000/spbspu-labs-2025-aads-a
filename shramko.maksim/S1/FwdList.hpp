@@ -48,7 +48,7 @@ namespace shramko
     void addToFront(T&& value);
     void removeFront();
 
-    void swapLists(ForwardList< T >& other);
+    void swapLists(ForwardList< T >& other) noexcept;
     void clearAll() noexcept;
 
     void addToBack(const T& value);
@@ -299,7 +299,7 @@ void shramko::ForwardList< T >::addToBack(T&& value)
 }
 
 template< typename T >
-void shramko::ForwardList< T >::swapLists(ForwardList< T >& other)
+void shramko::ForwardList< T >::swapLists(ForwardList< T >& other) noexcept
 {
   std::swap(headNode_, other.headNode_);
   std::swap(tailNode_, other.tailNode_);
