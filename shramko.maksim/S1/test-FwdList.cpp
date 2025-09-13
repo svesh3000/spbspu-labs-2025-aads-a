@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(move_constructor)
 
   size_t size_before = original.getSize();
   shramko::ForwardList< int > moved(std::move(original));
-  
+
   BOOST_TEST(moved.getSize() == size_before);
   BOOST_TEST(original.isEmpty());
   BOOST_TEST(original.getSize() == 0);
