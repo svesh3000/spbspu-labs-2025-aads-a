@@ -60,7 +60,7 @@ namespace shramko
     size_t currentSize_;
 
     void insertFrontNode(ListNode< T >* newNode) noexcept;
-    void insertBackNode(ListNode< T >* newNode);
+    void insertBackNode(ListNode< T >* newNode) noexcept;
   };
 }
 
@@ -270,7 +270,7 @@ void shramko::ForwardList< T >::removeFront()
 }
 
 template< typename T >
-void shramko::ForwardList< T >::insertBackNode(ListNode< T >* newNode)
+void shramko::ForwardList< T >::insertBackNode(ListNode< T >* newNode) noexcept
 {
   if (!isEmpty())
   {
