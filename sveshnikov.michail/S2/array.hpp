@@ -10,17 +10,17 @@ namespace sveshnikov
   class Array
   {
   public:
-    explicit Array();
+    Array();
     Array(const Array &other);
     Array(Array &&other) noexcept;
     ~Array();
     Array< T > &operator=(const Array &other);
     Array< T > &operator=(Array &&other) noexcept;
 
-    T &front() noexcept;
-    const T &front() const noexcept;
-    T &back() noexcept;
-    const T &back() const noexcept;
+    T &front();
+    const T &front() const;
+    T &back();
+    const T &back() const;
 
     size_t getSize() const noexcept;
     bool empty() const noexcept;
@@ -99,27 +99,27 @@ namespace sveshnikov
   }
 
   template< class T >
-  const T &Array< T >::front() const noexcept
+  const T &Array< T >::front() const
   {
     assert(!empty());
     return data_[first_];
   }
 
   template< class T >
-  T &Array< T >::front() noexcept
+  T &Array< T >::front()
   {
     return const_cast< T & >(static_cast< const Array< T > & >(*this).front());
   }
 
   template< class T >
-  const T &Array< T >::back() const noexcept
+  const T &Array< T >::back() const
   {
     assert(!empty());
     return data_[(first_ + size_ - 1) % capacity_];
   }
 
   template< class T >
-  T &Array< T >::back() noexcept
+  T &Array< T >::back()
   {
     return const_cast< T & >(static_cast< const Array< T > & >(*this).back());
   }
