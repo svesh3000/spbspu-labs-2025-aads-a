@@ -61,10 +61,20 @@ void sveshnikov::inbound(const GraphsMap_t &graph_map, std::istream &in, std::os
 }
 
 void sveshnikov::bind(GraphsMap_t &graph_map, std::istream &in)
-{}
+{
+  std::string graph_name, vertex_out, vertex_in;
+  unsigned int weight = 0;
+  in >> graph_name >> vertex_out >> vertex_in >> weight;
+  graph_map.at(graph_name).bind(vertex_out, vertex_in, weight);
+}
 
 void sveshnikov::cut(GraphsMap_t &graph_map, std::istream &in)
-{}
+{
+  std::string graph_name, vertex_out, vertex_in;
+  unsigned int weight = 0;
+  in >> graph_name >> vertex_out >> vertex_in >> weight;
+  graph_map.at(graph_name).cut(vertex_out, vertex_in, weight);
+}
 
 void sveshnikov::create(GraphsMap_t &graph_map, std::istream &in)
 {}
