@@ -74,7 +74,7 @@ void sveshnikov::Graph::cut(const std::string &vert_out, const std::string &vert
       {
         std::swap(edge_it->second[j], edge_it->second[j + 1]);
       }
-      edge_it->second.pop_back();
+      graph_.erase(edge_it);
       return;
     }
   }

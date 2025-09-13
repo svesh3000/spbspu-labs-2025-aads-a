@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   }
 
   std::unordered_map< std::string, std::function< void() > > cmds;
-  cmds["graph"] = std::bind(graph, cref(graph_map), ref(std::cout));
+  cmds["graphs"] = std::bind(graphs, cref(graph_map), ref(std::cout));
   cmds["vertexes"] = std::bind(vertexes, cref(graph_map), ref(std::cin), ref(std::cout));
   cmds["outbound"] = std::bind(outbound, cref(graph_map), ref(std::cin), ref(std::cout));
   cmds["inbound"] = std::bind(inbound, cref(graph_map), ref(std::cin), ref(std::cout));

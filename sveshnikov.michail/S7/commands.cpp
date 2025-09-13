@@ -21,10 +21,11 @@ namespace
   }
 }
 
-void sveshnikov::graph(const GraphsMap_t &graph_map, std::ostream &out)
+void sveshnikov::graphs(const GraphsMap_t &graph_map, std::ostream &out)
 {
   if (graph_map.empty())
   {
+    out << '\n';
     return;
   }
   for (auto it = graph_map.begin(); it != graph_map.end(); it++)

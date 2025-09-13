@@ -6,7 +6,7 @@ namespace sveshnikov
 {
   using GraphsMap_t = std::unordered_map< std::string, sveshnikov::Graph >;
 
-  void graph(const GraphsMap_t &graph_map, std::ostream &out);
+  void graphs(const GraphsMap_t &graph_map, std::ostream &out);
   void vertexes(const GraphsMap_t &graph_map, std::istream &in, std::ostream &out);
   void outbound(const GraphsMap_t &graph_map, std::istream &in, std::ostream &out);
   void inbound(const GraphsMap_t &graph_map, std::istream &in, std::ostream &out);
