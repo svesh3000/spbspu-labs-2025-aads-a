@@ -124,11 +124,7 @@ namespace karnauhova
   template < class T >
   T& DynamicArray< T >::front()
   {
-    if (empty())
-    {
-      throw std::out_of_range("Is empty");
-    }
-    return data_[0];
+    return const_cast< T& >(static_cast< const DynamicArray< T >& >(*this).front());
   }
 
   template < class T >
@@ -144,11 +140,7 @@ namespace karnauhova
   template < class T >
   T& DynamicArray< T >::back()
   {
-    if (empty())
-    {
-      throw std::out_of_range("Is empty");
-    }
-    return data_[size_ - 1];
+    return const_cast< T& >(static_cast< const DynamicArray< T >& >(*this).back());
   }
 
   template < class T >
@@ -164,20 +156,12 @@ namespace karnauhova
   template < class T >
   T& DynamicArray< T >::operator[](size_t index)
   {
-    if (index >= size_)
-    {
-      throw std::out_of_range("Index out of range");
-    }
     return data_[index];
   }
 
   template < class T >
   const T& DynamicArray< T >::operator[](size_t index) const
   {
-    if (index >= size_)
-    {
-      throw std::out_of_range("Index out of range");
-    }
     return data_[index];
   }
 
