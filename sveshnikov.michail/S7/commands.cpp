@@ -38,7 +38,7 @@ void sveshnikov::vertexes(const GraphsMap_t &graph_map, std::istream &in, std::o
   std::string graph_name;
   in >> graph_name;
   Array< std::string > verts = graph_map.at(graph_name).get_vertexes();
-  for (auto i = 0; i < verts.getSize(); i++)
+  for (size_t i = 0; i < verts.getSize(); i++)
   {
     out << verts[i] << '\n';
   }
@@ -77,10 +77,43 @@ void sveshnikov::cut(GraphsMap_t &graph_map, std::istream &in)
 }
 
 void sveshnikov::create(GraphsMap_t &graph_map, std::istream &in)
-{}
+{
+  std::string graph_name;
+  size_t count_k = 0;
+  in >> graph_name >> count_k;
+  if (graph_map.find(graph_name) != graph_map.end())
+  {
+    throw std::out_of_range("ERROR: this graph already exists!");
+  }
+  Graph graph;
+  for (size_t i = 0; i < count_k; i++)
+  {
+    std::string vertex;
+    in >> vertex;
+    graph.add_vertex(vertex);
+  }
+  graph_map[graph_name] = graph;
+}
 
 void sveshnikov::merge(GraphsMap_t &graph_map, std::istream &in)
-{}
+{
+  std::string new_graph, old_graph1, old_graph2;
+  in >> new_graph >> old_graph1 >> old_graph2;
+  Graph graph(graph_map.at(old_graph1), graph_map.at(old_graph2));
+  graph_map[new_graph] = graph;
+}
 
 void sveshnikov::extract(GraphsMap_t &graph_map, std::istream &in)
-{}
+{
+  std::string new_graph, old_graph;
+  size_t count_k = 0;
+  in >> new_graph >> old_graph >> count_k;
+  Graph graph(graph_map.at(old_graph));
+  for (size_t i = 0; i < count_k; i++)
+  {
+    std::string vertex;
+    in >> vertex;
+    graph.add_vertex(vertex);
+  }
+  graph_map[new_graph] = graph;
+}
