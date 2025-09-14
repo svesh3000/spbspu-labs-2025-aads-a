@@ -50,6 +50,23 @@ void sveshnikov::Graph::add_vertex(const std::string &vert)
   vertexes_[vert];
 }
 
+void sveshnikov::Graph::delete_vertex(const std::string &vert)
+{
+  vertexes_.erase(vert);
+  Array< std::pair< std::string, std::string > > keys_to_remove;
+  for (auto i = graph_.begin(); i != graph_.end(); i++)
+  {
+    if (i->first.first == vert || i->first.second == vert)
+    {
+      keys_to_remove.push_back(i->first);
+    }
+  }
+  for (size_t j = 0; j < keys_to_remove.getSize(); j++)
+  {
+    graph_.erase(keys_to_remove[j]);
+  }
+}
+
 void sveshnikov::Graph::bind(const std::string &vert_out, const std::string &vert_in,
     unsigned weight)
 {
@@ -74,9 +91,14 @@ void sveshnikov::Graph::cut(const std::string &vert_out, const std::string &vert
       {
         std::swap(edge_it->second[j], edge_it->second[j + 1]);
       }
-      graph_.erase(edge_it);
+      edge_it->second.pop_back();
       return;
     }
+  }
+  if (edge_it->second.empty())
+  {
+    graph_.erase(edge_it);
+    return;
   }
   throw std::out_of_range("ERROR: edge with this weight was not found!");
 }
@@ -103,6 +125,10 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       sort_weights(outbounds[i->first.second]);
     }
   }
+  if (outbounds.empty())
+  {
+    throw std::out_of_range("ERROR: this vertex is not exist!");
+  }
   return outbounds;
 }
 
@@ -117,6 +143,10 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       inbounds[i->first.first] = i->second;
       sort_weights(inbounds[i->first.first]);
     }
+  }
+  if (inbounds.empty())
+  {
+    throw std::out_of_range("ERROR: this vertex is not exist!");
   }
   return inbounds;
 }

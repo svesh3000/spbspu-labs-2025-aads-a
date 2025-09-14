@@ -3,12 +3,17 @@
 
 namespace
 {
-  void ioBound(const sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > > &bounds,
-      std::ostream &out);
+  using Bounds_t = sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >;
 
-  void ioBound(const sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > > &bounds,
-      std::ostream &out)
+  void ioBound(const Bounds_t &bounds, std::ostream &out);
+  bool checkVertExistance(const sveshnikov::Array< std::string > &verts, const std::string &vertex);
+
+  void ioBound(const Bounds_t &bounds, std::ostream &out)
   {
+    if (bounds.empty())
+    {
+      out << '\n';
+    }
     for (auto i = bounds.begin(); i != bounds.end(); i++)
     {
       out << i->first;
@@ -19,6 +24,19 @@ namespace
       out << '\n';
     }
   }
+
+  bool checkVertExistance(const sveshnikov::Array< std::string > &verts, const std::string &vertex)
+  {
+    bool isVertExist = false;
+    for (size_t i = 0; i < verts.getSize(); i++)
+    {
+      if (verts[i] == vertex)
+      {
+        isVertExist = true;
+      }
+    }
+    return isVertExist;
+  }
 }
 
 void sveshnikov::graphs(const GraphsMap_t &graph_map, std::ostream &out)
@@ -28,7 +46,12 @@ void sveshnikov::graphs(const GraphsMap_t &graph_map, std::ostream &out)
     out << '\n';
     return;
   }
+  AvlTree< std::string, char > names;
   for (auto it = graph_map.begin(); it != graph_map.end(); it++)
+  {
+    names[it->first];
+  }
+  for (auto it = names.begin(); it != names.end(); it++)
   {
     out << it->first << '\n';
   }
@@ -39,6 +62,11 @@ void sveshnikov::vertexes(const GraphsMap_t &graph_map, std::istream &in, std::o
   std::string graph_name;
   in >> graph_name;
   Array< std::string > verts = graph_map.at(graph_name).get_vertexes();
+  if (verts.empty())
+  {
+    out << '\n';
+    return;
+  }
   for (size_t i = 0; i < verts.getSize(); i++)
   {
     out << verts[i] << '\n';
@@ -49,7 +77,7 @@ void sveshnikov::outbound(const GraphsMap_t &graph_map, std::istream &in, std::o
 {
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
-  auto outbounds = graph_map.at(graph_name).get_outbounds(vertex);
+  Bounds_t outbounds = graph_map.at(graph_name).get_outbounds(vertex);
   ioBound(outbounds, out);
 }
 
@@ -57,7 +85,7 @@ void sveshnikov::inbound(const GraphsMap_t &graph_map, std::istream &in, std::os
 {
   std::string graph_name, vertex;
   in >> graph_name >> vertex;
-  auto inbounds = graph_map.at(graph_name).get_inbounds(vertex);
+  Bounds_t inbounds = graph_map.at(graph_name).get_inbounds(vertex);
   ioBound(inbounds, out);
 }
 
@@ -110,11 +138,24 @@ void sveshnikov::extract(GraphsMap_t &graph_map, std::istream &in)
   size_t count_k = 0;
   in >> new_graph >> old_graph >> count_k;
   Graph graph(graph_map.at(old_graph));
+  Array< std::string > verts = graph.get_vertexes();
+  Array< std::string > new_verts;
   for (size_t i = 0; i < count_k; i++)
   {
     std::string vertex;
     in >> vertex;
-    graph.add_vertex(vertex);
+    if (!checkVertExistance(verts, vertex))
+    {
+      throw std::out_of_range("ERROR: there are no corresponding vertexes in the graph!");
+    }
+    new_verts.push_back(vertex);
+  }
+  for (size_t i = 0; i < verts.getSize(); i++)
+  {
+    if (!checkVertExistance(new_verts, verts[i]))
+    {
+      graph.delete_vertex(verts[i]);
+    }
   }
   graph_map[new_graph] = graph;
 }

@@ -14,6 +14,7 @@ namespace sveshnikov
     Graph(const Graph &graph1, const Graph &graph2);
 
     void add_vertex(const std::string &vert);
+    void delete_vertex(const std::string &vert);
     void bind(const std::string &vert_out, const std::string &vert_in, unsigned int weight);
     void cut(const std::string &vert_out, const std::string &vert_in, unsigned int weight);
 
