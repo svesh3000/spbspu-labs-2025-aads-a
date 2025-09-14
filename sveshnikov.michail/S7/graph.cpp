@@ -16,7 +16,7 @@ namespace
       {
         if (weights[j] > weights[j + 1])
         {
-          std::swap(weights[j], weights[j + 1]);
+          weights[j] = weights[j + 1];
         }
       }
     }
@@ -83,22 +83,22 @@ void sveshnikov::Graph::cut(const std::string &vert_out, const std::string &vert
   {
     throw std::out_of_range("ERROR: edge was not found!");
   }
-  for (size_t i = 0; i != edge_it->second.getSize(); i++)
+  Array< unsigned int > &weights = edge_it->second;
+  for (size_t i = 0; i < weights.getSize(); i++)
   {
-    if (edge_it->second[i] == weight)
+    if (weights[i] == weight)
     {
-      for (size_t j = i; j != edge_it->second.getSize() - 1; j++)
+      for (size_t j = i; j < weights.getSize() - 1; j++)
       {
-        std::swap(edge_it->second[j], edge_it->second[j + 1]);
+        weights[j] = weights[j + 1];
       }
-      edge_it->second.pop_back();
+      weights.pop_back();
+      if (weights.getSize() == 0)
+      {
+        graph_.erase(edge_it);
+      }
       return;
     }
-  }
-  if (edge_it->second.empty())
-  {
-    graph_.erase(edge_it);
-    return;
   }
   throw std::out_of_range("ERROR: edge with this weight was not found!");
 }
@@ -116,6 +116,10 @@ sveshnikov::Array< std::string > sveshnikov::Graph::get_vertexes() const
 sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
     sveshnikov::Graph::get_outbounds(const std::string &vert) const
 {
+  if (!check_vert_existance(vert))
+  {
+    throw std::out_of_range("ERROR: this vertex is not exist!");
+  }
   AvlTree< std::string, sveshnikov::Array< unsigned int > > outbounds;
   for (auto i = graph_.begin(); i != graph_.end(); i++)
   {
@@ -125,16 +129,16 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       sort_weights(outbounds[i->first.second]);
     }
   }
-  if (outbounds.empty())
-  {
-    throw std::out_of_range("ERROR: this vertex is not exist!");
-  }
   return outbounds;
 }
 
 sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
     sveshnikov::Graph::get_inbounds(const std::string &vert) const
 {
+  if (!check_vert_existance(vert))
+  {
+    throw std::out_of_range("ERROR: this vertex is not exist!");
+  }
   AvlTree< std::string, sveshnikov::Array< unsigned int > > inbounds;
   for (auto i = graph_.begin(); i != graph_.end(); i++)
   {
@@ -144,9 +148,19 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       sort_weights(inbounds[i->first.first]);
     }
   }
-  if (inbounds.empty())
-  {
-    throw std::out_of_range("ERROR: this vertex is not exist!");
-  }
+
   return inbounds;
+}
+
+bool sveshnikov::Graph::check_vert_existance(const std::string &vertex) const
+{
+  bool isVertExist = false;
+  for (auto i = vertexes_.begin(); i != vertexes_.end(); i++)
+  {
+    if (i->first == vertex)
+    {
+      isVertExist = true;
+    }
+  }
+  return isVertExist;
 }

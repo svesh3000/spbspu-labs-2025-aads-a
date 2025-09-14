@@ -6,7 +6,6 @@ namespace
   using Bounds_t = sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >;
 
   void ioBound(const Bounds_t &bounds, std::ostream &out);
-  bool checkVertExistance(const sveshnikov::Array< std::string > &verts, const std::string &vertex);
 
   void ioBound(const Bounds_t &bounds, std::ostream &out)
   {
@@ -23,19 +22,6 @@ namespace
       }
       out << '\n';
     }
-  }
-
-  bool checkVertExistance(const sveshnikov::Array< std::string > &verts, const std::string &vertex)
-  {
-    bool isVertExist = false;
-    for (size_t i = 0; i < verts.getSize(); i++)
-    {
-      if (verts[i] == vertex)
-      {
-        isVertExist = true;
-      }
-    }
-    return isVertExist;
   }
 }
 
@@ -108,12 +94,13 @@ void sveshnikov::cut(GraphsMap_t &graph_map, std::istream &in)
 void sveshnikov::create(GraphsMap_t &graph_map, std::istream &in)
 {
   std::string graph_name;
-  size_t count_k = 0;
-  in >> graph_name >> count_k;
+  in >> graph_name;
   if (graph_map.find(graph_name) != graph_map.end())
   {
     throw std::out_of_range("ERROR: this graph already exists!");
   }
+  size_t count_k = 0;
+  in >> count_k;
   Graph graph;
   for (size_t i = 0; i < count_k; i++)
   {
@@ -134,28 +121,28 @@ void sveshnikov::merge(GraphsMap_t &graph_map, std::istream &in)
 
 void sveshnikov::extract(GraphsMap_t &graph_map, std::istream &in)
 {
-  std::string new_graph, old_graph;
+  std::string new_graph_name, old_graph_name;
   size_t count_k = 0;
-  in >> new_graph >> old_graph >> count_k;
-  Graph graph(graph_map.at(old_graph));
+  in >> new_graph_name >> old_graph_name >> count_k;
+  Graph graph(graph_map.at(old_graph_name));
   Array< std::string > verts = graph.get_vertexes();
-  Array< std::string > new_verts;
+  Graph new_graph;
   for (size_t i = 0; i < count_k; i++)
   {
     std::string vertex;
     in >> vertex;
-    if (!checkVertExistance(verts, vertex))
+    if (graph.check_vert_existance(vertex))
     {
       throw std::out_of_range("ERROR: there are no corresponding vertexes in the graph!");
     }
-    new_verts.push_back(vertex);
+    new_graph.add_vertex(vertex);
   }
   for (size_t i = 0; i < verts.getSize(); i++)
   {
-    if (!checkVertExistance(new_verts, verts[i]))
+    if (!new_graph.check_vert_existance(verts[i]))
     {
       graph.delete_vertex(verts[i]);
     }
   }
-  graph_map[new_graph] = graph;
+  graph_map[new_graph_name] = graph;
 }

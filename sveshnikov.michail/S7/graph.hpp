@@ -21,6 +21,7 @@ namespace sveshnikov
     Array< std::string > get_vertexes() const;
     AvlTree< std::string, Array< unsigned int > > get_outbounds(const std::string &vert) const;
     AvlTree< std::string, Array< unsigned int > > get_inbounds(const std::string &vert) const;
+    bool check_vert_existance(const std::string &vertex) const;
 
   private:
     std::unordered_map< std::pair< std::string, std::string >, Array< unsigned int >, PairHash >
