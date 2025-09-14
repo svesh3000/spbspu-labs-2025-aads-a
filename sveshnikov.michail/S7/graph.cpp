@@ -16,7 +16,7 @@ namespace
       {
         if (weights[j] > weights[j + 1])
         {
-          weights[j] = weights[j + 1];
+          std::swap(weights[j], weights[j + 1]);
         }
       }
     }
@@ -148,7 +148,6 @@ sveshnikov::AvlTree< std::string, sveshnikov::Array< unsigned int > >
       sort_weights(inbounds[i->first.first]);
     }
   }
-
   return inbounds;
 }
 
