@@ -125,8 +125,8 @@ void sveshnikov::extract(GraphsMap_t &graph_map, std::istream &in)
   size_t count_k = 0;
   in >> new_graph_name >> old_graph_name >> count_k;
   Graph graph(graph_map.at(old_graph_name));
-  Array< std::string > verts;
-
+  Array< std::string > verts = graph.get_vertexes();
+  Graph new_graph;
   for (size_t i = 0; i < count_k; i++)
   {
     std::string vertex;
@@ -135,25 +135,13 @@ void sveshnikov::extract(GraphsMap_t &graph_map, std::istream &in)
     {
       throw std::out_of_range("ERROR: there are no corresponding vertexes in the graph!");
     }
-    verts.push_back(vertex);
+    new_graph.add_vertex(vertex);
   }
-
-  Array< std::string > all_verts = graph.get_vertexes();
-  for (size_t i = 0; i < all_verts.getSize(); i++)
+  for (size_t i = 0; i < verts.getSize(); i++)
   {
-    const std::string &v = all_verts[i];
-    bool keep = false;
-    for (size_t j = 0; j < verts.getSize(); j++)
+    if (!new_graph.check_vert_existance(verts[i]))
     {
-      if (v == verts[j])
-      {
-        keep = true;
-        break;
-      }
-    }
-    if (!keep)
-    {
-      graph.delete_vertex(v);
+      graph.delete_vertex(verts[i]);
     }
   }
   graph_map[new_graph_name] = graph;
