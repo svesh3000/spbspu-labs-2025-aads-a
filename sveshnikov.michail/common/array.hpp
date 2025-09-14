@@ -14,6 +14,7 @@ namespace sveshnikov
     Array();
     Array(const Array &other);
     Array(Array &&other) noexcept;
+    explicit Array(size_t capacity);
     ~Array();
     Array< T > &operator=(const Array &other);
     Array< T > &operator=(Array &&other) noexcept;
@@ -74,6 +75,14 @@ namespace sveshnikov
   {
     other.reset();
   }
+
+  template< class T >
+  Array< T >::Array(size_t capacity):
+    capacity_(capacity),
+    data_((capacity != 0) ? new T[capacity]{} : nullptr),
+    size_(0),
+    first_(0)
+  {}
 
   template< class T >
   Array< T >::~Array()
